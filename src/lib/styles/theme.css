@@ -1,0 +1,102 @@
+/* Civic OS Theme — adapted from Comhairle shadcn design system */
+/* Primary: #2952C0 | Accent Pink: #FC3AA8 */
+
+:root {
+  --background: #FFFFFF;
+  --foreground: #0A0A0A;
+  --card: #FFFFFF;
+  --card-foreground: #030712;
+  --popover: #FFFFFF;
+  --popover-foreground: #030712;
+  --primary: #2952C0;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F3F4F6;
+  --secondary-foreground: #252622;
+  --muted: #F3F4F6;
+  --muted-foreground: #6B7280;
+  --accent: #F3F4F6;
+  --accent-foreground: #111827;
+  --destructive: #DC2626;
+  --destructive-foreground: #FEF2F2;
+  --border: #E5E7EB;
+  --input: #E5E7EB;
+  --ring: #5B8DEF;
+  --chart-1: #4F46E5;
+  --chart-2: #0284C7;
+  --chart-3: #164E63;
+  --chart-4: #FBBF24;
+  --chart-5: #F59E0B;
+  --sidebar: #111827;
+  --sidebar-foreground: #F9FAFB;
+  --sidebar-primary: #2952C0;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #FFFFFF;
+  --sidebar-accent-foreground: #111827;
+  --sidebar-border: #FFFFFF;
+  --sidebar-ring: #2952C0;
+  --sidebar-secondary: #7DD3FC;
+  --sidebar-active-bg: #0E1F4A;
+
+  --accent-pink: #FC3AA8;
+  --accent-pink-foreground: #FFFFFF;
+
+  --font-sans: 'DM Mono', monospace;
+  --font-serif: Merriweather, serif;
+  --font-mono: 'DM Mono', monospace;
+
+  --radius: 0.5rem;
+  --radius-xs: calc(0.5rem - 6px);
+  --radius-sm: calc(0.5rem - 4px);
+  --radius-md: calc(0.5rem - 2px);
+  --radius-lg: 0.5rem;
+  --radius-xl: calc(0.5rem + 4px);
+
+  --shadow-2xs: 0px 1px 3px 0px rgb(31 67 51 / 0.02);
+  --shadow-xs: 0px 1px 3px 0px rgb(31 67 51 / 0.02);
+  --shadow-sm: 0px 1px 3px 0px rgb(31 67 51 / 0.04), 0px 1px 2px -1px rgb(31 67 51 / 0.04);
+  --shadow: 0px 1px 3px 0px rgb(31 67 51 / 0.04), 0px 1px 2px -1px rgb(31 67 51 / 0.04);
+  --shadow-md: 0px 1px 3px 0px rgb(31 67 51 / 0.04), 0px 2px 4px -1px rgb(31 67 51 / 0.04);
+  --shadow-lg: 0px 1px 3px 0px rgb(31 67 51 / 0.04), 0px 4px 6px -1px rgb(31 67 51 / 0.04);
+  --shadow-xl: 0px 1px 3px 0px rgb(31 67 51 / 0.04), 0px 8px 10px -1px rgb(31 67 51 / 0.04);
+  --shadow-2xl: 0px 1px 3px 0px rgb(31 67 51 / 0.10);
+}
+
+.dark {
+  --background: #0A0A0A;
+  --foreground: #FAFAFA;
+  --card: #111827;
+  --card-foreground: #F9FAFB;
+  --popover: #111827;
+  --popover-foreground: #F9FAFB;
+  --primary: #5B8DEF;
+  --primary-foreground: #FFFFFF;
+  --secondary: #1F2937;
+  --secondary-foreground: #F3F4F6;
+  --muted: #1F2937;
+  --muted-foreground: #9CA3AF;
+  --accent: #1F2937;
+  --accent-foreground: #F9FAFB;
+  --destructive: #EF4444;
+  --destructive-foreground: #FEF2F2;
+  --border: #374151;
+  --input: #374151;
+  --ring: #5B8DEF;
+  --chart-1: #818CF8;
+  --chart-2: #38BDF8;
+  --chart-3: #22D3EE;
+  --chart-4: #FDE68A;
+  --chart-5: #FBBF24;
+  --sidebar: #030712;
+  --sidebar-foreground: #F9FAFB;
+  --sidebar-primary: #5B8DEF;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #1F2937;
+  --sidebar-accent-foreground: #F9FAFB;
+  --sidebar-border: #374151;
+  --sidebar-ring: #5B8DEF;
+  --sidebar-secondary: #38BDF8;
+  --sidebar-active-bg: #1E3A5F;
+
+  --accent-pink: #FC3AA8;
+  --accent-pink-foreground: #FFFFFF;
+}
