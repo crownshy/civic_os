@@ -52,7 +52,7 @@
 <AppShell>
 	<div class="relative flex h-dvh flex-col bg-gradient-primary overflow-hidden">
 		<!-- Decorative ellipse -->
-		<div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/20 sm:translate-y-1/4 md:translate-y-1/3 lg:translate-y-1/2 w-[120%] aspect-2/1 rounded-t-full bg-gradient-to-b from-blue-600/30 to-transparent"></div>
+		<div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-2/5 sm:translate-y-6/9 md:translate-y-4/5 lg:translate-y-3/4  xl:translate-y-5/7 w-[160%] aspect-2/1 rounded-t-full bg-gradient-to-b from-blue-600/30 to-transparent"></div>
 
 		<!-- Scrollable content -->
 		<div class="relative z-10 flex flex-1 flex-col overflow-y-auto">
@@ -76,14 +76,20 @@
 				<h1 class="mt-3 text-center font-sans text-4xl font-bold leading-10 text-white">
 					AI and the Future of Our Communities
 				</h1>
-				{#if hasHost}
+				{#if !hasHost}
 					<div class="mt-4 flex items-center gap-2">
-						<span class="h-3.5 w-3.5 rounded-full bg-secondary/40"></span>
-						<span class="font-sans text-sm font-medium leading-4 text-secondary/80">
+						<span class="h-3.5 w-3.5 rounded-full bg-secondary"></span>
+						<span class="font-sans text-sm font-medium leading-4 text-secondary">
 							Mormon Women for Ethical Governance
 						</span>
 					</div>
+
+					{:else}
+						<div class="bg-card w-30 rounded-sm  mt-7 h-1">
+							
+						</div>	
 				{/if}
+				
 			</div>
 
 			<!-- Swipeable description carousel -->
