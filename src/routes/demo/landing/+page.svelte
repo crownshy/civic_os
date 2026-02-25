@@ -127,7 +127,7 @@
 					<input
 						bind:value={zipCode}
 						placeholder="Enter your zip code..."
-						class="w-40 bg-transparent text-center font-sans text-base font-medium text-blue-900 placeholder:text-blue-900/80 border-0 outline-none focus:ring-0"
+						class="w-50 bg-transparent text-center font-sans text-base font-medium text-blue-900 placeholder:text-blue-900/80 border-0 outline-none focus:ring-0"
 					/>
 				</div>
 				<button

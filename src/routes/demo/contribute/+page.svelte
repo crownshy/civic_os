@@ -24,6 +24,61 @@
 	const totalStatements = statements.length;
 	const milestoneInterval = 5;
 
+	// Swipe state for voting
+	let swipeStartX = $state(0);
+	let swipeStartY = $state(0);
+	let swipeDeltaX = $state(0);
+	let swiping = $state(false);
+	let swipeDirection = $state<'none' | 'agree' | 'disagree'>('none');
+	let swipeDismissed = $state(false);
+
+	const SWIPE_THRESHOLD = 80;
+
+	function handleSwipeStart(e: TouchEvent) {
+		if (swipeDismissed) return;
+		swipeStartX = e.touches[0].clientX;
+		swipeStartY = e.touches[0].clientY;
+		swipeDeltaX = 0;
+		swiping = true;
+		swipeDirection = 'none';
+	}
+
+	function handleSwipeMove(e: TouchEvent) {
+		if (!swiping || swipeDismissed) return;
+		const dx = e.touches[0].clientX - swipeStartX;
+		const dy = e.touches[0].clientY - swipeStartY;
+		// Only track horizontal swipes
+		if (Math.abs(dx) > Math.abs(dy) * 1.2) {
+			swipeDeltaX = dx;
+			swipeDirection = dx > SWIPE_THRESHOLD ? 'agree' : dx < -SWIPE_THRESHOLD ? 'disagree' : 'none';
+		}
+	}
+
+	function handleSwipeEnd() {
+		if (!swiping || swipeDismissed) return;
+		swiping = false;
+		if (swipeDirection === 'agree') {
+			swipeDismissed = true;
+			setTimeout(() => {
+				handleVote('agree');
+				swipeDeltaX = 0;
+				swipeDirection = 'none';
+				swipeDismissed = false;
+			}, 200);
+		} else if (swipeDirection === 'disagree') {
+			swipeDismissed = true;
+			setTimeout(() => {
+				handleVote('disagree');
+				swipeDeltaX = 0;
+				swipeDirection = 'none';
+				swipeDismissed = false;
+			}, 200);
+		} else {
+			swipeDeltaX = 0;
+			swipeDirection = 'none';
+		}
+	}
+
 	const currentStatement = $derived(statements[currentIndex % totalStatements]);
 
 	// Adaptive font: short → Hanken big, medium → Hanken mid, long → Hanken smaller
@@ -35,11 +90,11 @@
 	});
 
 	// Countdown timer for interstitials
-	let countdown = $state(5);
+	let countdown = $state(2);
 	let countdownInterval: ReturnType<typeof setInterval> | null = null;
 
 	function startCountdown() {
-		countdown = 5;
+		countdown = 2;
 		if (countdownInterval) clearInterval(countdownInterval);
 		countdownInterval = setInterval(() => {
 			countdown--;
@@ -111,6 +166,37 @@
 		// Stay on compose page — user navigates back manually
 	}
 
+	// Report Back carousel state
+	const reportSlides = [
+		{ title: 'Report Back', body: 'This is a place-based conversation about how we should regulate social media to minimize its harms for ourselves and those we care about.' },
+		{ title: 'What We Heard', body: 'Participants broadly agreed on the need for digital literacy education and stronger platform accountability, with nuanced views on parental controls.' },
+		{ title: 'What\'s Next', body: 'Results from this conversation will be shared with local officials and community organizations to help inform policy decisions in Utah County.' }
+	];
+	let reportSlideIndex = $state(0);
+	let reportTouchStartX = $state(0);
+	let reportTouchDelta = $state(0);
+	let reportSwiping = $state(false);
+
+	function handleReportTouchStart(e: TouchEvent) {
+		reportTouchStartX = e.touches[0].clientX;
+		reportTouchDelta = 0;
+		reportSwiping = true;
+	}
+	function handleReportTouchMove(e: TouchEvent) {
+		if (!reportSwiping) return;
+		reportTouchDelta = e.touches[0].clientX - reportTouchStartX;
+	}
+	function handleReportTouchEnd() {
+		if (!reportSwiping) return;
+		reportSwiping = false;
+		if (reportTouchDelta < -40 && reportSlideIndex < reportSlides.length - 1) {
+			reportSlideIndex++;
+		} else if (reportTouchDelta > 40 && reportSlideIndex > 0) {
+			reportSlideIndex--;
+		}
+		reportTouchDelta = 0;
+	}
+
 	function toggleAboutSelection(idx: number) {
 		const next = new Set(aboutSelections);
 		if (currentAbout.multiSelect) {
@@ -139,10 +225,37 @@
 				class="shrink-0"
 			/>
 
-			<!-- Scrollable statement content -->
-			<div class="flex flex-1 flex-col overflow-y-auto px-8 pt-6">
+			<!-- Swipeable statement content -->
+			<div
+				class="relative flex flex-1 flex-col overflow-hidden px-8 pt-6"
+				ontouchstart={handleSwipeStart}
+				ontouchmove={handleSwipeMove}
+				ontouchend={handleSwipeEnd}
+				role="region"
+				aria-label="Swipe to vote"
+			>
+				<!-- Swipe direction labels -->
+				{#if swiping && Math.abs(swipeDeltaX) > 30}
+					<div class="pointer-events-none absolute inset-0 z-10 flex items-center justify-between px-4">
+						<span
+							class="rounded-full px-4 py-2 font-mono text-sm font-medium transition-opacity {swipeDirection === 'disagree' ? 'bg-blue-900 text-white opacity-100' : 'opacity-0'}"
+						>
+							DISAGREE
+						</span>
+						<span
+							class="rounded-full px-4 py-2 font-mono text-sm font-medium transition-opacity {swipeDirection === 'agree' ? 'bg-teal-500 text-white opacity-100' : 'opacity-0'}"
+						>
+							AGREE
+						</span>
+					</div>
+				{/if}
+
 				{#key currentIndex}
-					<div in:fly={{ y: 20, duration: 300, easing: cubicOut }}>
+					<div
+						class="transition-transform {swiping ? 'duration-0' : 'duration-300'}"
+						style="transform: translateX({swipeDismissed ? (swipeDirection === 'agree' ? 400 : -400) : swipeDeltaX}px) rotate({swipeDismissed ? (swipeDirection === 'agree' ? 8 : -8) : swipeDeltaX * 0.04}deg); opacity: {swipeDismissed ? 0 : 1}"
+						in:fly={{ y: 20, duration: 300, easing: cubicOut }}
+					>
 						<!-- Attribution -->
 						<div class="flex items-center gap-2">
 							<span
@@ -500,17 +613,32 @@
 					Thank you for participating! Here's what's next...
 				</p>
 
-				<!-- Report Back carousel card -->
-				<div class="mt-8 border-t border-b border-white/20 py-6">
-					<h3 class="font-sans text-2xl font-bold leading-9 text-white">Report Back</h3>
-					<p class="mt-3 font-sans text-lg font-medium leading-7 text-white/80">
-						This is a place-based conversation about how we should regulate social media to minimize its harms for ourselves and those we care about.
-					</p>
+				<!-- Report Back swipeable carousel -->
+				<div
+					class="mt-8 border-t border-b border-white/20 py-6 overflow-hidden"
+					ontouchstart={handleReportTouchStart}
+					ontouchmove={handleReportTouchMove}
+					ontouchend={handleReportTouchEnd}
+					role="region"
+					aria-label="Report back carousel"
+				>
+					{#key reportSlideIndex}
+						<div in:fly={{ x: reportTouchDelta <= 0 ? 60 : -60, duration: 250, easing: cubicOut }}>
+							<h3 class="font-sans text-2xl font-bold leading-9 text-white">{reportSlides[reportSlideIndex].title}</h3>
+							<p class="mt-3 font-sans text-lg font-medium leading-7 text-white/80">
+								{reportSlides[reportSlideIndex].body}
+							</p>
+						</div>
+					{/key}
 					<!-- Pagination dots -->
 					<div class="mt-6 flex items-center justify-center gap-[23px]">
-						<span class="h-2 w-2 rounded-full bg-white"></span>
-						<span class="h-2 w-2 rounded-full bg-zinc-300/50"></span>
-						<span class="h-2 w-2 rounded-full bg-zinc-300/50"></span>
+						{#each reportSlides as _, i}
+							<button
+								onclick={() => (reportSlideIndex = i)}
+								class="h-2 w-2 rounded-full transition-colors {i === reportSlideIndex ? 'bg-white' : 'bg-zinc-300/50'}"
+								aria-label="Slide {i + 1}"
+							></button>
+						{/each}
 					</div>
 				</div>
 			</div>

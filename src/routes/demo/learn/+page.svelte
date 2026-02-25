@@ -23,7 +23,7 @@
 	}
 
 	let seqIndex = $state(0);
-	let countdown = $state(5);
+	let countdown = $state(2);
 	let timer: ReturnType<typeof setInterval> | null = null;
 
 	// Quiz state
@@ -38,7 +38,7 @@
 	const quiz = $derived(isQuiz ? popQuizQuestions[current.index] : null);
 
 	function startCountdown() {
-		countdown = 5;
+		countdown = 2;
 		if (timer) clearInterval(timer);
 		timer = setInterval(() => {
 			countdown--;
