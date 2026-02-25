@@ -18,7 +18,7 @@
 		<!-- Key question label + question -->
 		<div class="bg-primary px-8 pb-4">
 			<MonoLabel size="sm" variant="white">KEY QUESTION</MonoLabel>
-			<h1 class="mt-2 font-mono text-3xl font-medium leading-9 text-primary-foreground">
+			<h1 class="mt-2 font-sans text-3xl font-semibold leading-9 text-primary-foreground">
 				{deliberation.question}
 			</h1>
 			<div class="mt-6">
@@ -31,7 +31,7 @@
 	<div class="rounded-t-lg bg-background w-full">
 		<!-- Participant count -->
 		<div class="px-8 pt-8">
-			<h2 class="font-mono text-4xl font-medium text-primary">
+			<h2 class="font-sans text-4xl font-bold text-primary">
 				{deliberation.participantCount} PARTICIPANTS
 			</h2>
 			<MonoLabel size="sm" variant="primary" class="mt-1">

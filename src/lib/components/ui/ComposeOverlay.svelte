@@ -6,6 +6,7 @@
 		countyName: string;
 		onSubmit?: (text: string, anonymous: boolean) => void;
 		onBack?: () => void;
+		onShowInstructions?: () => void;
 		class?: string;
 	}
 
@@ -14,93 +15,108 @@
 		countyName,
 		onSubmit,
 		onBack,
+		onShowInstructions,
 		class: className
 	}: Props = $props();
 
 	let text = $state('');
 	let anonymous = $state(true);
+	let submitted = $state(false);
 	const maxChars = 240;
 	const charCount = $derived(text.length);
-	const canSubmit = $derived(charCount > 0 && charCount <= maxChars);
+	const overLimit = $derived(charCount > maxChars);
+	const canSubmit = $derived(charCount > 0 && charCount <= maxChars && !submitted);
+
+	function handleSubmit() {
+		if (!canSubmit) return;
+		submitted = true;
+		onSubmit?.(text, anonymous);
+	}
 </script>
 
 <div class={cn('flex h-dvh flex-col bg-background', className)}>
-	<!-- Blue card area -->
-	<div class="flex flex-1 flex-col rounded-[30px] bg-primary shadow-lg">
+	<!-- Blue gradient card area -->
+	<div class="flex flex-1 flex-col rounded-bl-[30px] rounded-br-[30px] bg-gradient-to-b from-blue-800 to-blue-900 shadow-[0px_4px_16.6px_0px_rgba(41,82,192,0.40)]">
 		<!-- Header -->
 		<div class="flex items-center justify-between px-8 pt-6">
-			<span class="font-mono text-sm font-medium text-primary-foreground">{countyName}</span>
+			<span class="font-mono text-sm font-medium text-white/80">{countyName}</span>
 			<span class="flex items-center gap-2">
-				<span class="h-3 w-3 rounded-full border border-primary-foreground bg-primary-foreground"></span>
-				<span class="font-mono text-sm font-medium text-primary-foreground">YOU</span>
+				<span class="h-3 w-3 rounded-full border border-white bg-teal-400"></span>
+				<span class="font-mono text-sm font-medium text-white/80">YOU</span>
 			</span>
 		</div>
 
-		<!-- Share your thoughts label -->
+		<!-- Question — now Hanken Grotesk -->
 		<div class="px-8 pt-6">
-			<span class="font-mono text-lg font-medium leading-5 text-primary-foreground">
-				SHARE YOUR THOUGHTS:
-			</span>
-		</div>
-
-		<!-- Question -->
-		<div class="px-8 pt-2">
-			<p class="font-mono text-3xl font-medium leading-9 text-primary-foreground">
+			<p class="font-sans text-4xl font-bold leading-10 text-white">
 				{question}
 			</p>
 		</div>
 
 		<!-- Instructions toggle -->
 		<div class="px-8 pt-4">
-			<span class="font-mono text-sm font-medium text-primary-foreground/80">
+			<button onclick={onShowInstructions} class="font-mono text-sm font-medium text-white/80 hover:text-white transition-colors">
 				SHOW INSTRUCTIONS &rarr;
-			</span>
+			</button>
 		</div>
 
 		<!-- White textarea card -->
-		<div class="mx-4 mt-4 flex flex-1 flex-col overflow-hidden rounded-3xl bg-background shadow-lg outline-2 outline-background">
+		<div class="mx-4 mt-4 flex flex-1 flex-col overflow-hidden rounded-[20px] bg-white shadow-[0px_10px_15px_0px_rgba(12,34,95,0.25)] outline outline-2 outline-white">
 			<textarea
 				bind:value={text}
-				placeholder="TYPE HERE – WHAT DO YOU THINK?"
-				maxlength={maxChars}
-				class="flex-1 resize-none bg-transparent p-6 font-mono text-2xl font-medium leading-7 text-primary placeholder:text-primary/70 border-0 outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 appearance-none"			></textarea>
-			<div class="flex items-center gap-2 px-4 pt-2 pb-4">
-				<span class="font-mono text-sm font-medium text-primary">{charCount} / {maxChars} CHAR</span>
+				placeholder="Type here – what do you think?"
+				maxlength={maxChars + 10}
+				disabled={submitted}
+				class="flex-1 resize-none bg-transparent p-6 font-sans text-2xl font-medium leading-7 text-blue-700 placeholder:text-blue-700/70 border-0 outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 appearance-none"
+			></textarea>
+			<div class="flex items-center justify-between px-5 pt-2 pb-4">
+				<span class={cn('font-mono text-sm font-medium', overLimit ? 'text-pink-500' : 'text-blue-700')}>
+					{charCount} / {maxChars} CHAR
+				</span>
 				<button
 					onclick={() => (anonymous = !anonymous)}
-					class="ml-4 flex items-center gap-2"
+					class="flex items-center gap-2"
 				>
 					<span
 						class={cn(
 							'flex h-5 w-5 items-center justify-center rounded-full',
-							anonymous ? 'bg-primary' : 'border-2 border-primary bg-transparent'
+							anonymous ? 'bg-blue-700' : 'border-2 border-blue-700 bg-transparent'
 						)}
 					>
 						{#if anonymous}
-							<svg class="h-3 w-3 text-primary-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+							<svg class="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
 							</svg>
 						{/if}
 					</span>
-					<span class="font-mono text-sm font-medium text-primary">SUBMIT ANONYMOUSLY</span>
+					<span class="font-mono text-sm font-medium text-blue-700">SUBMIT ANONYMOUSLY</span>
 				</button>
 			</div>
 		</div>
 
 		<!-- Submit button -->
 		<div class="p-4">
-			<button
-				disabled={!canSubmit}
-				onclick={() => onSubmit?.(text, anonymous)}
-				class={cn(
-					'flex w-full items-center justify-center rounded-full px-7 py-3.5 font-mono text-2xl font-medium transition-colors',
-					canSubmit
-						? 'bg-teal-400 text-primary-foreground'
-						: 'bg-white/20 text-white/70 outline outline-2 outline-white/70'
-				)}
-			>
-				SUBMIT
-			</button>
+			{#if submitted}
+				<button
+					disabled
+					class="flex w-full items-center justify-center rounded-full bg-white/20 px-7 py-3.5 font-mono text-lg font-medium text-white/70"
+				>
+					SUBMITTED!
+				</button>
+			{:else}
+				<button
+					disabled={!canSubmit}
+					onclick={handleSubmit}
+					class={cn(
+						'flex w-full items-center justify-center rounded-full px-7 py-3.5 font-mono text-lg font-medium transition-colors',
+						canSubmit
+							? 'bg-teal-500 text-white'
+							: 'bg-white/20 text-white/70'
+					)}
+				>
+					SUBMIT
+				</button>
+			{/if}
 		</div>
 	</div>
 
@@ -108,9 +124,11 @@
 	<div class="shrink-0 py-4">
 		<button
 			onclick={onBack}
-			class="w-full text-center font-mono text-lg font-medium text-primary/70"
+			class="w-full text-center"
 		>
-			&larr; BACK TO THE CONVERSATION
+			<span class="rounded-[20px] bg-cyan-100 px-3 py-1.5 font-mono text-base font-medium text-teal-700">
+				&lt;&lt; BACK TO THE CONVERSATION
+			</span>
 		</button>
 	</div>
 </div>

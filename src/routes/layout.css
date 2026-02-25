@@ -41,6 +41,8 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --color-accent-pink: var(--accent-pink);
   --color-accent-pink-foreground: var(--accent-pink-foreground);
+  --color-accent-teal: var(--accent-teal);
+  --color-accent-teal-foreground: var(--accent-teal-foreground);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

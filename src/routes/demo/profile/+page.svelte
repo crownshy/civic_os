@@ -21,7 +21,7 @@
 				</span>
 			</div>
 
-			<h1 class="mt-4 font-mono text-3xl font-medium leading-9 text-primary-foreground">
+			<h1 class="mt-4 font-sans text-3xl font-bold leading-9 text-primary-foreground">
 				PROFILE
 			</h1>
 

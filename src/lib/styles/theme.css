@@ -1,5 +1,5 @@
 /* Civic OS Theme — adapted from Comhairle shadcn design system */
-/* Primary: #2952C0 | Accent Pink: #FC3AA8 */
+/* Primary: #2952C0 | Accent Pink: #FC3AA8 | Accent Teal: #07A89E */
 
 :root {
   --background: #FFFFFF;
@@ -40,7 +40,10 @@
   --accent-pink: #FC3AA8;
   --accent-pink-foreground: #FFFFFF;
 
-  --font-sans: 'DM Mono', monospace;
+  --accent-teal: #07A89E;
+  --accent-teal-foreground: #FFFFFF;
+
+  --font-sans: 'Hanken Grotesk', sans-serif;
   --font-serif: Merriweather, serif;
   --font-mono: 'DM Mono', monospace;
 

@@ -89,7 +89,7 @@
 		<div class="px-8 pt-4 pb-4">
 			<p
 				class={cn(
-					'font-mono text-lg font-medium',
+					'font-mono text-sm font-medium uppercase',
 					isPrimary ? 'text-primary-foreground' : 'text-primary'
 				)}
 			>
@@ -101,7 +101,7 @@
 	{#if title}
 		<h1
 			class={cn(
-				'px-8 pb-6 font-mono text-3xl font-medium leading-9',
+				'px-8 pb-6 font-sans text-4xl font-bold leading-10',
 				isPrimary ? 'text-primary-foreground' : 'text-primary'
 			)}
 		>
@@ -113,10 +113,10 @@
 		<div class="px-7 pb-4">
 			<button
 				onclick={onShareClick}
-				class="flex w-full items-center justify-center gap-2.5 rounded-full border border-blue-50/70 bg-white/10 px-5 py-2"
+				class="flex w-full items-center justify-center gap-2.5 rounded-full bg-white/10 px-5 py-2 shadow-[inset_2px_4px_4px_0px_rgba(0,0,0,0.20)] outline outline-2 outline-white/20"
 			>
-				<span class="font-mono text-sm font-medium text-primary-foreground">
-					SHARE YOUR OWN THOUGHTS...
+				<span class="font-sans text-sm font-medium text-primary-foreground/80">
+					What's missing from the conversation?
 				</span>
 			</button>
 		</div>

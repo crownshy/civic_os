@@ -74,3 +74,20 @@ export interface Vote {
 	statementId: string;
 	value: 'agree' | 'disagree' | 'skip';
 }
+
+export interface PopQuizQuestion {
+	id: string;
+	label: string;
+	question: string;
+	options: string[];
+	correctIndex: number;
+	explanation: string;
+}
+
+export interface AboutYouQuestion {
+	id: string;
+	question: string;
+	description: string;
+	options: string[];
+	multiSelect: boolean;
+}

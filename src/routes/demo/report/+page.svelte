@@ -13,7 +13,7 @@
 		<div class="flex flex-1 flex-col overflow-y-auto">
 			<!-- Title area -->
 			<div class="flex flex-col items-center px-8 pt-20">
-				<h1 class="text-center font-mono text-4xl font-medium text-primary-foreground">
+				<h1 class="text-center font-sans text-4xl font-bold text-primary-foreground">
 					BLOOM REPORT
 				</h1>
 				<MonoLabel size="lg" variant="white" class="mt-4">SUMMARY</MonoLabel>
