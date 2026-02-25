@@ -65,3 +65,8 @@
 button, a {
   cursor: pointer;
 }
+
+button, input, textarea, select {
+  -webkit-appearance: none;
+  appearance: none;
+}

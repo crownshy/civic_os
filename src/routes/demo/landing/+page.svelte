@@ -40,17 +40,6 @@
 
 			<!-- Scrollable content -->
 			<div class="relative z-10 flex flex-1 flex-col overflow-y-auto">
-				<!-- Back button -->
-				<a
-					href="/demo"
-					class="flex h-10 w-10 items-center justify-center text-white"
-					aria-label="Back"
-				>
-					<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-					</svg>
-				</a>
-
 				<!-- Hero -->
 				<div class="flex flex-col items-center px-8 pt-24">
 					<span class="text-center font-mono text-base font-medium uppercase text-white/70">
@@ -85,7 +74,7 @@
 					<input
 						bind:value={zipCode}
 						placeholder="Enter your zip code..."
-						class="w-50 bg-transparent text-center font-sans text-base font-medium text-blue-900 placeholder:text-blue-900/80 border-0 outline-none focus:ring-0"
+						class="w-60 bg-transparent text-center font-sans text-base font-medium text-blue-900 placeholder:text-blue-900/80 border-0 outline-none focus:ring-0"
 					/>
 				</div>
 				<button
@@ -105,17 +94,6 @@
 
 			<!-- Scrollable content -->
 			<div class="relative z-10 flex flex-1 flex-col overflow-y-auto">
-				<!-- Back button -->
-				<button
-					onclick={() => (step = 'landing')}
-					class="flex h-10 w-10 items-center justify-center text-white"
-					aria-label="Back"
-				>
-					<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-					</svg>
-				</button>
-
 				<!-- Host message banner -->
 				<div class="mx-5 mt-2 flex items-center gap-3 rounded-lg bg-gradient-to-r from-white/10 to-white/0 p-4 outline outline-1 outline-white/10 overflow-hidden">
 					<span class="h-9 w-9 shrink-0 rounded-full bg-teal-400"></span>
@@ -150,8 +128,8 @@
 			<!-- Bottom section: location filled + CTA -->
 			<div class="relative z-10 flex shrink-0 flex-col items-center px-7 pb-8">
 				<span class="font-mono text-base font-medium uppercase text-white/80">YOUR LOCATION</span>
-				<div class="mt-2 inline-flex w-50 items-center justify-center gap-1 rounded-full bg-white px-6 py-2 shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)] outline outline-2 outline-white/20">
-					<span class="font-sans text-base font-medium text-blue-900">Utah County</span>
+				<div class="mt-2 inline-flex w-60 items-center justify-center gap-1 rounded-full bg-white px-6 py-2 shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)] outline outline-2 outline-white/20">
+					<span class="py-2 font-sans text-base font-medium text-blue-900">Utah County</span>
 					<button onclick={() => (step = 'landing')} class="font-sans text-base font-medium text-teal-500">(change)</button>
 				</div>
 				<button
@@ -182,18 +160,8 @@
 
 			<!-- Popup content -->
 			<div class="relative z-20 flex flex-1 flex-col">
-				<!-- Back button -->
-				<button
-					onclick={() => (step = 'with-location')}
-					class="flex h-10 w-10 items-center justify-center text-white"
-					aria-label="Back"
-				>
-					<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-					</svg>
-				</button>
 
-				<div class="flex flex-1 flex-col items-center justify-center px-6">
+				<form onsubmit={(e) => { e.preventDefault(); window.location.href = '/demo/contribute'; }} class="flex flex-1 flex-col items-center justify-center px-6">
 					<!-- Card with scale-in -->
 					<div
 						class="w-full rounded-[20px] bg-white p-6 shadow-[0px_20px_40px_rgba(0,0,0,0.35)]"
@@ -214,12 +182,12 @@
 
 					<!-- SHARE button -->
 					<div class="mt-6 w-full" in:fade={{ duration: 300, delay: 250 }}>
-						<a
-							href="/demo/contribute"
+						<button
+							type="submit"
 							class="flex w-full items-center justify-center rounded-full bg-teal-500 px-7 py-3.5 font-mono text-lg font-medium text-white shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
 						>
 							SHARE
-						</a>
+						</button>
 					</div>
 
 					<!-- Skip link -->
@@ -230,7 +198,7 @@
 					>
 						I'll decide later.
 					</a>
-				</div>
+				</form>
 			</div>
 		</div>
 	{/if}

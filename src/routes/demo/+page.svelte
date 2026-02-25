@@ -5,14 +5,7 @@
 
 <AppShell>
 	<div class="flex h-dvh flex-col items-center justify-center gap-6 bg-primary px-8">
-		<h1 class="text-center font-sans text-4xl font-bold text-primary-foreground">
-			CIVIC OS
-		</h1>
-		<p class="text-center font-mono text-lg font-medium text-primary-foreground">
-			DEMO SCREENS
-		</p>
-
-		<div class="mt-8 flex w-full max-w-md flex-col gap-3">
+			<div class="mt-8 flex w-full max-w-md flex-col gap-3">
 			<a href="/demo/landing">
 				<PillButton variant="filled-white" fullWidth>LANDING</PillButton>
 			</a>
@@ -39,7 +32,6 @@
 			<a href="/demo/report">
 				<PillButton variant="filled-white" fullWidth>BLOOM REPORT</PillButton>
 			</a>
-	
 		</div>
 	</div>
 </AppShell>

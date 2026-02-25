@@ -10,7 +10,6 @@
 		<AppHeader
 			countyName={county.name}
 			variant="on-primary"
-			backHref="/demo"
 			class="pb-6"
 		>
 		</AppHeader>

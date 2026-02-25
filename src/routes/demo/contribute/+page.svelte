@@ -198,7 +198,6 @@
 				rounded
 				shareInput
 				onShareClick={() => (screen = 'compose')}
-				backHref="/demo"
 				class="shrink-0"
 			/>
 
