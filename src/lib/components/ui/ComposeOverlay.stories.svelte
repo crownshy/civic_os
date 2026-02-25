@@ -3,13 +3,20 @@
 	import ComposeOverlay from './ComposeOverlay.svelte';
 
 	const { Story } = defineMeta({
-		title: 'UI/ComposeOverlay',
+		title: 'Composites/ComposeOverlay',
 		component: ComposeOverlay,
-		tags: ['autodocs']
+		tags: ['autodocs'],
+		argTypes: {
+			question: { control: 'text' },
+			countyName: { control: 'text' }
+		},
+		parameters: {
+			layout: 'fullscreen'
+		}
 	});
 </script>
 
-<Story name="Empty" args={{ question: 'WHAT SHOULD WE DO TO MAKE SURE SOCIAL MEDIA IS HEALTHY FOR TEENS?', countyName: 'ABC COUNTY' }}>
+<Story name="Default" args={{ question: 'What should we do to make sure social media helps us, not hurts us?', countyName: 'UTAH COUNTY' }}>
 	{#snippet children(args)}
 		<ComposeOverlay {...args} />
 	{/snippet}

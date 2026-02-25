@@ -3,7 +3,7 @@
 	import AlertBanner from './AlertBanner.svelte';
 
 	const { Story } = defineMeta({
-		title: 'UI/AlertBanner',
+		title: 'Primitives/AlertBanner',
 		component: AlertBanner,
 		tags: ['autodocs'],
 		argTypes: {
@@ -12,8 +12,18 @@
 	});
 </script>
 
-<Story name="Default" args={{ message: 'You have not verified your email yet! Click here to complete.' }}>
+<Story name="Default" args={{ message: 'Your email has not been verified yet. Check your inbox for the verification link.' }}>
 	{#snippet children(args)}
-		<AlertBanner {...args} />
+		<div class="p-6">
+			<AlertBanner {...args} />
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Short Message" args={{ message: 'Something went wrong. Please try again.' }}>
+	{#snippet children(args)}
+		<div class="p-6">
+			<AlertBanner {...args} />
+		</div>
 	{/snippet}
 </Story>
