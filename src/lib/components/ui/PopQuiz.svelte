@@ -18,6 +18,7 @@
 	let selected = $state<number | null>(null);
 	let showCorrectAnim = $state(false);
 	let showConfetti = $state(false);
+	let scrollContainer = $state<HTMLDivElement>();
 
 	function selectOption(idx: number) {
 		if (selected !== null) return;
@@ -26,12 +27,26 @@
 			showCorrectAnim = true;
 			setTimeout(() => { showConfetti = true; }, 200);
 		}
+		
+		setTimeout(() => {
+			if (scrollContainer) {
+				const scrollAmount = window.innerHeight * 0.5;
+				scrollContainer.scrollTo({
+					top: scrollContainer.scrollTop + scrollAmount,
+					behavior: 'smooth'
+
+				});
+			}
+		}, 100);
 	}
 
 	export function reset() {
 		selected = null;
 		showCorrectAnim = false;
 		showConfetti = false;
+		if (scrollContainer) {
+			scrollContainer.scrollTop = 0;
+		}
 	}
 </script>
 
@@ -59,7 +74,7 @@
 	<ConfettiOverlay active={showConfetti} />
 
 	<!-- Content -->
-	<div class="flex flex-1 flex-col overflow-y-auto px-8 pt-10">
+	<div bind:this={scrollContainer} class="flex flex-1 flex-col overflow-y-auto px-8 pt-10">
 		<span class="font-mono text-sm font-medium text-white/80">{quiz.label}</span>
 		<p class="mt-4 font-sans text-4xl font-bold leading-10 text-white">
 			{quiz.question}
