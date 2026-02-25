@@ -4,7 +4,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { AppShell } from '$lib/components/layout';
-	import { SwipeCarousel, Button } from '$lib/components/ui';
+	import { SwipeCarousel, Button, EmojiCircle } from '$lib/components/ui';
 	import { county, deliberation } from '$lib/data/mock';
 
 	const hasHost = $derived($page.url.searchParams.get('host') === 'true');
@@ -59,7 +59,8 @@
 			{#if hasHost}
 				<!-- Host message banner -->
 				<div class="mx-5 mt-2 flex items-center gap-3 rounded-lg bg-gradient-to-r from-white/10 to-white/0 p-4 outline outline-1 outline-white/10 overflow-hidden">
-					<span class="h-9 w-9 shrink-0 rounded-full bg-secondary"></span>
+					<EmojiCircle emoji="🎉" size="sm" />
+
 					<div>
 						<span class="font-mono text-xs font-medium uppercase text-white/70">A MESSAGE FROM YOUR HOST</span>
 						<p class="font-sans text-base font-medium text-white">Mormon Women for Ethical Governance</p>

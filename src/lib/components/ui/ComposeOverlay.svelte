@@ -4,6 +4,7 @@
 	import { elasticOut, cubicOut } from 'svelte/easing';
 	import ConfettiOverlay from './ConfettiOverlay.svelte';
 	import Button from './Button.svelte';
+	import EmojiCircle from './EmojiCircle.svelte';
 
 	interface Props {
 		question: string;
@@ -138,10 +139,7 @@
 			<!-- Card -->
 			<div class="relative z-10 mx-6 flex flex-col items-center" in:scale={{ start: 0.8, duration: 500, easing: elasticOut, delay: 100 }}>
 				<!-- Emoji circle -->
-				<div class="relative mb-6">
-					<div class="h-28 w-28 rounded-full bg-secondary"></div>
-					<span class="absolute inset-0 flex items-center justify-center text-7xl drop-shadow-lg">🎉</span>
-				</div>
+				<EmojiCircle emoji="🎉" size="md" class="mb-6" />
 
 				<div class="w-full rounded-[20px] bg-white p-6">
 					<h2 class="text-center font-sans text-3xl font-bold leading-9 text-blue-800">

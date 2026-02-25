@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
-	import { Header, SwipeCarousel, Button } from '$lib/components/ui';
+	import { Header, SwipeCarousel, Button, EmojiCircle } from '$lib/components/ui';
 	import { scale } from 'svelte/transition';
 
 	interface Props {
@@ -25,10 +25,7 @@
 
 	<!-- Centered content -->
 	<div class="flex flex-1 flex-col items-center mt-16 overflow-y-auto px-8">
-		<div class="relative shrink-0">
-			<div class="h-30 w-30 rounded-full bg-secondary"></div>
-			<span class="absolute inset-0 flex items-center justify-center text-9xl drop-shadow-[0px_4px_24px_rgba(0,0,0,0.25)]">🎉</span>
-		</div>
+		<EmojiCircle emoji="🎉" size="lg" />
 		<p class="mt-4 font-sans text-3xl font-bold leading-10 text-white">
 			Thank you for participating! Here's what's next...
 		</p>

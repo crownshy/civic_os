@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { scale } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
-	import { Header, Button } from '$lib/components/ui';
+	import { Header, Button, EmojiCircle } from '$lib/components/ui';
 
 	interface Props {
 		countyName: string;
@@ -17,10 +17,7 @@
 
 	<!-- Centered content -->
 	<div class="flex flex-1 flex-col items-center justify-center overflow-y-auto px-8">
-		<div class="relative shrink-0">
-			<div class="h-30 w-30 rounded-full bg-secondary"></div>
-			<span class="absolute inset-0 flex items-center justify-center text-9xl drop-shadow-[0px_4px_24px_rgba(0,0,0,0.25)]">🎉</span>
-		</div>
+		<EmojiCircle emoji="🎉" size="lg" />
 		<p class="mt-8 text-center font-sans text-3xl font-bold leading-10 text-white">
 			Nice job!
 		</p>
