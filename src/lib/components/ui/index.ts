@@ -17,3 +17,4 @@ export { default as BlueHeader } from './BlueHeader.svelte';
 export { default as ConfettiOverlay } from './ConfettiOverlay.svelte';
 export { default as PopQuiz } from './PopQuiz.svelte';
 export { default as EmailCapture } from './EmailCapture.svelte';
+export { default as Button } from './Button.svelte';

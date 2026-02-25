@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
+	import Button from './Button.svelte';
 
 	interface Props {
 		onAgree?: () => void;
@@ -28,15 +29,12 @@
 <div class={cn('overflow-hidden bg-card', className)}>
 	<!-- Remaining / End pills row -->
 	<div class="flex items-center justify-between px-6 py-2">
-		<span class="rounded-[20px] bg-secondary/20 px-3 py-1.5 font-mono text-base font-medium text-secondary">
+		<Button variant="pill" size="sm">
 			{remaining} LEFT
-		</span>
-		<button
-			onclick={onEnd}
-			class="rounded-[20px] bg-destructive/20 px-3 py-1.5 font-mono text-base font-medium text-destructive hover:opacity-80"
-		>
+		</Button>
+		<Button variant="destructive" size="sm" onclick={onEnd}>
 			END
-		</button>
+		</Button>
 	</div>
 
 	<!-- Progress bar -->
@@ -48,19 +46,15 @@
 	</div>
 
 	<!-- Vote buttons row -->
-	<div class="flex items-center gap-3.5 bg-background px-7 py-5 border-t border-background">
-		<button
-			onclick={onAgree}
-			class="flex h-14 flex-1 items-center justify-center rounded-full bg-secondary font-mono text-lg font-medium text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
-		>
-			&#10003; AGREE
-		</button>
-		<button
-			onclick={onDisagree}
-			class="flex h-14 flex-1 items-center justify-center rounded-full bg-black/30 font-mono text-lg font-medium text-white shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
-		>
-			X DISAGREE
-		</button>
+	<div class="flex items-center gap-4 bg-background px-5 py-5 border-t border-background">
+		<Button variant="primary" class="flex-1" onclick={onAgree}>
+			<span class="text-2xl mr-2">&#10003;</span>
+			AGREE
+		</Button>
+		<Button variant="secondary" class="flex-1" onclick={onDisagree}>
+			<span class="mr-2">X</span>
+			DISAGREE
+		</Button>
 		<button
 			aria-label="Skip"
 			onclick={onSkip}

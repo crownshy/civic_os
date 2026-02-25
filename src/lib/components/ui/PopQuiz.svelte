@@ -2,6 +2,7 @@
 	import { fly, scale } from 'svelte/transition';
 	import { cubicOut, elasticOut } from 'svelte/easing';
 	import ConfettiOverlay from './ConfettiOverlay.svelte';
+	import Button from './Button.svelte';
 	import type { PopQuizQuestion } from '$lib/types/mock-data';
 
 	interface Props {
@@ -114,19 +115,11 @@
 
 	<!-- Bottom actions -->
 	<div class="flex shrink-0 items-center gap-3.5 border-t border-primary bg-blue-900 px-7 py-8">
-		<button
-			onclick={onContinue}
-			class="flex h-14 flex-1 items-center justify-center rounded-full font-mono text-lg font-medium shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)] transition-colors {selected !== null
-				? 'bg-secondary text-secondary-foreground'
-				: 'bg-secondary/50 text-white/70'}"
-		>
+		<Button variant="primary" class="flex-1" onclick={onContinue}>
 			CONTINUE
-		</button>
-		<button
-			onclick={onSkip}
-			class="flex h-14 flex-1 items-center justify-center rounded-full bg-black/30 font-mono text-lg font-medium text-white shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
-		>
+		</Button>
+		<Button variant="secondary" class="flex-1" onclick={onSkip}>
 			SKIP
-		</button>
+		</Button>
 	</div>
 </div>

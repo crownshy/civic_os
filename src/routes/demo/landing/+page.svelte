@@ -1,8 +1,10 @@
 <script lang="ts">
+	import { fade, scale } from 'svelte/transition';
+	import { elasticOut } from 'svelte/easing';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { AppShell } from '$lib/components/layout';
-	import { SwipeCarousel } from '$lib/components/ui';
+	import { SwipeCarousel, Button } from '$lib/components/ui';
 	import { county, deliberation } from '$lib/data/mock';
 
 	const hasHost = $derived($page.url.searchParams.get('host') === 'true');
@@ -100,7 +102,7 @@
 			{#if editingLocation}
 				<!-- Zip input mode -->
 				<form onsubmit={(e) => { e.preventDefault(); handleSetLocation(); }} class="mt-2 flex flex-col items-center w-full">
-					<div class="inline-flex items-center rounded-full bg-white px-6 py-2 shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)] outline outline-2 outline-white/20">
+					<div class="inline-flex items-center rounded-full bg-white px-6 py-2 shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)] outline-2 outline-white/20">
 						<input
 							bind:this={zipInputEl}
 							bind:value={zipCode}
@@ -108,28 +110,23 @@
 							class="w-60 bg-transparent text-center font-sans text-base font-medium text-blue-900 placeholder:text-blue-900/80 border-0 outline-none focus:ring-0"
 						/>
 					</div>
-					<button
-						type="submit"
-						class="mt-4 flex h-14 w-full items-center justify-center rounded-full px-7 py-3.5 font-mono text-lg font-medium {zipCode.trim() ? 'bg-secondary text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]' : 'bg-white/20 text-white/70'}"
-					>
+					<Button type="submit" variant="primary" fullWidth disabled={!zipCode.trim()} class="mt-4">
 						JOIN THE CONVERSATION
-					</button>
+					</Button>
 				</form>
 			{:else}
 				<!-- Location set — show pill with (change) -->
-				<div class="mt-2 inline-flex items-center justify-center gap-1 rounded-full bg-white px-6 py-2 shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)] outline outline-2 outline-white/20">
+				<div class="mt-2 inline-flex items-center justify-center gap-1 rounded-full bg-white px-6 py-2 shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)] outline-2 outline-white/20">
 					<span class="py-2 font-sans text-base font-medium text-blue-900">{locationName}</span>
 					<button onclick={startEditing} class="font-sans text-base font-medium text-secondary">(change)</button>
 				</div>
-				<button
-					onclick={handleJoin}
-					class="mt-4 flex h-14 w-full items-center justify-center rounded-full bg-secondary px-7 py-3.5 font-mono text-lg font-medium text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
-				>
+				<Button variant="primary" fullWidth onclick={handleJoin} class="mt-4">
 					JOIN THE CONVERSATION
-				</button>
+				</Button>
 			{/if}
 
-			<span class="mt-4 font-mono text-sm font-medium text-white/50 opacity-50">POWERED BY BLOOM</span>
+
+			<span class="mt-2 font-mono text-sm font-medium text-white/50 opacity-50">POWERED BY BLOOM</span>
 		</div>
 	</div>
 </AppShell>
