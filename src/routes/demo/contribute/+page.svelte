@@ -499,7 +499,7 @@
 				</p>
 
 				<!-- Report Back swipeable carousel -->
-				<SwipeCarousel count={reportSlides.length} bind:index={reportSlideIndex} class="mt-8 border-t border-b border-white/20 py-6">
+				<SwipeCarousel count={reportSlides.length} bind:index={reportSlideIndex} class="mt-4 border-t border-white/20 py-6">
 					{#snippet children(i)}
 						<h3 class="font-sans text-2xl font-bold leading-9 text-white">{reportSlides[i].title}</h3>
 						<p class="mt-3 font-sans text-lg font-medium leading-7 text-white/80">
@@ -510,7 +510,7 @@
 			</div>
 
 			<!-- Bottom CTAs -->
-			<div class="flex shrink-0 items-center gap-3.5 border-t border-primary bg-blue-900 px-7 py-8">
+			<div class="flex shrink-0 items-center gap-3.5 px-7 py-8">
 				<button
 					onclick={continueVoting}
 					class="flex h-14 flex-1 items-center justify-center rounded-full bg-secondary font-mono text-lg font-medium text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
