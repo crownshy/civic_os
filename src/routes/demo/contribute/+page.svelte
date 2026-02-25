@@ -190,7 +190,7 @@
 <AppShell>
 	{#if screen === 'voting'}
 		<!-- Voting screen -->
-		<div class="flex h-dvh flex-col bg-background" in:fly={{ x: -40, duration: 350, easing: cubicOut }}>
+		<div class="flex h-dvh flex-col bg-card" in:fly={{ x: -40, duration: 350, easing: cubicOut }}>
 			<AppHeader
 				countyName={county.name}
 				question={deliberation.question}
@@ -219,7 +219,7 @@
 							DISAGREE
 						</span>
 						<span
-							class="rounded-full px-4 py-2 font-mono text-sm font-medium transition-opacity {swipeDirection === 'agree' ? 'bg-teal-500 text-white opacity-100' : 'opacity-0'}"
+							class="rounded-full px-4 py-2 font-mono text-sm font-medium transition-opacity {swipeDirection === 'agree' ? 'bg-secondary text-secondary-foreground opacity-100' : 'opacity-0'}"
 						>
 							AGREE
 						</span>
@@ -239,14 +239,14 @@
 								style="background-color: {currentStatement.authorColor ?? '#2952C0'}"
 							></span>
 							<span
-								class="font-mono text-sm font-medium text-blue-700"
+								class="font-mono text-sm font-medium text-primary"
 							>
 								{currentStatement.authorAlias} SAYS...
 							</span>
 						</div>
 
 						<!-- Quote with adaptive font — now Hanken Grotesk -->
-						<p class="mt-4 {statementClasses} text-blue-700">
+						<p class="mt-4 {statementClasses} text-primary">
 							{currentStatement.text}
 						</p>
 					</div>
@@ -284,7 +284,7 @@
 						<h2 class="font-sans text-4xl font-bold leading-10 text-blue-800">
 							How to contribute to this conversation:
 						</h2>
-						<div class="mt-6 h-1.5 w-14 bg-teal-400 rounded-full"></div>
+						<div class="mt-6 h-1.5 w-14 bg-secondary rounded-full"></div>
 						<div class="mt-6 font-sans text-lg font-medium leading-7 text-blue-900">
 							<p>You can share ideas, opinions, values, or whatever else. Others will see these and vote on them.</p>
 							<br />
@@ -298,7 +298,7 @@
 					<div class="mt-6 w-full px-2">
 						<button
 							onclick={() => (showInstructions = false)}
-							class="flex w-full items-center justify-center rounded-full bg-teal-500 px-7 py-3.5 font-mono text-lg font-medium text-white"
+							class="flex w-full items-center justify-center rounded-full bg-secondary px-7 py-3.5 font-mono text-lg font-medium text-secondary-foreground"
 						>
 							I UNDERSTAND
 						</button>
@@ -309,7 +309,7 @@
 
 	{:else if screen === 'did-you-know'}
 		<!-- DID YOU KNOW INTERSTITIAL -->
-		<div class="flex h-dvh flex-col bg-gradient-to-b from-blue-800 to-blue-900" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
+		<div class="flex h-dvh flex-col bg-gradient-to-b from-primary to-blue-900" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
 			<BlueHeader countyName={county.name} />
 
 			<!-- Scrollable content -->
@@ -326,11 +326,11 @@
 			</div>
 
 			<!-- Sticky bottom actions -->
-			<div class="flex shrink-0 flex-col gap-2.5 border-t border-blue-700 bg-blue-900 px-7 py-8">
+			<div class="flex shrink-0 flex-col gap-2.5 border-t border-primary bg-blue-900 px-7 py-8">
 				<button
 					disabled={countdown > 0}
 					onclick={resumeVoting}
-					class="flex w-full items-center justify-center rounded-full px-7 py-3.5 font-mono text-lg font-medium text-white/70 {countdown > 0 ? 'bg-white/20' : 'bg-teal-500 text-white'}"
+					class="flex w-full items-center justify-center rounded-full px-7 py-3.5 font-mono text-lg font-medium text-white/70 {countdown > 0 ? 'bg-white/20' : 'bg-secondary text-secondary-foreground'}"
 				>
 					{#if countdown > 0}
 						CONTINUE IN {countdown}...
@@ -343,14 +343,14 @@
 
 	{:else if screen === 'pop-quiz'}
 		<!-- POP QUIZ INTERSTITIAL -->
-		<div class="flex h-dvh flex-col bg-gradient-to-b from-blue-800 to-blue-900" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
+		<div class="flex h-dvh flex-col bg-gradient-to-b from-primary to-blue-900" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
 			<BlueHeader countyName={county.name} />
 			<PopQuiz quiz={currentQuiz} onContinue={resumeVoting} onSkip={resumeVoting} />
 		</div>
 
 	{:else if screen === 'about-you'}
 		<!-- ABOUT YOU demographic questions -->
-		<div class="flex h-dvh flex-col bg-gradient-to-b from-blue-800 to-blue-900" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
+		<div class="flex h-dvh flex-col bg-gradient-to-b from-primary to-blue-900" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
 			<BlueHeader countyName={county.name} />
 
 			<!-- Scrollable content -->
@@ -386,7 +386,7 @@
 			</div>
 
 			<!-- Bottom actions -->
-			<div class="flex shrink-0 items-center gap-3.5 border-t border-blue-700 bg-blue-900 px-7 py-8">
+			<div class="flex shrink-0 items-center gap-3.5 border-t border-primary bg-blue-900 px-7 py-8">
 				<button
 					onclick={() => {
 						if (aboutIndex < aboutYouQuestions.length - 1) {
@@ -396,7 +396,7 @@
 							resumeVoting();
 						}
 					}}
-					class="flex h-14 flex-1 items-center justify-center rounded-full bg-teal-500 font-mono text-lg font-medium text-white shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
+					class="flex h-14 flex-1 items-center justify-center rounded-full bg-secondary font-mono text-lg font-medium text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
 				>
 					CONTINUE
 				</button>
@@ -418,23 +418,23 @@
 
 	{:else if screen === 'nice-job'}
 		<!-- NICE JOB celebration -->
-		<div class="flex h-dvh flex-col bg-gradient-to-b from-blue-800 to-blue-900" in:scale={{ start: 0.9, duration: 500, easing: cubicOut }}>
+		<div class="flex h-dvh flex-col bg-gradient-to-b from-primary to-blue-900" in:scale={{ start: 0.9, duration: 500, easing: cubicOut }}>
 			<BlueHeader countyName={county.name} />
 
 			<!-- Centered content -->
 			<div class="flex flex-1 flex-col items-center justify-center overflow-y-auto px-8">
-				<div class="h-32 w-32 rounded-full bg-teal-400"></div>
+				<div class="h-32 w-32 rounded-full bg-secondary"></div>
 				<p class="mt-[-90px] text-9xl font-bold drop-shadow-lg">🎉</p>
-				<p class="mt-8 text-center font-sans text-4xl font-bold leading-10 text-white">
+				<p class="mt-8 text-center font-sans text-3xl font-bold leading-10 text-white">
 					Thank you for participating! Here's what's next...
 				</p>
 			</div>
 
 			<!-- Bottom CTAs -->
-			<div class="flex shrink-0 items-center gap-3.5 border-t border-blue-700 bg-blue-900 px-7 py-8">
+			<div class="flex shrink-0 items-center gap-3.5 border-t border-primary bg-blue-900 px-7 py-8">
 				<button
 					onclick={continueVoting}
-					class="flex h-14 flex-1 items-center justify-center rounded-full bg-teal-500 font-mono text-lg font-medium text-white shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
+					class="flex h-14 flex-1 items-center justify-center rounded-full bg-secondary font-mono text-lg font-medium text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
 				>
 					KEEP VOTING
 				</button>
@@ -481,7 +481,7 @@
 
 	{:else if screen === 'thank-you'}
 		<!-- THANK YOU / WHAT'S NEXT completion -->
-		<div class="flex h-dvh flex-col bg-gradient-to-b from-blue-800 to-blue-900" in:fly={{ y: 40, duration: 400, easing: cubicOut }}>
+		<div class="flex h-dvh flex-col bg-gradient-to-b from-primary to-blue-900" in:fly={{ y: 40, duration: 400, easing: cubicOut }}>
 			<BlueHeader countyName={county.name} />
 
 			<!-- Scrollable content -->
@@ -489,12 +489,12 @@
 				<!-- Emoji + circle -->
 				<div class="flex flex-col items-center">
 					<div class="relative">
-						<div class="h-32 w-32 rounded-full bg-teal-400"></div>
+						<div class="h-32 w-32 rounded-full bg-secondary"></div>
 						<span class="absolute inset-0 flex items-center justify-center text-9xl font-bold drop-shadow-[0px_4px_24px_rgba(0,0,0,0.25)]">🎉</span>
 					</div>
 				</div>
 
-				<p class="mt-8 font-sans text-4xl font-bold leading-10 text-white">
+				<p class="mt-8 font-sans text-3xl font-bold leading-10 text-white">
 					Thank you for participating! Here's what's next...
 				</p>
 
@@ -510,10 +510,10 @@
 			</div>
 
 			<!-- Bottom CTAs -->
-			<div class="flex shrink-0 items-center gap-3.5 border-t border-blue-700 bg-blue-900 px-7 py-8">
+			<div class="flex shrink-0 items-center gap-3.5 border-t border-primary bg-blue-900 px-7 py-8">
 				<button
 					onclick={continueVoting}
-					class="flex h-14 flex-1 items-center justify-center rounded-full bg-teal-500 font-mono text-lg font-medium text-white shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
+					class="flex h-14 flex-1 items-center justify-center rounded-full bg-secondary font-mono text-lg font-medium text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
 				>
 					CONTINUE
 				</button>

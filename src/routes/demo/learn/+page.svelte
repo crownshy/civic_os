@@ -92,13 +92,13 @@
 			</div>
 
 			<!-- Bottom: countdown button -->
-			<div class="flex shrink-0 flex-col gap-2.5 border-t border-blue-700 bg-blue-900 px-7 py-8">
+			<div class="flex shrink-0 flex-col gap-2.5 border-t border-primary bg-blue-900 px-7 py-8">
 				<button
 					disabled={countdown > 0}
 					onclick={nextScreen}
 					class="flex w-full items-center justify-center rounded-full px-7 py-3.5 font-mono text-lg font-medium transition-colors {countdown > 0
 						? 'bg-white/20 text-white/70'
-						: 'bg-teal-500 text-white shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]'}"
+						: 'bg-secondary text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]'}"
 				>
 					{#if countdown > 0}
 						CONTINUE IN {countdown}...

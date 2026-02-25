@@ -45,14 +45,15 @@
 
 </script>
 
-<div class={cn('relative flex h-dvh flex-col bg-background', className)}>
+<div class={cn('relative flex h-dvh flex-col bg-white', className)}>
 	<!-- Blue gradient card area -->
-	<div class="flex flex-1 flex-col rounded-bl-[30px] rounded-br-[30px] bg-gradient-to-b from-blue-800 to-blue-900 shadow-[0px_4px_16.6px_0px_rgba(41,82,192,0.40)]">
+	 <!-- TODO: hardcoded blue -->
+	<div class="flex flex-1 flex-col rounded-bl-[30px] rounded-br-[30px] bg-gradient-to-b from-primary to-blue-900 shadow-[0px_4px_16.6px_0px_rgba(41,82,192,0.40)]">
 		<!-- Header -->
 		<div class="flex items-center justify-between px-8 pt-6">
 			<span class="font-mono text-sm font-medium text-white/80">{countyName}</span>
 			<span class="flex items-center gap-2">
-				<span class="h-3 w-3 rounded-full border border-white bg-teal-400"></span>
+				<span class="h-3 w-3 rounded-full border border-white bg-secondary"></span>
 				<span class="font-mono text-sm font-medium text-white/80">YOU</span>
 			</span>
 		</div>
@@ -80,10 +81,10 @@
 				maxlength={maxChars + 10}
 				disabled={submitted}
 				onkeydown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }}
-				class="flex-1 resize-none bg-transparent p-6 font-sans text-2xl font-medium leading-7 text-blue-700 placeholder:text-blue-700/70 border-0 outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 appearance-none"
+				class="flex-1 resize-none bg-transparent p-6 font-sans text-2xl font-medium leading-7 text-primary placeholder:text-primary/70 border-0 outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 appearance-none"
 			></textarea>
 			<div class="flex items-center justify-between px-5 pt-2 pb-4">
-				<span class={cn('font-mono text-sm font-medium', overLimit ? 'text-pink-500' : 'text-blue-700')}>
+				<span class={cn('font-mono text-sm font-medium', overLimit ? 'text-destructive' : 'text-primary')}>
 					{charCount} / {maxChars} CHAR
 				</span>
 				<button
@@ -93,7 +94,7 @@
 					<span
 						class={cn(
 							'flex h-5 w-5 items-center justify-center rounded-full',
-							anonymous ? 'bg-blue-700' : 'border-2 border-blue-700 bg-transparent'
+							anonymous ? 'bg-primary' : 'border-2 border-primary bg-transparent'
 						)}
 					>
 						{#if anonymous}
@@ -102,7 +103,7 @@
 							</svg>
 						{/if}
 					</span>
-					<span class="font-mono text-sm font-medium text-blue-700">SUBMIT ANONYMOUSLY</span>
+					<span class="font-mono text-sm font-medium text-primary">SUBMIT ANONYMOUSLY</span>
 				</button>
 			</div>
 		</div>
@@ -123,7 +124,7 @@
 					class={cn(
 						'flex w-full items-center justify-center rounded-full px-7 py-3.5 font-mono text-lg font-medium transition-colors',
 						canSubmit
-							? 'bg-teal-500 text-white'
+							? 'bg-secondary text-secondary-foreground'
 							: 'bg-white/20 text-white/70'
 					)}
 				>
@@ -140,7 +141,7 @@
 			onclick={onBack}
 			class="w-full text-center"
 		>
-			<span class="rounded-[20px] bg-cyan-100 px-3 py-1.5 font-mono text-base font-medium text-teal-700">
+			<span class="rounded-[20px] bg-secondary/20 px-3 py-1.5 font-mono text-base font-medium text-secondary">
 				&lt;&lt; BACK TO THE CONVERSATION
 			</span>
 		</button>
@@ -155,7 +156,7 @@
 			<div class="relative z-10 mx-6 flex flex-col items-center" in:scale={{ start: 0.8, duration: 500, easing: elasticOut, delay: 100 }}>
 				<!-- Emoji circle -->
 				<div class="relative mb-6">
-					<div class="h-28 w-28 rounded-full bg-teal-400"></div>
+					<div class="h-28 w-28 rounded-full bg-secondary"></div>
 					<span class="absolute inset-0 flex items-center justify-center text-7xl drop-shadow-lg">🎉</span>
 				</div>
 
@@ -170,7 +171,7 @@
 
 				<button
 					onclick={onBack}
-					class="mt-6 flex w-full items-center justify-center rounded-full bg-teal-500 px-7 py-3.5 font-mono text-lg font-medium text-white shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
+					class="mt-6 flex w-full items-center justify-center rounded-full bg-secondary px-7 py-3.5 font-mono text-lg font-medium text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
 				>
 					BACK TO THE CONVERSATION
 				</button>

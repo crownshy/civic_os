@@ -27,7 +27,7 @@
 			</div>
 		</div>
 
-	<div class="rounded-t-lg bg-background w-full">
+	<div class="rounded-t-lg bg-card w-full">
 		<!-- Participant count -->
 		<div class="px-8 pt-8">
 			<h2 class="font-sans text-4xl font-bold text-primary">

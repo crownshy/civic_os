@@ -33,7 +33,7 @@
 <header
 	class={cn(
 		'w-full overflow-hidden',
-		isPrimary ? 'bg-primary' : 'bg-background',
+		isPrimary ? 'bg-primary' : 'bg-card',
 		rounded && 'rounded-bl-[20px] rounded-br-[20px]',
 		className
 	)}
@@ -54,7 +54,7 @@
 				<span
 					class={cn(
 						'h-3 w-3 rounded-full border border-primary-foreground',
-						isPrimary ? 'bg-teal-400' : 'bg-primary'
+						isPrimary ? 'bg-secondary' : 'bg-primary'
 					)}
 				></span>
 				<span

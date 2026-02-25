@@ -35,7 +35,7 @@
 <AppShell>
 	{#if step === 'landing'}
 		<!-- LANDING: zip code entry -->
-		<div class="relative flex h-dvh flex-col bg-gradient-to-b from-blue-700 to-blue-900 overflow-hidden">
+		<div class="relative flex h-dvh flex-col bg-gradient-to-b from-primary to-blue-900 overflow-hidden">
 			{@render decorativeEllipse()}
 
 			<!-- Scrollable content -->
@@ -50,8 +50,8 @@
 					</h1>
 					<!-- Host badge -->
 					<div class="mt-4 flex items-center gap-2">
-						<span class="h-3.5 w-3.5 rounded-full bg-cyan-200"></span>
-						<span class="font-sans text-sm font-medium leading-4 text-cyan-200">
+						<span class="h-3.5 w-3.5 rounded-full bg-secondary/40"></span>
+						<span class="font-sans text-sm font-medium leading-4 text-secondary/80">
 							Mormon Women for Ethical Governance
 						</span>
 					</div>
@@ -79,7 +79,7 @@
 				</div>
 				<button
 					type="submit"
-					class="mt-4 flex h-14 w-full items-center justify-center rounded-full px-7 py-3.5 font-mono text-lg font-medium {zipCode.trim() ? 'bg-teal-500 text-white shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]' : 'bg-white/20 text-white/70'}"
+					class="mt-4 flex h-14 w-full items-center justify-center rounded-full px-7 py-3.5 font-mono text-lg font-medium {zipCode.trim() ? 'bg-secondary text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]' : 'bg-white/20 text-white/70'}"
 				>
 					JOIN THE CONVERSATION
 				</button>
@@ -89,14 +89,14 @@
 
 	{:else if step === 'with-location'}
 		<!-- WITH LOCATION: show host banner, location filled -->
-		<div class="relative flex h-dvh flex-col bg-gradient-to-b from-blue-700 to-blue-900 overflow-hidden">
+		<div class="relative flex h-dvh flex-col bg-gradient-to-b from-primary to-blue-900 overflow-hidden">
 			{@render decorativeEllipse()}
 
 			<!-- Scrollable content -->
 			<div class="relative z-10 flex flex-1 flex-col overflow-y-auto">
 				<!-- Host message banner -->
 				<div class="mx-5 mt-2 flex items-center gap-3 rounded-lg bg-gradient-to-r from-white/10 to-white/0 p-4 outline outline-1 outline-white/10 overflow-hidden">
-					<span class="h-9 w-9 shrink-0 rounded-full bg-teal-400"></span>
+					<span class="h-9 w-9 shrink-0 rounded-full bg-secondary"></span>
 					<div>
 						<span class="font-mono text-xs font-medium uppercase text-white/70">A MESSAGE FROM YOUR HOST</span>
 						<p class="font-sans text-base font-medium text-white">Mormon Women for Ethical Governance</p>
@@ -130,11 +130,11 @@
 				<span class="font-mono text-base font-medium uppercase text-white/80">YOUR LOCATION</span>
 				<div class="mt-2 inline-flex w-60 items-center justify-center gap-1 rounded-full bg-white px-6 py-2 shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)] outline outline-2 outline-white/20">
 					<span class="py-2 font-sans text-base font-medium text-blue-900">Utah County</span>
-					<button onclick={() => (step = 'landing')} class="font-sans text-base font-medium text-teal-500">(change)</button>
+					<button onclick={() => (step = 'landing')} class="font-sans text-base font-medium text-secondary">(change)</button>
 				</div>
 				<button
 					onclick={() => (step = 'email-capture')}
-					class="mt-4 flex h-14 w-full items-center justify-center rounded-full bg-teal-500 px-7 py-3.5 font-mono text-lg font-medium text-white shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
+					class="mt-4 flex h-14 w-full items-center justify-center rounded-full bg-secondary px-7 py-3.5 font-mono text-lg font-medium text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
 				>
 					JOIN THE CONVERSATION
 				</button>
@@ -144,7 +144,7 @@
 
 	{:else if step === 'email-capture'}
 		<!-- EMAIL CAPTURE — popup overlay on top of blurred with-location screen -->
-		<div class="relative flex h-dvh flex-col bg-gradient-to-b from-blue-700 to-blue-900 overflow-hidden">
+		<div class="relative flex h-dvh flex-col bg-gradient-to-b from-primary to-blue-900 overflow-hidden">
 			{@render decorativeEllipse()}
 
 			<!-- Ghost of with-location content behind (visible through blur) -->
@@ -171,7 +171,7 @@
 						<p class="mt-4 font-sans text-lg font-medium leading-7 text-blue-800/80">
 							We'll only use this to give you updates on this conversation. No spam, no marketing emails or anything like that.
 						</p>
-						<div class="mt-5 flex h-12 items-center rounded-full bg-white shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)] outline outline-2 outline-blue-700 overflow-hidden px-5">
+						<div class="mt-5 flex h-12 items-center rounded-full bg-white shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)] outline outline-2 outline-primary overflow-hidden px-5">
 							<input
 								bind:value={email}
 								placeholder="email@xyz.com"
@@ -184,7 +184,7 @@
 					<div class="mt-6 w-full" in:fade={{ duration: 300, delay: 250 }}>
 						<button
 							type="submit"
-							class="flex w-full items-center justify-center rounded-full bg-teal-500 px-7 py-3.5 font-mono text-lg font-medium text-white shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
+							class="flex w-full items-center justify-center rounded-full bg-secondary px-7 py-3.5 font-mono text-lg font-medium text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
 						>
 							SHARE
 						</button>

@@ -2,22 +2,22 @@
 /* Primary: #2952C0 | Accent Pink: #FC3AA8 | Accent Teal: #07A89E */
 
 :root {
-  --background: #FFFFFF;
-  --foreground: #0A0A0A;
+  --background: #1D46B5;
+  --foreground: #FFFFFF;
   --card: #FFFFFF;
   --card-foreground: #030712;
   --popover: #FFFFFF;
   --popover-foreground: #030712;
-  --primary: #2952C0;
+  --primary: #1D46B5;
   --primary-foreground: #FFFFFF;
-  --secondary: #F3F4F6;
-  --secondary-foreground: #252622;
+  --secondary: #07A89E;
+  --secondary-foreground: #FFFFFF;
   --muted: #F3F4F6;
   --muted-foreground: #6B7280;
   --accent: #F3F4F6;
   --accent-foreground: #111827;
-  --destructive: #DC2626;
-  --destructive-foreground: #FEF2F2;
+  --destructive: #FC3AA8;
+  --destructive-foreground: #FFFFFF;
   --border: #E5E7EB;
   --input: #E5E7EB;
   --ring: #5B8DEF;

@@ -36,7 +36,7 @@
 			<div class="flex items-center justify-between">
 				<span class="font-mono text-sm font-medium text-white/80">{county.name}</span>
 				<span class="flex items-center gap-2">
-					<span class="h-3 w-3 rounded-full border border-white bg-teal-400"></span>
+					<span class="h-3 w-3 rounded-full border border-white bg-secondary"></span>
 					<span class="font-mono text-sm font-medium text-white/80">YOU</span>
 				</span>
 			</div>
@@ -75,10 +75,10 @@
 		</div>
 
 		<!-- Bottom actions -->
-		<div class="flex shrink-0 items-center gap-3.5 border-t border-blue-700 bg-blue-900 px-7 py-8">
+		<div class="flex shrink-0 items-center gap-3.5 border-t border-primary bg-blue-900 px-7 py-8">
 			<button
 				onclick={nextQuestion}
-				class="flex h-14 flex-1 items-center justify-center rounded-full bg-teal-500 font-mono text-lg font-medium text-white shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
+				class="flex h-14 flex-1 items-center justify-center rounded-full bg-secondary font-mono text-lg font-medium text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
 			>
 				CONTINUE
 			</button>

@@ -11,12 +11,12 @@
 
 <div
 	class={cn(
-		'flex items-center gap-4 rounded-[10px] bg-accent-pink px-4 py-4',
+		'flex items-center gap-4 rounded-[10px] bg-destructive px-4 py-4',
 		className
 	)}
 >
 	<div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-foreground">
-		<span class="font-mono text-lg font-medium text-accent-pink">!</span>
+		<span class="font-mono text-lg font-medium text-destructive">!</span>
 	</div>
 	<p class="font-mono text-xs font-medium text-primary-foreground">{message}</p>
 </div>

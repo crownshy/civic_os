@@ -75,7 +75,7 @@
 					disabled={answered}
 					class="relative flex h-16 w-full items-center rounded-[20px] px-6 text-left font-sans text-2xl font-bold leading-7 transition-all duration-300
 						{answered && isCorrect
-							? 'bg-teal-500 text-white shadow-[0px_10px_15px_0px_rgba(12,34,95,0.25)]'
+							? 'bg-secondary text-secondary-foreground shadow-[0px_10px_15px_0px_rgba(12,34,95,0.25)]'
 							: isSelected && !isCorrect
 								? 'bg-white/30 text-white'
 								: answered
@@ -113,12 +113,12 @@
 	</div>
 
 	<!-- Bottom actions -->
-	<div class="flex shrink-0 items-center gap-3.5 border-t border-blue-700 bg-blue-900 px-7 py-8">
+	<div class="flex shrink-0 items-center gap-3.5 border-t border-primary bg-blue-900 px-7 py-8">
 		<button
 			onclick={onContinue}
 			class="flex h-14 flex-1 items-center justify-center rounded-full font-mono text-lg font-medium shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)] transition-colors {selected !== null
-				? 'bg-teal-500 text-white'
-				: 'bg-teal-500/50 text-white/70'}"
+				? 'bg-secondary text-secondary-foreground'
+				: 'bg-secondary/50 text-white/70'}"
 		>
 			CONTINUE
 		</button>
