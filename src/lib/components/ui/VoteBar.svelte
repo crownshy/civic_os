@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
 	import Button from './Button.svelte';
+	import { SkipForward } from 'lucide-svelte';
+
 
 	interface Props {
 		onAgree?: () => void;
@@ -46,7 +48,7 @@
 	</div>
 
 	<!-- Vote buttons row -->
-	<div class="flex items-center gap-4 bg-background px-5 py-5 border-t border-background">
+	<div class="flex items-center gap-3 bg-background px-4 py-7 border-t border-background">
 		<Button variant="primary" class="flex-1" onclick={onAgree}>
 			<span class="text-2xl mr-2">&#10003;</span>
 			AGREE
@@ -55,11 +57,29 @@
 			<span class="mr-2">X</span>
 			DISAGREE
 		</Button>
-		<button
-			aria-label="Skip"
-			onclick={onSkip}
-			class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white/20 outline outline-4 outline-white"
-		>
-		</button>
+
+		<!-- Skip button -->
+		<div class="relative inline-flex items-center justify-center">
+			<Button aria-label="Skip" onclick={onSkip} variant="outline" 
+				class="h-13 w-13 shrink-0 overflow-visible">
+				<SkipForward class="h-6 w-6 text-white" />
+			</Button>
+			<svg
+			viewBox="0 0 100 100"
+			xmlns="http://www.w3.org/2000/svg"
+			class="pointer-events-none absolute h-20 w-20"
+			>
+			<path 
+				id="circlePath"
+				d="M 50,90 a 40,40 0 1,1 0,-80 a 40,40 0 1,1 0,80"
+				fill="none"
+			/>
+			<text fill="white" font-size="14">
+				<textPath href="#circlePath" text-anchor="middle" startOffset="50%">
+				SKIP
+				</textPath>
+			</text>
+			</svg>
+		</div>
 	</div>
 </div>

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
-	import { cubicOut } from 'svelte/easing';
+	import { cubicInOut } from 'svelte/easing';
 	import { onDestroy } from 'svelte';
 	import type { Snippet } from 'svelte';
 
@@ -100,7 +100,7 @@
 	aria-label="Carousel"
 >
 	{#key index}
-		<div in:fly={{ x: touchDeltaX <= 0 ? 60 : -60, duration: 250, easing: cubicOut }}>
+		<div in:fly={{ x: touchDeltaX <= 0 ? 80 : -80, duration: 750, easing: cubicInOut }}>
 			{@render children(index)}
 		</div>
 	{/key}

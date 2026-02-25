@@ -38,7 +38,8 @@
 		destructive: 'bg-destructive/20 text-destructive hover:opacity-80',
 		pill: 'bg-secondary/20 text-secondary',
 		ghost: 'bg-transparent text-white/70',
-		gradient: 'bg-white/10 shadow-[inset_2px_4px_4px_0px_rgba(0,0,0,0.20)] outline outline-2 outline-white/20'
+		gradient: 'bg-white/10 shadow-[inset_2px_4px_4px_0px_rgba(0,0,0,0.20)] outline outline-2 outline-white/20',
+		outline: 'bg-white/20 text-white/70 border-4 border-white'
 	};
 
 	const disabledVariants: Record<Variant, string> = {
