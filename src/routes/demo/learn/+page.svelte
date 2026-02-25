@@ -3,7 +3,7 @@
 	import { fly, fade, scale } from 'svelte/transition';
 	import { cubicOut, elasticOut, backOut } from 'svelte/easing';
 	import { AppShell } from '$lib/components/layout';
-	import { BlueHeader, PopQuiz } from '$lib/components/ui';
+	import { Header, PopQuiz } from '$lib/components/ui';
 	import { county, learningCards, popQuizQuestions } from '$lib/data/mock';
 
 	// Screen types: alternate between learning and quiz
@@ -76,7 +76,7 @@
 	{#if current.type === 'learning' && card}
 		<!-- LEARNING / DID YOU KNOW SCREEN -->
 		<div class="flex h-dvh flex-col bg-gradient-to-b from-blue-800 to-blue-900" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
-			<BlueHeader countyName={county.name} />
+			<Header countyName={county.name} />
 
 			<!-- Content -->
 			<div class="flex flex-1 flex-col overflow-y-auto px-8 pt-10">
@@ -112,7 +112,7 @@
 	{:else if current.type === 'quiz' && quiz}
 		<!-- POP QUIZ SCREEN -->
 		<div class="flex h-dvh flex-col bg-gradient-to-b from-blue-800 to-blue-900 overflow-hidden" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
-			<BlueHeader countyName={county.name} />
+			<Header countyName={county.name} />
 			<PopQuiz quiz={quiz} onContinue={nextScreen} onSkip={nextScreen} />
 		</div>
 	{/if}

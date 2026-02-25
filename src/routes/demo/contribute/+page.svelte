@@ -2,14 +2,13 @@
 	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import { AppShell } from '$lib/components/layout';
-	import { PopQuiz, EmailCapture, BlueHeader } from '$lib/components/ui';
+	import { PopQuiz, EmailCapture, Header } from '$lib/components/ui';
 	import { county, deliberation, statements, popQuizQuestions, aboutYouQuestions } from '$lib/data/mock';
 	import VotingScreen from './VotingScreen.svelte';
 	import ComposeScreen from './ComposeScreen.svelte';
 	import DidYouKnowScreen from './DidYouKnowScreen.svelte';
 	import AboutYouScreen from './AboutYouScreen.svelte';
 	import NiceJobScreen from './NiceJobScreen.svelte';
-	import OnARollScreen from './OnARollScreen.svelte';
 	import ThankYouScreen from './ThankYouScreen.svelte';
 
 	type Screen =
@@ -20,7 +19,6 @@
 		| 'pop-quiz'
 		| 'about-you'
 		| 'nice-job'
-		| 'on-a-roll'
 		| 'thank-you';
 
 	let screen = $state<Screen>('voting');
@@ -45,7 +43,7 @@
 		currentIndex++;
 
 		if (currentIndex >= totalStatements) {
-			screen = 'thank-you';
+			screen = 'nice-job';
 			return;
 		}
 
@@ -58,11 +56,13 @@
 				return;
 			}
 			// Then cycle: did-you-know → pop-quiz → about-you ...
-			const cycle = (interstitialStep - 1) % 3;
+			const cycle = (interstitialStep - 1) % 4;
 			if (cycle === 0) {
 				screen = 'did-you-know';
 			} else if (cycle === 1) {
 				screen = 'pop-quiz';
+			}  else if (cycle === 2) {
+				screen = 'nice-job';
 			} else {
 				screen = 'about-you';
 			}
@@ -114,7 +114,7 @@
 
 	{:else if screen === 'email-capture'}
 		<div class="flex h-dvh flex-col bg-gradient-primary" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
-			<BlueHeader countyName={county.name} />
+			<Header countyName={county.name} />
 			<div class="flex flex-1 flex-col items-center justify-center px-6">
 				<EmailCapture
 					onSubmit={() => resumeVoting()}
@@ -131,7 +131,7 @@
 
 	{:else if screen === 'pop-quiz'}
 		<div class="flex h-dvh flex-col bg-gradient-primary" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
-			<BlueHeader countyName={county.name} />
+			<Header countyName={county.name} />
 			<PopQuiz quiz={currentQuiz} onContinue={resumeVoting} onSkip={resumeVoting} />
 		</div>
 
@@ -147,17 +147,6 @@
 			countyName={county.name}
 			onKeepVoting={continueVoting}
 			onDone={handleEnd}
-		/>
-
-	{:else if screen === 'on-a-roll'}
-		<OnARollScreen
-			countyName={county.name}
-			question={deliberation.question}
-			{totalVotes}
-			{totalStatements}
-			onVote={handleVote}
-			onEnd={handleEnd}
-			onCompose={() => (screen = 'compose')}
 		/>
 
 	{:else if screen === 'thank-you'}

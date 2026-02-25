@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
-	import { BlueHeader, SwipeCarousel, Button } from '$lib/components/ui';
+	import { Header, SwipeCarousel, Button } from '$lib/components/ui';
+	import { scale } from 'svelte/transition';
 
 	interface Props {
 		countyName: string;
@@ -19,24 +20,21 @@
 	let reportSlideIndex = $state(0);
 </script>
 
-<div class="flex h-dvh flex-col bg-gradient-primary" in:fly={{ y: 40, duration: 400, easing: cubicOut }}>
-	<BlueHeader {countyName} />
+<div class="flex h-dvh flex-col bg-gradient-primary" in:scale={{ start: 0.9, duration: 500, easing: cubicOut }}>
+	<Header {countyName} />
 
-	<!-- Scrollable content -->
-	<div class="flex flex-1 flex-col overflow-y-auto px-8 pt-6">
-		<!-- Compact emoji + heading row -->
-		<div class="flex items-center gap-4">
-			<div class="relative shrink-0">
-				<div class="h-16 w-16 rounded-full bg-secondary"></div>
-				<span class="absolute inset-0 flex items-center justify-center text-5xl drop-shadow-[0px_4px_24px_rgba(0,0,0,0.25)]">🎉</span>
-			</div>
-			<p class="font-sans text-2xl font-bold leading-8 text-white">
-				Thank you for participating!
-			</p>
+	<!-- Centered content -->
+	<div class="flex flex-1 flex-col items-center mt-16 overflow-y-auto px-8">
+		<div class="relative shrink-0">
+			<div class="h-30 w-30 rounded-full bg-secondary"></div>
+			<span class="absolute inset-0 flex items-center justify-center text-9xl drop-shadow-[0px_4px_24px_rgba(0,0,0,0.25)]">🎉</span>
 		</div>
+		<p class="mt-4 font-sans text-3xl font-bold leading-10 text-white">
+			Thank you for participating! Here's what's next...
+		</p>
 
-		<!-- Report Back swipeable carousel -->
-		<SwipeCarousel count={reportSlides.length} autoScrollMs={4000} bind:index={reportSlideIndex} class="mt-5 border-t border-white/20 pt-5">
+	<!-- Report Back swipeable carousel -->
+	<SwipeCarousel count={reportSlides.length} autoScrollMs={4000} bind:index={reportSlideIndex} class="mt-5 border-t border-white/20 pt-5">
 			{#snippet children(i)}
 				<h3 class="font-sans text-xl font-bold leading-7 text-white">{reportSlides[i].title}</h3>
 				<p class="mt-2 font-sans text-base font-medium leading-6 text-white/80">

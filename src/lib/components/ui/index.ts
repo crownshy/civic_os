@@ -13,7 +13,7 @@ export { default as FloatingStatement } from './FloatingStatement.svelte';
 export { default as PillInput } from './PillInput.svelte';
 export { default as ComposeOverlay } from './ComposeOverlay.svelte';
 export { default as SwipeCarousel } from './SwipeCarousel.svelte';
-export { default as BlueHeader } from './BlueHeader.svelte';
+export { default as Header } from './Header.svelte';
 export { default as ConfettiOverlay } from './ConfettiOverlay.svelte';
 export { default as PopQuiz } from './PopQuiz.svelte';
 export { default as EmailCapture } from './EmailCapture.svelte';

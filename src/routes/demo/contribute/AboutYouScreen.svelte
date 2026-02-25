@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
-	import { BlueHeader, Button } from '$lib/components/ui';
+	import { Header, Button } from '$lib/components/ui';
 	import type { AboutYouQuestion } from '$lib/types/mock-data';
 
 	interface Props {
@@ -39,7 +39,7 @@
 </script>
 
 <div class="flex h-dvh flex-col bg-gradient-primary" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
-	<BlueHeader {countyName} />
+	<Header {countyName} />
 
 	<!-- Scrollable content -->
 	<div class="flex flex-1 flex-col overflow-y-auto px-8 pt-8">
