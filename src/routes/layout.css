@@ -52,6 +52,11 @@
   --font-serif: var(--font-serif);
 }
 
+/* TODO: hardcoded blue */
+@utility bg-gradient-primary {
+  background-image: linear-gradient(to bottom, var(--color-primary), var(--color-blue-900));
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

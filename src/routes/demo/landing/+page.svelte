@@ -35,7 +35,7 @@
 <AppShell>
 	{#if step === 'landing'}
 		<!-- LANDING: zip code entry -->
-		<div class="relative flex h-dvh flex-col bg-gradient-to-b from-primary to-blue-900 overflow-hidden">
+		<div class="relative flex h-dvh flex-col bg-gradient-primary overflow-hidden">
 			{@render decorativeEllipse()}
 
 			<!-- Scrollable content -->
@@ -89,7 +89,7 @@
 
 	{:else if step === 'with-location'}
 		<!-- WITH LOCATION: show host banner, location filled -->
-		<div class="relative flex h-dvh flex-col bg-gradient-to-b from-primary to-blue-900 overflow-hidden">
+		<div class="relative flex h-dvh flex-col bg-gradient-primary overflow-hidden">
 			{@render decorativeEllipse()}
 
 			<!-- Scrollable content -->
@@ -144,7 +144,7 @@
 
 	{:else if step === 'email-capture'}
 		<!-- EMAIL CAPTURE — popup overlay on top of blurred with-location screen -->
-		<div class="relative flex h-dvh flex-col bg-gradient-to-b from-primary to-blue-900 overflow-hidden">
+		<div class="relative flex h-dvh flex-col bg-gradient-primary overflow-hidden">
 			{@render decorativeEllipse()}
 
 			<!-- Ghost of with-location content behind (visible through blur) -->

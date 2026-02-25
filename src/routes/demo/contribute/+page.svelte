@@ -309,7 +309,7 @@
 
 	{:else if screen === 'did-you-know'}
 		<!-- DID YOU KNOW INTERSTITIAL -->
-		<div class="flex h-dvh flex-col bg-gradient-to-b from-primary to-blue-900" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
+		<div class="flex h-dvh flex-col bg-gradient-primary" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
 			<BlueHeader countyName={county.name} />
 
 			<!-- Scrollable content -->
@@ -343,14 +343,14 @@
 
 	{:else if screen === 'pop-quiz'}
 		<!-- POP QUIZ INTERSTITIAL -->
-		<div class="flex h-dvh flex-col bg-gradient-to-b from-primary to-blue-900" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
+		<div class="flex h-dvh flex-col bg-gradient-primary" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
 			<BlueHeader countyName={county.name} />
 			<PopQuiz quiz={currentQuiz} onContinue={resumeVoting} onSkip={resumeVoting} />
 		</div>
 
 	{:else if screen === 'about-you'}
 		<!-- ABOUT YOU demographic questions -->
-		<div class="flex h-dvh flex-col bg-gradient-to-b from-primary to-blue-900" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
+		<div class="flex h-dvh flex-col bg-gradient-primary" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
 			<BlueHeader countyName={county.name} />
 
 			<!-- Scrollable content -->
@@ -418,7 +418,7 @@
 
 	{:else if screen === 'nice-job'}
 		<!-- NICE JOB celebration -->
-		<div class="flex h-dvh flex-col bg-gradient-to-b from-primary to-blue-900" in:scale={{ start: 0.9, duration: 500, easing: cubicOut }}>
+		<div class="flex h-dvh flex-col bg-gradient-primary" in:scale={{ start: 0.9, duration: 500, easing: cubicOut }}>
 			<BlueHeader countyName={county.name} />
 
 			<!-- Centered content -->
@@ -481,7 +481,7 @@
 
 	{:else if screen === 'thank-you'}
 		<!-- THANK YOU / WHAT'S NEXT completion -->
-		<div class="flex h-dvh flex-col bg-gradient-to-b from-primary to-blue-900" in:fly={{ y: 40, duration: 400, easing: cubicOut }}>
+		<div class="flex h-dvh flex-col bg-gradient-primary" in:fly={{ y: 40, duration: 400, easing: cubicOut }}>
 			<BlueHeader countyName={county.name} />
 
 			<!-- Scrollable content -->

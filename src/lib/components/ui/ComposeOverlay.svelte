@@ -47,8 +47,7 @@
 
 <div class={cn('relative flex h-dvh flex-col bg-white', className)}>
 	<!-- Blue gradient card area -->
-	 <!-- TODO: hardcoded blue -->
-	<div class="flex flex-1 flex-col rounded-bl-[30px] rounded-br-[30px] bg-gradient-to-b from-primary to-blue-900 shadow-[0px_4px_16.6px_0px_rgba(41,82,192,0.40)]">
+	<div class="flex flex-1 flex-col rounded-bl-[30px] rounded-br-[30px] bg-gradient-primary shadow-[0px_4px_16.6px_0px_rgba(41,82,192,0.40)]">
 		<!-- Header -->
 		<div class="flex items-center justify-between px-8 pt-6">
 			<span class="font-mono text-sm font-medium text-white/80">{countyName}</span>
