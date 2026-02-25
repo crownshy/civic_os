@@ -1,17 +1,38 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
-	import { AppShell, AppHeader } from '$lib/components/layout';
-	import { PillButton, MonoLabel, QuoteText, ProgressBar } from '$lib/components/ui';
-	import { county, deliberation, learningCards, themeSummaries } from '$lib/data/mock';
+	import { fly, fade, scale } from 'svelte/transition';
+	import { cubicOut, elasticOut, backOut } from 'svelte/easing';
+	import { AppShell } from '$lib/components/layout';
+	import { BlueHeader, PopQuiz } from '$lib/components/ui';
+	import { county, learningCards, popQuizQuestions } from '$lib/data/mock';
 
-	let currentCard = $state(0);
-	let countdown = $state(5);
+	// Screen types: alternate between learning and quiz
+	type ScreenType = 'learning' | 'quiz';
+
+	// Build the sequence: learning, quiz, learning, quiz, ...
+	const sequence: { type: ScreenType; index: number }[] = [];
+	const maxLen = Math.max(learningCards.length, popQuizQuestions.length);
+	for (let i = 0; i < maxLen; i++) {
+		if (i < learningCards.length) sequence.push({ type: 'learning', index: i });
+		if (i < popQuizQuestions.length) sequence.push({ type: 'quiz', index: i });
+	}
+	// If more learning cards than quizzes, append remaining
+	for (let i = popQuizQuestions.length; i < learningCards.length; i++) {
+		if (!sequence.find((s) => s.type === 'learning' && s.index === i)) {
+			sequence.push({ type: 'learning', index: i });
+		}
+	}
+
+	let seqIndex = $state(0);
+	let countdown = $state(2);
 	let timer: ReturnType<typeof setInterval> | null = null;
 
-	const card = $derived(learningCards[currentCard]);
+	const current = $derived(sequence[seqIndex % sequence.length]);
+	const card = $derived(current.type === 'learning' ? learningCards[current.index] : null);
+	const quiz = $derived(current.type === 'quiz' ? popQuizQuestions[current.index] : null);
 
 	function startCountdown() {
-		countdown = 5;
+		countdown = 2;
 		if (timer) clearInterval(timer);
 		timer = setInterval(() => {
 			countdown--;
@@ -22,81 +43,78 @@
 		}, 1000);
 	}
 
-	startCountdown();
+	function stopCountdown() {
+		if (timer) clearInterval(timer);
+		timer = null;
+	}
 
-	function nextCard() {
-		if (currentCard < learningCards.length - 1) {
-			currentCard++;
+	// Start countdown for first screen if it's learning
+	if (current.type === 'learning') startCountdown();
+
+	function nextScreen() {
+		if (seqIndex < sequence.length - 1) {
+			seqIndex++;
 		} else {
-			currentCard = 0;
+			seqIndex = 0;
 		}
-		startCountdown();
+		// Start countdown only for learning screens
+		if (sequence[seqIndex % sequence.length].type === 'learning') {
+			startCountdown();
+		} else {
+			stopCountdown();
+		}
 	}
 
 	onDestroy(() => {
 		if (timer) clearInterval(timer);
 	});
+
 </script>
 
 <AppShell>
-	<div class="flex h-dvh flex-col bg-primary">
-		<!-- Header with question (fixed) -->
-		<AppHeader
-			countyName={county.name}
-			question={deliberation.question}
-			variant="on-primary"
-			backHref="/demo"
-			class="shrink-0 border-b border-primary-foreground/20"
-		/>
+	{#key seqIndex}
+	{#if current.type === 'learning' && card}
+		<!-- LEARNING / DID YOU KNOW SCREEN -->
+		<div class="flex h-dvh flex-col bg-gradient-to-b from-blue-800 to-blue-900" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
+			<BlueHeader countyName={county.name} />
 
-		<!-- Scrollable card content -->
-		<div class="flex flex-1 flex-col overflow-y-auto px-8 pt-6">
-			<MonoLabel size="md" variant="white">{card.label}</MonoLabel>
+			<!-- Content -->
+			<div class="flex flex-1 flex-col overflow-y-auto px-8 pt-10">
+				<span class="font-mono text-sm font-medium text-white/80">{card.label}</span>
+				<p class="mt-4 font-sans text-4xl font-bold leading-10 text-white">
+					{card.body || card.title}
+				</p>
 
-			{#if card.type === 'did-you-know'}
-				<QuoteText size="lg" variant="white" class="mt-4">
-					{card.body}
-				</QuoteText>
-			{:else if card.type === 'where-were-at'}
-				<QuoteText size="lg" variant="white" class="mt-4">
-					{card.title}
-				</QuoteText>
-				<div class="mt-8 flex flex-col gap-4">
-					{#each themeSummaries as theme}
-						<ProgressBar
-							percentage={theme.percentage}
-							variant="on-primary"
-						/>
-					{/each}
-				</div>
-			{:else if card.type === 'testimony'}
-				<div class="mt-4 flex-1">
-					<img
-						src={card.imageUrl}
-						alt="Testimony"
-						class="h-full w-full rounded-lg object-cover opacity-50"
-					/>
-				</div>
-			{/if}
+				<!-- Lorem body text -->
+				<p class="mt-10 font-sans text-lg font-medium leading-9 text-white">
+					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis finibus purus mollis, ultrices lorem quis, facilisis mauris. Nulla tortor magna, consequat sed pharetra quis, blandit elementum velit. Curabitur finibus et felis nec vehicula. Vivamus facilisis nunc sed dui ultrices, quis vulputate tellus egestas. Donec in elementum dui. Sed ut placerat nunc.
+				</p>
+			</div>
+
+			<!-- Bottom: countdown button -->
+			<div class="flex shrink-0 flex-col gap-2.5 border-t border-primary bg-blue-900 px-7 py-8">
+				<button
+					disabled={countdown > 0}
+					onclick={nextScreen}
+					class="flex w-full items-center justify-center rounded-full px-7 py-3.5 font-mono text-lg font-medium transition-colors {countdown > 0
+						? 'bg-white/20 text-white/70'
+						: 'bg-secondary text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]'}"
+				>
+					{#if countdown > 0}
+						CONTINUE IN {countdown}...
+					{:else}
+						CONTINUE
+					{/if}
+				</button>
+			</div>
 		</div>
 
-		<!-- Sticky bottom actions -->
-		<div class="flex shrink-0 flex-col gap-3 border-t border-primary-foreground/10 px-8 pb-8 pt-4 w-full">
-			<PillButton
-				variant="ghost"
-				fullWidth
-				disabled={countdown > 0}
-				onclick={nextCard}
-			>
-				{#if countdown > 0}
-					CONTINUE IN {countdown}...
-				{:else}
-					CONTINUE
-				{/if}
-			</PillButton>
-			<PillButton variant="filled-white" fullWidth>
-				LEARN MORE
-			</PillButton>
+	{:else if current.type === 'quiz' && quiz}
+		<!-- POP QUIZ SCREEN -->
+		<div class="flex h-dvh flex-col bg-gradient-to-b from-blue-800 to-blue-900 overflow-hidden" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
+			<BlueHeader countyName={county.name} />
+			<PopQuiz quiz={quiz} onContinue={nextScreen} onSkip={nextScreen} />
 		</div>
-	</div>
+	{/if}
+	{/key}
 </AppShell>

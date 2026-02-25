@@ -10,7 +10,7 @@
 </script>
 
 <AppShell>
-	<div class="flex flex-col bg-background">
+	<div class="flex flex-col bg-card">
 		<!-- Header -->
 		<div class="bg-primary px-8 pt-6 pb-4">
 			<div class="flex items-center justify-between">
@@ -21,12 +21,12 @@
 				</span>
 			</div>
 
-			<h1 class="mt-4 font-mono text-3xl font-medium leading-9 text-primary-foreground">
+			<h1 class="mt-4 font-sans text-3xl font-bold leading-9 text-primary-foreground">
 				PROFILE
 			</h1>
 
 			<!-- User card -->
-			<div class="mt-4 flex items-center gap-4 rounded-2xl bg-background p-4">
+			<div class="mt-4 flex items-center gap-4 rounded-2xl bg-card p-4">
 				<div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-lg text-primary-foreground">
 					🦊
 				</div>

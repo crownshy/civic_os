@@ -41,6 +41,8 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --color-accent-pink: var(--accent-pink);
   --color-accent-pink-foreground: var(--accent-pink-foreground);
+  --color-accent-teal: var(--accent-teal);
+  --color-accent-teal-foreground: var(--accent-teal-foreground);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -48,6 +50,11 @@
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
   --font-serif: var(--font-serif);
+}
+
+/* TODO: hardcoded blue */
+@utility bg-gradient-primary {
+  background-image: linear-gradient(to bottom, var(--color-primary), var(--color-blue-900));
 }
 
 @layer base {
@@ -62,4 +69,9 @@
 
 button, a {
   cursor: pointer;
+}
+
+button, input, textarea, select {
+  -webkit-appearance: none;
+  appearance: none;
 }

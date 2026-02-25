@@ -22,7 +22,7 @@
 		<span class="text-primary">{meta}</span>
 		{#if onDelete}
 			<span class="text-primary"> | </span>
-			<button onclick={onDelete} class="text-accent-pink uppercase">DELETE</button>
+			<button onclick={onDelete} class="text-destructive uppercase">DELETE</button>
 		{/if}
 	</p>
 </div>

@@ -2,35 +2,99 @@
 	import { fly, fade, scale } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import { AppShell, AppHeader } from '$lib/components/layout';
-	import { VoteBar, PillButton, MonoLabel, QuoteText } from '$lib/components/ui';
+	import { VoteBar, PillButton, BlueHeader, SwipeCarousel, PopQuiz } from '$lib/components/ui';
 	import ComposeOverlay from '$lib/components/ui/ComposeOverlay.svelte';
-	import { county, deliberation, statements, learningCards } from '$lib/data/mock';
+	import { county, deliberation, statements, learningCards, popQuizQuestions, aboutYouQuestions } from '$lib/data/mock';
 
-	type Screen = 'voting' | 'compose' | 'did-you-know' | 'nice-job' | 'on-a-roll' | 'whats-next';
+	type Screen =
+		| 'voting'
+		| 'compose'
+		| 'did-you-know'
+		| 'pop-quiz'
+		| 'about-you'
+		| 'nice-job'
+		| 'on-a-roll'
+		| 'thank-you';
 
 	let screen = $state<Screen>('voting');
+	let showInstructions = $state(false);
 	let currentIndex = $state(0);
 	let votesInRound = $state(0);
 	let totalVotes = $state(0);
 	const totalStatements = statements.length;
 	const milestoneInterval = 5;
 
+	// Swipe state for voting
+	let swipeStartX = $state(0);
+	let swipeStartY = $state(0);
+	let swipeDeltaX = $state(0);
+	let swiping = $state(false);
+	let swipeDirection = $state<'none' | 'agree' | 'disagree'>('none');
+	let swipeDismissed = $state(false);
+
+	const SWIPE_THRESHOLD = 80;
+
+	function handleSwipeStart(e: TouchEvent) {
+		if (swipeDismissed) return;
+		swipeStartX = e.touches[0].clientX;
+		swipeStartY = e.touches[0].clientY;
+		swipeDeltaX = 0;
+		swiping = true;
+		swipeDirection = 'none';
+	}
+
+	function handleSwipeMove(e: TouchEvent) {
+		if (!swiping || swipeDismissed) return;
+		const dx = e.touches[0].clientX - swipeStartX;
+		const dy = e.touches[0].clientY - swipeStartY;
+		// Only track horizontal swipes
+		if (Math.abs(dx) > Math.abs(dy) * 1.2) {
+			swipeDeltaX = dx;
+			swipeDirection = dx > SWIPE_THRESHOLD ? 'agree' : dx < -SWIPE_THRESHOLD ? 'disagree' : 'none';
+		}
+	}
+
+	function handleSwipeEnd() {
+		if (!swiping || swipeDismissed) return;
+		swiping = false;
+		if (swipeDirection === 'agree') {
+			swipeDismissed = true;
+			setTimeout(() => {
+				handleVote('agree');
+				swipeDeltaX = 0;
+				swipeDirection = 'none';
+				swipeDismissed = false;
+			}, 200);
+		} else if (swipeDirection === 'disagree') {
+			swipeDismissed = true;
+			setTimeout(() => {
+				handleVote('disagree');
+				swipeDeltaX = 0;
+				swipeDirection = 'none';
+				swipeDismissed = false;
+			}, 200);
+		} else {
+			swipeDeltaX = 0;
+			swipeDirection = 'none';
+		}
+	}
+
 	const currentStatement = $derived(statements[currentIndex % totalStatements]);
 
-	// Adaptive font size based on statement text length
-	const statementSize = $derived.by(() => {
+	// Adaptive font: short → Hanken big, medium → Hanken mid, long → Hanken smaller
+	const statementClasses = $derived.by(() => {
 		const len = currentStatement.text.length;
-		if (len < 60) return 'text-5xl';
-		if (len < 140) return 'text-4xl';
-		return 'text-2xl';
+		if (len < 60) return 'font-sans text-5xl font-bold leading-[1.1]';
+		if (len < 140) return 'font-sans text-3xl font-semibold leading-10';
+		return 'font-sans text-2xl font-medium leading-8';
 	});
 
 	// Countdown timer for interstitials
-	let countdown = $state(5);
+	let countdown = $state(2);
 	let countdownInterval: ReturnType<typeof setInterval> | null = null;
 
-	function startCountdown(cb: () => void) {
-		countdown = 5;
+	function startCountdown() {
+		countdown = 2;
 		if (countdownInterval) clearInterval(countdownInterval);
 		countdownInterval = setInterval(() => {
 			countdown--;
@@ -41,28 +105,50 @@
 		}, 1000);
 	}
 
+	// Pop quiz state
+	let quizIndex = $state(0);
+	let quizSelected = $state<number | null>(null);
+	const currentQuiz = $derived(popQuizQuestions[quizIndex % popQuizQuestions.length]);
+
+	// About you state
+	let aboutIndex = $state(0);
+	let aboutSelections = $state<Set<number>>(new Set());
+	const currentAbout = $derived(aboutYouQuestions[aboutIndex % aboutYouQuestions.length]);
+
+	// Interstitial queue: after milestones, cycle through learning types
+	let interstitialStep = $state(0);
+
 	function handleVote(type: 'agree' | 'disagree' | 'skip') {
 		totalVotes++;
 		votesInRound++;
 		currentIndex++;
 
-		// Check total FIRST — if we've done all statements, show nice-job
 		if (currentIndex >= totalStatements) {
-			screen = 'nice-job';
+			screen = 'thank-you';
 			return;
 		}
 
-		// Every milestone votes, show a learning interstitial
 		if (votesInRound === milestoneInterval) {
 			votesInRound = 0;
-			screen = 'did-you-know';
-			startCountdown(() => {});
+			interstitialStep++;
+			// Cycle: did-you-know → pop-quiz → about-you → did-you-know ...
+			const cycle = interstitialStep % 3;
+			if (cycle === 1) {
+				screen = 'did-you-know';
+				startCountdown();
+			} else if (cycle === 2) {
+				quizSelected = null;
+				screen = 'pop-quiz';
+			} else {
+				aboutSelections = new Set();
+				screen = 'about-you';
+			}
 			return;
 		}
 	}
 
 	function handleEnd() {
-		screen = 'whats-next';
+		screen = 'thank-you';
 	}
 
 	function resumeVoting() {
@@ -77,16 +163,34 @@
 	}
 
 	function handleCompose(text: string, anonymous: boolean) {
-		// In a real app, this would submit the statement
-		screen = 'voting';
+		// Stay on compose page — user navigates back manually
+	}
+
+	// Report Back carousel slides
+	const reportSlides = [
+		{ title: 'Report Back', body: 'This is a place-based conversation about how we should regulate social media to minimize its harms for ourselves and those we care about.' },
+		{ title: 'What We Heard', body: 'Participants broadly agreed on the need for digital literacy education and stronger platform accountability, with nuanced views on parental controls.' },
+		{ title: 'What\'s Next', body: 'Results from this conversation will be shared with local officials and community organizations to help inform policy decisions in Utah County.' }
+	];
+	let reportSlideIndex = $state(0);
+
+	function toggleAboutSelection(idx: number) {
+		const next = new Set(aboutSelections);
+		if (currentAbout.multiSelect) {
+			if (next.has(idx)) next.delete(idx);
+			else next.add(idx);
+		} else {
+			next.clear();
+			next.add(idx);
+		}
+		aboutSelections = next;
 	}
 </script>
 
 <AppShell>
 	{#if screen === 'voting'}
 		<!-- Voting screen -->
-		<div class="flex h-dvh flex-col bg-background" in:fly={{ x: -40, duration: 350, easing: cubicOut }}>
-			<!-- Header with rounded bottom + share input -->
+		<div class="flex h-dvh flex-col bg-card" in:fly={{ x: -40, duration: 350, easing: cubicOut }}>
 			<AppHeader
 				countyName={county.name}
 				question={deliberation.question}
@@ -94,14 +198,40 @@
 				rounded
 				shareInput
 				onShareClick={() => (screen = 'compose')}
-				backHref="/demo"
 				class="shrink-0"
 			/>
 
-			<!-- Scrollable statement content -->
-			<div class="flex flex-1 flex-col overflow-y-auto px-8 pt-6">
+			<!-- Swipeable statement content -->
+			<div
+				class="relative flex flex-1 flex-col overflow-hidden px-8 pt-6"
+				ontouchstart={handleSwipeStart}
+				ontouchmove={handleSwipeMove}
+				ontouchend={handleSwipeEnd}
+				role="region"
+				aria-label="Swipe to vote"
+			>
+				<!-- Swipe direction labels -->
+				{#if swiping && Math.abs(swipeDeltaX) > 30}
+					<div class="pointer-events-none absolute inset-0 z-10 flex items-center justify-between px-4">
+						<span
+							class="rounded-full px-4 py-2 font-mono text-sm font-medium transition-opacity {swipeDirection === 'disagree' ? 'bg-blue-900 text-white opacity-100' : 'opacity-0'}"
+						>
+							DISAGREE
+						</span>
+						<span
+							class="rounded-full px-4 py-2 font-mono text-sm font-medium transition-opacity {swipeDirection === 'agree' ? 'bg-secondary text-secondary-foreground opacity-100' : 'opacity-0'}"
+						>
+							AGREE
+						</span>
+					</div>
+				{/if}
+
 				{#key currentIndex}
-					<div in:fly={{ y: 20, duration: 300, easing: cubicOut }}>
+					<div
+						class="transition-transform {swiping ? 'duration-0' : 'duration-300'}"
+						style="transform: translateX({swipeDismissed ? (swipeDirection === 'agree' ? 400 : -400) : swipeDeltaX}px) rotate({swipeDismissed ? (swipeDirection === 'agree' ? 8 : -8) : swipeDeltaX * 0.04}deg); opacity: {swipeDismissed ? 0 : 1}"
+						in:fly={{ y: 20, duration: 300, easing: cubicOut }}
+					>
 						<!-- Attribution -->
 						<div class="flex items-center gap-2">
 							<span
@@ -109,15 +239,14 @@
 								style="background-color: {currentStatement.authorColor ?? '#2952C0'}"
 							></span>
 							<span
-								class="font-mono text-sm font-medium"
-								style="color: {currentStatement.authorColor ?? '#2952C0'}"
+								class="font-mono text-sm font-medium text-primary"
 							>
 								{currentStatement.authorAlias} SAYS...
 							</span>
 						</div>
 
-						<!-- Quote with adaptive font size -->
-						<p class="mt-4 font-mono {statementSize} font-medium text-primary">
+						<!-- Quote with adaptive font — now Hanken Grotesk -->
+						<p class="mt-4 {statementClasses} text-primary">
 							{currentStatement.text}
 						</p>
 					</div>
@@ -139,101 +268,182 @@
 
 	{:else if screen === 'compose'}
 		<!-- Compose / share thoughts screen -->
-		<div in:fly={{ y: 100, duration: 400, easing: cubicOut }}>
-		<ComposeOverlay
-			question={deliberation.question}
-			countyName={county.name}
-			onSubmit={handleCompose}
-			onBack={() => (screen = 'voting')}
-		/>
+		<div class="relative" in:fly={{ y: 100, duration: 400, easing: cubicOut }}>
+			<ComposeOverlay
+				question={deliberation.question}
+				countyName={county.name}
+				onSubmit={handleCompose}
+				onBack={() => (screen = 'voting')}
+				onShowInstructions={() => (showInstructions = true)}
+			/>
+
+			{#if showInstructions}
+				<!-- Instructions overlay on top of compose -->
+				<div class="absolute inset-0 z-50 bg-blue-950/90 backdrop-blur-[2.65px] flex flex-col items-center justify-center px-4" in:fade={{ duration: 200 }}>
+					<div class="w-full rounded-[20px] bg-white p-6 outline outline-2 outline-white overflow-hidden">
+						<h2 class="font-sans text-4xl font-bold leading-10 text-blue-800">
+							How to contribute to this conversation:
+						</h2>
+						<div class="mt-6 h-1.5 w-14 bg-secondary rounded-full"></div>
+						<div class="mt-6 font-sans text-lg font-medium leading-7 text-blue-900">
+							<p>You can share ideas, opinions, values, or whatever else. Others will see these and vote on them.</p>
+							<br />
+							<p>You are contributing standalone statements – not responding to specific statements you see in the conversation.</p>
+							<br />
+							<p>No profanity, threats, etc.</p>
+							<br />
+							<p>You can submit as many statements as you'd like, but remember to listen!</p>
+						</div>
+					</div>
+					<div class="mt-6 w-full px-2">
+						<button
+							onclick={() => (showInstructions = false)}
+							class="flex w-full items-center justify-center rounded-full bg-secondary px-7 py-3.5 font-mono text-lg font-medium text-secondary-foreground"
+						>
+							I UNDERSTAND
+						</button>
+					</div>
+				</div>
+			{/if}
 		</div>
 
 	{:else if screen === 'did-you-know'}
 		<!-- DID YOU KNOW INTERSTITIAL -->
-		<div class="flex h-dvh flex-col bg-primary" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
-			<!-- Compact header -->
-			<div class="shrink-0 border-b border-primary-foreground/40 px-8 py-6">
-				<div class="flex items-center justify-between">
-					<span class="font-mono text-sm font-medium text-primary-foreground">{county.name}</span>
-					<span class="flex items-center gap-2">
-						<span class="h-3 w-3 rounded-full border border-primary-foreground bg-teal-400"></span>
-						<span class="font-mono text-sm font-medium text-primary-foreground">YOU</span>
-					</span>
-				</div>
-				<p class="mt-4 font-mono text-lg font-medium text-primary-foreground">
-					{deliberation.question}
-				</p>
-			</div>
+		<div class="flex h-dvh flex-col bg-gradient-primary" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
+			<BlueHeader countyName={county.name} />
 
 			<!-- Scrollable content -->
-			<div class="flex flex-1 flex-col overflow-y-auto px-8 pt-6">
-				<span class="font-mono text-lg font-medium text-primary-foreground/70">DID YOU KNOW?</span>
-				<p class="mt-4 font-mono text-3xl font-medium text-primary-foreground">
+			<div class="flex flex-1 flex-col overflow-y-auto px-8 pt-8">
+				<span class="font-mono text-sm font-medium text-white/80">DID YOU KNOW?</span>
+				<p class="mt-4 font-sans text-4xl font-bold text-white">
 					4 in 5 teenagers in Utah are chatting with AI friends online.
 				</p>
 
-				<!-- Image placeholder -->
-				<div class="mt-6 h-64 rounded-[10px] bg-gradient-to-br from-cyan-200 to-primary"></div>
-
 				<!-- Body text -->
-				<p class="mt-6 font-mono text-base font-medium leading-6 text-primary-foreground">
-					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis finibus purus mollis, ultrices lorem quis, facilisis mauris. Nulla tortor magna, consequat sed pharetra quis, blandit elementum velit.
+				<p class="mt-8 font-sans text-lg font-medium leading-9 text-white">
+					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis finibus purus mollis, ultrices lorem quis, facilisis mauris. Nulla tortor magna, consequat sed pharetra quis, blandit elementum velit. Curabitur finibus et felis nec vehicula. Vivamus facilisis nunc sed dui ultrices, quis vulputate tellus egestas.
 				</p>
 			</div>
 
 			<!-- Sticky bottom actions -->
-			<div class="flex shrink-0 flex-col gap-3 bg-primary/90 px-8 pb-8 pt-4 backdrop-blur-sm">
-				<PillButton
-					variant="ghost"
-					fullWidth
+			<div class="flex shrink-0 flex-col gap-2.5 border-t border-primary bg-blue-900 px-7 py-8">
+				<button
 					disabled={countdown > 0}
 					onclick={resumeVoting}
+					class="flex w-full items-center justify-center rounded-full px-7 py-3.5 font-mono text-lg font-medium text-white/70 {countdown > 0 ? 'bg-white/20' : 'bg-secondary text-secondary-foreground'}"
 				>
 					{#if countdown > 0}
 						CONTINUE IN {countdown}...
 					{:else}
 						CONTINUE
 					{/if}
-				</PillButton>
-				<PillButton variant="filled-white" fullWidth>
-					LEARN MORE
-				</PillButton>
+				</button>
+			</div>
+		</div>
+
+	{:else if screen === 'pop-quiz'}
+		<!-- POP QUIZ INTERSTITIAL -->
+		<div class="flex h-dvh flex-col bg-gradient-primary" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
+			<BlueHeader countyName={county.name} />
+			<PopQuiz quiz={currentQuiz} onContinue={resumeVoting} onSkip={resumeVoting} />
+		</div>
+
+	{:else if screen === 'about-you'}
+		<!-- ABOUT YOU demographic questions -->
+		<div class="flex h-dvh flex-col bg-gradient-primary" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
+			<BlueHeader countyName={county.name} />
+
+			<!-- Scrollable content -->
+			<div class="flex flex-1 flex-col overflow-y-auto px-8 pt-8">
+				<span class="font-mono text-sm font-medium text-white/80">ABOUT YOU</span>
+				<p class="mt-4 font-sans text-4xl font-bold leading-10 text-white">
+					{currentAbout.question}
+				</p>
+				<p class="mt-3 font-sans text-sm font-medium text-white/80">
+					{currentAbout.description}
+				</p>
+
+				<!-- Options -->
+				<div class="mt-8 flex flex-col gap-2">
+					{#each currentAbout.options as option, i}
+						<button
+							onclick={() => toggleAboutSelection(i)}
+							class="relative flex h-16 w-full items-center rounded-[20px] px-6 text-left font-sans text-2xl font-bold leading-7 transition-colors {aboutSelections.has(i)
+								? 'bg-white text-blue-800 shadow-[0px_10px_15px_0px_rgba(12,34,95,0.25)]'
+								: 'bg-blue-900 text-white'}"
+						>
+							{option}
+							{#if aboutSelections.has(i)}
+								<span class="absolute right-5 flex h-8 w-8 items-center justify-center rounded-full bg-blue-900">
+									<svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+									</svg>
+								</span>
+							{/if}
+						</button>
+					{/each}
+				</div>
+			</div>
+
+			<!-- Bottom actions -->
+			<div class="flex shrink-0 items-center gap-3.5 border-t border-primary bg-blue-900 px-7 py-8">
+				<button
+					onclick={() => {
+						if (aboutIndex < aboutYouQuestions.length - 1) {
+							aboutIndex++;
+							aboutSelections = new Set();
+						} else {
+							resumeVoting();
+						}
+					}}
+					class="flex h-14 flex-1 items-center justify-center rounded-full bg-secondary font-mono text-lg font-medium text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
+				>
+					CONTINUE
+				</button>
+				<button
+					onclick={() => {
+						if (aboutIndex < aboutYouQuestions.length - 1) {
+							aboutIndex++;
+							aboutSelections = new Set();
+						} else {
+							resumeVoting();
+						}
+					}}
+					class="flex h-14 flex-1 items-center justify-center rounded-full bg-black/30 font-mono text-lg font-medium text-white shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
+				>
+					SKIP
+				</button>
 			</div>
 		</div>
 
 	{:else if screen === 'nice-job'}
 		<!-- NICE JOB celebration -->
-		<div class="flex h-dvh flex-col bg-primary" in:scale={{ start: 0.9, duration: 500, easing: cubicOut }}>
-			<!-- Compact header bar -->
-			<div class="shrink-0 border-b border-primary-foreground/40 px-8 py-6">
-				<div class="flex items-center justify-between">
-					<span class="font-mono text-sm font-medium text-primary-foreground">{county.name}</span>
-					<span class="flex items-center gap-2">
-						<span class="h-3 w-3 rounded-full border border-primary-foreground bg-teal-400"></span>
-						<span class="font-mono text-sm font-medium text-primary-foreground">YOU</span>
-					</span>
-				</div>
-			</div>
+		<div class="flex h-dvh flex-col bg-gradient-primary" in:scale={{ start: 0.9, duration: 500, easing: cubicOut }}>
+			<BlueHeader countyName={county.name} />
 
 			<!-- Centered content -->
 			<div class="flex flex-1 flex-col items-center justify-center overflow-y-auto px-8">
-				<div class="h-80 w-80 rounded-full bg-white/20"></div>
-				<p class="mt-[-180px] text-center font-mono text-5xl font-medium text-primary-foreground">
-					NICE JOB!
-				</p>
-				<p class="mt-8 text-center font-mono text-3xl font-medium text-primary-foreground">
-					Keep contributing to the conversation – your voice counts!
+				<div class="h-32 w-32 rounded-full bg-secondary"></div>
+				<p class="mt-[-90px] text-9xl font-bold drop-shadow-lg">🎉</p>
+				<p class="mt-8 text-center font-sans text-3xl font-bold leading-10 text-white">
+					Thank you for participating! Here's what's next...
 				</p>
 			</div>
 
 			<!-- Bottom CTAs -->
-			<div class="flex shrink-0 flex-col gap-3 px-8 pb-8">
-				<PillButton variant="filled-white" fullWidth onclick={continueVoting}>
+			<div class="flex shrink-0 items-center gap-3.5 border-t border-primary bg-blue-900 px-7 py-8">
+				<button
+					onclick={continueVoting}
+					class="flex h-14 flex-1 items-center justify-center rounded-full bg-secondary font-mono text-lg font-medium text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
+				>
 					KEEP VOTING
-				</PillButton>
-				<PillButton variant="ghost" fullWidth onclick={handleEnd}>
+				</button>
+				<button
+					onclick={handleEnd}
+					class="flex h-14 flex-1 items-center justify-center rounded-full bg-black/30 font-mono text-lg font-medium text-white shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
+				>
 					I'M DONE
-				</PillButton>
+				</button>
 			</div>
 		</div>
 
@@ -252,7 +462,7 @@
 
 			<div class="flex flex-1 flex-col items-center justify-center overflow-y-auto px-8">
 				<div class="h-52 w-52 rounded-full bg-primary"></div>
-				<p class="mt-8 text-center font-mono text-3xl font-medium leading-9 text-primary">
+				<p class="mt-8 text-center font-sans text-3xl font-bold leading-9 text-primary">
 					YOU'RE ON A ROLL!
 				</p>
 			</div>
@@ -269,51 +479,50 @@
 			</div>
 		</div>
 
-	{:else if screen === 'whats-next'}
-		<!-- WHAT'S NEXT completion -->
-		<div class="flex h-dvh flex-col bg-primary" in:fly={{ y: 40, duration: 400, easing: cubicOut }}>
-			<!-- Compact header bar -->
-			<div class="shrink-0 border-b border-primary-foreground/40 px-8 py-6">
-				<div class="flex items-center justify-between">
-					<span class="font-mono text-sm font-medium text-primary-foreground">{county.name}</span>
-					<span class="flex items-center gap-2">
-						<span class="h-3 w-3 rounded-full border border-primary-foreground bg-teal-400"></span>
-						<span class="font-mono text-sm font-medium text-primary-foreground">YOU</span>
-					</span>
-				</div>
-			</div>
+	{:else if screen === 'thank-you'}
+		<!-- THANK YOU / WHAT'S NEXT completion -->
+		<div class="flex h-dvh flex-col bg-gradient-primary" in:fly={{ y: 40, duration: 400, easing: cubicOut }}>
+			<BlueHeader countyName={county.name} />
 
 			<!-- Scrollable content -->
 			<div class="flex flex-1 flex-col overflow-y-auto px-8 pt-8">
-				<p class="font-mono text-5xl font-medium text-primary-foreground">WHAT'S NEXT?</p>
-
-				<!-- Gradient image placeholder -->
-				<div class="mt-6 h-48 rounded-[10px] bg-gradient-to-br from-cyan-200 to-primary"></div>
-
-				<div class="mt-6 font-mono text-lg font-medium text-primary-foreground">
-					<p>Thank you for participating! You're awesome.</p>
-					<br />
-					<p>
-						In the next few weeks, we'll know more about how people all over Utah are thinking about
-						this issue. We'll send you an email with the most interesting insights, including where
-						YOU fit into the conversation.
-					</p>
-					<br />
-					<p>
-						In ____, we'll start to organize small-group conversations to develop ideas. If you'd
-						like to take part in that, let us know:
-					</p>
+				<!-- Emoji + circle -->
+				<div class="flex flex-col items-center">
+					<div class="relative">
+						<div class="h-32 w-32 rounded-full bg-secondary"></div>
+						<span class="absolute inset-0 flex items-center justify-center text-9xl font-bold drop-shadow-[0px_4px_24px_rgba(0,0,0,0.25)]">🎉</span>
+					</div>
 				</div>
+
+				<p class="mt-8 font-sans text-3xl font-bold leading-10 text-white">
+					Thank you for participating! Here's what's next...
+				</p>
+
+				<!-- Report Back swipeable carousel -->
+				<SwipeCarousel count={reportSlides.length} bind:index={reportSlideIndex} class="mt-4 border-t border-white/20 py-6">
+					{#snippet children(i)}
+						<h3 class="font-sans text-2xl font-bold leading-9 text-white">{reportSlides[i].title}</h3>
+						<p class="mt-3 font-sans text-lg font-medium leading-7 text-white/80">
+							{reportSlides[i].body}
+						</p>
+					{/snippet}
+				</SwipeCarousel>
 			</div>
 
 			<!-- Bottom CTAs -->
-			<div class="flex shrink-0 flex-col gap-3 px-8 pb-8">
-				<a href="/demo">
-					<PillButton variant="filled-white" fullWidth>GO HOME</PillButton>
+			<div class="flex shrink-0 items-center gap-3.5 px-7 py-8">
+				<button
+					onclick={continueVoting}
+					class="flex h-14 flex-1 items-center justify-center rounded-full bg-secondary font-mono text-lg font-medium text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
+				>
+					CONTINUE
+				</button>
+				<a
+					href="/demo"
+					class="flex h-14 flex-1 items-center justify-center rounded-full bg-black/30 font-mono text-lg font-medium text-white shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
+				>
+					GO HOME
 				</a>
-				<PillButton variant="ghost" fullWidth onclick={continueVoting}>
-					BACK TO VOTING
-				</PillButton>
 			</div>
 		</div>
 	{/if}

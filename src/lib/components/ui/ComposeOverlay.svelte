@@ -1,11 +1,15 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
+	import { fade, fly, scale } from 'svelte/transition';
+	import { elasticOut, cubicOut } from 'svelte/easing';
+	import ConfettiOverlay from './ConfettiOverlay.svelte';
 
 	interface Props {
 		question: string;
 		countyName: string;
 		onSubmit?: (text: string, anonymous: boolean) => void;
 		onBack?: () => void;
+		onShowInstructions?: () => void;
 		class?: string;
 	}
 
@@ -14,61 +18,77 @@
 		countyName,
 		onSubmit,
 		onBack,
+		onShowInstructions,
 		class: className
 	}: Props = $props();
 
 	let text = $state('');
 	let anonymous = $state(true);
+	let submitted = $state(false);
+	let showCelebration = $state(false);
+	let showConfetti = $state(false);
 	const maxChars = 240;
 	const charCount = $derived(text.length);
-	const canSubmit = $derived(charCount > 0 && charCount <= maxChars);
+	const overLimit = $derived(charCount > maxChars);
+	const canSubmit = $derived(charCount > 0 && charCount <= maxChars && !submitted);
+
+	function handleSubmit() {
+		if (!canSubmit) return;
+		submitted = true;
+		onSubmit?.(text, anonymous);
+		// Show celebration after a tiny delay
+		setTimeout(() => {
+			showCelebration = true;
+			setTimeout(() => { showConfetti = true; }, 150);
+		}, 300);
+	}
+
 </script>
 
-<div class={cn('flex h-dvh flex-col bg-background', className)}>
-	<!-- Blue card area -->
-	<div class="flex flex-1 flex-col rounded-[30px] bg-primary shadow-lg">
+<div class={cn('relative flex h-dvh flex-col bg-white', className)}>
+	<!-- Blue gradient card area -->
+	<div class="flex flex-1 flex-col rounded-bl-[30px] rounded-br-[30px] bg-gradient-primary shadow-[0px_4px_16.6px_0px_rgba(41,82,192,0.40)]">
 		<!-- Header -->
 		<div class="flex items-center justify-between px-8 pt-6">
-			<span class="font-mono text-sm font-medium text-primary-foreground">{countyName}</span>
+			<span class="font-mono text-sm font-medium text-white/80">{countyName}</span>
 			<span class="flex items-center gap-2">
-				<span class="h-3 w-3 rounded-full border border-primary-foreground bg-primary-foreground"></span>
-				<span class="font-mono text-sm font-medium text-primary-foreground">YOU</span>
+				<span class="h-3 w-3 rounded-full border border-white bg-secondary"></span>
+				<span class="font-mono text-sm font-medium text-white/80">YOU</span>
 			</span>
 		</div>
 
-		<!-- Share your thoughts label -->
+		<!-- Question — now Hanken Grotesk -->
 		<div class="px-8 pt-6">
-			<span class="font-mono text-lg font-medium leading-5 text-primary-foreground">
-				SHARE YOUR THOUGHTS:
-			</span>
-		</div>
-
-		<!-- Question -->
-		<div class="px-8 pt-2">
-			<p class="font-mono text-3xl font-medium leading-9 text-primary-foreground">
+			<p class="font-sans text-4xl font-bold leading-10 text-white">
 				{question}
 			</p>
 		</div>
 
 		<!-- Instructions toggle -->
 		<div class="px-8 pt-4">
-			<span class="font-mono text-sm font-medium text-primary-foreground/80">
+			<button onclick={onShowInstructions} class="font-mono text-sm font-medium text-white/80 hover:text-white transition-colors">
 				SHOW INSTRUCTIONS &rarr;
-			</span>
+			</button>
 		</div>
 
+		<form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }} class="mx-4 mt-4 flex flex-1 flex-col gap-0">
 		<!-- White textarea card -->
-		<div class="mx-4 mt-4 flex flex-1 flex-col overflow-hidden rounded-3xl bg-background shadow-lg outline-2 outline-background">
+		<div class="flex flex-1 flex-col overflow-hidden rounded-[20px] bg-white shadow-[0px_10px_15px_0px_rgba(12,34,95,0.25)] outline outline-2 outline-white">
 			<textarea
 				bind:value={text}
-				placeholder="TYPE HERE – WHAT DO YOU THINK?"
-				maxlength={maxChars}
-				class="flex-1 resize-none bg-transparent p-6 font-mono text-2xl font-medium leading-7 text-primary placeholder:text-primary/70 border-0 outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 appearance-none"			></textarea>
-			<div class="flex items-center gap-2 px-4 pt-2 pb-4">
-				<span class="font-mono text-sm font-medium text-primary">{charCount} / {maxChars} CHAR</span>
+				placeholder="Type here – what do you think?"
+				maxlength={maxChars + 10}
+				disabled={submitted}
+				onkeydown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }}
+				class="flex-1 resize-none bg-transparent p-6 font-sans text-2xl font-medium leading-7 text-primary placeholder:text-primary/70 border-0 outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 appearance-none"
+			></textarea>
+			<div class="flex items-center justify-between px-5 pt-2 pb-4">
+				<span class={cn('font-mono text-sm font-medium', overLimit ? 'text-destructive' : 'text-primary')}>
+					{charCount} / {maxChars} CHAR
+				</span>
 				<button
 					onclick={() => (anonymous = !anonymous)}
-					class="ml-4 flex items-center gap-2"
+					class="flex items-center gap-2"
 				>
 					<span
 						class={cn(
@@ -77,7 +97,7 @@
 						)}
 					>
 						{#if anonymous}
-							<svg class="h-3 w-3 text-primary-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+							<svg class="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
 							</svg>
 						{/if}
@@ -88,29 +108,80 @@
 		</div>
 
 		<!-- Submit button -->
-		<div class="p-4">
-			<button
-				disabled={!canSubmit}
-				onclick={() => onSubmit?.(text, anonymous)}
-				class={cn(
-					'flex w-full items-center justify-center rounded-full px-7 py-3.5 font-mono text-2xl font-medium transition-colors',
-					canSubmit
-						? 'bg-teal-400 text-primary-foreground'
-						: 'bg-white/20 text-white/70 outline outline-2 outline-white/70'
-				)}
-			>
-				SUBMIT
-			</button>
+		<div class="px-0 pt-4 pb-4">
+			{#if submitted}
+				<button
+					disabled
+					class="flex w-full items-center justify-center rounded-full bg-white/20 px-7 py-3.5 font-mono text-lg font-medium text-white/70"
+				>
+					SUBMITTED!
+				</button>
+			{:else}
+				<button
+					type="submit"
+					disabled={!canSubmit}
+					class={cn(
+						'flex w-full items-center justify-center rounded-full px-7 py-3.5 font-mono text-lg font-medium transition-colors',
+						canSubmit
+							? 'bg-secondary text-secondary-foreground'
+							: 'bg-white/20 text-white/70'
+					)}
+				>
+					SUBMIT
+				</button>
+			{/if}
 		</div>
+		</form>
 	</div>
 
 	<!-- Back link -->
 	<div class="shrink-0 py-4">
 		<button
 			onclick={onBack}
-			class="w-full text-center font-mono text-lg font-medium text-primary/70"
+			class="w-full text-center"
 		>
-			&larr; BACK TO THE CONVERSATION
+			<span class="rounded-[20px] bg-secondary/20 px-3 py-1.5 font-mono text-base font-medium text-secondary">
+				&lt;&lt; BACK TO THE CONVERSATION
+			</span>
 		</button>
 	</div>
+
+	<!-- Celebration popover overlay -->
+	{#if showCelebration}
+		<div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-blue-950/90 backdrop-blur-sm" in:fade={{ duration: 250 }}>
+			<ConfettiOverlay active={showConfetti} count={30} />
+
+			<!-- Card -->
+			<div class="relative z-10 mx-6 flex flex-col items-center" in:scale={{ start: 0.8, duration: 500, easing: elasticOut, delay: 100 }}>
+				<!-- Emoji circle -->
+				<div class="relative mb-6">
+					<div class="h-28 w-28 rounded-full bg-secondary"></div>
+					<span class="absolute inset-0 flex items-center justify-center text-7xl drop-shadow-lg">🎉</span>
+				</div>
+
+				<div class="w-full rounded-[20px] bg-white p-6">
+					<h2 class="text-center font-sans text-3xl font-bold leading-9 text-blue-800">
+						Thanks for sharing!
+					</h2>
+					<p class="mt-3 text-center font-sans text-lg font-medium leading-7 text-blue-800/80">
+						Your voice matters. Others will see your statement and vote on it. Keep listening and contributing!
+					</p>
+				</div>
+
+				<button
+					onclick={onBack}
+					class="mt-6 flex w-full items-center justify-center rounded-full bg-secondary px-7 py-3.5 font-mono text-lg font-medium text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
+				>
+					BACK TO THE CONVERSATION
+				</button>
+
+				<button
+					onclick={() => { showCelebration = false; showConfetti = false; submitted = false; text = ''; }}
+					class="mt-3 font-mono text-sm font-medium text-white/70"
+				>
+					SUBMIT ANOTHER
+				</button>
+			</div>
+		</div>
+	{/if}
 </div>

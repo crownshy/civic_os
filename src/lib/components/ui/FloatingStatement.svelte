@@ -11,7 +11,7 @@
 
 <div
 	class={cn(
-		'flex h-16 items-center gap-3 rounded-full border-[3px] border-primary bg-background px-4',
+		'flex h-16 items-center gap-3 rounded-full border-[3px] border-primary bg-card px-4',
 		className
 	)}
 >
