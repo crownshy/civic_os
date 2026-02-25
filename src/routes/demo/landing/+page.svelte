@@ -53,12 +53,15 @@
 	}
 </script>
 
+{#snippet decorativeEllipse()}
+	<div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/20 sm:translate-y-1/4 md:translate-y-1/3 lg:translate-y-1/2 w-[120%] aspect-2/1 rounded-t-full bg-gradient-to-b from-blue-600/30 to-transparent"></div>
+{/snippet}
+
 <AppShell>
 	{#if step === 'landing'}
 		<!-- LANDING: zip code entry -->
 		<div class="relative flex h-dvh flex-col bg-gradient-to-b from-blue-700 to-blue-900 overflow-hidden" in:fade={{ duration: 400 }}>
-			<!-- Decorative ellipse — half-circle anchored to bottom -->
-			<div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[140%] aspect-[2/1] rounded-t-full bg-gradient-to-b from-blue-600/30 to-transparent"></div>
+			{@render decorativeEllipse()}
 
 			<!-- Scrollable content -->
 			<div class="relative z-10 flex flex-1 flex-col overflow-y-auto">
@@ -143,8 +146,7 @@
 	{:else if step === 'with-location'}
 		<!-- WITH LOCATION: show host banner, location filled -->
 		<div class="relative flex h-dvh flex-col bg-gradient-to-b from-blue-700 to-blue-900 overflow-hidden" in:fade={{ duration: 400 }}>
-			<!-- Decorative ellipse — half-circle anchored to bottom -->
-			<div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[140%] aspect-[2/1] rounded-t-full bg-gradient-to-b from-blue-600/30 to-transparent"></div>
+			{@render decorativeEllipse()}
 
 			<!-- Scrollable content -->
 			<div class="relative z-10 flex flex-1 flex-col overflow-y-auto">
@@ -230,8 +232,7 @@
 	{:else if step === 'email-capture'}
 		<!-- EMAIL CAPTURE overlay -->
 		<div class="relative flex h-dvh flex-col bg-gradient-to-b from-blue-700 to-blue-900 overflow-hidden" in:fade={{ duration: 400 }}>
-			<!-- Decorative ellipse — half-circle anchored to bottom -->
-			<div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[140%] aspect-[2/1] rounded-t-full bg-gradient-to-b from-blue-600/30 to-transparent"></div>
+			{@render decorativeEllipse()}
 
 			<!-- Background content (dimmed) -->
 			<div class="absolute inset-0 z-0 opacity-5">
