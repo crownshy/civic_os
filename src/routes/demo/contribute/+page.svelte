@@ -2,7 +2,7 @@
 	import { fly, fade, scale } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import { AppShell, AppHeader } from '$lib/components/layout';
-	import { VoteBar, PillButton } from '$lib/components/ui';
+	import { VoteBar, PillButton, BlueHeader, SwipeCarousel, PopQuiz } from '$lib/components/ui';
 	import ComposeOverlay from '$lib/components/ui/ComposeOverlay.svelte';
 	import { county, deliberation, statements, learningCards, popQuizQuestions, aboutYouQuestions } from '$lib/data/mock';
 
@@ -166,36 +166,13 @@
 		// Stay on compose page — user navigates back manually
 	}
 
-	// Report Back carousel state
+	// Report Back carousel slides
 	const reportSlides = [
 		{ title: 'Report Back', body: 'This is a place-based conversation about how we should regulate social media to minimize its harms for ourselves and those we care about.' },
 		{ title: 'What We Heard', body: 'Participants broadly agreed on the need for digital literacy education and stronger platform accountability, with nuanced views on parental controls.' },
 		{ title: 'What\'s Next', body: 'Results from this conversation will be shared with local officials and community organizations to help inform policy decisions in Utah County.' }
 	];
 	let reportSlideIndex = $state(0);
-	let reportTouchStartX = $state(0);
-	let reportTouchDelta = $state(0);
-	let reportSwiping = $state(false);
-
-	function handleReportTouchStart(e: TouchEvent) {
-		reportTouchStartX = e.touches[0].clientX;
-		reportTouchDelta = 0;
-		reportSwiping = true;
-	}
-	function handleReportTouchMove(e: TouchEvent) {
-		if (!reportSwiping) return;
-		reportTouchDelta = e.touches[0].clientX - reportTouchStartX;
-	}
-	function handleReportTouchEnd() {
-		if (!reportSwiping) return;
-		reportSwiping = false;
-		if (reportTouchDelta < -40 && reportSlideIndex < reportSlides.length - 1) {
-			reportSlideIndex++;
-		} else if (reportTouchDelta > 40 && reportSlideIndex > 0) {
-			reportSlideIndex--;
-		}
-		reportTouchDelta = 0;
-	}
 
 	function toggleAboutSelection(idx: number) {
 		const next = new Set(aboutSelections);
@@ -334,16 +311,7 @@
 	{:else if screen === 'did-you-know'}
 		<!-- DID YOU KNOW INTERSTITIAL -->
 		<div class="flex h-dvh flex-col bg-gradient-to-b from-blue-800 to-blue-900" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
-			<!-- Compact header -->
-			<div class="shrink-0 px-8 pt-6">
-				<div class="flex items-center justify-between">
-					<span class="font-mono text-sm font-medium text-white/80">{county.name}</span>
-					<span class="flex items-center gap-2">
-						<span class="h-3 w-3 rounded-full border border-white bg-teal-400"></span>
-						<span class="font-mono text-sm font-medium text-white/80">YOU</span>
-					</span>
-				</div>
-			</div>
+			<BlueHeader countyName={county.name} />
 
 			<!-- Scrollable content -->
 			<div class="flex flex-1 flex-col overflow-y-auto px-8 pt-8">
@@ -377,78 +345,14 @@
 	{:else if screen === 'pop-quiz'}
 		<!-- POP QUIZ INTERSTITIAL -->
 		<div class="flex h-dvh flex-col bg-gradient-to-b from-blue-800 to-blue-900" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
-			<!-- Compact header -->
-			<div class="shrink-0 px-8 pt-6">
-				<div class="flex items-center justify-between">
-					<span class="font-mono text-sm font-medium text-white/80">{county.name}</span>
-					<span class="flex items-center gap-2">
-						<span class="h-3 w-3 rounded-full border border-white bg-teal-400"></span>
-						<span class="font-mono text-sm font-medium text-white/80">YOU</span>
-					</span>
-				</div>
-			</div>
-
-			<!-- Scrollable content -->
-			<div class="flex flex-1 flex-col overflow-y-auto px-8 pt-8">
-				<span class="font-mono text-sm font-medium text-white/80">{currentQuiz.label}</span>
-				<p class="mt-4 font-sans text-4xl font-bold leading-10 text-white">
-					{currentQuiz.question}
-				</p>
-
-				<!-- Options -->
-				<div class="mt-8 flex flex-col gap-2">
-					{#each currentQuiz.options as option, i}
-						<button
-							onclick={() => (quizSelected = i)}
-							class="flex h-16 w-full items-center rounded-[20px] px-6 text-left font-sans text-2xl font-bold leading-7 transition-colors {quizSelected === i
-								? i === currentQuiz.correctIndex
-									? 'bg-teal-500 text-white shadow-[0px_10px_15px_0px_rgba(12,34,95,0.25)]'
-									: 'bg-white text-blue-800 shadow-[0px_10px_15px_0px_rgba(12,34,95,0.25)]'
-								: 'bg-blue-900 text-white'}"
-						>
-							{option}
-						</button>
-					{/each}
-				</div>
-
-				<!-- Explanation (shown after selection) -->
-				{#if quizSelected !== null}
-					<p class="mt-8 font-sans text-lg font-medium leading-9 text-white" in:fade={{ duration: 300 }}>
-						{currentQuiz.explanation}
-					</p>
-				{/if}
-			</div>
-
-			<!-- Bottom actions -->
-			<div class="flex shrink-0 items-center gap-3.5 border-t border-blue-700 bg-blue-900 px-7 py-8">
-				<button
-					onclick={resumeVoting}
-					class="flex h-14 flex-1 items-center justify-center rounded-full bg-teal-500 font-mono text-lg font-medium text-white shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
-				>
-					CONTINUE
-				</button>
-				<button
-					onclick={resumeVoting}
-					class="flex h-14 flex-1 items-center justify-center rounded-full bg-black/30 font-mono text-lg font-medium text-white shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
-				>
-					SKIP
-				</button>
-			</div>
+			<BlueHeader countyName={county.name} />
+			<PopQuiz quiz={currentQuiz} onContinue={resumeVoting} onSkip={resumeVoting} />
 		</div>
 
 	{:else if screen === 'about-you'}
 		<!-- ABOUT YOU demographic questions -->
 		<div class="flex h-dvh flex-col bg-gradient-to-b from-blue-800 to-blue-900" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
-			<!-- Compact header -->
-			<div class="shrink-0 px-8 pt-6">
-				<div class="flex items-center justify-between">
-					<span class="font-mono text-sm font-medium text-white/80">{county.name}</span>
-					<span class="flex items-center gap-2">
-						<span class="h-3 w-3 rounded-full border border-white bg-teal-400"></span>
-						<span class="font-mono text-sm font-medium text-white/80">YOU</span>
-					</span>
-				</div>
-			</div>
+			<BlueHeader countyName={county.name} />
 
 			<!-- Scrollable content -->
 			<div class="flex flex-1 flex-col overflow-y-auto px-8 pt-8">
@@ -516,16 +420,7 @@
 	{:else if screen === 'nice-job'}
 		<!-- NICE JOB celebration -->
 		<div class="flex h-dvh flex-col bg-gradient-to-b from-blue-800 to-blue-900" in:scale={{ start: 0.9, duration: 500, easing: cubicOut }}>
-			<!-- Compact header bar -->
-			<div class="shrink-0 px-8 pt-6">
-				<div class="flex items-center justify-between">
-					<span class="font-mono text-sm font-medium text-white/80">{county.name}</span>
-					<span class="flex items-center gap-2">
-						<span class="h-3 w-3 rounded-full border border-white bg-teal-400"></span>
-						<span class="font-mono text-sm font-medium text-white/80">YOU</span>
-					</span>
-				</div>
-			</div>
+			<BlueHeader countyName={county.name} />
 
 			<!-- Centered content -->
 			<div class="flex flex-1 flex-col items-center justify-center overflow-y-auto px-8">
@@ -588,16 +483,7 @@
 	{:else if screen === 'thank-you'}
 		<!-- THANK YOU / WHAT'S NEXT completion -->
 		<div class="flex h-dvh flex-col bg-gradient-to-b from-blue-800 to-blue-900" in:fly={{ y: 40, duration: 400, easing: cubicOut }}>
-			<!-- Compact header bar -->
-			<div class="shrink-0 px-8 pt-6">
-				<div class="flex items-center justify-between">
-					<span class="font-mono text-sm font-medium text-white/80">{county.name}</span>
-					<span class="flex items-center gap-2">
-						<span class="h-3 w-3 rounded-full border border-white bg-teal-400"></span>
-						<span class="font-mono text-sm font-medium text-white/80">YOU</span>
-					</span>
-				</div>
-			</div>
+			<BlueHeader countyName={county.name} />
 
 			<!-- Scrollable content -->
 			<div class="flex flex-1 flex-col overflow-y-auto px-8 pt-8">
@@ -614,33 +500,14 @@
 				</p>
 
 				<!-- Report Back swipeable carousel -->
-				<div
-					class="mt-8 border-t border-b border-white/20 py-6 overflow-hidden"
-					ontouchstart={handleReportTouchStart}
-					ontouchmove={handleReportTouchMove}
-					ontouchend={handleReportTouchEnd}
-					role="region"
-					aria-label="Report back carousel"
-				>
-					{#key reportSlideIndex}
-						<div in:fly={{ x: reportTouchDelta <= 0 ? 60 : -60, duration: 250, easing: cubicOut }}>
-							<h3 class="font-sans text-2xl font-bold leading-9 text-white">{reportSlides[reportSlideIndex].title}</h3>
-							<p class="mt-3 font-sans text-lg font-medium leading-7 text-white/80">
-								{reportSlides[reportSlideIndex].body}
-							</p>
-						</div>
-					{/key}
-					<!-- Pagination dots -->
-					<div class="mt-6 flex items-center justify-center gap-[23px]">
-						{#each reportSlides as _, i}
-							<button
-								onclick={() => (reportSlideIndex = i)}
-								class="h-2 w-2 rounded-full transition-colors {i === reportSlideIndex ? 'bg-white' : 'bg-zinc-300/50'}"
-								aria-label="Slide {i + 1}"
-							></button>
-						{/each}
-					</div>
-				</div>
+				<SwipeCarousel count={reportSlides.length} bind:index={reportSlideIndex} class="mt-8 border-t border-b border-white/20 py-6">
+					{#snippet children(i)}
+						<h3 class="font-sans text-2xl font-bold leading-9 text-white">{reportSlides[i].title}</h3>
+						<p class="mt-3 font-sans text-lg font-medium leading-7 text-white/80">
+							{reportSlides[i].body}
+						</p>
+					{/snippet}
+				</SwipeCarousel>
 			</div>
 
 			<!-- Bottom CTAs -->

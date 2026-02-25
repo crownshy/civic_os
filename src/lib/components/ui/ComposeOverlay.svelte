@@ -2,6 +2,7 @@
 	import { cn } from '$lib/utils';
 	import { fade, fly, scale } from 'svelte/transition';
 	import { elasticOut, cubicOut } from 'svelte/easing';
+	import ConfettiOverlay from './ConfettiOverlay.svelte';
 
 	interface Props {
 		question: string;
@@ -42,28 +43,7 @@
 		}, 300);
 	}
 
-	// Confetti particles
-	const confettiColors = ['#07A89E', '#2DD4BF', '#FBBF24', '#FC3AA8', '#818CF8', '#FFFFFF'];
-	const confettiParticles = Array.from({ length: 30 }, (_, i) => ({
-		id: i,
-		color: confettiColors[i % confettiColors.length],
-		left: Math.random() * 100,
-		delay: Math.random() * 500,
-		size: 5 + Math.random() * 9,
-		rotation: Math.random() * 360
-	}));
 </script>
-
-<style>
-	@keyframes confetti-fall {
-		0% { transform: translateY(-20px) rotate(0deg) scale(0); opacity: 1; }
-		15% { transform: translateY(0px) rotate(45deg) scale(1.2); opacity: 1; }
-		100% { transform: translateY(600px) rotate(720deg) scale(0.3); opacity: 0; }
-	}
-	.confetti-piece {
-		animation: confetti-fall 2.2s ease-out forwards;
-	}
-</style>
 
 <div class={cn('relative flex h-dvh flex-col bg-background', className)}>
 	<!-- Blue gradient card area -->
@@ -166,17 +146,7 @@
 	<!-- Celebration popover overlay -->
 	{#if showCelebration}
 		<div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-blue-950/90 backdrop-blur-sm" in:fade={{ duration: 250 }}>
-			<!-- Confetti -->
-			{#if showConfetti}
-				<div class="pointer-events-none absolute inset-0 overflow-hidden">
-					{#each confettiParticles as p}
-						<div
-							class="confetti-piece absolute rounded-sm"
-							style="left: {p.left}%; top: -10px; width: {p.size}px; height: {p.size}px; background: {p.color}; animation-delay: {p.delay}ms; transform: rotate({p.rotation}deg);"
-						></div>
-					{/each}
-				</div>
-			{/if}
+			<ConfettiOverlay active={showConfetti} count={30} />
 
 			<!-- Card -->
 			<div class="relative z-10 mx-6 flex flex-col items-center" in:scale={{ start: 0.8, duration: 500, easing: elasticOut, delay: 100 }}>

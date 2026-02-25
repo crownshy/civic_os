@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { fade, fly } from 'svelte/transition';
-	import { cubicOut } from 'svelte/easing';
+	import { fade, scale } from 'svelte/transition';
+	import { elasticOut } from 'svelte/easing';
 	import { AppShell } from '$lib/components/layout';
+	import { SwipeCarousel } from '$lib/components/ui';
 	import { county, deliberation } from '$lib/data/mock';
 
 	type Step = 'landing' | 'with-location' | 'email-capture';
@@ -11,7 +12,6 @@
 	let email = $state('');
 	let locationSet = $state(false);
 
-	// Carousel slides
 	const slides = [
 		'This is a place-based conversation about how we should regulate social media to minimize its harms on us and those we care about.',
 		'Your voice matters. Share your perspective and hear from your neighbors about the issues that affect our community.',
@@ -19,31 +19,6 @@
 	];
 
 	let slideIndex = $state(0);
-	let touchStartX = $state(0);
-	let touchDeltaX = $state(0);
-	let swiping = $state(false);
-
-	function handleTouchStart(e: TouchEvent) {
-		touchStartX = e.touches[0].clientX;
-		touchDeltaX = 0;
-		swiping = true;
-	}
-
-	function handleTouchMove(e: TouchEvent) {
-		if (!swiping) return;
-		touchDeltaX = e.touches[0].clientX - touchStartX;
-	}
-
-	function handleTouchEnd() {
-		if (!swiping) return;
-		swiping = false;
-		if (touchDeltaX < -40 && slideIndex < slides.length - 1) {
-			slideIndex++;
-		} else if (touchDeltaX > 40 && slideIndex > 0) {
-			slideIndex--;
-		}
-		touchDeltaX = 0;
-	}
 
 	function handleSetLocation() {
 		if (zipCode.trim()) {
@@ -94,33 +69,13 @@
 				</div>
 
 				<!-- Swipeable description carousel -->
-				<div
-					class="mt-8 overflow-hidden px-10"
-					ontouchstart={handleTouchStart}
-					ontouchmove={handleTouchMove}
-					ontouchend={handleTouchEnd}
-					role="region"
-					aria-label="Info carousel"
-				>
-					{#key slideIndex}
-						<p
-							class="font-sans text-lg font-medium leading-7 text-white"
-							in:fly={{ x: touchDeltaX <= 0 ? 60 : -60, duration: 250, easing: cubicOut }}
-						>
-							{slides[slideIndex]}
+				<SwipeCarousel count={slides.length} bind:index={slideIndex} class="mt-8 px-10">
+					{#snippet children(i)}
+						<p class="font-sans text-lg font-medium leading-7 text-white">
+							{slides[i]}
 						</p>
-					{/key}
-					<!-- Dots -->
-					<div class="mt-8 flex items-center justify-center gap-[23px]">
-						{#each slides as _, i}
-							<button
-								onclick={() => (slideIndex = i)}
-								class="h-2 w-2 rounded-full transition-colors {i === slideIndex ? 'bg-white' : 'bg-zinc-300/50'}"
-								aria-label="Slide {i + 1}"
-							></button>
-						{/each}
-					</div>
-				</div>
+					{/snippet}
+				</SwipeCarousel>
 			</div>
 
 			<!-- Bottom section: location + CTA -->
@@ -183,33 +138,13 @@
 				</div>
 
 				<!-- Swipeable description carousel -->
-				<div
-					class="mt-8 overflow-hidden px-10"
-					ontouchstart={handleTouchStart}
-					ontouchmove={handleTouchMove}
-					ontouchend={handleTouchEnd}
-					role="region"
-					aria-label="Info carousel"
-				>
-					{#key slideIndex}
-						<p
-							class="font-sans text-lg font-medium leading-7 text-white"
-							in:fly={{ x: touchDeltaX <= 0 ? 60 : -60, duration: 250, easing: cubicOut }}
-						>
-							{slides[slideIndex]}
+				<SwipeCarousel count={slides.length} bind:index={slideIndex} class="mt-8 px-10">
+					{#snippet children(i)}
+						<p class="font-sans text-lg font-medium leading-7 text-white">
+							{slides[i]}
 						</p>
-					{/key}
-					<!-- Dots -->
-					<div class="mt-8 flex items-center justify-center gap-[23px]">
-						{#each slides as _, i}
-							<button
-								onclick={() => (slideIndex = i)}
-								class="h-2 w-2 rounded-full transition-colors {i === slideIndex ? 'bg-white' : 'bg-zinc-300/50'}"
-								aria-label="Slide {i + 1}"
-							></button>
-						{/each}
-					</div>
-				</div>
+					{/snippet}
+				</SwipeCarousel>
 			</div>
 
 			<!-- Bottom section: location filled + CTA -->
@@ -230,19 +165,23 @@
 		</div>
 
 	{:else if step === 'email-capture'}
-		<!-- EMAIL CAPTURE overlay -->
-		<div class="relative flex h-dvh flex-col bg-gradient-to-b from-blue-700 to-blue-900 overflow-hidden" in:fade={{ duration: 400 }}>
+		<!-- EMAIL CAPTURE — popup overlay on top of blurred with-location screen -->
+		<div class="relative flex h-dvh flex-col bg-gradient-to-b from-blue-700 to-blue-900 overflow-hidden">
 			{@render decorativeEllipse()}
 
-			<!-- Background content (dimmed) -->
-			<div class="absolute inset-0 z-0 opacity-5">
-				<div class="flex flex-col items-center px-8 pt-40">
-					<h1 class="text-center font-sans text-4xl font-bold leading-10 text-white">AI and the Future of Our Communities</h1>
+			<!-- Ghost of with-location content behind (visible through blur) -->
+			<div class="absolute inset-0 z-0 opacity-30">
+				<div class="flex flex-col items-center px-8 pt-32">
+					<span class="font-mono text-base font-medium uppercase text-white/70">A PUBLIC CONVERSATION ON</span>
+					<h1 class="mt-3 text-center font-sans text-4xl font-bold leading-10 text-white">AI and the Future of Our Communities</h1>
 				</div>
 			</div>
 
-			<!-- Dark overlay + email card -->
-			<div class="relative z-10 flex flex-1 flex-col bg-blue-950/95">
+			<!-- Blurred dark overlay -->
+			<div class="absolute inset-0 z-10 bg-blue-950/85 backdrop-blur-md" in:fade={{ duration: 300 }}></div>
+
+			<!-- Popup content -->
+			<div class="relative z-20 flex flex-1 flex-col">
 				<!-- Back button -->
 				<button
 					onclick={() => (step = 'with-location')}
@@ -254,14 +193,17 @@
 					</svg>
 				</button>
 
-				<div class="flex flex-1 flex-col items-center justify-center px-4">
-					<!-- White email card -->
-					<div class="w-full rounded-[20px] bg-white p-6 outline outline-2 outline-white overflow-hidden">
+				<div class="flex flex-1 flex-col items-center justify-center px-6">
+					<!-- Card with scale-in -->
+					<div
+						class="w-full rounded-[20px] bg-white p-6 shadow-[0px_20px_40px_rgba(0,0,0,0.35)]"
+						in:scale={{ start: 0.85, duration: 450, easing: elasticOut, delay: 100 }}
+					>
 						<h2 class="font-sans text-4xl font-bold leading-10 text-blue-800">Share your email</h2>
-						<p class="mt-4 font-sans text-lg font-medium leading-7 text-blue-800">
+						<p class="mt-4 font-sans text-lg font-medium leading-7 text-blue-800/80">
 							We'll only use this to give you updates on this conversation. No spam, no marketing emails or anything like that.
 						</p>
-						<div class="mt-4 flex h-11 items-center rounded-full bg-white shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)] outline outline-2 outline-blue-700 overflow-hidden px-5">
+						<div class="mt-5 flex h-12 items-center rounded-full bg-white shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)] outline outline-2 outline-blue-700 overflow-hidden px-5">
 							<input
 								bind:value={email}
 								placeholder="email@xyz.com"
@@ -271,10 +213,10 @@
 					</div>
 
 					<!-- SHARE button -->
-					<div class="mt-6 w-full px-2">
+					<div class="mt-6 w-full" in:fade={{ duration: 300, delay: 250 }}>
 						<a
 							href="/demo/contribute"
-							class="flex w-full items-center justify-center rounded-full bg-teal-500 px-7 py-3.5 font-mono text-lg font-medium text-white"
+							class="flex w-full items-center justify-center rounded-full bg-teal-500 px-7 py-3.5 font-mono text-lg font-medium text-white shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
 						>
 							SHARE
 						</a>
@@ -283,7 +225,8 @@
 					<!-- Skip link -->
 					<a
 						href="/demo/contribute"
-						class="mt-6 font-mono text-sm font-medium uppercase leading-5 text-white"
+						class="mt-5 font-mono text-sm font-medium uppercase leading-5 text-white/70"
+						in:fade={{ duration: 300, delay: 350 }}
 					>
 						I'll decide later.
 					</a>
