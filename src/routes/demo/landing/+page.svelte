@@ -35,7 +35,7 @@
 <AppShell>
 	{#if step === 'landing'}
 		<!-- LANDING: zip code entry -->
-		<div class="relative flex h-dvh flex-col bg-gradient-to-b from-blue-700 to-blue-900 overflow-hidden" in:fade={{ duration: 400 }}>
+		<div class="relative flex h-dvh flex-col bg-gradient-to-b from-blue-700 to-blue-900 overflow-hidden">
 			{@render decorativeEllipse()}
 
 			<!-- Scrollable content -->
@@ -79,7 +79,7 @@
 			</div>
 
 			<!-- Bottom section: location + CTA -->
-			<div class="relative z-10 flex shrink-0 flex-col items-center px-7 pb-8">
+			<form onsubmit={(e) => { e.preventDefault(); handleSetLocation(); }} class="relative z-10 flex shrink-0 flex-col items-center px-7 pb-8">
 				<span class="font-mono text-base font-medium uppercase text-white/80">YOUR LOCATION</span>
 				<div class="mt-2 inline-flex items-center rounded-full bg-white px-6 py-2 shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)] outline outline-2 outline-white/20">
 					<input
@@ -89,18 +89,18 @@
 					/>
 				</div>
 				<button
-					onclick={handleSetLocation}
+					type="submit"
 					class="mt-4 flex h-14 w-full items-center justify-center rounded-full px-7 py-3.5 font-mono text-lg font-medium {zipCode.trim() ? 'bg-teal-500 text-white shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]' : 'bg-white/20 text-white/70'}"
 				>
 					JOIN THE CONVERSATION
 				</button>
 				<span class="mt-4 font-mono text-sm font-medium text-white/50 opacity-50">POWERED BY BLOOM</span>
-			</div>
+			</form>
 		</div>
 
 	{:else if step === 'with-location'}
 		<!-- WITH LOCATION: show host banner, location filled -->
-		<div class="relative flex h-dvh flex-col bg-gradient-to-b from-blue-700 to-blue-900 overflow-hidden" in:fade={{ duration: 400 }}>
+		<div class="relative flex h-dvh flex-col bg-gradient-to-b from-blue-700 to-blue-900 overflow-hidden">
 			{@render decorativeEllipse()}
 
 			<!-- Scrollable content -->
@@ -150,7 +150,7 @@
 			<!-- Bottom section: location filled + CTA -->
 			<div class="relative z-10 flex shrink-0 flex-col items-center px-7 pb-8">
 				<span class="font-mono text-base font-medium uppercase text-white/80">YOUR LOCATION</span>
-				<div class="mt-2 inline-flex items-center gap-1 rounded-full bg-white px-6 py-2 shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)] outline outline-2 outline-white/20">
+				<div class="mt-2 inline-flex w-50 items-center justify-center gap-1 rounded-full bg-white px-6 py-2 shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)] outline outline-2 outline-white/20">
 					<span class="font-sans text-base font-medium text-blue-900">Utah County</span>
 					<button onclick={() => (step = 'landing')} class="font-sans text-base font-medium text-teal-500">(change)</button>
 				</div>

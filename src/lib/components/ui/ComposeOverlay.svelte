@@ -71,13 +71,15 @@
 			</button>
 		</div>
 
+		<form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }} class="mx-4 mt-4 flex flex-1 flex-col gap-0">
 		<!-- White textarea card -->
-		<div class="mx-4 mt-4 flex flex-1 flex-col overflow-hidden rounded-[20px] bg-white shadow-[0px_10px_15px_0px_rgba(12,34,95,0.25)] outline outline-2 outline-white">
+		<div class="flex flex-1 flex-col overflow-hidden rounded-[20px] bg-white shadow-[0px_10px_15px_0px_rgba(12,34,95,0.25)] outline outline-2 outline-white">
 			<textarea
 				bind:value={text}
 				placeholder="Type here – what do you think?"
 				maxlength={maxChars + 10}
 				disabled={submitted}
+				onkeydown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }}
 				class="flex-1 resize-none bg-transparent p-6 font-sans text-2xl font-medium leading-7 text-blue-700 placeholder:text-blue-700/70 border-0 outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 appearance-none"
 			></textarea>
 			<div class="flex items-center justify-between px-5 pt-2 pb-4">
@@ -106,7 +108,7 @@
 		</div>
 
 		<!-- Submit button -->
-		<div class="p-4">
+		<div class="px-0 pt-4 pb-4">
 			{#if submitted}
 				<button
 					disabled
@@ -116,8 +118,8 @@
 				</button>
 			{:else}
 				<button
+					type="submit"
 					disabled={!canSubmit}
-					onclick={handleSubmit}
 					class={cn(
 						'flex w-full items-center justify-center rounded-full px-7 py-3.5 font-mono text-lg font-medium transition-colors',
 						canSubmit
@@ -129,6 +131,7 @@
 				</button>
 			{/if}
 		</div>
+		</form>
 	</div>
 
 	<!-- Back link -->

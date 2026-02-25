@@ -53,7 +53,7 @@
 	}
 </style>
 
-<div class="relative flex h-dvh flex-col overflow-hidden {className}">
+<div class="relative flex flex-1 flex-col overflow-hidden {className}">
 	<!-- Confetti layer -->
 	<ConfettiOverlay active={showConfetti} />
 
