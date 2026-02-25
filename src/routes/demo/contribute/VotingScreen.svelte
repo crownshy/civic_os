@@ -105,7 +105,7 @@
 
 	<!-- Swipeable statement content -->
 	<div
-		class="relative flex flex-1 flex-col overflow-x-hidden overflow-y-auto px-8 pt-6"
+		class="relative flex flex-1 flex-col overflow-x-hidden px-8 pt-6"
 		ontouchstart={handleSwipeStart}
 		ontouchmove={handleSwipeMove}
 		ontouchend={handleSwipeEnd}
@@ -146,7 +146,7 @@
 				</div>
 
 				<!-- Quote with adaptive font -->
-				<p class="mt-4 {statementClasses} text-primary">
+				<p class="mt-4 pb-60 overflow-y-auto {statementClasses} text-primary">
 					{statement.text}
 				</p>
 			</div>
@@ -154,7 +154,7 @@
 	</div>
 
 	<!-- Sticky bottom VoteBar -->
-	<div class="shrink-0 w-full">
+	<div class="absolute bottom-0 left-0 right-0 shrink-0 w-full">
 		<VoteBar
 			onAgree={() => onVote('agree')}
 			onDisagree={() => onVote('disagree')}

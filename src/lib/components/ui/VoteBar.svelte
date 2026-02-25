@@ -28,7 +28,7 @@
 	const progress = $derived(total > 0 ? (current / total) * 100 : 0);
 </script>
 
-<div class={cn('overflow-hidden bg-card', className)}>
+<div class={cn('overflow-hidden bg-linear-to-b from-card/20 via-card/90 via-20% to-card', className)}>
 	<!-- Remaining / End pills row -->
 	<div class="flex items-center justify-between px-6 py-2">
 		<Button variant="pill" size="sm">

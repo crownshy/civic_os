@@ -35,8 +35,8 @@
 	const variants: Record<Variant, string> = {
 		primary: 'bg-secondary text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]',
 		secondary: 'bg-black/30 text-white shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]',
-		destructive: 'bg-destructive/20 text-destructive hover:opacity-80',
-		pill: 'bg-secondary/20 text-secondary',
+		destructive: 'text-destructive [background-color:color-mix(in_srgb,var(--destructive)_20%,white)]',
+		pill: 'text-secondary [background-color:color-mix(in_srgb,var(--secondary)_20%,white)]',
 		ghost: 'bg-transparent text-white/70',
 		gradient: 'bg-white/10 shadow-[inset_2px_4px_4px_0px_rgba(0,0,0,0.20)] outline outline-2 outline-white/20',
 		outline: 'bg-white/20 text-white/70 border-4 border-white'
