@@ -3,6 +3,8 @@
 	import { fade, fly, scale } from 'svelte/transition';
 	import { elasticOut, cubicOut } from 'svelte/easing';
 	import ConfettiOverlay from './ConfettiOverlay.svelte';
+	import Button from './Button.svelte';
+	import EmojiCircle from './EmojiCircle.svelte';
 
 	interface Props {
 		question: string;
@@ -110,40 +112,23 @@
 		<!-- Submit button -->
 		<div class="px-0 pt-4 pb-4">
 			{#if submitted}
-				<button
-					disabled
-					class="flex w-full items-center justify-center rounded-full bg-white/20 px-7 py-3.5 font-mono text-lg font-medium text-white/70"
-				>
+				<Button variant="primary" fullWidth disabled>
 					SUBMITTED!
-				</button>
+				</Button>
 			{:else}
-				<button
-					type="submit"
-					disabled={!canSubmit}
-					class={cn(
-						'flex w-full items-center justify-center rounded-full px-7 py-3.5 font-mono text-lg font-medium transition-colors',
-						canSubmit
-							? 'bg-secondary text-secondary-foreground'
-							: 'bg-white/20 text-white/70'
-					)}
-				>
+				<Button type="submit" variant="primary" fullWidth disabled={!canSubmit}>
 					SUBMIT
-				</button>
+				</Button>
 			{/if}
 		</div>
 		</form>
 	</div>
 
 	<!-- Back link -->
-	<div class="shrink-0 py-4">
-		<button
-			onclick={onBack}
-			class="w-full text-center"
-		>
-			<span class="rounded-[20px] bg-secondary/20 px-3 py-1.5 font-mono text-base font-medium text-secondary">
-				&lt;&lt; BACK TO THE CONVERSATION
-			</span>
-		</button>
+	<div class="shrink-0 py-4 text-center">
+		<Button variant="pill" size="sm" onclick={onBack}>
+			&lt;&lt; BACK TO THE CONVERSATION
+		</Button>
 	</div>
 
 	<!-- Celebration popover overlay -->
@@ -154,10 +139,7 @@
 			<!-- Card -->
 			<div class="relative z-10 mx-6 flex flex-col items-center" in:scale={{ start: 0.8, duration: 500, easing: elasticOut, delay: 100 }}>
 				<!-- Emoji circle -->
-				<div class="relative mb-6">
-					<div class="h-28 w-28 rounded-full bg-secondary"></div>
-					<span class="absolute inset-0 flex items-center justify-center text-7xl drop-shadow-lg">🎉</span>
-				</div>
+				<EmojiCircle emoji="🎉" size="md" class="mb-6" />
 
 				<div class="w-full rounded-[20px] bg-white p-6">
 					<h2 class="text-center font-sans text-3xl font-bold leading-9 text-blue-800">
@@ -168,19 +150,13 @@
 					</p>
 				</div>
 
-				<button
-					onclick={onBack}
-					class="mt-6 flex w-full items-center justify-center rounded-full bg-secondary px-7 py-3.5 font-mono text-lg font-medium text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
-				>
+				<Button variant="primary" fullWidth onclick={onBack} class="mt-6">
 					BACK TO THE CONVERSATION
-				</button>
+				</Button>
 
-				<button
-					onclick={() => { showCelebration = false; showConfetti = false; submitted = false; text = ''; }}
-					class="mt-3 font-mono text-sm font-medium text-white/70"
-				>
+				<Button variant="ghost" onclick={() => { showCelebration = false; showConfetti = false; submitted = false; text = ''; }} class="mt-3">
 					SUBMIT ANOTHER
-				</button>
+				</Button>
 			</div>
 		</div>
 	{/if}

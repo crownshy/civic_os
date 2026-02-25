@@ -2,6 +2,7 @@
 	import { fly, scale } from 'svelte/transition';
 	import { cubicOut, elasticOut } from 'svelte/easing';
 	import ConfettiOverlay from './ConfettiOverlay.svelte';
+	import Button from './Button.svelte';
 	import type { PopQuizQuestion } from '$lib/types/mock-data';
 
 	interface Props {
@@ -17,6 +18,7 @@
 	let selected = $state<number | null>(null);
 	let showCorrectAnim = $state(false);
 	let showConfetti = $state(false);
+	let scrollContainer = $state<HTMLDivElement>();
 
 	function selectOption(idx: number) {
 		if (selected !== null) return;
@@ -25,12 +27,26 @@
 			showCorrectAnim = true;
 			setTimeout(() => { showConfetti = true; }, 200);
 		}
+		
+		setTimeout(() => {
+			if (scrollContainer) {
+				const scrollAmount = window.innerHeight * 0.5;
+				scrollContainer.scrollTo({
+					top: scrollContainer.scrollTop + scrollAmount,
+					behavior: 'smooth'
+
+				});
+			}
+		}, 100);
 	}
 
 	export function reset() {
 		selected = null;
 		showCorrectAnim = false;
 		showConfetti = false;
+		if (scrollContainer) {
+			scrollContainer.scrollTop = 0;
+		}
 	}
 </script>
 
@@ -58,7 +74,7 @@
 	<ConfettiOverlay active={showConfetti} />
 
 	<!-- Content -->
-	<div class="flex flex-1 flex-col overflow-y-auto px-8 pt-10">
+	<div bind:this={scrollContainer} class="flex flex-1 flex-col overflow-y-auto px-8 pt-10">
 		<span class="font-mono text-sm font-medium text-white/80">{quiz.label}</span>
 		<p class="mt-4 font-sans text-4xl font-bold leading-10 text-white">
 			{quiz.question}
@@ -114,19 +130,11 @@
 
 	<!-- Bottom actions -->
 	<div class="flex shrink-0 items-center gap-3.5 border-t border-primary bg-blue-900 px-7 py-8">
-		<button
-			onclick={onContinue}
-			class="flex h-14 flex-1 items-center justify-center rounded-full font-mono text-lg font-medium shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)] transition-colors {selected !== null
-				? 'bg-secondary text-secondary-foreground'
-				: 'bg-secondary/50 text-white/70'}"
-		>
+		<Button variant="primary" class="flex-1" onclick={onContinue}>
 			CONTINUE
-		</button>
-		<button
-			onclick={onSkip}
-			class="flex h-14 flex-1 items-center justify-center rounded-full bg-black/30 font-mono text-lg font-medium text-white shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"
-		>
+		</Button>
+		<Button variant="secondary" class="flex-1" onclick={onSkip}>
 			SKIP
-		</button>
+		</Button>
 	</div>
 </div>

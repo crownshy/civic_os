@@ -3,7 +3,7 @@
 	import MonoLabel from './MonoLabel.svelte';
 
 	const { Story } = defineMeta({
-		title: 'UI/MonoLabel',
+		title: 'Primitives/MonoLabel',
 		component: MonoLabel,
 		tags: ['autodocs'],
 		argTypes: {
@@ -13,34 +13,33 @@
 	});
 </script>
 
-<Story name="Primary SM" args={{ size: 'sm', variant: 'primary' }}>
+<Story name="Primary" args={{ size: 'sm', variant: 'primary' }}>
 	{#snippet children(args)}
-		<MonoLabel {...args}>ABC COUNTY</MonoLabel>
+		<MonoLabel {...args}>UTAH COUNTY</MonoLabel>
 	{/snippet}
 </Story>
 
-<Story name="Primary MD" args={{ size: 'md', variant: 'primary' }}>
+<Story name="White" args={{ variant: 'white' }}>
 	{#snippet children(args)}
-		<MonoLabel {...args}>WHERE WE AGREE</MonoLabel>
-	{/snippet}
-</Story>
-
-<Story name="Primary LG" args={{ size: 'lg', variant: 'primary' }}>
-	{#snippet children(args)}
-		<MonoLabel {...args}>ABC COUNTY</MonoLabel>
-	{/snippet}
-</Story>
-
-<Story name="On Primary" args={{ size: 'sm', variant: 'white' }}>
-	{#snippet children(args)}
-		<div class="bg-primary p-4">
-			<MonoLabel {...args}>ABC COUNTY</MonoLabel>
+		<div class="bg-primary p-6 rounded-xl">
+			<MonoLabel {...args}>YOU</MonoLabel>
 		</div>
 	{/snippet}
 </Story>
 
-<Story name="Muted" args={{ size: 'xs', variant: 'muted' }}>
+<Story name="Muted" args={{ variant: 'muted' }}>
 	{#snippet children(args)}
-		<MonoLabel {...args}>POSTED JAN 02 2026</MonoLabel>
+		<MonoLabel {...args}>Jan 02 2026</MonoLabel>
+	{/snippet}
+</Story>
+
+<Story name="All Sizes" args={{}}>
+	{#snippet children(args)}
+		<div class="flex flex-col gap-3">
+			<MonoLabel size="xs">EXTRA SMALL — DID YOU KNOW...</MonoLabel>
+			<MonoLabel size="sm">SMALL — POP QUIZ</MonoLabel>
+			<MonoLabel size="md">MEDIUM — AGREE</MonoLabel>
+			<MonoLabel size="lg">LARGE — SUBMIT</MonoLabel>
+		</div>
 	{/snippet}
 </Story>

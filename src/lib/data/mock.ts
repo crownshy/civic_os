@@ -44,7 +44,7 @@ export const statements: Statement[] = [
 	},
 	{
 		id: 'stmt-003',
-		text: 'And this is a much longer thing. I figure we want to stick to Polis rules and keep statements a bit shorter, but I also like the idea of giving people a bit more room to say what\'s on their mind. Still want to keep it easy to consume and prevent ranting, but yeah.',
+		text: 'And this is a much longer thing. I figure we want to stick to Polis rules and keep statements a bit shorter, but I also like the idea of giving people a bit more room to say what\'s on their mind. Still want to keep it easy to consume and prevent ranting, but yeah. And this is a much longer thing. And this is a much longer thing. And this is a much longer thing. And this is a much longer thing. And this is a much longer thing. And this is a much longer thing.',
 		authorAlias: 'Clandestine Coral',
 		authorColor: '#2DD4BF',
 		deliberationId: 'delib-001',
