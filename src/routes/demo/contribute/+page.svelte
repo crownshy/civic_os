@@ -2,13 +2,14 @@
 	import { fly, fade, scale } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import { AppShell, AppHeader } from '$lib/components/layout';
-	import { VoteBar, PillButton, BlueHeader, SwipeCarousel, PopQuiz } from '$lib/components/ui';
+	import { VoteBar, PillButton, BlueHeader, SwipeCarousel, PopQuiz, EmailCapture } from '$lib/components/ui';
 	import ComposeOverlay from '$lib/components/ui/ComposeOverlay.svelte';
 	import { county, deliberation, statements, learningCards, popQuizQuestions, aboutYouQuestions } from '$lib/data/mock';
 
 	type Screen =
 		| 'voting'
 		| 'compose'
+		| 'email-capture'
 		| 'did-you-know'
 		| 'pop-quiz'
 		| 'about-you'
@@ -131,12 +132,17 @@
 		if (votesInRound === milestoneInterval) {
 			votesInRound = 0;
 			interstitialStep++;
-			// Cycle: did-you-know → pop-quiz → about-you → did-you-know ...
-			const cycle = interstitialStep % 3;
-			if (cycle === 1) {
+			// First interstitial: email capture (shown once)
+			if (interstitialStep === 1) {
+				screen = 'email-capture';
+				return;
+			}
+			// Then cycle: did-you-know → pop-quiz → about-you ...
+			const cycle = (interstitialStep - 1) % 3;
+			if (cycle === 0) {
 				screen = 'did-you-know';
 				startCountdown();
-			} else if (cycle === 2) {
+			} else if (cycle === 1) {
 				quizSelected = null;
 				screen = 'pop-quiz';
 			} else {
@@ -203,7 +209,7 @@
 
 			<!-- Swipeable statement content -->
 			<div
-				class="relative flex flex-1 flex-col overflow-hidden px-8 pt-6"
+				class="relative flex flex-1 flex-col overflow-x-hidden overflow-y-auto px-8 pt-6"
 				ontouchstart={handleSwipeStart}
 				ontouchmove={handleSwipeMove}
 				ontouchend={handleSwipeEnd}
@@ -305,6 +311,16 @@
 					</div>
 				</div>
 			{/if}
+		</div>
+
+	{:else if screen === 'email-capture'}
+		<!-- EMAIL CAPTURE interstitial -->
+		<div in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
+			<EmailCapture
+				countyName={county.name}
+				onSubmit={() => resumeVoting()}
+				onSkip={resumeVoting}
+			/>
 		</div>
 
 	{:else if screen === 'did-you-know'}
@@ -485,24 +501,23 @@
 			<BlueHeader countyName={county.name} />
 
 			<!-- Scrollable content -->
-			<div class="flex flex-1 flex-col overflow-y-auto px-8 pt-8">
-				<!-- Emoji + circle -->
-				<div class="flex flex-col items-center">
-					<div class="relative">
-						<div class="h-32 w-32 rounded-full bg-secondary"></div>
-						<span class="absolute inset-0 flex items-center justify-center text-9xl font-bold drop-shadow-[0px_4px_24px_rgba(0,0,0,0.25)]">🎉</span>
+			<div class="flex flex-1 flex-col overflow-y-auto px-8 pt-6">
+				<!-- Compact emoji + heading row -->
+				<div class="flex items-center gap-4">
+					<div class="relative shrink-0">
+						<div class="h-16 w-16 rounded-full bg-secondary"></div>
+						<span class="absolute inset-0 flex items-center justify-center text-5xl drop-shadow-[0px_4px_24px_rgba(0,0,0,0.25)]">🎉</span>
 					</div>
+					<p class="font-sans text-2xl font-bold leading-8 text-white">
+						Thank you for participating!
+					</p>
 				</div>
 
-				<p class="mt-8 font-sans text-3xl font-bold leading-10 text-white">
-					Thank you for participating! Here's what's next...
-				</p>
-
 				<!-- Report Back swipeable carousel -->
-				<SwipeCarousel count={reportSlides.length} bind:index={reportSlideIndex} class="mt-4 border-t border-white/20 py-6">
+				<SwipeCarousel count={reportSlides.length} bind:index={reportSlideIndex} class="mt-5 border-t border-white/20 pt-5">
 					{#snippet children(i)}
-						<h3 class="font-sans text-2xl font-bold leading-9 text-white">{reportSlides[i].title}</h3>
-						<p class="mt-3 font-sans text-lg font-medium leading-7 text-white/80">
+						<h3 class="font-sans text-xl font-bold leading-7 text-white">{reportSlides[i].title}</h3>
+						<p class="mt-2 font-sans text-base font-medium leading-6 text-white/80">
 							{reportSlides[i].body}
 						</p>
 					{/snippet}
@@ -510,7 +525,7 @@
 			</div>
 
 			<!-- Bottom CTAs -->
-			<div class="flex shrink-0 items-center gap-3.5 px-7 py-8">
+			<div class="flex shrink-0 items-center gap-3.5 px-7 py-6">
 				<button
 					onclick={continueVoting}
 					class="flex h-14 flex-1 items-center justify-center rounded-full bg-secondary font-mono text-lg font-medium text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]"

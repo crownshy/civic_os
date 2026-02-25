@@ -7,9 +7,11 @@
 	<div class="flex h-dvh flex-col items-center justify-center gap-6 bg-primary px-8">
 			<div class="mt-8 flex w-full max-w-md flex-col gap-3">
 			<a href="/demo/landing">
-				<PillButton variant="filled-white" fullWidth>LANDING</PillButton>
+				<PillButton variant="filled-white" fullWidth>LANDING (WITHOUT HOST)</PillButton>
 			</a>
-	
+			<a href="/demo/landing?host=true">
+				<PillButton variant="filled-white" fullWidth>LANDING (WITH HOST)</PillButton>
+			</a>
 	
 			<a href="/demo/contribute">
 				<PillButton variant="filled-white" fullWidth>CONTRIBUTE / VOTE</PillButton>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
+	import { onDestroy } from 'svelte';
 	import type { Snippet } from 'svelte';
 
 	interface Props {
@@ -12,20 +13,54 @@
 		children: Snippet<[number]>;
 		/** Optional extra class on the outer wrapper */
 		class?: string;
+		/** Auto-advance interval in ms (e.g. 4000). Disabled if not set. */
+		autoScrollMs?: number;
 	}
 
 	let {
 		count,
 		index = $bindable(0),
 		children,
-		class: className = ''
+		class: className = '',
+		autoScrollMs
 	}: Props = $props();
 
 	let touchStartX = $state(0);
 	let touchDeltaX = $state(0);
 	let swiping = $state(false);
 
+	// Auto-scroll timer
+	let autoTimer: ReturnType<typeof setInterval> | null = null;
+
+	function startAutoScroll() {
+		stopAutoScroll();
+		if (!autoScrollMs || autoScrollMs <= 0) return;
+		autoTimer = setInterval(() => {
+			index = (index + 1) % count;
+		}, autoScrollMs);
+	}
+
+	function stopAutoScroll() {
+		if (autoTimer) {
+			clearInterval(autoTimer);
+			autoTimer = null;
+		}
+	}
+
+	function resetAutoScroll() {
+		if (autoScrollMs && autoScrollMs > 0) startAutoScroll();
+	}
+
+	// Start auto-scroll on mount if configured
+	$effect(() => {
+		if (autoScrollMs && autoScrollMs > 0) {
+			startAutoScroll();
+		}
+		return () => stopAutoScroll();
+	});
+
 	function handleTouchStart(e: TouchEvent) {
+		stopAutoScroll();
 		touchStartX = e.touches[0].clientX;
 		touchDeltaX = 0;
 		swiping = true;
@@ -45,7 +80,15 @@
 			index--;
 		}
 		touchDeltaX = 0;
+		resetAutoScroll();
 	}
+
+	function handleDotClick(i: number) {
+		index = i;
+		resetAutoScroll();
+	}
+
+	onDestroy(() => stopAutoScroll());
 </script>
 
 <div
@@ -65,7 +108,7 @@
 	<div class="mt-6 flex items-center justify-center gap-[23px]">
 		{#each { length: count } as _, i}
 			<button
-				onclick={() => (index = i)}
+				onclick={() => handleDotClick(i)}
 				class="h-2 w-2 rounded-full transition-colors {i === index ? 'bg-white' : 'bg-zinc-300/50'}"
 				aria-label="Slide {i + 1}"
 			></button>
