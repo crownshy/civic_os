@@ -1,18 +1,17 @@
 <script lang="ts">
-	import { fly } from 'svelte/transition';
+	import { fly, fade } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import { AppHeader } from '$lib/components/layout';
 	import { VoteBar } from '$lib/components/ui';
-	import type { Statement } from '$lib/types/mock-data';
 
 	interface Props {
 		countyName: string;
 		question: string;
-		statement: Statement;
-		totalVotes: number;
-		totalStatements: number;
-		currentIndex: number;
-		onVote: (type: 'agree' | 'disagree' | 'skip') => void;
+		statementText: string;
+		remaining: number;
+		total: number;
+		loading?: boolean;
+		onVote: (type: 'agree' | 'disagree' | 'pass') => void;
 		onEnd: () => void;
 		onCompose: () => void;
 	}
@@ -20,18 +19,27 @@
 	let {
 		countyName,
 		question,
-		statement,
-		totalVotes,
-		totalStatements,
-		currentIndex,
+		statementText,
+		remaining,
+		total,
+		loading = false,
 		onVote,
 		onEnd,
 		onCompose
 	}: Props = $props();
 
-	// Adaptive font sizing
+	let lastDisplayedText = $state(statementText);
+	let waitingForNext = $state(false);
+
+	$effect(() => {
+		if (statementText !== lastDisplayedText && !loading) {
+			lastDisplayedText = statementText;
+			waitingForNext = false;
+		}
+	});
+
 	const statementClasses = $derived.by(() => {
-		const len = statement.text.length;
+		const len = statementText.length;
 		if (len < 60) return 'font-sans text-5xl font-bold leading-[1.1]';
 		if (len < 140) return 'font-sans text-3xl font-semibold leading-10';
 		return 'font-sans text-2xl font-medium leading-8';
@@ -48,7 +56,7 @@
 	const SWIPE_THRESHOLD = 80;
 
 	function handleSwipeStart(e: TouchEvent) {
-		if (swipeDismissed) return;
+		if (swipeDismissed || waitingForNext) return;
 		swipeStartX = e.touches[0].clientX;
 		swipeStartY = e.touches[0].clientY;
 		swipeDeltaX = 0;
@@ -66,25 +74,23 @@
 		}
 	}
 
+	function doVote(type: 'agree' | 'disagree' | 'skip') {
+		waitingForNext = true;
+		onVote(type);
+		swipeDeltaX = 0;
+		swipeDirection = 'none';
+		swipeDismissed = false;
+	}
+
 	function handleSwipeEnd() {
 		if (!swiping || swipeDismissed) return;
 		swiping = false;
 		if (swipeDirection === 'agree') {
 			swipeDismissed = true;
-			setTimeout(() => {
-				onVote('agree');
-				swipeDeltaX = 0;
-				swipeDirection = 'none';
-				swipeDismissed = false;
-			}, 200);
+			setTimeout(() => doVote('agree'), 200);
 		} else if (swipeDirection === 'disagree') {
 			swipeDismissed = true;
-			setTimeout(() => {
-				onVote('disagree');
-				swipeDeltaX = 0;
-				swipeDirection = 'none';
-				swipeDismissed = false;
-			}, 200);
+			setTimeout(() => doVote('disagree'), 200);
 		} else {
 			swipeDeltaX = 0;
 			swipeDirection = 'none';
@@ -128,7 +134,20 @@
 			</div>
 		{/if}
 
-		{#key currentIndex}
+		{#if waitingForNext}
+			<!-- Loading skeleton between statements -->
+			<div in:fade={{ duration: 200 }} class="animate-pulse">
+				<div class="flex items-center gap-2">
+					<span class="h-5 w-5 rounded-full bg-primary/20"></span>
+					<span class="h-4 w-32 rounded bg-primary/20"></span>
+				</div>
+				<div class="mt-6 space-y-3">
+					<div class="h-8 w-full rounded bg-primary/10"></div>
+					<div class="h-8 w-4/5 rounded bg-primary/10"></div>
+					<div class="h-8 w-3/5 rounded bg-primary/10"></div>
+				</div>
+			</div>
+		{:else}
 			<div
 				class="transition-transform {swiping ? 'duration-0' : 'duration-300'}"
 				style="transform: translateX({swipeDismissed ? (swipeDirection === 'agree' ? 400 : -400) : swipeDeltaX}px) rotate({swipeDismissed ? (swipeDirection === 'agree' ? 8 : -8) : swipeDeltaX * 0.04}deg); opacity: {swipeDismissed ? 0 : 1}"
@@ -137,31 +156,30 @@
 				<!-- Attribution -->
 				<div class="flex items-center gap-2">
 					<span
-						class="h-5 w-5 rounded-full"
-						style="background-color: {statement.authorColor ?? '#2952C0'}"
+						class="h-5 w-5 rounded-full bg-primary"
 					></span>
 					<span class="font-mono text-sm font-medium text-primary">
-						{statement.authorAlias} SAYS...
+						SOMEONE SAYS...
 					</span>
 				</div>
 
 				<!-- Quote with adaptive font -->
 				<p class="mt-4 pb-60 overflow-y-auto {statementClasses} text-primary">
-					{statement.text}
+					{statementText}
 				</p>
 			</div>
-		{/key}
+		{/if}
 	</div>
 
 	<!-- Sticky bottom VoteBar -->
 	<div class="absolute bottom-0 left-0 right-0 shrink-0 w-full">
 		<VoteBar
-			onAgree={() => onVote('agree')}
-			onDisagree={() => onVote('disagree')}
-			onSkip={() => onVote('skip')}
+			onAgree={waitingForNext ? undefined : () => doVote('agree')}
+			onDisagree={waitingForNext ? undefined : () => doVote('disagree')}
+			onSkip={waitingForNext ? undefined : () => doVote('pass')}
 			{onEnd}
-			current={totalVotes}
-			total={totalStatements}
+			current={total - remaining}
+			{total}
 		/>
 	</div>
 </div>
