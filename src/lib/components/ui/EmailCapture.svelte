@@ -14,8 +14,8 @@
 
 <div class="flex w-full flex-col items-center">
 	<div class="w-full rounded-[20px] bg-white p-6 shadow-[0px_20px_40px_rgba(0,0,0,0.35)]">
-		<h2 class="font-sans text-4xl font-bold leading-10 text-blue-800">Share your email</h2>
-		<p class="mt-4 font-sans text-lg font-medium leading-7 text-blue-800/80">
+		<h2 class="font-sans text-4xl font-bold leading-10 text-secondary">Share your email</h2>
+		<p class="mt-4 font-sans text-lg font-medium leading-7 text-secondary/80">
 			We'll only use this to give you updates on this conversation. No spam, no marketing emails or anything like that.
 		</p>
 		<form
@@ -25,7 +25,7 @@
 			<input
 				bind:value={email}
 				placeholder="email@xyz.com"
-				class="w-full bg-transparent font-sans text-base font-medium text-blue-900 placeholder:text-blue-900/80 border-0 outline-none focus:ring-0"
+				class="w-full bg-transparent font-sans text-base font-medium text-secondary placeholder:text-secondary/80 border-0 outline-none focus:ring-0"
 			/>
 		</form>
 	</div>

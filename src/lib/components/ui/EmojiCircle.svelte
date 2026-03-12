@@ -4,7 +4,7 @@
 		emoji?: string;
 		/** Size variant */
 		size?: 'sm' | 'md' | 'lg' | 'xl';
-		/** Background color - defaults to secondary (teal) */
+		/** Background color - defaults to primary (teal) */
 		bgColor?: string;
 		/** Optional extra classes */
 		class?: string;
@@ -13,7 +13,7 @@
 	let {
 		emoji = '🎉',
 		size = 'xl',
-		bgColor = 'bg-secondary',
+		bgColor = 'bg-primary',
 		class: className = ''
 	}: Props = $props();
 

@@ -52,8 +52,8 @@
 
 <style>
 	@keyframes pulse-glow {
-		0%, 100% { box-shadow: 0 0 0 0 rgba(7, 168, 158, 0.4); }
-		50% { box-shadow: 0 0 0 12px rgba(7, 168, 158, 0); }
+		0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 40%, transparent); }
+		50% { box-shadow: 0 0 0 12px color-mix(in srgb, var(--primary) 0%, transparent); }
 	}
 	.correct-glow {
 		animation: pulse-glow 0.8s ease-in-out 2;
@@ -91,12 +91,12 @@
 					disabled={answered}
 					class="relative flex h-16 w-full items-center rounded-[20px] px-6 text-left font-sans text-2xl font-bold leading-7 transition-all duration-300
 						{answered && isCorrect
-							? 'bg-secondary text-secondary-foreground shadow-[0px_10px_15px_0px_rgba(12,34,95,0.25)]'
+							? 'bg-primary text-primary-foreground shadow-[0px_10px_15px_0px_rgba(12,34,95,0.25)]'
 							: isSelected && !isCorrect
 								? 'bg-white/30 text-white'
 								: answered
-									? 'bg-blue-900/60 text-white/50'
-									: 'bg-blue-900 text-white'}
+									? 'bg-secondary/60 text-white/50'
+									: 'bg-secondary text-white'}
 						{answered && isCorrect && showCorrectAnim ? 'correct-glow' : ''}"
 				>
 					{#if answered && isCorrect}
@@ -129,7 +129,7 @@
 	</div>
 
 	<!-- Bottom actions -->
-	<div class="flex shrink-0 items-center gap-3.5 border-t border-primary bg-blue-900 px-7 py-8">
+	<div class="flex shrink-0 items-center gap-3.5 border-t border-background bg-secondary px-7 py-8">
 		<Button variant="primary" class="flex-1" onclick={onContinue}>
 			CONTINUE
 		</Button>

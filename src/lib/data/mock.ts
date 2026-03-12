@@ -207,6 +207,13 @@ export const aboutYouQuestions: AboutYouQuestion[] = [
 		question: 'Which of the following ethnicities do you identify with?',
 		description: 'This information helps us make sure everyone is represented in the conversation. You can revoke access to this at any time.',
 		options: ['Asian', 'Black', 'White', 'Hispanic', 'Other'],
-		multiSelect: true
+		multiSelect: false
+	},
+	{
+		id: 'about-003',
+		question: 'What is your gender?',
+		description: 'This information helps us make sure everyone is represented in the conversation. You can revoke access to this at any time.',
+		options: ['Male', 'Female', 'Non-binary', 'Prefer not to say'],
+		multiSelect: false
 	}
 ];

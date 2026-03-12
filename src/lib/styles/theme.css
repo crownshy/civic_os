@@ -1,17 +1,17 @@
 /* Civic OS Theme — adapted from Comhairle shadcn design system */
-/* Primary: #2952C0 | Accent Pink: #FC3AA8 | Accent Teal: #07A89E */
+/* Primary: #07A89E | Destructive: #E02D99 | Background: #1D46B5 */
 
 :root {
   --background: #1D46B5;
   --foreground: #FFFFFF;
   --card: #FFFFFF;
-  --card-foreground: #030712;
+  --card-foreground: #2952C0;
   --popover: #FFFFFF;
   --popover-foreground: #030712;
-  --primary: #1D46B5;
+  --primary: #07A89E;
   --primary-foreground: #FFFFFF;
-  --secondary: #07A89E;
-  --secondary-foreground: #FFFFFF;
+  --secondary: #0E2D80;
+  --secondary-foreground: #615c5c;
   --muted: #F3F4F6;
   --muted-foreground: #6B7280;
   --accent: #F3F4F6;
@@ -36,12 +36,6 @@
   --sidebar-ring: #2952C0;
   --sidebar-secondary: #7DD3FC;
   --sidebar-active-bg: #0E1F4A;
-
-  --accent-pink: #FC3AA8;
-  --accent-pink-foreground: #FFFFFF;
-
-  --accent-teal: #07A89E;
-  --accent-teal-foreground: #FFFFFF;
 
   --font-sans: 'Hanken Grotesk', sans-serif;
   --font-serif: Merriweather, serif;
@@ -99,7 +93,4 @@
   --sidebar-ring: #5B8DEF;
   --sidebar-secondary: #38BDF8;
   --sidebar-active-bg: #1E3A5F;
-
-  --accent-pink: #FC3AA8;
-  --accent-pink-foreground: #FFFFFF;
 }

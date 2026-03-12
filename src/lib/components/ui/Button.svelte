@@ -33,13 +33,13 @@
 	const base = 'inline-flex items-center justify-center rounded-full font-mono font-medium transition-colors';
 
 	const variants: Record<Variant, string> = {
-		primary: 'bg-secondary text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]',
+		primary: 'bg-primary text-primary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]',
 		secondary: 'bg-black/30 text-white shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]',
 		destructive: 'text-destructive [background-color:color-mix(in_srgb,var(--destructive)_20%,white)]',
-		pill: 'text-secondary [background-color:color-mix(in_srgb,var(--secondary)_20%,white)]',
+		pill: 'text-primary [background-color:color-mix(in_srgb,var(--primary)_20%,white)]',
 		ghost: 'bg-transparent text-white/70',
-		gradient: 'bg-white/10 shadow-[inset_2px_4px_4px_0px_rgba(0,0,0,0.20)] outline outline-2 outline-white/20',
-		outline: 'bg-white/20 text-white/70 border-4 border-white'
+		gradient: 'bg-white/10 shadow-[inset_2px_4px_4px_0px_rgba(0,0,0,0.20)] outline outline-2 outline-foreground/20',
+		outline: 'bg-white/20 text-white/70 border-3 border-foreground'
 	};
 
 	const disabledVariants: Record<Variant, string> = {
@@ -48,7 +48,8 @@
 		destructive: 'opacity-50',
 		pill: 'opacity-50',
 		ghost: 'opacity-50',
-		gradient: 'opacity-50'
+		gradient: 'opacity-50',
+		outline: 'opacity-50 bg-white/20 text-white/70 border-3 border-foreground'
 	};
 
 	const sizes: Record<Size, string> = {

@@ -11,21 +11,9 @@
 
 <div
 	class={cn(
-		'app-shell relative min-h-dvh w-full bg-background overflow-x-hidden',
+		'app-shell relative mx-auto h-dvh w-full max-w-[430px] overflow-x-hidden overflow-y-hidden bg-background shadow-none md:max-w-[768px] md:rounded-2xl md:shadow-2xl',
 		className
 	)}
 >
 	{@render children()}
 </div>
-
-<style>
-	/* Page wrappers (1st-level children) stay full-width for bg colors.
-	   Content sections (2nd-level children) get constrained on desktop. */
-	@media (min-width: 1264px) {
-		.app-shell > :global(*) > :global(*) {
-			max-width: 1200px;
-			margin-left: auto;
-			margin-right: auto;
-		}
-	}
-</style>
