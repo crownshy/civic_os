@@ -1,4 +1,3 @@
-export { default as PillButton } from './PillButton.svelte';
 export { default as MonoLabel } from './MonoLabel.svelte';
 export { default as QuoteText } from './QuoteText.svelte';
 export { default as VoteBar } from './VoteBar.svelte';

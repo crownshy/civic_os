@@ -49,7 +49,7 @@
 }
 
 @utility bg-gradient-primary {
-  background-image: linear-gradient(to bottom, var(--background), var(--secondary));
+  background-image: linear-gradient(to bottom, #FFF6EB, #FFDDAA);
 }
 
 @layer base {

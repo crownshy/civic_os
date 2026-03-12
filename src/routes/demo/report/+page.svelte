@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { AppShell } from '$lib/components/layout';
-	import { PillButton, MonoLabel, QuoteText, ProgressBar } from '$lib/components/ui';
+	import { Button, MonoLabel, QuoteText, ProgressBar } from '$lib/components/ui';
 	import { themeSummaries } from '$lib/data/mock';
 	import { county, deliberation } from '$lib/data/mock';
 
@@ -32,14 +32,14 @@
 
 		<!-- Sticky bottom navigation -->
 		<div class="shrink-0 bg-background px-8 py-6">
-			<PillButton variant="outline" fullWidth class="mb-3">
+			<Button variant="outline" fullWidth class="mb-3">
 				GO BACK
-			</PillButton>
+			</Button>
 			{#each regions as region}
 				<div class="mb-3">
-					<PillButton variant="filled" fullWidth>
+					<Button variant="primary" fullWidth>
 						CHECK OUT {region}
-					</PillButton>
+					</Button>
 				</div>
 			{/each}
 		</div>

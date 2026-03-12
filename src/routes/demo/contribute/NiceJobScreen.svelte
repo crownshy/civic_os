@@ -19,18 +19,18 @@
 	<!-- Centered content -->
 	<div class="flex flex-1 flex-col items-center justify-center overflow-y-auto px-8">
 		<EmojiCircle emoji="🎉" size="lg" />
-		<p class="mt-8 text-center font-sans text-3xl font-bold leading-10 text-white">
+		<p class="mt-8 text-center font-sans text-3xl font-bold leading-10 text-foreground">
 			Nice job!
 		</p>
 		{#if remaining != null && remaining > 0}
-			<p class="mt-4 text-center font-sans text-lg font-medium text-white/80">
+			<p class="mt-4 text-center font-sans text-lg font-medium text-foreground/80">
 				There are {remaining} more statements remaining. Keep going?
 			</p>
 		{/if}
 	</div>
 
 	<!-- Bottom CTAs -->
-	<div class="flex shrink-0 items-center gap-3.5 border-t border-background bg-secondary px-7 py-8">
+	<div class="flex shrink-0 items-center gap-3.5 border-t border-background bg-secondary/20 px-7 py-8">
 		<Button variant="primary" fullWidth onclick={onKeepVoting}>
 			KEEP VOTING
 		</Button>

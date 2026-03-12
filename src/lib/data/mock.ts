@@ -12,7 +12,7 @@ import type {
 } from '$lib/types/mock-data';
 
 export const county: County = {
-	name: 'Utah County',
+	name: 'Utah',
 	participantCount: 2312
 };
 

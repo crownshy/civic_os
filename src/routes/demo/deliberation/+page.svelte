@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { AppShell, AppHeader } from '$lib/components/layout';
-	import { PillButton, MonoLabel, ThemeChip, ProgressBar, MapPlaceholder } from '$lib/components/ui';
+	import { Button, MonoLabel, ThemeChip, ProgressBar, MapPlaceholder } from '$lib/components/ui';
 	import { county, deliberation, themeSummaries } from '$lib/data/mock';
 	</script>
 
@@ -21,9 +21,9 @@
 				{deliberation.question}
 			</h1>
 			<div class="mt-6">
-				<PillButton variant="filled-white" fullWidth>
+				<Button variant="outline" fullWidth>
 					SHARE YOUR THOUGHTS NOW
-				</PillButton>
+				</Button>
 			</div>
 		</div>
 

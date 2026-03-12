@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
-	import { FastForward, Check, X } from 'lucide-svelte';
-		import Button from './Button.svelte';
+	import { SkipForward, Check, X } from 'lucide-svelte';
+	import Button from './Button.svelte';
 
 
 	interface Props {
@@ -12,6 +12,7 @@
 		remaining?: number;
 		total?: number;
 		disabled?: boolean;
+		skeleton?: boolean;
 		class?: string;
 	}
 
@@ -23,57 +24,61 @@
 		remaining = 0,
 		total = 10,
 		disabled = false,
+		skeleton = false,
 		class: className
 	}: Props = $props();
 
 	const progress = $derived(total > 0 ? ((total - remaining) / total) * 100 : 0);
 </script>
 
-<div class={cn('shrink-0 overflow-hidden bg-linear-to-b from-card/20 via-card/90 via-20% to-card', className)}>
+<div class={cn('shrink-0 overflow-hidden', skeleton && 'pointer-events-none opacity-40', className)}>
 	<!-- Remaining / End pills row -->
 	<div class="flex items-center justify-between px-6 py-2 pb-3">
-		<span class="inline-flex items-center rounded-[20px] bg-primary/20 px-3 py-1.5">
-			<span class="font-mono text-base font-medium text-primary">{remaining} LEFT</span>
+		<span class="inline-flex items-center rounded-[20px] bg-secondary px-3 py-1.5">
+			<span class="font-mono text-base font-medium text-secondary-foreground">{remaining} LEFT</span>
 		</span>
-		<button onclick={onEnd} class="inline-flex items-center rounded-[20px] bg-destructive/20 px-3 py-1.5">
-			<span class="font-mono text-base font-medium text-destructive">END</span>
-		</button>
+
+		
+		<Button onclick={onEnd} size="sm" variant="pill" class="bg-accent text-secondary" >
+			<span class="font-mono text-base font-medium">END</span>
+		</Button>
 	</div>
 
 	<!-- Progress bar -->
-	<div class="relative h-1.5 w-full bg-primary/30">
+	<div class="relative h-1.5 w-full bg-secondary/30">
 		<div
-			class="absolute left-0 top-0 h-full bg-primary transition-all duration-300"
+			class="absolute left-0 top-0 h-full bg-secondary transition-all duration-300"
 			style="width: {progress}%"
 		></div>
 	</div>
 
 	<!-- Vote buttons row -->
-	<div class="border-t border-background bg-background px-5 py-8">
+	<div class="border-t border-background bg-[#FFEDD3] px-5 py-8">
 	
 		<div class="flex flex-nowrap items-end justify-center gap-2.5">
-			<button
+			<Button
 				{disabled}
 				onclick={onAgree}
 				class="flex min-w-0 flex-1 items-center justify-center gap-1.5 whitespace-nowrap overflow-hidden rounded-[30px] bg-primary px-4 py-3.5 shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)] disabled:cursor-not-allowed disabled:opacity-50"
 			>
 				<Check class="h-5 w-5" />
-				<span class="font-mono text-base font-sm text-foreground">AGREE</span>
-			</button>
-			<button
+				<span>AGREE</span>
+			</Button>
+			<Button
 				{disabled}
+				variant="destructive"
 				onclick={onDisagree}
-				class="flex min-w-0 flex-1 items-center justify-center gap-1.5 whitespace-nowrap overflow-hidden rounded-[30px] bg-black/30 px-4 py-3.5 shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)] disabled:cursor-not-allowed disabled:opacity-50"
+				class="flex min-w-0 flex-1 items-center justify-center gap-1.5 whitespace-nowrap overflow-hidden rounded-[30px] px-4 py-3.5 shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)] disabled:cursor-not-allowed disabled:opacity-50"
 			>
 				<X class="h-5 w-5" />
-				<span class="font-mono text-base font-sm text-foreground">DISAGREE</span>
-			</button>
+				<span>DISAGREE</span>
+		</Button>
 			
 		<!-- Skip button -->
 		<div class="relative inline-flex items-center justify-center">
 			<Button {disabled} aria-label="Skip" onclick={onSkip} variant="outline" 
 				class="h-13 w-13 shrink-0 overflow-visible">
-				<FastForward class="h-6 w-6 text-foreground" />
+				<SkipForward fill="currentColor" class="h-6 w-6 text-secondary" />
 			</Button>
 			<svg
 			viewBox="0 0 100 100"
@@ -85,9 +90,9 @@
 				d="M 50,90 a 40,40 0 1,1 0,-80 a 40,40 0 1,1 0,80"
 				fill="none"
 			/>
-			<text fill="background" opacity={`${disabled ? 0.5 : 1}`} font-size="14">
+			<text fill="#A6722E" opacity={`${disabled ? 0.5 : 1}`} font-size="14">
 				<textPath href="#circlePath" text-anchor="middle" startOffset="50%">
-				PASS
+				SKIP
 				</textPath>
 			</text>
 			</svg>

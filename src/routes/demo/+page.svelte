@@ -1,38 +1,30 @@
 <script lang="ts">
 	import { AppShell } from '$lib/components/layout';
-	import { PillButton, MonoLabel } from '$lib/components/ui';
+	import { Button, MonoLabel } from '$lib/components/ui';
 </script>
 
 <AppShell>
 	<div class="flex h-full flex-col items-center justify-center gap-6 bg-background px-8">
 			<div class="mt-8 flex w-full max-w-md flex-col gap-3">
-			<a href="/demo/landing">
-				<PillButton fullWidth>LANDING (WITHOUT HOST)</PillButton>
-			</a>
+
 			<a href="/demo/landing?host=true">
-				<PillButton fullWidth>LANDING (WITH HOST)</PillButton>
+				<Button fullWidth>LANDING</Button>
 			</a>
 	
 			<a href="/demo/contribute">
-				<PillButton fullWidth>CONTRIBUTE / VOTE</PillButton>
+				<Button fullWidth>CONTRIBUTE / VOTE</Button>
 			</a>
-					<a href="/demo/pop-quiz">
-				<PillButton fullWidth>POP QUIZ</PillButton>
+			<a href="/demo/pop-quiz">
+				<Button fullWidth>POP QUIZ</Button>
 			</a>
 			<a href="/demo/about-you">
-				<PillButton fullWidth>ABOUT YOU</PillButton>
+				<Button fullWidth>ABOUT YOU</Button>
 			</a>
 			<a href="/demo/learn">
-				<PillButton fullWidth>LEARNING (IN-FLOW)</PillButton>
-			</a>
-			<a href="/demo/deliberation">
-				<PillButton fullWidth>DELIBERATION PAGE</PillButton>
-			</a>
-			<a href="/demo/profile">
-				<PillButton fullWidth>PROFILE</PillButton>
+				<Button fullWidth>LEARNING (IN-FLOW)</Button>
 			</a>
 			<a href="/demo/report">
-				<PillButton fullWidth>BLOOM REPORT</PillButton>
+				<Button fullWidth>BLOOM REPORT</Button>
 			</a>
 		</div>
 	</div>

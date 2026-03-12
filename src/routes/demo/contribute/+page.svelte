@@ -2,7 +2,7 @@
 	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import { AppShell } from '$lib/components/layout';
-	import { PopQuiz, AboutBar } from '$lib/components/ui';
+	import { PopQuiz, AboutBar, Header, VoteBar } from '$lib/components/ui';
 	import { county, deliberation, popQuizQuestions, aboutYouQuestions } from '$lib/data/mock';
 	import PolisApi from '$lib/services/polis-api.svelte';
 	import { session } from '$lib/services/session.svelte';
@@ -45,6 +45,10 @@
 	// Pop quiz state (preserved for future use)
 	let quizIndex = $state(0);
 	const currentQuiz = $derived(popQuizQuestions[quizIndex % popQuizQuestions.length]);
+
+	// In the first phase, cap displayed remaining/total at FIRST_BATCH
+	const displayedRemaining = $derived(hasSeenPause ? polis.remaining : Math.min(FIRST_BATCH - votesInRound, FIRST_BATCH));
+	const displayedTotal = $derived(hasSeenPause ? polis.total : FIRST_BATCH);
 
 	// When Polis runs out of statements while voting, go to end flow
 	$effect(() => {
@@ -108,16 +112,43 @@
 				countyName={county.name}
 				question={deliberation.question}
 				statementText={polis.currentStatement.txt}
-				remaining={polis.remaining}
-				total={polis.total}
+				remaining={displayedRemaining}
+				total={displayedTotal}
 				loading={polis.loading}
 				onVote={handleVote}
 				onEnd={handleEnd}
 				onCompose={() => (screen = 'compose')}
 			/>
-		{:else if polis.loading}
-			<div class="flex h-full items-center justify-center bg-card">
-				<p class="font-mono text-lg text-white/50">Loading...</p>
+		{:else}
+			<!-- Skeleton that reuses real components so layout stays in sync -->
+			<div class="flex h-full flex-col bg-muted">
+				<Header
+					countyName={county.name}
+					question={deliberation.question}
+					onCompose={() => {}}
+					about
+				/>
+
+				<!-- Skeleton statement area -->
+				<div class="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-8">
+					<div class="w-full animate-pulse text-left">
+						<div class="flex items-center gap-2">
+							<span class="h-5 w-5 rounded-full bg-muted-foreground/20"></span>
+							<span class="h-4 w-28 rounded bg-muted-foreground/20"></span>
+						</div>
+						<div class="mt-6 space-y-3">
+							<div class="h-8 w-full rounded bg-muted-foreground/10"></div>
+							<div class="h-8 w-4/5 rounded bg-muted-foreground/10"></div>
+							<div class="h-8 w-3/5 rounded bg-muted-foreground/10"></div>
+						</div>
+					</div>
+				</div>
+
+				<VoteBar
+					remaining={FIRST_BATCH}
+					total={FIRST_BATCH}
+					skeleton
+				/>
 			</div>
 		{/if}
 

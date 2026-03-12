@@ -109,7 +109,7 @@
 		{#each { length: count } as _, i}
 			<button
 				onclick={() => handleDotClick(i)}
-				class="h-2 w-2 rounded-full transition-colors {i === index ? 'bg-white' : 'bg-zinc-300/50'}"
+				class="h-2 w-2 rounded-full transition-colors {i === index ? 'bg-muted-foreground' : 'bg-muted-foreground/50'}"
 				aria-label="Slide {i + 1}"
 			></button>
 		{/each}

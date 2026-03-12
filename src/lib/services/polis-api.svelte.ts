@@ -120,20 +120,21 @@ export default class PolisApi {
 			return;
 		}
 
+		const votedTid = this.currentStatement.tid;
 		this._loading = true;
 		this._error = undefined;
 
 		// Polis API: 1 = agree, -1 = disagree, 0 = pass ??
 		const voteValue = { agree: 1, disagree: -1, pass: 0 }[vote];
 
-		fetch(`${this.baseUrl}/api/v3/votes`, {
+		const voteRequest = fetch(`${this.baseUrl}/api/v3/votes`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			credentials: 'omit',
 			body: JSON.stringify({
 				agid: 1,
 				conversation_id: this.polisId,
-				tid: this.currentStatement.tid,
+				tid: votedTid,
 				vote: voteValue,
 				xid: this.userId,
 				...(this.pid !== undefined && { pid: this.pid }),
@@ -150,13 +151,59 @@ export default class PolisApi {
 				if (typeof data.currentPid === 'number') {
 					this.pid = data.currentPid;
 				}
-				this.fetchNextStatement();
-			})
-			.catch((err) => {
-				console.error('[PolisApi] Error submitting vote:', err);
-				this._error = err.message;
-				this._loading = false;
 			});
+
+		if (this.pid !== undefined) {
+			// Already have pid — fire nextComment in parallel with the vote
+			const pidParam = `&not_voted_by_pid=${this.pid}`;
+			const nextUrl = `${this.baseUrl}/api/v3/nextComment?conversation_id=${this.polisId}${pidParam}`;
+
+			const nextRequest = fetch(nextUrl, { credentials: 'omit' })
+				.then((r) => {
+					if (!r.ok) throw new Error(`nextComment failed: ${r.status}`);
+					return r.json();
+				});
+
+			// Wait for both, then check if server had recorded the vote in time
+			Promise.all([voteRequest, nextRequest])
+				.then(([_, comment]) => {
+					console.log('[PolisApi] Parallel nextComment:', comment);
+					if (typeof comment.currentPid === 'number') {
+						this.pid = comment.currentPid;
+					}
+					if (comment.tid === votedTid) {
+						// Server processed nextComment before recording the vote — retry once
+						console.log('[PolisApi] Got same statement back, retrying...');
+						this.fetchNextStatement();
+						return;
+					}
+					if (comment.txt) {
+						this._currentStatement = comment;
+						this._remaining = comment.remaining;
+						this._total = comment.total;
+						this._ready = true;
+					} else {
+						this._currentStatement = undefined;
+						this._remaining = 0;
+						this._ready = true;
+					}
+					this._loading = false;
+				})
+				.catch((err) => {
+					console.error('[PolisApi] Error in parallel vote+fetch:', err);
+					this._error = err.message;
+					this._loading = false;
+				});
+		} else {
+			// First vote: must await to get pid before fetching next
+			voteRequest
+				.then(() => this.fetchNextStatement())
+				.catch((err) => {
+					console.error('[PolisApi] Error submitting vote:', err);
+					this._error = err.message;
+					this._loading = false;
+				});
+		}
 	}
 
 	get currentStatement() {

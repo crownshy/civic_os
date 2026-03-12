@@ -45,7 +45,7 @@
 
 </script>
 
-<div class={cn('relative flex h-dvh flex-col bg-white ', className)}>
+<div class={cn('relative flex h-dvh flex-col bg-background', className)}>
 	<!-- Blue gradient card area -->
 	<div class="flex flex-1 flex-col rounded-bl-[30px] rounded-br-[30px] bg-gradient-primary shadow-[0px_4px_16.6px_0px_rgba(41,82,192,0.40)]">
 		<!-- Header -->
@@ -53,14 +53,14 @@
 
 		<!-- Question -->
 		<div class="px-6 pt-4">
-			<p class="font-sans text-4xl font-bold leading-10 text-white">
+			<p class="font-sans text-4xl font-bold leading-10 text-foreground">
 				{question}
 			</p>
 		</div>
 
 		<!-- Instructions toggle -->
 		<div class="px-6 pt-4">
-			<button onclick={onShowInstructions} class="font-mono text-sm font-medium text-white/80 hover:text-white transition-colors">
+			<button onclick={onShowInstructions} class="font-mono text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
 				SHOW INSTRUCTIONS &rarr;
 			</button>
 		</div>
@@ -99,9 +99,9 @@
 	</div>
 
 	<!-- Back link — pinned to bottom -->
-	<div class="shrink-0 py-3 text-center">
-		<Button variant="pill" size="sm" onclick={onBack}>
-			&lt;&lt; BACK TO THE CONVERSATION
+	<div class="shrink-0 py-5 text-center">
+		<Button variant="pill" class="bg-destructive/5 text-destructive" size="sm" onclick={onBack}>
+			<span class="text-base font-medium">&lt;&lt; BACK TO THE CONVERSATION</span>
 		</Button>
 	</div>
 

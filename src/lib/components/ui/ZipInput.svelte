@@ -28,7 +28,6 @@
 </script>
 
 <div class="relative flex w-full justify-center">
-	<div class="inline-flex h-11 w-60 items-center justify-center overflow-hidden rounded-[33px] bg-card px-6 py-2 shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)] outline-2 -outline-offset-2 outline-white/20">
 		<input
 			bind:this={inputEl}
 			bind:value
@@ -37,9 +36,9 @@
 			maxlength={5}
 			onfocus={() => (showDropdown = true)}
 			onblur={() => setTimeout(() => (showDropdown = false), 150)}
-			class="w-full bg-transparent text-center font-sans text-base font-medium text-secondary placeholder:text-secondary/80 border-0 outline-none focus:ring-0"
+			class="bg-card w-65 h-13 inline-flex items-center justify-center rounded-full py-2 shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)] outline-2 -outline-offset-2 outline-white/10 text-center font-sans text-base font-medium text-secondary placeholder:text-secondary/80 border-0 outline-none focus:ring-0"
 		/>
-	</div>
+	<!-- </div> -->
 	{#if showDropdown && suggestions.length > 0}
 		<div
 			class="absolute top-full z-50 mt-2 w-56 overflow-hidden rounded-2xl bg-card shadow-[0px_8px_24px_0px_rgba(0,0,0,0.20)]"
