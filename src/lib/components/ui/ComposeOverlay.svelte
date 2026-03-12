@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onDestroy } from 'svelte';
 	import { cn } from '$lib/utils';
 	import Button from './Button.svelte';
 	import AboutBar from './AboutBar.svelte';
@@ -24,6 +25,7 @@
 	let text = $state('');
 	let anonymous = $state(true);
 	let submitted = $state(false);
+	let submitTimer: ReturnType<typeof setTimeout>;
 	const maxChars = 240;
 	const charCount = $derived(text.length);
 	const overLimit = $derived(charCount > maxChars);
@@ -34,8 +36,12 @@
 		submitted = true;
 		onSubmit?.(text, anonymous);
 		// Show SUBMITTED! for 2s then auto-navigate back
-		setTimeout(() => { onBack?.(); }, 2000);
+		submitTimer = setTimeout(() => { onBack?.(); }, 2000);
 	}
+
+	onDestroy(() => {
+		clearTimeout(submitTimer);
+	});
 
 </script>
 
