@@ -80,6 +80,11 @@ export default class PolisApi {
 	}
 
 	submitStatement(statement: string) {
+		if (this.pid === undefined) {
+			console.warn('[PolisApi] Cannot submit statement before voting (no pid yet)');
+			this._error = 'Vote on at least one statement before adding your own.';
+			return;
+		}
 		this._loading = true;
 		this._error = undefined;
 		fetch(`${this.baseUrl}/api/v3/comments`, {
@@ -89,9 +94,10 @@ export default class PolisApi {
 			body: JSON.stringify({
 				conversation_id: this.polisId,
 				txt: statement,
+				pid: this.pid,
 				xid: this.userId,
-				...(this.pid !== undefined && { pid: this.pid }),
-				vote: 0
+				vote: 0,
+				is_seed: false
 			})
 		})
 			.then((r) => {

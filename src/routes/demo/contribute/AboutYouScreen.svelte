@@ -8,7 +8,7 @@
 		countyName: string;
 		questions: AboutYouQuestion[];
 		zipCode?: string;
-		onDone: () => void;
+		onDone: (demographics?: { age?: string; ethnicity?: string; gender?: string }) => void;
 		onSkip?: () => void;
 	}
 
@@ -54,6 +54,19 @@
 	function hasSelection(questionId: string): boolean {
 		const sel = selections[questionId];
 		return !!sel && sel.size > 0;
+	}
+
+	function collectDemographics(): { age?: string; ethnicity?: string; gender?: string } {
+		const result: { age?: string; ethnicity?: string; gender?: string } = {};
+		for (const q of questions) {
+			const sel = selections[q.id];
+			if (!sel || sel.size === 0) continue;
+			const values = [...sel].map((i) => q.options[i]).join(', ');
+			if (q.id === 'about-001') result.age = values;
+			else if (q.id === 'about-002') result.ethnicity = values;
+			else if (q.id === 'about-003') result.gender = values;
+		}
+		return result;
 	}
 </script>
 
@@ -147,7 +160,7 @@
 
 	<!-- Bottom actions — single CONTINUE only -->
 	<div class="flex shrink-0 items-center gap-3.5 border-t border-background bg-secondary px-7 py-8">
-		<Button variant="primary" fullWidth onclick={onDone}>
+		<Button variant="primary" fullWidth onclick={() => onDone(collectDemographics())}>
 			CONTINUE
 		</Button>
 	</div>

@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
-	import { page } from '$app/stores';
 	import { AppShell } from '$lib/components/layout';
-	import { PopQuiz, EmailCapture, AboutBar } from '$lib/components/ui';
+	import { PopQuiz, AboutBar } from '$lib/components/ui';
 	import { county, deliberation, popQuizQuestions, aboutYouQuestions } from '$lib/data/mock';
 	import PolisApi from '$lib/services/polis-api.svelte';
+	import { session } from '$lib/services/session.svelte';
+	import { config } from '$lib/services/api';
 	import VotingScreen from './VotingScreen.svelte';
 	import ComposeScreen from './ComposeScreen.svelte';
 	import DidYouKnowScreen from './DidYouKnowScreen.svelte';
@@ -13,11 +14,10 @@
 	import NiceJobScreen from './NiceJobScreen.svelte';
 	import ThankYouScreen from './ThankYouScreen.svelte';
 
-	// TODO: These will come from route params / config eventually
-	const POLIS_ID = '3itaahejzh';
-	const USER_ID = `bloom-user-${Math.random().toString(36).slice(2, 8)}`;
+	// Use session user ID for Polis xid (falls back to random if not yet joined)
+	const userId = session.userId ?? `bloom-anon-${Math.random().toString(36).slice(2, 8)}`;
 
-	let polis = new PolisApi(USER_ID, POLIS_ID);
+	let polis = new PolisApi(userId, config.polisId, 'en', config.polisUrl);
 
 	// --- simplified flow ---
 	// voting → (after FIRST_BATCH) pause → voting (SECOND_BATCH more) → ...
@@ -28,7 +28,6 @@
 		| 'compose'
 		| 'pause'
 		| 'about-you'
-		| 'email-capture'
 		| 'thank-you'
 		// Preserved but unused in conference flow:
 		| 'did-you-know'
@@ -42,12 +41,6 @@
 	let votesInRound = $state(0);
 	let totalVotes = $state(0);
 	let hasSeenPause = $state(false);
-
-	// Read landing page params
-	const emailFromLanding = $derived($page.url.searchParams.get('email') === 'true');
-	const zipFromLanding = $derived($page.url.searchParams.get('zip') ?? '');
-	let emailProvided = $state(false);
-	$effect(() => { if (emailFromLanding) emailProvided = true; });
 
 	// Pop quiz state (preserved for future use)
 	let quizIndex = $state(0);
@@ -86,16 +79,16 @@
 		goToEndFlow();
 	}
 
-	function handleDemographicsDone() {
-		// if (!emailProvided) {
-		// 	screen = 'email-capture';
-		// } else {
-			screen = 'thank-you';
-		// }
-	}
+	function handleDemographicsDone(demographics?: { age?: string; ethnicity?: string; gender?: string }) {
+		// Save demographics to backend profile
+		if (demographics) {
+			session.saveProfile({
+				age: demographics.age ? parseInt(demographics.age, 10) || undefined : undefined,
+				ethnicity: demographics.ethnicity || undefined,
+				gender: demographics.gender || undefined
+			});
+		}
 
-	function handleEmailSubmit(email: string) {
-		emailProvided = true;
 		screen = 'thank-you';
 	}
 
@@ -148,26 +141,13 @@
 		<AboutYouScreen
 			countyName={county.name}
 			questions={aboutYouQuestions}
-			zipCode={zipFromLanding}
+			zipCode={session.zipCode}
 			onDone={handleDemographicsDone}
 		/>
-
-	{:else if screen === 'email-capture'}
-		<div class="flex h-full flex-col bg-gradient-primary" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
-			<AboutBar countyName={county.name} />
-			<div class="flex flex-1 flex-col items-center justify-center px-6">
-				<EmailCapture
-					onSubmit={handleEmailSubmit}
-					onSkip={() => { screen = 'thank-you'; }}
-				/>
-			</div>
-		</div>
 
 	{:else if screen === 'thank-you'}
 		<ThankYouScreen
 			countyName={county.name}
-			onContinue={resumeVoting}
-			onGoHome={() => {}}
 		/>
 
 	<!-- Preserved screens (unused in conference flow) -->

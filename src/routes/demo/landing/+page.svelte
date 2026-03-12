@@ -6,6 +6,7 @@
 	import { AppShell } from '$lib/components/layout';
 	import { SwipeCarousel, Button, EmailCapture, EmojiCircle, InfoOverlay, ZipInput } from '$lib/components/ui';
 	import { county, deliberation } from '$lib/data/mock';
+	import { session } from '$lib/services/session.svelte';
 
 	// --- Valid Utah zip codes (mock validation) ---
 	const VALID_UTAH_ZIPS = new Set([
@@ -42,7 +43,7 @@
 	let zipCode = $state('');
 	let hasZip = $state(false);
 	let slideIndex = $state(0);
-	let emailProvided = $state(false);
+	let joining = $state(false);
 
 	const zipOptions = [...VALID_UTAH_ZIPS];
 
@@ -60,21 +61,26 @@
 		step = 'email-capture';
 	}
 
-	function handleEmailSubmit(email: string) {
-		emailProvided = true;
-		step = 'host-message';
+	async function handleEmailSubmit(email: string) {
+		joining = true;
+		const success = await session.join(zipCode.trim(), email);
+		joining = false;
+		if (success) {
+			step = 'host-message';
+		}
 	}
 
-	function handleEmailSkip() {
-		step = 'host-message';
+	async function handleEmailSkip() {
+		joining = true;
+		const success = await session.join(zipCode.trim());
+		joining = false;
+		if (success) {
+			step = 'host-message';
+		}
 	}
 
 	function handleHostDismiss() {
-		// Navigate to contribute with zip and email state via URL params
-		const params = new URLSearchParams();
-		params.set('zip', zipCode.trim());
-		if (emailProvided) params.set('email', 'true');
-		goto(`/demo/contribute?${params.toString()}`);
+		goto('/demo/contribute');
 	}
 
 </script>

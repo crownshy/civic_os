@@ -14,6 +14,6 @@
 
 <Story name="Default" args={{ countyName: 'UTAH COUNTY' }}>
 	{#snippet children(args)}
-		<ThankYouScreen {...args} onContinue={() => {}} onGoHome={() => {}} />
+		<ThankYouScreen {...args} />
 	{/snippet}
 </Story>
