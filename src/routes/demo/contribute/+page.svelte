@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
+	import { page } from '$app/stores';
 	import { AppShell } from '$lib/components/layout';
-	import { PopQuiz, EmailCapture, Header } from '$lib/components/ui';
+	import { PopQuiz, EmailCapture, AboutBar } from '$lib/components/ui';
 	import { county, deliberation, popQuizQuestions, aboutYouQuestions } from '$lib/data/mock';
 	import PolisApi from '$lib/services/polis-api.svelte';
 	import VotingScreen from './VotingScreen.svelte';
@@ -18,66 +19,83 @@
 
 	let polis = new PolisApi(USER_ID, POLIS_ID);
 
+	// --- simplified flow ---
+	// voting → (after FIRST_BATCH) pause → voting (SECOND_BATCH more) → ...
+	// END at any point or out of statements → about-you → email-capture (if needed) → thank-you
+
 	type Screen =
 		| 'voting'
 		| 'compose'
+		| 'pause'
+		| 'about-you'
 		| 'email-capture'
+		| 'thank-you'
+		// Preserved but unused in conference flow:
 		| 'did-you-know'
 		| 'pop-quiz'
-		| 'about-you'
-		| 'nice-job'
-		| 'thank-you';
+		| 'nice-job';
+
+	const FIRST_BATCH = 10;
+	const SECOND_BATCH = 20;
 
 	let screen = $state<Screen>('voting');
 	let votesInRound = $state(0);
 	let totalVotes = $state(0);
-	const milestoneInterval = 5;
+	let hasSeenPause = $state(false);
 
-	// Pop quiz state
+	// Read landing page params
+	const emailFromLanding = $derived($page.url.searchParams.get('email') === 'true');
+	const zipFromLanding = $derived($page.url.searchParams.get('zip') ?? '');
+	let emailProvided = $state(false);
+	$effect(() => { if (emailFromLanding) emailProvided = true; });
+
+	// Pop quiz state (preserved for future use)
 	let quizIndex = $state(0);
 	const currentQuiz = $derived(popQuizQuestions[quizIndex % popQuizQuestions.length]);
 
-	// Interstitial queue: after milestones, cycle through learning types
-	let interstitialStep = $state(0);
-
+	// When Polis runs out of statements while voting, go to end flow
 	$effect(() => {
 		if (screen === 'voting' && polis.ready && !polis.loading && !polis.currentStatement) {
-			screen = 'thank-you';
+			goToEndFlow();
 		}
 	});
 
 	function handleVote(type: 'agree' | 'disagree' | 'pass') {
 		polis.submitVote(type);
-
 		totalVotes++;
 		votesInRound++;
 
-		if (votesInRound === milestoneInterval) {
+		const batchLimit = hasSeenPause ? SECOND_BATCH : FIRST_BATCH;
+		if (votesInRound >= batchLimit) {
 			votesInRound = 0;
-			interstitialStep++;
-			// First interstitial: email capture (shown once)
-			if (interstitialStep === 1) {
-				screen = 'email-capture';
-				return;
+			if (!hasSeenPause) {
+				// First batch done → soft pause
+				hasSeenPause = true;
+				screen = 'pause';
 			}
-			// Then cycle: did-you-know → pop-quiz → nice-job → about-you ...
-			const cycle = (interstitialStep - 1) % 4;
-			if (cycle === 0) {
-				screen = 'did-you-know';
-			} else if (cycle === 1) {
-				screen = 'pop-quiz';
-			} else if (cycle === 2) {
-				screen = 'nice-job';
-			} else {
-				screen = 'about-you';
-			}
-			return;
+			// After second batch, keep voting until they press END or run out
 		}
+	}
 
-		// If Polis has no more statements after this vote, the $effect will transition to thank-you once the API responds
+	/** Transition to the ending sequence: demographics → email → thank-you */
+	function goToEndFlow() {
+		screen = 'about-you';
 	}
 
 	function handleEnd() {
+		goToEndFlow();
+	}
+
+	function handleDemographicsDone() {
+		// if (!emailProvided) {
+		// 	screen = 'email-capture';
+		// } else {
+			screen = 'thank-you';
+		// }
+	}
+
+	function handleEmailSubmit(email: string) {
+		emailProvided = true;
 		screen = 'thank-you';
 	}
 
@@ -105,7 +123,7 @@
 				onCompose={() => (screen = 'compose')}
 			/>
 		{:else if polis.loading}
-			<div class="flex h-dvh items-center justify-center bg-card">
+			<div class="flex h-full items-center justify-center bg-card">
 				<p class="font-mono text-lg text-white/50">Loading...</p>
 			</div>
 		{/if}
@@ -118,48 +136,56 @@
 			onBack={() => (screen = 'voting')}
 		/>
 
-	{:else if screen === 'email-capture'}
-		<div class="flex h-dvh flex-col bg-gradient-primary" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
-			<Header countyName={county.name} />
-			<div class="flex flex-1 flex-col items-center justify-center px-6">
-				<EmailCapture
-					onSubmit={() => resumeVoting()}
-					onSkip={resumeVoting}
-				/>
-			</div>
-		</div>
-
-	{:else if screen === 'did-you-know'}
-		<DidYouKnowScreen
+	{:else if screen === 'pause'}
+		<NiceJobScreen
 			countyName={county.name}
-			onContinue={resumeVoting}
+			remaining={polis.remaining}
+			onKeepVoting={resumeVoting}
+			onDone={goToEndFlow}
 		/>
-
-	{:else if screen === 'pop-quiz'}
-		<div class="flex h-dvh flex-col bg-gradient-primary" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
-			<Header countyName={county.name} />
-			<PopQuiz quiz={currentQuiz} onContinue={resumeVoting} onSkip={resumeVoting} />
-		</div>
 
 	{:else if screen === 'about-you'}
 		<AboutYouScreen
 			countyName={county.name}
 			questions={aboutYouQuestions}
-			onDone={resumeVoting}
+			zipCode={zipFromLanding}
+			onDone={handleDemographicsDone}
 		/>
 
-	{:else if screen === 'nice-job'}
-		<NiceJobScreen
-			countyName={county.name}
-			onKeepVoting={resumeVoting}
-			onDone={handleEnd}
-		/>
+	{:else if screen === 'email-capture'}
+		<div class="flex h-full flex-col bg-gradient-primary" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
+			<AboutBar countyName={county.name} />
+			<div class="flex flex-1 flex-col items-center justify-center px-6">
+				<EmailCapture
+					onSubmit={handleEmailSubmit}
+					onSkip={() => { screen = 'thank-you'; }}
+				/>
+			</div>
+		</div>
 
 	{:else if screen === 'thank-you'}
 		<ThankYouScreen
 			countyName={county.name}
 			onContinue={resumeVoting}
 			onGoHome={() => {}}
+		/>
+
+	<!-- Preserved screens (unused in conference flow) -->
+	{:else if screen === 'did-you-know'}
+		<DidYouKnowScreen
+			countyName={county.name}
+			onContinue={resumeVoting}
+		/>
+	{:else if screen === 'pop-quiz'}
+		<div class="flex h-full flex-col bg-gradient-primary" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
+			<AboutBar countyName={county.name} />
+			<PopQuiz quiz={currentQuiz} onContinue={resumeVoting} onSkip={resumeVoting} />
+		</div>
+	{:else if screen === 'nice-job'}
+		<NiceJobScreen
+			countyName={county.name}
+			onKeepVoting={resumeVoting}
+			onDone={handleEnd}
 		/>
 	{/if}
 </AppShell>

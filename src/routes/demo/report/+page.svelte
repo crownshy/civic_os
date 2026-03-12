@@ -8,7 +8,7 @@
 </script>
 
 <AppShell>
-	<div class="flex h-dvh flex-col bg-primary">
+	<div class="flex h-full flex-col bg-primary">
 		<!-- Scrollable content -->
 		<div class="flex flex-1 flex-col overflow-y-auto">
 			<!-- Title area -->

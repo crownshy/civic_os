@@ -25,8 +25,8 @@
 			<SwipeCarousel count={slides.length}>
 				{#snippet children(index)}
 					<div class="rounded-[20px] bg-white p-6">
-						<h3 class="font-sans text-2xl font-bold text-blue-800">{slides[index].title}</h3>
-						<p class="mt-3 font-sans text-lg text-blue-800/80">{slides[index].body}</p>
+						<h3 class="font-sans text-2xl font-bold text-secondary">{slides[index].title}</h3>
+						<p class="mt-3 font-sans text-lg text-secondary/80">{slides[index].body}</p>
 					</div>
 				{/snippet}
 			</SwipeCarousel>
@@ -40,8 +40,8 @@
 			<SwipeCarousel count={slides.length} autoScrollMs={3000}>
 				{#snippet children(index)}
 					<div class="rounded-[20px] bg-white p-6">
-						<h3 class="font-sans text-2xl font-bold text-blue-800">{slides[index].title}</h3>
-						<p class="mt-3 font-sans text-lg text-blue-800/80">{slides[index].body}</p>
+						<h3 class="font-sans text-2xl font-bold text-secondary">{slides[index].title}</h3>
+						<p class="mt-3 font-sans text-lg text-secondary/80">{slides[index].body}</p>
 					</div>
 				{/snippet}
 			</SwipeCarousel>

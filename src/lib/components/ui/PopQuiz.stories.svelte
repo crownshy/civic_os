@@ -23,7 +23,7 @@
 
 <Story name="Default" args={{ quiz }}>
 	{#snippet children(args)}
-		<div class="h-[932px] bg-linear-to-b from-blue-800 to-blue-900">
+		<div class="h-[932px] bg-gradient-primary">
 			<PopQuiz {...args} />
 		</div>
 	{/snippet}

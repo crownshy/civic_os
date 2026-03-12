@@ -2,17 +2,17 @@
 	import { AppShell, AppHeader } from '$lib/components/layout';
 	import { PillButton, MonoLabel, ThemeChip, ProgressBar, MapPlaceholder } from '$lib/components/ui';
 	import { county, deliberation, themeSummaries } from '$lib/data/mock';
-</script>
+	</script>
 
 <AppShell>
 	<div class="flex flex-col bg-primary">
 		<!-- Hero header -->
-		<AppHeader
+		<Header
 			countyName={county.name}
 			variant="on-primary"
 			class="pb-6"
 		>
-		</AppHeader>
+		</Header>
 
 		<!-- Key question label + question -->
 		<div class="bg-primary px-8 pb-4">

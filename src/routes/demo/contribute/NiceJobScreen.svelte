@@ -1,19 +1,20 @@
 <script lang="ts">
 	import { scale } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
-	import { Header, Button, EmojiCircle } from '$lib/components/ui';
+	import { AboutBar, Button, EmojiCircle } from '$lib/components/ui';
 
 	interface Props {
 		countyName: string;
+		remaining?: number;
 		onKeepVoting: () => void;
 		onDone: () => void;
 	}
 
-	let { countyName, onKeepVoting, onDone }: Props = $props();
+	let { countyName, remaining, onKeepVoting, onDone }: Props = $props();
 </script>
 
-<div class="flex h-dvh flex-col bg-gradient-primary" in:scale={{ start: 0.9, duration: 500, easing: cubicOut }}>
-	<Header {countyName} />
+<div class="flex h-full flex-col bg-gradient-primary" in:scale={{ start: 0.9, duration: 500, easing: cubicOut }}>
+	<AboutBar {countyName} />
 
 	<!-- Centered content -->
 	<div class="flex flex-1 flex-col items-center justify-center overflow-y-auto px-8">
@@ -21,10 +22,15 @@
 		<p class="mt-8 text-center font-sans text-3xl font-bold leading-10 text-white">
 			Nice job!
 		</p>
+		{#if remaining != null && remaining > 0}
+			<p class="mt-4 text-center font-sans text-lg font-medium text-white/80">
+				There are {remaining} more statements remaining. Keep going?
+			</p>
+		{/if}
 	</div>
 
 	<!-- Bottom CTAs -->
-	<div class="flex shrink-0 items-center gap-3.5 border-t border-primary bg-blue-900 px-7 py-8">
+	<div class="flex shrink-0 items-center gap-3.5 border-t border-background bg-secondary px-7 py-8">
 		<Button variant="primary" fullWidth onclick={onKeepVoting}>
 			KEEP VOTING
 		</Button>

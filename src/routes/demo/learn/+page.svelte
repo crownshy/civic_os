@@ -75,7 +75,7 @@
 	{#key seqIndex}
 	{#if current.type === 'learning' && card}
 		<!-- LEARNING / DID YOU KNOW SCREEN -->
-		<div class="flex h-dvh flex-col bg-gradient-to-b from-blue-800 to-blue-900" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
+		<div class="flex h-full flex-col bg-gradient-primary" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
 			<Header countyName={county.name} />
 
 			<!-- Content -->
@@ -92,13 +92,13 @@
 			</div>
 
 			<!-- Bottom: countdown button -->
-			<div class="flex shrink-0 flex-col gap-2.5 border-t border-primary bg-blue-900 px-7 py-8">
+			<div class="flex shrink-0 flex-col gap-2.5 border-t border-background bg-secondary px-7 py-8">
 				<button
 					disabled={countdown > 0}
 					onclick={nextScreen}
 					class="flex w-full items-center justify-center rounded-full px-7 py-3.5 font-mono text-lg font-medium transition-colors {countdown > 0
 						? 'bg-white/20 text-white/70'
-						: 'bg-secondary text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]'}"
+						: 'bg-primary text-primary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]'}"
 				>
 					{#if countdown > 0}
 						CONTINUE IN {countdown}...
@@ -111,7 +111,7 @@
 
 	{:else if current.type === 'quiz' && quiz}
 		<!-- POP QUIZ SCREEN -->
-		<div class="flex h-dvh flex-col bg-gradient-to-b from-blue-800 to-blue-900 overflow-hidden" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
+		<div class="flex h-full flex-col bg-gradient-primary overflow-hidden" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
 			<Header countyName={county.name} />
 			<PopQuiz quiz={quiz} onContinue={nextScreen} onSkip={nextScreen} />
 		</div>

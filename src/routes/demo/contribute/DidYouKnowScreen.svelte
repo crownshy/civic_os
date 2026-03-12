@@ -28,7 +28,7 @@
 	startCountdown();
 </script>
 
-<div class="flex h-dvh flex-col bg-gradient-primary" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
+<div class="flex h-full flex-col bg-gradient-primary" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
 	<Header {countyName} />
 
 	<!-- Scrollable content -->
@@ -45,7 +45,7 @@
 	</div>
 
 	<!-- Sticky bottom actions -->
-	<div class="flex shrink-0 flex-col gap-2.5 border-t border-primary bg-blue-900 px-7 py-8">
+	<div class="flex shrink-0 flex-col gap-2.5 border-t border-background bg-secondary px-7 py-8">
 		<Button
 			variant="primary"
 			fullWidth

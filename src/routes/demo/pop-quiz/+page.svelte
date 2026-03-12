@@ -19,7 +19,7 @@
 </script>
 
 <AppShell>
-	<div class="flex h-dvh flex-col bg-linear-to-b from-blue-800 to-blue-900">
+	<div class="flex h-full flex-col bg-gradient-primary">
 		<PopQuiz
 			bind:this={quizRef}
 			quiz={currentQuiz}

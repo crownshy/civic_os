@@ -19,7 +19,7 @@
 
 <Story name="On Dark Background" args={{}}>
 	{#snippet children(args)}
-		<div class="flex min-h-[600px] items-center justify-center bg-blue-950/90 p-8">
+		<div class="flex min-h-[600px] items-center justify-center bg-secondary/95 p-8">
 			<div class="mx-auto max-w-md">
 				<EmailCapture onSubmit={(email) => console.log('Submit:', email)} onSkip={() => console.log('Skip')} />
 			</div>
