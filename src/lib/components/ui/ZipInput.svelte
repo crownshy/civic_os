@@ -5,10 +5,11 @@
 		value: string;
 		options: string[];
 		placeholder?: string;
+		disabled?: boolean;
 		onSelect: (zip: string) => void;
 	}
 
-	let { value = $bindable(), options, placeholder = 'Enter your home zip code...', onSelect }: Props = $props();
+	let { value = $bindable(), options, placeholder = 'Enter your home zip code...', disabled = false, onSelect }: Props = $props();
 
 	let inputEl = $state<HTMLInputElement | null>(null);
 	let showDropdown = $state(false);
@@ -32,11 +33,12 @@
 			bind:this={inputEl}
 			bind:value
 			{placeholder}
+			{disabled}
 			inputmode="numeric"
 			maxlength={5}
-			onfocus={() => (showDropdown = true)}
+			onfocus={() => { if (!disabled) showDropdown = true; }}
 			onblur={() => setTimeout(() => (showDropdown = false), 150)}
-			class="bg-card w-65 h-13 inline-flex items-center justify-center rounded-full py-2 shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)] outline-2 -outline-offset-2 outline-white/10 text-center font-sans text-base font-medium text-secondary placeholder:text-secondary/80 border-0 outline-none focus:ring-0"
+			class="bg-card w-65 h-13 inline-flex items-center justify-center rounded-full py-2 shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)] outline-2 -outline-offset-2 outline-white/10 text-center font-sans text-base font-medium text-secondary placeholder:text-secondary/80 border-0 outline-none focus:ring-0 disabled:opacity-60 disabled:cursor-not-allowed"
 		/>
 	<!-- </div> -->
 	{#if showDropdown && suggestions.length > 0}

@@ -33,15 +33,11 @@
         'This conversation is hosted locally and powered by Bloom. Everything you share is anonymous unless you choose otherwise.'
     ];
 
-    let redirecting = $state(false);
-    if (session.hasSession) {
-        redirecting = true;
-        goto('/demo/contribute', { replaceState: true });
-    }
+    const isReturning = session.hasSession;
 
     // --- Flow steps ---
-    let zipCode = $state('');
-    let hasZip = $state(false);
+    let zipCode = $state(isReturning ? session.zipCode : '');
+    let hasZip = $state(isReturning && !!session.zipCode);
     let slideIndex = $state(0);
     let joining = $state(false);
     let showHostMessage = $state(false);
@@ -51,6 +47,10 @@
     }
 
     async function handleJoin() {
+        if (isReturning) {
+            goto('/demo/contribute');
+            return;
+        }
         joining = true;
         const success = await session.join(zipCode.trim());
         joining = false;
@@ -60,15 +60,6 @@
     }
 </script>
 
-{#if redirecting}
-<AppShell>
-    <div class="flex h-full flex-col items-center justify-center bg-gradient-primary">
-        <div class="animate-pulse text-center">
-            <span class="font-mono text-base font-medium uppercase text-muted-foreground/60">LOADING...</span>
-        </div>
-    </div>
-</AppShell>
-{:else}
 <AppShell>
     <div class="mt-4 relative flex h-full flex-col bg-gradient-primary overflow-hidden">
         <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-2/5 w-[160%] aspect-2/1 rounded-t-full bg-linear-to-b from-background/30 to-transparent"></div>
@@ -112,13 +103,15 @@
         </div>
 
         <div class="relative z-10 flex shrink-0 flex-col items-center px-7 pb-10">
-            <span class="font-mono text-base font-medium uppercase text-muted-foreground/80">YOUR LOCATION</span>
+            {#if !isReturning}
+                <span class="font-mono text-base font-medium uppercase text-muted-foreground/80">YOUR LOCATION</span>
+            {/if}
             <div class="mt-3">
-                <ZipInput bind:value={zipCode} options={zipOptions} onSelect={handleZipSelect} />
+                <ZipInput bind:value={zipCode} options={zipOptions} disabled={isReturning} onSelect={handleZipSelect} />
             </div>
 
             <Button variant="primary" fullWidth disabled={!hasZip} onclick={handleJoin} class="mt-6">
-                JOIN THE CONVERSATION
+                {isReturning ? 'CONTINUE' : 'JOIN THE CONVERSATION'}
             </Button>
 
             <span class="mt-4 font-mono text-sm font-medium text-primary/80">POWERED BY BLOOM</span>
@@ -158,4 +151,3 @@
         </div>
     {/if}
 </AppShell>
-{/if}
