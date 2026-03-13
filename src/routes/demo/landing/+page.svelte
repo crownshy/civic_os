@@ -33,8 +33,14 @@
         'This conversation is hosted locally and powered by Bloom. Everything you share is anonymous unless you choose otherwise.'
     ];
 
+    let redirecting = $state(false);
+    if (session.hasSession) {
+        redirecting = true;
+        goto('/demo/contribute', { replaceState: true });
+    }
+
     // --- Flow steps ---
-    let zipCode = $state('84001');
+    let zipCode = $state('');
     let hasZip = $state(false);
     let slideIndex = $state(0);
     let joining = $state(false);
@@ -54,6 +60,15 @@
     }
 </script>
 
+{#if redirecting}
+<AppShell>
+    <div class="flex h-full flex-col items-center justify-center bg-gradient-primary">
+        <div class="animate-pulse text-center">
+            <span class="font-mono text-base font-medium uppercase text-muted-foreground/60">LOADING...</span>
+        </div>
+    </div>
+</AppShell>
+{:else}
 <AppShell>
     <div class="mt-4 relative flex h-full flex-col bg-gradient-primary overflow-hidden">
         <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-2/5 w-[160%] aspect-2/1 rounded-t-full bg-linear-to-b from-background/30 to-transparent"></div>
@@ -143,3 +158,4 @@
         </div>
     {/if}
 </AppShell>
+{/if}

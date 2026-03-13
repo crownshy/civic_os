@@ -17,13 +17,23 @@
 	// Use session user ID for Polis xid (falls back to random if not yet joined)
 	const userId = session.userId ?? `bloom-anon-${Math.random().toString(36).slice(2, 8)}`;
 
-	let polis = new PolisApi(userId, config.polisId, 'en', config.polisUrl);
+	// Pass persisted pid so returning users only see unvoted statements
+	let polis = new PolisApi(userId, config.polisId, 'en', config.polisUrl, session.pid);
+
+	// Sync pid back to session whenever Polis assigns/updates it
+	$effect(() => {
+		const currentPid = polis.participantId;
+		if (currentPid !== undefined && currentPid !== session.pid) {
+			session.savePid(currentPid);
+		}
+	});
 
 	// --- simplified flow ---
 	// voting → (after FIRST_BATCH) pause → voting (SECOND_BATCH more) → ...
 	// END at any point or out of statements → about-you → email-capture (if needed) → thank-you
 
 	type Screen =
+		| 'loading'
 		| 'voting'
 		| 'compose'
 		| 'pause'
@@ -37,10 +47,16 @@
 	const FIRST_BATCH = 10;
 	const SECOND_BATCH = 20;
 
-	let screen = $state<Screen>('voting');
+	// Returning user: show loading splash until Polis resolves, then decide screen
+	const isReturning = session.pid !== undefined;
+	const initialScreen: Screen = (session.demographicsCompleted && isReturning) ? 'loading' : 'voting';
+	let screen = $state<Screen>(initialScreen);
 	let votesInRound = $state(0);
 	let totalVotes = $state(0);
-	let hasSeenPause = $state(false);
+	// Returning users skip the first-batch cap — show real Polis counts
+	let hasSeenPause = $state(isReturning);
+	// Tracks when user explicitly pressed END in this session — prevents thank-you→voting loop
+	let userEndedVoting = $state(false);
 
 	// Pop quiz state (preserved for future use)
 	let quizIndex = $state(0);
@@ -54,6 +70,13 @@
 	$effect(() => {
 		if (screen === 'voting' && polis.ready && !polis.loading && !polis.currentStatement) {
 			goToEndFlow();
+		}
+	});
+
+	// Resolve the loading screen once Polis is ready
+	$effect(() => {
+		if (screen === 'loading' && polis.ready && !polis.loading) {
+			screen = polis.currentStatement ? 'voting' : 'thank-you';
 		}
 	});
 
@@ -76,7 +99,12 @@
 
 	/** Transition to the ending sequence: demographics → email → thank-you */
 	function goToEndFlow() {
-		screen = 'about-you';
+		userEndedVoting = true;
+		if (session.demographicsCompleted) {
+			screen = 'thank-you';
+		} else {
+			screen = 'about-you';
+		}
 	}
 
 	function handleEnd() {
@@ -93,6 +121,7 @@
 			});
 		}
 
+		session.markDemographicsCompleted();
 		screen = 'thank-you';
 	}
 
@@ -106,7 +135,14 @@
 </script>
 
 <AppShell>
-	{#if screen === 'voting'}
+	{#if screen === 'loading'}
+		<div class="flex h-full flex-col items-center justify-center bg-gradient-primary">
+			<div class="animate-pulse text-center">
+				<span class="font-mono text-base font-medium uppercase text-muted-foreground/60">LOADING...</span>
+			</div>
+		</div>
+
+	{:else if screen === 'voting'}
 		{#if polis.currentStatement}
 			<VotingScreen
 				countyName={county.name}

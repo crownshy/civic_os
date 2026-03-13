@@ -26,18 +26,20 @@ export default class PolisApi {
 	userId: string;
 	lang: string;
 	baseUrl: string;
-	pid: number | undefined = undefined;
+	pid = $state<number | undefined>(undefined);
 
 	constructor(
 		userId: string,
 		polisId: string,
 		lang: string = 'en',
-		baseUrl: string = 'https://polis.comhairle.scot'
+		baseUrl: string = 'https://polis.comhairle.scot',
+		initialPid?: number
 	) {
 		this.polisId = polisId;
 		this.userId = userId;
 		this.lang = lang;
 		this.baseUrl = baseUrl;
+		if (initialPid !== undefined) this.pid = initialPid;
 		this.fetchNextStatement();
 	}
 
@@ -164,34 +166,40 @@ export default class PolisApi {
 					return r.json();
 				});
 
-			// Wait for both, then check if server had recorded the vote in time
-			Promise.all([voteRequest, nextRequest])
-				.then(([_, comment]) => {
-					console.log('[PolisApi] Parallel nextComment:', comment);
-					if (typeof comment.currentPid === 'number') {
-						this.pid = comment.currentPid;
+			// Use allSettled so a vote failure doesn't discard the nextComment result
+			Promise.allSettled([voteRequest, nextRequest])
+				.then(([voteResult, nextResult]) => {
+					if (voteResult.status === 'rejected') {
+						console.error('[PolisApi] Vote failed (server may be down):', voteResult.reason);
+						this._error = voteResult.reason?.message ?? 'Vote failed';
 					}
-					if (comment.tid === votedTid) {
-						// Server processed nextComment before recording the vote — retry once
-						console.log('[PolisApi] Got same statement back, retrying...');
-						this.fetchNextStatement();
-						return;
-					}
-					if (comment.txt) {
-						this._currentStatement = comment;
-						this._remaining = comment.remaining;
-						this._total = comment.total;
-						this._ready = true;
+
+					if (nextResult.status === 'fulfilled') {
+						const comment = nextResult.value;
+						console.log('[PolisApi] Parallel nextComment:', comment);
+						if (typeof comment.currentPid === 'number') {
+							this.pid = comment.currentPid;
+						}
+						if (comment.tid === votedTid) {
+							// Server processed nextComment before recording the vote — retry once
+							console.log('[PolisApi] Got same statement back, retrying...');
+							this.fetchNextStatement();
+							return;
+						}
+						if (comment.txt) {
+							this._currentStatement = comment;
+							this._remaining = comment.remaining;
+							this._total = comment.total;
+							this._ready = true;
+						} else {
+							this._currentStatement = undefined;
+							this._remaining = 0;
+							this._ready = true;
+						}
 					} else {
-						this._currentStatement = undefined;
-						this._remaining = 0;
-						this._ready = true;
+						console.error('[PolisApi] nextComment also failed:', nextResult.reason);
+						this._error = nextResult.reason?.message ?? 'Failed to fetch next statement';
 					}
-					this._loading = false;
-				})
-				.catch((err) => {
-					console.error('[PolisApi] Error in parallel vote+fetch:', err);
-					this._error = err.message;
 					this._loading = false;
 				});
 		} else {
@@ -199,9 +207,10 @@ export default class PolisApi {
 			voteRequest
 				.then(() => this.fetchNextStatement())
 				.catch((err) => {
-					console.error('[PolisApi] Error submitting vote:', err);
+					console.error('[PolisApi] Vote failed (server may be down):', err);
 					this._error = err.message;
-					this._loading = false;
+					// Still try to advance to next statement
+					this.fetchNextStatement();
 				});
 		}
 	}

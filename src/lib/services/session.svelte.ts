@@ -22,7 +22,7 @@ export interface User {
 
 const STORAGE_KEY = 'civic-os-session';
 
-function loadPersistedSession(): { userId?: string; emailProvided?: boolean; zipCode?: string } {
+function loadPersistedSession(): { userId?: string; emailProvided?: boolean; zipCode?: string; pid?: number; demographicsCompleted?: boolean } {
 	if (typeof window === 'undefined') return {};
 	try {
 		const raw = localStorage.getItem(STORAGE_KEY);
@@ -37,16 +37,21 @@ class Session {
 	profile = $state<UserProfile | null>(null);
 	emailProvided = $state(false);
 	zipCode = $state('');
+	pid = $state<number | undefined>(undefined);
+	demographicsCompleted = $state(false);
 	error = $state<string | null>(null);
 	loading = $state(false);
 
 	constructor() {
 		const saved = loadPersistedSession();
+		console.log('[Session] Restored from localStorage:', { userId: saved.userId, pid: saved.pid, demographicsCompleted: saved.demographicsCompleted, emailProvided: saved.emailProvided });
 		if (saved.userId) {
 			this.user = { id: saved.userId, authType: 'anonymous', emailVerified: false };
 		}
 		if (saved.emailProvided) this.emailProvided = true;
 		if (saved.zipCode) this.zipCode = saved.zipCode;
+		if (saved.pid !== undefined) this.pid = saved.pid;
+		if (saved.demographicsCompleted) this.demographicsCompleted = true;
 	}
 
 	private persist() {
@@ -55,7 +60,9 @@ class Session {
 			localStorage.setItem(STORAGE_KEY, JSON.stringify({
 				userId: this.user?.id,
 				emailProvided: this.emailProvided,
-				zipCode: this.zipCode
+				zipCode: this.zipCode,
+				pid: this.pid,
+				demographicsCompleted: this.demographicsCompleted
 			}));
 		} catch { /* ignore */ }
 	}
@@ -74,6 +81,20 @@ class Session {
 
 	get isAuthenticated() {
 		return this.user !== null;
+	}
+
+	get hasSession() {
+		return this.user !== null && !!this.zipCode;
+	}
+
+	savePid(pid: number) {
+		this.pid = pid;
+		this.persist();
+	}
+
+	markDemographicsCompleted() {
+		this.demographicsCompleted = true;
+		this.persist();
 	}
 
 	async join(zipCode: string, email?: string): Promise<boolean> {
@@ -118,6 +139,9 @@ class Session {
 	}
 
 	async registerEmail(email: string): Promise<boolean> {
+		this.emailProvided = true;
+		this.persist();
+
 		if (!this.conversationId || !email) return false;
 
 		try {
@@ -131,8 +155,6 @@ class Session {
 					params: { conversation_id: this.conversationId }
 				}
 			);
-			this.emailProvided = true;
-			this.persist();
 			return true;
 		} catch (e) {
 			console.error('[Session] Failed to register email:', e);

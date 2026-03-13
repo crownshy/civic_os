@@ -39,6 +39,13 @@
 		}
 	});
 
+	// Reset skeleton if loading finishes without a new statement (e.g. vote failed)
+	$effect(() => {
+		if (waitingForNext && !loading && statementText === previousText) {
+			waitingForNext = false;
+		}
+	});
+
 	const disabled = $derived(voteCooldown || waitingForNext);
 
 	function doVote(type: 'agree' | 'disagree' | 'pass') {
