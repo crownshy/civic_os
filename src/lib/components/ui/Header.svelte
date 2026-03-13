@@ -4,6 +4,7 @@
 	interface Props {
 		countyName: string;
 		question?: string;
+		marquee?: boolean;
 		onCompose?: () => void;
 		about?: boolean;
 		class?: string;
@@ -12,6 +13,7 @@
 	let {
 		countyName,
 		question,
+		marquee = true,
 		onCompose,
 		about = false,
 		class: className = ''
@@ -34,16 +36,22 @@
 		</div>
 	{/if}
 
-	<!-- Row 2: Scrolling question marquee (optional) -->
+	<!-- Row 2: Question text (scrolling marquee or static) -->
 	{#if question}
-		<div class="overflow-hidden whitespace-nowrap pt-3 pl-3.75">
-			<p class="marquee-text pl-3.75 inline-block font-mono text-sm font-medium uppercase text-card-foreground">
-				<span>{question}</span>
-				<span class="mx-8" aria-hidden="true">·</span>
-				<span aria-hidden="true">{question}</span>
-				<span class="mx-8" aria-hidden="true">·</span>
+		{#if marquee}
+			<div class="overflow-hidden whitespace-nowrap pt-3 pl-3.75">
+				<p class="marquee-text pl-3.75 inline-block font-mono text-sm font-medium uppercase text-card-foreground">
+					<span>{question}</span>
+					<span class="mx-8" aria-hidden="true">·</span>
+					<span aria-hidden="true">{question}</span>
+					<span class="mx-8" aria-hidden="true">·</span>
+				</p>
+			</div>
+		{:else}
+			<p class="pl-5 pr-2 pt-3 font-mono text-sm font-medium uppercase leading-5 text-card-foreground">
+				{question}
 			</p>
-		</div>
+		{/if}
 	{/if}
 
 	<!-- Row 3: Compose input-->
@@ -53,7 +61,7 @@
 			class="flex w-full items-center gap-3 pr-3.75 pl-6 pt-3.5 pb-3"
 		>
 			<div
-				class="flex flex-1 items-center justify-center gap-2.5 overflow-hidden rounded-full bg-secondary px-5 py-2"
+				class="flex flex-1 items-center justify-center gap-2.5 overflow-hidden rounded-full bg-foreground px-5 py-2"
 			>
 				<span class="text-base font-bold text-secondary-foreground">
 					Share your own response...

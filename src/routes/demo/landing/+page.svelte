@@ -28,9 +28,8 @@
     const zipOptions = [...VALID_UTAH_ZIPS];
 
     const slides = [
-        'This is a place-based conversation about how we should regulate social media to minimize its harms for ourselves and those we care about.',
-        'Your voice matters. Share your perspective and hear from your neighbors about the issues that affect our community.',
-        'This conversation is hosted locally and powered by Bloom. Everything you share is anonymous unless you choose otherwise.'
+        'This conversation is about how Utah can prepare for the growing impact of AI in so many aspects of our lives (work and the economy, education, wellbeing, information quality, government services, etc). ',
+        'In this conversation, you’ll see statements from your community about this question. You can vote (agree/disagree) or pass on each one.',
     ];
 
     const isReturning = session.hasSession;

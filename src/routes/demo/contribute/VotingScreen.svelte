@@ -64,6 +64,7 @@
 		{onCompose}
 		about
 		rounded
+		marquee={false}
 	/>
 
 	<!-- Statement content (white, centered) -->
