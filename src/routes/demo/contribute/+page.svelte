@@ -140,10 +140,10 @@
 		goToEndFlow();
 	}
 
-	function handleDemographicsDone(demographics?: { age?: string; ethnicity?: string; gender?: string }) {
-		// Save demographics to backend profile
+	async function handleDemographicsDone(demographics?: { age?: string; ethnicity?: string; gender?: string }) {
+		// Save demographics to backend profile (awaited so it completes before navigation)
 		if (demographics) {
-			session.saveProfile({
+			await session.saveProfile({
 				age: demographics.age ? parseInt(demographics.age, 10) || undefined : undefined,
 				ethnicity: demographics.ethnicity || undefined,
 				gender: demographics.gender || undefined

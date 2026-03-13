@@ -59,7 +59,6 @@ export default class PolisApi {
 				return s.json();
 			})
 			.then((comment) => {
-				console.log('[PolisApi] nextComment:', comment);
 				if (typeof comment.currentPid === 'number') {
 					this.pid = comment.currentPid;
 				}
@@ -107,7 +106,6 @@ export default class PolisApi {
 				return r.json();
 			})
 			.then((data) => {
-				console.log('[PolisApi] Comment created:', data);
 			})
 			.catch((err) => {
 				console.error('[PolisApi] Error submitting statement:', err);
@@ -149,7 +147,6 @@ export default class PolisApi {
 				return r.json();
 			})
 			.then((data) => {
-				console.log('[PolisApi] Vote response:', data);
 				if (typeof data.currentPid === 'number') {
 					this.pid = data.currentPid;
 				}
@@ -176,13 +173,11 @@ export default class PolisApi {
 
 					if (nextResult.status === 'fulfilled') {
 						const comment = nextResult.value;
-						console.log('[PolisApi] Parallel nextComment:', comment);
 						if (typeof comment.currentPid === 'number') {
 							this.pid = comment.currentPid;
 						}
 						if (comment.tid === votedTid) {
 							// Server processed nextComment before recording the vote — retry once
-							console.log('[PolisApi] Got same statement back, retrying...');
 							this.fetchNextStatement();
 							return;
 						}

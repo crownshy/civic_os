@@ -46,7 +46,6 @@ class Session {
 
 	constructor() {
 		const saved = loadPersistedSession();
-		console.log('[Session] Restored from localStorage:', { userId: saved.userId, pid: saved.pid, demographicsCompleted: saved.demographicsCompleted, emailProvided: saved.emailProvided });
 		if (saved.userId) {
 			this.user = { id: saved.userId, authType: 'anonymous', emailVerified: false };
 		}
@@ -130,14 +129,14 @@ class Session {
 				});
 			}
 
-			// 3. Save zipcode to profile (non-fatal — don't block flow if it fails)
+			// 3. Save zipcode to profile (awaited so it completes before navigation)
 			if (zipCode) {
-				this.saveProfile({ zipcode: zipCode });
+				await this.saveProfile({ zipcode: zipCode });
 			}
 
-			// 4. Register email if provided (non-fatal)
+			// 4. Register email if provided (awaited so it completes before navigation)
 			if (email) {
-				this.registerEmail(email);
+				await this.registerEmail(email);
 			}
 
 			return true;
@@ -154,10 +153,13 @@ class Session {
 		this.emailProvided = true;
 		this.persist();
 
-		if (!this.conversationId || !email) return false;
+		if (!this.conversationId || !email) {
+			console.warn('[Session] registerEmail skipped: missing conversationId or email');
+			return false;
+		}
 
 		try {
-			await api.RegisterEmailForUpdates(
+			const result = await api.RegisterEmailForUpdates(
 				{
 					email,
 					receive_updates_by_email: true,
@@ -181,20 +183,25 @@ class Session {
 		gender?: string;
 		consented?: boolean;
 	}): Promise<boolean> {
+		const body = {
+			zipcode: data.zipcode ?? null,
+			age: data.age ?? null,
+			ethnicity: data.ethnicity ?? null,
+			gender: data.gender ?? null,
+			consented: data.consented ?? true
+		};
 		try {
 			const res = await fetch('/api/user/profile', {
 				method: 'PUT',
 				credentials: 'include',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					zipcode: data.zipcode ?? null,
-					age: data.age ?? null,
-					ethnicity: data.ethnicity ?? null,
-					gender: data.gender ?? null,
-					consented: data.consented ?? true
-				})
+				body: JSON.stringify(body)
 			});
-			if (!res.ok) throw new Error(`UpsertUserProfile failed: ${res.status}`);
+			if (!res.ok) {
+				const text = await res.text();
+				console.error('[Session] saveProfile error body:', text);
+				throw new Error(`UpsertUserProfile failed: ${res.status}`);
+			}
 			this.profile = await res.json();
 			return true;
 		} catch (e) {
