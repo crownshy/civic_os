@@ -13,7 +13,7 @@
 	let {
 		countyName,
 		question,
-		marquee = true,
+		marquee = false,
 		onCompose,
 		about = false,
 		class: className = ''
