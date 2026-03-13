@@ -32,7 +32,7 @@
 			centered
 		>
 			<div class="mt-6 h-1.5 w-14 bg-primary rounded-full"></div>
-			<div class="mt-6 font-sans text-lg font-medium leading-7 text-background">
+			<div class="mt-6 font-sans text-lg font-medium leading-7 text-card-foreground">
 				<ul class="list-disc pl-5">
 					<li>You can share ideas, opinions, values, or whatever else. Others will see these and vote on them. </li>
 					<li>You are contributing standalone statements – not responding to specific statements you see in the conversation.</li>

@@ -12,14 +12,14 @@ import type {
 } from '$lib/types/mock-data';
 
 export const county: County = {
-	name: 'Utah County',
+	name: 'Utah',
 	participantCount: 2312
 };
 
 export const deliberation: Deliberation = {
 	id: 'delib-001',
 	title: 'AI & Online Safety',
-	question: 'What should we do to make sure social media helps us, not hurts us?',
+	question: 'How can Utah prepare for the growing impact of AI so that its benefits are widely shared and risks are responsibly managed?',
 	topics: ['Screen Time Limits', 'Platform Accountability', 'Digital Literacy', 'Parental Controls'],
 	participantCount: 325,
 	county

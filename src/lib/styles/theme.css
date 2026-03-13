@@ -1,41 +1,38 @@
-/* Civic OS Theme — adapted from Comhairle shadcn design system */
-/* Primary: #07A89E | Destructive: #E02D99 | Background: #1D46B5 */
-
 :root {
-  --background: #1D46B5;
-  --foreground: #FFFFFF;
+  --background: #FFF8F1;
+  --foreground: #532A0E;
   --card: #FFFFFF;
-  --card-foreground: #2952C0;
+  --card-foreground: #532A0E;
   --popover: #FFFFFF;
-  --popover-foreground: #030712;
-  --primary: #07A89E;
-  --primary-foreground: #FFFFFF;
-  --secondary: #0E2D80;
-  --secondary-foreground: #615c5c;
-  --muted: #F3F4F6;
-  --muted-foreground: #6B7280;
-  --accent: #F3F4F6;
-  --accent-foreground: #111827;
-  --destructive: #FC3AA8;
-  --destructive-foreground: #FFFFFF;
-  --border: #E5E7EB;
-  --input: #E5E7EB;
-  --ring: #5B8DEF;
-  --chart-1: #4F46E5;
-  --chart-2: #0284C7;
-  --chart-3: #164E63;
-  --chart-4: #FBBF24;
-  --chart-5: #F59E0B;
-  --sidebar: #111827;
-  --sidebar-foreground: #F9FAFB;
-  --sidebar-primary: #2952C0;
+  --popover-foreground: #532A0E;
+  --primary: #406B43;
+  --primary-foreground: #FAEFFB;
+  --secondary: #A6722E; 
+  --secondary-foreground: #FFFFFF;
+  --muted: #FFF7E4;
+  --muted-foreground: #532A0E;
+  --accent: #FFEEC5;
+  --accent-foreground: #AF9340;
+  --destructive: #EE503B;
+  --destructive-foreground: #FFF7E4;
+  --border: #E8EAED;
+  --input: #C8C8C8;
+  --ring: #FFEDC4;
+  --chart-1: #345136;
+  --chart-2: #A6722E;
+  --chart-3: #AF9340;
+  --chart-4: #755032;
+  --chart-5: #EE503B;
+  --sidebar: #52290D;
+  --sidebar-foreground: #FFF8F1;
+  --sidebar-primary: #345136;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #FFFFFF;
-  --sidebar-accent-foreground: #111827;
-  --sidebar-border: #FFFFFF;
-  --sidebar-ring: #2952C0;
-  --sidebar-secondary: #7DD3FC;
-  --sidebar-active-bg: #0E1F4A;
+  --sidebar-accent: #FFEDD3;
+  --sidebar-accent-foreground: #532A0E;
+  --sidebar-border: #FFEDC4;
+  --sidebar-ring: #345136;
+  --sidebar-secondary: #A6722E;
+  --sidebar-active-bg: #FFEDD3;
 
   --font-sans: 'Hanken Grotesk', sans-serif;
   --font-serif: Merriweather, serif;
@@ -48,15 +45,16 @@
   --radius-lg: 0.5rem;
   --radius-xl: calc(0.5rem + 4px);
 
-  --shadow-2xs: 0px 1px 3px 0px rgb(31 67 51 / 0.02);
-  --shadow-xs: 0px 1px 3px 0px rgb(31 67 51 / 0.02);
-  --shadow-sm: 0px 1px 3px 0px rgb(31 67 51 / 0.04), 0px 1px 2px -1px rgb(31 67 51 / 0.04);
-  --shadow: 0px 1px 3px 0px rgb(31 67 51 / 0.04), 0px 1px 2px -1px rgb(31 67 51 / 0.04);
-  --shadow-md: 0px 1px 3px 0px rgb(31 67 51 / 0.04), 0px 2px 4px -1px rgb(31 67 51 / 0.04);
-  --shadow-lg: 0px 1px 3px 0px rgb(31 67 51 / 0.04), 0px 4px 6px -1px rgb(31 67 51 / 0.04);
-  --shadow-xl: 0px 1px 3px 0px rgb(31 67 51 / 0.04), 0px 8px 10px -1px rgb(31 67 51 / 0.04);
-  --shadow-2xl: 0px 1px 3px 0px rgb(31 67 51 / 0.10);
+  --shadow-2xs: 0px 1px 3px 0px rgb(82 41 13 / 0.02);
+  --shadow-xs: 0px 1px 3px 0px rgb(82 41 13 / 0.02);
+  --shadow-sm: 0px 1px 3px 0px rgb(82 41 13 / 0.04), 0px 1px 2px -1px rgb(82 41 13 / 0.04);
+  --shadow: 0px 1px 3px 0px rgb(82 41 13 / 0.04), 0px 1px 2px -1px rgb(82 41 13 / 0.04);
+  --shadow-md: 0px 1px 3px 0px rgb(82 41 13 / 0.04), 0px 2px 4px -1px rgb(82 41 13 / 0.04);
+  --shadow-lg: 0px 1px 3px 0px rgb(82 41 13 / 0.04), 0px 4px 6px -1px rgb(82 41 13 / 0.04);
+  --shadow-xl: 0px 1px 3px 0px rgb(82 41 13 / 0.04), 0px 8px 10px -1px rgb(82 41 13 / 0.04);
+  --shadow-2xl: 0px 1px 3px 0px rgb(82 41 13 / 0.10);
 }
+
 
 .dark {
   --background: #0A0A0A;

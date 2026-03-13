@@ -92,24 +92,26 @@
 </script>
 
 <div
-	class="overflow-hidden {className}"
+	class="flex flex-col overflow-hidden {className}"
 	ontouchstart={handleTouchStart}
 	ontouchmove={handleTouchMove}
 	ontouchend={handleTouchEnd}
 	role="region"
 	aria-label="Carousel"
 >
-	{#key index}
-		<div in:fly={{ x: touchDeltaX <= 0 ? 80 : -80, duration: 750, easing: cubicInOut }}>
-			{@render children(index)}
-		</div>
-	{/key}
+	<div class="flex-1">
+		{#key index}
+			<div in:fly={{ x: touchDeltaX <= 0 ? 80 : -80, duration: 750, easing: cubicInOut }}>
+				{@render children(index)}
+			</div>
+		{/key}
+	</div>
 	<!-- Dots -->
-	<div class="mt-6 flex items-center justify-center gap-[23px]">
+	<div class="mt-6 flex shrink-0 items-center justify-center gap-[23px]">
 		{#each { length: count } as _, i}
 			<button
 				onclick={() => handleDotClick(i)}
-				class="h-2 w-2 rounded-full transition-colors {i === index ? 'bg-white' : 'bg-zinc-300/50'}"
+				class="h-2 w-2 rounded-full transition-colors {i === index ? 'bg-muted-foreground' : 'bg-muted-foreground/50'}"
 				aria-label="Slide {i + 1}"
 			></button>
 		{/each}

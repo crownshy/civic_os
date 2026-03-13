@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@crownshy/api-client':
-        specifier: ^0.0.1
-        version: 0.0.1(axios@1.13.6)(zod@3.25.76)
+        specifier: ^0.0.2
+        version: 0.0.2(axios@1.13.6)(zod@3.25.76)
       bits-ui:
         specifier: ^2.15.7
         version: 2.15.7(@internationalized/date@3.11.0)(@sveltejs/kit@2.50.2(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.50.1)(vite@7.3.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.50.1)(typescript@5.9.3)(vite@7.3.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.50.1)
@@ -182,8 +182,8 @@ packages:
     peerDependencies:
       storybook: ^0.0.0-0 || ^10.1.0 || ^10.1.0-0 || ^10.2.0-0 || ^10.3.0-0
 
-  '@crownshy/api-client@0.0.1':
-    resolution: {integrity: sha512-ttasEeprOSvDXtvJwPyoY+sKQJaJ3JbL8RyBlxLNFWlr3Hj1jlFzOxueDRMNJCG7+AEkigXHiM1qbPPvjI695Q==}
+  '@crownshy/api-client@0.0.2':
+    resolution: {integrity: sha512-ofPA9jG+WJTFaF+IE8QC2uUjMo3QBWLEJSWAlChZRzNyNLgjfONYFdSBxyJpDvxJDyqEtt/zs1YOooizuD8eYQ==}
 
   '@esbuild/aix-ppc64@0.27.3':
     resolution: {integrity: sha512-9fJMTNFTWZMh5qwrBItuziu834eOCUcEqymSH7pY+zoMVEZg3gcPuBNxH1EvfVYe9h0x/Ptw8KBzv7qxb7l8dg==}
@@ -2496,7 +2496,7 @@ snapshots:
       - '@chromatic-com/cypress'
       - '@chromatic-com/playwright'
 
-  '@crownshy/api-client@0.0.1(axios@1.13.6)(zod@3.25.76)':
+  '@crownshy/api-client@0.0.2(axios@1.13.6)(zod@3.25.76)':
     dependencies:
       '@zodios/core': 10.9.6(axios@1.13.6)(zod@3.25.76)
       typescript: 5.9.3

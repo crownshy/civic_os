@@ -3,7 +3,7 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLButtonAttributes, HTMLAnchorAttributes } from 'svelte/elements';
 
-	type Variant = 'primary' | 'secondary' | 'destructive' | 'pill' | 'ghost' | 'gradient';
+	type Variant = 'primary' | 'secondary' | 'destructive' | 'outline' | 'pill' | 'ghost' | 'gradient';
 	type Size = 'sm' | 'md' | 'lg';
 
 	interface Props {
@@ -34,22 +34,22 @@
 
 	const variants: Record<Variant, string> = {
 		primary: 'bg-primary text-primary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]',
-		secondary: 'bg-black/30 text-white shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]',
-		destructive: 'text-destructive [background-color:color-mix(in_srgb,var(--destructive)_20%,white)]',
+		secondary: 'bg-secondary text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]',
+		destructive: 'bg-destructive text-destructive-foreground ',
 		pill: 'text-primary [background-color:color-mix(in_srgb,var(--primary)_20%,white)]',
 		ghost: 'bg-transparent text-white/70',
 		gradient: 'bg-white/10 shadow-[inset_2px_4px_4px_0px_rgba(0,0,0,0.20)] outline outline-2 outline-foreground/20',
-		outline: 'bg-white/20 text-white/70 border-3 border-foreground'
+		outline: 'bg-transparent text-secondary border-4 border-secondary'
 	};
 
 	const disabledVariants: Record<Variant, string> = {
-		primary: 'bg-white/20 text-white/70 shadow-none',
+		primary: 'opacity-50 bg-primary text-primary-foreground shadow-none',
 		secondary: 'bg-black/10 text-white/40 shadow-none',
-		destructive: 'opacity-50',
+		destructive: 'opacity-50 bg-destructive text-destructive-foreground',
 		pill: 'opacity-50',
 		ghost: 'opacity-50',
 		gradient: 'opacity-50',
-		outline: 'opacity-50 bg-white/20 text-white/70 border-3 border-foreground'
+		outline: 'opacity-50 bg-transparent text-secondary/50 border-4 border-secondary/50'
 	};
 
 	const sizes: Record<Size, string> = {

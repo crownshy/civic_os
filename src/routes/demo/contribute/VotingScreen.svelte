@@ -39,6 +39,13 @@
 		}
 	});
 
+	// Reset skeleton if loading finishes without a new statement (e.g. vote failed)
+	$effect(() => {
+		if (waitingForNext && !loading && statementText === previousText) {
+			waitingForNext = false;
+		}
+	});
+
 	const disabled = $derived(voteCooldown || waitingForNext);
 
 	function doVote(type: 'agree' | 'disagree' | 'pass') {
@@ -50,13 +57,14 @@
 	}
 </script>
 
-<div class="flex h-full flex-col bg-card" in:fly={{ x: -40, duration: 350, easing: cubicOut }}>
+<div class="flex h-full flex-col bg-muted">
 	<Header
 		{countyName}
 		{question}
 		{onCompose}
 		about
 		rounded
+		marquee={false}
 	/>
 
 	<!-- Statement content (white, centered) -->
@@ -81,13 +89,13 @@
 			>
 				<!-- Attribution -->
 				<div class="flex items-center gap-2">
-					<span class="h-5 w-5 rounded-full bg-card-foreground"></span>
-					<span class="font-mono text-sm font-medium text-card-foreground"> SOMEONE SAYS... </span>
+					<span class="h-5 w-5 rounded-full bg-muted-foreground"></span>
+					<span class="font-mono text-sm font-medium text-muted-foreground"> SOMEONE SAYS... </span>
 				</div>
 
 				<!-- Quote -->
 				<p
-					class="mt-4 max-h-[50vh] overflow-y-auto font-sans text-3xl font-semibold leading-10 text-card-foreground"
+					class="mt-4 max-h-[50vh] overflow-y-auto font-sans text-3xl font-semibold leading-10 text-muted-foreground"
 				>
 					&ldquo;{statementText}&rdquo;
 				</p>
