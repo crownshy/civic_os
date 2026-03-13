@@ -52,8 +52,8 @@
 		<AboutBar {countyName} />
 
 		<!-- Question -->
-		<div class="px-6 pt-4">
-			<p class="font-sans text-4xl font-bold leading-10 text-foreground">
+		<div class="px-5 pt-4">
+			<p class="font-sans text-3xl font-bold leading-10 text-foreground">
 				{question}
 			</p>
 		</div>

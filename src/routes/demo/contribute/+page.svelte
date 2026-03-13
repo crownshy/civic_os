@@ -53,7 +53,7 @@
 	let screen = $state<Screen>(initialScreen);
 	let totalVotes = $state(session.totalVotes);
 	let hasSeenPause = $state(session.hasSeenPause);
-	let votesInRound = $state(0);
+	let votesInRound = $state(hasSeenPause ? 0 : totalVotes);
 	// Tracks when user explicitly pressed END in this session — prevents thank-you→voting loop
 	let userEndedVoting = $state(false);
 
