@@ -22,7 +22,7 @@ export interface User {
 
 const STORAGE_KEY = 'civic-os-session';
 
-function loadPersistedSession(): { userId?: string; emailProvided?: boolean; zipCode?: string; pid?: number; demographicsCompleted?: boolean } {
+function loadPersistedSession(): { userId?: string; emailProvided?: boolean; zipCode?: string; pid?: number; demographicsCompleted?: boolean; totalVotes?: number; hasSeenPause?: boolean } {
 	if (typeof window === 'undefined') return {};
 	try {
 		const raw = localStorage.getItem(STORAGE_KEY);
@@ -39,6 +39,8 @@ class Session {
 	zipCode = $state('');
 	pid = $state<number | undefined>(undefined);
 	demographicsCompleted = $state(false);
+	totalVotes = $state(0);
+	hasSeenPause = $state(false);
 	error = $state<string | null>(null);
 	loading = $state(false);
 
@@ -52,6 +54,8 @@ class Session {
 		if (saved.zipCode) this.zipCode = saved.zipCode;
 		if (saved.pid !== undefined) this.pid = saved.pid;
 		if (saved.demographicsCompleted) this.demographicsCompleted = true;
+		if (saved.totalVotes) this.totalVotes = saved.totalVotes;
+		if (saved.hasSeenPause) this.hasSeenPause = saved.hasSeenPause;
 	}
 
 	private persist() {
@@ -62,7 +66,9 @@ class Session {
 				emailProvided: this.emailProvided,
 				zipCode: this.zipCode,
 				pid: this.pid,
-				demographicsCompleted: this.demographicsCompleted
+				demographicsCompleted: this.demographicsCompleted,
+				totalVotes: this.totalVotes,
+				hasSeenPause: this.hasSeenPause
 			}));
 		} catch { /* ignore */ }
 	}
@@ -94,6 +100,12 @@ class Session {
 
 	markDemographicsCompleted() {
 		this.demographicsCompleted = true;
+		this.persist();
+	}
+
+	saveVoteProgress(totalVotes: number, hasSeenPause: boolean) {
+		this.totalVotes = totalVotes;
+		this.hasSeenPause = hasSeenPause;
 		this.persist();
 	}
 

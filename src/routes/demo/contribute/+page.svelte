@@ -51,20 +51,40 @@
 	const isReturning = session.pid !== undefined;
 	const initialScreen: Screen = (session.demographicsCompleted && isReturning) ? 'loading' : 'voting';
 	let screen = $state<Screen>(initialScreen);
+	let totalVotes = $state(session.totalVotes);
+	let hasSeenPause = $state(session.hasSeenPause);
 	let votesInRound = $state(0);
-	let totalVotes = $state(0);
-	// Returning users skip the first-batch cap — show real Polis counts
-	let hasSeenPause = $state(isReturning);
 	// Tracks when user explicitly pressed END in this session — prevents thank-you→voting loop
 	let userEndedVoting = $state(false);
+
+	// Anchor Polis counts once to avoid fluctuation from parallel vote+nextComment requests.
+	// After anchoring, we decrement client-side instead of reading polis.remaining directly.
+	let anchoredRemaining = $state<number | null>(null);
+	let anchoredTotal = $state<number | null>(null);
+
+	$effect(() => {
+		if (polis.ready && !polis.loading && anchoredRemaining === null) {
+			anchoredRemaining = polis.remaining;
+			anchoredTotal = polis.total;
+		}
+	});
 
 	// Pop quiz state (preserved for future use)
 	let quizIndex = $state(0);
 	const currentQuiz = $derived(popQuizQuestions[quizIndex % popQuizQuestions.length]);
 
-	// In the first phase, cap displayed remaining/total at FIRST_BATCH
-	const displayedRemaining = $derived(hasSeenPause ? polis.remaining : Math.min(FIRST_BATCH - votesInRound, FIRST_BATCH));
-	const displayedTotal = $derived(hasSeenPause ? polis.total : FIRST_BATCH);
+	// In the first phase, cap displayed remaining/total at FIRST_BATCH.
+	// After pause, use anchored counts that decrement client-side (no Polis fluctuation).
+	const displayedRemaining = $derived(
+		hasSeenPause
+			? Math.max(0, anchoredRemaining ?? polis.remaining)
+			: Math.max(0, FIRST_BATCH - votesInRound)
+	);
+	const displayedTotal = $derived(
+		hasSeenPause
+			? (anchoredTotal ?? polis.total)
+			: FIRST_BATCH
+	);
 
 	// When Polis runs out of statements while voting, go to end flow
 	$effect(() => {
@@ -85,12 +105,21 @@
 		totalVotes++;
 		votesInRound++;
 
+		// Decrement anchored remaining so counter is smooth and predictable
+		if (anchoredRemaining !== null && anchoredRemaining > 0) {
+			anchoredRemaining--;
+		}
+
+		// Persist vote progress so it survives page refresh
+		session.saveVoteProgress(totalVotes, hasSeenPause);
+
 		const batchLimit = hasSeenPause ? SECOND_BATCH : FIRST_BATCH;
 		if (votesInRound >= batchLimit) {
 			votesInRound = 0;
 			if (!hasSeenPause) {
 				// First batch done → soft pause
 				hasSeenPause = true;
+				session.saveVoteProgress(totalVotes, hasSeenPause);
 				screen = 'pause';
 			}
 			// After second batch, keep voting until they press END or run out
@@ -199,7 +228,7 @@
 	{:else if screen === 'pause'}
 		<NiceJobScreen
 			countyName={county.name}
-			remaining={polis.remaining}
+			remaining={anchoredRemaining ?? polis.remaining}
 			onKeepVoting={resumeVoting}
 			onDone={goToEndFlow}
 		/>
