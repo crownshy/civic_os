@@ -19,7 +19,7 @@ export const county: County = {
 export const deliberation: Deliberation = {
 	id: 'delib-001',
 	title: 'AI & Online Safety',
-	question: 'How can Utah prepare for the growing impact of AI so that its benefits are widely shared and risks are responsibly managed?',
+	question: 'How can Utahns ensure the benefits of AI are widely shared and risks are responsibly managed?',
 	topics: ['Screen Time Limits', 'Platform Accountability', 'Digital Literacy', 'Parental Controls'],
 	participantCount: 325,
 	county
