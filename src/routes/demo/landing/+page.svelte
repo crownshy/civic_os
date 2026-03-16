@@ -6,27 +6,6 @@
     import { SwipeCarousel, Button, InfoOverlay, ZipInput } from '$lib/components/ui';
     import { session } from '$lib/services/session.svelte';
 
-    // --- Valid Utah zip codes (mock validation) ---
-    const VALID_UTAH_ZIPS = new Set([
-        '84001','84003','84004','84005','84006','84009','84010','84014','84015',
-        '84020','84025','84037','84040','84041','84042','84043','84044','84045',
-        '84047','84049','84057','84058','84059','84060','84062','84065','84070',
-        '84074','84075','84078','84081','84084','84088','84092','84093','84094',
-        '84095','84096','84097','84098','84101','84102','84103','84104','84105',
-        '84106','84107','84108','84109','84111','84112','84113','84115','84116',
-        '84117','84118','84119','84120','84121','84123','84124','84128','84129',
-        '84132','84138','84143','84150','84157','84165','84170','84171','84180',
-        '84189','84190','84199','84301','84302','84304','84306','84310','84311',
-        '84314','84315','84317','84318','84319','84320','84321','84322','84324',
-        '84325','84326','84327','84328','84330','84332','84333','84335','84336',
-        '84337','84338','84339','84340','84341','84401','84403','84404','84405',
-        '84414','84601','84602','84604','84606','84620','84626','84633','84640',
-        '84645','84648','84651','84653','84655','84660','84663','84664','84701',
-        '84720','84721','84737','84738','84741','84745','84770','84780','84790',
-    ]);
-
-    const zipOptions = [...VALID_UTAH_ZIPS];
-
     const slides = [
         'This conversation is about how Utah can prepare for the growing impact of AI in so many aspects of our lives (work and the economy, education, wellbeing, information quality, government services, etc). ',
         'In this conversation, you’ll see statements from your community about this question. You can vote (agree/disagree) or pass on each one.',
@@ -36,14 +15,10 @@
 
     // --- Flow steps ---
     let zipCode = $state(isReturning ? session.zipCode : '');
-    let hasZip = $state(isReturning && !!session.zipCode);
+    let hasZip = $derived(!!zipCode.trim());
     let slideIndex = $state(0);
     let joining = $state(false);
     let showHostMessage = $state(false);
-
-    function handleZipSelect(_zip: string) {
-        hasZip = true;
-    }
 
     async function handleJoin() {
         if (isReturning) {
@@ -108,7 +83,7 @@
         <div class="relative z-10 shrink-0 flex flex-col items-center px-7 pb-3 pt-2">
             <span class="font-mono text-base font-medium uppercase text-muted-foreground/80">YOUR LOCATION</span>
             <div class="mt-1.5">
-                <ZipInput bind:value={zipCode} options={zipOptions} disabled={isReturning} onSelect={handleZipSelect} />
+                <ZipInput bind:value={zipCode} disabled={isReturning} />
             </div>
 
             <Button variant="primary" fullWidth disabled={!hasZip} onclick={handleJoin} class="mt-3">
