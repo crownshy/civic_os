@@ -61,8 +61,7 @@
 
 <AppShell>
     <div class="relative flex h-full flex-col bg-gradient-primary overflow-hidden">
-        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-2/5 w-[160%] aspect-2/1 rounded-t-full bg-linear-to-b from-background/30 to-transparent"></div>
-
+	<div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-5/12 md:translate-y-5/8 lg:translate-y-3/4  xl:translate-y-5/7 w-[160%] aspect-2/1 rounded-t-full bg-linear-to-b from-background/30 to-background/40"></div>
         <!-- Host banner -->
         <div class="relative z-10 shrink-0 px-5 pt-1">
             <button
@@ -85,7 +84,7 @@
 
         <!-- Main content — vertically centered, scrollable on small screens / large fonts -->
         <div class="relative z-10 flex-1 min-h-0 overflow-y-auto">
-            <div class="flex min-h-full flex-col items-center justify-center px-6 sm:px-8 py-4 sm:py-6">
+            <div class="flex min-h-full flex-col items-center justify-center px-6 sm:px-8 py-4 sm:py-6 max-w-xl mx-auto">
                 <span class="text-center font-mono text-base font-medium uppercase text-muted-foreground">
                     WHAT SHOULD WE DO ABOUT
                 </span>

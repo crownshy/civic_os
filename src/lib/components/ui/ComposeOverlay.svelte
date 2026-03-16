@@ -46,8 +46,7 @@
 </script>
 
 <div class={cn('relative flex h-dvh flex-col bg-background', className)}>
-	<!-- Blue gradient card area -->
-	<div class="flex flex-1 flex-col rounded-bl-[30px] rounded-br-[30px] bg-gradient-primary shadow-[0px_4px_16.6px_0px_rgba(41,82,192,0.40)]">
+	<div class="flex flex-1 flex-col rounded-bl-[30px] rounded-br-[30px] bg-gradient-primary shadow-[0px_4px_16.6px_0px_rgba(0,0,0,0.20)]">
 		<!-- Header -->
 		<AboutBar {countyName} />
 
