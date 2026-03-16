@@ -40,8 +40,20 @@ export default class PolisApi {
 		this.lang = lang;
 		this.baseUrl = baseUrl;
 		if (initialPid !== undefined) this.pid = initialPid;
+		this.tryToGetPidForXid();
 		this.fetchNextStatement();
 	}
+
+	tryToGetPidForXid() {
+		fetch(`${this.baseUrl}/api/v3/participationInit?conversation_id=${this.polisId}&xid=${this.userId}`)
+			.then((r) => r.json())
+			.then((data) => {
+				if (data.ptpt?.pid) {
+					this.pid = data.ptpt.pid
+				}
+			})
+	}
+
 
 	fetchNextStatement() {
 		this._loading = true;
@@ -51,6 +63,7 @@ export default class PolisApi {
 		// Otherwise, fetch without filter to get the first available statement.
 		const pidParam =
 			this.pid !== undefined ? `&not_voted_by_pid=${this.pid}` : '';
+
 		const url = `${this.baseUrl}/api/v3/nextComment?conversation_id=${this.polisId}${pidParam}`;
 
 		fetch(url, { credentials: 'omit' })
@@ -81,13 +94,16 @@ export default class PolisApi {
 	}
 
 	submitStatement(statement: string) {
-		if (this.pid === undefined) {
-			console.warn('[PolisApi] Cannot submit statement before voting (no pid yet)');
-			this._error = 'Vote on at least one statement before adding your own.';
-			return;
-		}
+		// if (this.pid === undefined) {
+		// 	console.warn('[PolisApi] Cannot submit statement before voting (no pid yet)');
+		// 	this._error = 'Vote on at least one statement before adding your own.';
+		// 	return;
+		// }
 		this._loading = true;
 		this._error = undefined;
+
+		let authType = this.pid ? { pid: this.pid } : { xid: this.userId };
+
 		fetch(`${this.baseUrl}/api/v3/comments`, {
 			method: 'POST',
 			credentials: 'omit',
@@ -95,10 +111,9 @@ export default class PolisApi {
 			body: JSON.stringify({
 				conversation_id: this.polisId,
 				txt: statement,
-				pid: this.pid,
-				xid: this.userId,
-				vote: 0,
-				is_seed: false
+				vote: -1,
+				is_seed: false,
+				...authType,
 			})
 		})
 			.then((r) => {
@@ -106,6 +121,10 @@ export default class PolisApi {
 				return r.json();
 			})
 			.then((data) => {
+				if (data.currentPid) {
+					console.log("Setting pid ", data.currentPid)
+					this.pid = data.currentPid
+				}
 			})
 			.catch((err) => {
 				console.error('[PolisApi] Error submitting statement:', err);
@@ -124,10 +143,11 @@ export default class PolisApi {
 		this._loading = true;
 		this._error = undefined;
 
-		// Polis API: 1 = agree, -1 = disagree, 0 = pass ??
-		const voteValue = { agree: 1, disagree: -1, pass: 0 }[vote];
+		const voteValue = { agree: -1, disagree: 1, pass: 0 }[vote];
 
-		const voteRequest = fetch(`${this.baseUrl}/api/v3/votes`, {
+		let authType = this.pid ? { pid: this.pid } : { xid: this.userId };
+
+		fetch(`${this.baseUrl}/api/v3/votes`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			credentials: 'omit',
@@ -136,10 +156,9 @@ export default class PolisApi {
 				conversation_id: this.polisId,
 				tid: votedTid,
 				vote: voteValue,
-				xid: this.userId,
-				...(this.pid !== undefined && { pid: this.pid }),
 				high_priority: false,
-				lang: this.lang
+				lang: this.lang,
+				...authType
 			})
 		})
 			.then((r) => {
@@ -149,65 +168,11 @@ export default class PolisApi {
 			.then((data) => {
 				if (typeof data.currentPid === 'number') {
 					this.pid = data.currentPid;
-				}
-			});
-
-		if (this.pid !== undefined) {
-			// Already have pid — fire nextComment in parallel with the vote
-			const pidParam = `&not_voted_by_pid=${this.pid}`;
-			const nextUrl = `${this.baseUrl}/api/v3/nextComment?conversation_id=${this.polisId}${pidParam}`;
-
-			const nextRequest = fetch(nextUrl, { credentials: 'omit' })
-				.then((r) => {
-					if (!r.ok) throw new Error(`nextComment failed: ${r.status}`);
-					return r.json();
-				});
-
-			// Use allSettled so a vote failure doesn't discard the nextComment result
-			Promise.allSettled([voteRequest, nextRequest])
-				.then(([voteResult, nextResult]) => {
-					if (voteResult.status === 'rejected') {
-						console.error('[PolisApi] Vote failed (server may be down):', voteResult.reason);
-						this._error = voteResult.reason?.message ?? 'Vote failed';
-					}
-
-					if (nextResult.status === 'fulfilled') {
-						const comment = nextResult.value;
-						if (typeof comment.currentPid === 'number') {
-							this.pid = comment.currentPid;
-						}
-						if (comment.tid === votedTid) {
-							// Server processed nextComment before recording the vote — retry once
-							this.fetchNextStatement();
-							return;
-						}
-						if (comment.txt) {
-							this._currentStatement = comment;
-							this._remaining = comment.remaining;
-							this._total = comment.total;
-							this._ready = true;
-						} else {
-							this._currentStatement = undefined;
-							this._remaining = 0;
-							this._ready = true;
-						}
-					} else {
-						console.error('[PolisApi] nextComment also failed:', nextResult.reason);
-						this._error = nextResult.reason?.message ?? 'Failed to fetch next statement';
-					}
-					this._loading = false;
-				});
-		} else {
-			// First vote: must await to get pid before fetching next
-			voteRequest
-				.then(() => this.fetchNextStatement())
-				.catch((err) => {
-					console.error('[PolisApi] Vote failed (server may be down):', err);
-					this._error = err.message;
-					// Still try to advance to next statement
 					this.fetchNextStatement();
-				});
-		}
+				}
+			})
+			.catch(e => console.log("Error with vote ", e));
+
 	}
 
 	get currentStatement() {
