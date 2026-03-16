@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { fly } from 'svelte/transition';
-	import { cubicInOut } from 'svelte/easing';
 	import { onDestroy } from 'svelte';
 	import type { Snippet } from 'svelte';
 
@@ -91,26 +89,28 @@
 	onDestroy(() => stopAutoScroll());
 </script>
 
-<div class="relative h-full w-full">
 <div
-	class="flex flex-col overflow-hidden {className}"
+	class="flex flex-col {className}"
 	ontouchstart={handleTouchStart}
 	ontouchmove={handleTouchMove}
 	ontouchend={handleTouchEnd}
 	role="region"
 	aria-label="Carousel"
 >
-	<div class="flex-1">
-		{#key index}
-			<div in:fly={{ x: touchDeltaX <= 0 ? 80 : -80, duration: 750, easing: cubicInOut }}>
-				{@render children(index)}
+	<div class="grid *:[grid-area:1/1]">
+		{#each { length: count } as _, i (i)}
+			<div
+				class="transition-opacity duration-500 ease-out {i === index ? 'opacity-100' : 'opacity-0 pointer-events-none'}"
+				aria-hidden={i !== index}
+			>
+				{@render children(i)}
 			</div>
-		{/key}
+		{/each}
 	</div>
 
 	<!-- Dots -->
-	<div class="absolute top-52 left-1/2 sm:top-30 -translate-x-1/2 flex shrink-0 items-center justify-center gap-[23px]">
-		{#each { length: count } as _, i}
+	<div class="mt-6 flex shrink-0 items-center justify-center gap-[23px]">
+		{#each { length: count } as _, i (i)}
 			<button
 				onclick={() => handleDotClick(i)}
 				class="h-2 w-2 rounded-full transition-colors {i === index ? 'bg-muted-foreground' : 'bg-muted-foreground/50'}"
@@ -118,5 +118,4 @@
 			></button>
 		{/each}
 	</div>
-</div>
 </div>
