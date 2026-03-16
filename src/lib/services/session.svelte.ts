@@ -191,18 +191,8 @@ class Session {
 			consented: data.consented ?? true
 		};
 		try {
-			const res = await fetch('/api/user/profile', {
-				method: 'PUT',
-				credentials: 'include',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(body)
-			});
-			if (!res.ok) {
-				const text = await res.text();
-				console.error('[Session] saveProfile error body:', text);
-				throw new Error(`UpsertUserProfile failed: ${res.status}`);
-			}
-			this.profile = await res.json();
+			const res = await api.UpsertUserProfile(body)
+			this.profile = res;
 			return true;
 		} catch (e) {
 			console.error('[Session] Failed to save profile:', e);
