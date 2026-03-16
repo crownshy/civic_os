@@ -142,10 +142,13 @@
                 >
                     <div class="pt-6">
                         <p class="font-sans text-lg font-medium leading-7">
-                            Thank you for joining this conversation about how Utah can prepare for the growing impact of AI. Your voice matters and will help shape how our community navigates this important issue.
+                            This space is hosted by <a href="https://www.utahcommonground.org/home" class="text-destructive underline" target="_blank" rel="noopener noreferrer">Utah Common Ground</a>, a coalition of nonprofit organizations from around the state, including Utah State University Center for Anticipatory Intelligence, the AI Ethics and Governance Institute, Engage Utah, and Mormon Women for Ethical Governance. We came together to help citizens come together across political differences to identify issues of local concern, consider possible solutions, and take the necessary steps to achieve meaningful, measurable change. 
                         </p>
                         <p class="mt-4 font-sans text-lg font-medium leading-7">
-                            This conversation is hosted by the <strong>Utah Common Ground Steering Committee</strong>, with the support of many nonpartisan organizations across Utah.
+                            We invite all Utahns to share what matters most to them about the future of AI and its impact on communities across the state. Over several weeks, this process will surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding. 
+                        </p>
+                        <p class="mt-4 font-sans text-lg font-medium leading-7">
+                            After this period of broad public input, a representative group of approximately 30 to 50 residents from three counties (Cache, Salt Lake, and Utah Counties) will be invited to convene in person in August and September 2026 for a Solutions Forum. Participants will reflect the demographic, geographic, and political diversity of Utah and will receive stipends to ensure participation is accessible.
                         </p>
                     </div>
                 </InfoOverlay>
