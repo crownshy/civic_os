@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { AppShell, AppHeader } from '$lib/components/layout';
-	import { Button, MonoLabel, ThemeChip, ProgressBar, MapPlaceholder } from '$lib/components/ui';
+	import { Button, MonoLabel, ProgressBar, MapPlaceholder } from '$lib/components/ui';
 	import { county, deliberation, themeSummaries } from '$lib/data/mock';
 	</script>
 
@@ -31,7 +31,7 @@
 		<!-- Participant count -->
 		<div class="px-8 pt-8">
 			<h2 class="font-sans text-4xl font-bold text-primary">
-				{deliberation.participantCount} PARTICIPANTS
+				{county.participantCount} PARTICIPANTS
 			</h2>
 			<MonoLabel size="sm" variant="primary" class="mt-1">
 				THROUGHOUT {county.name}
@@ -62,18 +62,6 @@
 				THINK SOMEONE'S VOICE IS MISSING?
 				<span class="underline">INVITE THEM!</span>
 			</p>
-		</div>
-
-		<!-- Themes section -->
-		<div class="px-8 pt-8">
-			<MonoLabel size="md" variant="primary">
-				HERE'S WHAT WE'RE TALKING ABOUT...
-			</MonoLabel>
-			<div class="mt-4 grid grid-cols-2 gap-3">
-				{#each deliberation.topics as topic}
-					<ThemeChip label={topic} />
-				{/each}
-			</div>
 		</div>
 
 		<!-- Where we agree / disagree -->

@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
-	import type { AvatarOption } from '$lib/types/mock-data';
 
 	interface Props {
-		avatars: AvatarOption[];
+		avatars: { id: string; color: string; emoji: string }[];
 		selected?: string;
 		onSelect?: (id: string) => void;
 		class?: string;
