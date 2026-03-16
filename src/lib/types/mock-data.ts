@@ -7,18 +7,7 @@ export interface Deliberation {
 	id: string;
 	title: string;
 	question: string;
-	topics: string[];
-	participantCount: number;
 	county: County;
-}
-
-export interface Statement {
-	id: string;
-	text: string;
-	authorAlias: string;
-	authorColor?: string;
-	deliberationId: string;
-	postedAt: string;
 }
 
 export interface Conversation {
@@ -62,12 +51,6 @@ export interface ReportSlide {
 	type: 'overview' | 'introduction' | 'methods' | 'participants' | 'themes' | 'summary';
 	title: string;
 	content: string[];
-}
-
-export interface AvatarOption {
-	id: string;
-	color: string;
-	emoji: string;
 }
 
 export interface Vote {

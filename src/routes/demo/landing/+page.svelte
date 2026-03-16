@@ -87,7 +87,7 @@
         <div class="relative z-10 flex-1 min-h-0 overflow-y-auto">
             <div class="flex min-h-full flex-col items-center justify-center px-6 sm:px-8 py-4 sm:py-6">
                 <span class="text-center font-mono text-base font-medium uppercase text-muted-foreground">
-                    A PUBLIC CONVERSATION ON
+                    WHAT SHOULD WE DO ABOUT
                 </span>
                 <h1 class="mt-2 sm:mt-3 text-center font-sans text-4xl font-bold leading-tight text-muted-foreground">
                     AI and the Future of Our Communities
@@ -116,7 +116,7 @@
                 {isReturning ? 'CONTINUE' : 'JOIN THE CONVERSATION'}
             </Button>
 
-            <span class="mt-2.5 font-mono text-sm font-medium text-primary/80">POWERED BY BLOOM</span>
+            <span class="mt-2.5 font-mono text-sm font-medium text-secondary/70">POWERED BY <a href="https://www.bloom-project.org/" class="underline" target="_blank" rel="noopener noreferrer">BLOOM PROJECT</a></span>
         </div>
     </div>
 

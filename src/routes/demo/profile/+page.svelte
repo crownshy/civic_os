@@ -6,7 +6,7 @@
 		ContributionRow,
 		ConversationCard
 	} from '$lib/components/ui';
-	import { county, userProfile, statements, conversations } from '$lib/data/mock';
+	import { county, userProfile, conversations } from '$lib/data/mock';
 </script>
 
 <AppShell>
@@ -78,13 +78,16 @@
 				<MonoLabel size="sm" variant="primary">RECENT CONTRIBUTIONS</MonoLabel>
 			</div>
 			<div class="mt-2">
-				{#each statements.slice(0, 2) as stmt}
 					<ContributionRow
-						text={stmt.text}
-						meta="DELIBERATION 01"
-						onDelete={() => {}}
-					/>
-				{/each}
+					text="Social media companies should be held more accountable."
+					meta="DELIBERATION 01"
+					onDelete={() => {}}
+				/>
+				<ContributionRow
+					text="We need mandatory digital literacy classes in schools."
+					meta="DELIBERATION 01"
+					onDelete={() => {}}
+				/>
 			</div>
 		</div>
 
