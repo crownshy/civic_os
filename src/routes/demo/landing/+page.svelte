@@ -86,13 +86,23 @@
                 <ZipInput bind:value={zipCode} disabled={isReturning} />
             </div>
 
-            <Button variant="primary" fullWidth disabled={!hasZip} onclick={handleJoin} class="mt-3">
+            <Button variant="primary" fullWidth disabled={!hasZip || joining} onclick={handleJoin} class="mt-3">
                 {isReturning ? 'CONTINUE' : 'JOIN THE CONVERSATION'}
             </Button>
 
             <span class="mt-2.5 font-mono text-sm font-medium text-secondary/70">POWERED BY <a href="https://www.bloom-project.org/" class="underline" target="_blank" rel="noopener noreferrer">BLOOM PROJECT</a></span>
         </div>
     </div>
+
+    {#if joining}
+        <div
+            class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-primary"
+            transition:fade={{ duration: 200 }}
+        >
+            <div class="h-10 w-10 animate-spin rounded-full border-4 border-card-foreground/30 border-t-card-foreground"></div>
+            <span class="mt-4 font-mono text-sm font-medium uppercase text-card-foreground/80">JOINING...</span>
+        </div>
+    {/if}
 
     {#if showHostMessage}
         <div 
