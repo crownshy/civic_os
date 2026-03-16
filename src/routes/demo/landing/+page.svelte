@@ -60,60 +60,63 @@
 </script>
 
 <AppShell>
-    <div class="mt-4 relative flex h-full flex-col bg-gradient-primary overflow-hidden">
+    <div class="relative flex h-full flex-col bg-gradient-primary overflow-hidden">
         <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-2/5 w-[160%] aspect-2/1 rounded-t-full bg-linear-to-b from-background/30 to-transparent"></div>
 
-        <div class="relative z-10 flex flex-1 flex-col overflow-y-auto">
+        <!-- Host banner -->
+        <div class="relative z-10 shrink-0 px-5 pt-1">
             <button
                 onclick={() => (showHostMessage = true)}
-                class="mx-5 mt-2 flex w-[calc(100%-2.5rem)] items-center gap-3 rounded-lg bg-primary p-3.5 shadow-[0px_4px_12px_0px_rgba(12,34,95,0.25)] outline-1 outline-white/10 overflow-hidden text-left transition-transform active:scale-[0.98]"
+                class="flex w-full items-center gap-3 rounded-lg bg-primary p-3 shadow-[0px_4px_12px_0px_rgba(12,34,95,0.25)] outline-1 outline-white/10 overflow-hidden text-left transition-transform active:scale-[0.98]"
             >
                 <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-card/15">
                     <span class="text-3xl pr-1 origin-center rotate-130 [text-shadow:0px_4px_4px_rgb(0_0_0/0.25)]">📣</span>
                 </div>
-                <div class="grow">
+                <div class="min-w-0 grow">
                     <span class="font-mono text-xs font-medium uppercase text-primary-foreground/70">HOSTED BY</span>
-                    <p class="font-sans text-base font-medium text-primary-foreground">Utah Common Ground</p>
+                    <p class="truncate font-sans text-base font-medium text-primary-foreground">Utah Common Ground</p>
                 </div>
                 
                 <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-card/15">
                     <span class="text-3xl pb-3 text-card">⟶</span>
                 </div>
             </button>
+        </div>
 
-            <div class="flex flex-col items-center px-8 pt-26">
+        <!-- Main content — vertically centered, scrollable on small screens / large fonts -->
+        <div class="relative z-10 flex-1 min-h-0 overflow-y-auto">
+            <div class="flex min-h-full flex-col items-center justify-center px-6 sm:px-8 py-4 sm:py-6">
                 <span class="text-center font-mono text-base font-medium uppercase text-muted-foreground">
                     A PUBLIC CONVERSATION ON
                 </span>
-                <h1 class="mt-3 text-center font-sans text-4xl font-bold leading-9 text-muted-goreground">
+                <h1 class="mt-2 sm:mt-3 text-center font-sans text-4xl font-bold leading-tight text-muted-foreground">
                     AI and the Future of Our Communities
                 </h1>
+
+                <div class="mx-auto mt-4 sm:mt-6 h-1 w-20 rounded-full bg-muted-foreground"></div>
+
+                <SwipeCarousel count={slides.length} bind:index={slideIndex} autoScrollMs={4000} class="mt-4 sm:mt-6 w-full">
+                    {#snippet children(i)}
+                        <p class="font-sans text-lg font-medium leading-relaxed text-muted-foreground">
+                            {slides[i]}
+                        </p>
+                    {/snippet}
+                </SwipeCarousel>
             </div>
-
-            <div class="mx-auto mt-6 h-1 w-20 rounded-full bg-muted-foreground"></div>
-
-            <SwipeCarousel count={slides.length} bind:index={slideIndex} autoScrollMs={4000} class="mt-8 px-10">
-                {#snippet children(i)}
-                    <p class="font-sans text-lg font-medium leading-7 text-muted-foreground">
-                        {slides[i]}
-                    </p>
-                {/snippet}
-            </SwipeCarousel>
         </div>
 
-        <div class="relative z-10 flex shrink-0 flex-col items-center px-7 pb-10">
-            {#if !isReturning}
-                <span class="font-mono text-base font-medium uppercase text-muted-foreground/80">YOUR LOCATION</span>
-            {/if}
-            <div class="mt-3">
+        <!-- Bottom CTA -->
+        <div class="relative z-10 shrink-0 flex flex-col items-center px-7 pb-3 pt-2">
+            <span class="font-mono text-base font-medium uppercase text-muted-foreground/80">YOUR LOCATION</span>
+            <div class="mt-1.5">
                 <ZipInput bind:value={zipCode} options={zipOptions} disabled={isReturning} onSelect={handleZipSelect} />
             </div>
 
-            <Button variant="primary" fullWidth disabled={!hasZip} onclick={handleJoin} class="mt-6">
+            <Button variant="primary" fullWidth disabled={!hasZip} onclick={handleJoin} class="mt-3">
                 {isReturning ? 'CONTINUE' : 'JOIN THE CONVERSATION'}
             </Button>
 
-            <span class="mt-4 font-mono text-sm font-medium text-primary/80">POWERED BY BLOOM</span>
+            <span class="mt-2.5 font-mono text-sm font-medium text-primary/80">POWERED BY BLOOM</span>
         </div>
     </div>
 
