@@ -91,6 +91,7 @@
 	onDestroy(() => stopAutoScroll());
 </script>
 
+<div class="relative h-full w-full">
 <div
 	class="flex flex-col overflow-hidden {className}"
 	ontouchstart={handleTouchStart}
@@ -106,8 +107,9 @@
 			</div>
 		{/key}
 	</div>
+
 	<!-- Dots -->
-	<div class="mt-6 flex shrink-0 items-center justify-center gap-[23px]">
+	<div class="absolute top-52 left-1/2 sm:top-30 -translate-x-1/2 flex shrink-0 items-center justify-center gap-[23px]">
 		{#each { length: count } as _, i}
 			<button
 				onclick={() => handleDotClick(i)}
@@ -116,4 +118,5 @@
 			></button>
 		{/each}
 	</div>
+</div>
 </div>
