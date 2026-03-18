@@ -3,7 +3,7 @@
     import { cubicOut } from 'svelte/easing';
     import { goto } from '$app/navigation';
     import { AppShell } from '$lib/components/layout';
-    import { SwipeCarousel, Button, InfoOverlay, ZipInput } from '$lib/components/ui';
+    import { SwipeCarousel, Button, Dialog, ZipInput } from '$lib/components/ui';
     import { session } from '$lib/services/session.svelte';
 
     const slides = [
@@ -104,39 +104,21 @@
         </div>
     {/if}
 
-    {#if showHostMessage}
-        <div 
-            class="fixed inset-0 z-50 flex items-end justify-center sm:items-center"
-            transition:fade={{ duration: 250 }}
-        >
-            <div 
-                class="absolute inset-0 bg-black/40 backdrop-blur-sm" 
-                onclick={() => (showHostMessage = false)}
-                aria-hidden="true"
-            ></div>
-
-            <div 
-                class="relative w-full max-w-5xl h-full"
-                transition:fly={{ y: 100, duration: 400, easing: cubicOut }}
-            >
-                <InfoOverlay 
-                    title="A Message from Your Hosts" 
-                    buttonText="GO BACK" 
-                    onClose={() => (showHostMessage = false)}
-                >
-                    <div class="pt-6">
-                        <p class="font-sans text-lg font-medium leading-7">
-                            This space is hosted by <a href="https://www.utahcommonground.org/home" class="text-destructive underline" target="_blank" rel="noopener noreferrer">Utah Common Ground</a>, a coalition of nonprofit organizations from around the state, including Utah State University Center for Anticipatory Intelligence, the AI Ethics and Governance Institute, Engage Utah, and Mormon Women for Ethical Governance. We came together to help citizens come together across political differences to identify issues of local concern, consider possible solutions, and take the necessary steps to achieve meaningful, measurable change. 
-                        </p>
-                        <p class="mt-4 font-sans text-lg font-medium leading-7">
-                            We invite all Utahns to share what matters most to them about the future of AI and its impact on communities across the state. Over several weeks, this process will surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding. 
-                        </p>
-                        <p class="mt-4 font-sans text-lg font-medium leading-7">
-                            After this period of broad public input, a representative group of approximately 30 to 50 residents from three counties (Cache, Salt Lake, and Utah Counties) will be invited to convene in person in August and September 2026 for a Solutions Forum. Participants will reflect the demographic, geographic, and political diversity of Utah and will receive stipends to ensure participation is accessible.
-                        </p>
-                    </div>
-                </InfoOverlay>
-            </div>
+    <Dialog
+        bind:open={showHostMessage}
+        title="A Message from Your Hosts"
+        buttonText="GO BACK"
+    >
+        <div class="px-7 pt-6">
+            <p class="font-sans text-lg font-medium leading-7">
+                This space is hosted by <a href="https://www.utahcommonground.org/home" class="text-destructive underline" target="_blank" rel="noopener noreferrer">Utah Common Ground</a>, a coalition of nonprofit organizations from around the state, including Utah State University Center for Anticipatory Intelligence, the AI Ethics and Governance Institute, Engage Utah, and Mormon Women for Ethical Governance. We came together to help citizens come together across political differences to identify issues of local concern, consider possible solutions, and take the necessary steps to achieve meaningful, measurable change. 
+            </p>
+            <p class="mt-4 font-sans text-lg font-medium leading-7">
+                We invite all Utahns to share what matters most to them about the future of AI and its impact on communities across the state. Over several weeks, this process will surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding. 
+            </p>
+            <p class="mt-4 font-sans text-lg font-medium leading-7">
+                After this period of broad public input, a representative group of approximately 30 to 50 residents from three counties (Cache, Salt Lake, and Utah Counties) will be invited to convene in person in August and September 2026 for a Solutions Forum. Participants will reflect the demographic, geographic, and political diversity of Utah and will receive stipends to ensure participation is accessible.
+            </p>
         </div>
-    {/if}
+    </Dialog>
 </AppShell>

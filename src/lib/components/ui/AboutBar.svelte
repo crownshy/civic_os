@@ -1,7 +1,5 @@
 <script lang="ts">
-    import { fly, fade } from 'svelte/transition';
-    import { cubicOut } from 'svelte/easing';
-    import AboutOverlay from './AboutOverlay.svelte';
+    import Dialog from './Dialog.svelte';
 
     interface Props {
         countyName: string;
@@ -27,16 +25,16 @@
     </button>
 </div>
 
-{#if showAbout}
-    <div 
-        transition:fade={{ duration: 200 }} 
-        class="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm"
-    >
-        <div 
-            class="h-full w-full"
-            transition:fly={{ y: 500, duration: 400, easing: cubicOut }}
-        >
-            <AboutOverlay {countyName} onClose={() => (showAbout = false)} />
-        </div>
+<Dialog
+    bind:open={showAbout}
+    title="About this Conversation"
+>
+    <div class="px-7 pt-6">
+        <p class="font-sans text-lg font-medium leading-7">
+            This conversation is about how Utah can prepare for the growing impact of AI in so many aspects of our lives (work and the economy, education, wellbeing, information quality, government services, etc). 
+        </p>
+        <p class="mt-4 font-sans text-lg font-medium leading-7">
+            It is hosted by Utah Common Ground, a collaboration of diverse nonpartisan organizations across Utah. You can find out more about them at utahcommonground.org.
+        </p>
     </div>
-{/if}
+</Dialog>

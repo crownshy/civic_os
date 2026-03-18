@@ -101,10 +101,10 @@ export const aboutYouQuestions: AboutYouQuestion[] = [
 	},
 	{
 		id: 'about-002',
-		question: 'Which of the following ethnicities do you identify with?',
-		description: 'This information helps us make sure everyone is represented in the conversation. You can revoke access to this at any time.',
-		options: ['Asian', 'Black', 'White', 'Hispanic', 'Other'],
-		multiSelect: false
+		question: 'Select your ethnicity.',
+		description: 'Select all that apply.',
+		options: ['White', 'Black / African American', 'Hispanic / Latino', 'Asian / Pacific Islander', 'Middle Eastern / North African', 'Native American', 'Other'],
+		multiSelect: true
 	},
 	{
 		id: 'about-003',
