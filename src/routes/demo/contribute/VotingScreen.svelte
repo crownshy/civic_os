@@ -84,7 +84,7 @@
 			</div>
 		{:else}
 			<div
-				class="w-full text-left"
+				class="w-full text-left max-h-[50vh] overflow-y-auto"
 				in:fly={{ y: 20, duration: 500, easing: cubicOut }}
 			>
 				<!-- Attribution -->
@@ -95,7 +95,7 @@
 
 				<!-- Quote -->
 				<p
-					class="mt-4 max-h-[50vh] overflow-y-auto font-sans text-3xl font-semibold leading-10 text-muted-foreground"
+					class="mt-4 font-sans text-3xl font-semibold leading-10 text-muted-foreground"
 				>
 					&ldquo;{statementText}&rdquo;
 				</p>

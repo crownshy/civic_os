@@ -69,7 +69,7 @@
 
                 <div class="mx-auto mt-4 sm:mt-6 h-1 w-20 rounded-full bg-muted-foreground"></div>
 
-                <SwipeCarousel count={slides.length} bind:index={slideIndex} autoScrollMs={4000} class="mt-4 sm:mt-6 w-full">
+                <SwipeCarousel count={slides.length} bind:index={slideIndex} autoScrollMs={5000} class="mt-4 sm:mt-6 w-full">
                     {#snippet children(i)}
                         <p class="font-sans text-lg font-medium leading-relaxed text-muted-foreground">
                             {slides[i]}
