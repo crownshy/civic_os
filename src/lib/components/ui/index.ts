@@ -18,7 +18,6 @@ export { default as PopQuiz } from './PopQuiz.svelte';
 export { default as EmailCapture } from './EmailCapture.svelte';
 export { default as Button } from './Button.svelte';
 export { default as EmojiCircle } from './EmojiCircle.svelte';
-export { default as AboutOverlay } from './AboutOverlay.svelte';
 export { default as AboutBar } from './AboutBar.svelte';
-export { default as InfoOverlay } from './InfoOverlay.svelte';
+export { default as Dialog } from './Dialog.svelte';
 export { default as ZipInput } from './ZipInput.svelte';

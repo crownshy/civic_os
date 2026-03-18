@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { fly, slide, scale } from 'svelte/transition';
-    import { cubicOut, backOut } from 'svelte/easing';
-    import { tick } from 'svelte';
+    import { fly } from 'svelte/transition';
+    import { cubicOut } from 'svelte/easing';
+    import { SvelteSet } from 'svelte/reactivity';
     import type { AboutYouQuestion } from '$lib/types/mock-data';
-    import { AboutBar, Button } from '$lib/components/ui';
+    import { AboutBar, Button, Dialog } from '$lib/components/ui';
     import { Check, Plus } from 'lucide-svelte';
 
     interface Props {
@@ -16,34 +16,21 @@
 
     let { countyName, questions, zipCode = '', onDone, onSkip }: Props = $props();
 
-    let expandedCategory = $state<string | null>(null);
-    let selections = $state<Record<string, Set<number>>>({});
-    let containerRef = $state<HTMLDivElement | null>(null);
+    let openDialog = $state<string | null>(null);
+    let dialogOpen = $derived(openDialog !== null);
+    let selections = $state<Record<string, SvelteSet<number>>>({});
 
-    $effect(() => {
-        if (expandedCategory) {
-            handleScroll(expandedCategory);
-        }
-    });
-
-    async function handleScroll(id: string) {
-        await tick();
-        const el = document.getElementById(`question-${id}`);
-        if (el) {
-            el.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
+    function openCategory(id: string) {
+        openDialog = id;
     }
 
-    function toggleCategory(id: string) {
-        expandedCategory = expandedCategory === id ? null : id;
+    function closeDialog() {
+        openDialog = null;
     }
 
     function toggleOption(questionId: string, idx: number, multiSelect: boolean) {
-        const current = selections[questionId] ?? new Set<number>();
-        const next = new Set(current);
+        const current = selections[questionId] ?? new SvelteSet<number>();
+        const next = new SvelteSet(current);
         if (multiSelect) {
             if (next.has(idx)) next.delete(idx);
             else next.add(idx);
@@ -52,10 +39,6 @@
             next.add(idx);
         }
         selections = { ...selections, [questionId]: next };
-
-        if (!multiSelect) {
-            setTimeout(() => { expandedCategory = null; }, 400); 
-        }
     }
 
     function getSelectionLabel(q: AboutYouQuestion): string {
@@ -71,8 +54,8 @@
 
     function getCategoryLabel(q: AboutYouQuestion): string {
         if (q.id === 'about-001') return 'Age?';
-        if (q.id === 'about-002') return 'Gender?';
-        if (q.id === 'about-003') return 'Ethnicity?';
+        if (q.id === 'about-002') return 'Ethnicity?';
+        if (q.id === 'about-003') return 'Gender?';
         return q.question;
     }
 
@@ -88,12 +71,14 @@
         }
         return result;
     }
+
+    let dialogQuestion = $derived(openDialog ? questions.find((q) => q.id === openDialog) : null);
 </script>
 
 <div class="flex h-full flex-col bg-gradient-primary">
     <AboutBar {countyName} />
 
-    <div bind:this={containerRef} class="flex flex-1 flex-col overflow-y-auto px-6 pt-8">
+    <div class="flex flex-1 flex-col overflow-y-auto px-6 pt-8">
         <span
             class="font-mono text-sm font-medium text-foreground/80"
             in:fly={{ y: -10, duration: 300, delay: 100, easing: cubicOut }}
@@ -113,74 +98,31 @@
             This information helps us make sure everyone is represented in the conversation. You can share only as much as you'd like to.
         </p>
 
-        <div class="mt-8 flex flex-col gap-3 pb-12">
-            {#each questions as q, qIdx}
-                <div 
-                    id="question-{q.id}"
-                    class="flex flex-col gap-2 scroll-mt-6 transition-opacity duration-300"
-                    class:opacity-40={expandedCategory && expandedCategory !== q.id}
+        <div class="mt-8 flex flex-col gap-2 pb-12">
+            {#each questions as q, qIdx (q.id)}
+                <button
+                    onclick={() => openCategory(q.id)}
+                    class="relative flex h-16 w-full items-center rounded-[20px] text-left font-sans text-2xl font-bold leading-7 transition-all duration-300 {hasSelection(q.id)
+                        ? 'bg-card text-foreground shadow-[0px_5px_15px_0px_rgba(12,34,95,0.13)]'
+                        : 'bg-secondary/10 text-foreground/70 hover:bg-secondary/15'}"
                     in:fly={{ y: 15, delay: 400 + qIdx * 80, duration: 400, easing: cubicOut }}
                 >
-                    <button
-                        onclick={() => toggleCategory(q.id)}
-                        class="relative flex h-16 w-full items-center rounded-[20px] text-left font-sans text-2xl font-bold leading-7 transition-all duration-300 {(expandedCategory === q.id || hasSelection(q.id))
-                            ? 'bg-card text-foreground shadow-[0px_5px_15px_0px_rgba(12,34,95,0.13)]'
-                            : 'bg-secondary/10 text-foreground/70 hover:bg-secondary/15'}"
-                    >
-                        {#if hasSelection(q.id)}
-                            <span class="absolute left-6 right-16 truncate" in:fly={{ y: 10, duration: 250, delay: 150 }} out:fly={{ y: -10, duration: 150 }}>
-                                {getSelectionLabel(q)}
-                            </span>
-                            
-                            <span 
-                                class="absolute right-5 flex h-8 w-8 items-center justify-center rounded-full bg-foreground" 
-                                in:scale={{ duration: 250, delay: 150, easing: backOut }} 
-                                out:scale={{ duration: 150 }}
-                            >
-                                <Check class="h-4 w-4 text-card stroke-4" /> 
-                            </span>
-                        {:else}
-                            <span class="absolute left-6 right-16 truncate" in:fly={{ y: -10, duration: 250, delay: 150 }} out:fly={{ y: 10, duration: 150 }}>
-                                {getCategoryLabel(q)}
-                            </span>
-                            
-                            <span 
-                                class="absolute right-5 flex h-8 w-8 items-center justify-center rounded-full bg-foreground opacity-40 transition-transform duration-300"
-                                in:scale={{ duration: 250, delay: 150, easing: backOut }} 
-                                out:scale={{ duration: 150 }}
-                            >
-                                <Plus class="h-4 w-4 text-card stroke-4" />  
-                            </span>
-                        {/if}
-                    </button>
-
-                    {#if expandedCategory === q.id}
-                        <div transition:slide={{ duration: 300, easing: cubicOut }}>
-                            <div class="flex flex-col gap-2 pb-2 pt-2">
-                                {#each q.options as option, i}
-                                    <button
-                                        onclick={() => toggleOption(q.id, i, q.multiSelect)}
-                                        class="relative flex h-16 w-full shrink-0 items-center rounded-[20px] px-6 text-left font-sans text-2xl font-bold leading-7 transition-all duration-200 {(selections[q.id] ?? new Set()).has(i)
-                                            ? 'bg-card text-foreground shadow-[0px_5px_15px_0px_rgba(12,34,95,0.13)]'
-                                            : 'bg-secondary/10 text-foreground/70 hover:bg-secondary/15'}"
-                                        in:fly={{ y: -10, delay: i * 30, duration: 250, easing: cubicOut }}
-                                    >
-                                        {option}
-                                    </button>
-                                {/each}
-                                
-                                {#if q.multiSelect}
-                                    <button
-                                        onclick={() => { expandedCategory = null; }}
-                                        class="mt-1 flex items-center gap-2 px-2 font-mono text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
-                                    >
-                                        DONE <Check class="h-3 w-3" />
-                                    </button>
-                                {/if}
-                            </div>
-                        </div>
+                    {#if hasSelection(q.id)}
+                        <span class="absolute left-6 right-16 truncate">
+                            {getSelectionLabel(q)}
+                        </span>
+                        <span class="absolute right-5 flex h-8 w-8 items-center justify-center rounded-full bg-foreground">
+                            <Check class="h-4 w-4 text-card stroke-4" />
+                        </span>
+                    {:else}
+                        <span class="absolute left-6 right-16 truncate">
+                            {getCategoryLabel(q)}
+                        </span>
+                        <span class="absolute right-5 flex h-8 w-8 items-center justify-center rounded-full bg-foreground opacity-40">
+                            <Plus class="h-4 w-4 text-card stroke-4" />
+                        </span>
                     {/if}
-                </div>
+                </button>
             {/each}
         </div>
     </div>
@@ -191,3 +133,35 @@
         </Button>
     </div>
 </div>
+
+{#if dialogQuestion}
+    {@const dq = dialogQuestion}
+    <Dialog
+        open={dialogOpen}
+        title={dq.question}
+        description={dq.description}
+        buttonText="SUBMIT"
+        onButtonClick={closeDialog}
+        onOpenChange={(v) => { if (!v) closeDialog(); }}
+    >
+    <div class="mt-10">
+        {#each dq.options as option, i (option)}
+            <button
+                onclick={() => toggleOption(dq.id, i, dq.multiSelect)}
+                class="relative flex px-8 h-16 w-full items-center border-b border-foreground/20 text-left font-sans text-lg font-bold leading-5 text-foreground/70 transition-colors hover:bg-secondary/5"
+            >
+                <span class="flex-1">{option}</span>
+                <span
+                    class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-all duration-200 {(selections[dq.id] ?? new SvelteSet()).has(i)
+                        ? 'bg-foreground'
+                        : 'bg-foreground/30'}"
+                >
+                    {#if (selections[dq.id] ?? new SvelteSet()).has(i)}
+                        <Plus class="h-3 w-3 text-card stroke-4" />
+                    {/if}
+                </span>
+            </button>
+        {/each}
+    </div>
+    </Dialog>
+{/if}
