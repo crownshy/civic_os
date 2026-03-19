@@ -1,4 +1,5 @@
 import { api, config } from './api';
+import { getCountyFromZip } from '$lib/data/utah-counties';
 
 export interface UserProfile {
 	id: string;
@@ -22,7 +23,7 @@ export interface User {
 
 const STORAGE_KEY = 'civic-os-session';
 
-function loadPersistedSession(): { userId?: string; emailProvided?: boolean; zipCode?: string; pid?: number; demographicsCompleted?: boolean; totalVotes?: number; hasSeenPause?: boolean } {
+function loadPersistedSession(): { userId?: string; emailProvided?: boolean; zipCode?: string; pid?: number; demographicsCompleted?: boolean; totalVotes?: number; hasSeenPause?: boolean; hasSeenComposeInstructions?: boolean } {
 	if (typeof window === 'undefined') return {};
 	try {
 		const raw = localStorage.getItem(STORAGE_KEY);
@@ -41,6 +42,7 @@ class Session {
 	demographicsCompleted = $state(false);
 	totalVotes = $state(0);
 	hasSeenPause = $state(false);
+	hasSeenComposeInstructions = $state(false);
 	error = $state<string | null>(null);
 	loading = $state(false);
 
@@ -55,6 +57,7 @@ class Session {
 		if (saved.demographicsCompleted) this.demographicsCompleted = true;
 		if (saved.totalVotes) this.totalVotes = saved.totalVotes;
 		if (saved.hasSeenPause) this.hasSeenPause = saved.hasSeenPause;
+		if (saved.hasSeenComposeInstructions) this.hasSeenComposeInstructions = true;
 	}
 
 	private persist() {
@@ -67,7 +70,8 @@ class Session {
 				pid: this.pid,
 				demographicsCompleted: this.demographicsCompleted,
 				totalVotes: this.totalVotes,
-				hasSeenPause: this.hasSeenPause
+				hasSeenPause: this.hasSeenPause,
+				hasSeenComposeInstructions: this.hasSeenComposeInstructions
 			}));
 		} catch { /* ignore */ }
 	}
@@ -90,6 +94,15 @@ class Session {
 
 	get hasSession() {
 		return this.user !== null && !!this.zipCode;
+	}
+
+	markComposeInstructionsSeen() {
+		this.hasSeenComposeInstructions = true;
+		this.persist();
+	}
+
+	get county(): string {
+		return this.zipCode ? getCountyFromZip(this.zipCode) : 'Utah';
 	}
 
 	savePid(pid: number) {
