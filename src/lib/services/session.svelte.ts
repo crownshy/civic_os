@@ -22,7 +22,16 @@ export interface User {
 
 const STORAGE_KEY = 'civic-os-session';
 
-function loadPersistedSession(): { userId?: string; emailProvided?: boolean; zipCode?: string; pid?: number; demographicsCompleted?: boolean; totalVotes?: number; hasSeenPause?: boolean } {
+function loadPersistedSession(): {
+	userId?: string;
+	emailProvided?: boolean;
+	zipCode?: string;
+	pid?: number;
+	demographicsCompleted?: boolean;
+	totalVotes?: number;
+	hasSeenPause?: boolean;
+	hasAgreedToTos?: boolean;
+} {
 	if (typeof window === 'undefined') return {};
 	try {
 		const raw = localStorage.getItem(STORAGE_KEY);
@@ -56,6 +65,7 @@ class Session {
 		if (saved.demographicsCompleted) this.demographicsCompleted = true;
 		if (saved.totalVotes) this.totalVotes = saved.totalVotes;
 		if (saved.hasSeenPause) this.hasSeenPause = saved.hasSeenPause;
+		if (saved.hasAgreedToTos) this.hasAgreedToTos = saved.hasAgreedToTos;
 	}
 
 	private persist() {
