@@ -3,7 +3,7 @@
     import { cubicOut } from 'svelte/easing';
     import { SvelteSet } from 'svelte/reactivity';
     import type { AboutYouQuestion } from '$lib/types/mock-data';
-    import { AboutBar, Button, Dialog } from '$lib/components/ui';
+    import { AboutBar, Button, Dialog, Link } from '$lib/components/ui';
     import { Check, Plus } from 'lucide-svelte';
 
     interface Props {
@@ -95,7 +95,7 @@
             class="mt-3 font-sans text-sm font-medium text-foreground/80"
             in:fly={{ y: 10, duration: 400, delay: 300, easing: cubicOut }}
         >
-            This information helps us make sure everyone is represented in the conversation. You can share only as much as you'd like to.
+            This information helps us make sure everyone is represented in the conversation. Share only as much as you’d like to, and you have full control over your data. See our full privacy terms <Link href="https://app.termly.io/policy-viewer/policy.html?policyUUID=ba402bb7-5499-4b37-860b-bbb507d3c3c1" external>here</Link>.
         </p>
 
         <div class="mt-8 flex flex-col gap-2 pb-12">

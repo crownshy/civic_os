@@ -24,7 +24,7 @@
 		</p>
 		{#if remaining != null && remaining > 0}
 			<p class="mt-4 text-center font-sans text-lg font-medium text-foreground/80">
-				There are {remaining} more statements remaining. Keep going?
+				There are {remaining} more statements. Want to respond to a couple more?
 			</p>
 		{/if}
 	</div>

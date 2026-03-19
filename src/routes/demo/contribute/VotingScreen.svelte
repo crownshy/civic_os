@@ -84,7 +84,7 @@
 			</div>
 		{:else}
 			<div
-				class="w-full text-left max-h-[50vh] overflow-y-auto"
+				class="w-full text-left max-h-[60vh] mt-4 overflow-y-auto"
 				in:fly={{ y: 20, duration: 500, easing: cubicOut }}
 			>
 				<!-- Attribution -->

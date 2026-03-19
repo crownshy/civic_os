@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
+	import { Input } from './input';
 
 	interface Props {
 		placeholder?: string;
@@ -42,13 +43,13 @@
 		{#if isPrimary}
 			<span class="mr-3 h-[5px] w-3.5 shrink-0 bg-white"></span>
 		{/if}
-		<input
+		<Input
 			type="text"
 			{placeholder}
 			bind:value
 			{oninput}
 			class={cn(
-				'w-full border-none bg-transparent font-mono text-lg font-medium outline-none placeholder:opacity-100',
+				'w-full rounded-none border-0 bg-transparent font-mono text-lg font-medium shadow-none focus-visible:ring-0 placeholder:opacity-100',
 				isPrimary
 					? 'text-white placeholder:text-white'
 					: 'text-primary placeholder:text-primary'

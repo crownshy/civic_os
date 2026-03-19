@@ -21,3 +21,4 @@ export { default as EmojiCircle } from './EmojiCircle.svelte';
 export { default as AboutBar } from './AboutBar.svelte';
 export { default as Dialog } from './Dialog.svelte';
 export { default as ZipInput } from './ZipInput.svelte';
+export { default as Link } from './Link.svelte';

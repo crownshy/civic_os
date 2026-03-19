@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 	import Button from './Button.svelte';
+	import { Input } from './input';
 
 	interface Props {
 		onSubmit: (email: string) => void;
@@ -22,10 +23,11 @@
 			onsubmit={(e) => { e.preventDefault(); onSubmit(email); }}
 			class="mt-5 flex h-12 items-center rounded-full bg-white shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)] outline-2 outline-primary overflow-hidden px-5"
 		>
-			<input
+				<Input
 				bind:value={email}
+				type="email"
 				placeholder="email@xyz.com"
-				class="w-full bg-transparent font-sans text-base font-medium text-secondary placeholder:text-secondary/80 border-0 outline-none focus:ring-0"
+				class="w-full rounded-none border-0 bg-transparent font-sans text-base font-medium text-secondary placeholder:text-secondary/80 shadow-none focus-visible:ring-0"
 			/>
 		</form>
 	</div>

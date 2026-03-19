@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
-	import { ComposeOverlay, Dialog } from '$lib/components/ui';
+	import { ComposeOverlay, Dialog, Link } from '$lib/components/ui';
 
 	interface Props {
 		question: string;
@@ -28,16 +28,12 @@
 		bind:open={showInstructions}
 		title="How to contribute to this conversation:"
 		buttonText="I UNDERSTAND"
-		centered
 	>
-		<div class="mt-6 px-6 ml-6 h-1.5 w-14 bg-primary rounded-full"></div>
-		<div class="mt-6 px-6 font-sans text-lg font-medium leading-7 text-card-foreground">
-			<ul class="list-disc pl-5">
-				<li>You can share ideas, opinions, values, or whatever else. Others will see these and vote on them. </li>
-				<li>You are contributing standalone statements – not responding to specific statements you see in the conversation.</li>
-				<li>No profanity, threats, etc.</li>
-				<li>You can submit as many statements as you'd like, but remember to listen!</li>
-			</ul>
+		<div class="px-7 pt-6 font-sans text-lg font-medium leading-7 text-foreground">
+			<p>Feel free to share any ideas, values, or positions on this question. Others will see these statements and vote on them.</p>
+			<p class="mt-4">You are contributing standalone statements – not responding to specific statements you see in the conversation.</p>
+			<p class="mt-4">Do not include profanity, threats, or other content that might cause distress to others. Any such threats will be removed from the platform.</p>
+			<p class="mt-4">We want this to be a constructive and respectful space for everyone. By participating, you agree to our <Link href="https://app.termly.io/policy-viewer/policy.html?policyUUID=4f85478f-bc07-46b7-a67b-e9f11de4b279" external>Terms of Use & Moderation Policy</Link>.</p>
 		</div>
 	</Dialog>
 </div>
