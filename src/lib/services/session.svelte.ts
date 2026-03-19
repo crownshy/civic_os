@@ -23,7 +23,17 @@ export interface User {
 
 const STORAGE_KEY = 'civic-os-session';
 
-function loadPersistedSession(): { userId?: string; emailProvided?: boolean; zipCode?: string; pid?: number; demographicsCompleted?: boolean; totalVotes?: number; hasSeenPause?: boolean; hasSeenComposeInstructions?: boolean } {
+function loadPersistedSession(): {
+	userId?: string;
+	emailProvided?: boolean;
+	zipCode?: string;
+	pid?: number;
+	demographicsCompleted?: boolean;
+	totalVotes?: number;
+	hasSeenPause?: boolean; 
+	hasAgreedToTos?: boolean;
+	hasSeenComposeInstructions?: boolean;
+} {
 	if (typeof window === 'undefined') return {};
 	try {
 		const raw = localStorage.getItem(STORAGE_KEY);
@@ -45,6 +55,7 @@ class Session {
 	hasSeenComposeInstructions = $state(false);
 	error = $state<string | null>(null);
 	loading = $state(false);
+	hasAgreedToTos = $state(false);
 
 	constructor() {
 		const saved = loadPersistedSession();
@@ -57,6 +68,7 @@ class Session {
 		if (saved.demographicsCompleted) this.demographicsCompleted = true;
 		if (saved.totalVotes) this.totalVotes = saved.totalVotes;
 		if (saved.hasSeenPause) this.hasSeenPause = saved.hasSeenPause;
+		if (saved.hasAgreedToTos) this.hasAgreedToTos = saved.hasAgreedToTos;
 		if (saved.hasSeenComposeInstructions) this.hasSeenComposeInstructions = true;
 	}
 
@@ -71,6 +83,7 @@ class Session {
 				demographicsCompleted: this.demographicsCompleted,
 				totalVotes: this.totalVotes,
 				hasSeenPause: this.hasSeenPause,
+				hasAgreedToTos: this.hasAgreedToTos,
 				hasSeenComposeInstructions: this.hasSeenComposeInstructions
 			}));
 		} catch { /* ignore */ }
@@ -118,6 +131,11 @@ class Session {
 	saveVoteProgress(totalVotes: number, hasSeenPause: boolean) {
 		this.totalVotes = totalVotes;
 		this.hasSeenPause = hasSeenPause;
+		this.persist();
+	}
+
+	setSessionField(field: keyof typeof this, value: any) {
+		this[field] = value;
 		this.persist();
 	}
 

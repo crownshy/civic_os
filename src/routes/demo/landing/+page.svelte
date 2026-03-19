@@ -1,6 +1,5 @@
 <script lang="ts">
-    import { fade, fly } from 'svelte/transition';
-    import { cubicOut } from 'svelte/easing';
+    import { fade } from 'svelte/transition';
     import { goto } from '$app/navigation';
     import { AppShell } from '$lib/components/layout';
     import { SwipeCarousel, Button, Dialog, ZipInput, Link } from '$lib/components/ui';
@@ -20,6 +19,17 @@
     let slideIndex = $state(0);
     let joining = $state(false);
     let showHostMessage = $state(false);
+    let showTermsMessage = $state(false);
+    let hasAgreedToTos = $derived(session.hasAgreedToTos);
+
+    function showTermsModal() {
+        showTermsMessage = true;
+    }
+
+    function handleAgreeToTos() {
+        session.setSessionField('hasAgreedToTos', true);
+        handleJoin();
+    }
 
     async function handleJoin() {
         if (isReturning) {
@@ -87,7 +97,13 @@
                 <ZipInput bind:value={zipCode} disabled={isReturning} />
             </div>
 
-            <Button variant="primary" fullWidth disabled={!hasZip || joining} onclick={handleJoin} class="mt-3">
+            <Button variant="primary" fullWidth disabled={!hasZip || joining} onclick={() => {
+                if (hasAgreedToTos) {
+                    handleJoin();
+                } else {
+                    showTermsModal();
+                }
+            }} class="mt-3">
                 {isReturning ? 'CONTINUE' : 'JOIN THE CONVERSATION'}
             </Button>
 
@@ -126,6 +142,29 @@
             </p>
             <p class="mt-4 font-sans text-lg font-medium leading-7">
                 After this period of broad public input, a representative group of approximately 30 to 50 residents from three counties (Cache, Salt Lake, and Utah Counties) will be invited to convene in person in August and September 2026 for a Solutions Forum. Participants will reflect the demographic, geographic, and political diversity of Utah and will receive stipends to ensure participation is accessible.
+            </p>
+        </div>
+    </Dialog>
+
+    <Dialog
+        bind:open={showTermsMessage}
+        title="Our Approach to Personal Data"
+        buttonText="I AGREE TO THESE TERMS"
+        onButtonClick={handleAgreeToTos}
+    >
+        <div class="px-7 pt-6">
+            <p class="font-sans text-lg font-medium leading-7">
+                We treat your data as part of a shared civic process — not a product to be sold.
+            </p>
+            <ul class="mt-4 font-sans text-lg font-medium leading-7 list-[square] pl-6">
+                <li><span class="font-bold">We collect only what’s needed</span> to run these public-problem solving processes and improve the platform.</li>
+                <li><span class="font-bold">You remain in control.</span> You can access, correct, or delete your data at any time.</li>
+                <li><span class="font-bold">We do not sell or monetize your personal data</span>, and we minimize the collection of identifiable data wherever possible.</li>
+                <li><span class="font-bold">We share insights from deliberations with civic partners to support community decision-making.</span> These insights are aggregated and do not identify you personally</li>
+                <li><span class="font-bold">If you choose, you can stay connected locally.</span> With your permission, we may share your contact information (like your email) with your hosts so they can follow up about this deliberation or related opportunities.</li>
+            </ul>
+            <p class="mt-4 font-sans text-lg font-medium leading-7">
+                For more information, please view the full <a href="https://app.termly.io/policy-viewer/policy.html?policyUUID=ba402bb7-5499-4b37-860b-bbb507d3c3c1" class="text-destructive underline" target="_blank" rel="noopener noreferrer">Privacy Policy.</a>
             </p>
         </div>
     </Dialog>
