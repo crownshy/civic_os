@@ -161,6 +161,11 @@
 	function handleCompose(text: string, anonymous: boolean) {
 		polis.submitStatement(text);
 	}
+
+	function handleBackToVoting() {
+		userEndedVoting = false;
+		screen = 'voting';
+	}
 </script>
 
 <AppShell>
@@ -245,6 +250,7 @@
 	{:else if screen === 'thank-you'}
 		<ThankYouScreen
 			countyName={session.county}
+			onBackToVoting={handleBackToVoting}
 		/>
 
 	<!-- Preserved screens (unused in conference flow) -->

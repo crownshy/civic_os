@@ -8,9 +8,10 @@
 
 	interface Props {
 		countyName: string;
+		onBackToVoting?: () => void;
 	}
 
-	let { countyName }: Props = $props();
+	let { countyName, onBackToVoting }: Props = $props();
 
 	let email = $state('');
 	let submitting = $state(false);
@@ -86,6 +87,15 @@
 
 				<Button variant="primary" fullWidth disabled={!email.trim() || submitting} onclick={handleEmailSubmit}>
 					SIGN UP FOR UPDATES
+				</Button>
+			</div>
+		{/if}
+
+		<!-- Back to Conversation button -->
+		{#if onBackToVoting}
+			<div class="mt-3 px-7">
+				<Button variant="secondary" fullWidth onclick={onBackToVoting}>
+					BACK TO CONVERSATION
 				</Button>
 			</div>
 		{/if}
