@@ -6,9 +6,10 @@
     import { SwipeCarousel, Button, Dialog, ZipInput } from '$lib/components/ui';
     import { session } from '$lib/services/session.svelte';
 
-    const slides = [
-        'This conversation is about how Utah can prepare for the growing impact of AI in so many aspects of our lives (work and the economy, education, wellbeing, information quality, government services, etc). ',
-        'In this conversation, you’ll see statements from your community about this question. You can vote (agree/disagree) or pass on each one.',
+    const slides: string[] = [
+        'This conversation is about how Utahns can direct the growing impact of artificial intelligence to benefit our communities.',
+        'You’ll see statements from your neighbors and other community members about this question. You can vote: agree, disagree, or unsure on each one.',
+        'This “Open Poll” will reveal shared concerns and values that will be the basis of action-oriented community conversations in the coming months.',
     ];
 
     const isReturning = session.hasSession;
