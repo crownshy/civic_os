@@ -3,7 +3,7 @@
     import { cubicOut } from 'svelte/easing';
     import { goto } from '$app/navigation';
     import { AppShell } from '$lib/components/layout';
-    import { SwipeCarousel, Button, Dialog, ZipInput } from '$lib/components/ui';
+    import { SwipeCarousel, Button, Dialog, ZipInput, Link } from '$lib/components/ui';
     import { session } from '$lib/services/session.svelte';
 
     const slides: string[] = [
@@ -91,7 +91,14 @@
                 {isReturning ? 'CONTINUE' : 'JOIN THE CONVERSATION'}
             </Button>
 
-            <span class="mt-2.5 font-mono text-sm font-medium text-secondary/70">POWERED BY <a href="https://www.bloom-project.org/" class="underline" target="_blank" rel="noopener noreferrer">BLOOM PROJECT</a></span>
+            <span class="mt-2.5 opacity-50 text-center font-mono text-xs font-medium uppercase">
+                <span class="text-foreground">THIS IS A{" "}</span>
+                <span class="text-destructive">BETA,{" "}</span>
+                <span class="text-foreground">POWERED BY </span>
+                <Link href="https://www.bloom-project.org/" external>BLOOM PROJECT.</Link>
+                <span class="text-foreground"> SEE THE FULL TERMS AND CONDITIONS </span>
+                <Link href="https://app.termly.io/policy-viewer/policy.html?policyUUID=ba402bb7-5499-4b37-860b-bbb507d3c3c1" external>HERE.</Link>
+            </span>
         </div>
     </div>
 
@@ -112,7 +119,7 @@
     >
         <div class="px-7 pt-6">
             <p class="font-sans text-lg font-medium leading-7">
-                This space is hosted by <a href="https://www.utahcommonground.org/home" class="text-destructive underline" target="_blank" rel="noopener noreferrer">Utah Common Ground</a>, a coalition of nonprofit organizations from around the state, including Utah State University Center for Anticipatory Intelligence, the AI Ethics and Governance Institute, Engage Utah, and Mormon Women for Ethical Governance. We came together to help citizens come together across political differences to identify issues of local concern, consider possible solutions, and take the necessary steps to achieve meaningful, measurable change. 
+                This space is hosted by <Link href="https://www.utahcommonground.org/home" external>Utah Common Ground</Link>, a coalition of nonprofit organizations from around the state, including Utah State University Center for Anticipatory Intelligence, the AI Ethics and Governance Institute, Engage Utah, and Mormon Women for Ethical Governance. We came together to help citizens come together across political differences to identify issues of local concern, consider possible solutions, and take the necessary steps to achieve meaningful, measurable change. 
             </p>
             <p class="mt-4 font-sans text-lg font-medium leading-7">
                 We invite all Utahns to share what matters most to them about the future of AI and its impact on communities across the state. Over several weeks, this process will surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding. 

@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { scale, slide, fade } from 'svelte/transition';
+	import { scale, fade } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
-	import { AboutBar, Button, EmojiCircle } from '$lib/components/ui';
+	import { AboutBar, Button, EmojiCircle, Link } from '$lib/components/ui';
+	import { Input } from '$lib/components/ui/input';
 	import { session } from '$lib/services/session.svelte';
-    import { Mail } from 'lucide-svelte'
+	import { Mail } from 'lucide-svelte';
 
 	interface Props {
 		countyName: string;
@@ -32,89 +33,78 @@
 		}
 		submitting = true;
 		await session.registerEmail(trimmed);
-		// Mark as provided even if API fails (demo mode)
 		session.emailProvided = true;
 		submitting = false;
-	}
-
-	function handleSkip() {
-		session.emailProvided = true;
 	}
 </script>
 
 <div class="flex h-full flex-col bg-gradient-primary" in:scale={{ start: 0.9, duration: 500, easing: cubicOut }}>
 	<AboutBar {countyName} />
 
-	<!-- Centered content -->
-	<div class="flex flex-1 flex-col items-center justify-center px-8">
-		<!-- Emoji -->
-		<EmojiCircle emoji="🎉" size="lg" />
+	<div class="flex flex-1 flex-col overflow-y-auto">
+		<!-- Hero: emoji + heading -->
+		<div class="flex flex-col items-center px-8 pt-8">
+			<EmojiCircle emoji="🎉" size="lg" />
 
-		{#if session.emailProvided}
-			<!-- Email already given — clean thank you -->
-			<div in:fade={{ duration: 400, delay: 300 }}>
-				<h1 class="mt-6 text-center font-sans text-5xl font-bold leading-10 text-foreground">
-					Thank you for your perspectives!
-				</h1>
-				<p class="mt-4 text-center font-sans text-lg font-medium leading-7 text-foreground/80">
-					Here's what comes next...
+			<h1 class="mt-6 text-center font-sans text-4xl font-bold leading-10 text-foreground">
+				Thank you!
+			</h1>
+
+			{#if session.emailProvided}
+				<p class="mt-2 text-center font-sans text-base font-medium leading-6 text-foreground/80" in:fade={{ duration: 400, delay: 300 }}>
+					Received! We'll be in touch.
 				</p>
-			</div>
-		{:else}
-			<!-- No email yet — show thank you + email form -->
-			<div out:fade={{ duration: 200 }}>
-				<h1 class="mt-6 text-center font-sans text-5xl font-bold leading-10 text-foreground">
-					Thank you!
-				</h1>
-				<p class="mt-2 text-center font-sans text-lg font-medium leading-7 text-foreground/80">
-					You're done sharing your perspectives.
+			{:else}
+				<p class="mt-2 text-center font-sans text-base font-medium leading-6 text-foreground/80">
+					Share your email to receive updates on this conversation and opportunities to share your voice on this issue.
 				</p>
-			</div>
-		{/if}
-	</div>
+			{/if}
+		</div>
 
-	{#if !session.emailProvided}
-		<!-- Email collection panel -->
-		<div
-			out:slide={{ duration: 400, easing: cubicOut }}
-			class="flex shrink-0 flex-col items-start gap-4 border-t-2 border-secondary/20 px-7 py-8 bg-secondary/10"
-		>
-			<p class="w-full text-center font-sans text-lg font-bold leading-7 text-foreground/80">
-				Sign up to see what everyone else said and get updates on the conversation.
-			</p>
-
-			<div class="w-full">
+		<!-- Email capture (inline, not a bottom panel) -->
+		{#if !session.emailProvided}
+			<div class="mt-4 flex flex-col gap-3.5 px-7">
 				<form
 					onsubmit={(e) => { e.preventDefault(); handleEmailSubmit(); }}
-					class="flex w-full items-center justify-center rounded-full bg-card px-5 py-1 shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)]"
+					class="flex w-full items-center rounded-full bg-card px-5 py-3 shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)]"
 					class:ring-2={emailError}
 					class:ring-destructive={emailError}
 				>
-					<Mail class="mt-1 text-secondary size-4"/>
-					<input
+					<Mail class="text-secondary/60 size-4 shrink-0" />
+					<Input
 						bind:value={email}
 						oninput={() => emailError = ''}
 						type="email"
 						placeholder="email@xyz.com"
 						disabled={submitting}
-						class="flex-1 bg-transparent font-sans text-lg font-medium text-secondary placeholder:text-secondary/80 border-0 outline-none focus:ring-0"
+						class="ml-2.5 flex-1 h-8 rounded-none border-0 bg-transparent font-sans text-lg font-medium text-foreground/80 placeholder:text-foreground/50 shadow-none focus-visible:ring-0"
 					/>
 				</form>
 				{#if emailError}
-					<p class="mt-1.5 px-2 font-sans text-sm text-destructive">{emailError}</p>
+					<p class="-mt-2 px-2 font-sans text-sm text-destructive">{emailError}</p>
 				{/if}
+
+				<Button variant="primary" fullWidth disabled={!email.trim() || submitting} onclick={handleEmailSubmit}>
+					SIGN UP FOR UPDATES
+				</Button>
+			</div>
+		{/if}
+
+		<!-- Live Conversations section -->
+		<div class="mt-8 px-7 pb-8">
+			<div class="flex items-center gap-2">
+				<span class="rounded-[5px] bg-destructive px-2 py-1 font-sans text-sm font-bold leading-5 text-card">NEXT UP</span>
+				<span class="font-sans text-2xl font-bold leading-9 text-foreground">Live Conversations</span>
 			</div>
 
-			<Button variant="primary" fullWidth disabled={!email.trim() || submitting} onclick={handleEmailSubmit}>
-				SUBMIT
-			</Button>
-
-			<button
-				class="w-full text-center font-mono text-base font-medium uppercase text-foreground/80"
-				onclick={handleSkip}
-			>
-				NOT NOW
-			</button>
+			<div class="mt-4 font-sans text-lg font-normal leading-7 text-foreground">
+				<p>
+					In April and May, there will be <strong>live conversations</strong> across Salt Lake, Weber, and Cache Counties. These conversations will build on the common themes and shared values that emerge from the statements here. If you want to take part in these or future conversations, please <strong>share your email above</strong> or visit the <Link href="https://www.utahcommonground.org/home" external class="font-bold">Utah Common Ground website.</Link>
+				</p>
+				<p class="mt-4">
+					The ultimate goal of this campaign is to surface common ground that lets Utahns take action from the local to state levels and beyond. If you are interested in getting involved in a deeper way, let us know at <Link href="mailto:hello@bloom-project.org" external class="font-bold">hello@bloom-project.org</Link>.
+				</p>
+			</div>
 		</div>
-	{/if}
+	</div>
 </div>
