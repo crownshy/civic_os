@@ -43,6 +43,7 @@ class Session {
 	hasSeenPause = $state(false);
 	error = $state<string | null>(null);
 	loading = $state(false);
+	hasAgreedToTos = $state(false);
 
 	constructor() {
 		const saved = loadPersistedSession();
@@ -67,7 +68,8 @@ class Session {
 				pid: this.pid,
 				demographicsCompleted: this.demographicsCompleted,
 				totalVotes: this.totalVotes,
-				hasSeenPause: this.hasSeenPause
+				hasSeenPause: this.hasSeenPause,
+				hasAgreedToTos: this.hasAgreedToTos,
 			}));
 		} catch { /* ignore */ }
 	}
@@ -105,6 +107,11 @@ class Session {
 	saveVoteProgress(totalVotes: number, hasSeenPause: boolean) {
 		this.totalVotes = totalVotes;
 		this.hasSeenPause = hasSeenPause;
+		this.persist();
+	}
+
+	setSessionField(field: keyof typeof this, value: any) {
+		this[field] = value;
 		this.persist();
 	}
 
