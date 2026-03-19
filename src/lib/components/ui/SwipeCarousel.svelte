@@ -1,6 +1,11 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
 	import type { Snippet } from 'svelte';
+	import * as Carousel from '$lib/components/ui/carousel';
+	import { type CarouselAPI } from './carousel/context';
+	import Autoplay from 'embla-carousel-autoplay';
+	import Play from '$lib/assets/icons/play.svelte';
+	import Pause from '$lib/assets/icons/pause.svelte';
+	import { cn } from '$lib/utils';
 
 	interface Props {
 		/** Total number of slides */
@@ -23,99 +28,66 @@
 		autoScrollMs
 	}: Props = $props();
 
-	let touchStartX = $state(0);
-	let touchDeltaX = $state(0);
-	let swiping = $state(false);
-
-	// Auto-scroll timer
-	let autoTimer: ReturnType<typeof setInterval> | null = null;
-
-	function startAutoScroll() {
-		stopAutoScroll();
-		if (!autoScrollMs || autoScrollMs <= 0) return;
-		autoTimer = setInterval(() => {
-			index = (index + 1) % count;
-		}, autoScrollMs);
-	}
-
-	function stopAutoScroll() {
-		if (autoTimer) {
-			clearInterval(autoTimer);
-			autoTimer = null;
-		}
-	}
-
-	function resetAutoScroll() {
-		if (autoScrollMs && autoScrollMs > 0) startAutoScroll();
-	}
-
-	// Start auto-scroll on mount if configured
-	$effect(() => {
-		if (autoScrollMs && autoScrollMs > 0) {
-			startAutoScroll();
-		}
-		return () => stopAutoScroll();
-	});
-
-	function handleTouchStart(e: TouchEvent) {
-		stopAutoScroll();
-		touchStartX = e.touches[0].clientX;
-		touchDeltaX = 0;
-		swiping = true;
-	}
-
-	function handleTouchMove(e: TouchEvent) {
-		if (!swiping) return;
-		touchDeltaX = e.touches[0].clientX - touchStartX;
-	}
-
-	function handleTouchEnd() {
-		if (!swiping) return;
-		swiping = false;
-		if (touchDeltaX < -40 && index < count - 1) {
-			index++;
-		} else if (touchDeltaX > 40 && index > 0) {
-			index--;
-		}
-		touchDeltaX = 0;
-		resetAutoScroll();
-	}
+	let api = $state<CarouselAPI>();
 
 	function handleDotClick(i: number) {
-		index = i;
-		resetAutoScroll();
+		api.scrollTo(i);
 	}
 
-	onDestroy(() => stopAutoScroll());
+	let selectedSlide = $state(0);
+
+	$effect(() => {
+		if (api) {
+			selectedSlide = api.selectedScrollSnap() + 1;
+			api.on("select", () => {
+				selectedSlide = api!.selectedScrollSnap() + 1;
+			});
+		}
+	});
+
+	let autoplay = $state(true);
+
+	function toggleAutoplay() {
+		if (!api) return;
+
+		if (autoplay) {
+			api.plugins().autoplay?.stop();
+			autoplay = false;
+		} else {
+			api.plugins().autoplay?.play();
+			autoplay = true;
+		}
+	}
 </script>
 
-<div
-	class="flex flex-col {className}"
-	ontouchstart={handleTouchStart}
-	ontouchmove={handleTouchMove}
-	ontouchend={handleTouchEnd}
-	role="region"
-	aria-label="Carousel"
+<Carousel.Root
+	class={cn("w-full", className)}
+	opts={{ loop: true }}
+	setApi={(emblaApi) => (api = emblaApi)}
+	plugins={[Autoplay({ delay: autoScrollMs })]}
 >
-	<div class="grid *:[grid-area:1/1]">
+	<Carousel.Content>
 		{#each { length: count } as _, i (i)}
-			<div
-				class="transition-opacity duration-500 ease-out {i === index ? 'opacity-100' : 'opacity-0 pointer-events-none'}"
-				aria-hidden={i !== index}
-			>
-				{@render children(i)}
-			</div>
+			<Carousel.Item>
+				<div>{@render children(i)}</div>
+			</Carousel.Item>
 		{/each}
-	</div>
-
+	</Carousel.Content>
 	<!-- Dots -->
 	<div class="mt-6 flex shrink-0 items-center justify-center gap-[23px]">
 		{#each { length: count } as _, i (i)}
 			<button
 				onclick={() => handleDotClick(i)}
-				class="h-2 w-2 rounded-full transition-colors {i === index ? 'bg-muted-foreground' : 'bg-muted-foreground/50'}"
+				class="h-2 w-2 rounded-full transition-colors {selectedSlide === i + 1 ? 'bg-muted-foreground' : 'bg-muted-foreground/50'}"
 				aria-label="Slide {i + 1}"
 			></button>
 		{/each}
+		<button class="bg-muted-foreground rounded-full p-1.5 flex items-center justify-center" onclick={toggleAutoplay}>
+			{#if autoplay}
+				<Pause class="stroke-background h-1.5 w-1.5" />
+			{:else}
+				<Play class="fill-background h-1.5 w-1.5" />
+			{/if}
+		</button>
 	</div>
-</div>
+</Carousel.Root>
