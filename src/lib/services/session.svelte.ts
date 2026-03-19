@@ -1,4 +1,5 @@
 import { api, config } from './api';
+import { getCountyFromZip } from '$lib/data/utah-counties';
 
 export interface UserProfile {
 	id: string;
@@ -29,8 +30,9 @@ function loadPersistedSession(): {
 	pid?: number;
 	demographicsCompleted?: boolean;
 	totalVotes?: number;
-	hasSeenPause?: boolean;
+	hasSeenPause?: boolean; 
 	hasAgreedToTos?: boolean;
+	hasSeenComposeInstructions?: boolean;
 } {
 	if (typeof window === 'undefined') return {};
 	try {
@@ -50,6 +52,7 @@ class Session {
 	demographicsCompleted = $state(false);
 	totalVotes = $state(0);
 	hasSeenPause = $state(false);
+	hasSeenComposeInstructions = $state(false);
 	error = $state<string | null>(null);
 	loading = $state(false);
 	hasAgreedToTos = $state(false);
@@ -66,6 +69,7 @@ class Session {
 		if (saved.totalVotes) this.totalVotes = saved.totalVotes;
 		if (saved.hasSeenPause) this.hasSeenPause = saved.hasSeenPause;
 		if (saved.hasAgreedToTos) this.hasAgreedToTos = saved.hasAgreedToTos;
+		if (saved.hasSeenComposeInstructions) this.hasSeenComposeInstructions = true;
 	}
 
 	private persist() {
@@ -80,6 +84,7 @@ class Session {
 				totalVotes: this.totalVotes,
 				hasSeenPause: this.hasSeenPause,
 				hasAgreedToTos: this.hasAgreedToTos,
+				hasSeenComposeInstructions: this.hasSeenComposeInstructions
 			}));
 		} catch { /* ignore */ }
 	}
@@ -102,6 +107,15 @@ class Session {
 
 	get hasSession() {
 		return this.user !== null && !!this.zipCode;
+	}
+
+	markComposeInstructionsSeen() {
+		this.hasSeenComposeInstructions = true;
+		this.persist();
+	}
+
+	get county(): string {
+		return this.zipCode ? getCountyFromZip(this.zipCode) : 'Utah';
 	}
 
 	savePid(pid: number) {

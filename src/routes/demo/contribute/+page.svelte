@@ -3,7 +3,7 @@
 	import { cubicOut } from 'svelte/easing';
 	import { AppShell } from '$lib/components/layout';
 	import { PopQuiz, AboutBar, Header, VoteBar } from '$lib/components/ui';
-	import { county, deliberation, popQuizQuestions, aboutYouQuestions } from '$lib/data/mock';
+	import { deliberation, popQuizQuestions, aboutYouQuestions } from '$lib/data/mock';
 	import PolisApi from '$lib/services/polis-api.svelte';
 	import { session } from '$lib/services/session.svelte';
 	import { config } from '$lib/services/api';
@@ -56,7 +56,7 @@
 	let votesInRound = $state(hasSeenPause ? 0 : totalVotes);
 	// Tracks when user explicitly pressed END in this session — prevents thank-you→voting loop
 	let userEndedVoting = $state(false);
-
+	
 	// Anchor Polis counts once to avoid fluctuation from parallel vote+nextComment requests.
 	// After anchoring, we decrement client-side instead of reading polis.remaining directly.
 	let anchoredRemaining = $state<number | null>(null);
@@ -174,7 +174,7 @@
 	{:else if screen === 'voting'}
 		{#if polis.currentStatement}
 			<VotingScreen
-				countyName={county.name}
+				countyName={session.county}
 				question={deliberation.question}
 				statementText={polis.currentStatement.txt}
 				remaining={displayedRemaining}
@@ -188,7 +188,7 @@
 			<!-- Skeleton that reuses real components so layout stays in sync -->
 			<div class="flex h-full flex-col bg-muted">
 				<Header
-					countyName={county.name}
+					countyName={session.county}
 					question={deliberation.question}
 					onCompose={() => {}}
 					about
@@ -220,14 +220,15 @@
 	{:else if screen === 'compose'}
 		<ComposeScreen
 			question={deliberation.question}
-			countyName={county.name}
-			onSubmit={handleCompose}
-			onBack={() => (screen = 'voting')}
+			countyName={session.county}
+			firstVisit={!session.hasSeenComposeInstructions}
+			onSubmit={(text, anon) => { session.markComposeInstructionsSeen(); handleCompose(text, anon); }}
+			onBack={() => { session.markComposeInstructionsSeen(); screen = 'voting'; }}
 		/>
 
 	{:else if screen === 'pause'}
 		<NiceJobScreen
-			countyName={county.name}
+			countyName={session.county}
 			remaining={anchoredRemaining ?? polis.remaining}
 			onKeepVoting={resumeVoting}
 			onDone={goToEndFlow}
@@ -235,7 +236,7 @@
 
 	{:else if screen === 'about-you'}
 		<AboutYouScreen
-			countyName={county.name}
+			countyName={session.county}
 			questions={aboutYouQuestions}
 			zipCode={session.zipCode}
 			onDone={handleDemographicsDone}
@@ -243,23 +244,23 @@
 
 	{:else if screen === 'thank-you'}
 		<ThankYouScreen
-			countyName={county.name}
+			countyName={session.county}
 		/>
 
 	<!-- Preserved screens (unused in conference flow) -->
 	{:else if screen === 'did-you-know'}
 		<DidYouKnowScreen
-			countyName={county.name}
+			countyName={session.county}
 			onContinue={resumeVoting}
 		/>
 	{:else if screen === 'pop-quiz'}
 		<div class="flex h-full flex-col bg-gradient-primary" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
-			<AboutBar countyName={county.name} />
+			<AboutBar countyName={session.county} />
 			<PopQuiz quiz={currentQuiz} onContinue={resumeVoting} onSkip={resumeVoting} />
 		</div>
 	{:else if screen === 'nice-job'}
 		<NiceJobScreen
-			countyName={county.name}
+			countyName={session.county}
 			onKeepVoting={resumeVoting}
 			onDone={handleEnd}
 		/>
