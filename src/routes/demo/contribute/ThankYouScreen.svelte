@@ -40,9 +40,8 @@
 </script>
 
 <div class="flex h-full flex-col bg-gradient-primary" in:scale={{ start: 0.9, duration: 500, easing: cubicOut }}>
-	<AboutBar {countyName} />
-
 	<div class="flex flex-1 flex-col overflow-y-auto">
+		<AboutBar {countyName} onBack={onBackToVoting} />
 		<!-- Hero: emoji + heading -->
 		<div class="flex flex-col items-center px-8 pt-8">
 			<EmojiCircle emoji="🎉" size="lg" />
@@ -91,15 +90,6 @@
 			</div>
 		{/if}
 
-		<!-- Back to Conversation button -->
-		{#if onBackToVoting}
-			<div class="mt-3 px-7">
-				<Button variant="secondary" fullWidth onclick={onBackToVoting}>
-					BACK TO CONVERSATION
-				</Button>
-			</div>
-		{/if}
-
 		<!-- Live Conversations section -->
 		<div class="mt-8 px-7 pb-8">
 			<div class="flex items-center gap-2">
@@ -113,6 +103,12 @@
 				</p>
 				<p class="mt-4">
 					The ultimate goal of this campaign is to surface common ground that lets Utahns take action from the local to state levels and beyond. If you are interested in getting involved in a deeper way, let us know at <Link href="mailto:hello@bloom-project.org" external class="font-bold">hello@bloom-project.org</Link>.
+				</p>
+			
+				<div class="mt-8 outline-[0.5px] outline-foreground/40"></div>
+
+				<p class="mt-14">
+					Have some feedback or ideas? <Link href="https://form.jotform.com/260746654096062" external class="font-bold">Fill out a survey</Link> about your experience with this website.
 				</p>
 			</div>
 		</div>
