@@ -101,16 +101,23 @@ export const aboutYouQuestions: AboutYouQuestion[] = [
 	},
 	{
 		id: 'about-002',
-		question: 'Select your ethnicity.',
+		question: 'What is your ethnicity?',
 		description: 'Select the one that best describes you.',
-		options: ['White', 'Black / African American', 'Hispanic / Latino', 'Asian / Pacific Islander', 'Middle Eastern / North African', 'Native American', 'Multiple ethnicities', 'Other'],
+		options: ['White', 'Black', 'Hispanic', 'Asian / Pacific Islander', 'Native American', 'Middle Eastern / North African', 'Multiracial', 'Other'],
 		multiSelect: false
 	},
 	{
 		id: 'about-003',
-		question: 'What is your gender?',
+		question: 'What is your gender identity?',
 		description: 'Select the one that best describes you.',
-		options: ['Male', 'Female', 'Non-binary', 'Prefer not to say'],
+		options: ['Male', 'Female', 'Nonbinary', 'Other'],
+		multiSelect: false
+	},
+	{
+		id: 'about-004',
+		question: 'Which of the following best describes your political leaning?',
+		description: 'Select the one that best describes you.',
+		options: ['Republican / Conservative', 'Democrat / Progressive / Liberal', 'No Party Preference / Independent'],
 		multiSelect: false
 	}
 ];
