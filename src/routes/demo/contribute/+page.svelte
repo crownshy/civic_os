@@ -140,7 +140,7 @@
 		goToEndFlow();
 	}
 
-	async function handleDemographicsDone(demographics?: { age?: string; ethnicity?: string; gender?: string }) {
+	async function handleDemographicsDone(demographics?: { age?: string; ethnicity?: string; gender?: string; politicalParty?: string }) {
 		// Save demographics to backend profile (awaited so it completes before navigation)
 		if (demographics) {
 			await session.saveProfile({

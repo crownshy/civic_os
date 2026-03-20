@@ -3,14 +3,14 @@
     import { cubicOut } from 'svelte/easing';
     import { SvelteSet } from 'svelte/reactivity';
     import type { AboutYouQuestion } from '$lib/types/mock-data';
-    import { AboutBar, Button, Dialog } from '$lib/components/ui';
+    import { AboutBar, Button, Dialog, Link } from '$lib/components/ui';
     import { Check, Plus } from 'lucide-svelte';
 
     interface Props {
         countyName: string;
         questions: AboutYouQuestion[];
         zipCode?: string;
-        onDone: (demographics?: { age?: string; ethnicity?: string; gender?: string }) => void;
+        onDone: (demographics?: { age?: string; ethnicity?: string; gender?: string; politicalParty?: string }) => void;
         onSkip?: () => void;
     }
 
@@ -52,15 +52,16 @@
         return !!sel && sel.size > 0;
     }
 
-    function getCategoryLabel(q: AboutYouQuestion): string {
-        if (q.id === 'about-001') return 'Age?';
-        if (q.id === 'about-002') return 'Ethnicity?';
-        if (q.id === 'about-003') return 'Gender?';
+    function getCategoryTitle(q: AboutYouQuestion): string {
+        if (q.id === 'about-001') return 'Age';
+        if (q.id === 'about-002') return 'Ethnicity';
+        if (q.id === 'about-003') return 'Gender';
+        if (q.id === 'about-004') return 'Political Party';
         return q.question;
     }
 
-    function collectDemographics(): { age?: string; ethnicity?: string; gender?: string } {
-        const result: { age?: string; ethnicity?: string; gender?: string } = {};
+    function collectDemographics(): { age?: string; ethnicity?: string; gender?: string; politicalParty?: string } {
+        const result: { age?: string; ethnicity?: string; gender?: string; politicalParty?: string } = {};
         for (const q of questions) {
             const sel = selections[q.id];
             if (!sel || sel.size === 0) continue;
@@ -68,6 +69,7 @@
             if (q.id === 'about-001') result.age = values;
             else if (q.id === 'about-002') result.ethnicity = values;
             else if (q.id === 'about-003') result.gender = values;
+            else if (q.id === 'about-004') result.politicalParty = values;
         }
         return result;
     }
@@ -95,7 +97,7 @@
             class="mt-3 font-sans text-sm font-medium text-foreground"
             in:fly={{ y: 10, duration: 400, delay: 300, easing: cubicOut }}
         >
-            This information helps us make sure everyone is represented in the conversation. You can share only as much as you'd like to.
+            This information helps us make sure everyone is represented in the conversation. Share only as much as you'd like to, and you have full control over your data. See our full privacy terms <Link href="https://app.termly.io/policy-viewer/policy.html?policyUUID=ba402bb7-5499-4b37-860b-bbb507d3c3c1" external>here</Link>.
         </p>
 
         <div class="mt-8 flex flex-col gap-2 pb-12">
@@ -116,7 +118,7 @@
                         </span>
                     {:else}
                         <span class="absolute left-6 right-16 truncate">
-                            {getCategoryLabel(q)}
+                            {getCategoryTitle(q)}?
                         </span>
                         <span class="absolute right-5 flex h-8 w-8 items-center justify-center rounded-full bg-foreground/40">
                             <Plus class="h-3 w-3 text-accent stroke-3" />
@@ -138,8 +140,8 @@
     {@const dq = dialogQuestion}
     <Dialog
         open={dialogOpen}
-        title={dq.question}
-        description={dq.description}
+        title={getCategoryTitle(dq)}
+        description={dq.question}
         buttonText="SUBMIT"
         onButtonClick={closeDialog}
         onOpenChange={(v) => { if (!v) closeDialog(); }}
