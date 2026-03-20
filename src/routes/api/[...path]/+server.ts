@@ -14,6 +14,10 @@ const handler: RequestHandler = async ({ request, params, cookies }) => {
 	const contentType = request.headers.get('content-type');
 	if (contentType) headers.set('content-type', contentType);
 
+	// Forward origin header so backend CORS accepts the request
+	const origin = request.headers.get('origin') || url.origin;
+	headers.set('origin', origin);
+
 	const authToken = cookies.get('auth-token');
 	if (authToken) {
 		headers.set('cookie', `auth-token=${authToken}`);
