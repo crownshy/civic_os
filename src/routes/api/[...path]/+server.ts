@@ -28,9 +28,43 @@ const handler: RequestHandler = async ({ request, params, cookies }) => {
 	const responseHeaders = new Headers();
 	responseHeaders.set('content-type', res.headers.get('content-type') || 'application/json');
 
+	// Parse and set cookies properly for same-origin (fixes Safari iOS)
 	const setCookies = res.headers.getSetCookie?.() ?? [];
-	for (const cookie of setCookies) {
-		responseHeaders.append('set-cookie', cookie);
+	for (const cookieHeader of setCookies) {
+		// Parse cookie name and value
+		const [nameValue, ...attributes] = cookieHeader.split(';').map(s => s.trim());
+		const [name, value] = nameValue.split('=');
+
+		// Extract relevant attributes
+		let maxAge: number | undefined;
+		let path = '/';
+		let httpOnly = false;
+		let secure = false;
+
+		for (const attr of attributes) {
+			const [key, val] = attr.split('=').map(s => s.trim());
+			const lowerKey = key.toLowerCase();
+
+			if (lowerKey === 'max-age' && val) {
+				maxAge = parseInt(val);
+			} else if (lowerKey === 'path' && val) {
+				path = val;
+			} else if (lowerKey === 'httponly') {
+				httpOnly = true;
+			} else if (lowerKey === 'secure') {
+				secure = true;
+			}
+			// Ignore SameSite, Domain, etc. - let SvelteKit handle them for same-origin
+		}
+
+		// Use SvelteKit's cookies API to set same-origin cookies
+		cookies.set(name, value, {
+			path,
+			httpOnly,
+			secure,
+			maxAge,
+			sameSite: 'lax' // Use Lax for same-origin (Safari iOS friendly)
+		});
 	}
 
 	return new Response(res.body, {
