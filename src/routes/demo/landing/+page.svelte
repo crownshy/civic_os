@@ -151,6 +151,7 @@
         title="Our Approach to Personal Data"
         buttonText="I AGREE TO THESE TERMS"
         onButtonClick={handleAgreeToTos}
+        requireScrollToBottom
     >
         <div class="px-7 pt-6">
             <p class="font-sans text-lg font-medium leading-7">

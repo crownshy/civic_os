@@ -12,6 +12,7 @@
 		onButtonClick?: () => void;
 		onOpenChange?: (open: boolean) => void;
 		centered?: boolean;
+		requireScrollToBottom?: boolean;
 		class?: string;
 		children: Snippet;
 		footer?: Snippet;
@@ -25,15 +26,41 @@
 		onButtonClick,
 		onOpenChange,
 		centered = false,
+		requireScrollToBottom = false,
 		class: className,
 		children,
 		footer
 	}: Props = $props();
 
+	let hasScrolledToBottom = $state(false);
+	let scrollEl: HTMLDivElement | undefined = $state();
+
+	$effect(() => {
+		if (open) {
+			hasScrolledToBottom = false;
+		}
+	});
+
+	function handleScroll() {
+		if (!requireScrollToBottom || !scrollEl) return;
+		const { scrollTop, scrollHeight, clientHeight } = scrollEl;
+		if (scrollTop + clientHeight >= scrollHeight - 20) {
+			hasScrolledToBottom = true;
+		}
+	}
+
+	let buttonDisabled = $derived(requireScrollToBottom && !hasScrolledToBottom);
+
 	function handleClose() {
 		open = false;
 		onOpenChange?.(false);
 		onButtonClick?.();
+	}
+
+	function handleOpenAutoFocus(e: Event) {
+		e.preventDefault();
+		const content = (e.target as HTMLElement);
+		content?.focus({ preventScroll: true });
 	}
 
 	function handleBitsOpenChange(value: boolean) {
@@ -68,7 +95,7 @@
 					{#if footer}
 						{@render footer()}
 					{:else}
-						<Button variant="primary" fullWidth onclick={handleClose}>
+						<Button variant="primary" fullWidth disabled={buttonDisabled} onclick={handleClose}>
 							{buttonText}
 						</Button>
 					{/if}
@@ -79,10 +106,11 @@
 				class="fixed inset-0 z-50 bg-gradient-primary backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 duration-300"
 			/>
 			<DialogPrimitive.Content
+				onOpenAutoFocus={handleOpenAutoFocus}
 				class="fixed inset-0 z-50 mx-auto flex max-w-[800px] flex-col pb-5 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4 duration-300"
 			>
 				<div class={cn('mx-4 mt-4 flex flex-1 flex-col overflow-hidden rounded-[20px] bg-card outline-2 -outline-offset-2 outline-card', className)}>
-					<div class="flex-1 overflow-y-auto pt-10">
+					<div bind:this={scrollEl} onscroll={handleScroll} class="flex-1 overflow-y-auto pt-10">
 						<DialogPrimitive.Title class="px-7 font-sans text-4xl font-bold leading-10 text-card-foreground">
 							{title}
 						</DialogPrimitive.Title>
@@ -97,7 +125,7 @@
 						{#if footer}
 							{@render footer()}
 						{:else}
-							<Button variant="primary" fullWidth onclick={handleClose}>
+							<Button variant="primary" fullWidth disabled={buttonDisabled} onclick={handleClose}>
 								{buttonText}
 							</Button>
 						{/if}
