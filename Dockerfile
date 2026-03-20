@@ -15,6 +15,13 @@ FROM base AS build
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 WORKDIR /app
 
+# Set placeholder environment variables for build
+# These will be overridden at runtime
+ENV PUBLIC_CONVERSATION_ID=""
+ENV PUBLIC_INVITE_ID=""
+ENV PUBLIC_POLIS_URL=""
+ENV PUBLIC_POLIS_ID=""
+
 # Copy all project files
 COPY . .
 
