@@ -1,5 +1,5 @@
 import { createApiClient } from '@crownshy/api-client/client';
-import { PUBLIC_CONVERSATION_ID, PUBLIC_INVITE_ID, PUBLIC_POLIS_URL, PUBLIC_POLIS_ID } from '$env/static/public';
+import { PUBLIC_CONVERSATION_ID, PUBLIC_INVITE_ID, PUBLIC_POLIS_URL, PUBLIC_POLIS_ID } from '$env/dynamic/public';
 
 export const api = createApiClient('/api', undefined, 'client');
 
