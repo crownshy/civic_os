@@ -3,7 +3,7 @@
     import { cubicOut } from 'svelte/easing';
     import { SvelteSet } from 'svelte/reactivity';
     import type { AboutYouQuestion } from '$lib/types/mock-data';
-    import { AboutBar, Button, Dialog, Link } from '$lib/components/ui';
+    import { AboutBar, Button, Dialog } from '$lib/components/ui';
     import { Check, Plus } from 'lucide-svelte';
 
     interface Props {
@@ -92,10 +92,10 @@
         </p>
         
         <p
-            class="mt-3 font-sans text-sm font-medium text-foreground/80"
+            class="mt-3 font-sans text-sm font-medium text-foreground"
             in:fly={{ y: 10, duration: 400, delay: 300, easing: cubicOut }}
         >
-            This information helps us make sure everyone is represented in the conversation. Share only as much as you’d like to, and you have full control over your data. See our full privacy terms <Link href="https://app.termly.io/policy-viewer/policy.html?policyUUID=ba402bb7-5499-4b37-860b-bbb507d3c3c1" external>here</Link>.
+            This information helps us make sure everyone is represented in the conversation. You can share only as much as you'd like to.
         </p>
 
         <div class="mt-8 flex flex-col gap-2 pb-12">
@@ -112,14 +112,14 @@
                             {getSelectionLabel(q)}
                         </span>
                         <span class="absolute right-5 flex h-8 w-8 items-center justify-center rounded-full bg-foreground">
-                            <Check class="h-4 w-4 text-card stroke-4" />
+                            <Check class="h-3.5 w-3.5 text-card stroke-3" />
                         </span>
                     {:else}
                         <span class="absolute left-6 right-16 truncate">
                             {getCategoryLabel(q)}
                         </span>
-                        <span class="absolute right-5 flex h-8 w-8 items-center justify-center rounded-full bg-foreground opacity-40">
-                            <Plus class="h-4 w-4 text-card stroke-4" />
+                        <span class="absolute right-5 flex h-8 w-8 items-center justify-center rounded-full bg-foreground/40">
+                            <Plus class="h-3 w-3 text-accent stroke-3" />
                         </span>
                     {/if}
                 </button>
@@ -144,22 +144,22 @@
         onButtonClick={closeDialog}
         onOpenChange={(v) => { if (!v) closeDialog(); }}
     >
-    <div class="mt-10">
+    <div class="mt-6">
         {#each dq.options as option, i (option)}
             <button
                 onclick={() => toggleOption(dq.id, i, dq.multiSelect)}
-                class="relative flex px-8 h-16 w-full items-center border-b border-foreground/20 text-left font-sans text-lg font-bold leading-5 text-foreground/70 transition-colors hover:bg-secondary/5"
+                class="relative flex h-16 w-full items-center border-b border-foreground/20 px-7 text-left font-sans text-lg font-bold leading-5 transition-colors hover:bg-accent/30 {(selections[dq.id] ?? new SvelteSet()).has(i)
+                    ? 'bg-accent/30 text-foreground'
+                    : 'text-foreground/70'}"
             >
                 <span class="flex-1">{option}</span>
-                <span
-                    class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-all duration-200 {(selections[dq.id] ?? new SvelteSet()).has(i)
-                        ? 'bg-foreground'
-                        : 'bg-foreground/30'}"
-                >
-                    {#if (selections[dq.id] ?? new SvelteSet()).has(i)}
-                        <Plus class="h-3 w-3 text-card stroke-4" />
-                    {/if}
-                </span>
+                {#if (selections[dq.id] ?? new SvelteSet()).has(i)}
+                    <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-foreground">
+                        <Check class="h-2.5 w-2.5 text-card stroke-[2.5]" />
+                    </span>
+                {:else}
+                    <span class="h-5 w-5 shrink-0 rounded-full border-2 border-foreground/50"></span>
+                {/if}
             </button>
         {/each}
     </div>
