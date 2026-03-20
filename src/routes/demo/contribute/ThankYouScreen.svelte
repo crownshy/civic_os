@@ -43,7 +43,7 @@
 	<div class="flex flex-1 flex-col overflow-y-auto">
 		<AboutBar {countyName} onBack={onBackToVoting} />
 		<!-- Hero: emoji + heading -->
-		<div class="flex flex-col items-center px-8 pt-8">
+		<div class="flex flex-col items-center px-8 pt-14">
 			<EmojiCircle emoji="🎉" size="lg" />
 
 			<h1 class="mt-6 text-center font-sans text-4xl font-bold leading-10 text-foreground">
