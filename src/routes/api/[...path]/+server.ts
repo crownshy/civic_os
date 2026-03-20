@@ -11,8 +11,6 @@ const handler: RequestHandler = async ({ request, params, cookies }) => {
 	const url = new URL(request.url);
 	const fullTarget = url.search ? `${target}${url.search}` : target;
 
-	console.log('[Proxy]', request.method, fullTarget);
-
 	const headers = new Headers();
 	const contentType = request.headers.get('content-type');
 	if (contentType) headers.set('content-type', contentType);
@@ -31,8 +29,6 @@ const handler: RequestHandler = async ({ request, params, cookies }) => {
 		headers,
 		body: request.method !== 'GET' && request.method !== 'HEAD' ? await request.text() : undefined
 	});
-
-	console.log('[Proxy] Response:', res.status, res.statusText);
 
 	const responseHeaders = new Headers();
 	responseHeaders.set('content-type', res.headers.get('content-type') || 'application/json');
