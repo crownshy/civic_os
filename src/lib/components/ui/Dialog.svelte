@@ -38,6 +38,11 @@
 	$effect(() => {
 		if (open) {
 			hasScrolledToBottom = false;
+			requestAnimationFrame(() => {
+				if (scrollEl && scrollEl.scrollHeight <= scrollEl.clientHeight) {
+					hasScrolledToBottom = true;
+				}
+			});
 		}
 	});
 

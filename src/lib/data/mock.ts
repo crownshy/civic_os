@@ -95,29 +95,22 @@ export const aboutYouQuestions: AboutYouQuestion[] = [
 	{
 		id: 'about-001',
 		question: 'What is your age?',
-		description: 'This information helps us make sure everyone is represented in the conversation. You can revoke access to this at any time.',
+		description: 'Select the one that best describes you.',
 		options: ['Under 18', '18 - 34', '35 - 54', '55 - 64', '65+'],
 		multiSelect: false
 	},
 	{
 		id: 'about-002',
-		question: 'What is your ethnicity?',
-		description: 'Select all that apply.',
-		options: ['White', 'Black', 'Hispanic', 'Asian / Pacific Islander', 'Native American', 'Middle Eastern / North African', 'Multiracial', 'Other'],
-		multiSelect: true
-	},
-	{
-		id: 'about-003',
-		question: 'What is your gender identity?',
-		description: 'This information helps us make sure everyone is represented in the conversation. You can revoke access to this at any time.',
-		options: ['Male', 'Female', 'Nonbinary', 'Other'],
+		question: 'Select your ethnicity.',
+		description: 'Select the one that best describes you.',
+		options: ['White', 'Black / African American', 'Hispanic / Latino', 'Asian / Pacific Islander', 'Middle Eastern / North African', 'Native American', 'Multiple ethnicities', 'Other'],
 		multiSelect: false
 	},
 	{
-		id: 'about-004',
-		question: 'Which of the following best describes your political leaning?',
-		description: 'This information helps us make sure everyone is represented in the conversation. You can revoke access to this at any time.',
-		options: ['Republican / Conservative', 'Democrat / Progressive / Liberal', 'No Party Preference / Independent'],
+		id: 'about-003',
+		question: 'What is your gender?',
+		description: 'Select the one that best describes you.',
+		options: ['Male', 'Female', 'Non-binary', 'Prefer not to say'],
 		multiSelect: false
 	}
 ];

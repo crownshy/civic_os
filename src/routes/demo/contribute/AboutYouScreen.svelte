@@ -1,43 +1,78 @@
 <script lang="ts">
     import { fly } from 'svelte/transition';
     import { cubicOut } from 'svelte/easing';
-    import { Select } from 'bits-ui';
+    import { SvelteSet } from 'svelte/reactivity';
     import type { AboutYouQuestion } from '$lib/types/mock-data';
-    import { AboutBar, Button, Link } from '$lib/components/ui';
+    import { AboutBar, Button, Dialog } from '$lib/components/ui';
     import { Check, Plus } from 'lucide-svelte';
 
     interface Props {
         countyName: string;
         questions: AboutYouQuestion[];
         zipCode?: string;
-        onDone: (demographics?: { age?: string; ethnicity?: string; gender?: string; politicalParty?: string }) => void;
+        onDone: (demographics?: { age?: string; ethnicity?: string; gender?: string }) => void;
         onSkip?: () => void;
     }
 
     let { countyName, questions, zipCode = '', onDone, onSkip }: Props = $props();
 
-    let selections = $state<Record<string, string>>({});
+    let openDialog = $state<string | null>(null);
+    let dialogOpen = $derived(openDialog !== null);
+    let selections = $state<Record<string, SvelteSet<number>>>({});
+
+    function openCategory(id: string) {
+        openDialog = id;
+    }
+
+    function closeDialog() {
+        openDialog = null;
+    }
+
+    function toggleOption(questionId: string, idx: number, multiSelect: boolean) {
+        const current = selections[questionId] ?? new SvelteSet<number>();
+        const next = new SvelteSet(current);
+        if (multiSelect) {
+            if (next.has(idx)) next.delete(idx);
+            else next.add(idx);
+        } else {
+            next.clear();
+            next.add(idx);
+        }
+        selections = { ...selections, [questionId]: next };
+    }
+
+    function getSelectionLabel(q: AboutYouQuestion): string {
+        const sel = selections[q.id];
+        if (!sel || sel.size === 0) return '';
+        return [...sel].map((i) => q.options[i]).join(', ');
+    }
+
+    function hasSelection(questionId: string): boolean {
+        const sel = selections[questionId];
+        return !!sel && sel.size > 0;
+    }
 
     function getCategoryLabel(q: AboutYouQuestion): string {
         if (q.id === 'about-001') return 'Age?';
         if (q.id === 'about-002') return 'Ethnicity?';
         if (q.id === 'about-003') return 'Gender?';
-        if (q.id === 'about-004') return 'Political Party?';
         return q.question;
     }
 
-    function collectDemographics(): { age?: string; ethnicity?: string; gender?: string; politicalParty?: string } {
-        const result: { age?: string; ethnicity?: string; gender?: string; politicalParty?: string } = {};
+    function collectDemographics(): { age?: string; ethnicity?: string; gender?: string } {
+        const result: { age?: string; ethnicity?: string; gender?: string } = {};
         for (const q of questions) {
-            const val = selections[q.id];
-            if (!val) continue;
-            if (q.id === 'about-001') result.age = val;
-            else if (q.id === 'about-002') result.ethnicity = val;
-            else if (q.id === 'about-003') result.gender = val;
-            else if (q.id === 'about-004') result.politicalParty = val;
+            const sel = selections[q.id];
+            if (!sel || sel.size === 0) continue;
+            const values = [...sel].map((i) => q.options[i]).join(', ');
+            if (q.id === 'about-001') result.age = values;
+            else if (q.id === 'about-002') result.ethnicity = values;
+            else if (q.id === 'about-003') result.gender = values;
         }
         return result;
     }
+
+    let dialogQuestion = $derived(openDialog ? questions.find((q) => q.id === openDialog) : null);
 </script>
 
 <div class="flex h-full flex-col bg-gradient-primary">
@@ -57,66 +92,37 @@
         </p>
         
         <p
-            class="mt-3 font-sans text-sm font-medium text-foreground/80"
+            class="mt-3 font-sans text-sm font-medium text-foreground"
             in:fly={{ y: 10, duration: 400, delay: 300, easing: cubicOut }}
         >
-            This information helps us make sure everyone is represented in the conversation. Share only as much as you'd like to, and you have full control over your data. See our full privacy terms <Link href="https://app.termly.io/policy-viewer/policy.html?policyUUID=ba402bb7-5499-4b37-860b-bbb507d3c3c1" external>here</Link>.
+            This information helps us make sure everyone is represented in the conversation. You can share only as much as you'd like to.
         </p>
 
         <div class="mt-8 flex flex-col gap-2 pb-12">
             {#each questions as q, qIdx (q.id)}
-                <div
+                <button
+                    onclick={() => openCategory(q.id)}
+                    class="relative flex h-16 w-full items-center rounded-[20px] text-left font-sans text-2xl font-bold leading-7 transition-all duration-300 {hasSelection(q.id)
+                        ? 'bg-card text-foreground shadow-[0px_5px_15px_0px_rgba(12,34,95,0.13)]'
+                        : 'bg-secondary/10 text-foreground/70 hover:bg-secondary/15'}"
                     in:fly={{ y: 15, delay: 400 + qIdx * 80, duration: 400, easing: cubicOut }}
                 >
-                    <Select.Root
-                        type="single"
-                        onValueChange={(val) => {
-                            if (val) selections = { ...selections, [q.id]: val };
-                        }}
-                    >
-                        <Select.Trigger
-                            class="flex h-16 w-full cursor-pointer items-center rounded-[20px] pl-6 pr-5 transition-all duration-300 focus:outline-none {selections[q.id]
-                                ? 'bg-card text-foreground shadow-[0px_5px_15px_0px_rgba(12,34,95,0.13)]'
-                                : 'bg-secondary/10 text-foreground/70'}"
-                        >
-                            <span class="flex-1 truncate text-left font-sans text-2xl font-bold leading-7">
-                                {selections[q.id] ?? getCategoryLabel(q)}
-                            </span>
-                            {#if selections[q.id]}
-                                <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground">
-                                    <Check class="h-3.5 w-3.5 text-card stroke-3" />
-                                </span>
-                            {:else}
-                                <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground/40">
-                                    <Plus class="h-3.5 w-3.5 text-accent stroke-3" />
-                                </span>
-                            {/if}
-                        </Select.Trigger>
-                        <Select.Portal>
-                            <Select.Content
-                                class="z-50 min-w-[340px] max-h-72 overflow-y-auto rounded-2xl border border-foreground/10 bg-card shadow-xl"
-                                sideOffset={4}
-                            >
-                                <Select.Viewport>
-                                    {#each q.options as option (option)}
-                                        <Select.Item
-                                            value={option}
-                                            label={option}
-                                            class="flex cursor-pointer items-center px-5 py-3.5 font-sans text-lg font-medium text-foreground/80 transition-colors hover:bg-secondary/10 data-highlighted:bg-secondary/10"
-                                        >
-                                            {#snippet children({ selected })}
-                                                <span class="flex-1">{option}</span>
-                                                {#if selected}
-                                                    <Check class="h-4 w-4 text-foreground stroke-3" />
-                                                {/if}
-                                            {/snippet}
-                                        </Select.Item>
-                                    {/each}
-                                </Select.Viewport>
-                            </Select.Content>
-                        </Select.Portal>
-                    </Select.Root>
-                </div>
+                    {#if hasSelection(q.id)}
+                        <span class="absolute left-6 right-16 truncate">
+                            {getSelectionLabel(q)}
+                        </span>
+                        <span class="absolute right-5 flex h-8 w-8 items-center justify-center rounded-full bg-foreground">
+                            <Check class="h-3.5 w-3.5 text-card stroke-3" />
+                        </span>
+                    {:else}
+                        <span class="absolute left-6 right-16 truncate">
+                            {getCategoryLabel(q)}
+                        </span>
+                        <span class="absolute right-5 flex h-8 w-8 items-center justify-center rounded-full bg-foreground/40">
+                            <Plus class="h-3 w-3 text-accent stroke-3" />
+                        </span>
+                    {/if}
+                </button>
             {/each}
         </div>
     </div>
@@ -127,3 +133,35 @@
         </Button>
     </div>
 </div>
+
+{#if dialogQuestion}
+    {@const dq = dialogQuestion}
+    <Dialog
+        open={dialogOpen}
+        title={dq.question}
+        description={dq.description}
+        buttonText="SUBMIT"
+        onButtonClick={closeDialog}
+        onOpenChange={(v) => { if (!v) closeDialog(); }}
+    >
+    <div class="mt-6">
+        {#each dq.options as option, i (option)}
+            <button
+                onclick={() => toggleOption(dq.id, i, dq.multiSelect)}
+                class="relative flex h-16 w-full items-center border-b border-foreground/20 px-7 text-left font-sans text-lg font-bold leading-5 transition-colors hover:bg-accent/30 {(selections[dq.id] ?? new SvelteSet()).has(i)
+                    ? 'bg-accent/30 text-foreground'
+                    : 'text-foreground/70'}"
+            >
+                <span class="flex-1">{option}</span>
+                {#if (selections[dq.id] ?? new SvelteSet()).has(i)}
+                    <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-foreground">
+                        <Check class="h-2.5 w-2.5 text-card stroke-[2.5]" />
+                    </span>
+                {:else}
+                    <span class="h-5 w-5 shrink-0 rounded-full border-2 border-foreground/50"></span>
+                {/if}
+            </button>
+        {/each}
+    </div>
+    </Dialog>
+{/if}
