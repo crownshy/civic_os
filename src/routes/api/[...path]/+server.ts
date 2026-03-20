@@ -5,7 +5,8 @@ const BACKEND_URL = env.API_URL || 'http://localhost:3000';
 
 const handler: RequestHandler = async ({ request, params, cookies }) => {
 	const path = params.path;
-	const target = `${BACKEND_URL}/${path}`;
+	// Backend API expects /api prefix
+	const target = `${BACKEND_URL}/api/${path}`;
 
 	const url = new URL(request.url);
 	const fullTarget = url.search ? `${target}${url.search}` : target;
