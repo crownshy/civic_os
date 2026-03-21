@@ -30,7 +30,7 @@ function loadPersistedSession(): {
 	pid?: number;
 	demographicsCompleted?: boolean;
 	totalVotes?: number;
-	hasSeenPause?: boolean; 
+	hasSeenPause?: boolean;
 	hasAgreedToTos?: boolean;
 	hasSeenComposeInstructions?: boolean;
 } {
@@ -213,13 +213,15 @@ class Session {
 		ethnicity?: string;
 		gender?: string;
 		consented?: boolean;
+		politicalParty?: string;
 	}): Promise<boolean> {
 		const body = {
 			zipcode: data.zipcode ?? null,
 			age: data.age ?? null,
 			ethnicity: data.ethnicity ?? null,
 			gender: data.gender ?? null,
-			consented: data.consented ?? true
+			consented: data.consented ?? true,
+			politicalParty: data.politicalParty ?? null
 		};
 		try {
 			const res = await api.UpsertUserProfile(body)

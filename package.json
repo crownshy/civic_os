@@ -66,7 +66,7 @@
 		"vitest-browser-svelte": "^2.0.2"
 	},
 	"dependencies": {
-		"@crownshy/api-client": "^0.0.2",
+		"@crownshy/api-client": "^0.0.3",
 		"bits-ui": "^2.15.7",
 		"clsx": "^2.1.1",
 		"embla-carousel-autoplay": "^8.6.0",
