@@ -146,7 +146,8 @@
 			await session.saveProfile({
 				age: demographics.age ? parseInt(demographics.age, 10) || undefined : undefined,
 				ethnicity: demographics.ethnicity || undefined,
-				gender: demographics.gender || undefined
+				gender: demographics.gender || undefined,
+				politicalParty: demographics.politicalParty || undefined
 			});
 		}
 
