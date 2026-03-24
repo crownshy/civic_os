@@ -19,7 +19,7 @@
 	console.log("config ", config, userId, )
 
 	// Pass persisted pid so returning users only see unvoted statements
-	let polis = new PolisApi(userId, config.polisId, 'en', config.polisUrl, session.pid);
+	let polis = new PolisApi(userId, config.polisId, 'en', session.pid);
 
 	// Sync pid back to session whenever Polis assigns/updates it
 	$effect(() => {
