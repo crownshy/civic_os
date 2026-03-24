@@ -35,11 +35,12 @@ export default class PolisApi {
 		baseUrl: string = 'https://polis.comhairle.scot',
 		initialPid?: number
 	) {
+		console.log("base URL", baseUrl)
 		this.polisId = polisId;
 		this.userId = userId;
 		this.lang = lang;
 		this.baseUrl = 'https://polis.comhairle.scot';
-		console.log("baseurl ", this.baseUrl, this.polisId)
+		console.log("baseurl [v2-hardcoded]", this.baseUrl, this.polisId)
 		if (initialPid !== undefined) this.pid = initialPid;
 		this.tryToGetPidForXid();
 		this.fetchNextStatement();
