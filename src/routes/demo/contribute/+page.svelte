@@ -16,6 +16,8 @@
 	// Use session user ID for Polis xid (falls back to random if not yet joined)
 	const userId = session.userId ?? `bloom-anon-${Math.random().toString(36).slice(2, 8)}`;
 
+	console.log("config ", config, userId, )
+
 	// Pass persisted pid so returning users only see unvoted statements
 	let polis = new PolisApi(userId, config.polisId, 'en', config.polisUrl, session.pid);
 
