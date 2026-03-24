@@ -37,8 +37,12 @@ export default class PolisApi {
 		this.polisId = polisId;
 		this.userId = userId;
 		this.lang = lang;
-		this.baseUrl = 'https://polis.comhairle.scot';
-		console.log("baseurl [v3-fixed]", this.baseUrl, this.polisId)
+		const hardcoded = 'https://polis.comhairle.scot';
+		console.log("[DEBUG] About to assign:", hardcoded);
+		this.baseUrl = hardcoded;
+		console.log("[DEBUG] After assignment:", this.baseUrl);
+		console.log("[DEBUG] Are they equal?", this.baseUrl === hardcoded);
+		console.log("baseurl [v4-debug]", this.baseUrl, this.polisId)
 		if (initialPid !== undefined) this.pid = initialPid;
 		this.tryToGetPidForXid();
 		this.fetchNextStatement();
