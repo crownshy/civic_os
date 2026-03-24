@@ -39,6 +39,7 @@ export default class PolisApi {
 		this.userId = userId;
 		this.lang = lang;
 		this.baseUrl = baseUrl;
+		console.log("baseurl ", this.baseUrl, this.polisId)
 		if (initialPid !== undefined) this.pid = initialPid;
 		this.tryToGetPidForXid();
 		this.fetchNextStatement();
