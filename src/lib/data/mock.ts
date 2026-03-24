@@ -17,7 +17,7 @@ export const county: County = {
 export const deliberation: Deliberation = {
 	id: 'delib-001',
 	title: 'AI & Online Safety',
-	question: 'How can Utahns ensure benefits of AI are widely shared and risks are responsibly managed?',
+	question: 'How should AI care for our communities, and who gets to decide?',
 	county
 };
 

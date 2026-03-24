@@ -2,20 +2,18 @@
     import { fade } from 'svelte/transition';
     import { goto } from '$app/navigation';
     import { AppShell } from '$lib/components/layout';
-    import { SwipeCarousel, Button, Dialog, ZipInput, Link } from '$lib/components/ui';
+    import { SwipeCarousel, Button, Dialog, Link } from '$lib/components/ui';
     import { session } from '$lib/services/session.svelte';
 
     const slides: string[] = [
-        'This conversation is about how Utahns can direct the growing impact of artificial intelligence to benefit our communities.',
-        'You’ll see statements from your neighbors and other community members about this question. You can vote: agree, disagree, or unsure on each one.',
-        'This “Open Poll” will reveal shared concerns and values that will be the basis of action-oriented community conversations in the coming months.',
+        'This conversation is about how AI can enter the loop of communities, rather than the other way around. We want to hear from everyone, whether you work in technology, care, education, or simply live alongside it.',
+        'You will see statements about AI and community life. You can vote: agree, disagree, or pass on each one. There are no wrong answers.',
+        'This Open Poll will reveal shared concerns and values. The results will feed directly into live conversations at the Civic AI Conference at Rhodes House, Oxford, and into ongoing work on how AI can support relational health.',
     ];
 
     const isReturning = session.hasSession;
 
     // --- Flow steps ---
-    let zipCode = $state(isReturning ? session.zipCode : '');
-    let hasZip = $derived(!!zipCode.trim());
     let slideIndex = $state(0);
     let joining = $state(false);
     let showHostMessage = $state(false);
@@ -37,7 +35,7 @@
             return;
         }
         joining = true;
-        const success = await session.join(zipCode.trim());
+        const success = await session.join('');
         joining = false;
         if (success) {
             goto('/demo/contribute');
@@ -59,7 +57,7 @@
                 </div>
                 <div class="min-w-0 grow">
                     <span class="font-mono text-xs font-medium uppercase text-primary-foreground/70">HOSTED BY</span>
-                    <p class="truncate font-sans text-base font-medium text-primary-foreground">Utah Common Ground</p>
+                    <p class="truncate font-sans text-base font-medium text-primary-foreground">Institute for Ethics in AI, University of Oxford</p>
                 </div>
                 
                 <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-card/15">
@@ -75,7 +73,7 @@
                     WHAT SHOULD WE DO ABOUT
                 </span>
                 <h1 class="mt-2 sm:mt-3 text-center font-sans text-4xl font-bold leading-tight text-muted-foreground">
-                    AI and the Future of Our Communities
+                   How should Civic AI care with — and for — our communities? 
                 </h1>
 
                 <div class="mx-auto mt-4 sm:mt-6 h-1 w-20 rounded-full bg-muted-foreground"></div>
@@ -92,12 +90,7 @@
 
         <!-- Bottom CTA -->
         <div class="relative z-10 shrink-0 flex flex-col items-center px-7 pb-3 pt-2">
-            <span class="font-mono text-base font-medium uppercase text-muted-foreground/80">YOUR LOCATION</span>
-            <div class="mt-1.5">
-                <ZipInput bind:value={zipCode} disabled={isReturning} />
-            </div>
-
-            <Button variant="primary" fullWidth disabled={!hasZip || joining} onclick={() => {
+            <Button variant="primary" fullWidth disabled={joining} onclick={() => {
                 if (hasAgreedToTos) {
                     handleJoin();
                 } else {
@@ -106,7 +99,14 @@
             }} class="mt-3">
                 {isReturning ? 'CONTINUE' : 'JOIN THE CONVERSATION'}
             </Button>
+  
+		  <span class="mt-2.5 opacity-50 text-center font-mono text-xs font-medium uppercase">
 
+			<p>This is a civic space, not a data marketplace.</p>
+			<p>Your data is not sold. Insights are shared anonymously, and you choose if civic partners can
+			contact you.</p>
+		  </span>
+			
             <span class="mt-2.5 opacity-50 text-center font-mono text-xs font-medium uppercase">
                 <span class="text-foreground">THIS IS A{" "}</span>
                 <span class="text-destructive">BETA,{" "}</span>
@@ -135,20 +135,41 @@
     >
         <div class="px-7 pt-6">
             <p class="font-sans text-lg font-medium leading-7">
-                This space is hosted by <Link href="https://www.utahcommonground.org/home" external>Utah Common Ground</Link>, a coalition of nonprofit organizations from around the state, including Utah State University Center for Anticipatory Intelligence, the AI Ethics and Governance Institute, Engage Utah, and Mormon Women for Ethical Governance. We came together to help citizens come together across political differences to identify issues of local concern, consider possible solutions, and take the necessary steps to achieve meaningful, measurable change. 
+                First, thank you for joining this conversation. We really appreciate your time, perspective, and
+willingness to engage. 
             </p>
             <p class="mt-4 font-sans text-lg font-medium leading-7">
-                We invite all Utahns to share what matters most to them about the future of AI and its impact on communities across the state. Over several weeks, this process will surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding. 
+                We are a group of researchers, practitioners, and community members who believe that the
+people most affected by AI should have the strongest voice in how it is shaped. This Open Poll
+is part of a broader initiative called Civic AI, which asks a simple question: how can we make
+sure AI works with and for us, our families, our communities, and our societies? 
             </p>
             <p class="mt-4 font-sans text-lg font-medium leading-7">
-                After this period of broad public input, a representative group of approximately 30 to 50 residents from three counties (Cache, Salt Lake, and Utah Counties) will be invited to convene in person in August and September 2026 for a Solutions Forum. Participants will reflect the demographic, geographic, and political diversity of Utah and will receive stipends to ensure participation is accessible.
+		AI is already present in our daily lives, from the way health decisions are made to how schools
+teach, how employers hire, and how governments deliver services. Some of these changes
+bring real benefits. Others raise serious concerns about fairness, jobs, privacy, and the quality
+of human relationships.
             </p>
-        </div>
+            <p class="mt-4 font-sans text-lg font-medium leading-7">
+	We believe that no matter how different our views may be, there is common ground to be found.
+This poll is designed to surface that common ground and to identify the real tensions that need
+honest conversation.	
+            </p>
+
+            <p class="mt-4 font-sans text-lg font-medium leading-7">
+		Whether you are a researcher, a care worker, an artist, a student, a parent, or simply someone
+who wants to have a say, your perspective matters here.
+            </p>
+			
+			<p class="mt-4 font-sans text-lg font-medium leading-7">
+		  If you have questions, please reach out at: <a href='mailto:hi@civic.ai'>hi@civic.ai</a> 
+
+	  </p>
     </Dialog>
 
     <Dialog
         bind:open={showTermsMessage}
-        title="Our Approach to Personal Data"
+        title="Our Approach to Data"
         buttonText="I AGREE TO THESE TERMS"
         onButtonClick={handleAgreeToTos}
         requireScrollToBottom
@@ -159,7 +180,7 @@
             </p>
             <ul class="mt-4 font-sans text-lg font-medium leading-7 list-[square] pl-6">
                 <li><span class="font-bold">We collect only what’s needed</span> to run these public-problem solving processes and improve the platform.</li>
-                <li><span class="font-bold">You remain in control.</span> You can access, correct, or delete your data at any time.</li>
+                <li><span class="font-bold">You remain in control.</span> You can access, correct, or delete your data at any time by emailing us at: <a href='mailto:au@civic.ai'>au@civic.ai</a></li>
                 <li><span class="font-bold">We do not sell or monetize your personal data</span>, and we minimize the collection of identifiable data wherever possible.</li>
                 <li><span class="font-bold">We share insights from deliberations with civic partners to support community decision-making.</span> These insights are aggregated and do not identify you personally</li>
                 <li><span class="font-bold">If you choose, you can stay connected locally.</span> With your permission, we may share your contact information (like your email) with your hosts so they can follow up about this deliberation or related opportunities.</li>

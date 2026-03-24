@@ -3,14 +3,13 @@
 	import { cubicOut } from 'svelte/easing';
 	import { AppShell } from '$lib/components/layout';
 	import { PopQuiz, AboutBar, Header, VoteBar } from '$lib/components/ui';
-	import { deliberation, popQuizQuestions, aboutYouQuestions } from '$lib/data/mock';
+	import { deliberation, popQuizQuestions } from '$lib/data/mock';
 	import PolisApi from '$lib/services/polis-api.svelte';
 	import { session } from '$lib/services/session.svelte';
 	import { config } from '$lib/services/api';
 	import VotingScreen from './VotingScreen.svelte';
 	import ComposeScreen from './ComposeScreen.svelte';
 	import DidYouKnowScreen from './DidYouKnowScreen.svelte';
-	import AboutYouScreen from './AboutYouScreen.svelte';
 	import NiceJobScreen from './NiceJobScreen.svelte';
 	import ThankYouScreen from './ThankYouScreen.svelte';
 
@@ -30,14 +29,13 @@
 
 	// --- simplified flow ---
 	// voting → (after FIRST_BATCH) pause → voting (SECOND_BATCH more) → ...
-	// END at any point or out of statements → about-you → email-capture (if needed) → thank-you
+	// END at any point or out of statements → thank-you
 
 	type Screen =
 		| 'loading'
 		| 'voting'
 		| 'compose'
 		| 'pause'
-		| 'about-you'
 		| 'thank-you'
 		// Preserved but unused in conference flow:
 		| 'did-you-know'
@@ -126,33 +124,14 @@
 		}
 	}
 
-	/** Transition to the ending sequence: demographics → email → thank-you */
+	/** Transition to thank you screen */
 	function goToEndFlow() {
 		userEndedVoting = true;
-		if (session.demographicsCompleted) {
-			screen = 'thank-you';
-		} else {
-			screen = 'about-you';
-		}
+		screen = 'thank-you';
 	}
 
 	function handleEnd() {
 		goToEndFlow();
-	}
-
-	async function handleDemographicsDone(demographics?: { age?: string; ethnicity?: string; gender?: string; politicalParty?: string }) {
-		// Save demographics to backend profile (awaited so it completes before navigation)
-		if (demographics) {
-			await session.saveProfile({
-				age: demographics.age ? parseInt(demographics.age, 10) || undefined : undefined,
-				ethnicity: demographics.ethnicity || undefined,
-				gender: demographics.gender || undefined,
-				politicalParty: demographics.politicalParty || undefined
-			});
-		}
-
-		session.markDemographicsCompleted();
-		screen = 'thank-you';
 	}
 
 	function resumeVoting() {
@@ -238,14 +217,6 @@
 			remaining={anchoredRemaining ?? polis.remaining}
 			onKeepVoting={resumeVoting}
 			onDone={goToEndFlow}
-		/>
-
-	{:else if screen === 'about-you'}
-		<AboutYouScreen
-			countyName={session.county}
-			questions={aboutYouQuestions}
-			zipCode={session.zipCode}
-			onDone={handleDemographicsDone}
 		/>
 
 	{:else if screen === 'thank-you'}

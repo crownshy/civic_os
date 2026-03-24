@@ -106,7 +106,7 @@ class Session {
 	}
 
 	get hasSession() {
-		return this.user !== null && !!this.zipCode;
+		return this.user !== null;
 	}
 
 	markComposeInstructionsSeen() {
@@ -139,10 +139,12 @@ class Session {
 		this.persist();
 	}
 
-	async join(zipCode: string, email?: string): Promise<boolean> {
+	async join(zipCode?: string, email?: string): Promise<boolean> {
 		this.loading = true;
 		this.error = null;
-		this.zipCode = zipCode;
+		if (zipCode) {
+			this.zipCode = zipCode;
+		}
 
 		try {
 			// 1. Create anonymous user (sets auth-token cookie)
@@ -161,7 +163,7 @@ class Session {
 			}
 
 			// 3. Save zipcode to profile (awaited so it completes before navigation)
-			if (zipCode) {
+			if (zipCode && zipCode.trim()) {
 				await this.saveProfile({ zipcode: zipCode });
 			}
 
