@@ -1,12 +1,15 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
+	import { page } from '$app/state';
 	import { AppShell } from '$lib/components/layout';
 	import { PopQuiz, AboutBar, Header, VoteBar } from '$lib/components/ui';
-	import { deliberation, popQuizQuestions, aboutYouQuestions } from '$lib/data/mock';
+	import { popQuizQuestions, aboutYouQuestions } from '$lib/data/mock';
+	import { getRegionByZipcode } from '$lib/config/regions';
+	import type { RegionConfig } from '$lib/config/regions';
 	import PolisApi from '$lib/services/polis-api.svelte';
 	import { session } from '$lib/services/session.svelte';
-	import { config } from '$lib/services/api';
+	import { config, getPolisIdForRegion } from '$lib/services/api';
 	import VotingScreen from './VotingScreen.svelte';
 	import ComposeScreen from './ComposeScreen.svelte';
 	import DidYouKnowScreen from './DidYouKnowScreen.svelte';
@@ -14,11 +17,19 @@
 	import NiceJobScreen from './NiceJobScreen.svelte';
 	import ThankYouScreen from './ThankYouScreen.svelte';
 
+	// Region from subdomain (layout server load)
+	const subdomainRegion: RegionConfig = page.data.region;
+
+	// Resolve which Polis to use based on user's zipcode
+	const zipRegion = session.zipCode ? getRegionByZipcode(session.zipCode) : subdomainRegion;
+	const polisId = getPolisIdForRegion(zipRegion.slug, zipRegion.polisId);
+	const question = zipRegion.question;
+
 	// Use session user ID for Polis xid (falls back to random if not yet joined)
 	const userId = session.userId ?? `bloom-anon-${Math.random().toString(36).slice(2, 8)}`;
 
 	// Pass persisted pid so returning users only see unvoted statements
-	let polis = new PolisApi(userId, config.polisId, 'en', config.polisUrl, session.pid);
+	let polis = new PolisApi(userId, polisId, 'en', config.polisUrl, session.pid);
 
 	// Sync pid back to session whenever Polis assigns/updates it
 	$effect(() => {
@@ -181,7 +192,7 @@
 		{#if polis.currentStatement}
 			<VotingScreen
 				countyName={session.county}
-				question={deliberation.question}
+				question={question}
 				statementText={polis.currentStatement.txt}
 				remaining={displayedRemaining}
 				total={displayedTotal}
@@ -195,7 +206,7 @@
 			<div class="flex h-full flex-col bg-muted">
 				<Header
 					countyName={session.county}
-					question={deliberation.question}
+					question={question}
 					onCompose={() => {}}
 					about
 				/>
@@ -225,7 +236,7 @@
 
 	{:else if screen === 'compose'}
 		<ComposeScreen
-			question={deliberation.question}
+			question={question}
 			countyName={session.county}
 			firstVisit={!session.hasSeenComposeInstructions}
 			onSubmit={(text, anon) => { session.markComposeInstructionsSeen(); handleCompose(text, anon); }}

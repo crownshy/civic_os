@@ -41,6 +41,10 @@ export default defineConfig({
 			outdir: './src/lib/paraglide'
 		})
 	],
+	server: {
+		// Allow subdomain-based local dev: utah.localhost, oregon.localhost, etc.
+		allowedHosts: ['.localhost']
+	},
 	test: {
 		expect: {
 			requireAssertions: true
