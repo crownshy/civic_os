@@ -67,7 +67,7 @@ export default class PolisApi {
 
 		const url = `${this.baseUrl}/api/v3/nextComment?conversation_id=${this.polisId}${pidParam}`;
 
-		fetch(url, { credentials: 'omit' })
+		fetch(url, { credentials: 'include' })
 			.then((s) => {
 				if (!s.ok) throw new Error(`nextComment failed: ${s.status}`);
 				return s.json();
@@ -107,7 +107,7 @@ export default class PolisApi {
 
 		fetch(`${this.baseUrl}/api/v3/comments`, {
 			method: 'POST',
-			credentials: 'omit',
+			credentials: 'include',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
 				conversation_id: this.polisId,
@@ -151,7 +151,7 @@ export default class PolisApi {
 		fetch(`${this.baseUrl}/api/v3/votes`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			credentials: 'omit',
+			credentials: 'include',
 			body: JSON.stringify({
 				agid: 1,
 				conversation_id: this.polisId,
