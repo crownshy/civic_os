@@ -73,7 +73,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 		question:
 			'How can Oregonians ensure the benefits of AI are widely shared and risks are responsibly managed?',
 		polisId: '5v4ictwb87',
-		conversationId: '8a55fb75-5442-4654-886c-339c693b8ac5/design',
+		conversationId: '8a55fb75-5442-4654-886c-339c693b8ac5',
 		inviteId: '9e5e3e93-2a71-4979-bcf4-3c894804fe7f',
 		hostName: 'Oregon Civic Forum',
 		hostUrl: '',
