@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { AppShell } from '$lib/components/layout';
 	import { Button, MonoLabel, QuoteText, ProgressBar } from '$lib/components/ui';
-	import { themeSummaries } from '$lib/data/mock';
-	import { county, deliberation } from '$lib/data/mock';
+	import { themeSummaries, county } from '$lib/data/mock';
 
 	const regions = ['REGION 1', 'REGION 2', 'REGION 3'];
 </script>

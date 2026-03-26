@@ -1,7 +1,11 @@
 <script lang="ts">
-	import { AppShell, AppHeader } from '$lib/components/layout';
-	import { Button, MonoLabel, ProgressBar, MapPlaceholder } from '$lib/components/ui';
-	import { county, deliberation, themeSummaries } from '$lib/data/mock';
+	import { page } from '$app/state';
+	import { AppShell } from '$lib/components/layout';
+	import { Button, MonoLabel, ProgressBar, MapPlaceholder, Header } from '$lib/components/ui';
+	import { county, themeSummaries } from '$lib/data/mock';
+	import type { RegionConfig } from '$lib/config/regions';
+
+	const region: RegionConfig = page.data.region;
 	</script>
 
 <AppShell>
@@ -18,7 +22,7 @@
 		<div class="bg-primary px-8 pb-4">
 			<MonoLabel size="sm" variant="white">KEY QUESTION</MonoLabel>
 			<h1 class="mt-2 font-sans text-3xl font-semibold leading-9 text-primary-foreground">
-				{deliberation.question}
+				{region.question}
 			</h1>
 			<div class="mt-6">
 				<Button variant="outline" fullWidth>
