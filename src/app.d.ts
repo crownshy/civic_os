@@ -18,9 +18,6 @@ declare global {
 		readonly PUBLIC_INVITE_ID: string;
 		readonly PUBLIC_POLIS_URL: string;
 		readonly PUBLIC_POLIS_ID: string;
-		readonly PUBLIC_POLIS_ID_UTAH: string;
-		readonly PUBLIC_POLIS_ID_OREGON: string;
-		readonly PUBLIC_POLIS_ID_GENERIC: string;
 	}
 
 	interface ImportMeta {

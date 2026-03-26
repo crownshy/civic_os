@@ -9,7 +9,7 @@
 	import type { RegionConfig } from '$lib/config/regions';
 	import PolisApi from '$lib/services/polis-api.svelte';
 	import { session } from '$lib/services/session.svelte';
-	import { config, getPolisIdForRegion } from '$lib/services/api';
+	import { config } from '$lib/services/api';
 	import VotingScreen from './VotingScreen.svelte';
 	import ComposeScreen from './ComposeScreen.svelte';
 	import DidYouKnowScreen from './DidYouKnowScreen.svelte';
@@ -22,7 +22,7 @@
 
 	// Resolve which Polis to use based on user's zipcode
 	const zipRegion = session.zipCode ? getRegionByZipcode(session.zipCode) : subdomainRegion;
-	const polisId = getPolisIdForRegion(zipRegion.slug, zipRegion.polisId);
+	const polisId = zipRegion.polisId || config.polisId;
 	const question = zipRegion.question;
 
 	// Use session user ID for Polis xid (falls back to random if not yet joined)

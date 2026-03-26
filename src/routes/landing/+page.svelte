@@ -5,6 +5,7 @@
     import { AppShell } from '$lib/components/layout';
     import { SwipeCarousel, Button, Dialog, ZipInput, Link } from '$lib/components/ui';
     import { session } from '$lib/services/session.svelte';
+    import { getRegionByZipcode } from '$lib/config/regions';
     import type { RegionConfig } from '$lib/config/regions';
 
     const region: RegionConfig = page.data.region;
@@ -34,8 +35,15 @@
             goto('/contribute');
             return;
         }
+        // Resolve region from zipcode for correct conversationId/inviteId
+        const zipRegion = getRegionByZipcode(zipCode.trim());
         joining = true;
-        const success = await session.join(zipCode.trim());
+        const success = await session.join(
+            zipCode.trim(),
+            undefined,
+            zipRegion.conversationId,
+            zipRegion.inviteId
+        );
         joining = false;
         if (success) {
             goto('/contribute');

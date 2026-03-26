@@ -21,6 +21,10 @@ export interface RegionConfig {
 	question: string;
 	/** Polis conversation ID for this region */
 	polisId: string;
+	/** Bloom backend conversation ID (for user registration/tracking) */
+	conversationId: string;
+	/** Bloom backend invite ID (for user registration/tracking) */
+	inviteId: string;
 	/** Host organization name */
 	hostName: string;
 	/** Host organization URL */
@@ -44,7 +48,9 @@ export const REGIONS: Record<string, RegionConfig> = {
 		demonym: 'Utahns',
 		question:
 			'How can Utahns ensure the benefits of AI are widely shared and risks are responsibly managed?',
-		polisId: '3itaahejzh', // default — override via PUBLIC_POLIS_ID_UTAH env var
+		polisId: '3itaahejzh',
+		conversationId: '',
+		inviteId: '',
 		hostName: 'Utah Common Ground',
 		hostUrl: 'https://www.utahcommonground.org/home',
 		zipPrefixes: ['84'],
@@ -66,7 +72,9 @@ export const REGIONS: Record<string, RegionConfig> = {
 		demonym: 'Oregonians',
 		question:
 			'How can Oregonians ensure the benefits of AI are widely shared and risks are responsibly managed?',
-		polisId: '', // set via PUBLIC_POLIS_ID_OREGON env var
+		polisId: '',
+		conversationId: '',
+		inviteId: '',
 		hostName: 'Oregon Civic Forum',
 		hostUrl: '',
 		zipPrefixes: ['97'],
@@ -89,7 +97,9 @@ export const GENERIC_REGION: RegionConfig = {
 	demonym: 'Americans',
 	question:
 		'How can we ensure the benefits of AI are widely shared and risks are responsibly managed?',
-	polisId: '', // set via PUBLIC_POLIS_ID_GENERIC env var
+	polisId: '',
+	conversationId: '',
+	inviteId: '',
 	hostName: 'Bloom Project',
 	hostUrl: 'https://www.bloom-project.org/',
 	zipPrefixes: [],
