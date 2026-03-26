@@ -1,15 +1,14 @@
 <script lang="ts">
     import { fade } from 'svelte/transition';
     import { goto } from '$app/navigation';
+    import { page } from '$app/state';
     import { AppShell } from '$lib/components/layout';
     import { SwipeCarousel, Button, Dialog, ZipInput, Link } from '$lib/components/ui';
     import { session } from '$lib/services/session.svelte';
+    import { getRegionByZipcode } from '$lib/config/regions';
+    import type { RegionConfig } from '$lib/config/regions';
 
-    const slides: string[] = [
-        'This conversation is about how Utahns can direct the growing impact of artificial intelligence to benefit our communities.',
-        'You’ll see statements from your neighbors and other community members about this question. You can vote: agree, disagree, or unsure on each one.',
-        'This “Open Poll” will reveal shared concerns and values that will be the basis of action-oriented community conversations in the coming months.',
-    ];
+    const region: RegionConfig = page.data.region;
 
     const isReturning = session.hasSession;
 
@@ -33,14 +32,21 @@
 
     async function handleJoin() {
         if (isReturning) {
-            goto('/demo/contribute');
+            goto('/contribute');
             return;
         }
+        // Resolve region from zipcode for correct conversationId/inviteId
+        const zipRegion = getRegionByZipcode(zipCode.trim());
         joining = true;
-        const success = await session.join(zipCode.trim());
+        const success = await session.join(
+            zipCode.trim(),
+            undefined,
+            zipRegion.conversationId,
+            zipRegion.inviteId
+        );
         joining = false;
         if (success) {
-            goto('/demo/contribute');
+            goto('/contribute');
         }
     }
 </script>
@@ -59,7 +65,7 @@
                 </div>
                 <div class="min-w-0 grow">
                     <span class="font-mono text-xs font-medium uppercase text-primary-foreground/70">HOSTED BY</span>
-                    <p class="truncate font-sans text-base font-medium text-primary-foreground">Utah Common Ground</p>
+                    <p class="truncate font-sans text-base font-medium text-primary-foreground">{region.hostName}</p>
                 </div>
                 
                 <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-card/15">
@@ -80,10 +86,10 @@
 
                 <div class="mx-auto mt-4 sm:mt-6 h-1 w-20 rounded-full bg-muted-foreground"></div>
 
-                <SwipeCarousel count={slides.length} bind:index={slideIndex} autoScrollMs={5000} class="mt-4 sm:mt-6 w-full">
+                <SwipeCarousel count={region.slides.length} bind:index={slideIndex} autoScrollMs={5000} class="mt-4 sm:mt-6 w-full">
                     {#snippet children(i)}
                         <p class="font-sans text-lg font-medium leading-relaxed text-muted-foreground">
-                            {slides[i]}
+                            {region.slides[i]}
                         </p>
                     {/snippet}
                 </SwipeCarousel>
@@ -134,15 +140,11 @@
         buttonText="GO BACK"
     >
         <div class="px-7 pt-6">
-            <p class="font-sans text-lg font-medium leading-7">
-                This space is hosted by <Link href="https://www.utahcommonground.org/home" external>Utah Common Ground</Link>, a coalition of nonprofit organizations from around the state, including Utah State University Center for Anticipatory Intelligence, the AI Ethics and Governance Institute, Engage Utah, and Mormon Women for Ethical Governance. We came together to help citizens come together across political differences to identify issues of local concern, consider possible solutions, and take the necessary steps to achieve meaningful, measurable change. 
-            </p>
-            <p class="mt-4 font-sans text-lg font-medium leading-7">
-                We invite all Utahns to share what matters most to them about the future of AI and its impact on communities across the state. Over several weeks, this process will surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding. 
-            </p>
-            <p class="mt-4 font-sans text-lg font-medium leading-7">
-                After this period of broad public input, a representative group of approximately 30 to 50 residents from three counties (Cache, Salt Lake, and Utah Counties) will be invited to convene in person in August and September 2026 for a Solutions Forum. Participants will reflect the demographic, geographic, and political diversity of Utah and will receive stipends to ensure participation is accessible.
-            </p>
+            {#each region.hostMessage as paragraph}
+                <p class="mt-4 first:mt-0 font-sans text-lg font-medium leading-7">
+                    {@html paragraph}
+                </p>
+            {/each}
         </div>
     </Dialog>
 

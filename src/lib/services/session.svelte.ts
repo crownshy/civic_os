@@ -33,6 +33,8 @@ function loadPersistedSession(): {
 	hasSeenPause?: boolean;
 	hasAgreedToTos?: boolean;
 	hasSeenComposeInstructions?: boolean;
+	conversationId?: string;
+	inviteId?: string;
 } {
 	if (typeof window === 'undefined') return {};
 	try {
@@ -56,6 +58,8 @@ class Session {
 	error = $state<string | null>(null);
 	loading = $state(false);
 	hasAgreedToTos = $state(false);
+	_conversationId = $state('');
+	_inviteId = $state('');
 
 	constructor() {
 		const saved = loadPersistedSession();
@@ -70,6 +74,8 @@ class Session {
 		if (saved.hasSeenPause) this.hasSeenPause = saved.hasSeenPause;
 		if (saved.hasAgreedToTos) this.hasAgreedToTos = saved.hasAgreedToTos;
 		if (saved.hasSeenComposeInstructions) this.hasSeenComposeInstructions = true;
+		if (saved.conversationId) this._conversationId = saved.conversationId;
+		if (saved.inviteId) this._inviteId = saved.inviteId;
 	}
 
 	private persist() {
@@ -84,17 +90,19 @@ class Session {
 				totalVotes: this.totalVotes,
 				hasSeenPause: this.hasSeenPause,
 				hasAgreedToTos: this.hasAgreedToTos,
-				hasSeenComposeInstructions: this.hasSeenComposeInstructions
+				hasSeenComposeInstructions: this.hasSeenComposeInstructions,
+				conversationId: this._conversationId,
+				inviteId: this._inviteId
 			}));
 		} catch { /* ignore */ }
 	}
 
 	get conversationId() {
-		return config.conversationId;
+		return this._conversationId || config.conversationId;
 	}
 
 	get inviteId() {
-		return config.inviteId;
+		return this._inviteId || config.inviteId;
 	}
 
 	get userId() {
@@ -139,10 +147,14 @@ class Session {
 		this.persist();
 	}
 
-	async join(zipCode: string, email?: string): Promise<boolean> {
+	async join(zipCode: string, email?: string, regionConversationId?: string, regionInviteId?: string): Promise<boolean> {
 		this.loading = true;
 		this.error = null;
 		this.zipCode = zipCode;
+
+		// Store region-specific IDs if provided
+		if (regionConversationId) this._conversationId = regionConversationId;
+		if (regionInviteId) this._inviteId = regionInviteId;
 
 		try {
 			// 1. Create anonymous user (sets auth-token cookie)
