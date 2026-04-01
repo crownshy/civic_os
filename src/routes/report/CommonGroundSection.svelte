@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { CommentReportData } from '$lib/types/report';
 	import SectionLabel from './SectionLabel.svelte';
+	import SwipeCarousel from '$lib/components/ui/SwipeCarousel.svelte';
 
 	interface Props {
 		participantCount: number;
@@ -8,23 +9,6 @@
 	}
 
 	let { participantCount, statements }: Props = $props();
-
-	let currentIndex = $state(0);
-	let containerEl = $state<HTMLDivElement>();
-
-	function scrollToCard(index: number) {
-		if (!containerEl) return;
-		const cards = containerEl.querySelectorAll('[data-card]');
-		cards[index]?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-		currentIndex = index;
-	}
-
-	function handleScroll(e: Event) {
-		const el = e.target as HTMLDivElement;
-		const scrollLeft = el.scrollLeft;
-		const cardWidth = el.querySelector('[data-card]')?.clientWidth ?? 300;
-		currentIndex = Math.round(scrollLeft / (cardWidth + 16));
-	}
 
 	function getAgreementPercent(s: CommentReportData): number {
 		const total = s.overall_votes.agrees + s.overall_votes.disagrees + s.overall_votes.passes;
@@ -60,19 +44,11 @@
 	</p>
 
 	<!-- Carousel -->
-	<div class="relative mt-10">
-		<!-- Horizontal scroll container -->
-		<div
-			bind:this={containerEl}
-			onscroll={handleScroll}
-			class="flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-4 scrollbar-hide"
-			style="scroll-padding: 24px;"
-		>
-			{#each consensusStatements as statement, i (statement.tid)}
-				<div
-					data-card
-					class="relative flex w-[85%] shrink-0 snap-center flex-col items-center"
-				>
+	<div class="mt-5 px-6 select-none" >
+		<SwipeCarousel count={consensusStatements.length} hideDots={true} autoScrollMs={4000}>
+			{#snippet children(i)}
+				{@const statement = consensusStatements[i]}
+				<div class="relative flex flex-col items-center">
 					<!-- Avatar -->
 					<div
 						class="z-10 h-12 w-12 rounded-full bg-linear-to-b from-background to-orange-200 outline-[0.8px] outline-stone-500/20"
@@ -95,17 +71,7 @@
 						</div>
 					</div>
 				</div>
-			{/each}
-		</div>
+			{/snippet}
+		</SwipeCarousel>
 	</div>
 </section>
-
-<style>
-	.scrollbar-hide::-webkit-scrollbar {
-		display: none;
-	}
-	.scrollbar-hide {
-		-ms-overflow-style: none;
-		scrollbar-width: none;
-	}
-</style>
