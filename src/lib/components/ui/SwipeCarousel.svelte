@@ -34,7 +34,7 @@
 	let api = $state<CarouselAPI>();
 
 	function handleDotClick(i: number) {
-		api.scrollTo(i);
+		api?.scrollTo(i);
 	}
 
 	let selectedSlide = $state(0);
@@ -42,9 +42,18 @@
 	$effect(() => {
 		if (api) {
 			selectedSlide = api.selectedScrollSnap() + 1;
+			index = api.selectedScrollSnap();
 			api.on("select", () => {
 				selectedSlide = api!.selectedScrollSnap() + 1;
+				index = api!.selectedScrollSnap();
 			});
+		}
+	});
+
+	// Scroll to slide when index changes externally
+	$effect(() => {
+		if (api && api.selectedScrollSnap() !== index) {
+			api.scrollTo(index);
 		}
 	});
 
@@ -67,7 +76,7 @@
 	class={cn("w-full", className)}
 	opts={{ loop: true }}
 	setApi={(emblaApi) => (api = emblaApi)}
-	plugins={[Autoplay({ delay: autoScrollMs })]}
+	plugins={autoScrollMs ? [Autoplay({ delay: autoScrollMs })] : []}
 >
 	<Carousel.Content>
 		{#each { length: count } as _, i (i)}

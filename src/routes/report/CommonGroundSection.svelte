@@ -2,6 +2,7 @@
 	import type { CommentReportData } from '$lib/types/report';
 	import SectionLabel from './SectionLabel.svelte';
 	import SwipeCarousel from '$lib/components/ui/SwipeCarousel.svelte';
+	import GradientCard from '$lib/components/ui/GradientCard.svelte';
 
 	interface Props {
 		participantCount: number;
@@ -24,7 +25,7 @@
 	);
 </script>
 
-<section class="relative overflow-hidden bg-background px-0 py-8">
+<section class="relative overflow-hidden bg-background -px-10 py-8">
 	<div class="px-6">
 		<SectionLabel>COMMON GROUND</SectionLabel>
 	</div>
@@ -54,10 +55,12 @@
 						class="z-10 h-12 w-12 rounded-full bg-linear-to-b from-background to-orange-200 outline-[0.8px] outline-stone-500/20"
 					></div>
 					<!-- Card body (overlaps avatar) -->
-					<div class="-mt-5 rounded-3xl p-px bg-linear-to-b from-stone-300 to-transparent">
-						<div
-							class="flex min-h-48 w-full flex-col justify-between rounded-[calc(1.5rem-1px)] bg-linear-to-b from-white to-background px-7 pt-10 pb-7"
-						>
+					<GradientCard
+						borderGradient="bg-linear-to-b from-stone-300 to-transparent"
+						bg="bg-linear-to-b from-white to-background"
+						class="-mt-5"
+					>
+						<div class="flex min-h-48 w-full flex-col justify-between px-7 pt-10 pb-7">
 							<p class="font-sans text-xl font-semibold leading-6 text-foreground">
 								"{statement.text}"
 							</p>
@@ -69,7 +72,7 @@
 								</span>
 							</div>
 						</div>
-					</div>
+					</GradientCard>
 				</div>
 			{/snippet}
 		</SwipeCarousel>

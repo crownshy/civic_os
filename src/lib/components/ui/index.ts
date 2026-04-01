@@ -22,3 +22,4 @@ export { default as InfoBar } from './InfoBar.svelte';
 export { default as Dialog } from './Dialog.svelte';
 export { default as ZipInput } from './ZipInput.svelte';
 export { default as Link } from './Link.svelte';
+export { default as GradientCard } from './GradientCard.svelte';
