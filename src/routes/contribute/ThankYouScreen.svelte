@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { scale, fade } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
-	import { AboutBar, Button, EmojiCircle, Link } from '$lib/components/ui';
+	import { InfoBar, Button, EmojiCircle, Link } from '$lib/components/ui';
 	import { Input } from '$lib/components/ui/input';
 	import { session } from '$lib/services/session.svelte';
 	import { Mail } from 'lucide-svelte';
@@ -43,7 +43,7 @@
 
 <div class="flex h-full flex-col bg-gradient-primary" in:scale={{ start: 0.9, duration: 500, easing: cubicOut }}>
 	<div class="flex flex-1 flex-col overflow-y-auto">
-		<AboutBar region={region} {countyName} onBack={onBackToVoting} />
+		<InfoBar region={region} {countyName} onBack={onBackToVoting} />
 		<!-- Hero: emoji + heading -->
 		<div class="flex flex-col items-center px-8 pt-14">
 			<EmojiCircle emoji="🎉" size="lg" />

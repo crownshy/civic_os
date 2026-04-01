@@ -1,7 +1,7 @@
 <script lang="ts">
-	import AboutBar from './AboutBar.svelte';
 	import type { RegionConfig } from '$lib/config/regions';
-
+	import InfoBar from './InfoBar.svelte';
+	
 	interface Props {
 		countyName: string;
 		region?: RegionConfig;
@@ -28,7 +28,8 @@
 >
 	<!-- Row 1: County name + ABOUT pill or YOU dot -->
 	{#if about && region}
-		<AboutBar region={region} {countyName} />
+		<InfoBar region={region} {countyName} />
+		<InfoBar {countyName} />
 	{:else}
 		<div class="flex items-center justify-between pr-3.75 pl-6 pt-3.75">
 			<span class="font-mono text-sm font-medium text-foreground/70">{countyName.toUpperCase()}</span>
