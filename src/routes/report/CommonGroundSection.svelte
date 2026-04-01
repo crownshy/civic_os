@@ -73,39 +73,28 @@
 					data-card
 					class="relative flex w-[85%] shrink-0 snap-center flex-col items-center"
 				>
-					<!-- Per-card avatar -->
+					<!-- Avatar -->
 					<div
 						class="z-10 h-12 w-12 rounded-full bg-linear-to-b from-background to-orange-200 outline-[0.8px] outline-stone-500/20"
 					></div>
 					<!-- Card body (overlaps avatar) -->
-					<div
-						class="-mt-5 flex min-h-48 w-full flex-col justify-between rounded-[30px] bg-linear-to-b from-white/90 to-white/0 px-7 pt-10 pb-7 outline-1 outline-stone-500"
-					>
-						<p class="font-sans text-xl font-semibold leading-6 text-foreground">
-							"{statement.text}"
-						</p>
-						<div class="mt-4 flex justify-center">
-							<span
-								class="inline-flex items-center rounded-[10px] bg-primary px-2 py-0.5 font-mono text-sm font-medium leading-5 text-orange-100"
-							>
-								{getAgreementPercent(statement)}% AGREEMENT
-							</span>
+					<div class="-mt-5 rounded-3xl p-px bg-linear-to-b from-stone-300 to-transparent">
+						<div
+							class="flex min-h-48 w-full flex-col justify-between rounded-[calc(1.5rem-1px)] bg-linear-to-b from-white to-background px-7 pt-10 pb-7"
+						>
+							<p class="font-sans text-xl font-semibold leading-6 text-foreground">
+								"{statement.text}"
+							</p>
+							<div class="mt-4 flex justify-center">
+								<span
+									class="inline-flex items-center rounded-[10px] bg-primary px-2 py-0.5 font-mono text-sm font-medium leading-5 text-orange-100"
+								>
+									{getAgreementPercent(statement)}% AGREEMENT
+								</span>
+							</div>
 						</div>
 					</div>
 				</div>
-			{/each}
-		</div>
-
-		<!-- Dots -->
-		<div class="mt-4 flex items-center justify-center gap-2">
-			{#each consensusStatements as _, i}
-				<button
-					onclick={() => scrollToCard(i)}
-					class="h-2 w-2 rounded-full transition-colors {currentIndex === i
-						? 'bg-foreground'
-						: 'bg-foreground/30'}"
-					aria-label="Card {i + 1}"
-				></button>
 			{/each}
 		</div>
 	</div>
