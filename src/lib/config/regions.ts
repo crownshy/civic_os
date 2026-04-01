@@ -42,6 +42,29 @@ export interface RegionConfig {
 // ---------------------------------------------------------------------------
 
 export const REGIONS: Record<string, RegionConfig> = {
+	testing: {
+		slug: 'testing',
+		stateName: 'Testing',
+		demonym: 'Test Subjects',
+		question:
+			'How can we all ensure the benefits of AI are widely shared and risks are responsibly managed?',
+		polisId: '2cd5jmhdvm',
+		conversationId: 'e00cfd87-5f22-4332-83bc-bc8401802e3d',
+		inviteId: 'b3778c56-32fa-4c8a-973f-7723b066daca',
+		hostName: 'Bloom Testing',
+		hostUrl: 'https://bloomproject.us',
+		zipPrefixes: [],
+		slides: [
+			'This conversation is about how everyone can direct the growing impact of artificial intelligence to benefit our communities.',
+			'You\u2019ll see statements from your neighbors and other community members about this question. You can vote: agree, disagree, or unsure on each one.',
+			'This \u201COpen Poll\u201D will reveal shared concerns and values that will be the basis of action-oriented community conversations in the coming months.'
+		],
+		hostMessage: [
+			'This is a testing version of the site to check things are working and to play with new features with play',
+			'This is mostly just to see if things work',
+			'This is not a live conversation'
+		]
+	},
 	utah: {
 		slug: 'utah',
 		stateName: 'Utah',
