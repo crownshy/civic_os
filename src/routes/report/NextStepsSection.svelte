@@ -23,11 +23,11 @@
 			<div class="absolute left-6 top-6 h-48 w-0.5 bg-neutral-600"></div>
 
 			<!-- Status dot -->
-			<div class="relative ml-[-4px]">
+			<div class="relative ml-[-11px]">
 				<div
 					class="absolute h-6 w-6 rounded-full bg-background/20 opacity-20 shadow-[0px_0px_11.3px_4px_rgba(64,107,67,1)]"
 				></div>
-				<div class="absolute left-1 top-1 h-4 w-4 rounded-full bg-neutral-600"></div>
+				<div class="absolute left-1 top-1 h-4 w-4 rounded-full bg-primary"></div>
 			</div>
 
 			<div class="ml-6 mt-[-2px]">
