@@ -3,19 +3,12 @@
 	import { cn } from '$lib/utils';
 
 	interface Props {
-		/** Gradient classes for the border (e.g. 'bg-linear-to-b from-stone-300 to-transparent'). Enables gradient border technique. */
 		borderGradient?: string;
-		/** Solid border/outline classes when not using gradient border (e.g. 'outline outline-1 outline-stone-500/20') */
 		borderClass?: string;
-		/** Background classes for the content area (e.g. 'bg-white' or 'bg-linear-to-b from-white/90 to-white/0') */
 		bg?: string;
-		/** Border radius in px, applied uniformly (default 30). Ignored when roundedClass is set. */
 		radius?: number;
-		/** Tailwind rounding class override (e.g. 'rounded-t-[30px]'). Overrides radius prop. */
 		roundedClass?: string;
-		/** Shadow classes (e.g. 'shadow-[0px_4px_24.3px_0px_rgba(134,101,73,0.20)]') */
 		shadow?: string;
-		/** Extra classes on the outermost wrapper */
 		class?: string;
 		children: Snippet;
 	}
