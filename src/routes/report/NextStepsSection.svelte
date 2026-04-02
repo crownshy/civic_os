@@ -16,27 +16,27 @@
 
 	<!-- CTA Card -->
 	<div
-		class="mx-6 mt-10 overflow-hidden rounded-[10px] bg-white outline outline-1 outline-offset-[-1px] outline-foreground/20"
+		class="mx-6 mt-10 overflow-hidden rounded-[10px] bg-card outline outline-1 outline-offset-[-1px] outline-foreground/20"
 	>
 		<!-- Left border accent -->
 		<div class="relative pl-6 pt-3">
-			<div class="absolute left-6 top-6 h-48 w-0.5 bg-neutral-600"></div>
+			<div class="absolute left-6 top-6 h-48 w-0.5 bg-foreground"></div>
 
 			<!-- Status dot -->
 			<div class="relative ml-[-11px]">
 				<div
-					class="absolute h-6 w-6 rounded-full bg-background/20 opacity-20 shadow-[0px_0px_11.3px_4px_rgba(64,107,67,1)]"
+					class="absolute h-6 w-6 rounded-full bg-background/20 opacity-20 shadow-[0px_0px_11.3px_4px_var(--primary)]"
 				></div>
 				<div class="absolute left-1 top-1 h-4 w-4 rounded-full bg-primary"></div>
 			</div>
 
 			<div class="ml-6 mt-[-2px]">
-				<span class="font-mono text-xs font-medium text-red-900/70">NEXT STEP</span>
+				<span class="font-mono text-xs font-medium text-destructive">NEXT STEP</span>
 			</div>
 		</div>
 
 		<div class="px-11 pb-5 pt-1">
-			<h3 class="font-sans text-3xl font-bold leading-[48px] text-green-900">Listen & Learn</h3>
+			<h3 class="font-sans text-3xl font-bold leading-[48px] text-primary">Listen & Learn</h3>
 			<p class="mt-1 font-sans text-sm font-medium leading-5 text-foreground">
 				An opportunity for people to share their thoughts on how artificial intelligence should be
 				managed to protect people's livelihoods.

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { CommentReportData, GroupReportData } from '$lib/types/report';
-	import SectionLabel from './SectionLabel.svelte';
+	import Badge from '$lib/components/ui/Badge.svelte';
 	import GradientCard from '$lib/components/ui/GradientCard.svelte';
 	import SwipeCarousel from '$lib/components/ui/SwipeCarousel.svelte';
 
@@ -47,14 +47,14 @@
 <section class="relative overflow-hidden bg-background py-6">
 	<!-- Decorative circles -->
 	<div
-		class="pointer-events-none absolute -right-20 top-16 h-80 w-80 rounded-full opacity-40 outline outline-neutral-600"
+		class="pointer-events-none absolute -right-20 top-16 h-80 w-80 rounded-full opacity-40 outline outline-foreground"
 	></div>
 	<div
 		class="pointer-events-none absolute -left-32 -top-5 h-80 w-80 rounded-full opacity-40 outline outline-destructive"
 	></div>
 
 	<div class="relative z-10 px-6">
-		<SectionLabel>OPINION GROUPS</SectionLabel>
+		<Badge variant="soft" size="lg">OPINION GROUPS</Badge>
 	</div>
 
 	<div class="relative z-10 mt-8 px-8">
@@ -75,20 +75,20 @@
 	<!-- Statement flipper card -->
 	{#if divisiveStatements.length > 0}
 		<GradientCard
-			borderGradient="bg-linear-to-b from-stone-300 to-transparent"
-			bg="bg-linear-to-b from-white to-background"
+			borderGradient="bg-linear-to-b from-border to-transparent"
+			bg="bg-linear-to-b from-card to-background"
 			shadow="shadow-[0px_4px_24.3px_0px_rgba(134,101,73,0.20)]"
 			class="relative z-10 mx-6 mt-10"
 		>
 			<!-- Group selection header -->
 			<div class="flex items-center justify-between px-5 pt-5">
-				<span class="font-mono text-xs font-medium text-black/60">GROUP SELECTION</span>
+				<span class="font-mono text-xs font-medium text-muted-foreground">GROUP SELECTION</span>
 				<div class="flex items-center gap-[5px]">
 					{#each groups as _, gi}
 						<button
 							onclick={() => selectGroup(gi)}
 							class="flex h-7 w-7 items-center justify-center rounded-full font-mono text-sm font-medium transition-colors {selectedGroup === gi
-								? 'bg-neutral-600 text-stone-50'
+								? 'bg-foreground text-background'
 								: 'bg-secondary/10 text-foreground'}"
 						>
 							{String.fromCharCode(65 + gi)}
@@ -99,7 +99,7 @@
 
 			<!-- Subtitle -->
 			<div class="px-5 pt-3">
-				<span class="font-mono text-xs font-medium text-black/60">
+				<span class="font-mono text-xs font-medium text-muted-foreground">
 					STATEMENTS THAT SET GROUP {selectedGroupLetter} APART
 				</span>
 			</div>
@@ -111,10 +111,10 @@
 					<div class="px-5 pb-2 pt-4">
 						<!-- Statement text card -->
 						<div
-							class="flex items-center gap-5 rounded-[10px] border-b border-background bg-background px-5 py-4"
+							class="flex items-center gap-5 rounded-[10px] border-b border-muted bg-muted px-5 py-4"
 						>
 							<div
-								class="h-8 w-8 shrink-0 rounded-full bg-linear-to-b from-background to-orange-200 outline outline-[0.54px] outline-stone-500/20"
+								class="h-8 w-8 shrink-0 rounded-full bg-linear-to-b from-background to-accent outline outline-[0.54px] outline-border"
 							></div>
 							<p class="font-sans text-sm font-semibold leading-4 text-foreground">
 								"{statement.text}"
@@ -125,11 +125,11 @@
 						<div class="mt-5">
 							<!-- Axis labels -->
 							<div class="mb-2 flex items-center pl-20">
-								<span class="font-mono text-xs text-stone-500/60">0%</span>
-								<span class="ml-[22%] font-mono text-xs text-stone-500/60">25</span>
-								<span class="ml-[22%] font-mono text-xs text-stone-500/60">50</span>
-								<span class="ml-[22%] font-mono text-xs text-stone-500/60">75</span>
-								<span class="ml-auto font-mono text-xs text-stone-500/60">100</span>
+								<span class="font-mono text-xs text-muted-foreground/60">0%</span>
+								<span class="ml-[22%] font-mono text-xs text-muted-foreground/60">25</span>
+								<span class="ml-[22%] font-mono text-xs text-muted-foreground/60">50</span>
+								<span class="ml-[22%] font-mono text-xs text-muted-foreground/60">75</span>
+								<span class="ml-auto font-mono text-xs text-muted-foreground/60">100</span>
 							</div>
 
 							<!-- Groups with vertical stacked bars -->
@@ -139,9 +139,9 @@
 								<div class="mb-4">
 									<!-- Group label -->
 									<span
-										class="font-mono text-sm font-medium leading-4 {isSelected
-											? 'text-primary underline'
-											: 'text-stone-500'}"
+									class="font-mono text-sm font-medium leading-4 {isSelected
+										? 'text-primary underline'
+										: 'text-muted-foreground'}"
 									>
 										{groupLabels[gi] ?? `GROUP ${String.fromCharCode(65 + gi)}`}
 									</span>
@@ -152,17 +152,17 @@
 										<div class="pointer-events-none absolute inset-0">
 											{#each [0, 25, 50, 75, 100] as tick}
 												<div
-													class="absolute top-0 h-full border-l border-stone-500/20"
+													class="absolute top-0 h-full border-l border-border"
 													style="left: {tick}%"
 												></div>
 											{/each}
 										</div>
 										<!-- Agree bar -->
-										<div class="h-1.5 bg-teal-600" style="width: {percents.agree}%"></div>
-										<!-- Disagree bar -->
-										<div class="h-1.5 bg-red-400" style="width: {percents.disagree}%"></div>
-										<!-- Pass bar -->
-										<div class="h-1.5 bg-zinc-300" style="width: {percents.pass}%"></div>
+										<div class="h-1.5 bg-primary" style="width: {percents.agree}%"></div>
+									<!-- Disagree bar -->
+									<div class="h-1.5 bg-destructive" style="width: {percents.disagree}%"></div>
+									<!-- Pass bar -->
+									<div class="h-1.5 bg-input" style="width: {percents.pass}%"></div>
 									</div>
 								</div>
 							{/each}
@@ -174,17 +174,17 @@
 			<!-- Legend (outside carousel) -->
 			<div class="flex items-center justify-center gap-5 px-5 pb-5">
 				<div class="flex items-center gap-1.5">
-					<div class="h-3 w-3 rounded-full bg-teal-600"></div>
-					<span class="font-mono text-xs font-medium text-stone-500">AGREE</span>
-				</div>
-				<div class="flex items-center gap-1.5">
-					<div class="h-3 w-3 rounded-full bg-red-400"></div>
-					<span class="font-mono text-xs font-medium text-stone-500">DISAGREE</span>
-				</div>
-				<div class="flex items-center gap-1.5">
-					<div class="h-3 w-3 rounded-full bg-zinc-300"></div>
-					<span class="font-mono text-xs font-medium text-stone-500">PASS/UNSURE</span>
-				</div>
+				<div class="h-3 w-3 rounded-full bg-primary"></div>
+				<span class="font-mono text-xs font-medium text-muted-foreground">AGREE</span>
+			</div>
+			<div class="flex items-center gap-1.5">
+				<div class="h-3 w-3 rounded-full bg-destructive"></div>
+				<span class="font-mono text-xs font-medium text-muted-foreground">DISAGREE</span>
+			</div>
+			<div class="flex items-center gap-1.5">
+				<div class="h-3 w-3 rounded-full bg-input"></div>
+				<span class="font-mono text-xs font-medium text-muted-foreground">PASS/UNSURE</span>
+			</div>
 			</div>
 		</GradientCard>
 	{/if}

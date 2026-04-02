@@ -1,5 +1,6 @@
 <script lang="ts">
   import InfoBar from '$lib/components/ui/InfoBar.svelte';
+  import Badge from '$lib/components/ui/Badge.svelte';
 
   interface Props {
     title: string;
@@ -11,20 +12,18 @@
   let { title, region, phase, description }: Props = $props();
 </script>
 
-<section class="relative min-h-dvh flex-col overflow-hidden bg-[radial-gradient(ellipse_69%_69%_at_50%_89%,#176A21,#07490F)]">
+<section class="relative min-h-dvh flex-col overflow-hidden" style="background: var(--gradient-hero);">
   <InfoBar countyName={region} variant="light" buttonText="LEARN MORE →" />
 
   <div class="mt-16 px-8">
-    <div class="inline-flex items-center rounded-full bg-green-950 px-7 py-2 font-mono text-sm font-medium text-white">
-      {phase}
-    </div>
+    <Badge variant="dark" size="lg" class="px-7">{phase}</Badge>
   </div>
 
-  <h1 class="mt-4 px-8 font-sans text-5xl font-extrabold leading-[1.01] text-white">
+  <h1 class="mt-4 px-8 font-sans text-5xl font-extrabold leading-[1.01] text-primary-foreground">
     {title}
   </h1>
 
-  <p class="mt-8 px-8 font-sans text-base font-medium leading-6 text-white">
+  <p class="mt-8 px-8 font-sans text-base font-medium leading-6 text-primary-foreground">
     {description}
   </p>
 

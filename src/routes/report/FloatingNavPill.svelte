@@ -21,7 +21,7 @@
 	>
 		<button
 			{onclick}
-			class="inline-flex items-center rounded-full bg-white px-7 py-2 font-sans text-base font-semibold text-green-950 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] transition-transform hover:scale-105 active:scale-95"
+			class="inline-flex items-center rounded-full bg-card px-7 py-2 font-sans text-base font-semibold text-primary-dark shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] transition-transform hover:scale-105 active:scale-95"
 		>
 			{text}
 		</button>

@@ -75,6 +75,7 @@
 			/>
 		</div>
 
+
 		<div id="common-ground">
 			<CommonGroundSection
 				participantCount={reportConfig.participantCount}

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { CommentReportData } from '$lib/types/report';
-	import SectionLabel from './SectionLabel.svelte';
+	import Badge from '$lib/components/ui/Badge.svelte';
 
 	interface Props {
 		statements: CommentReportData[];
@@ -37,47 +37,49 @@
 </script>
 
 <section
-	class="relative overflow-hidden bg-linear-to-b from-green-800 to-green-950 px-0 py-12"
+	class="relative overflow-hidden px-0 py-12"
+	style="background: var(--gradient-consensus);"
 >
 	<!-- Decorative circles -->
-	<div
-		class="pointer-events-none absolute -left-20 -top-4 h-96 w-96 rounded-full outline outline-1 outline-white/20"
-	></div>
-	<div
-		class="pointer-events-none absolute left-[28%] -top-4 h-96 w-96 rounded-full outline outline-1 outline-white/20"
-	></div>
+	<div class="pointer-events-none absolute inset-0 flex justify-center overflow-hidden">
+		<div
+			class="absolute -top-10 left-1/2 h-120 w-120 min-w-[50vw] -translate-x-[65%] rounded-full outline outline-primary-foreground/20"
+		></div>
 
+		<div
+			class="absolute -top-10 left-1/2 h-120 w-120 min-w-[50vw] -translate-x-[35%] rounded-full outline outline-primary-foreground/20"
+		></div>
+	</div>
 	<div class="flex justify-center px-6">
-		<SectionLabel class="bg-green-950 text-white">CONSENSUS</SectionLabel>
+		<Badge variant="dark" size="lg">CONSENSUS</Badge>
 	</div>
 
-	<div class="mt-8 px-8">
-		<h2 class="text-center font-sans text-3xl font-bold leading-8 text-white">
+	<div class="mt-4 px-8">
+		<h2 class="text-center font-sans text-3xl font-bold leading-8 text-primary-foreground">
 			In spite of differences, everyone seemed to agree on certain things.
 		</h2>
 	</div>
 
-	<p class="mt-5 px-8 text-center font-sans text-base font-medium text-white/80">
+	<p class="mt-5 px-8 text-center font-sans text-base font-medium text-primary-foreground/80">
 		These could be a strong foundation for future conversations, and opportunities for action.
 	</p>
 
 	<!-- Consensus card -->
 	<div
-		class="mx-6 mt-10 overflow-hidden rounded-[30px] bg-white shadow-[0px_4px_24.3px_0px_rgba(134,101,73,0.20)] outline outline-1 outline-offset-[-1px] outline-stone-500/20"
+		class="mx-6 mt-10 overflow-hidden rounded-[30px] bg-card shadow-[0px_4px_24.3px_0px_rgba(134,101,73,0.20)] outline -outline-offset-1 outline-border"
 	>
 		<!-- Threshold header -->
 		<div class="flex flex-wrap items-center gap-2 px-5 pt-5">
-			<span class="font-mono text-sm font-medium text-black/60">BRIDGING THRESHOLD</span>
+			<span class="font-mono text-sm font-medium text-muted-foreground">BRIDGING THRESHOLD</span>
 			<div class="flex items-center gap-1.5">
 				{#each thresholds as threshold}
 					<button
 						onclick={() => (activeThreshold = threshold)}
-						class="rounded-full px-2.5 py-1 font-mono text-xs font-medium transition-colors {activeThreshold ===
-						threshold
-							? 'bg-primary text-stone-50'
-							: 'bg-secondary/10 text-foreground'}"
+						class="transition-colors"
 					>
-						{threshold}%
+						<Badge variant={activeThreshold === threshold ? 'dark' : 'soft'} size="md">
+							{threshold}%
+						</Badge>
 					</button>
 				{/each}
 			</div>
@@ -86,20 +88,18 @@
 		<!-- Statement list -->
 		<div class="mt-4">
 			{#each filteredStatements as statement (statement.tid)}
-				<div class="flex items-start gap-4 border-y border-secondary/20 px-0 py-4">
+				<div class="flex items-start gap-4 border-y border-border px-0 py-4">
 					<div
-						class="ml-5 mt-2 h-8 w-8 shrink-0 rounded-full border border-stone-500/10 bg-linear-to-b from-stone-500 to-amber-100/0"
+						class="ml-5 mt-2 h-8 w-8 shrink-0 rounded-full border border-border bg-linear-to-b from-muted-foreground to-accent/0"
 					></div>
 					<div class="flex flex-1 flex-col pr-5">
 						<p class="font-sans text-sm font-semibold leading-6 text-foreground">
 							"{statement.text}"
 						</p>
 						<div class="mt-1">
-							<span
-								class="inline-flex items-center rounded-[10px] bg-primary/10 px-1.5 py-px font-mono text-[10px] font-medium leading-4 text-primary"
-							>
+							<Badge variant="primary-soft" size="sm">
 								AT LEAST {getAgreePercent(statement)}% AGREE
-							</span>
+							</Badge>
 						</div>
 					</div>
 				</div>
@@ -107,7 +107,7 @@
 
 			{#if filteredStatements.length === 0}
 				<div class="px-5 py-12 text-center">
-					<p class="font-sans text-sm text-stone-400">
+					<p class="font-sans text-sm text-muted-foreground">
 						No statements meet the {activeThreshold}% agreement threshold.
 					</p>
 				</div>

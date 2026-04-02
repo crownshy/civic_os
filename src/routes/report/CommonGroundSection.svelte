@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { CommentReportData } from '$lib/types/report';
-	import SectionLabel from './SectionLabel.svelte';
+	import Badge from '$lib/components/ui/Badge.svelte';
 	import SwipeCarousel from '$lib/components/ui/SwipeCarousel.svelte';
 	import GradientCard from '$lib/components/ui/GradientCard.svelte';
 
@@ -27,7 +27,7 @@
 
 <section class="relative overflow-hidden bg-background -px-10 py-8">
 	<div class="px-6">
-		<SectionLabel>COMMON GROUND</SectionLabel>
+		<Badge variant="soft" size="lg">COMMON GROUND</Badge>
 	</div>
 
 	<div class="mt-3 px-8">
@@ -52,12 +52,12 @@
 				<div class="relative flex flex-col items-center">
 					<!-- Avatar -->
 					<div
-						class="z-10 h-12 w-12 rounded-full bg-linear-to-b from-background to-orange-200 outline-[0.8px] outline-stone-500/20"
+						class="z-10 h-12 w-12 rounded-full bg-linear-to-b from-background to-accent outline-[0.8px] outline-border"
 					></div>
 					<!-- Card body (overlaps avatar) -->
 					<GradientCard
-						borderGradient="bg-linear-to-b from-stone-300 to-transparent"
-						bg="bg-linear-to-b from-white to-background"
+						borderGradient="bg-linear-to-b from-border to-transparent"
+						bg="bg-linear-to-b from-card to-background"
 						class="-mt-5"
 					>
 						<div class="flex min-h-48 w-full flex-col justify-between px-7 pt-10 pb-7">
@@ -65,11 +65,9 @@
 								"{statement.text}"
 							</p>
 							<div class="mt-4 flex justify-center">
-								<span
-									class="inline-flex items-center rounded-[10px] bg-primary px-2 py-0.5 font-mono text-sm font-medium leading-5 text-orange-100"
-								>
+								<Badge variant="primary" size="md" class="px-2 py-0.5 text-sm rounded-[10px]">
 									{getAgreementPercent(statement)}% AGREEMENT
-								</span>
+								</Badge>
 							</div>
 						</div>
 					</GradientCard>

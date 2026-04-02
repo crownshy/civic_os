@@ -1,5 +1,5 @@
 <script lang="ts">
-	import SectionLabel from './SectionLabel.svelte';
+	import Badge from '$lib/components/ui/Badge.svelte';
 	import GradientCard from '$lib/components/ui/GradientCard.svelte';
 	import SwipeCarousel from '$lib/components/ui/SwipeCarousel.svelte';
 
@@ -7,12 +7,12 @@
 	let activeTab = $state(1);
 
 	const ageData = [
-		{ label: '18-24', color: 'bg-lime-400', count: 312 },
-		{ label: '25-39', color: 'bg-indigo-400', count: 486 },
-		{ label: '40-54', color: 'bg-amber-400', count: 398 },
-		{ label: '55-64', color: 'bg-red-400', count: 224 },
-		{ label: '65+', color: 'bg-pink-950', count: 156 },
-		{ label: 'Not Provided', color: 'bg-neutral-500', count: 569 }
+		{ label: '18-24', color: 'bg-chart-1', count: 312 },
+		{ label: '25-39', color: 'bg-chart-2', count: 486 },
+		{ label: '40-54', color: 'bg-chart-3', count: 398 },
+		{ label: '55-64', color: 'bg-chart-4', count: 224 },
+		{ label: '65+', color: 'bg-chart-5', count: 156 },
+		{ label: 'Not Provided', color: 'bg-chart-6', count: 569 }
 	];
 
 	function handleTabClick(index: number) {
@@ -22,7 +22,7 @@
 
 <section class="relative overflow-hidden bg-background py-6">
 	<div class="px-6">
-		<SectionLabel>DEMOGRAPHICS</SectionLabel>
+		<Badge variant="soft" size="lg">DEMOGRAPHICS</Badge>
 	</div>
 
 	<div class="mt-8 px-8">
@@ -37,8 +37,8 @@
 
 	<!-- Demographics card -->
 	<GradientCard
-		bg="bg-linear-to-b from-white to-background"
-		borderGradient="bg-linear-to-b from-stone-300 to-transparent"
+		bg="bg-linear-to-b from-card to-background"
+		borderGradient="bg-linear-to-b from-border to-transparent"
 		class="mx-6 mt-10"
 	>
 		<!-- Tabs -->
@@ -77,20 +77,20 @@
 					{:else if i === 1}
 						<!-- Location (map placeholder) -->
 						<div class="flex flex-col items-center">
-							<div class="flex h-[200px] w-full items-center justify-center rounded-lg bg-stone-100">
-								<p class="font-mono text-xs text-stone-400">MAP PLACEHOLDER</p>
+							<div class="flex h-[200px] w-full items-center justify-center rounded-lg bg-muted">
+								<p class="font-mono text-xs text-muted-foreground">MAP PLACEHOLDER</p>
 							</div>
 
 							<div class="mt-4 flex w-full flex-col items-center gap-1">
-								<span class="font-mono text-[10px] font-medium text-stone-500 opacity-50"
+								<span class="font-mono text-[10px] font-medium text-muted-foreground opacity-50"
 									>PARTICIPATION</span
 								>
 								<div class="flex w-full items-center gap-2">
-									<span class="font-mono text-[10px] text-stone-500">0</span>
+									<span class="font-mono text-[10px] text-muted-foreground">0</span>
 									<div
-										class="h-3.5 flex-1 rounded-sm bg-linear-to-r from-teal-100 to-teal-600"
+										class="h-3.5 flex-1 rounded-sm bg-linear-to-r from-primary/20 to-primary"
 									></div>
-									<span class="font-mono text-[10px] text-stone-500">X</span>
+									<span class="font-mono text-[10px] text-muted-foreground">X</span>
 								</div>
 							</div>
 						</div>
