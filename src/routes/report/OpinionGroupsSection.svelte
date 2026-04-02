@@ -17,12 +17,24 @@
 	let selectedGroup = $state(0);
 	let currentStatementIndex = $state(0);
 
-	const divisiveStatements = $derived(
-		statements
-			.filter((s) => s.group_votes.length >= 2)
-			.sort((a, b) => (b.divisiveness ?? 0) - (a.divisiveness ?? 0))
-			.slice(0, 6)
+	const commentsByTid = $derived(
+		new Map(statements.map((s) => [s.tid, s]))
 	);
+
+	const representativeStatements = $derived.by(() => {
+		const group = groups[selectedGroup];
+		if (!group?.representative_comments?.length) {
+			// Fallback? show most divisive statements if no representative comments?
+			return statements
+				.filter((s) => s.group_votes.length >= 2)
+				.sort((a, b) => (b.divisiveness ?? 0) - (a.divisiveness ?? 0))
+				.slice(0, 6);
+		}
+
+		return group.representative_comments
+			.map((rc) => commentsByTid.get(rc.tid))
+			.filter((s): s is CommentReportData => s !== undefined);
+	});
 
 	function selectGroup(i: number) {
 		selectedGroup = i;
@@ -73,7 +85,7 @@
 	</p>
 
 	<!-- Statement flipper card -->
-	{#if divisiveStatements.length > 0}
+	{#if representativeStatements.length > 0}
 		<GradientCard
 			borderGradient="bg-linear-to-b from-border to-transparent"
 			bg="bg-linear-to-b from-card to-background"
@@ -105,9 +117,9 @@
 			</div>
 
 			<!-- Swipeable statements -->
-			<SwipeCarousel count={divisiveStatements.length} bind:index={currentStatementIndex} hideDots={true}>
+			<SwipeCarousel count={representativeStatements.length} bind:index={currentStatementIndex} hideDots={true}>
 				{#snippet children(i)}
-					{@const statement = divisiveStatements[i]}
+					{@const statement = representativeStatements[i]}
 					<div class="px-5 pb-2 pt-4">
 						<!-- Statement text card -->
 						<div

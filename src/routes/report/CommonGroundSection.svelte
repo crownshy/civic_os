@@ -7,9 +7,10 @@
 	interface Props {
 		participantCount: number;
 		statements: CommentReportData[];
+		regionName?: string;
 	}
 
-	let { participantCount, statements }: Props = $props();
+	let { participantCount, statements, regionName = 'Utah' }: Props = $props();
 
 	function getAgreementPercent(s: CommentReportData): number {
 		const total = s.overall_votes.agrees + s.overall_votes.disagrees + s.overall_votes.passes;
@@ -34,7 +35,7 @@
 		<h2 class="font-sans text-3xl font-bold leading-8 text-foreground">
 			After engaging
 			<span class="text-primary">{participantCount.toLocaleString()} people</span>
-			all over Utah, we found a lot of
+			all over {regionName}, we found a lot of
 			<span class="text-primary">common ground.</span>
 		</h2>
 	</div>

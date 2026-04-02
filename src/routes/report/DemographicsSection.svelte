@@ -3,10 +3,34 @@
 	import GradientCard from '$lib/components/ui/GradientCard.svelte';
 	import SwipeCarousel from '$lib/components/ui/SwipeCarousel.svelte';
 
+	interface DemographicCategory {
+		category: string;
+		count: number;
+		value?: string | null;
+	}
+
+	interface DemographicReport {
+		ageRanges: DemographicCategory[];
+		ethnicity: DemographicCategory[];
+		gender: DemographicCategory[];
+		politicalParty: DemographicCategory[];
+		totalParticipants: number;
+		zipcodeCounts: Record<string, number>;
+	}
+
+	interface Props {
+		demographics: DemographicReport | null;
+		participantCount: number;
+	}
+
+	let { demographics, participantCount }: Props = $props();
+
+	const chartColors = ['bg-chart-1', 'bg-chart-2', 'bg-chart-3', 'bg-chart-4', 'bg-chart-5', 'bg-chart-6'];
+
 	const tabs = ['Age', 'Location', 'Gender', 'Race & Ethnicity', 'Political'] as const;
 	let activeTab = $state(1);
 
-	const ageData = [
+	const fallbackAgeData = [
 		{ label: '18-24', color: 'bg-chart-1', count: 312 },
 		{ label: '25-39', color: 'bg-chart-2', count: 486 },
 		{ label: '40-54', color: 'bg-chart-3', count: 398 },
@@ -14,6 +38,40 @@
 		{ label: '65+', color: 'bg-chart-5', count: 156 },
 		{ label: 'Not Provided', color: 'bg-chart-6', count: 569 }
 	];
+
+	function toCategoryItems(categories: DemographicCategory[]) {
+		return categories.map((c, i) => ({
+			label: c.category,
+			color: chartColors[i % chartColors.length],
+			count: c.count
+		}));
+	}
+
+	const ageData = $derived(
+		demographics?.ageRanges?.length ? toCategoryItems(demographics.ageRanges) : fallbackAgeData
+	);
+
+	const genderData = $derived(
+		demographics?.gender?.length ? toCategoryItems(demographics.gender) : []
+	);
+
+	const ethnicityData = $derived(
+		demographics?.ethnicity?.length ? toCategoryItems(demographics.ethnicity) : []
+	);
+
+	const politicalData = $derived(
+		demographics?.politicalParty?.length ? toCategoryItems(demographics.politicalParty) : []
+	);
+
+	const totalDisplay = $derived(
+		demographics?.totalParticipants
+			? demographics.totalParticipants >= 1000
+				? `${(demographics.totalParticipants / 1000).toFixed(1)}K`
+				: demographics.totalParticipants.toString()
+			: participantCount >= 1000
+				? `${(participantCount / 1000).toFixed(1)}K`
+				: participantCount.toString()
+	);
 
 	function handleTabClick(index: number) {
 		activeTab = index;
@@ -62,7 +120,7 @@
 					{#if i === 0}
 						<!-- Age breakdown -->
 						<div class="flex flex-col items-center">
-							<div class="text-center font-mono text-2xl font-medium text-foreground">1.1K</div>
+							<div class="text-center font-mono text-2xl font-medium text-foreground">{totalDisplay}</div>
 							<div class="font-mono text-[10px] font-medium text-foreground">PARTICIPANTS</div>
 
 							<div class="mt-8 grid w-full grid-cols-2 gap-3">
@@ -95,31 +153,58 @@
 							</div>
 						</div>
 					{:else if i === 2}
-						<!-- Gender placeholder -->
+						<!-- Gender -->
 						<div class="flex flex-col items-center">
-							<div class="text-center font-mono text-2xl font-medium text-foreground">1.1K</div>
+							<div class="text-center font-mono text-2xl font-medium text-foreground">{totalDisplay}</div>
 							<div class="font-mono text-[10px] font-medium text-foreground">PARTICIPANTS</div>
-							<p class="mt-8 font-sans text-sm text-muted-foreground">
-								Gender demographic data placeholder
-							</p>
+							{#if genderData.length}
+								<div class="mt-8 grid w-full grid-cols-2 gap-3">
+									{#each genderData as item}
+										<div class="flex items-center gap-3.5">
+											<div class="h-3 w-3 shrink-0 rounded-full {item.color}"></div>
+											<span class="font-sans text-sm font-medium text-foreground">{item.label}</span>
+										</div>
+									{/each}
+								</div>
+							{:else}
+								<p class="mt-8 font-sans text-sm text-muted-foreground">No gender data available yet.</p>
+							{/if}
 						</div>
 					{:else if i === 3}
-						<!-- Race & Ethnicity placeholder -->
+						<!-- Race & Ethnicity -->
 						<div class="flex flex-col items-center">
-							<div class="text-center font-mono text-2xl font-medium text-foreground">1.1K</div>
+							<div class="text-center font-mono text-2xl font-medium text-foreground">{totalDisplay}</div>
 							<div class="font-mono text-[10px] font-medium text-foreground">PARTICIPANTS</div>
-							<p class="mt-8 font-sans text-sm text-muted-foreground">
-								Race & ethnicity demographic data placeholder
-							</p>
+							{#if ethnicityData.length}
+								<div class="mt-8 grid w-full grid-cols-2 gap-3">
+									{#each ethnicityData as item}
+										<div class="flex items-center gap-3.5">
+											<div class="h-3 w-3 shrink-0 rounded-full {item.color}"></div>
+											<span class="font-sans text-sm font-medium text-foreground">{item.label}</span>
+										</div>
+									{/each}
+								</div>
+							{:else}
+								<p class="mt-8 font-sans text-sm text-muted-foreground">No ethnicity data available yet.</p>
+							{/if}
 						</div>
 					{:else}
-						<!-- Political placeholder -->
+						<!-- Political -->
 						<div class="flex flex-col items-center">
-							<div class="text-center font-mono text-2xl font-medium text-foreground">1.1K</div>
+							<div class="text-center font-mono text-2xl font-medium text-foreground">{totalDisplay}</div>
 							<div class="font-mono text-[10px] font-medium text-foreground">PARTICIPANTS</div>
-							<p class="mt-8 font-sans text-sm text-muted-foreground">
-								Political affiliation demographic data placeholder
-							</p>
+							{#if politicalData.length}
+								<div class="mt-8 grid w-full grid-cols-2 gap-3">
+									{#each politicalData as item}
+										<div class="flex items-center gap-3.5">
+											<div class="h-3 w-3 shrink-0 rounded-full {item.color}"></div>
+											<span class="font-sans text-sm font-medium text-foreground">{item.label}</span>
+										</div>
+									{/each}
+								</div>
+							{:else}
+								<p class="mt-8 font-sans text-sm text-muted-foreground">No political affiliation data available yet.</p>
+							{/if}
 						</div>
 					{/if}
 				</div>
