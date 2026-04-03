@@ -2,6 +2,7 @@
 	import { fly, fade } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import { Header, VoteBar } from '$lib/components/ui';
+	import type { RegionConfig } from '$lib/config/regions';
 
 	interface Props {
 		countyName: string;
@@ -13,6 +14,7 @@
 		onVote: (type: 'agree' | 'disagree' | 'pass') => void;
 		onEnd: () => void;
 		onCompose: () => void;
+		region: RegionConfig
 	}
 
 	let {
@@ -24,7 +26,8 @@
 		loading = false,
 		onVote,
 		onEnd,
-		onCompose
+		onCompose,
+		region
 	}: Props = $props();
 
 	let previousText = statementText;
