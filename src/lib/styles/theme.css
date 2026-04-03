@@ -6,6 +6,7 @@
   --popover: #FFFFFF;
   --popover-foreground: #532A0E;
   --primary: #406B43;
+  --primary-dark: #093F0F;
   --primary-foreground: #FAEFFB;
   --secondary: #A6722E; 
   --secondary-foreground: #FFFFFF;
@@ -33,6 +34,10 @@
   --sidebar-ring: #345136;
   --sidebar-secondary: #A6722E;
   --sidebar-active-bg: #FFEDD3;
+
+  --gradient-hero: radial-gradient(ellipse 69% 69% at 50% 89%, #176A21, #07490F);
+  --gradient-consensus: linear-gradient(to bottom, #1A5C2A, #0A2E14);
+  --chart-6: #8B6D54;
 
   --font-sans: 'Hanken Grotesk', sans-serif;
   --font-serif: Merriweather, serif;
@@ -64,6 +69,7 @@
   --popover: #111827;
   --popover-foreground: #F9FAFB;
   --primary: #5B8DEF;
+  --primary-dark: #1E3A8F;
   --primary-foreground: #FFFFFF;
   --secondary: #1F2937;
   --secondary-foreground: #F3F4F6;
@@ -91,4 +97,8 @@
   --sidebar-ring: #5B8DEF;
   --sidebar-secondary: #38BDF8;
   --sidebar-active-bg: #1E3A5F;
+
+  --gradient-hero: radial-gradient(ellipse 69% 69% at 50% 89%, #4B7CF3, #1E3A8F);
+  --gradient-consensus: linear-gradient(to bottom, #1E40AF, #0F1D45);
+  --chart-6: #64748B;
 }

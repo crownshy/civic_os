@@ -18,6 +18,8 @@
 		class?: string;
 		/** Auto-advance interval in ms (e.g. 4000). Disabled if not set. */
 		autoScrollMs?: number;
+		/** Hide the dots */
+		hideDots?: boolean;
 	}
 
 	let {
@@ -25,13 +27,14 @@
 		index = $bindable(0),
 		children,
 		class: className = '',
-		autoScrollMs
+		autoScrollMs,
+		hideDots = false
 	}: Props = $props();
 
 	let api = $state<CarouselAPI>();
 
 	function handleDotClick(i: number) {
-		api.scrollTo(i);
+		api?.scrollTo(i);
 	}
 
 	let selectedSlide = $state(0);
@@ -39,9 +42,18 @@
 	$effect(() => {
 		if (api) {
 			selectedSlide = api.selectedScrollSnap() + 1;
+			index = api.selectedScrollSnap();
 			api.on("select", () => {
 				selectedSlide = api!.selectedScrollSnap() + 1;
+				index = api!.selectedScrollSnap();
 			});
+		}
+	});
+
+	// Scroll to slide when index changes externally
+	$effect(() => {
+		if (api && api.selectedScrollSnap() !== index) {
+			api.scrollTo(index);
 		}
 	});
 
@@ -64,7 +76,7 @@
 	class={cn("w-full", className)}
 	opts={{ loop: true }}
 	setApi={(emblaApi) => (api = emblaApi)}
-	plugins={[Autoplay({ delay: autoScrollMs })]}
+	plugins={autoScrollMs ? [Autoplay({ delay: autoScrollMs })] : []}
 >
 	<Carousel.Content>
 		{#each { length: count } as _, i (i)}
@@ -74,20 +86,22 @@
 		{/each}
 	</Carousel.Content>
 	<!-- Dots -->
-	<div class="mt-6 flex shrink-0 items-center justify-center gap-[23px]">
-		{#each { length: count } as _, i (i)}
-			<button
-				onclick={() => handleDotClick(i)}
-				class="h-2 w-2 rounded-full transition-colors {selectedSlide === i + 1 ? 'bg-muted-foreground' : 'bg-muted-foreground/50'}"
-				aria-label="Slide {i + 1}"
-			></button>
-		{/each}
-		<button class="bg-muted-foreground rounded-full p-1.5 flex items-center justify-center" onclick={toggleAutoplay}>
-			{#if autoplay}
-				<Pause class="stroke-background h-1.5 w-1.5" />
-			{:else}
-				<Play class="fill-background h-1.5 w-1.5" />
-			{/if}
-		</button>
-	</div>
+	{#if !hideDots}
+		<div class="mt-6 flex shrink-0 items-center justify-center gap-[23px]">
+			{#each { length: count } as _, i (i)}
+				<button
+					onclick={() => handleDotClick(i)}
+					class="h-2 w-2 rounded-full transition-colors {selectedSlide === i + 1 ? 'bg-muted-foreground' : 'bg-muted-foreground/50'}"
+					aria-label="Slide {i + 1}"
+				></button>
+			{/each}
+			<button class="bg-muted-foreground rounded-full p-1.5 flex items-center justify-center" onclick={toggleAutoplay}>
+				{#if autoplay}
+					<Pause class="stroke-background h-1.5 w-1.5" />
+				{:else}
+					<Play class="fill-background h-1.5 w-1.5" />
+				{/if}
+			</button>
+		</div>
+	{/if}
 </Carousel.Root>

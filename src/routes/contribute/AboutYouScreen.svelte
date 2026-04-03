@@ -3,7 +3,7 @@
     import { cubicOut } from 'svelte/easing';
     import { SvelteSet } from 'svelte/reactivity';
     import type { AboutYouQuestion } from '$lib/types/mock-data';
-    import { AboutBar, Button, Dialog, Link } from '$lib/components/ui';
+    import { InfoBar, Button, Dialog, Link } from '$lib/components/ui';
     import { Check, Plus } from 'lucide-svelte';
 	import type { RegionConfig } from '$lib/config/regions';
 
@@ -80,7 +80,7 @@
 </script>
 
 <div class="flex h-full flex-col bg-gradient-primary">
-    <AboutBar region={region} {countyName} />
+    <InfoBar region={region} {countyName} />
 
     <div class="flex flex-1 flex-col overflow-y-auto px-6 pt-8">
         <span

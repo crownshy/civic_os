@@ -3,7 +3,7 @@
 	import { cubicOut } from 'svelte/easing';
 	import { page } from '$app/state';
 	import { AppShell } from '$lib/components/layout';
-	import { PopQuiz, AboutBar, Header, VoteBar } from '$lib/components/ui';
+	import { PopQuiz, InfoBar, Header, VoteBar } from '$lib/components/ui';
 	import { popQuizQuestions, aboutYouQuestions } from '$lib/data/mock';
 	import { getRegionByZipcode } from '$lib/config/regions';
 	import type { RegionConfig } from '$lib/config/regions';
@@ -278,7 +278,7 @@
 		/>
 	{:else if screen === 'pop-quiz'}
 		<div class="flex h-full flex-col bg-gradient-primary" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
-			<AboutBar region={subdomainRegion} countyName={session.county} />
+			<InfoBar region={subdomainRegion} countyName={session.county} />
 			<PopQuiz quiz={currentQuiz} onContinue={resumeVoting} onSkip={resumeVoting} />
 		</div>
 	{:else if screen === 'nice-job'}
