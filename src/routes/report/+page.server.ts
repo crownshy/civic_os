@@ -12,8 +12,8 @@ interface WorkflowStepDto {
 	id: string;
 	name: string;
 	stepOrder: number;
-	previewToolConfig: { type: string; poll_id?: string; [key: string]: unknown };
-	toolConfig?: { type: string; poll_id?: string; [key: string]: unknown } | null;
+	previewToolConfig: { type: string; poll_id?: string;[key: string]: unknown };
+	toolConfig?: { type: string; poll_id?: string;[key: string]: unknown } | null;
 }
 
 interface DemographicCategory {
@@ -38,7 +38,7 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 	console.log('[Report] Loading report for region:', region.slug, '| conversationId:', conversationId);
 
 	async function fetchApi<T>(path: string): Promise<T> {
-		const apiUrl = `${url.origin}/api${path}`;
+		const apiUrl = `https://comhairle.bloomproject.us/api${path}`;
 		console.log('[Report]   → GET', apiUrl);
 		const res = await fetch(apiUrl);
 		if (!res.ok) {
@@ -70,26 +70,26 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 		const workflow = workflows[0];
 		console.log('[Report] Using workflow:', workflow.id, workflow.name);
 
-		const steps = await fetchApi<WorkflowStepDto[]>(
-			`/conversation/${conversationId}/workflow/${workflow.id}/workflow_step`
-		);
-		console.log('[Report] Found', steps.length, 'workflow steps:', steps.map((s: WorkflowStepDto) => `${s.name} (${s.previewToolConfig?.type || s.toolConfig?.type || '?'})`));
-
-		const polisStep = steps.find(
-			(s: WorkflowStepDto) =>
-				s.previewToolConfig?.type === 'polis' ||
-				s.toolConfig?.type === 'polis'
-		);
-
-		if (!polisStep) {
-			const msg = `No Polis workflow step found in ${steps.length} steps`;
-			console.warn('[Report]', msg);
-			return { report: null, demographics: null, error: msg, region };
-		}
-		console.log('[Report] Found Polis step:', polisStep.id, polisStep.name);
+		// const steps = await fetchApi<WorkflowStepDto[]>(
+		// 	`/conversation/${conversationId}/workflow/${workflow.id}/workflow_step`
+		// );
+		// console.log('[Report] Found', steps.length, 'workflow steps:', steps.map((s: WorkflowStepDto) => `${s.name} (${s.previewToolConfig?.type || s.toolConfig?.type || '?'})`));
+		//
+		// const polisStep = steps.find(
+		// 	(s: WorkflowStepDto) =>
+		// 		s.previewToolConfig?.type === 'polis' ||
+		// 		s.toolConfig?.type === 'polis'
+		// );
+		//
+		// if (!polisStep) {
+		// 	const msg = `No Polis workflow step found in ${steps.length} steps`;
+		// 	console.warn('[Report]', msg);
+		// 	return { report: null, demographics: null, error: msg, region };
+		// }
+		// console.log('[Report] Found Polis step:', polisStep.id, polisStep.name);
 
 		const report = await fetchApi<WikiPollReport>(
-			`/tools/polis/report_data?workflow_step_id=${polisStep.id}`
+			`/tools/polis/report_data?workflow_step_id=${region.polis_workflow_step_id}`
 		);
 		console.log('[Report] Got report:', report.comments?.length, 'comments,', report.groups?.length, 'groups,', report.participants?.length, 'participants');
 
@@ -99,7 +99,7 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 				`/conversation/${conversationId}/workflow/${workflow.id}/participation_report`
 			);
 		} catch (e) {
-			console.warn('[Report] Failed to fetch demographics:', e);
+			console.warn('[Report] Failed to fetch demographics:', e.message);
 		}
 
 		return { report, demographics, error: null, region };

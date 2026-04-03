@@ -20,6 +20,7 @@ export interface RegionConfig {
 	/** The main deliberation question, with demonym baked in */
 	question: string;
 	/** Polis conversation ID for this region */
+	polis_workflow_step_id: string;
 	polisId: string;
 	/** Bloom backend conversation ID (for user registration/tracking) */
 	conversationId: string;
@@ -75,7 +76,8 @@ export const REGIONS: Record<string, RegionConfig> = {
 			'It is hosted by Utah Common Ground, a collaboration of diverse nonpartisan organizations across Utah. You can find out more about them at utahcommonground.org.'
 		],
 		whatsNext: "Nothing",
-		goDeeper: "Nothing"
+		goDeeper: "Nothing",
+		polis_workflow_step_id: "68425b0d-21e9-4f36-8c13-229dab4508bc"
 	},
 	utah: {
 		slug: 'utah',
@@ -104,7 +106,9 @@ export const REGIONS: Record<string, RegionConfig> = {
 			'            It is hosted by Utah Common Ground, a collaboration of diverse nonpartisan organizations across Utah. You can find out more about them at utahcommonground.org.'
 		],
 		whatsNext: "In April and May, there will be <strong>live conversations</strong> across Salt Lake, Weber, and Cache Counties. These conversations will build on the common themes and shared values that emerge from the statements here. If you want to take part in these or future conversations, please <strong>share your email above</strong> or visit the <Link href=\"https://www.utahcommonground.org/home\" external class=\"font-bold\">Utah Common Ground website.</Link>",
-		goDeeper: "The ultimate goal of this campaign is to surface common ground that lets Utahns take action from the local to state levels and beyond. If you are interested in getting involved in a deeper way, let us know at <Link href=\"mailto:hello@bloom-project.org\" external class=\"font-bold\">hello@bloom-project.org</Link>."
+		goDeeper: "The ultimate goal of this campaign is to surface common ground that lets Utahns take action from the local to state levels and beyond. If you are interested in getting involved in a deeper way, let us know at <Link href=\"mailto:hello@bloom-project.org\" external class=\"font-bold\">hello@bloom-project.org</Link>.",
+
+		polis_workflow_step_id: "9d1041f9-fda6-4597-b4b0-c1260e4b7268"
 	},
 
 	oregon: {
@@ -164,7 +168,8 @@ export const REGIONS: Record<string, RegionConfig> = {
 			"Questions or want to get involved? Reach us at <a href='mailto:hello@cocap.us'>hello@cocap.us</a>."
 		],
 		whatsNext: "In May and June, small group conversations will take place in Deschutes, Jefferson, and Crook counties — and online. They'll build on the themes and common ground that emerge from this poll. Share your email above to stay in the loop and be notified when registration opens, or visit [cocap.us] to learn more.",
-		goDeeper: "This process is ultimately about finding common ground and turning it into action that benefits Central Oregon communities. If you'd like to get more involved, reach out at <a href=\"hello@cocap.us\">hello@cocap.us</a>."
+		goDeeper: "This process is ultimately about finding common ground and turning it into action that benefits Central Oregon communities. If you'd like to get more involved, reach out at <a href=\"hello@cocap.us\">hello@cocap.us</a>.",
+		polis_workflow_step_id: "8299fec7-a543-419f-8692-f68652648a0b"
 	}
 };
 
@@ -191,7 +196,8 @@ export const GENERIC_REGION: RegionConfig = {
 	],
 	aboutConversation: [],
 	whatsNext: "",
-	goDeeper: ""
+	goDeeper: "",
+	polis_workflow_step_id: "f553a7b9-b3ac-4159-b88d-198f609b110c"
 };
 
 // ---------------------------------------------------------------------------
