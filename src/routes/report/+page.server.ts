@@ -38,7 +38,7 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 	console.log('[Report] Loading report for region:', region.slug, '| conversationId:', conversationId);
 
 	async function fetchApi<T>(path: string): Promise<T> {
-		const apiUrl = `https://comhairle.bloomproject.us/api${path}`;
+		const apiUrl = `${url.origin}/api${path}`;
 		console.log('[Report]   → GET', apiUrl);
 		const res = await fetch(apiUrl);
 		if (!res.ok) {
