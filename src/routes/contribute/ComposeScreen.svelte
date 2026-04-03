@@ -31,16 +31,19 @@
 
 	<Dialog
 		bind:open={showInstructions}
-		title="How to contribute to this conversation:"
+		title="Add your own perspective:"
 		buttonText="GOT IT, LET’S GO!"
 	>
 		<div class="px-7 pt-6 font-sans text-lg font-medium leading-7 text-foreground">
+			<p>Have something to say that the poll hasn't captured yet? This is your chance.</p>
 			<ul class="list-disc space-y-2 px-4">
-				<li>Feel free to share any ideas, values, or positions on this question. Others will see these statements and vote on them.</li>
-				<li>You are contributing standalone statements – not responding to specific statements you see in the conversation.</li>
-				<li>Do not include profanity, threats, or other content that might cause distress to others. Any such threats will be removed from the platform.</li>
+				<li><span class='text-bold'>Share a belief, concern, or value</span> in your own words. Other participants will see it and respond.</li>
+				<li><span class='text-bold'>Write one idea per submission.</span>Your statement will stand on its own — not as a reply to anything specific.</li>
+				<li><span class='text-bold'>Keep it respectful.</span> Profanity, threats, or content that could harm others will be removed.</li>
+				<li><span class='text-bold'>No links or URLs, please.</span> This keeps the conversation focused and prevents spam.</li>
+				<li><span class='text-bold'>This is a shared space.</span> By contributing, you agree to our <Link href="https://app.termly.io/policy-viewer/policy.html?policyUUID=4f85478f-bc07-46b7-a67b-e9f11de4b279" external>Terms of Use & Moderation Policy</Link>.</li>
 			</ul>
-			<p class="mt-4">We want this to be a constructive and respectful space for everyone. By participating, you agree to our <Link href="https://app.termly.io/policy-viewer/policy.html?policyUUID=4f85478f-bc07-46b7-a67b-e9f11de4b279" external>Terms of Use & Moderation Policy</Link>.</p>
+			<p class="mt-4">And don't overthink it. There's no wrong answer here.</p>
 		</div>
 	</Dialog>
 </div>

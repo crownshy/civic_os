@@ -157,14 +157,15 @@
     >
         <div class="px-7 pt-6">
             <p class="font-sans text-lg font-medium leading-7">
-                We treat your data as part of a shared civic process — not a product to be sold.
+               We're here to run a community conversation, not collect data on you. 
             </p>
             <ul class="mt-4 font-sans text-lg font-medium leading-7 list-[square] pl-6">
-                <li><span class="font-bold">We collect only what’s needed</span> to run these public-problem solving processes and improve the platform.</li>
-                <li><span class="font-bold">You remain in control.</span> You can access, correct, or delete your data at any time.</li>
-                <li><span class="font-bold">We do not sell or monetize your personal data</span>, and we minimize the collection of identifiable data wherever possible.</li>
-                <li><span class="font-bold">We share insights from deliberations with civic partners to support community decision-making.</span> These insights are aggregated and do not identify you personally</li>
-                <li><span class="font-bold">If you choose, you can stay connected locally.</span> With your permission, we may share your contact information (like your email) with your hosts so they can follow up about this deliberation or related opportunities.</li>
+                <li><span class="font-bold">We collect your responses and, if you choose, your contact info.</span> That's it.</li>
+                <li><span class="font-bold">You are in control.</span> You can access or delete your data at any time. Email us at <a href='mailto:hello@bloom-project.org'>hello@bloom-project.org</a>. </li>
+                <li><span class="font-bold">We never sell or monetize anything you share.</span></li>
+                <li><span class="font-bold">OpenPoll results are public by design — so the whole community can see what people think.</span> Your responses are always anonymous.</li>
+                <li><span class="font-bold">Want to stay in the loop?</span> We’ll share your contact info (email address) with the local organization(s) hosting this conversation so they can follow up about related opportunities.</li>
+                <li><span class="font-bold">We look at how people use the platform to make it better</span> — not to profile you or target you with ads.</li>
             </ul>
             <p class="mt-4 font-sans text-lg font-medium leading-7">
                 For more information, please view the full <a href="https://app.termly.io/policy-viewer/policy.html?policyUUID=ba402bb7-5499-4b37-860b-bbb507d3c3c1" class="text-destructive underline" target="_blank" rel="noopener noreferrer">Privacy Policy.</a>
