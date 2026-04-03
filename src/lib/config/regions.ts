@@ -170,7 +170,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 /** Fallback region for unknown subdomains or non-matching zipcodes */
 export const GENERIC_REGION: RegionConfig = {
 	slug: 'generic',
-	stateName: '',
+	stateName: 'USA',
 	demonym: 'Americans',
 	question:
 		'How can we ensure the benefits of AI are widely shared and risks are responsibly managed?',

@@ -3,6 +3,7 @@
  * Covers the three focus counties (Cache, Salt Lake, Utah) plus major others.
  * Falls back to "Utah" (the state) for unknown zips.
  */
+import { GENERIC_REGION, REGIONS } from "$lib/config/regions"
 
 const ZIP_TO_COUNTY: Record<string, string> = {
 	// --- Salt Lake County ---
@@ -153,19 +154,3 @@ const ZIP_TO_COUNTY: Record<string, string> = {
 	'84790': 'Washington',
 };
 
-export function getCountyFromZip(zip: string): string {
-	const trimmed = zip.trim();
-	if (ZIP_TO_COUNTY[trimmed]) return ZIP_TO_COUNTY[trimmed];
-
-	// Fallback: prefix-based heuristic
-	const prefix = trimmed.slice(0, 3);
-	switch (prefix) {
-		case '841': return 'Salt Lake';
-		case '846': return 'Utah';
-		case '843': return 'Cache';
-		case '840': return 'Davis';
-		case '844': return 'Weber';
-		case '847': return 'Washington';
-		default: return 'Utah';
-	}
-}
