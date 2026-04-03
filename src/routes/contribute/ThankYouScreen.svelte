@@ -106,7 +106,7 @@
 			</div>
 
 			<div class="flex items-center gap-2">
-				<span class="rounded-[5px] bg-destructive px-2 py-1 font-sans text-sm font-bold leading-5 text-card">GO DEEPER</span>
+				<span class="font-sans text-2xl font-bold leading-9 text-foreground">GO DEEPER</span>
 			</div>
 			<div>
 
