@@ -63,6 +63,7 @@
 <div class="flex h-full flex-col bg-muted">
 	<Header
 		{countyName}
+		{region}
 		{question}
 		{onCompose}
 		about
