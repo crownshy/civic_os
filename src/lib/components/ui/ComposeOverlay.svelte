@@ -3,6 +3,7 @@
 	import { cn } from '$lib/utils';
 	import Button from './Button.svelte';
 	import AboutBar from './AboutBar.svelte';
+	import type { RegionConfig } from '$lib/config/regions';
 
 	interface Props {
 		question: string;
@@ -10,6 +11,7 @@
 		onSubmit?: (text: string, anonymous: boolean) => void;
 		onBack?: () => void;
 		onShowInstructions?: () => void;
+		region: RegionConfig,
 		class?: string;
 	}
 
@@ -19,6 +21,7 @@
 		onSubmit,
 		onBack,
 		onShowInstructions,
+		region,
 		class: className
 	}: Props = $props();
 
@@ -48,7 +51,7 @@
 <div class={cn('relative flex h-dvh flex-col bg-background', className)}>
 	<div class="flex flex-1 flex-col rounded-bl-[30px] rounded-br-[30px] bg-gradient-primary shadow-[0px_4px_16.6px_0px_rgba(0,0,0,0.20)]">
 		<!-- Header -->
-		<AboutBar {countyName} />
+		<AboutBar region={region} {countyName} />
 
 		<!-- Question -->
 		<div class="px-5 pt-4">

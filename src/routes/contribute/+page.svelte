@@ -200,6 +200,7 @@
 				onVote={handleVote}
 				onEnd={handleEnd}
 				onCompose={() => (screen = 'compose')}
+				region={subdomainRegion}
 			/>
 		{:else}
 			<!-- Skeleton that reuses real components so layout stays in sync -->
