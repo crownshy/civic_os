@@ -1,8 +1,10 @@
 <script lang="ts">
 	import AboutBar from './AboutBar.svelte';
-	
+	import type { RegionConfig } from '$lib/config/regions';
+
 	interface Props {
 		countyName: string;
+		region?: RegionConfig;
 		question?: string;
 		marquee?: boolean;
 		onCompose?: () => void;
@@ -12,6 +14,7 @@
 
 	let {
 		countyName,
+		region,
 		question,
 		marquee = false,
 		onCompose,
@@ -24,8 +27,8 @@
 	class="shrink-0 overflow-hidden rounded-bl-[20px] rounded-br-[20px] border-b border-secondary bg-linear-to-r from-[#FFEDD3] to-[#FFEDD3]/40 {className}"
 >
 	<!-- Row 1: County name + ABOUT pill or YOU dot -->
-	{#if about}
-		<AboutBar {countyName} />
+	{#if about && region}
+		<AboutBar region={region} {countyName} />
 	{:else}
 		<div class="flex items-center justify-between pr-3.75 pl-6 pt-3.75">
 			<span class="font-mono text-sm font-medium text-foreground/70">{countyName.toUpperCase()}</span>

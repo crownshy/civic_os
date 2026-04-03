@@ -2,19 +2,21 @@
 	import { scale } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import { AboutBar, Button, EmojiCircle } from '$lib/components/ui';
+	import type { RegionConfig } from '$lib/config/regions';
 
 	interface Props {
 		countyName: string;
+		region: RegionConfig;
 		remaining?: number;
 		onKeepVoting: () => void;
 		onDone: () => void;
 	}
 
-	let { countyName, remaining, onKeepVoting, onDone }: Props = $props();
+	let { countyName, region, remaining, onKeepVoting, onDone }: Props = $props();
 </script>
 
 <div class="flex h-full flex-col bg-gradient-primary" in:scale={{ start: 0.9, duration: 500, easing: cubicOut }}>
-	<AboutBar {countyName} />
+	<AboutBar region={region} {countyName} />
 
 	<!-- Centered content -->
 	<div class="flex flex-1 flex-col items-center justify-center overflow-y-auto px-8">

@@ -207,6 +207,7 @@
 			<div class="flex h-full flex-col bg-muted">
 				<Header
 					countyName={session.county}
+					region={subdomainRegion}
 					question={question}
 					onCompose={() => {}}
 					about
@@ -246,6 +247,7 @@
 
 	{:else if screen === 'pause'}
 		<NiceJobScreen
+			region={subdomainRegion}
 			countyName={session.county}
 			remaining={anchoredRemaining ?? polis.remaining}
 			onKeepVoting={resumeVoting}
@@ -281,6 +283,7 @@
 		</div>
 	{:else if screen === 'nice-job'}
 		<NiceJobScreen
+			region={subdomainRegion}
 			countyName={session.county}
 			onKeepVoting={resumeVoting}
 			onDone={handleEnd}
