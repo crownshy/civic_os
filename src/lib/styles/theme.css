@@ -24,6 +24,8 @@
   --chart-3: #AF9340;
   --chart-4: #755032;
   --chart-5: #EE503B;
+  --chart-6: #8B6D54;
+  --chart-undefined: #737373;
   --sidebar: #52290D;
   --sidebar-foreground: #FFF8F1;
   --sidebar-primary: #345136;
@@ -37,7 +39,6 @@
 
   --gradient-hero: radial-gradient(ellipse 69% 69% at 50% 89%, #176A21, #07490F);
   --gradient-consensus: linear-gradient(to bottom, #1A5C2A, #0A2E14);
-  --chart-6: #8B6D54;
 
   --font-sans: 'Hanken Grotesk', sans-serif;
   --font-serif: Merriweather, serif;
@@ -87,6 +88,8 @@
   --chart-3: #22D3EE;
   --chart-4: #FDE68A;
   --chart-5: #FBBF24;
+  --chart-6: #64748B;
+  --chart-undefined: #737373;
   --sidebar: #030712;
   --sidebar-foreground: #F9FAFB;
   --sidebar-primary: #5B8DEF;
@@ -100,5 +103,4 @@
 
   --gradient-hero: radial-gradient(ellipse 69% 69% at 50% 89%, #4B7CF3, #1E3A8F);
   --gradient-consensus: linear-gradient(to bottom, #1E40AF, #0F1D45);
-  --chart-6: #64748B;
 }

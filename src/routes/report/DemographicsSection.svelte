@@ -31,25 +31,17 @@
 	const tabs = ['Age', 'Location', 'Gender', 'Race & Ethnicity', 'Political'] as const;
 	let activeTab = $state(1);
 
-	const fallbackAgeData = [
-		{ label: '18-24', color: 'bg-chart-1', count: 312 },
-		{ label: '25-39', color: 'bg-chart-2', count: 486 },
-		{ label: '40-54', color: 'bg-chart-3', count: 398 },
-		{ label: '55-64', color: 'bg-chart-4', count: 224 },
-		{ label: '65+', color: 'bg-chart-5', count: 156 },
-		{ label: 'Not Provided', color: 'bg-chart-6', count: 569 }
-	];
 
 	function toCategoryItems(categories: DemographicCategory[]) {
 		return categories.map((c, i) => ({
-			label: c.category,
-			color: chartColors[i % chartColors.length],
+			label: c.value ? c.value : "Not Provided",
+			color: c.value ? chartColors[i % chartColors.length] : 'bg-chart-undefined' ,
 			count: c.count
 		}));
 	}
 
 	const ageData = $derived(
-		demographics?.ageRanges?.length ? toCategoryItems(demographics.ageRanges) : fallbackAgeData
+		demographics?.ageRanges?.length ? toCategoryItems(demographics.ageRanges) : [] 
 	);
 
 	const genderData = $derived(
@@ -63,6 +55,9 @@
 	const politicalData = $derived(
 		demographics?.politicalParty?.length ? toCategoryItems(demographics.politicalParty) : []
 	);
+
+	console.log({ageData, ethnicityData, politicalData,genderData})
+
 
 	const totalDisplay = $derived(
 		demographics?.totalParticipants
