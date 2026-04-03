@@ -56,9 +56,9 @@
 
     function getCategoryTitle(q: AboutYouQuestion): string {
         if (q.id === 'about-001') return 'Age';
-        if (q.id === 'about-002') return 'Ethnicity';
+        if (q.id === 'about-002') return 'Race / Ethnicity';
         if (q.id === 'about-003') return 'Gender';
-        if (q.id === 'about-004') return 'Political Party';
+        if (q.id === 'about-004') return 'Political Affiliation or Leaning';
         return q.question;
     }
 
@@ -92,15 +92,28 @@
             class="mt-4 font-sans text-4xl font-bold leading-9 text-foreground"
             in:fly={{ y: 10, duration: 400, delay: 200, easing: cubicOut }}
         >
-            Let's get to know you.
+		  Help {region.stateName} see itself.
         </p>
         
         <p
             class="mt-3 font-sans text-sm font-medium text-foreground"
             in:fly={{ y: 10, duration: 400, delay: 300, easing: cubicOut }}
         >
-            This information helps us make sure everyone is represented in the conversation. Share only as much as you'd like to, and you have full control over your data. See our full privacy terms <Link href="https://app.termly.io/policy-viewer/policy.html?policyUUID=ba402bb7-5499-4b37-860b-bbb507d3c3c1" external>here</Link>.
-        </p>
+		  This conversation is richer when it reflects the full range of [Central Oregon]. Sharing a little about yourself helps the whole community see who's in this conversation — and whose voices might still be missing.
+       </p>
+        <p
+            class="mt-3 font-sans text-sm font-medium text-foreground"
+            in:fly={{ y: 10, duration: 400, delay: 300, easing: cubicOut }}
+        >
+		  Every question is optional. Share only what you're comfortable with.
+		</p>
+
+        <p
+            class="mt-3 font-sans text-sm font-medium text-foreground"
+            in:fly={{ y: 10, duration: 400, delay: 300, easing: cubicOut }}
+        >
+		  See our full privacy terms <Link href="https://app.termly.io/policy-viewer/policy.html?policyUUID=ba402bb7-5499-4b37-860b-bbb507d3c3c1" external>here</Link>.
+		</p>
 
         <div class="mt-8 flex flex-col gap-2 pb-12">
             {#each questions as q, qIdx (q.id)}
