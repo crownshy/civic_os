@@ -253,6 +253,7 @@
 
 	{:else if screen === 'about-you'}
 		<AboutYouScreen
+			region={subdomainRegion}
 			countyName={session.county}
 			questions={aboutYouQuestions}
 			zipCode={session.zipCode}
