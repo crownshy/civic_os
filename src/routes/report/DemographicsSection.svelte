@@ -2,6 +2,7 @@
 	import Badge from '$lib/components/ui/Badge.svelte';
 	import GradientCard from '$lib/components/ui/GradientCard.svelte';
 	import SwipeCarousel from '$lib/components/ui/SwipeCarousel.svelte';
+	import DonutChart from '$lib/components/ui/DonutChart.svelte';
 
 	interface DemographicCategory {
 		category: string;
@@ -101,7 +102,7 @@
 	>
 		<!-- Tabs -->
 		<div class="scrollbar-hide flex gap-8 overflow-x-auto px-6 pt-5">
-			{#each tabs as tab, i}
+			{#each tabs as tab, i (tab)}
 				<button
 					onclick={() => handleTabClick(i)}
 					class="shrink-0 whitespace-nowrap font-sans text-2xl font-bold leading-7 transition-opacity {activeTab === i
@@ -119,19 +120,7 @@
 				<div class="min-h-[280px] px-6 py-8">
 					{#if i === 0}
 						<!-- Age breakdown -->
-						<div class="flex flex-col items-center">
-							<div class="text-center font-mono text-2xl font-medium text-foreground">{totalDisplay}</div>
-							<div class="font-mono text-[10px] font-medium text-foreground">PARTICIPANTS</div>
-
-							<div class="mt-8 grid w-full grid-cols-2 gap-3">
-								{#each ageData as item}
-									<div class="flex items-center gap-3.5">
-										<div class="h-3 w-3 shrink-0 rounded-full {item.color}"></div>
-										<span class="font-sans text-sm font-medium text-foreground">{item.label}</span>
-									</div>
-								{/each}
-							</div>
-						</div>
+						<DonutChart data={ageData} size={200} />
 					{:else if i === 1}
 						<!-- Location (map placeholder) -->
 						<div class="flex flex-col items-center">
@@ -154,58 +143,25 @@
 						</div>
 					{:else if i === 2}
 						<!-- Gender -->
-						<div class="flex flex-col items-center">
-							<div class="text-center font-mono text-2xl font-medium text-foreground">{totalDisplay}</div>
-							<div class="font-mono text-[10px] font-medium text-foreground">PARTICIPANTS</div>
-							{#if genderData.length}
-								<div class="mt-8 grid w-full grid-cols-2 gap-3">
-									{#each genderData as item}
-										<div class="flex items-center gap-3.5">
-											<div class="h-3 w-3 shrink-0 rounded-full {item.color}"></div>
-											<span class="font-sans text-sm font-medium text-foreground">{item.label}</span>
-										</div>
-									{/each}
-								</div>
-							{:else}
-								<p class="mt-8 font-sans text-sm text-muted-foreground">No gender data available yet.</p>
-							{/if}
-						</div>
+						{#if genderData.length}
+							<DonutChart data={genderData} size={200} />
+						{:else}
+							<p class="mt-8 font-sans text-sm text-muted-foreground">No gender data available yet.</p>
+						{/if}
 					{:else if i === 3}
 						<!-- Race & Ethnicity -->
-						<div class="flex flex-col items-center">
-							<div class="text-center font-mono text-2xl font-medium text-foreground">{totalDisplay}</div>
-							<div class="font-mono text-[10px] font-medium text-foreground">PARTICIPANTS</div>
-							{#if ethnicityData.length}
-								<div class="mt-8 grid w-full grid-cols-2 gap-3">
-									{#each ethnicityData as item}
-										<div class="flex items-center gap-3.5">
-											<div class="h-3 w-3 shrink-0 rounded-full {item.color}"></div>
-											<span class="font-sans text-sm font-medium text-foreground">{item.label}</span>
-										</div>
-									{/each}
-								</div>
-							{:else}
-								<p class="mt-8 font-sans text-sm text-muted-foreground">No ethnicity data available yet.</p>
-							{/if}
-						</div>
+						{#if ethnicityData.length}
+							<DonutChart data={ethnicityData} size={200} />
+						{:else}
+							<p class="mt-8 font-sans text-sm text-muted-foreground">No ethnicity data available yet.</p>
+						{/if}
 					{:else}
 						<!-- Political -->
-						<div class="flex flex-col items-center">
-							<div class="text-center font-mono text-2xl font-medium text-foreground">{totalDisplay}</div>
-							<div class="font-mono text-[10px] font-medium text-foreground">PARTICIPANTS</div>
-							{#if politicalData.length}
-								<div class="mt-8 grid w-full grid-cols-2 gap-3">
-									{#each politicalData as item}
-										<div class="flex items-center gap-3.5">
-											<div class="h-3 w-3 shrink-0 rounded-full {item.color}"></div>
-											<span class="font-sans text-sm font-medium text-foreground">{item.label}</span>
-										</div>
-									{/each}
-								</div>
-							{:else}
-								<p class="mt-8 font-sans text-sm text-muted-foreground">No political affiliation data available yet.</p>
-							{/if}
-						</div>
+						{#if politicalData.length}
+							<DonutChart data={politicalData} size={200} />
+						{:else}
+							<p class="mt-8 font-sans text-sm text-muted-foreground">No political affiliation data available yet.</p>
+						{/if}
 					{/if}
 				</div>
 			{/snippet}
