@@ -72,7 +72,7 @@
 
 	{#if showLegend}
 		<div class="grid w-full grid-cols-2 gap-3">
-			{#each data as item (item.label)}
+			{#each data as item, i (`${item.label}-${i}`)}
 				<div class="flex items-center gap-3.5">
 					<div class="h-3 w-3 shrink-0 rounded-full {item.color}"></div>
 					<span class="font-sans text-sm font-medium text-foreground">{item.label}</span>
