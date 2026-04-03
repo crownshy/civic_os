@@ -5,13 +5,15 @@
 	import { Input } from '$lib/components/ui/input';
 	import { session } from '$lib/services/session.svelte';
 	import { Mail } from 'lucide-svelte';
+	import type { RegionConfig } from '$lib/config/regions';
 
 	interface Props {
 		countyName: string;
+		region:RegionConfig;
 		onBackToVoting?: () => void;
 	}
 
-	let { countyName, onBackToVoting }: Props = $props();
+	let { countyName, onBackToVoting, region }: Props = $props();
 
 	let email = $state('');
 	let submitting = $state(false);
@@ -41,7 +43,7 @@
 
 <div class="flex h-full flex-col bg-gradient-primary" in:scale={{ start: 0.9, duration: 500, easing: cubicOut }}>
 	<div class="flex flex-1 flex-col overflow-y-auto">
-		<AboutBar {countyName} onBack={onBackToVoting} />
+		<AboutBar region={region} {countyName} onBack={onBackToVoting} />
 		<!-- Hero: emoji + heading -->
 		<div class="flex flex-col items-center px-8 pt-14">
 			<EmojiCircle emoji="🎉" size="lg" />
@@ -56,7 +58,7 @@
 				</p>
 			{:else}
 				<p class="mt-2 text-center font-sans text-base font-medium leading-6 text-foreground/80">
-					Share your email to receive updates on this conversation and opportunities to share your voice on this issue.
+					Share your email to receive updates on this conversation and future opportunities to get involved.
 				</p>
 			{/if}
 		</div>
@@ -99,10 +101,17 @@
 
 			<div class="mt-4 font-sans text-lg font-normal leading-7 text-foreground">
 				<p>
-					In April and May, there will be <strong>live conversations</strong> across Salt Lake, Weber, and Cache Counties. These conversations will build on the common themes and shared values that emerge from the statements here. If you want to take part in these or future conversations, please <strong>share your email above</strong> or visit the <Link href="https://www.utahcommonground.org/home" external class="font-bold">Utah Common Ground website.</Link>
+				  {@html region.whatsNext}
 				</p>
+			</div>
+
+			<div class="flex items-center gap-2">
+				<span class="rounded-[5px] bg-destructive px-2 py-1 font-sans text-sm font-bold leading-5 text-card">GO DEEPER</span>
+			</div>
+			<div>
+
 				<p class="mt-4">
-					The ultimate goal of this campaign is to surface common ground that lets Utahns take action from the local to state levels and beyond. If you are interested in getting involved in a deeper way, let us know at <Link href="mailto:hello@bloom-project.org" external class="font-bold">hello@bloom-project.org</Link>.
+				  {@html region.goDeeper}
 				</p>
 			
 				<div class="mt-8 outline-[0.5px] outline-foreground/40"></div>

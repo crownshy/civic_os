@@ -263,6 +263,7 @@
 		<ThankYouScreen
 			countyName={session.county}
 			onBackToVoting={handleBackToVoting}
+			region={subdomainRegion}
 		/>
 
 	<!-- Preserved screens (unused in conference flow) -->
@@ -273,7 +274,7 @@
 		/>
 	{:else if screen === 'pop-quiz'}
 		<div class="flex h-full flex-col bg-gradient-primary" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
-			<AboutBar countyName={session.county} />
+			<AboutBar region={subdomainRegion} countyName={session.county} />
 			<PopQuiz quiz={currentQuiz} onContinue={resumeVoting} onSkip={resumeVoting} />
 		</div>
 	{:else if screen === 'nice-job'}

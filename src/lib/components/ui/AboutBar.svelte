@@ -1,14 +1,16 @@
 <script lang="ts">
     import Dialog from './Dialog.svelte';
     import Button from './Button.svelte';
+	import type { RegionConfig } from '$lib/config/regions';
 
     interface Props {
         countyName: string;
+		region: RegionConfig;
         onBack?: () => void;
         backLabel?: string;
     }
 
-    let { countyName, onBack, backLabel = '← BACK TO VOTING' }: Props = $props();
+    let { countyName, onBack, backLabel = '← BACK TO VOTING' , region}: Props = $props();
     let showAbout = $state(false);
 </script>
 
@@ -39,11 +41,16 @@
     title="About this Conversation"
 >
     <div class="px-7 pt-6">
-        <p class="font-sans text-lg font-medium leading-7">
-            This conversation is about how Utah can prepare for the growing impact of AI in so many aspects of our lives (work and the economy, education, wellbeing, information quality, government services, etc). 
-        </p>
-        <p class="mt-4 font-sans text-lg font-medium leading-7">
-            It is hosted by Utah Common Ground, a collaboration of diverse nonpartisan organizations across Utah. You can find out more about them at utahcommonground.org.
-        </p>
+		{#each region.aboutConversation as para, index}
+		  {#if index==0}
+			<p class="font-sans text-lg font-medium leading-7">
+				{@html para}
+			</p>
+		  {:else}
+			<p class="mt-4 font-sans text-lg font-medium leading-7">
+				{@html para}
+			</p>
+		  {/if}
+		{/each}
     </div>
 </Dialog>

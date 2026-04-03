@@ -36,7 +36,7 @@
             return;
         }
         // Resolve region from zipcode for correct conversationId/inviteId
-        const zipRegion = region.slug=='testing' ? getRegionByZipcode(zipCode.trim()) : region;
+        const zipRegion = region.slug=='testing' ? region : getRegionByZipcode(zipCode.trim()) ;
         joining = true;
         const success = await session.join(
             zipCode.trim(),

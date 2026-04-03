@@ -5,16 +5,18 @@
     import type { AboutYouQuestion } from '$lib/types/mock-data';
     import { AboutBar, Button, Dialog, Link } from '$lib/components/ui';
     import { Check, Plus } from 'lucide-svelte';
+	import type { RegionConfig } from '$lib/config/regions';
 
     interface Props {
         countyName: string;
         questions: AboutYouQuestion[];
         zipCode?: string;
+		region:RegionConfig;
         onDone: (demographics?: { age?: string; ethnicity?: string; gender?: string; politicalParty?: string }) => void;
         onSkip?: () => void;
     }
 
-    let { countyName, questions, zipCode = '', onDone, onSkip }: Props = $props();
+    let { countyName, questions, zipCode = '', onDone, onSkip, region }: Props = $props();
 
     let openDialog = $state<string | null>(null);
     let dialogOpen = $derived(openDialog !== null);
@@ -78,7 +80,7 @@
 </script>
 
 <div class="flex h-full flex-col bg-gradient-primary">
-    <AboutBar {countyName} />
+    <AboutBar region={region} {countyName} />
 
     <div class="flex flex-1 flex-col overflow-y-auto px-6 pt-8">
         <span

@@ -1,5 +1,5 @@
 import { api, config } from './api';
-import { getCountyFromZip } from '$lib/data/utah-counties';
+import { GENERIC_REGION, REGIONS } from '$lib/config/regions';
 
 export interface UserProfile {
 	id: string;
@@ -22,6 +22,17 @@ export interface User {
 }
 
 const STORAGE_KEY = 'civic-os-session';
+
+export function getCountyFromZip(zip: string): string {
+	const trimmed = zip.trim();
+
+	// Fallback: prefix-based heuristic
+	const prefix = trimmed.slice(0, 2);
+	let region = Object.values(REGIONS).find((region) => region.zipPrefixes.includes(prefix))
+	if (region) { return region.stateName }
+
+	else { return GENERIC_REGION.stateName }
+}
 
 function loadPersistedSession(): {
 	userId?: string;
