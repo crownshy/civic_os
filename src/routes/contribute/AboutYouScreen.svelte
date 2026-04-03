@@ -99,7 +99,7 @@
             class="mt-3 font-sans text-sm font-medium text-foreground"
             in:fly={{ y: 10, duration: 400, delay: 300, easing: cubicOut }}
         >
-		  This conversation is richer when it reflects the full range of [Central Oregon]. Sharing a little about yourself helps the whole community see who's in this conversation — and whose voices might still be missing.
+		  This conversation is richer when it reflects the full range of {region.stateName}. Sharing a little about yourself helps the whole community see who's in this conversation — and whose voices might still be missing.
        </p>
         <p
             class="mt-3 font-sans text-sm font-medium text-foreground"
