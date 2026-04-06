@@ -251,3 +251,35 @@ export function extractSubdomain(hostname: string): string {
 
 	return '';
 }
+
+/**
+ * Build the full URL for a region's subdomain with zipcode parameter.
+ * Handles both production and local development environments.
+ */
+export function getRegionUrl(region: RegionConfig, zipCode: string, currentHostname: string): string {
+	const host = currentHostname.split(':')[0];
+	const port = currentHostname.includes(':') ? ':' + currentHostname.split(':')[1] : '';
+
+	// Determine base domain
+	let baseDomain: string;
+	if (host.endsWith('.localhost') || host.endsWith('.local')) {
+		// Local dev
+		baseDomain = host.endsWith('.localhost') ? 'localhost' : 'local';
+	} else {
+		// Production - extract base domain from current hostname
+		// e.g., utah.bloomproject.us → bloomproject.us
+		const parts = host.split('.');
+		if (parts.length >= 2) {
+			baseDomain = parts.slice(-2).join('.');
+		} else {
+			baseDomain = 'bloomproject.us'; // fallback
+		}
+	}
+
+	// Build the full URL
+	const protocol = host.includes('localhost') || host.includes('.local') ? 'http' : 'https';
+	const subdomain = region.slug;
+	const url = `${protocol}://${subdomain}.${baseDomain}${port}`;
+
+	return `${url}/landing?zip_code=${encodeURIComponent(zipCode)}`;
+}

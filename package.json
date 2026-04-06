@@ -67,7 +67,7 @@
 		"vitest-browser-svelte": "^2.0.2"
 	},
 	"dependencies": {
-		"@crownshy/api-client": "^0.0.3",
+		"@crownshy/api-client": "^0.0.5",
 		"@lukulent/svelte-umami": "^0.0.4",
 		"bits-ui": "^2.15.7",
 		"clsx": "^2.1.1",

@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@crownshy/api-client':
-        specifier: ^0.0.3
-        version: 0.0.3(axios@1.13.6)(zod@3.25.76)
+        specifier: ^0.0.5
+        version: 0.0.5(axios@1.13.6)(zod@3.25.76)
       '@lukulent/svelte-umami':
         specifier: ^0.0.4
         version: 0.0.4(svelte@5.50.1)
@@ -212,8 +212,8 @@ packages:
     peerDependencies:
       storybook: ^0.0.0-0 || ^10.1.0 || ^10.1.0-0 || ^10.2.0-0 || ^10.3.0-0
 
-  '@crownshy/api-client@0.0.3':
-    resolution: {integrity: sha512-yTc9c8Uldzx84lK91ENiXqAsAoJh1uaKVvNCViT5K9S3HuDFtqRq87owvUjE2lbbW57SZqnWwVNbYagacfzc8Q==}
+  '@crownshy/api-client@0.0.5':
+    resolution: {integrity: sha512-fWDk4vAepvyg9GVqg3XHXLxGh9Ha81xZRgCgCfA5RaG4GZnPZAezogvx1+VUACDE6F1dbzzicmZ9VskqOfcANA==}
 
   '@esbuild/aix-ppc64@0.27.3':
     resolution: {integrity: sha512-9fJMTNFTWZMh5qwrBItuziu834eOCUcEqymSH7pY+zoMVEZg3gcPuBNxH1EvfVYe9h0x/Ptw8KBzv7qxb7l8dg==}
@@ -2617,7 +2617,7 @@ snapshots:
       - '@chromatic-com/cypress'
       - '@chromatic-com/playwright'
 
-  '@crownshy/api-client@0.0.3(axios@1.13.6)(zod@3.25.76)':
+  '@crownshy/api-client@0.0.5(axios@1.13.6)(zod@3.25.76)':
     dependencies:
       '@zodios/core': 10.9.6(axios@1.13.6)(zod@3.25.76)
       typescript: 5.9.3
