@@ -50,7 +50,7 @@
         </div>
     {/if}
     
-    <Button variant={variant === 'light' ? 'ghost' : 'soft'} size="xs" onclick={() => (showAbout = true)} class={variant === 'light' ? 'bg-white/10 text-white/80' : ''}>
+    <Button variant={variant === 'light' ? 'ghost' : 'soft'} size="xs" href='/campaign/ai' class={variant === 'light' ? 'bg-white/10 text-white/80' : ''}>
         {buttonText}
     </Button>
 </div>
