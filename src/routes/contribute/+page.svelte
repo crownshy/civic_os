@@ -151,11 +151,26 @@
 		goToEndFlow();
 	}
 
+	/** Map age range strings to representative numbers (midpoints) */
+	function ageRangeToNumber(ageRange: string): number | undefined {
+		const ageMap: Record<string, number> = {
+			'Under 18': 16,
+			'18 - 24': 21,
+			'25 - 34': 29,
+			'35 - 44': 39,
+			'45 - 54': 49,
+			'55 - 64': 59,
+			'65 - 84': 74,
+			'85+': 85
+		};
+		return ageMap[ageRange];
+	}
+
 	async function handleDemographicsDone(demographics?: { age?: string; ethnicity?: string; gender?: string; politicalParty?: string }) {
 		// Save demographics to backend profile (awaited so it completes before navigation)
 		if (demographics) {
 			await session.saveProfile({
-				age: demographics.age ? parseInt(demographics.age, 10) || undefined : undefined,
+				age: demographics.age ? ageRangeToNumber(demographics.age) : undefined,
 				ethnicity: demographics.ethnicity || undefined,
 				gender: demographics.gender || undefined,
 				politicalParty: demographics.politicalParty || undefined
