@@ -4,10 +4,16 @@
 	import type { RegionConfig } from '$lib/config/regions';
 	import { AppShell } from '$lib/components/layout';
 	import { Button, Badge, PhaseCard } from '$lib/components/ui';
+	import { Input } from '$lib/components/ui/input';
+	import { session } from '$lib/services/session.svelte';
+	import { Mail } from 'lucide-svelte';
+	import { fade } from 'svelte/transition';
 
 	const region: RegionConfig = page.data.region;
 
 	let email = $state('');
+	let submitting = $state(false);
+	let emailError = $state('');
 
 	function handleJoinConversation() {
 		goto('/');
@@ -18,8 +24,25 @@
 		console.log('Learn more clicked');
 	}
 
-	function handleSignUp() {
-		console.log('Sign up:', email);
+	function isValidEmail(value: string): boolean {
+		return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+	}
+
+	async function handleSignUp() {
+		emailError = '';
+		const trimmed = email.trim();
+		if (!trimmed) {
+			emailError = 'Please enter an email address';
+			return;
+		}
+		if (!isValidEmail(trimmed)) {
+			emailError = 'Please enter a valid email address';
+			return;
+		}
+		submitting = true;
+		await session.registerEmail(trimmed);
+		session.emailProvided = true;
+		submitting = false;
 	}
 </script>
 
@@ -28,9 +51,11 @@
 		<!-- Header Bar -->
 		<div class="flex items-center justify-between px-6 py-3  backdrop-blur-sm">
 			<span class="font-mono text-sm font-medium text-muted-foreground/70">{region.stateName}</span>
-			<Badge variant="soft" size="md">
-				<span class="text-primary">SHARE YOUR THOUGHTS →</span>
-			</Badge>
+			<a href='/'>
+			  <Badge variant="soft" size="md">
+				  <span class="text-primary">SHARE YOUR THOUGHTS →</span>
+			  </Badge>
+			</a>
 		</div>
 
 		<!-- Hero Section -->
@@ -64,7 +89,7 @@
 				hasProgressIndicator
 				kind="primary"
 			>
-				<Button variant="primary" fullWidth onclick={handleJoinConversation}>
+				<Button href='/' variant="primary" fullWidth onclick={handleJoinConversation}>
 					JOIN THE CONVERSATION
 				</Button>
 			</PhaseCard>
@@ -90,9 +115,11 @@
 				<p class="font-sans text-base font-medium text-muted-foreground leading-6 mb-6">
 					This conversation is supported by public-serving organizations all over {region.stateName}, including <strong class="text-secondary">{region.hostName}</strong> and more.
 				</p>
-				<Button variant="primary" fullWidth onclick={handleLearnMore}>
-					LEARN MORE
-				</Button>
+				<a href={region.hostUrl} target="_blank" rel="noopener noreferrer">
+				  <Button variant="primary" fullWidth >
+					  LEARN MORE
+				  </Button>
+				</a>
 			</div>
 		</div>
 
@@ -114,7 +141,7 @@
 					hasProgressIndicator
 					kind="primary"
 				>
-					<Button variant="destructive" fullWidth>
+					<Button href='/' variant="destructive" fullWidth>
 						SHARE YOUR PERSPECTIVE →
 					</Button>
 				</PhaseCard>
@@ -152,20 +179,39 @@
 		<!-- Email Signup Section -->
 		<div class="bg-card/30 py-8 px-6">
 			<div class="flex flex-col gap-4 max-w-md mx-auto">
-				<p class="font-sans text-base text-muted-foreground leading-6 text-center">
-					<strong>Share your email</strong> to receive updates on this conversation and opportunities to share your voice on this issue.
-				</p>
-				<div class="flex flex-col gap-2">
-					<input
-						type="email"
-						bind:value={email}
-						placeholder="email@xyz.com"
-						class="px-5 py-3 bg-card rounded-full shadow-[inset_2px_4px_4px_0px_rgba(0,0,0,0.10)] font-sans text-lg font-medium text-muted-foreground placeholder:opacity-80 focus:outline-none focus:ring-2 focus:ring-primary"
-					/>
-					<Button variant="primary" fullWidth onclick={handleSignUp}>
-						SIGN UP FOR UPDATES
-					</Button>
-				</div>
+				{#if session.emailProvided}
+					<p class="font-sans text-base text-muted-foreground leading-6 text-center" in:fade={{ duration: 400, delay: 300 }}>
+						<strong>Received! We'll be in touch.</strong>
+					</p>
+				{:else}
+					<p class="font-sans text-base text-muted-foreground leading-6 text-center">
+						<strong>Share your email</strong> to receive updates on this conversation and opportunities to share your voice on this issue.
+					</p>
+					<div class="flex flex-col gap-3.5">
+						<form
+							onsubmit={(e) => { e.preventDefault(); handleSignUp(); }}
+							class="flex w-full items-center rounded-full bg-card px-5 py-3 shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)]"
+							class:ring-2={emailError}
+							class:ring-destructive={emailError}
+						>
+							<Mail class="text-muted-foreground/60 size-4 shrink-0" />
+							<Input
+								bind:value={email}
+								oninput={() => emailError = ''}
+								type="email"
+								placeholder="email@xyz.com"
+								disabled={submitting}
+								class="ml-2.5 flex-1 h-8 rounded-none border-0 bg-transparent font-sans text-lg font-medium text-muted-foreground placeholder:text-muted-foreground/50 shadow-none focus-visible:ring-0"
+							/>
+						</form>
+						{#if emailError}
+							<p class="-mt-2 px-2 font-sans text-sm text-destructive">{emailError}</p>
+						{/if}
+						<Button variant="primary" fullWidth disabled={!email.trim() || submitting} onclick={handleSignUp}>
+							SIGN UP FOR UPDATES
+						</Button>
+					</div>
+				{/if}
 			</div>
 		</div>
 
