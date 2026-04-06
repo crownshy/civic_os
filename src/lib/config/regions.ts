@@ -175,7 +175,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 
 /** Fallback region for unknown subdomains or non-matching zipcodes */
 export const GENERIC_REGION: RegionConfig = {
-	slug: 'generic',
+	slug: 'all',
 	stateName: 'USA',
 	demonym: 'Americans',
 	question:
