@@ -96,21 +96,21 @@ export const aboutYouQuestions: AboutYouQuestion[] = [
 		id: 'about-001',
 		question: 'What is your age?',
 		description: 'Select the one that best describes you.',
-		options: ['Under 18', '18 - 34', '35 - 54', '55 - 64', '65+'],
+		options: ['Under 18', '18 - 24', '25 - 34', '35 - 44', '45 - 54', '55 - 64', '65 - 84', '85+'],
 		multiSelect: false
 	},
 	{
 		id: 'about-002',
 		question: 'What is your ethnicity?',
 		description: 'Select the one that best describes you.',
-		options: ['White', 'Black', 'Hispanic', 'Asian / Pacific Islander', 'Native American', 'Middle Eastern / North African', 'Multiracial', 'Other'],
+		options: ['White or Caucasian', 'Black or African American', 'Hispanic or Latino', 'Asian / Pacific Islander', 'Native American', 'Middle Eastern / North African', 'Multiracial', 'Other'],
 		multiSelect: false
 	},
 	{
 		id: 'about-003',
 		question: 'What is your gender identity?',
 		description: 'Select the one that best describes you.',
-		options: ['Male', 'Female', 'Nonbinary', 'Other'],
+		options: ['Male', 'Female', 'Other'],
 		multiSelect: false
 	},
 	{
