@@ -68,6 +68,7 @@
 	},
 	"dependencies": {
 		"@crownshy/api-client": "^0.0.3",
+		"@lukulent/svelte-umami": "^0.0.4",
 		"bits-ui": "^2.15.7",
 		"clsx": "^2.1.1",
 		"d3-scale": "^4.0.2",
