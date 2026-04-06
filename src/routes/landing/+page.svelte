@@ -5,8 +5,10 @@
     import { AppShell } from '$lib/components/layout';
     import { SwipeCarousel, Button, Dialog, ZipInput, Link } from '$lib/components/ui';
     import { session } from '$lib/services/session.svelte';
-    import { getRegionByZipcode } from '$lib/config/regions';
+    import { getRegionByZipcode, getRegionUrl } from '$lib/config/regions';
     import type { RegionConfig } from '$lib/config/regions';
+    import { onMount } from 'svelte';
+    import { browser } from '$app/environment';
 
     const region: RegionConfig = page.data.region;
 
@@ -20,6 +22,17 @@
     let showHostMessage = $state(false);
     let showTermsMessage = $state(false);
     let hasAgreedToTos = $derived(session.hasAgreedToTos);
+
+    // Check for zipcode in URL parameter on mount
+    onMount(() => {
+        if (browser && !isReturning) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const zipParam = urlParams.get('zip_code');
+            if (zipParam) {
+                zipCode = zipParam;
+            }
+        }
+    });
 
     function showTermsModal() {
         showTermsMessage = true;
@@ -35,8 +48,19 @@
             goto('/contribute');
             return;
         }
-        // Resolve region from zipcode for correct conversationId/inviteId
-        const zipRegion = getRegionByZipcode(zipCode.trim()) ;
+
+        // Resolve region from zipcode
+        const zipRegion = getRegionByZipcode(zipCode.trim());
+
+        // Check if we need to redirect to a different subdomain
+        if (zipRegion.slug !== region.slug) {
+            // Redirect to the appropriate subdomain with zipcode parameter
+            const redirectUrl = getRegionUrl(zipRegion, zipCode.trim(), window.location.hostname);
+            window.location.href = redirectUrl;
+            return;
+        }
+
+        // Zipcode matches current region - proceed with registration
         joining = true;
         const success = await session.join(
             zipCode.trim(),
