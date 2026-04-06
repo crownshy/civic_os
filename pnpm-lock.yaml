@@ -11,6 +11,9 @@ importers:
       '@crownshy/api-client':
         specifier: ^0.0.3
         version: 0.0.3(axios@1.13.6)(zod@3.25.76)
+      '@lukulent/svelte-umami':
+        specifier: ^0.0.4
+        version: 0.0.4(svelte@5.50.1)
       bits-ui:
         specifier: ^2.15.7
         version: 2.15.7(@internationalized/date@3.11.0)(@sveltejs/kit@2.50.2(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.50.1)(vite@7.3.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.50.1)(typescript@5.9.3)(vite@7.3.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.50.1)
@@ -485,6 +488,11 @@ packages:
     resolution: {integrity: sha512-vofKV2UFVrKE6I4ewKJ3dfCXSV6iP6nWVmiM83MLjsU91EeJcEg7LoWUABLp/aOTxj1HQNbJD1f3g3L0JQgH9A==}
     peerDependencies:
       svelte: ^5
+
+  '@lukulent/svelte-umami@0.0.4':
+    resolution: {integrity: sha512-LXmo0oa8lPg032gfqFQgRhEJgUDqgsOzyqPSXtJ2nKlUAYhsPbB0EXwgOjrj7+IfeiBEiq2c6vfv0VV5Jvv/PA==}
+    peerDependencies:
+      svelte: ^4.0.0 || ^5.0.0
 
   '@mdx-js/react@3.1.1':
     resolution: {integrity: sha512-f++rKLQgUVYDAtECQ6fn/is15GkEH9+nZPM3MS0RcxVqoTfawHvDlSCH7JbMhAM6uJ32v3eXLvLmLvjGu7PTQw==}
@@ -2838,6 +2846,11 @@ snapshots:
 
   '@lucide/svelte@0.561.0(svelte@5.50.1)':
     dependencies:
+      svelte: 5.50.1
+
+  '@lukulent/svelte-umami@0.0.4(svelte@5.50.1)':
+    dependencies:
+      esm-env: 1.2.2
       svelte: 5.50.1
 
   '@mdx-js/react@3.1.1(@types/react@19.2.13)(react@19.2.4)':
