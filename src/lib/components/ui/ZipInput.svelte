@@ -12,7 +12,7 @@
 		placeholder?: string;
 		disabled?: boolean;
 		regionPrefixes?: string[];
-		shake?: boolean;
+		flash?: boolean;
 	}
 
 	let {
@@ -20,13 +20,13 @@
 		placeholder = 'Enter your home zip code...',
 		disabled = false,
 		regionPrefixes = [],
-		shake = $bindable(false)
+		flash = $bindable(false)
 	}: Props = $props();
 
 	let open = $state(false);
 	let searchValue = $state('');
 	let triggerRef = $state<HTMLButtonElement>(null!);
-	let shaking = $state(false);
+	let flashing = $state(false);
 
 	$effect(() => {
 		const stripped = searchValue.replace(/\D/g, '');
@@ -36,11 +36,11 @@
 	});
 
 	$effect(() => {
-		if (shake) {
-			shaking = true;
+		if (flash) {
+			flashing = true;
 			const id = setTimeout(() => {
-				shaking = false;
-				shake = false;
+				flashing = false;
+				flash = false;
 			}, 800);
 			return () => clearTimeout(id);
 		}
@@ -82,7 +82,7 @@
 		50% { outline-color: color-mix(in srgb, var(--secondary) 30%, transparent); }
 		75% { outline-color: var(--secondary); }
 	}
-	.shake-flash {
+	.flash-border-active {
 		animation: flash-border 0.8s ease-in-out;
 	}
 </style>
@@ -100,7 +100,7 @@
 							: 'outline-secondary/30 text-secondary',
 						disabled && 'opacity-60 cursor-not-allowed',
 						!value && 'text-secondary/80',
-						shaking && 'shake-flash'
+						flashing && 'flash-border-active'
 					)}
 				>
 					<MapPinIcon class={cn('size-4 shrink-0', isValid ? 'text-primary' : 'text-secondary/60')} />
