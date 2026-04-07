@@ -25,4 +25,4 @@ export { default as ZipInput } from './ZipInput.svelte';
 export { default as Link } from './Link.svelte';
 export { default as GradientCard } from './GradientCard.svelte';
 export { default as DonutChart } from './DonutChart.svelte';
-export { default as PhaseCard } from './PhaseCard.svelte';
+export { default as Card } from './Card.svelte';

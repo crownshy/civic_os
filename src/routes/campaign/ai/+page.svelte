@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import type { RegionConfig } from '$lib/config/regions';
 	import { AppShell } from '$lib/components/layout';
-	import { Button, Badge, PhaseCard } from '$lib/components/ui';
+	import { Button, Badge, Card } from '$lib/components/ui';
 	import { Input } from '$lib/components/ui/input';
 	import { session } from '$lib/services/session.svelte';
 	import { Mail, MapPin } from 'lucide-svelte';
@@ -74,7 +74,7 @@
 			</p>
 
 			<!-- Phase Navigation -->
-			<div class="mt-5 flex items-center justify-center gap-1 flex-wrap">
+			<div class="mt-5 flex items-center gap-1 flex-wrap">
 				<Badge variant="dark" size="md">OUR VIEWS</Badge>
 				<span class="font-mono text-sm text-muted-foreground/50">&gt;</span>
 				<Badge variant="soft" size="md">LISTEN & LEARN</Badge>
@@ -85,16 +85,30 @@
 
 		<!-- Our Views Card -->
 		<div class="px-6 pb-8">
-			<PhaseCard
-				heading="Our Views"
-				description="An opportunity for everyday people to share their thoughts on how artificial intelligence should be managed to protect people's livelihoods."
-				subheading="LIVE NOW"
-				kind="primary"
-			>
-				<Button href='/' variant="primary" fullWidth onclick={handleJoinConversation}>
-					JOIN NOW
-				</Button>
-			</PhaseCard>
+			<Card class="p-6">
+				<div class="flex gap-3">
+					<!-- Left indicator -->
+					<div class="flex flex-col mr-2 items-center shrink-0 pt-1">
+						<div class="relative">
+							<div class="absolute -inset-1 rounded-full bg-background/20 shadow-[0px_0px_15px_1px_var(--primary)]"></div>
+							<div class="relative w-4 h-4 rounded-full bg-primary"></div>
+						</div>
+						<div class="mt-1.5 w-0.5 flex-1 bg-linear-to-b from-primary to-transparent"></div>
+					</div>
+
+					<!-- Content -->
+					<div class="flex-1 min-w-0">
+						<span class="font-mono text-xs text-destructive">LIVE NOW</span>
+						<h3 class="font-sans text-3xl font-bold leading-tight mt-2 mb-3 text-primary">Our Views</h3>
+						<p class="font-sans text-sm font-medium leading-5 mb-6 text-muted-foreground">
+							An opportunity for everyday people to share their thoughts on how artificial intelligence should be managed to protect people's livelihoods.
+						</p>
+						<Button href='/' fullWidth variant="primary" size="md" class="text-sm bg-linear-to-r from-primary to-primary-dark">
+							JOIN THE CONVERSATION
+						</Button>
+					</div>
+				</div>
+			</Card>
 		</div>
 
 		<!-- What is this about? Section -->
@@ -109,8 +123,8 @@
 
 		<!-- Your Hosts Section -->
 		<div class="px-6 pb-8">
-			<div class="bg-card rounded-xl p-6 border border-muted-foreground/20">
-				<span class="font-mono text-xs font-medium uppercase text-muted-foreground/70">WHO'S HOLDING THE SPACE?</span>
+			<Card class="p-6">
+				<span class="font-mono text-xs uppercase text-primary">WHO'S HOLDING THE SPACE?</span>
 				<h2 class="font-sans text-3xl font-bold text-muted-foreground leading-8 mt-2 mb-4">
 					Your Hosts
 				</h2>
@@ -122,11 +136,11 @@
 					  LEARN MORE
 				  </Button>
 				</a>
-			</div>
+			</Card>
 		</div>
 
 		<!-- Timeline Section -->
-		<div class="bg-gradient-to-b from-primary to-primary-dark py-10 px-6">
+		<div class="py-10 px-6" style="background: var(--gradient-consensus)">
 			<h2 class="font-sans text-4xl font-bold text-primary-foreground text-center leading-9 mb-2">
 				Timeline
 			</h2>
@@ -136,43 +150,79 @@
 
 			<!-- Phase 1: Our Views -->
 			<div class="mb-6">
-				<PhaseCard
-					heading="Our Views"
-					description="An opportunity for everyday people to share their thoughts on how artificial intelligence should be managed to protect people's livelihoods."
-					subheading="PHASE ONE (APRIL 2026)"
-					kind="primary"
-				>
-					<Button href='/' variant="destructive" fullWidth>
-						SHARE YOUR PERSPECTIVE →
-					</Button>
-				</PhaseCard>
+				<Card class="p-6">
+					<div class="flex gap-3">
+						<!-- Left indicator -->
+						<div class="flex flex-col items-center shrink-0 pt-0.5">
+							<div class="relative">
+								<div class="absolute -inset-1 rounded-full bg-background/20 shadow-[0px_0px_11px_4px_var(--destructive)]"></div>
+								<div class="relative w-4 h-4 rounded-full bg-destructive"></div>
+							</div>
+							<div class="mt-1.5 w-0.5 flex-1 bg-linear-to-b from-destructive to-transparent"></div>
+						</div>
+
+						<!-- Content -->
+						<div class="flex-1 min-w-0">
+							<span class="font-mono text-xs font-medium text-destructive/70">PHASE ONE (APRIL 2026)</span>
+							<h3 class="font-sans text-3xl font-bold leading-tight mt-2 mb-3 text-muted-foreground">Our Views</h3>
+							<p class="font-sans text-sm font-medium leading-5 mb-6 text-muted-foreground">
+								An opportunity for everyday people to share their thoughts on how artificial intelligence should be managed to protect people's livelihoods.
+							</p>
+							<Button href='/' variant="destructive" fullWidth>
+								SHARE YOUR PERSPECTIVE →
+							</Button>
+						</div>
+					</div>
+				</Card>
 			</div>
 
 			<!-- Phase 2: Listen & Learn -->
 			<div class="mb-6">
-				<PhaseCard
-					heading="Listen & Learn"
-					description="Everyone will have a chance to join live conversations to figure out what is actionable from the first phase."
-					subheading="PHASE TWO (MAY 2026)"
-					kind="secondary"
-				>
-					<Button class='text-white bg-white/20 font-bold' variant="gradient" fullWidth disabled>
-						TBA
-					</Button>
-				</PhaseCard>
+				<Card class="bg-card/10 border-card/20 p-6">
+					<div class="flex gap-3">
+						<!-- Left indicator -->
+						<div class="flex flex-col items-center shrink-0 pt-0.5">
+							<div class="w-4 h-4 rounded-full bg-card/20"></div>
+							<div class="mt-1.5 w-0.5 flex-1 bg-linear-to-b from-card/20 to-transparent"></div>
+						</div>
+
+						<!-- Content -->
+						<div class="flex-1 min-w-0">
+							<span class="font-mono text-xs font-medium text-card/70">PHASE TWO (MAY 2026)</span>
+							<h3 class="font-sans text-3xl font-bold leading-tight mt-2 mb-3 text-card">Listen & Learn</h3>
+							<p class="font-sans text-sm font-medium leading-5 mb-6 text-card">
+								Everyone will have a chance to join live conversations to figure out what is actionable from the first phase.
+							</p>
+							<Button class='text-white bg-white/20 font-bold' variant="gradient" fullWidth disabled>
+								TBA
+							</Button>
+						</div>
+					</div>
+				</Card>
 			</div>
 
 			<!-- Phase 3: Decisions -->
-			<PhaseCard
-				heading="Decisions"
-				description="Everyone will have a chance to join live conversations to figure out what is actionable from the first phase."
-				subheading="PHASE THREE (MAY 2026)"
-				kind="secondary"
-			>
-				<Button class='text-white bg-white/20 font-bold' variant="gradient" fullWidth disabled>
-					TBA
-				</Button>
-			</PhaseCard>
+			<Card class="bg-card/10 border-card/20 p-6">
+				<div class="flex gap-3">
+					<!-- Left indicator -->
+					<div class="flex flex-col items-center shrink-0 pt-0.5">
+						<div class="w-4 h-4 rounded-full bg-card/20"></div>
+						<div class="mt-1.5 w-0.5 flex-1 bg-linear-to-b from-card/20 to-transparent"></div>
+					</div>
+
+					<!-- Content -->
+					<div class="flex-1 min-w-0">
+						<span class="font-mono text-xs font-medium text-card/70">PHASE THREE (MAY 2026)</span>
+						<h3 class="font-sans text-3xl font-bold leading-tight mt-2 mb-3 text-card">Decisions</h3>
+						<p class="font-sans text-sm font-medium leading-5 mb-6 text-card">
+							Everyone will have a chance to join live conversations to figure out what is actionable from the first phase.
+						</p>
+						<Button class='text-white bg-white/20 font-bold' variant="gradient" fullWidth disabled>
+							TBA
+						</Button>
+					</div>
+				</div>
+			</Card>
 		</div>
 
 		<!-- Email Signup Section -->
