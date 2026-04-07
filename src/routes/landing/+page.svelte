@@ -102,10 +102,10 @@
         <div class="relative z-10 flex-1 min-h-0 overflow-y-auto">
             <div class="flex min-h-full flex-col items-center justify-center px-6 sm:px-8 py-4 sm:py-6 max-w-xl mx-auto">
                 <span class="text-center font-mono text-base font-medium uppercase text-muted-foreground">
-                    WHAT SHOULD WE DO ABOUT
+                    {region.carouselPreHeader}
                 </span>
                 <h1 class="mt-2 sm:mt-3 text-center font-sans text-4xl font-bold leading-tight text-muted-foreground">
-                    AI and the Future of Our Communities
+                    {region.carouselHeader}
                 </h1>
 
                 <div class="mx-auto mt-4 sm:mt-6 h-1 w-20 rounded-full bg-muted-foreground"></div>
