@@ -106,7 +106,7 @@
 			</div>
 
 			<div class="flex items-center gap-2">
-				<span class="font-sans text-2xl font-bold leading-9 text-foreground">GO DEEPER</span>
+				<span class="font-sans text-2xl font-bold leading-9 text-foreground">Go Deeper</span>
 			</div>
 			<div>
 
