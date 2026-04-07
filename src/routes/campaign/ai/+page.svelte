@@ -6,7 +6,7 @@
 	import { Button, Badge, PhaseCard } from '$lib/components/ui';
 	import { Input } from '$lib/components/ui/input';
 	import { session } from '$lib/services/session.svelte';
-	import { Mail } from 'lucide-svelte';
+	import { Mail, MapPin } from 'lucide-svelte';
 	import { fade } from 'svelte/transition';
 
 	const region: RegionConfig = page.data.region;
@@ -49,29 +49,32 @@
 <AppShell>
 	<div class="flex flex-col bg-gradient-primary h-full overflow-y-auto">
 		<!-- Header Bar -->
-		<div class="flex items-center justify-between px-6 py-3  backdrop-blur-sm">
-			<span class="font-mono text-sm font-medium text-muted-foreground/70">{region.stateName}</span>
-			<a href='/'>
-			  <Badge variant="soft" size="md">
-				  <span class="text-primary">SHARE YOUR THOUGHTS →</span>
-			  </Badge>
-			</a>
+		<div class="flex items-center justify-between pl-6 pr-3.75 pt-3.75 pb-2">
+			<div class="flex items-center gap-1.5">
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="text-foreground/80">
+					<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0Zm-8 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+				</svg>
+				<span class="font-mono text-sm font-medium text-foreground/70">{region.stateName.toUpperCase()}</span>
+			</div>
+			<Button variant="soft" size="xs" href="/">
+				SHARE YOUR THOUGHTS →
+			</Button>
 		</div>
 
 		<!-- Hero Section -->
-		<div class="flex flex-col gap-6 px-6 py-8">
+		<div class="flex flex-col px-6 pt-6 pb-8">
 			<span class="font-mono text-base font-medium uppercase text-muted-foreground">
 				What should we do about
 			</span>
-			<h1 class="font-sans text-5xl font-extrabold leading-tight text-muted-foreground">
+			<h1 class="mt-1 font-sans text-5xl font-extrabold leading-[1.05] text-muted-foreground">
 				AI and the future of {region.stateName} communities?
 			</h1>
-			<p class="font-sans text-lg font-medium leading-7 text-muted-foreground">
+			<p class="mt-5 font-sans text-lg font-medium leading-7 text-muted-foreground">
 				A <strong>place-based forum in {region.stateName}</strong> to put real people at the center of shaping our future. All are welcome to join the conversation.
 			</p>
 
 			<!-- Phase Navigation -->
-			<div class="flex items-center gap-1 flex-wrap">
+			<div class="mt-5 flex items-center justify-center gap-1 flex-wrap">
 				<Badge variant="dark" size="md">OUR VIEWS</Badge>
 				<span class="font-mono text-sm text-muted-foreground/50">&gt;</span>
 				<Badge variant="soft" size="md">LISTEN & LEARN</Badge>
@@ -86,11 +89,10 @@
 				heading="Our Views"
 				description="An opportunity for everyday people to share their thoughts on how artificial intelligence should be managed to protect people's livelihoods."
 				subheading="LIVE NOW"
-				hasProgressIndicator
 				kind="primary"
 			>
 				<Button href='/' variant="primary" fullWidth onclick={handleJoinConversation}>
-					JOIN THE CONVERSATION
+					JOIN NOW
 				</Button>
 			</PhaseCard>
 		</div>
@@ -100,7 +102,7 @@
 			<h2 class="font-sans text-4xl font-bold text-muted-foreground leading-9">
 				What is this about?
 			</h2>
-			<p class="font-sans text-base font-medium text-muted-foreground leading-6">
+			<p class="font-sans text-sm font-medium text-muted-foreground leading-5">
 				This forum is about figuring out what local communities in {region.stateName} can do to make sure the coming changes with artificial intelligence actually serve them. The answer can and will lie at many different levels – in families, schools, community programs, city and state policy, and beyond. No idea is too small, and everyone has a role to play.
 			</p>
 		</div>
@@ -112,7 +114,7 @@
 				<h2 class="font-sans text-3xl font-bold text-muted-foreground leading-8 mt-2 mb-4">
 					Your Hosts
 				</h2>
-				<p class="font-sans text-base font-medium text-muted-foreground leading-6 mb-6">
+					<p class="font-sans text-sm font-medium text-muted-foreground leading-5 mb-6">
 					This conversation is supported by public-serving organizations all over {region.stateName}, including <strong class="text-secondary">{region.hostName}</strong> and more.
 				</p>
 				<a href={region.hostUrl} target="_blank" rel="noopener noreferrer">
@@ -138,7 +140,6 @@
 					heading="Our Views"
 					description="An opportunity for everyday people to share their thoughts on how artificial intelligence should be managed to protect people's livelihoods."
 					subheading="PHASE ONE (APRIL 2026)"
-					hasProgressIndicator
 					kind="primary"
 				>
 					<Button href='/' variant="destructive" fullWidth>
@@ -153,11 +154,10 @@
 					heading="Listen & Learn"
 					description="Everyone will have a chance to join live conversations to figure out what is actionable from the first phase."
 					subheading="PHASE TWO (MAY 2026)"
-					hasProgressIndicator
 					kind="secondary"
 				>
 					<Button class='text-white bg-white/20 font-bold' variant="gradient" fullWidth disabled>
-						REGISTRATIONS OPEN APR 21
+						TBA
 					</Button>
 				</PhaseCard>
 			</div>
@@ -167,11 +167,10 @@
 				heading="Decisions"
 				description="Everyone will have a chance to join live conversations to figure out what is actionable from the first phase."
 				subheading="PHASE THREE (MAY 2026)"
-				hasProgressIndicator
 				kind="secondary"
 			>
 				<Button class='text-white bg-white/20 font-bold' variant="gradient" fullWidth disabled>
-					REGISTRATIONS TBA
+					TBA
 				</Button>
 			</PhaseCard>
 		</div>
@@ -222,23 +221,23 @@
 					This conversation is taking place in communities across the country.
 				</h2>
 				<p class="font-sans text-lg font-medium text-muted-foreground leading-7">
-					Want to bring this conversation to your community? Get in touch with us at <strong>hello@bloom-project.org</strong>.
+					Want to bring this conversation to your community? Get in touch with us at <a href="mailto:hello@bloom-project.org" class="font-bold underline">hello@bloom-project.org</a>.
 				</p>
 				<div class="flex flex-wrap justify-center gap-2 my-4">
 					<Badge variant="soft" size="lg">
-						<span class="inline-block w-2.5 h-3 bg-muted-foreground/50 mr-2"></span>
+						<MapPin class="size-3.5 mr-1.5 text-muted-foreground/50" />
 						UTAH COUNTIES
 					</Badge>
 					<Badge variant="soft" size="lg">
-						<span class="inline-block w-2.5 h-3 bg-muted-foreground/50 mr-2"></span>
+						<MapPin class="size-3.5 mr-1.5 text-muted-foreground/50" />
 						SAN FRANCISCO
 					</Badge>
 					<Badge variant="soft" size="lg">
-						<span class="inline-block w-2.5 h-3 bg-muted-foreground/50 mr-2"></span>
+						<MapPin class="size-3.5 mr-1.5 text-muted-foreground/50" />
 						CENTRAL OREGON
 					</Badge>
 				</div>
-				<Button href="/" variant="destructive" fullWidth size="lg">
+				<Button href="mailto:hello@bloom-project.org" variant="destructive" fullWidth size="lg">
 					START IN YOUR COMMUNITY
 				</Button>
 			</div>
