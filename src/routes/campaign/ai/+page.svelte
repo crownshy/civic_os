@@ -46,6 +46,21 @@
 	}
 </script>
 
+{#snippet phaseIndicator(color: string)}
+	<div class="flex flex-col mr-2 items-center shrink-0 pt-1">
+		<div class="relative">
+			<div class="absolute -inset-1 rounded-full bg-background/20" style="box-shadow: 0px 0px 15px 1px var(--{color})"></div>
+			<div class="relative w-4 h-4 rounded-full" style="background-color: var(--{color})"></div>
+		</div>
+		<div class="mt-1.5 w-0.5 flex-1" style="background: linear-gradient(to bottom, var(--{color}), transparent)"></div>
+	</div>
+{/snippet}
+
+{#snippet inactiveIndicator()}
+	<div class="absolute left-6 top-0 w-0.5 h-full bg-white/20"></div>
+	<div class="absolute left-[17px] top-[22px] w-4 h-4 rounded-full bg-white/20"></div>
+{/snippet}
+
 <AppShell>
 	<div class="flex flex-col bg-gradient-primary h-full overflow-y-auto">
 		<!-- Header Bar -->
@@ -88,13 +103,8 @@
 			<Card class="p-6">
 				<div class="flex gap-3">
 					<!-- Left indicator -->
-					<div class="flex flex-col mr-2 items-center shrink-0 pt-1">
-						<div class="relative">
-							<div class="absolute -inset-1 rounded-full bg-background/20 shadow-[0px_0px_15px_1px_var(--primary)]"></div>
-							<div class="relative w-4 h-4 rounded-full bg-primary"></div>
-						</div>
-						<div class="mt-1.5 w-0.5 flex-1 bg-linear-to-b from-primary to-transparent"></div>
-					</div>
+					{@render phaseIndicator('primary')}
+
 
 					<!-- Content -->
 					<div class="flex-1 min-w-0">
@@ -129,10 +139,10 @@
 					Your Hosts
 				</h2>
 					<p class="font-sans text-sm font-medium text-muted-foreground leading-5 mb-6">
-					This conversation is supported by public-serving organizations all over {region.stateName}, including <strong class="text-secondary">{region.hostName}</strong> and more.
+					This conversation is supported by public-serving organizations all over {region.stateName}, including <strong class="text-primary">{region.hostName}</strong> and more.
 				</p>
 				<a href={region.hostUrl} target="_blank" rel="noopener noreferrer">
-				  <Button variant="primary" fullWidth >
+				  <Button variant="primary" size="md" fullWidth >
 					  LEARN MORE
 				  </Button>
 				</a>
@@ -153,13 +163,8 @@
 				<Card class="p-6">
 					<div class="flex gap-3">
 						<!-- Left indicator -->
-						<div class="flex flex-col items-center shrink-0 pt-0.5">
-							<div class="relative">
-								<div class="absolute -inset-1 rounded-full bg-background/20 shadow-[0px_0px_11px_4px_var(--destructive)]"></div>
-								<div class="relative w-4 h-4 rounded-full bg-destructive"></div>
-							</div>
-							<div class="mt-1.5 w-0.5 flex-1 bg-linear-to-b from-destructive to-transparent"></div>
-						</div>
+						{@render phaseIndicator('destructive')}
+
 
 						<!-- Content -->
 						<div class="flex-1 min-w-0">
@@ -168,7 +173,7 @@
 							<p class="font-sans text-sm font-medium leading-5 mb-6 text-muted-foreground">
 								An opportunity for everyday people to share their thoughts on how artificial intelligence should be managed to protect people's livelihoods.
 							</p>
-							<Button href='/' variant="destructive" fullWidth>
+							<Button href='/' variant="destructive" size="md" fullWidth>
 								SHARE YOUR PERSPECTIVE →
 							</Button>
 						</div>
@@ -178,50 +183,30 @@
 
 			<!-- Phase 2: Listen & Learn -->
 			<div class="mb-6">
-				<Card class="bg-card/10 border-card/20 p-6">
-					<div class="flex gap-3">
-						<!-- Left indicator -->
-						<div class="flex flex-col items-center shrink-0 pt-0.5">
-							<div class="w-4 h-4 rounded-full bg-card/20"></div>
-							<div class="mt-1.5 w-0.5 flex-1 bg-linear-to-b from-card/20 to-transparent"></div>
-						</div>
-
-						<!-- Content -->
-						<div class="flex-1 min-w-0">
-							<span class="font-mono text-xs font-medium text-card/70">PHASE TWO (MAY 2026)</span>
-							<h3 class="font-sans text-3xl font-bold leading-tight mt-2 mb-3 text-card">Listen & Learn</h3>
-							<p class="font-sans text-sm font-medium leading-5 mb-6 text-card">
-								Everyone will have a chance to join live conversations to figure out what is actionable from the first phase.
-							</p>
-							<Button class='text-white bg-white/20 font-bold' variant="gradient" fullWidth disabled>
-								TBA
-							</Button>
-						</div>
-					</div>
+				<Card class="relative bg-white/10 border-white/20 overflow-hidden pt-6 pr-6 pb-6 pl-12">
+					{@render inactiveIndicator()}
+					<span class="font-mono text-xs font-medium text-white/70">PHASE TWO (MAY 2026)</span>
+					<h3 class="font-sans text-3xl font-bold leading-tight mt-2 mb-3 text-white">Listen & Learn</h3>
+					<p class="font-sans text-sm font-medium leading-5 mb-6 text-white">
+						Everyone will have a chance to join live conversations to figure out what is actionable from the first phase.
+					</p>
+					<Button size="md" class='text-white bg-white/20 border border-white/10' variant="gradient" fullWidth disabled>
+						REGISTRATIONS OPEN APR 21
+					</Button>
 				</Card>
 			</div>
 
 			<!-- Phase 3: Decisions -->
-			<Card class="bg-card/10 border-card/20 p-6">
-				<div class="flex gap-3">
-					<!-- Left indicator -->
-					<div class="flex flex-col items-center shrink-0 pt-0.5">
-						<div class="w-4 h-4 rounded-full bg-card/20"></div>
-						<div class="mt-1.5 w-0.5 flex-1 bg-linear-to-b from-card/20 to-transparent"></div>
-					</div>
-
-					<!-- Content -->
-					<div class="flex-1 min-w-0">
-						<span class="font-mono text-xs font-medium text-card/70">PHASE THREE (MAY 2026)</span>
-						<h3 class="font-sans text-3xl font-bold leading-tight mt-2 mb-3 text-card">Decisions</h3>
-						<p class="font-sans text-sm font-medium leading-5 mb-6 text-card">
-							Everyone will have a chance to join live conversations to figure out what is actionable from the first phase.
-						</p>
-						<Button class='text-white bg-white/20 font-bold' variant="gradient" fullWidth disabled>
-							TBA
-						</Button>
-					</div>
-				</div>
+			<Card class="relative bg-white/10 border-white/20 overflow-hidden pt-6 pr-6 pb-6 pl-12">
+				{@render inactiveIndicator()}
+				<span class="font-mono text-xs font-medium text-white/70">PHASE THREE (MAY 2026)</span>
+				<h3 class="font-sans text-3xl font-bold leading-tight mt-2 mb-3 text-white">Decisions</h3>
+				<p class="font-sans text-sm font-medium leading-5 mb-6 text-white">
+					Everyone will have a chance to join live conversations to figure out what is actionable from the first phase.
+				</p>
+				<Button size="md" class='text-white bg-white/20 border border-white/10' variant="gradient" fullWidth disabled>
+					REGISTRATIONS TBA
+				</Button>
 			</Card>
 		</div>
 
