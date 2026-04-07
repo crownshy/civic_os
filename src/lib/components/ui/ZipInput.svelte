@@ -38,10 +38,11 @@
 	$effect(() => {
 		if (shake) {
 			shaking = true;
-			setTimeout(() => {
+			const id = setTimeout(() => {
 				shaking = false;
 				shake = false;
 			}, 800);
+			return () => clearTimeout(id);
 		}
 	});
 
