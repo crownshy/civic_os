@@ -192,27 +192,37 @@ export const GENERIC_REGION: RegionConfig = {
 	slug: 'all',
 	stateName: 'USA',
 	demonym: 'Americans',
-	question:
-		'How can we ensure the benefits of AI are widely shared and risks are responsibly managed?',
+	question: 'How can Americans ensure the benefits of AI are widely shared and its risks are responsibly managed?',
 	polisId: '58wekdkx9u',
 	conversationId: '30f5c285-a538-4ed7-9565-61f8e4b9d998',
 	inviteId: '0571cc17-64ad-4949-9034-76c74be254ce',
 	hostName: 'Bloom Project',
-	hostUrl: 'https://www.bloom-project.org/',
+	hostUrl: 'https://bloom-project.org/',
 	zipPrefixes: [],
 	carouselPreHeader: 'WHAT SHOULD WE DO ABOUT',
 	carouselHeader: 'AI and the Future of Our Communities',
 	slides: [
-		'This conversation is about how we can direct the growing impact of artificial intelligence to benefit our communities.',
-		'You\u2019ll see statements from your neighbors and other community members about this question. You can vote: agree, disagree, or unsure on each one.',
-		'This \u201COpen Poll\u201D will reveal shared concerns and values that will be the basis of action-oriented community conversations in the coming months.'
+		'People across America are weighing in on how AI is changing our country — and what we should do about it. Now it\'s your turn.',
+		'You\u2019ll see statements from community members on this question. For each one, you can share if you: agree, disagree, or are unsure.',
+		'Your responses — combined with everyone else\u2019s — will help surface what Americans have in common, where we differ, and what we might tackle together.',
+		'Results will be published publicly so anyone can see where people stand.',
 	],
 	hostMessage: [
-		'This space is hosted by <a href="https://www.bloom-project.org/" class="text-destructive underline" target="_blank" rel="noopener noreferrer">Bloom Project</a>. We came together to help citizens come together across political differences to identify issues of local concern, consider possible solutions, and take the necessary steps to achieve meaningful, measurable change.'
+		"First, thank you for being here and for caring about the future of our country.",
+		"AI is already reshaping American life — bringing real promise alongside real concerns. Many see new economic opportunities, better tools for healthcare and education, and new ways to tackle longstanding challenges. Others worry about jobs, privacy, democracy, and access to truthful information. Both are true, and both matter.",
+		"Americans should have a say in changes that shape their lives. This poll is a way to understand where our country stands and to put that picture in front of the public, policymakers, and the companies building these tools.",
+		"This conversation is open to all U.S. residents, regardless of background or belief. It only takes a few minutes. We hope you’ll add your voice — and pass it on.",
+		"Questions? Reach us at <a href='mailto:hello@bloom-project.org'>hello@bloom-project.org</a>."
 	],
-	aboutConversation: [],
-	whatsNext: "",
-	goDeeper: "",
+	aboutConversation: [
+		"This Open Poll is hosted by The Bloom Project, a civic technology initiative that uses deliberative polling to surface where the American public actually stands on complex issues.",
+		"America is navigating big questions about AI and how it’s shaping our lives. This is a space for residents to share what matters most — what you’re hopeful about, what concerns you, and what you think our country needs.",
+		"There are no right answers here. This poll is designed to reveal where Americans agree, where we differ, and what the genuine fault lines are — in a format that anyone can understand.",
+		"Results will be published publicly when the conversation closes.",
+		"Questions or want to get involved? Reach us at <a href='mailto:hello@bloom-project.org'>hello@bloom-project.org</a>."
+	],
+	whatsNext: "When this conversation closes, Bloom will publish the results publicly — showing where Americans agree, where we differ, and what the opinion landscape looks like across different groups. We’ll share a link when it’s ready.",
+	goDeeper: "If you’d like to get more involved with Bloom’s civic deliberation work, reach out at <a href='mailto:hello@bloom-project.org'>hello@bloom-project.org</a> or visit <a href='https://www.bloom-project.org'>https://www.bloom-project.org</a>.",
 	polis_workflow_step_id: "f553a7b9-b3ac-4159-b88d-198f609b110c",
 	fullHosts: "<a href='https://www.bloom-project.org/'>The Bloom Project</a>."
 };
