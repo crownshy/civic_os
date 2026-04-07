@@ -9,6 +9,7 @@
     import type { RegionConfig } from '$lib/config/regions';
     import { onMount } from 'svelte';
     import { browser } from '$app/environment';
+	import InfoBar from '$lib/components/ui/InfoBar.svelte';
 
     const region: RegionConfig = page.data.region;
 
@@ -78,26 +79,20 @@
 
 <AppShell>
     <div class="relative flex h-full flex-col bg-gradient-primary overflow-hidden">
-	<div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-5/12 md:translate-y-5/8 lg:translate-y-3/4  xl:translate-y-5/7 w-[160%] aspect-2/1 rounded-t-full bg-linear-to-b from-background/30 to-background/40"></div>
         <!-- Host banner -->
-        <div class="relative z-10 shrink-0 px-5 pt-1">
+        <div class="relative z-10 shrink-0  pt-1">
             <button
                 onclick={() => (showHostMessage = true)}
-                class="flex w-full items-center gap-3 rounded-lg bg-primary p-3 shadow-[0px_4px_12px_0px_rgba(12,34,95,0.25)] outline-1 outline-white/10 overflow-hidden text-left transition-transform active:scale-[0.98]"
+                class="flex w-full items-center gap-3 rounded-none bg-primary p-3 shadow-[0px_4px_12px_0px_rgba(12,34,95,0.25)] outline-1 outline-white/10 overflow-hidden text-left transition-transform active:scale-[0.98]"
             >
-                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-card/15">
-                    <span class="text-3xl pr-1 origin-center rotate-130 [text-shadow:0px_4px_4px_rgb(0_0_0/0.25)]">📣</span>
-                </div>
-                <div class="min-w-0 grow">
-                    <span class="font-mono text-xs font-medium uppercase text-primary-foreground/70">HOSTED BY</span>
-                    <p class="truncate font-sans text-base font-medium text-primary-foreground">{region.hostName}</p>
+                <div class="min-w-0 grow text-center">
+                    <p class="truncate font-sans text-base font-medium text-primary-foreground">Hello From <span class='font-bold'>{region.hostName}</span> 👋</p>
                 </div>
                 
-                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-card/15">
-                    <span class="text-3xl pb-3 text-card">⟶</span>
-                </div>
             </button>
         </div>
+
+		<InfoBar countyName={region.stateName} {region}/>
 
         <!-- Main content — vertically centered, scrollable on small screens / large fonts -->
         <div class="relative z-10 flex-1 min-h-0 overflow-y-auto">
