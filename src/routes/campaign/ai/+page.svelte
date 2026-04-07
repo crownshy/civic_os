@@ -250,28 +250,45 @@
 		</div>
 
 		<!-- Community Section -->
-		<div class="py-10 px-6">
-			<div class="flex flex-col gap-4 max-w-md mx-auto">
+		<div class="py-10 bg-card/30">
+			<div class="flex flex-col gap-2.5 px-6">
 				<h2 class="font-sans text-3xl font-bold text-muted-foreground leading-8">
 					This conversation is taking place in communities across the country.
 				</h2>
 				<p class="font-sans text-lg font-medium text-muted-foreground leading-7">
 					Want to bring this conversation to your community? Get in touch with us at <a href="mailto:hello@bloom-project.org" class="font-bold underline">hello@bloom-project.org</a>.
 				</p>
-				<div class="flex flex-wrap justify-center gap-2 my-4">
-					<Badge variant="soft" size="lg">
-						<MapPin class="size-3.5 mr-1.5 text-muted-foreground/50" />
-						UTAH COUNTIES
-					</Badge>
-					<Badge variant="soft" size="lg">
-						<MapPin class="size-3.5 mr-1.5 text-muted-foreground/50" />
-						SAN FRANCISCO
-					</Badge>
-					<Badge variant="soft" size="lg">
-						<MapPin class="size-3.5 mr-1.5 text-muted-foreground/50" />
-						CENTRAL OREGON
-					</Badge>
+			</div>
+
+			<!-- Scrolling community badges -->
+			<div class="overflow-hidden my-6">
+				<div class="community-marquee flex gap-2 w-max">
+					{#each { length: 2 } as _}
+						<Badge variant="soft" size="sm">
+							<MapPin class="size-2.5 mr-1 text-muted-foreground/50" />
+							UTAH COUNTIES
+						</Badge>
+						<Badge variant="soft" size="sm">
+							<MapPin class="size-2.5 mr-1 text-muted-foreground/50" />
+							SAN FRANCISCO
+						</Badge>
+						<Badge variant="soft" size="sm">
+							<MapPin class="size-2.5 mr-1 text-muted-foreground/50" />
+							CENTRAL OREGON
+						</Badge>
+						<Badge variant="soft" size="sm">
+							<MapPin class="size-2.5 mr-1 text-muted-foreground/50" />
+							PORTLAND
+						</Badge>
+						<Badge variant="soft" size="sm">
+							<MapPin class="size-2.5 mr-1 text-muted-foreground/50" />
+							SALT LAKE CITY
+						</Badge>
+					{/each}
 				</div>
+			</div>
+
+			<div class="px-6">
 				<Button href="mailto:hello@bloom-project.org" variant="destructive" fullWidth size="lg">
 					START IN YOUR COMMUNITY
 				</Button>
@@ -280,3 +297,17 @@
 
 	</div>
 </AppShell>
+
+<style>
+	.community-marquee {
+		animation: community-scroll 20s linear infinite;
+	}
+	@keyframes community-scroll {
+		0% {
+			transform: translateX(0);
+		}
+		100% {
+			transform: translateX(-50%);
+		}
+	}
+</style>
