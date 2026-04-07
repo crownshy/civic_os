@@ -64,7 +64,7 @@
 <AppShell>
 	<div class="flex flex-col bg-gradient-primary h-full overflow-y-auto">
 		<!-- Header Bar -->
-		<div class="flex items-center justify-between pl-6 pr-3.75 pt-3.75 pb-2">
+		<div class="flex items-center justify-between pl-6 pr-3.75 pt-3.75 pb-2 md:pl-12 md:pr-8">
 			<div class="flex items-center gap-1.5">
 				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="text-foreground/80">
 					<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0Zm-8 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
@@ -77,7 +77,7 @@
 		</div>
 
 		<!-- Hero Section -->
-		<div class="flex flex-col px-6 pt-6 pb-8">
+		<div class="flex flex-col px-6 md:px-12 pt-6 pb-8">
 			<span class="font-mono text-base font-medium uppercase text-muted-foreground">
 				What should we do about
 			</span>
@@ -99,7 +99,7 @@
 		</div>
 
 		<!-- Our Views Card -->
-		<div class="px-6 pb-8">
+		<div class="px-6 md:px-12 pb-8">
 			<Card class="p-6">
 				<div class="flex gap-3">
 					<!-- Left indicator -->
@@ -122,7 +122,7 @@
 		</div>
 
 		<!-- What is this about? Section -->
-		<div class="flex flex-col gap-4 px-6 pb-8">
+		<div class="flex flex-col gap-4 px-6 md:px-12 pb-8">
 			<h2 class="font-sans text-4xl font-bold text-muted-foreground leading-9">
 				What is this about?
 			</h2>
@@ -132,7 +132,7 @@
 		</div>
 
 		<!-- Your Hosts Section -->
-		<div class="px-6 pb-8">
+		<div class="px-6 md:px-12 pb-8">
 			<Card class="p-6">
 				<span class="font-mono text-xs uppercase text-primary">WHO'S HOLDING THE SPACE?</span>
 				<h2 class="font-sans text-3xl font-bold text-muted-foreground leading-8 mt-2 mb-4">
@@ -150,7 +150,7 @@
 		</div>
 
 		<!-- Timeline Section -->
-		<div class="py-10 px-6" style="background: var(--gradient-consensus)">
+		<div class="py-10 px-6 md:px-12" style="background: var(--gradient-consensus)">
 			<h2 class="font-sans text-4xl font-bold text-primary-foreground text-center leading-9 mb-2">
 				Timeline
 			</h2>
@@ -211,7 +211,7 @@
 		</div>
 
 		<!-- Email Signup Section -->
-		<div class="bg-card/30 py-8 px-6">
+		<div class="bg-card/30 py-8 px-6 md:px-12">
 			<div class="flex flex-col gap-4 max-w-md mx-auto">
 				{#if session.emailProvided}
 					<p class="font-sans text-base text-muted-foreground leading-6 text-center" in:fade={{ duration: 400, delay: 300 }}>
@@ -251,7 +251,7 @@
 
 		<!-- Community Section -->
 		<div class="py-10 bg-card/30">
-			<div class="flex flex-col gap-2.5 px-6">
+			<div class="flex flex-col gap-2.5 px-6 md:px-12">
 				<h2 class="font-sans text-3xl font-bold text-muted-foreground leading-8">
 					This conversation is taking place in communities across the country.
 				</h2>
@@ -288,7 +288,7 @@
 				</div>
 			</div>
 
-			<div class="px-6">
+			<div class="px-6 md:px-12">
 				<Button href="mailto:hello@bloom-project.org" variant="destructive" fullWidth size="lg">
 					START IN YOUR COMMUNITY
 				</Button>
