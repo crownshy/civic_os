@@ -124,7 +124,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 
 	oregon: {
 		slug: 'oregon',
-		stateName: 'Oregon',
+		stateName: 'Central Oregon',
 		demonym: 'Central Oregonians',
 		question:
 			'How can Central Oregonians ensure benefits of AI are widely shared and risks are responsibly managed?',

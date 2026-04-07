@@ -85,25 +85,20 @@
 			  AI and Our Future
 			</h1>
 			<p class="mt-5 font-sans text-lg font-medium leading-7 text-muted-foreground">
-				A <strong>Community Solutions Assembly</strong> bringing {region.stateName} together around the decisions that affect us all.
+				A <strong>Community Solutions Assembly</strong> bringing {region.demonym} together around the decisions that affect us all.
+			</p>
+
+			<p class="mt-5 font-sans text-lg font-medium leading-7 text-muted-foreground">
+				This Assembly is about making sure Central Oregonians have a real say in how artificial intelligence shapes our lives — who it benefits, who gets left behind, and what we can do about it at every level, from families and schools to city and state policy.
+			</p>
+			<p class="mt-5 font-sans text-lg font-medium leading-7 text-muted-foreground">
+				Every perspective makes the picture more complete.
 			</p>
 
 		</div>
 
 
 		<!-- What is this about? Section -->
-		<div class="flex flex-col gap-4 px-6 md:px-12 pb-8">
-			<h2 class="font-sans text-4xl font-bold text-muted-foreground leading-9">
-				What is this about?
-			</h2>
-			<p class="font-sans text-sm font-medium text-muted-foreground leading-5">
-				This Assembly is about making sure Central Oregonians have a real say in how artificial intelligence shapes our lives — who it benefits, who gets left behind, and what we can do about it at every level, from families and schools to city and state policy.
-			</p>
-			<p class='font-sans text-sm font-medium text-muted-foreground leading-5'>
-				Every perspective makes the picture more complete.
-			</p>
-		</div>
-
 		<!-- Your Hosts Section -->
 		<div class="px-6 md:px-12 pb-8">
 			<Card class="p-6">
