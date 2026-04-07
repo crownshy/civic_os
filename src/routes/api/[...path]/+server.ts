@@ -4,9 +4,11 @@ import { env } from '$env/dynamic/private';
 const BACKEND_URL = env.API_URL || 'http://localhost:3000';
 
 const handler: RequestHandler = async ({ request, params, cookies }) => {
+	const isLocal = BACKEND_URL.includes('localhost');
 	const path = params.path;
 	// Backend API expects /api prefix
-	const target = `${BACKEND_URL}/api/${path}`;
+	const pathPrefix = isLocal ? '' : '/api'
+	const target = `${BACKEND_URL}${pathPrefix}/${path}`;
 
 	const url = new URL(request.url);
 	const fullTarget = url.search ? `${target}${url.search}` : target;
@@ -18,6 +20,12 @@ const handler: RequestHandler = async ({ request, params, cookies }) => {
 	// Forward origin header so backend CORS accepts the request
 	const origin = request.headers.get('origin') || url.origin;
 	headers.set('origin', origin);
+
+	if (isLocal) {
+		const forwardedFor = request.headers.get("x-forwareded-for") || '127.0.0.1';
+		headers.set("x-forwarded-for", forwardedFor);
+		headers.set('x-real-ip', forwardedFor.split(',')[0].trim());
+	}
 
 	const authToken = cookies.get('auth-token');
 	if (authToken) {

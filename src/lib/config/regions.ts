@@ -1,3 +1,5 @@
+import { config } from '$lib/services/api';
+
 /**
  * Region configuration for multi-state deployment.
  *
@@ -190,9 +192,9 @@ export const GENERIC_REGION: RegionConfig = {
 	demonym: 'Americans',
 	question:
 		'How can we ensure the benefits of AI are widely shared and risks are responsibly managed?',
-	polisId: '58wekdkx9u',
-	conversationId: '30f5c285-a538-4ed7-9565-61f8e4b9d998',
-	inviteId: '0571cc17-64ad-4949-9034-76c74be254ce',
+	polisId: config.polisId,
+	conversationId: config.conversationId,
+	inviteId: config.inviteId,
 	hostName: 'Bloom Project',
 	hostUrl: 'https://www.bloom-project.org/',
 	zipPrefixes: [],
