@@ -72,54 +72,24 @@
 				<span class="font-mono text-sm font-medium text-foreground/70">{region.stateName.toUpperCase()}</span>
 			</div>
 			<Button variant="soft" size="xs" href="/">
-				SHARE YOUR THOUGHTS →
+			  To Open Poll	
 			</Button>
 		</div>
 
 		<!-- Hero Section -->
 		<div class="flex flex-col px-6 md:px-12 pt-6 pb-8">
 			<span class="font-mono text-base font-medium uppercase text-muted-foreground">
-				What should we do about
+			  {region.stateName.toUpperCase()} Speaks	
 			</span>
 			<h1 class="mt-1 font-sans text-5xl font-extrabold leading-[1.05] text-muted-foreground">
-				AI and the future of {region.stateName} communities?
+			  AI and Our Future
 			</h1>
 			<p class="mt-5 font-sans text-lg font-medium leading-7 text-muted-foreground">
-				A <strong>place-based forum in {region.stateName}</strong> to put real people at the center of shaping our future. All are welcome to join the conversation.
+				A <strong>Community Solutions Assembly</strong> bringing {region.stateName} together around the decisions that affect us all.
 			</p>
 
-			<!-- Phase Navigation -->
-			<div class="mt-5 flex items-center gap-1 flex-wrap">
-				<Badge variant="dark" size="md">OUR VIEWS</Badge>
-				<span class="font-mono text-sm text-muted-foreground/50">&gt;</span>
-				<Badge variant="soft" size="md">LISTEN & LEARN</Badge>
-				<span class="font-mono text-sm text-muted-foreground/50">&gt;</span>
-				<Badge variant="soft" size="md">DECISIONS</Badge>
-			</div>
 		</div>
 
-		<!-- Our Views Card -->
-		<div class="px-6 md:px-12 pb-8">
-			<Card class="p-6">
-				<div class="flex gap-3">
-					<!-- Left indicator -->
-					{@render phaseIndicator('primary')}
-
-
-					<!-- Content -->
-					<div class="flex-1 min-w-0">
-						<span class="font-mono text-xs text-destructive">LIVE NOW</span>
-						<h3 class="font-sans text-3xl font-bold leading-tight mt-2 mb-3 text-primary">Our Views</h3>
-						<p class="font-sans text-sm font-medium leading-5 mb-6 text-muted-foreground">
-							An opportunity for everyday people to share their thoughts on how artificial intelligence should be managed to protect people's livelihoods.
-						</p>
-						<Button href='/' fullWidth variant="primary" size="md" class="text-sm bg-linear-to-r from-primary to-primary-dark">
-							JOIN THE CONVERSATION
-						</Button>
-					</div>
-				</div>
-			</Card>
-		</div>
 
 		<!-- What is this about? Section -->
 		<div class="flex flex-col gap-4 px-6 md:px-12 pb-8">
@@ -127,19 +97,22 @@
 				What is this about?
 			</h2>
 			<p class="font-sans text-sm font-medium text-muted-foreground leading-5">
-				This forum is about figuring out what local communities in {region.stateName} can do to make sure the coming changes with artificial intelligence actually serve them. The answer can and will lie at many different levels – in families, schools, community programs, city and state policy, and beyond. No idea is too small, and everyone has a role to play.
+				This Assembly is about making sure Central Oregonians have a real say in how artificial intelligence shapes our lives — who it benefits, who gets left behind, and what we can do about it at every level, from families and schools to city and state policy.
+			</p>
+			<p class='font-sans text-sm font-medium text-muted-foreground leading-5'>
+				Every perspective makes the picture more complete.
 			</p>
 		</div>
 
 		<!-- Your Hosts Section -->
 		<div class="px-6 md:px-12 pb-8">
 			<Card class="p-6">
-				<span class="font-mono text-xs uppercase text-primary">WHO'S HOLDING THE SPACE?</span>
+				<span class="font-mono text-xs uppercase text-primary">WHO'S BEHIND THIS?</span>
 				<h2 class="font-sans text-3xl font-bold text-muted-foreground leading-8 mt-2 mb-4">
 					Your Hosts
 				</h2>
 					<p class="font-sans text-sm font-medium text-muted-foreground leading-5 mb-6">
-					This conversation is supported by public-serving organizations all over {region.stateName}, including <strong class="text-primary">{region.hostName}</strong> and more.
+					Hosted by {@html region.fullHosts}
 				</p>
 				<a href={region.hostUrl} target="_blank" rel="noopener noreferrer">
 				  <Button variant="primary" size="md" fullWidth >
@@ -155,7 +128,7 @@
 				Timeline
 			</h2>
 			<p class="font-sans text-base font-bold text-primary-foreground text-center leading-6 mb-8">
-				How it's going down – and how you can take part.
+			  Here's how the Solutions Assembly works — and how to get involved.	
 			</p>
 
 			<!-- Phase 1: Our Views -->
@@ -169,12 +142,12 @@
 						<!-- Content -->
 						<div class="flex-1 min-w-0">
 							<span class="font-mono text-xs font-medium text-destructive/70">PHASE ONE (APRIL 2026)</span>
-							<h3 class="font-sans text-3xl font-bold leading-tight mt-2 mb-3 text-muted-foreground">Our Views</h3>
+							<h3 class="font-sans text-3xl font-bold leading-tight mt-2 mb-3 text-muted-foreground">Open Poll</h3>
 							<p class="font-sans text-sm font-medium leading-5 mb-6 text-muted-foreground">
-								An opportunity for everyday people to share their thoughts on how artificial intelligence should be managed to protect people's livelihoods.
+							  Share your thoughts in as little as 2 minutes on how artificial intelligence should be managed to benefit our communities, and see what fellow community members think.
 							</p>
 							<Button href='/' variant="destructive" size="md" fullWidth>
-								SHARE YOUR PERSPECTIVE →
+								JOIN THE CONVERSATION →
 							</Button>
 						</div>
 					</div>
@@ -186,9 +159,9 @@
 				<Card class="relative bg-white/10 border-white/20 overflow-hidden pt-6 pr-6 pb-6 pl-12">
 					{@render inactiveIndicator()}
 					<span class="font-mono text-xs font-medium text-white/70">PHASE TWO (MAY 2026)</span>
-					<h3 class="font-sans text-3xl font-bold leading-tight mt-2 mb-3 text-white">Listen & Learn</h3>
+					<h3 class="font-sans text-3xl font-bold leading-tight mt-2 mb-3 text-white">Community Conversations </h3>
 					<p class="font-sans text-sm font-medium leading-5 mb-6 text-white">
-						Everyone will have a chance to join live conversations to figure out what is actionable from the first phase.
+					  Join live conversations in-person or online to discuss what is actionable from the first phase and listen and learn with other community members. 
 					</p>
 					<Button size="md" class='text-white bg-white/20 border border-white/10' variant="gradient" fullWidth disabled>
 						REGISTRATIONS OPEN APR 21
@@ -200,9 +173,9 @@
 			<Card class="relative bg-white/10 border-white/20 overflow-hidden pt-6 pr-6 pb-6 pl-12">
 				{@render inactiveIndicator()}
 				<span class="font-mono text-xs font-medium text-white/70">PHASE THREE (MAY 2026)</span>
-				<h3 class="font-sans text-3xl font-bold leading-tight mt-2 mb-3 text-white">Decisions</h3>
+				<h3 class="font-sans text-3xl font-bold leading-tight mt-2 mb-3 text-white">Solutions Forum</h3>
 				<p class="font-sans text-sm font-medium leading-5 mb-6 text-white">
-					Everyone will have a chance to join live conversations to figure out what is actionable from the first phase.
+				  30 residents, selected by lottery to represent all walks of life in Central Oregon, will work together over a long weekend to prioritize the top policies and practices  the region should pursue.
 				</p>
 				<Button size="md" class='text-white bg-white/20 border border-white/10' variant="gradient" fullWidth disabled>
 					REGISTRATIONS TBA
@@ -219,7 +192,7 @@
 					</p>
 				{:else}
 					<p class="font-sans text-base text-muted-foreground leading-6 text-center">
-						<strong>Share your email</strong> to receive updates on this conversation and opportunities to share your voice on this issue.
+					  Receive updates on this assembly and opportunities to get involved at every stage	
 					</p>
 					<div class="flex flex-col gap-3.5">
 						<form
@@ -256,7 +229,7 @@
 					This conversation is taking place in communities across the country.
 				</h2>
 				<p class="font-sans text-lg font-medium text-muted-foreground leading-7">
-					Want to bring this conversation to your community? Get in touch with us at <a href="mailto:hello@bloom-project.org" class="font-bold underline">hello@bloom-project.org</a>.
+				  This conversation is taking place in communities across the country. Want to bring this to your community? Get in touch with us at hello@bloom-project.org.
 				</p>
 			</div>
 
@@ -275,14 +248,6 @@
 						<Badge variant="soft" size="sm">
 							<MapPin class="size-2.5 mr-1 text-muted-foreground/50" />
 							CENTRAL OREGON
-						</Badge>
-						<Badge variant="soft" size="sm">
-							<MapPin class="size-2.5 mr-1 text-muted-foreground/50" />
-							PORTLAND
-						</Badge>
-						<Badge variant="soft" size="sm">
-							<MapPin class="size-2.5 mr-1 text-muted-foreground/50" />
-							SALT LAKE CITY
 						</Badge>
 					{/each}
 				</div>

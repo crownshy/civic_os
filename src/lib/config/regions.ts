@@ -45,6 +45,7 @@ export interface RegionConfig {
 	/** ending Content */
 	whatsNext: string;
 	goDeeper: string;
+	fullHosts: string;
 
 }
 
@@ -83,7 +84,8 @@ export const REGIONS: Record<string, RegionConfig> = {
 		],
 		whatsNext: "Nothing",
 		goDeeper: "Nothing",
-		polis_workflow_step_id: "68425b0d-21e9-4f36-8c13-229dab4508bc"
+		polis_workflow_step_id: "68425b0d-21e9-4f36-8c13-229dab4508bc",
+		fullHosts: ''
 	},
 	utah: {
 		slug: 'utah',
@@ -116,7 +118,8 @@ export const REGIONS: Record<string, RegionConfig> = {
 		whatsNext: "In April and May, there will be <strong>live conversations</strong> across Salt Lake, Weber, and Cache Counties. These conversations will build on the common themes and shared values that emerge from the statements here. If you want to take part in these or future conversations, please <strong>share your email above</strong> or visit the <Link href=\"https://www.utahcommonground.org/home\" external class=\"font-bold\">Utah Common Ground website.</Link>",
 		goDeeper: "The ultimate goal of this campaign is to surface common ground that lets Utahns take action from the local to state levels and beyond. If you are interested in getting involved in a deeper way, let us know at <Link href=\"mailto:hello@bloom-project.org\" external class=\"font-bold\">hello@bloom-project.org</Link>.",
 
-		polis_workflow_step_id: "9d1041f9-fda6-4597-b4b0-c1260e4b7268"
+		polis_workflow_step_id: "9d1041f9-fda6-4597-b4b0-c1260e4b7268",
+		fullHosts: "<a href='https://www.utahcommonground.org/home'>Utah Common Ground</a>"
 	},
 
 	oregon: {
@@ -179,7 +182,8 @@ export const REGIONS: Record<string, RegionConfig> = {
 		],
 		whatsNext: "In May and June, small group conversations will take place in Deschutes, Jefferson, and Crook counties — and online. They'll build on the themes and common ground that emerge from this poll. Share your email above to stay in the loop and be notified when registration opens, or visit [cocap.us] to learn more.",
 		goDeeper: "This process is ultimately about finding common ground and turning it into action that benefits Central Oregon communities. If you'd like to get more involved, reach out at <a href=\"hello@cocap.us\">hello@cocap.us</a>.",
-		polis_workflow_step_id: "8299fec7-a543-419f-8692-f68652648a0b"
+		polis_workflow_step_id: "8299fec7-a543-419f-8692-f68652648a0b",
+		fullHosts: "<a href='https://www.utahcommonground.org/home'>Central Oregon Civic Action Project</a>, <a href='https://www.coic.org/'>Central Oregon Intergovernmental Council</a>, <a href='https://cocc.edu/'>Central Oregon Community College</a>, and <a href='https://citizens4community.com/'>Citizens4Community</a>."
 	}
 };
 
@@ -209,7 +213,8 @@ export const GENERIC_REGION: RegionConfig = {
 	aboutConversation: [],
 	whatsNext: "",
 	goDeeper: "",
-	polis_workflow_step_id: "f553a7b9-b3ac-4159-b88d-198f609b110c"
+	polis_workflow_step_id: "f553a7b9-b3ac-4159-b88d-198f609b110c",
+	fullHosts: "<a href='https://www.bloom-project.org/'>The Bloom Project</a>."
 };
 
 // ---------------------------------------------------------------------------

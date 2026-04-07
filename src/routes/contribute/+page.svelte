@@ -258,6 +258,7 @@
 			firstVisit={!session.hasSeenComposeInstructions}
 			onSubmit={(text, anon) => { session.markComposeInstructionsSeen(); handleCompose(text, anon); }}
 			onBack={() => { session.markComposeInstructionsSeen(); screen = 'voting'; }}
+			region={subdomainRegion}
 		/>
 
 	{:else if screen === 'pause'}
