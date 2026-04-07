@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import CheckIcon from '@lucide/svelte/icons/check';
+	import MapPinIcon from '@lucide/svelte/icons/map-pin';
 	import { ZIPCODES, ZIP_LOOKUP, type ZipEntry } from '$lib/data/zipcodes';
 	import * as Command from '$lib/components/ui/command/index.js';
 	import * as Popover from '$lib/components/ui/popover/index.js';
@@ -10,26 +11,59 @@
 		value: string;
 		placeholder?: string;
 		disabled?: boolean;
+		regionPrefixes?: string[];
+		flash?: boolean;
 	}
 
-	let { value = $bindable(), placeholder = 'Enter your home zip code...', disabled = false }: Props = $props();
+	let {
+		value = $bindable(),
+		placeholder = 'Enter your home zip code...',
+		disabled = false,
+		regionPrefixes = [],
+		flash = $bindable(false)
+	}: Props = $props();
 
 	let open = $state(false);
 	let searchValue = $state('');
 	let triggerRef = $state<HTMLButtonElement>(null!);
+	let flashing = $state(false);
+
+	$effect(() => {
+		const stripped = searchValue.replace(/\D/g, '');
+		if (stripped !== searchValue) {
+			searchValue = stripped;
+		}
+	});
+
+	$effect(() => {
+		if (flash) {
+			flashing = true;
+			const id = setTimeout(() => {
+				flashing = false;
+				flash = false;
+			}, 800);
+			return () => clearTimeout(id);
+		}
+	});
 
 	const filtered = $derived.by(() => {
 		const q = searchValue.trim();
-		if (!q) return ZIPCODES.slice(0, 6);
-		return ZIPCODES.filter(
-			(e) => e.zip.startsWith(q) || e.city.toLowerCase().startsWith(q.toLowerCase())
-		).slice(0, 6);
+		if (!q) {
+			if (regionPrefixes.length > 0) {
+				return ZIPCODES.filter((e) =>
+					regionPrefixes.some((p) => e.zip.startsWith(p))
+				).slice(0, 6);
+			}
+			return [];
+		}
+		return ZIPCODES.filter((e) => e.zip.startsWith(q)).slice(0, 6);
 	});
 
 	const match = $derived(ZIP_LOOKUP.get(value.trim()));
+	const isValid = $derived(!!match);
 
 	const displayLabel = $derived(
-		match ? `${value}, ${match.county}` : value || ''
+		match ? `${value}, ${match.county} County` : value || ''
 	);
 
 	function selectZip(entry: ZipEntry) {
@@ -41,6 +75,18 @@
 	}
 </script>
 
+<style>
+	@keyframes flash-border {
+		0%, 100% { outline-color: color-mix(in srgb, var(--secondary) 30%, transparent); }
+		25% { outline-color: var(--secondary); }
+		50% { outline-color: color-mix(in srgb, var(--secondary) 30%, transparent); }
+		75% { outline-color: var(--secondary); }
+	}
+	.flash-border-active {
+		animation: flash-border 0.8s ease-in-out;
+	}
+</style>
+
 <div class="flex w-full justify-center">
 	<Popover.Root bind:open>
 		<Popover.Trigger bind:ref={triggerRef} disabled={disabled}>
@@ -48,25 +94,33 @@
 				<button
 					{...props}
 					class={cn(
-						'bg-card w-65 h-13 inline-flex items-center justify-center rounded-full py-2 shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)] outline-2 -outline-offset-2 outline-white/10 text-center font-sans text-base font-medium text-secondary border-0 focus:ring-0',
+						'bg-card inline-flex w-fit items-center gap-2 justify-center rounded-full px-5 h-11 shadow-[inset_2px_4px_4.4px_0px_rgba(79,62,11,0.25)] outline-2 -outline-offset-2 font-sans text-base font-medium border-0 focus:ring-0',
+						isValid
+							? 'outline-primary text-primary'
+							: 'outline-secondary/30 text-secondary',
 						disabled && 'opacity-60 cursor-not-allowed',
-						!value && 'text-secondary/80'
+						!value && 'text-secondary/80',
+						flashing && 'flash-border-active'
 					)}
 				>
+					<MapPinIcon class={cn('size-4 shrink-0', isValid ? 'text-primary' : 'text-secondary/60')} />
 					{displayLabel || placeholder}
 				</button>
 			{/snippet}
 		</Popover.Trigger>
-		<Popover.Content class="w-65 overflow-hidden rounded-2xl bg-card p-0 shadow-[0px_8px_24px_0px_rgba(0,0,0,0.20)] border-0">
+		<Popover.Content side="top" class="w-65 overflow-hidden rounded-2xl bg-card p-0 shadow-[0px_8px_24px_0px_rgba(0,0,0,0.20)] border-0">
 			<Command.Root shouldFilter={false}>
 				<Command.Input
-					placeholder="Type a zip code or city..."
+					placeholder="Enter zip code..."
 					bind:value={searchValue}
 					class="font-sans text-base text-secondary placeholder:text-secondary/60"
 					inputmode="numeric"
+					pattern="[0-9]*"
 				/>
 				<Command.List>
-					<Command.Empty class="px-5 py-3 font-sans text-sm text-secondary/60 text-center">No matching zip codes.</Command.Empty>
+					{#if searchValue.trim()}
+						<Command.Empty class="px-5 py-3 font-sans text-sm text-secondary/60 text-center">No matching zip codes.</Command.Empty>
+					{/if}
 					<Command.Group>
 						{#each filtered as entry (entry.zip)}
 							<Command.Item

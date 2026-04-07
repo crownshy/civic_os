@@ -21,6 +21,7 @@
     let joining = $state(false);
     let showHostMessage = $state(false);
     let showTermsMessage = $state(false);
+    let zipFlash = $state(false);
     let hasAgreedToTos = $derived(session.hasAgreedToTos);
 
     // Check for zipcode in URL parameter on mount
@@ -122,10 +123,14 @@
         <div class="relative z-10 shrink-0 flex flex-col items-center px-7 pb-3 pt-2">
             <span class="font-mono text-base font-medium uppercase text-muted-foreground/80">YOUR LOCATION</span>
             <div class="mt-1.5">
-                <ZipInput bind:value={zipCode} disabled={isReturning} />
+                <ZipInput bind:value={zipCode} disabled={isReturning} bind:flash={zipFlash} regionPrefixes={region.zipPrefixes} />
             </div>
 
-            <Button variant="primary" fullWidth disabled={!hasZip || joining} onclick={() => {
+            <Button variant="primary" fullWidth disabled={joining} onclick={() => {
+                if (!hasZip) {
+                    zipFlash = true;
+                    return;
+                }
                 if (hasAgreedToTos) {
                     handleJoin();
                 } else {
