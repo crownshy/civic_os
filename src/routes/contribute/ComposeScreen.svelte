@@ -41,7 +41,7 @@
 			<p>Have something to say that the poll hasn't captured yet? This is your chance.</p>
 			<ul class="list-disc space-y-2 px-4">
 				<li><span class='font-bold'>Share a belief, concern, or value</span> in your own words. Other participants will see it and respond.</li>
-				<li><span class='font-bold'>Write one idea per submission.</span>Your statement will stand on its own — not as a reply to anything specific.</li>
+				<li><span class='font-bold'>Write one idea per submission.</span> Your statement will stand on its own — not as a reply to anything specific.</li>
 				<li><span class='font-bold'>Keep it respectful.</span> Profanity, threats, or content that could harm others will be removed.</li>
 				<li><span class='font-bold'>No links or URLs, please.</span> This keeps the conversation focused and prevents spam.</li>
 				<li><span class='font-bold'>This is a shared space.</span> By contributing, you agree to our <Link href="https://app.termly.io/policy-viewer/policy.html?policyUUID=4f85478f-bc07-46b7-a67b-e9f11de4b279" external>Terms of Use & Moderation Policy</Link>.</li>
