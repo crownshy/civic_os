@@ -93,8 +93,7 @@
 			>
 				<!-- Attribution -->
 				<div class="flex items-center gap-2">
-					<span class="h-5 w-5 rounded-full bg-muted-foreground"></span>
-					<span class="font-mono text-sm font-medium text-muted-foreground"> SOMEONE SAYS... </span>
+					<span class="font-mono text-sm font-medium text-muted-foreground">SOMEONE SAYS... </span>
 				</div>
 
 				<!-- Quote -->
