@@ -83,18 +83,18 @@
 			<svg
 			viewBox="0 0 100 100"
 			xmlns="http://www.w3.org/2000/svg"
-			class="pointer-events-none absolute h-20 w-20"
+			class="pointer-events-none absolute h-20 w-20 font-mono"
 			>
-			<path 
-				id="circlePath"
-				d="M 50,90 a 40,40 0 1,1 0,-80 a 40,40 0 1,1 0,80"
-				fill="none"
-			/>
-			<text fill="#A6722E" opacity={`${disabled ? 0.5 : 1}`} font-size="14">
-				<textPath href="#circlePath" text-anchor="middle" startOffset="50%">
-				SKIP
-				</textPath>
-			</text>
+				<path 
+					id="circlePath"
+					d="M 50,90 a 40,40 0 1,1 0,-80 a 40,40 0 1,1 0,80"
+					fill="none"
+				/>
+				<text fill="#A6722E" opacity={`${disabled ? 0.5 : 1}`} font-size="14">
+					<textPath href="#circlePath" text-anchor="middle" startOffset="50%">
+					UNSURE
+					</textPath>
+				</text>
 			</svg>
 		</div>
 		</div>
