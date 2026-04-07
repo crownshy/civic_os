@@ -76,10 +76,10 @@
 
 <style>
 	@keyframes flash-border {
-		0%, 100% { outline-color: color-mix(in srgb, #A6722E 30%, transparent); }
-		25% { outline-color: #A6722E; }
-		50% { outline-color: color-mix(in srgb, #A6722E 30%, transparent); }
-		75% { outline-color: #A6722E; }
+		0%, 100% { outline-color: color-mix(in srgb, var(--secondary) 30%, transparent); }
+		25% { outline-color: var(--secondary); }
+		50% { outline-color: color-mix(in srgb, var(--secondary) 30%, transparent); }
+		75% { outline-color: var(--secondary); }
 	}
 	.shake-flash {
 		animation: flash-border 0.8s ease-in-out;
