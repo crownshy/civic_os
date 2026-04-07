@@ -32,6 +32,10 @@ export interface RegionConfig {
 	hostUrl: string;
 	/** Zipcode prefix(es) that belong to this region */
 	zipPrefixes: string[];
+	/** Landing page carousel pre-header */
+	carouselPreHeader: string;
+	/** Landing page carousel header */
+	carouselHeader: string;
 	/** Landing page carousel slides */
 	slides: string[];
 	/** Host message paragraphs (for the "A Message from Your Hosts" dialog) */
@@ -61,6 +65,8 @@ export const REGIONS: Record<string, RegionConfig> = {
 		hostName: 'Bloom Testing',
 		hostUrl: 'https://bloomproject.us',
 		zipPrefixes: [],
+		carouselPreHeader: 'WHAT SHOULD WE DO ABOUT',
+		carouselHeader: 'AI and the Future of Our Communities',
 		slides: [
 			'This conversation is about how everyone can direct the growing impact of artificial intelligence to benefit our communities.',
 			'You\u2019ll see statements from your neighbors and other community members about this question. You can vote: agree, disagree, or unsure on each one.',
@@ -91,6 +97,8 @@ export const REGIONS: Record<string, RegionConfig> = {
 		hostName: 'Utah Common Ground',
 		hostUrl: 'https://www.utahcommonground.org/home',
 		zipPrefixes: ['84'],
+		carouselPreHeader: 'WHAT SHOULD WE DO ABOUT',
+		carouselHeader: 'AI and the Future of Our Communities',
 		slides: [
 			'This conversation is about how Utahns can direct the growing impact of artificial intelligence to benefit our communities.',
 			'You\u2019ll see statements from your neighbors and other community members about this question. You can vote: agree, disagree, or unsure on each one.',
@@ -123,11 +131,13 @@ export const REGIONS: Record<string, RegionConfig> = {
 		hostName: 'Central Oregon Civic Action Project',
 		hostUrl: 'https://cocap.us/',
 		zipPrefixes: ['97'],
+		carouselPreHeader: 'CENTRAL OREGON SPEAKS:',
+		carouselHeader: 'AI and Our Future',
 		slides: [
-			'Your neighbors and fellow Central Oregonians are weighing in on how AI is changing our region — and what we should do about it. Now it\u2019s your turn.',
-			'You\u2019ll see statements from community members about this question. For each one, you can share if you: 𝗮𝗴𝗿𝗲𝗲, 𝗱𝗶𝘀𝗮𝗴𝗿𝗲𝗲, or are 𝘂𝗻𝘀𝘂𝗿𝗲.',
-			'Your responses — combined with everyone else\u2019s — will help surface what Central Oregonians have in common, where we differ, and what we might tackle together.',
-			'This poll is just the beginning. Live conversations and a community Solutions Assembly follow in the months ahead.'
+			'AI is reshaping Central Oregon — and we have a choice in how we respond. This is a place for us to weigh in.',
+			'You\'ll see statements from community members. For each one, you can respond: agree, disagree, or are unsure.',
+			'Your responses — combined with everyone else\'s — will help surface what Central Oregonians have in common, where we differ, and what we might tackle together.',
+			'This is the first step. What we discover here leads to live conversations and a community Solutions Assembly.'
 		],
 		hostMessage: [
 			`
@@ -186,6 +196,8 @@ export const GENERIC_REGION: RegionConfig = {
 	hostName: 'Bloom Project',
 	hostUrl: 'https://www.bloom-project.org/',
 	zipPrefixes: [],
+	carouselPreHeader: 'WHAT SHOULD WE DO ABOUT',
+	carouselHeader: 'AI and the Future of Our Communities',
 	slides: [
 		'This conversation is about how we can direct the growing impact of artificial intelligence to benefit our communities.',
 		'You\u2019ll see statements from your neighbors and other community members about this question. You can vote: agree, disagree, or unsure on each one.',
