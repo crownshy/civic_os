@@ -58,7 +58,7 @@
 
 {#snippet inactiveIndicator()}
 	<div class="absolute left-6 top-0 w-0.5 h-full bg-white/20"></div>
-	<div class="absolute left-[17px] top-[22px] w-4 h-4 rounded-full bg-white/20"></div>
+	<div class="absolute left-[17px] top-[30px] w-4 h-4 rounded-full bg-white/20"></div>
 {/snippet}
 
 <AppShell>
