@@ -4,7 +4,7 @@
 	import { AppShell } from '$lib/components/layout';
 
 	onMount(() => {
-		goto('/landing?host=true');
+		goto('/landing');
 	});
 </script>
 

@@ -100,7 +100,7 @@
 
         <!-- Main content — vertically centered, scrollable on small screens / large fonts -->
         <div class="relative z-10 flex-1 min-h-0 overflow-y-auto">
-            <div class="flex min-h-full flex-col items-center justify-center px-6 sm:px-8 py-4 sm:py-6 max-w-xl mx-auto">
+            <div class="flex min-h-full flex-col items-center justify-center px-9 sm:px-8 py-4 sm:py-6 max-w-xl mx-auto">
                 <span class="text-center font-mono text-base font-medium uppercase text-muted-foreground">
                     {region.carouselPreHeader}
                 </span>
@@ -108,9 +108,7 @@
                     {region.carouselHeader}
                 </h1>
 
-                <div class="mx-auto mt-4 sm:mt-6 h-1 w-20 rounded-full bg-muted-foreground"></div>
-
-                <SwipeCarousel count={region.slides.length} bind:index={slideIndex} autoScrollMs={5000} class="mt-4 sm:mt-6 w-full">
+                <SwipeCarousel count={region.slides.length} bind:index={slideIndex} autoScrollMs={5000} class="mt-6 sm:mt-6 w-full">
                     {#snippet children(i)}
                         <p class="font-sans text-lg font-medium leading-relaxed text-muted-foreground">
                             {region.slides[i]}
