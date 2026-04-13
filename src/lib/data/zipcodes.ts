@@ -161123,7 +161123,7 @@ export const ZIPCODES: ZipEntry[] = [
   {
     "zip": "97759",
     "city": "Sisters",
-    "county": "Linn"
+    "county": "Deschutes"
   },
   {
     "zip": "97760",
