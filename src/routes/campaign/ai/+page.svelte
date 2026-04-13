@@ -89,7 +89,7 @@
 			</p>
 
 			<p class="mt-5 font-sans text-lg font-medium leading-7 text-muted-foreground">
-				This Assembly is about making sure Central Oregonians have a real say in how artificial intelligence shapes our lives — who it benefits, who gets left behind, and what we can do about it at every level, from families and schools to city and state policy.
+				{region.campaignPageDescription}
 			</p>
 			<p class="mt-5 font-sans text-lg font-medium leading-7 text-muted-foreground">
 				Every perspective makes the picture more complete.
@@ -107,7 +107,11 @@
 					Your Hosts
 				</h2>
 					<p class="font-sans text-sm font-medium text-muted-foreground leading-5 mb-6">
-					Hosted by {@html region.fullHosts}
+					{#if region.campaignPageHosts}
+						{@html region.campaignPageHosts}
+					{:else}
+						Hosted by {@html region.fullHosts}
+					{/if}
 				</p>
 				<a href={region.hostUrl} target="_blank" rel="noopener noreferrer">
 				  <Button variant="primary" size="md" fullWidth >
