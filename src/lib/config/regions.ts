@@ -42,6 +42,10 @@ export interface RegionConfig {
 	hostMessage: string[];
 	/** Appears in the aboutConversation dialog */
 	aboutConversation: string[];
+	/** Appears on `/campaigns/ai` */
+	campaignPageDescription: string;
+	/** Appears on `/campaigns/ai` */
+	campaignPageHosts: string;
 	/** ending Content */
 	whatsNext: string;
 	goDeeper: string;
@@ -82,6 +86,8 @@ export const REGIONS: Record<string, RegionConfig> = {
 			'This conversation is about how Utah can prepare for the growing impact of AI in so many aspects of our lives (work and the economy, education, wellbeing, information quality, government services, etc).',
 			'It is hosted by Utah Common Ground, a collaboration of diverse nonpartisan organizations across Utah. You can find out more about them at utahcommonground.org.'
 		],
+		campaignPageDescription: '',
+		campaignPageHosts: '',
 		whatsNext: "Nothing",
 		goDeeper: "Nothing",
 		polis_workflow_step_id: "68425b0d-21e9-4f36-8c13-229dab4508bc",
@@ -107,15 +113,17 @@ export const REGIONS: Record<string, RegionConfig> = {
 			'This \u201COpen Poll\u201D will reveal shared concerns and values that will be the basis of action-oriented community conversations in the coming months.'
 		],
 		hostMessage: [
-			'This space is hosted by <a href="https://www.utahcommonground.org/home" class="text-destructive underline" target="_blank" rel="noopener noreferrer">Utah Common Ground</a>, a coalition of nonprofit organizations from around the state, including Utah State University Center for Anticipatory Intelligence, the AI Ethics and Governance Institute, Engage Utah, and Mormon Women for Ethical Governance. We came together to help citizens come together across political differences to identify issues of local concern, consider possible solutions, and take the necessary steps to achieve meaningful, measurable change.',
+			'This space is hosted by <a href="https://www.utahcommonground.org/home" class="text-destructive underline" target="_blank" rel="noopener noreferrer">Utah Common Ground</a>, a coalition of nonprofit organizations from around the state, including Utah State University Center for Anticipatory Intelligence, the AI Ethics and Governance Institute, Engage Forum, Braver Angels and Mormon Women for Ethical Government. We came together to help citizens come together across political differences to identify issues of local concern, consider possible solutions, and take the necessary steps to achieve meaningful, measurable change.',
 			'We invite all Utahns to share what matters most to them about the future of AI and its impact on communities across the state. Over several weeks, this process will surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding.',
-			'After this period of broad public input, a representative group of approximately 30 to 50 residents from three counties (Cache, Salt Lake, and Utah Counties) will be invited to convene in person in August and September 2026 for a Solutions Forum. Participants will reflect the demographic, geographic, and political diversity of Utah and will receive stipends to ensure participation is accessible.'
+			'After this period of broad public input, a representative group of approximately 30 to 50 residents from three counties (Cache, Salt Lake, and Utah Counties) will be invited to convene in person in August and September 2026 for a Solutions Forum.'
 		],
 		aboutConversation: [
 			'This conversation is about how Utah can prepare for the growing impact of AI in so many aspects of our lives (work and the economy, education, wellbeing, information quality, government services, etc).',
 			'            It is hosted by Utah Common Ground, a collaboration of diverse nonpartisan organizations across Utah. You can find out more about them at utahcommonground.org.'
 		],
-		whatsNext: "In April and May, there will be <strong>live conversations</strong> across Salt Lake, Weber, and Cache Counties. These conversations will build on the common themes and shared values that emerge from the statements here. If you want to take part in these or future conversations, please <strong>share your email above</strong> or visit the <Link href=\"https://www.utahcommonground.org/home\" external class=\"font-bold\">Utah Common Ground website.</Link>",
+		campaignPageDescription: 'This Assembly is about making sure Utahns have a real say in how artificial intelligence shapes our lives —ensuring that all Utahns can benefit from new technologies while mitigating risks to families, schools, and communities.',
+		campaignPageHosts: 'Hosted by Utah Common Ground, a project led by a coalition of organizations, including <a href="https://www.aegixinstitute.org/">AEGIX</a>, <a href="https://braverangels.org/">Braver Angels</a>, <a href="https://www.usu.edu/cai/">Center for Anticipatory Intelligence</a>, <a href="https://www.engageforum.org/">Engage Forum</a>, and <a href="https://www.mormonwomenforethicalgovernment.org/">Mormon Women for Ethical Government</a>.',
+		whatsNext: "In May, there will be <strong>live conversations</strong> across Salt Lake, Utah, and Cache Counties. These conversations will build on the common themes and shared values that emerge from the statements here. If you want to take part in these or future conversations, please <strong>share your email above</strong> or visit the <Link href=\"https://www.utahcommonground.org/home\" external class=\"font-bold\">Utah Common Ground website.</Link>",
 		goDeeper: "The ultimate goal of this campaign is to surface common ground that lets Utahns take action from the local to state levels and beyond. If you are interested in getting involved in a deeper way, let us know at <Link href=\"mailto:hello@bloom-project.org\" external class=\"font-bold\">hello@bloom-project.org</Link>.",
 
 		polis_workflow_step_id: "9d1041f9-fda6-4597-b4b0-c1260e4b7268",
@@ -180,6 +188,8 @@ export const REGIONS: Record<string, RegionConfig> = {
 			"A representative group of 30–50 residents will come together to deliberate on what this process surfaced — and work toward recommendations with broad, cross-party support.",
 			"Questions or want to get involved? Reach us at <a href='mailto:hello@cocap.us'>hello@cocap.us</a>."
 		],
+		campaignPageDescription: 'This Assembly is about making sure Central Oregonians have a real say in how artificial intelligence shapes our lives — who it benefits, who gets left behind, and what we can do about it at every level, from families and schools to city and state policy.',
+		campaignPageHosts: '',
 		whatsNext: "In May and June, small group conversations will take place in Deschutes, Jefferson, and Crook counties — and online. They'll build on the themes and common ground that emerge from this poll. Share your email above to stay in the loop and be notified when registration opens, or visit [cocap.us] to learn more.",
 		goDeeper: "This process is ultimately about finding common ground and turning it into action that benefits Central Oregon communities. If you'd like to get more involved, reach out at <a href=\"hello@cocap.us\">hello@cocap.us</a>.",
 		polis_workflow_step_id: "8299fec7-a543-419f-8692-f68652648a0b",
@@ -221,6 +231,8 @@ export const GENERIC_REGION: RegionConfig = {
 		"Results will be published publicly when the conversation closes.",
 		"Questions or want to get involved? Reach us at <a href='mailto:hello@bloom-project.org'>hello@bloom-project.org</a>."
 	],
+	campaignPageDescription: '',
+	campaignPageHosts: '',
 	whatsNext: "When this conversation closes, Bloom will publish the results publicly — showing where Americans agree, where we differ, and what the opinion landscape looks like across different groups. We’ll share a link when it’s ready.",
 	goDeeper: "If you’d like to get more involved with Bloom’s civic deliberation work, reach out at <a href='mailto:hello@bloom-project.org'>hello@bloom-project.org</a> or visit <a href='https://www.bloom-project.org'>https://www.bloom-project.org</a>.",
 	polis_workflow_step_id: "f553a7b9-b3ac-4159-b88d-198f609b110c",
