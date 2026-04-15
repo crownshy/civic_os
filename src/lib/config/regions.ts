@@ -54,6 +54,8 @@ export interface RegionConfig {
 	fullHosts: string;
 	/** Upcoming conversation events for this region */
 	events: ConversationEvent[];
+	/** Date labels for the three campaign phases */
+	phaseLabels?: { phase1: string; phase2: string; phase3: string };
 }
 
 // ---------------------------------------------------------------------------
@@ -163,7 +165,9 @@ export const REGIONS: Record<string, RegionConfig> = {
 				format: 'online',
 				description: 'Can\'t make it in person? Join this virtual conversation from anywhere. Same great discussion, from the comfort of your home.'
 			}
-		]
+		], 
+		phaseLabels: { phase1: 'APRIL 2026', phase2: 'MAY 2026', phase3: 'SEPTEMBER 2026' }
+
 	},
 
 	oregon: {
@@ -261,7 +265,9 @@ export const REGIONS: Record<string, RegionConfig> = {
 				format: 'online',
 				description: 'Can\'t make it in person? Join this virtual conversation from anywhere in Central Oregon.'
 			}
-		]
+		],
+		phaseLabels: { phase1: 'APRIL 2026', phase2: 'MAY 2026', phase3: 'SEPTEMBER 2026' }
+
 	}
 };
 
