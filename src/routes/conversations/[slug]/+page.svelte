@@ -2,7 +2,6 @@
 	import { page } from '$app/state';
 	import { AppShell } from '$lib/components/layout';
 	import { Button, InfoBar } from '$lib/components/ui';
-	import { conversationEvents } from '$lib/data/mock';
 	import type { RegionConfig } from '$lib/config/regions';
 	import type { ConversationEvent } from '$lib/types/mock-data';
 	import { onMount, onDestroy } from 'svelte';
@@ -10,7 +9,7 @@
 	const region: RegionConfig = page.data.region;
 	const slug = page.params.slug;
 
-	const event: ConversationEvent | undefined = conversationEvents.find((e) => e.slug === slug);
+	const event: ConversationEvent | undefined = region.events.find((e) => e.slug === slug);
 
 	let daysLeft = $state(0);
 	let hoursLeft = $state(0);

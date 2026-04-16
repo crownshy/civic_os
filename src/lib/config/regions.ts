@@ -10,6 +10,8 @@
  *   - Anything else → generic polis
  */
 
+import type { ConversationEvent } from '$lib/types/mock-data';
+
 export interface RegionConfig {
 	/** Slug used in subdomain and as map key */
 	slug: string;
@@ -50,7 +52,8 @@ export interface RegionConfig {
 	whatsNext: string;
 	goDeeper: string;
 	fullHosts: string;
-
+	/** Upcoming conversation events for this region */
+	events: ConversationEvent[];
 }
 
 // ---------------------------------------------------------------------------
@@ -91,7 +94,8 @@ export const REGIONS: Record<string, RegionConfig> = {
 		whatsNext: "Nothing",
 		goDeeper: "Nothing",
 		polis_workflow_step_id: "68425b0d-21e9-4f36-8c13-229dab4508bc",
-		fullHosts: ''
+		fullHosts: '',
+		events: []
 	},
 	utah: {
 		slug: 'utah',
@@ -127,7 +131,39 @@ export const REGIONS: Record<string, RegionConfig> = {
 		goDeeper: "The ultimate goal of this campaign is to surface common ground that lets Utahns take action from the local to state levels and beyond. If you are interested in getting involved in a deeper way, let us know at <Link href=\"mailto:hello@bloom-project.org\" external class=\"font-bold\">hello@bloom-project.org</Link>.",
 
 		polis_workflow_step_id: "9d1041f9-fda6-4597-b4b0-c1260e4b7268",
-		fullHosts: "<a href='https://www.utahcommonground.org/home'>Utah Common Ground</a>"
+		fullHosts: "<a href='https://www.utahcommonground.org/home'>Utah Common Ground</a>",
+		events: [
+			{
+				slug: 'may-18-springville',
+				title: 'May 18 (In-Person) Conversation',
+				topic: 'AI & OUR COMMUNITIES',
+				location: 'Springville, UT',
+				time: '1:00PM',
+				date: '2026-05-18T13:00:00-06:00',
+				format: 'in-person',
+				description: 'Join us for an in-person conversation about AI and its impact on our communities. Share your perspective, listen to your neighbors, and help shape actionable next steps.'
+			},
+			{
+				slug: 'may-24-provo',
+				title: 'May 24 (In-Person) Conversation',
+				topic: 'AI & OUR COMMUNITIES',
+				location: 'Provo, UT',
+				time: '10:00AM',
+				date: '2026-05-24T10:00:00-06:00',
+				format: 'in-person',
+				description: 'A morning conversation in Provo about how AI is shaping our communities. Come ready to listen, share, and find common ground with fellow residents.'
+			},
+			{
+				slug: 'jun-01-online',
+				title: 'June 1 (Online) Conversation',
+				topic: 'AI & OUR COMMUNITIES',
+				location: 'Online (Zoom)',
+				time: '6:00PM',
+				date: '2026-06-01T18:00:00-06:00',
+				format: 'online',
+				description: 'Can\'t make it in person? Join this virtual conversation from anywhere. Same great discussion, from the comfort of your home.'
+			}
+		]
 	},
 
 	oregon: {
@@ -193,7 +229,39 @@ export const REGIONS: Record<string, RegionConfig> = {
 		whatsNext: "In May and June, small group conversations will take place in Deschutes, Jefferson, and Crook counties — and online. They'll build on the themes and common ground that emerge from this poll. Share your email above to stay in the loop and be notified when registration opens, or visit [cocap.us] to learn more.",
 		goDeeper: "This process is ultimately about finding common ground and turning it into action that benefits Central Oregon communities. If you'd like to get more involved, reach out at <a href=\"hello@cocap.us\">hello@cocap.us</a>.",
 		polis_workflow_step_id: "8299fec7-a543-419f-8692-f68652648a0b",
-		fullHosts: "<a href='https://www.utahcommonground.org/home'>Central Oregon Civic Action Project</a>, <a href='https://www.coic.org/'>Central Oregon Intergovernmental Council</a>, <a href='https://cocc.edu/'>Central Oregon Community College</a>, and <a href='https://citizens4community.com/'>Citizens4Community</a>."
+		fullHosts: "<a href='https://www.utahcommonground.org/home'>Central Oregon Civic Action Project</a>, <a href='https://www.coic.org/'>Central Oregon Intergovernmental Council</a>, <a href='https://cocc.edu/'>Central Oregon Community College</a>, and <a href='https://citizens4community.com/'>Citizens4Community</a>.",
+		events: [
+			{
+				slug: 'may-31-bend',
+				title: 'May 31 (In-Person) Conversation',
+				topic: 'AI & OUR COMMUNITIES',
+				location: 'Bend, OR',
+				time: '10:00AM',
+				date: '2026-05-31T10:00:00-07:00',
+				format: 'in-person',
+				description: 'Join fellow Central Oregonians for a conversation about AI and its impact on our region. Share your perspective and help shape what comes next.'
+			},
+			{
+				slug: 'jun-07-redmond',
+				title: 'June 7 (In-Person) Conversation',
+				topic: 'AI & OUR COMMUNITIES',
+				location: 'Redmond, OR',
+				time: '1:00PM',
+				date: '2026-06-07T13:00:00-07:00',
+				format: 'in-person',
+				description: 'An afternoon conversation in Redmond about how AI is shaping Central Oregon. Come ready to listen, share, and find common ground.'
+			},
+			{
+				slug: 'jun-14-online-or',
+				title: 'June 14 (Online) Conversation',
+				topic: 'AI & OUR COMMUNITIES',
+				location: 'Online (Zoom)',
+				time: '6:00PM',
+				date: '2026-06-14T18:00:00-07:00',
+				format: 'online',
+				description: 'Can\'t make it in person? Join this virtual conversation from anywhere in Central Oregon.'
+			}
+		]
 	}
 };
 
@@ -236,7 +304,39 @@ export const GENERIC_REGION: RegionConfig = {
 	whatsNext: "When this conversation closes, Bloom will publish the results publicly — showing where Americans agree, where we differ, and what the opinion landscape looks like across different groups. We’ll share a link when it’s ready.",
 	goDeeper: "If you’d like to get more involved with Bloom’s civic deliberation work, reach out at <a href='mailto:hello@bloom-project.org'>hello@bloom-project.org</a> or visit <a href='https://www.bloom-project.org'>https://www.bloom-project.org</a>.",
 	polis_workflow_step_id: "f553a7b9-b3ac-4159-b88d-198f609b110c",
-	fullHosts: "<a href='https://www.bloom-project.org/'>The Bloom Project</a>."
+	fullHosts: "<a href='https://www.bloom-project.org/'>The Bloom Project</a>.",
+	events: [
+		{
+			slug: 'may-18-springville',
+			title: 'May 18 (In-Person) Conversation',
+			topic: 'AI & OUR COMMUNITIES',
+			location: 'Generic Location',
+			time: '1:00PM',
+			date: '2026-05-18T13:00:00-06:00',
+			format: 'in-person',
+			description: 'Join us for an in-person conversation about AI and its impact on our communities. Share your perspective, listen to your neighbors, and help shape actionable next steps.'
+		},
+		{
+			slug: 'may-24-provo',
+			title: 'May 24 (In-Person) Conversation',
+			topic: 'AI & OUR COMMUNITIES',
+			location: 'Generic Location',
+			time: '10:00AM',
+			date: '2026-05-24T10:00:00-06:00',
+			format: 'in-person',
+			description: 'A morning conversation about how AI is shaping our communities. Come ready to listen, share, and find common ground with fellow residents.'
+		},
+		{
+			slug: 'jun-01-online',
+			title: 'June 1 (Online) Conversation',
+			topic: 'AI & OUR COMMUNITIES',
+			location: 'Online (Zoom)',
+			time: '6:00PM',
+			date: '2026-06-01T18:00:00-06:00',
+			format: 'online',
+			description: 'Can\'t make it in person? Join this virtual conversation from anywhere. Same great discussion, from the comfort of your home.'
+		}
+	]
 };
 
 // ---------------------------------------------------------------------------

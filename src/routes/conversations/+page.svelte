@@ -2,7 +2,6 @@
 	import { page } from '$app/state';
 	import { AppShell } from '$lib/components/layout';
 	import { InfoBar, ConversationEventCard } from '$lib/components/ui';
-	import { conversationEvents } from '$lib/data/mock';
 	import type { RegionConfig } from '$lib/config/regions';
 	import { fly, fade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
@@ -21,8 +20,8 @@
 
 	const filtered = $derived(
 		activeFilter === 'all'
-			? conversationEvents
-			: conversationEvents.filter((e) => e.format === activeFilter)
+			? region.events
+			: region.events.filter((e) => e.format === activeFilter)
 	);
 </script>
 
