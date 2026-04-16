@@ -229,7 +229,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 		whatsNext: "In May and June, small group conversations will take place in Deschutes, Jefferson, and Crook counties — and online. They'll build on the themes and common ground that emerge from this poll. Share your email above to stay in the loop and be notified when registration opens, or visit [cocap.us] to learn more.",
 		goDeeper: "This process is ultimately about finding common ground and turning it into action that benefits Central Oregon communities. If you'd like to get more involved, reach out at <a href=\"hello@cocap.us\">hello@cocap.us</a>.",
 		polis_workflow_step_id: "8299fec7-a543-419f-8692-f68652648a0b",
-		fullHosts: "<a href='https://www.utahcommonground.org/home'>Central Oregon Civic Action Project</a>, <a href='https://www.coic.org/'>Central Oregon Intergovernmental Council</a>, <a href='https://cocc.edu/'>Central Oregon Community College</a>, and <a href='https://citizens4community.com/'>Citizens4Community</a>.",
+		fullHosts: "<a href='https://cocap.us/'>Central Oregon Civic Action Project</a>, <a href='https://www.coic.org/'>Central Oregon Intergovernmental Council</a>, <a href='https://cocc.edu/'>Central Oregon Community College</a>, and <a href='https://citizens4community.com/'>Citizens4Community</a>.",
 		events: [
 			{
 				slug: 'may-31-bend',
