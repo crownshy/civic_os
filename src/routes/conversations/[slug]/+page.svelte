@@ -16,6 +16,7 @@
 	let minutesLeft = $state(0);
 	let isPast = $state(false);
 	let interval: ReturnType<typeof setInterval> | null = null;
+	let showForm = $state(false);
 
 	function updateCountdown() {
 		if (!event) return;
@@ -97,11 +98,26 @@
 					{/if}
 				</p>
 
-				<Button variant="primary" fullWidth size="lg">
+				<Button variant="primary" fullWidth size="lg" onclick={() => (showForm = true)}>
 					SIGN UP TODAY
 				</Button>
 			</div>
 		</div>
+
+		{#if showForm}
+			<div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gradient-primary">
+				<button
+					class="absolute top-4 left-4 font-mono text-sm uppercase text-foreground"
+					onclick={() => (showForm = false)}
+				>
+					← BACK
+				</button>
+				<div class="flex flex-col items-center gap-4 px-6">
+					<span class="font-mono text-lg font-medium uppercase text-foreground/50">HeyForm Placeholder</span>
+					<p class="text-center font-sans text-sm text-muted-foreground">RSVP form will be embedded here</p>
+				</div>
+			</div>
+		{/if}
 	</AppShell>
 {:else}
 	<AppShell>
