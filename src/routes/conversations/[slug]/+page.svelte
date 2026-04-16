@@ -57,7 +57,7 @@
 				</span>
 
 				<!-- Title -->
-				<h1 class="mt-3 text-center font-sans text-5xl font-extrabold leading-12 text-foreground">
+				<h1 class="mt-3 text-center font-sans text-5xl font-extrabold leading-[3rem] text-foreground">
 					{event.title}
 				</h1>
 
