@@ -90,6 +90,8 @@
 						EVENT STARTS IN {daysLeft} {daysLeft === 1 ? 'DAY' : 'DAYS'}
 					{:else if hoursLeft > 0}
 						EVENT STARTS IN {hoursLeft}H {minutesLeft}M
+					{:else if minutesLeft > 0}
+						EVENT STARTS IN {minutesLeft} {minutesLeft === 1 ? 'MIN' : 'MINS'}
 					{:else}
 						HAPPENING NOW
 					{/if}
