@@ -4,6 +4,7 @@
 	import { Button, InfoBar } from '$lib/components/ui';
 	import type { RegionConfig } from '$lib/config/regions';
 	import type { ConversationEvent } from '$lib/types/mock-data';
+	import { differenceInDays, differenceInHours, differenceInMinutes, addHours, isBefore } from 'date-fns';
 	import { onMount, onDestroy } from 'svelte';
 
 	const region: RegionConfig = page.data.region;
@@ -22,12 +23,16 @@
 		if (!event) return;
 		const now = new Date();
 		const target = new Date(event.date);
-		const rawDiff = target.getTime() - now.getTime();
-		isPast = rawDiff < -2 * 60 * 60 * 1000; // past if >2h after start
-		const diff = Math.max(0, rawDiff);
-		daysLeft = Math.floor(diff / (1000 * 60 * 60 * 24));
-		hoursLeft = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-		minutesLeft = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+		isPast = isBefore(addHours(target, 2), now); // past if >2h after start
+		if (isPast || isBefore(target, now)) {
+			daysLeft = 0;
+			hoursLeft = 0;
+			minutesLeft = 0;
+			return;
+		}
+		daysLeft = differenceInDays(target, now);
+		hoursLeft = differenceInHours(target, now) % 24;
+		minutesLeft = differenceInMinutes(target, now) % 60;
 	}
 
 	onMount(() => {
