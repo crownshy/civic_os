@@ -7,9 +7,9 @@
 	import { onMount, onDestroy } from 'svelte';
 
 	const region: RegionConfig = page.data.region;
-	const slug = page.params.slug;
+	const slug = $derived(page.params.slug);
 
-	const event: ConversationEvent | undefined = region.events.find((e) => e.slug === slug);
+	const event: ConversationEvent | undefined = $derived(region.events.find((e) => e.slug === slug));
 
 	let daysLeft = $state(0);
 	let hoursLeft = $state(0);

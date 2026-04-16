@@ -74,7 +74,7 @@ export interface ConversationEvent {
 	location: string;
 	time: string;
 	date: string; // ISO date string for countdown
-	format: 'in-person' | 'online' | 'hybrid';
+	format: 'in-person' | 'online';
 	description: string;
 	imageUrl?: string;
 	signupUrl?: string;
