@@ -31,6 +31,7 @@
 	}
 
 	onMount(() => {
+		if (!event) return;
 		updateCountdown();
 		interval = setInterval(updateCountdown, 60000);
 	});
