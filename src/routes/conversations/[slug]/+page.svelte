@@ -15,7 +15,7 @@
 	let hoursLeft = $state(0);
 	let minutesLeft = $state(0);
 	let isPast = $state(false);
-	let interval: ReturnType<typeof setInterval>;
+	let interval: ReturnType<typeof setInterval> | null = null;
 
 	function updateCountdown() {
 		if (!event) return;
