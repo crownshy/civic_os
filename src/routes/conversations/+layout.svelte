@@ -1,13 +1,19 @@
 <script lang="ts">
 	import { onNavigate } from '$app/navigation';
 
+	type DocumentWithStartViewTransition = Document & {
+		startViewTransition?: (callback: () => Promise<void> | void) => unknown;
+	};
+
 	let { children } = $props();
 
 	onNavigate((navigation) => {
-		if (!document.startViewTransition) return;
+		const transitionDocument = document as DocumentWithStartViewTransition;
+
+		if (!transitionDocument.startViewTransition) return;
 
 		return new Promise((resolve) => {
-			document.startViewTransition(async () => {
+			transitionDocument.startViewTransition(async () => {
 				resolve();
 				await navigation.complete;
 			});
