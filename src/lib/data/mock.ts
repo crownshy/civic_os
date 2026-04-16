@@ -6,7 +6,8 @@ import type {
 	LearningCard,
 	ThemeSummary,
 	PopQuizQuestion,
-	AboutYouQuestion
+	AboutYouQuestion,
+	ConversationEvent
 } from '$lib/types/mock-data';
 
 export const county: County = {
@@ -119,5 +120,38 @@ export const aboutYouQuestions: AboutYouQuestion[] = [
 		description: 'Select the one that best describes you.',
 		options: ['Republican / Conservative', 'Democrat / Progressive / Liberal', 'No Party Preference / Independent'],
 		multiSelect: false
+	}
+];
+
+export const conversationEvents: ConversationEvent[] = [
+	{
+		slug: 'may-18-springville',
+		title: 'May 18 (In-Person) Conversation',
+		topic: 'AI & OUR COMMUNITIES',
+		location: 'Springville, UT',
+		time: '1:00PM',
+		date: '2026-05-18T13:00:00',
+		format: 'in-person',
+		description: 'Join us for an in-person conversation about AI and its impact on our communities. Share your perspective, listen to your neighbors, and help shape actionable next steps.'
+	},
+	{
+		slug: 'may-24-provo',
+		title: 'May 24 (In-Person) Conversation',
+		topic: 'AI & OUR COMMUNITIES',
+		location: 'Provo, UT',
+		time: '10:00AM',
+		date: '2026-05-24T10:00:00',
+		format: 'in-person',
+		description: 'A morning conversation in Provo about how AI is shaping our communities. Come ready to listen, share, and find common ground with fellow residents.'
+	},
+	{
+		slug: 'jun-01-online',
+		title: 'June 1 (Online) Conversation',
+		topic: 'AI & OUR COMMUNITIES',
+		location: 'Online (Zoom)',
+		time: '6:00PM',
+		date: '2026-06-01T18:00:00',
+		format: 'online',
+		description: 'Can\'t make it in person? Join this virtual conversation from anywhere. Same great discussion, from the comfort of your home.'
 	}
 ];

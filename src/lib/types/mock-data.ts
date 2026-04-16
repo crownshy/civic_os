@@ -67,6 +67,19 @@ export interface PopQuizQuestion {
 	explanation: string;
 }
 
+export interface ConversationEvent {
+	slug: string;
+	title: string;
+	topic: string;
+	location: string;
+	time: string;
+	date: string; // ISO date string for countdown
+	format: 'in-person' | 'online' | 'hybrid';
+	description: string;
+	imageUrl?: string;
+	signupUrl?: string;
+}
+
 export interface AboutYouQuestion {
 	id: string;
 	question: string;
