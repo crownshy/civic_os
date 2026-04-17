@@ -44,7 +44,28 @@
 	onDestroy(() => {
 		if (interval) clearInterval(interval);
 	});
+
+	function onFrameMessage(e: any) {
+		if (e.data.eventName === 'HIDE_EMBED_MODAL') {
+			setTimeout(() => {
+				showForm=false
+			}, 2000);
+		}
+	}
+
+	$effect(() => {
+		window.addEventListener('message', onFrameMessage);
+
+		return () => {
+			window.removeEventListener('message', onFrameMessage);
+		};
+	});
+
 </script>
+
+<svelte:head>
+  <script src="https://www.unpkg.com/@heyform-inc/embed@latest/dist/index.umd.js"></script>
+</svelte:head>
 
 {#if event}
 	<AppShell>
@@ -118,15 +139,21 @@
 				>
 					← BACK
 				</button>
-				<div class="flex flex-col items-center gap-4 px-6">
-					<span class="font-mono text-lg font-medium uppercase text-foreground/50">HeyForm Placeholder</span>
-					<p class="text-center font-sans text-sm text-muted-foreground">RSVP form will be embedded here</p>
-				</div>
-			</div>
-		{/if}
-	</AppShell>
-{:else}
-	<AppShell>
+				<div class="flex flex-col items-center gap-4 px-6  w-full h-full">
+				  <iframe
+					  title='event signup form'
+					  src={`https://forms.bloomproject.us/form/IspxhmX8?event_id=${encodeURIComponent(event.slug)}&hideAfterSubmit=true&autoClose=1`}
+					  width="100%"
+					  height="100%"
+					  frameborder="0"
+					  style="background: transparent;"
+				  ></iframe>
+				  </div>
+			  </div>
+		  {/if}
+	  </AppShell>
+  {:else}
+	  <AppShell>
 		<div class="flex h-full flex-col items-center justify-center bg-gradient-primary px-6">
 			<h1 class="font-sans text-2xl font-bold text-foreground">Conversation not found</h1>
 			<Button variant="primary" size="md" href="/conversations" class="mt-6">
