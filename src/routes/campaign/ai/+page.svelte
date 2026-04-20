@@ -179,7 +179,7 @@
 				<span class="font-mono text-xs font-medium text-white/70">PHASE THREE ({region.phaseLabels?.phase3 ?? 'SEPTEMBER 2026'})</span>
 				<h3 class="font-sans text-3xl font-bold leading-tight mt-2 mb-3 text-white">Solutions Forum</h3>
 				<p class="font-sans text-md font-medium leading-5 mb-6 text-white">
-				  30 residents, selected by lottery to represent all walks of life in Central Oregon, will work together over a long weekend to prioritize the top policies and practices  the region should pursue.
+				  30 residents, selected by lottery to represent all walks of life in {region.stateName}, will work together over a long weekend to prioritize the top policies and practices  the region should pursue.
 				</p>
 				<Button size="md" class='text-white bg-white/20 border border-white/10' variant="gradient" fullWidth disabled>
 					REGISTRATIONS TBA
