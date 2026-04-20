@@ -142,7 +142,7 @@
 						<!-- Content -->
 						<div class="flex-1 min-w-0">
 							<span class="font-mono text-xs font-medium text-destructive/70">PHASE ONE ({region.phaseLabels?.phase1 ?? 'APRIL 2026'})</span>
-							<h3 class="font-sans text-3xl font-bold leading-tight mt-2 mb-3 text-muted-foreground">Open Poll</h3>
+							<h3 class="font-sans text-3xl font-bold leading-tight mt-1 mb-3 text-muted-foreground">Open Poll</h3>
 							<p class="font-sans text-md font-medium leading-5 mb-6 text-muted-foreground">
 							  Share your thoughts in as little as 2 minutes on how artificial intelligence should be managed to benefit our communities, and see what fellow community members think.
 							</p>
@@ -161,7 +161,7 @@
 						{@render phaseIndicator('destructive')}
 						<div class="flex-1 min-w-0">
 							<span class="font-mono text-xs font-medium text-destructive/70">PHASE TWO ({region.phaseLabels?.phase2 ?? 'MAY 2026'})</span>
-							<h3 class="font-sans text-3xl font-bold leading-tight mt-2 mb-3 text-muted-foreground">Community Conversations</h3>
+							<h3 class="font-sans text-3xl font-bold leading-tight mt-1 mb-3 text-muted-foreground">Community Conversations</h3>
 							<p class="font-sans text-md font-medium leading-5 mb-6 text-muted-foreground">
 							  Join live conversations in-person or online to discuss what is actionable from the first phase and listen and learn with other community members.
 							</p>
@@ -177,7 +177,7 @@
 			<Card class="relative bg-white/10 border-white/20 overflow-hidden pt-6 pr-6 pb-6 pl-12">
 				{@render inactiveIndicator()}
 				<span class="font-mono text-xs font-medium text-white/70">PHASE THREE ({region.phaseLabels?.phase3 ?? 'SEPTEMBER 2026'})</span>
-				<h3 class="font-sans text-3xl font-bold leading-tight mt-2 mb-3 text-white">Solutions Forum</h3>
+				<h3 class="font-sans text-3xl font-bold leading-tight mt-1 mb-3 text-white">Solutions Forum</h3>
 				<p class="font-sans text-md font-medium leading-5 mb-6 text-white">
 				  30 residents, selected by lottery to represent all walks of life in {region.stateName}, will work together over a long weekend to prioritize the top policies and practices  the region should pursue.
 				</p>
