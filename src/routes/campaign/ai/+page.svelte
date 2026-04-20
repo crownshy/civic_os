@@ -293,4 +293,17 @@
 			opacity: 0;
 		}
 	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.community-marquee {
+			animation: none;
+			transform: none;
+		}
+
+		.pulse-ring {
+			animation: none;
+			transform: scale(1.5);
+			opacity: 0.2;
+		}
+	}
 </style>
