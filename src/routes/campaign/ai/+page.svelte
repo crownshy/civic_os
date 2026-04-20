@@ -147,7 +147,7 @@
 							  Share your thoughts in as little as 2 minutes on how artificial intelligence should be managed to benefit our communities, and see what fellow community members think.
 							</p>
 							<Button href='/' variant="destructive" size="md" fullWidth>
-								JOIN  CONVERSATION
+								JOIN CONVERSATION
 							</Button>
 						</div>
 					</div>
