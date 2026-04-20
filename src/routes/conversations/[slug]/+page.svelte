@@ -51,6 +51,7 @@
 	});
 
 	function onFrameMessage(e: any) {
+		if (e.origin !== 'https://forms.bloomproject.us') return;
 		if (e.data.eventName === 'HIDE_EMBED_MODAL') {
 			isRegistered = true;
 			localStorage.setItem(`registered-${slug}`, 'true');
@@ -153,7 +154,7 @@
 											<path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10Zm1-10V7h-2v7h6v-2h-4Z"/>
 										</svg>
 										<div>
-											<p class="font-sans text-xl font-bold leading-5 text-foreground">{event.time} – {event.endTime}</p>
+											<p class="font-sans text-xl font-bold leading-5 text-foreground">{event.time}{#if event.endTime} – {event.endTime}{/if}</p>
 											{#if event.duration}
 												<p class="mt-2 font-sans text-sm font-medium leading-4 text-foreground/80">{event.duration}</p>
 											{/if}
