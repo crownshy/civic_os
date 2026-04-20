@@ -49,10 +49,10 @@
 {#snippet phaseIndicator(color: string)}
 	<div class="flex flex-col mr-2 items-center shrink-0 pt-1">
 		<div class="relative">
-			<div class="absolute -inset-1 rounded-full bg-background/20" style="box-shadow: 0px 0px 15px 1px var(--{color})"></div>
+			<div class="absolute -inset-1 rounded-full bg-background/20 pulse-ring" style="box-shadow: 0px 0px 15px 1px var(--{color})"></div>
 			<div class="relative w-4 h-4 rounded-full" style="background-color: var(--{color})"></div>
 		</div>
-		<div class="mt-1.5 w-0.5 flex-1" style="background: linear-gradient(to bottom, var(--{color}), transparent)"></div>
+		<div class="w-0.5 flex-1" style="background: linear-gradient(to bottom, var(--{color}), transparent)"></div>
 	</div>
 {/snippet}
 
@@ -277,6 +277,20 @@
 		}
 		100% {
 			transform: translateX(-50%);
+		}
+	}
+
+	.pulse-ring {
+		animation: phase-pulse 2s ease-out infinite;
+	}
+	@keyframes phase-pulse {
+		0% {
+			transform: scale(0);
+			opacity: 1;
+		}
+		80%, 100% {
+			transform: scale(2.5);
+			opacity: 0;
 		}
 	}
 </style>
