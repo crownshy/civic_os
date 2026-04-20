@@ -308,7 +308,7 @@ export const GENERIC_REGION: RegionConfig = {
 	campaignPageDescription: '',
 	campaignPageHosts: '',
 	whatsNext: "When this conversation closes, Bloom will publish the results publicly — showing where Americans agree, where we differ, and what the opinion landscape looks like across different groups. We’ll share a link when it’s ready.",
-	goDeeper: "If you’d like to get more involved with Bloom’s civic deliberation work, reach out at <a href='mailto:hello@bloom-project.org'>hello@bloom-project.org</a> or visit <a href='https://www.bloom-project.org'>https://www.bloom-project.org</a>.",
+	goDeeper: "If you’d like to host this conversation in your own community, reach out at <a href='mailto:hello@bloom-project.org'>hello@bloom-project.org</a> or visit <a href='https://www.bloom-project.org'>https://www.bloom-project.org</a>.",
 	polis_workflow_step_id: "f553a7b9-b3ac-4159-b88d-198f609b110c",
 	fullHosts: "<a href='https://www.bloom-project.org/'>The Bloom Project</a>.",
 	events: [
