@@ -49,10 +49,10 @@
 {#snippet phaseIndicator(color: string)}
 	<div class="flex flex-col mr-2 items-center shrink-0 pt-1">
 		<div class="relative">
-			<div class="absolute -inset-1 rounded-full bg-background/20" style="box-shadow: 0px 0px 15px 1px var(--{color})"></div>
+			<div class="absolute -inset-1 rounded-full bg-background/20 pulse-ring" style="box-shadow: 0px 0px 15px 1px var(--{color})"></div>
 			<div class="relative w-4 h-4 rounded-full" style="background-color: var(--{color})"></div>
 		</div>
-		<div class="mt-1.5 w-0.5 flex-1" style="background: linear-gradient(to bottom, var(--{color}), transparent)"></div>
+		<div class="w-0.5 flex-1" style="background: linear-gradient(to bottom, var(--{color}), transparent)"></div>
 	</div>
 {/snippet}
 
@@ -72,7 +72,7 @@
 				<span class="font-mono text-sm font-medium text-foreground/70">{region.stateName.toUpperCase()}</span>
 			</div>
 			<Button variant="soft" size="xs" href="/">
-			  To Open Poll	
+			  TO OPEN POLL	
 			</Button>
 		</div>
 
@@ -87,10 +87,11 @@
 			<p class="mt-5 font-sans text-lg font-medium leading-7 text-muted-foreground">
 				A <strong>Community Solutions Assembly</strong> bringing {region.demonym} together around the decisions that affect us all.
 			</p>
-
-			<p class="mt-5 font-sans text-lg font-medium leading-7 text-muted-foreground">
-				{region.campaignPageDescription}
-			</p>
+			{#if region.campaignPageDescription}
+				<p class="mt-5 font-sans text-lg font-medium leading-7 text-muted-foreground">
+					{region.campaignPageDescription}
+				</p>
+			{/if}
 			<p class="mt-5 font-sans text-lg font-medium leading-7 text-muted-foreground">
 				Every perspective makes the picture more complete.
 			</p>
@@ -106,7 +107,7 @@
 				<h2 class="font-sans text-3xl font-bold text-muted-foreground leading-8 mt-2 mb-4">
 					Your Hosts
 				</h2>
-					<p class="font-sans text-sm font-medium text-muted-foreground leading-5 mb-6">
+					<p class="font-sans text-md font-medium text-muted-foreground leading-5 mb-6">
 					{#if region.campaignPageHosts}
 						{@html region.campaignPageHosts}
 					{:else}
@@ -140,13 +141,13 @@
 
 						<!-- Content -->
 						<div class="flex-1 min-w-0">
-							<span class="font-mono text-xs font-medium text-destructive/70">PHASE ONE (APRIL 2026)</span>
-							<h3 class="font-sans text-3xl font-bold leading-tight mt-2 mb-3 text-muted-foreground">Open Poll</h3>
-							<p class="font-sans text-sm font-medium leading-5 mb-6 text-muted-foreground">
+							<span class="font-mono text-xs font-medium text-destructive/70">PHASE ONE ({region.phaseLabels?.phase1 ?? 'APRIL 2026'})</span>
+							<h3 class="font-sans text-3xl font-bold leading-tight mt-1 mb-3 text-muted-foreground">Open Poll</h3>
+							<p class="font-sans text-md font-medium leading-5 mb-6 text-muted-foreground">
 							  Share your thoughts in as little as 2 minutes on how artificial intelligence should be managed to benefit our communities, and see what fellow community members think.
 							</p>
 							<Button href='/' variant="destructive" size="md" fullWidth>
-								JOIN THE CONVERSATION →
+								JOIN CONVERSATION
 							</Button>
 						</div>
 					</div>
@@ -155,26 +156,30 @@
 
 			<!-- Phase 2: Listen & Learn -->
 			<div class="mb-6">
-				<Card class="relative bg-white/10 border-white/20 overflow-hidden pt-6 pr-6 pb-6 pl-12">
-					{@render inactiveIndicator()}
-					<span class="font-mono text-xs font-medium text-white/70">PHASE TWO (MAY 2026)</span>
-					<h3 class="font-sans text-3xl font-bold leading-tight mt-2 mb-3 text-white">Community Conversations </h3>
-					<p class="font-sans text-sm font-medium leading-5 mb-6 text-white">
-					  Join live conversations in-person or online to discuss what is actionable from the first phase and listen and learn with other community members. 
-					</p>
-					<Button size="md" class='text-white bg-white/20 border border-white/10' variant="gradient" fullWidth disabled>
-						REGISTRATIONS OPEN APR 21
-					</Button>
+				<Card class="p-6">
+					<div class="flex gap-3">
+						{@render phaseIndicator('destructive')}
+						<div class="flex-1 min-w-0">
+							<span class="font-mono text-xs font-medium text-destructive/70">PHASE TWO ({region.phaseLabels?.phase2 ?? 'MAY 2026'})</span>
+							<h3 class="font-sans text-3xl font-bold leading-tight mt-1 mb-3 text-muted-foreground">Community Conversations</h3>
+							<p class="font-sans text-md font-medium leading-5 mb-6 text-muted-foreground">
+							  Join live conversations in-person or online to discuss what is actionable from the first phase and listen and learn with other community members.
+							</p>
+							<Button variant="destructive" size="md" fullWidth>
+								SIGN UP
+							</Button>
+						</div>
+					</div>
 				</Card>
 			</div>
 
 			<!-- Phase 3: Decisions -->
 			<Card class="relative bg-white/10 border-white/20 overflow-hidden pt-6 pr-6 pb-6 pl-12">
 				{@render inactiveIndicator()}
-				<span class="font-mono text-xs font-medium text-white/70">PHASE THREE (MAY 2026)</span>
-				<h3 class="font-sans text-3xl font-bold leading-tight mt-2 mb-3 text-white">Solutions Forum</h3>
-				<p class="font-sans text-sm font-medium leading-5 mb-6 text-white">
-				  30 residents, selected by lottery to represent all walks of life in Central Oregon, will work together over a long weekend to prioritize the top policies and practices  the region should pursue.
+				<span class="font-mono text-xs font-medium text-white/70">PHASE THREE ({region.phaseLabels?.phase3 ?? 'SEPTEMBER 2026'})</span>
+				<h3 class="font-sans text-3xl font-bold leading-tight mt-1 mb-3 text-white">Solutions Forum</h3>
+				<p class="font-sans text-md font-medium leading-5 mb-6 text-white">
+				  30 residents, selected by lottery to represent all walks of life in {region.stateName}, will work together over a long weekend to prioritize the top policies and practices  the region should pursue.
 				</p>
 				<Button size="md" class='text-white bg-white/20 border border-white/10' variant="gradient" fullWidth disabled>
 					REGISTRATIONS TBA
@@ -191,7 +196,7 @@
 					</p>
 				{:else}
 					<p class="font-sans text-base text-muted-foreground leading-6 text-center">
-					  Receive updates on this assembly and opportunities to get involved at every stage	
+					  Receive updates on this assembly and opportunities to get involved at every stage.
 					</p>
 					<div class="flex flex-col gap-3.5">
 						<form
@@ -235,16 +240,16 @@
 			<!-- Scrolling community badges -->
 			<div class="overflow-hidden my-6">
 				<div class="community-marquee flex gap-2 w-max">
-					{#each { length: 2 } as _}
-						<Badge variant="soft" size="sm">
+					{#each { length: 4 } as _}
+						<Badge variant="soft" size="md">
 							<MapPin class="size-2.5 mr-1 text-muted-foreground/50" />
 							UTAH COUNTIES
 						</Badge>
-						<Badge variant="soft" size="sm">
+						<Badge variant="soft" size="md">
 							<MapPin class="size-2.5 mr-1 text-muted-foreground/50" />
 							SAN FRANCISCO
 						</Badge>
-						<Badge variant="soft" size="sm">
+						<Badge variant="soft" size="md">
 							<MapPin class="size-2.5 mr-1 text-muted-foreground/50" />
 							CENTRAL OREGON
 						</Badge>
@@ -272,6 +277,33 @@
 		}
 		100% {
 			transform: translateX(-50%);
+		}
+	}
+
+	.pulse-ring {
+		animation: phase-pulse 2s ease-out infinite;
+	}
+	@keyframes phase-pulse {
+		0% {
+			transform: scale(0);
+			opacity: 1;
+		}
+		80%, 100% {
+			transform: scale(2.5);
+			opacity: 0;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.community-marquee {
+			animation: none;
+			transform: none;
+		}
+
+		.pulse-ring {
+			animation: none;
+			transform: scale(1.5);
+			opacity: 0.2;
 		}
 	}
 </style>
