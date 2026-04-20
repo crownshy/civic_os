@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { AppShell } from '$lib/components/layout';
-	import { Button, InfoBar } from '$lib/components/ui';
+	import { Button, InfoBar, SwipeCarousel } from '$lib/components/ui';
 	import type { RegionConfig } from '$lib/config/regions';
 	import type { ConversationEvent } from '$lib/types/mock-data';
-	import { differenceInDays, differenceInHours, differenceInMinutes, addHours, isBefore } from 'date-fns';
+	import { differenceInDays, differenceInHours, differenceInMinutes, addHours, isBefore, format } from 'date-fns';
 	import { onMount, onDestroy } from 'svelte';
 
 	const region: RegionConfig = page.data.region;
@@ -18,6 +18,10 @@
 	let isPast = $state(false);
 	let interval: ReturnType<typeof setInterval> | null = null;
 	let showForm = $state(false);
+	let isRegistered = $state(false);
+	let activeTab = $state(0);
+
+	const formattedDate = $derived(event ? format(new Date(event.date), 'EEEE, MMMM d') : '');
 
 	function updateCountdown() {
 		if (!event) return;
@@ -37,6 +41,7 @@
 
 	onMount(() => {
 		if (!event) return;
+		isRegistered = localStorage.getItem(`registered-${slug}`) === 'true';
 		updateCountdown();
 		interval = setInterval(updateCountdown, 60000);
 	});
@@ -47,8 +52,10 @@
 
 	function onFrameMessage(e: any) {
 		if (e.data.eventName === 'HIDE_EMBED_MODAL') {
+			isRegistered = true;
+			localStorage.setItem(`registered-${slug}`, 'true');
 			setTimeout(() => {
-				showForm=false
+				showForm = false;
 			}, 2000);
 		}
 	}
@@ -78,38 +85,97 @@
 			/>
 
 			<!-- Content -->
-			<div class="flex flex-1 flex-col px-6 pt-4 md:px-12" style="view-transition-name: detail-hero;">
-				<!-- Topic label -->
-				<span class="text-center font-mono text-base font-medium uppercase text-foreground">
-					{event.topic}
-				</span>
+			<div class="flex flex-1 flex-col items-center px-6 pt-2 md:px-12">
+				<!-- Topic pill -->
+				<div class="rounded-full bg-foreground px-3.5 py-1 overflow-hidden">
+					<span class="font-mono text-sm font-medium text-white">{event.topic}</span>
+				</div>
 
 				<!-- Title -->
-				<h1 class="mt-3 text-center font-sans text-5xl font-extrabold leading-[3rem] text-foreground">
+				<h1 class="mt-6 text-center font-sans text-5xl font-extrabold leading-10 text-foreground">
 					{event.title}
 				</h1>
 
-				<!-- Location + Time -->
-				<div class="mt-4 flex items-center justify-center gap-1">
-					<span class="font-mono text-base font-medium uppercase text-foreground">
-						{event.location} &bull; {event.time}
-					</span>
-				</div>
-
 				<!-- Description -->
-				<p class="font-sans text-base font-medium leading-6 mt-6 text-muted-foreground">
+				<p class="mt-4 text-center font-sans text-base font-medium leading-5 text-foreground">
 					{event.description}
 				</p>
+
+				<!-- Tab switcher -->
+				<div class="mt-6 flex items-center gap-2.5">
+					<button
+						onclick={() => (activeTab = 0)}
+						class="rounded-[20px] px-2.5 py-[3px] font-mono text-sm font-medium transition-colors overflow-hidden {activeTab === 0
+							? 'bg-foreground text-white'
+							: 'bg-secondary/10 text-muted-foreground'}"
+					>
+						DETAILS
+					</button>
+					<button
+						onclick={() => (activeTab = 1)}
+						class="rounded-[20px] px-2.5 py-[3px] font-mono text-sm font-medium transition-colors overflow-hidden {activeTab === 1
+							? 'bg-foreground text-white'
+							: 'bg-secondary/10 text-muted-foreground'}"
+					>
+						DESCRIPTION
+					</button>
+				</div>
+
+				<!-- Card carousel -->
+				<div class="mt-4 w-full">
+					<SwipeCarousel count={2} bind:index={activeTab} hideDots={true}>
+						{#snippet children(i)}
+							{#if i === 0}
+								<!-- Details Card -->
+								<div class="rounded-[30px] bg-linear-to-b from-white to-white/80 shadow-[0px_4px_24.3px_0px_rgba(134,101,73,0.20)] overflow-hidden">
+									<!-- Location row -->
+									<div class="flex items-start gap-4 border-b border-foreground/10 px-5 py-5">
+										<svg xmlns="http://www.w3.org/2000/svg" width="18" height="22" viewBox="0 0 14 20" fill="currentColor" class="mt-0.5 shrink-0 text-destructive">
+											<path d="M7 0C3.13 0 0 3.13 0 7c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z"/>
+										</svg>
+										<div>
+											<p class="font-sans text-xl font-bold leading-5 text-foreground">{event.venueName || event.location}</p>
+											{#if event.address}
+												<p class="mt-2 font-sans text-sm font-medium leading-4 text-foreground/80">{event.address}</p>
+											{/if}
+										</div>
+									</div>
+									<!-- Date row -->
+									<div class="flex items-center gap-4 border-b border-foreground/10 px-5 py-5">
+										<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="shrink-0 text-destructive">
+											<path d="M9 1v2h6V1h2v2h4a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h4V1h2Zm11 9H4v10h16V10Z"/>
+										</svg>
+										<p class="font-sans text-xl font-bold leading-5 text-foreground">{formattedDate}</p>
+									</div>
+									<!-- Time row -->
+									<div class="flex items-start gap-4 px-5 py-5">
+										<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="mt-0.5 shrink-0 text-destructive">
+											<path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10Zm1-10V7h-2v7h6v-2h-4Z"/>
+										</svg>
+										<div>
+											<p class="font-sans text-xl font-bold leading-5 text-foreground">{event.time} – {event.endTime}</p>
+											{#if event.duration}
+												<p class="mt-2 font-sans text-sm font-medium leading-4 text-foreground/80">{event.duration}</p>
+											{/if}
+										</div>
+									</div>
+								</div>
+							{:else}
+								<!-- Description Card -->
+								<div class="rounded-[30px] bg-linear-to-b from-white to-white/80 p-7 shadow-[0px_4px_24.3px_0px_rgba(134,101,73,0.20)] overflow-hidden min-h-[240px]">
+									<h2 class="font-sans text-xl font-bold leading-5 text-foreground">Description</h2>
+									<p class="mt-6 font-sans text-sm font-medium leading-5 text-foreground/80 whitespace-pre-line">
+										{event.fullDescription || event.description}
+									</p>
+								</div>
+							{/if}
+						{/snippet}
+					</SwipeCarousel>
+				</div>
 			</div>
 
 			<!-- Bottom CTA -->
-			<div class="shrink-0 px-6 pb-6 pt-4 md:px-12">
-				
-				<!-- Illustration placeholder -->
-				<div class="flex h-48 mb-10 items-center justify-center overflow-hidden rounded-xl bg-accent">
-					<span class="font-mono text-lg font-medium text-accent-foreground/50">ILLUSTRATION</span>
-				</div>
-
+			<div class="shrink-0 px-6 pb-6 pt-8 md:px-12">
 				<!-- Countdown -->
 				<p class="mb-3 text-center font-mono text-base font-medium uppercase text-foreground">
 					{#if isPast}
@@ -125,9 +191,18 @@
 					{/if}
 				</p>
 
-				<Button variant="primary" fullWidth size="lg" onclick={() => (showForm = true)}>
-					SIGN UP TODAY
-				</Button>
+				{#if isRegistered}
+					<button
+						class="w-full rounded-full bg-secondary/20 px-7 py-3.5 font-mono text-lg font-medium text-foreground"
+						disabled
+					>
+						ALREADY REGISTERED <span class="text-2xl">✓</span>
+					</button>
+				{:else}
+					<Button variant="primary" fullWidth size="lg" onclick={() => (showForm = true)}>
+						SIGN UP
+					</Button>
+				{/if}
 			</div>
 		</div>
 
@@ -139,7 +214,7 @@
 				>
 					← BACK
 				</button>
-				<div class="flex flex-col items-center gap-4 px-6  w-full h-full">
+				<div class="flex flex-col items-center gap-4 px-6 w-full h-full">
 				  <iframe
 					  title='event signup form'
 					  src={`https://forms.bloomproject.us/form/IspxhmX8?event_id=${encodeURIComponent(event.slug)}&hideAfterSubmit=true&autoClose=1`}
@@ -148,12 +223,12 @@
 					  frameborder="0"
 					  style="background: transparent;"
 				  ></iframe>
-				  </div>
-			  </div>
-		  {/if}
-	  </AppShell>
-  {:else}
-	  <AppShell>
+				</div>
+			</div>
+		{/if}
+	</AppShell>
+{:else}
+	<AppShell>
 		<div class="flex h-full flex-col items-center justify-center bg-gradient-primary px-6">
 			<h1 class="font-sans text-2xl font-bold text-foreground">Conversation not found</h1>
 			<Button variant="primary" size="md" href="/conversations" class="mt-6">
