@@ -54,6 +54,8 @@ export interface RegionConfig {
 	fullHosts: string;
 	/** Upcoming conversation events for this region */
 	events: ConversationEvent[];
+	/** Date labels for the three campaign phases */
+	phaseLabels?: { phase1: string; phase2: string; phase3: string };
 }
 
 // ---------------------------------------------------------------------------
@@ -234,7 +236,9 @@ export const REGIONS: Record<string, RegionConfig> = {
 				description: 'Join us for a small-group opinion gathering event for Utah Common Ground!',
 				fullDescription: 'This is a 1.5 hour conversation with regular people in Utah about AI. We\u2019ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
 			}
-		]
+		], 
+		phaseLabels: { phase1: 'APRIL 2026', phase2: 'MAY 2026', phase3: 'SEPTEMBER 2026' }
+
 	},
 
 	oregon: {
@@ -332,7 +336,9 @@ export const REGIONS: Record<string, RegionConfig> = {
 				format: 'online',
 				description: 'Can\'t make it in person? Join this virtual conversation from anywhere in Central Oregon.'
 			}
-		]
+		],
+		phaseLabels: { phase1: 'APRIL 2026', phase2: 'MAY 2026', phase3: 'SEPTEMBER 2026' }
+
 	}
 };
 
@@ -373,7 +379,7 @@ export const GENERIC_REGION: RegionConfig = {
 	campaignPageDescription: '',
 	campaignPageHosts: '',
 	whatsNext: "When this conversation closes, Bloom will publish the results publicly — showing where Americans agree, where we differ, and what the opinion landscape looks like across different groups. We’ll share a link when it’s ready.",
-	goDeeper: "If you’d like to get more involved with Bloom’s civic deliberation work, reach out at <a href='mailto:hello@bloom-project.org'>hello@bloom-project.org</a> or visit <a href='https://www.bloom-project.org'>https://www.bloom-project.org</a>.",
+	goDeeper: "If you’d like to host this conversation in your own community, reach out at <a href='mailto:hello@bloom-project.org'>hello@bloom-project.org</a> or visit <a href='https://www.bloom-project.org'>https://www.bloom-project.org</a>.",
 	polis_workflow_step_id: "f553a7b9-b3ac-4159-b88d-198f609b110c",
 	fullHosts: "<a href='https://www.bloom-project.org/'>The Bloom Project</a>.",
 	events: [
