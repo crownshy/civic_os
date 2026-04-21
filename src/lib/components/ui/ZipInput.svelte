@@ -31,7 +31,7 @@
 	let flashing = $state(false);
 
 	$effect(() => {
-		const stripped = searchValue.replace(/\D/g, '');
+		const stripped = searchValue.replace(/\D/g, '').slice(0, 5);
 		if (stripped !== searchValue) {
 			searchValue = stripped;
 		}
@@ -80,6 +80,13 @@
 		}
 	}
 
+	function handleBlur() {
+		if (searchValue.length === 5) {
+			const entry = ZIP_LOOKUP.get(searchValue);
+			if (entry) selectZip(entry);
+		}
+	}
+
 	function handleRemoveZip() {
 		value = '';
 		searchValue = '';
@@ -125,6 +132,8 @@
 				<Input
 					bind:value={searchValue}
 					onkeypress={handleKeyDown}
+					onblur={handleBlur}
+					maxlength={5}
 					class={cn(
 						'border-none inline-flex w-fit items-center gap-2 justify-center px-5 h-11 font-sans text-base md:text-base font-medium placeholder:font-sans placeholder:text-base placeholder:text-secondary placeholder:font-medium focus-visible:ring-0',
 						isValid
