@@ -22,6 +22,7 @@
 	let activeTab = $state(0);
 
 	const formattedDate = $derived(event ? format(new Date(event.date), 'EEEE, MMMM d') : '');
+	let iframeLoaded = $state(false);
 
 	function updateCountdown() {
 		if (!event) return;
@@ -200,9 +201,9 @@
 						ALREADY REGISTERED <span class="text-2xl">✓</span>
 					</button>
 				{:else}
-					<Button variant="primary" fullWidth size="lg" onclick={() => (showForm = true)}>
-						SIGN UP
-					</Button>
+				  <Button variant="primary" fullWidth size="lg" onclick={() => { showForm = true; iframeLoaded = false; }}>
+					  SIGN UP TODAY
+				  </Button>
 				{/if}
 			</div>
 		</div>
@@ -210,26 +211,34 @@
 		{#if showForm}
 			<div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gradient-primary">
 				<button
-					class="absolute top-4 left-4 font-mono text-sm uppercase text-foreground"
+					class="absolute z-50 top-4 left-4 font-mono text-sm uppercase text-foreground"
 					onclick={() => (showForm = false)}
 				>
-					← BACK
+					← BACK TO CONVERSATIONS
 				</button>
-				<div class="flex flex-col items-center gap-4 px-6 w-full h-full">
-				  <iframe
-					  title='event signup form'
-					  src={`https://forms.bloomproject.us/form/IspxhmX8?event_id=${encodeURIComponent(event.slug)}&hideAfterSubmit=true&autoClose=1`}
-					  width="100%"
-					  height="100%"
-					  frameborder="0"
-					  style="background: transparent;"
-				  ></iframe>
+				<div class="relative flex flex-col items-center gap-4 px-6 py-10 w-full grow">
+					{#if !iframeLoaded}
+						<div class="absolute inset-0 flex flex-col items-center justify-center gap-4">
+							<div class="h-10 w-10 animate-spin rounded-full border-4 border-foreground/20 border-t-foreground"></div>
+							<span class="font-mono text-sm uppercase text-foreground/60">Loading form...</span>
+						</div>
+					{/if}
+					<iframe
+						title='event signup form'
+						src={`https://forms.bloomproject.us/form/IspxhmX8?event_id=${encodeURIComponent(event.slug)}&hideAfterSubmit=true&autoClose=1`}
+						width="100%"
+						height="100%"
+						frameborder="0"
+						style="background: transparent;"
+						class="transition-opacity duration-300 {iframeLoaded ? 'opacity-100' : 'opacity-0'}"
+						onload={() => (iframeLoaded = true)}
+					></iframe>
 				</div>
-			</div>
-		{/if}
-	</AppShell>
-{:else}
-	<AppShell>
+			  </div>
+		  {/if}
+	  </AppShell>
+  {:else}
+	  <AppShell>
 		<div class="flex h-full flex-col items-center justify-center bg-gradient-primary px-6">
 			<h1 class="font-sans text-2xl font-bold text-foreground">Conversation not found</h1>
 			<Button variant="primary" size="md" href="/conversations" class="mt-6">
