@@ -211,12 +211,12 @@
 		{#if showForm}
 			<div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gradient-primary">
 				<button
-					class="absolute top-4 left-4 font-mono text-sm uppercase text-foreground"
+					class="absolute z-50 top-4 left-4 font-mono text-sm uppercase text-foreground"
 					onclick={() => (showForm = false)}
 				>
-					← BACK
+					← BACK TO CONVERSATIONS
 				</button>
-				<div class="relative flex flex-col items-center gap-4 px-6 w-full h-full">
+				<div class="relative flex flex-col items-center gap-4 px-6 py-10 w-full grow">
 					{#if !iframeLoaded}
 						<div class="absolute inset-0 flex flex-col items-center justify-center gap-4">
 							<div class="h-10 w-10 animate-spin rounded-full border-4 border-foreground/20 border-t-foreground"></div>
