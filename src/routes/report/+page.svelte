@@ -17,7 +17,7 @@
 	const error: string | null = $derived(page.data.error ?? null);
 	const region: RegionConfig = page.data.region;
 
-	const participantCount = $derived(report?.participants?.length ?? 0);
+	const participantCount = $derived(report?.groups?.reduce((a,b)=> a + b.total_members, 0) ?? 0);
 	const statementCount = $derived(report?.comments?.length ?? 0);
 	const totalVotes = $derived(
 		report?.comments?.reduce((sum: number, c: { overall_votes: { agrees: number; disagrees: number; passes: number } }) => {
