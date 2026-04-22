@@ -31,7 +31,7 @@
 		</p>
 	</div>
 
-	<div class="absolute inset-y-0 right-0 w-24 flex items-center justify-end px-5 bg-gradient-to-r from-[#2A9D90]/0 to-[#2A9D90]/15">
+	<div class="absolute inset-y-0 right-0 flex items-center pr-5">
 		<ArrowRight />
 	</div>
 </div>

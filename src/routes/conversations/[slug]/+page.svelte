@@ -86,15 +86,15 @@
 				backLabel="← BACK"
 			/>
 
-			<!-- Content -->
-			<div class="flex flex-1 flex-col items-center px-6 pt-2 md:px-12">
+			<!-- Header -->
+			<div class="flex flex-col items-center px-6 pt-6 pb-0 md:px-12">
 				<!-- Topic pill -->
 				<div class="rounded-full bg-foreground px-3.5 py-1 overflow-hidden">
 					<span class="font-mono text-sm font-medium text-white">{event.topic}</span>
 				</div>
 
 				<!-- Title -->
-				<h1 class="mt-6 text-center font-sans text-5xl font-extrabold leading-10 text-foreground">
+				<h1 class="mt-3 text-center font-sans text-5xl font-extrabold leading-[2.75rem] text-foreground">
 					{event.title}
 				</h1>
 
@@ -102,9 +102,12 @@
 				<p class="mt-4 text-center font-sans text-base font-medium leading-5 text-foreground">
 					{event.description}
 				</p>
+			</div>
 
+			<!-- Content -->
+			<div class="flex flex-1 flex-col items-center px-6 pt-3 md:px-12">
 				<!-- Tab switcher -->
-				<div class="mt-6 flex items-center gap-2.5">
+				<div class="flex items-center gap-2.5">
 					<button
 						onclick={() => (activeTab = 0)}
 						class="rounded-[20px] px-2.5 py-[3px] font-mono text-sm font-medium transition-colors overflow-hidden {activeTab === 0
