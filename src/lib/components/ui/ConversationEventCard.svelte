@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { ConversationEvent } from '$lib/types/mock-data';
 	import { cn } from '$lib/utils';
+	import ArrowRight from '$lib/assets/icons/arrow-right.svelte';
 
 	interface Props {
 		event: ConversationEvent;
@@ -8,6 +9,11 @@
 	}
 
 	let { event, class: className }: Props = $props();
+
+	const formattedDate = $derived.by(() => {
+		const d = new Date(event.date);
+		return `${d.getMonth() + 1}/${d.getDate()}`;
+	});
 </script>
 
 <div
@@ -16,16 +22,16 @@
 		className
 	)}
 >
-	<div class="min-w-0 flex-1 pr-4">
+	<div class="min-w-0 flex-1 pr-20">
 		<h2 class="font-sans text-2xl font-bold leading-7 text-foreground">
 			{event.title}
 		</h2>
 		<p class="mt-1 font-sans text-base font-bold leading-4 text-foreground/70">
-			{event.location} &bull; {event.time}
+			<span class="text-primary">{formattedDate}</span> &bull; {event.location}
 		</p>
 	</div>
 
-	<div class="shrink-0 flex h-8 items-center rounded-[30px] bg-primary px-2.5 overflow-hidden transition-colors duration-200 group-hover:bg-primary/85">
-		<span class="font-mono text-base font-medium text-white">SIGN UP</span>
+	<div class="absolute inset-y-0 right-0 w-24 flex items-center justify-end px-5 bg-gradient-to-r from-[#2A9D90]/0 to-[#2A9D90]/15">
+		<ArrowRight />
 	</div>
 </div>
