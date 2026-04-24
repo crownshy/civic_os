@@ -85,7 +85,7 @@
 			  AI and Our Future
 			</h1>
 			<p class="mt-5 font-sans text-lg font-medium leading-7 text-muted-foreground">
-				A <strong>Community Solutions Assembly</strong> bringing {region.demonym} together around the decisions that affect us all.
+				A <strong>Community Solutions Assembly</strong> is bringing {region.demonym} together around the decisions that affect us all.
 			</p>
 			{#if region.campaignPageDescription}
 				<p class="mt-5 font-sans text-lg font-medium leading-7 text-muted-foreground">
@@ -233,7 +233,7 @@
 					This conversation is taking place in communities across the country.
 				</h2>
 				<p class="font-sans text-lg font-medium text-muted-foreground leading-7">
-				  This conversation is taking place in communities across the country. Want to bring this to your community? Get in touch with us at hello@bloom-project.org.
+				  Want to bring this to your community? Get in touch with us at hello@bloom-project.org.
 				</p>
 			</div>
 
