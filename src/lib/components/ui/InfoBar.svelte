@@ -44,9 +44,6 @@
                 <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0Zm-8 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
             </svg>
             <span class={cn('font-mono text-sm font-medium text-foreground/70', variant === 'light' && 'text-white/70')}>{countyName.toUpperCase()}</span>
-            <span class="flex items-center justify-center overflow-hidden rounded-[10px] bg-destructive px-1.5 py-px">
-                <span class="font-mono text-[10px] font-medium leading-4 text-destructive-foreground">BETA</span>
-            </span>
         </div>
     {/if}
     

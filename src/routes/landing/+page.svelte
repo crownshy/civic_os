@@ -136,8 +136,6 @@
             </Button>
 
             <span class="mt-2.5 opacity-50 text-center font-mono text-xs font-medium uppercase">
-                <span class="text-foreground">THIS IS A{" "}</span>
-                <span class="text-destructive">BETA,{" "}</span>
                 <span class="text-foreground">POWERED BY </span>
                 <Link href="https://www.bloom-project.org/" external>BLOOM PROJECT.</Link>
                 <span class="text-foreground"> SEE THE FULL TERMS AND CONDITIONS </span>
