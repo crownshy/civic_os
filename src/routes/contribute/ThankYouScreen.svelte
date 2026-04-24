@@ -99,18 +99,17 @@
 				<span class="font-sans text-2xl font-bold leading-9 text-foreground">Live Conversations</span>
 			</div>
 
-			<div class="mt-4 font-sans text-lg font-normal leading-7 text-foreground">
+			<div class="mt-2 font-sans text-lg font-normal leading-7 text-foreground [&_a]:text-destructive">
 				<p>
 				  {@html region.whatsNext}
 				</p>
 			</div>
 
-			<div class="flex items-center gap-2">
+			<div class="mt-6 flex items-center gap-2">
 				<span class="font-sans text-2xl font-bold leading-9 text-foreground">Go Deeper</span>
 			</div>
-			<div>
-
-				<p class="mt-4">
+			<div class="mt-2 font-sans text-lg font-normal leading-7 text-foreground [&_a]:text-destructive">
+				<p class="mt-2 [&_a]:text-destructive [&_a]:underline hover:[&_a]:opacity-80">
 				  {@html region.goDeeper}
 				</p>
 			
