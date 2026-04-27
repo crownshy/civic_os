@@ -165,7 +165,7 @@
 							<p class="font-sans text-md font-medium leading-5 mb-6 text-muted-foreground">
 							  Join live conversations in-person or online to discuss what is actionable from the first phase and listen and learn with other community members.
 							</p>
-							<Button variant="destructive" size="md" fullWidth>
+							<Button href="/conversations/utm_source=campaign" variant="destructive" size="md" fullWidth>
 								SIGN UP
 							</Button>
 						</div>
