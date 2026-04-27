@@ -19,9 +19,10 @@
 	];
 
 	const filtered = $derived(
-		activeFilter === 'all'
+		(activeFilter === 'all'
 			? region.events
 			: region.events.filter((e) => e.format === activeFilter)
+		).toSorted((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 	);
 </script>
 
