@@ -165,7 +165,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 				format: 'online',
 				description: 'Can\'t make it in person? Join this virtual conversation from anywhere. Same great discussion, from the comfort of your home.'
 			}
-		], 
+		],
 		phaseLabels: { phase1: 'APRIL 2026', phase2: 'MAY 2026', phase3: 'SEPTEMBER 2026' }
 
 	},
@@ -230,8 +230,8 @@ export const REGIONS: Record<string, RegionConfig> = {
 		],
 		campaignPageDescription: 'This Assembly is about making sure Central Oregonians have a real say in how artificial intelligence shapes our lives — who it benefits, who gets left behind, and what we can do about it at every level, from families and schools to city and state policy.',
 		campaignPageHosts: '',
-		whatsNext: "<a href=\"/conversations?utm_source=openpoll\" class=\"font-bold underline\">Sign up↗</a> for live conversations about this topic, taking place both online and in-person in Deschutes, Jefferson, and Crook counties. These conversations will be an opportunity to connect with your neighbors and develop shared values around AI's influence on the people we care about.",
-		goDeeper: "This process is ultimately about finding common ground and turning it into action that benefits Central Oregon communities. If you'd like to get more involved, reach out at <a href=\"hello@cocap.us\">hello@cocap.us</a>.",
+		whatsNext: "<a href=\"/conversations?utm_source=whatsNext\">Join us</a> in May and June for small group conversations taking place in Deschutes, Jefferson, and Crook counties — both in-person and online. They'll build on the themes and common ground that emerge from this poll. Share your email above to stay in the loop, or visit <a href=\"https://cocap.us\" target=\"_blank\">cocap.us</a> to learn more.",
+		goDeeper: "This process is ultimately about finding common ground and turning it into action that benefits Central Oregon communities. If you'd like to get more involved, reach out to us at <a href=\"mailto:hello@cocap.us\">hello@cocap.us</a>.",
 		polis_workflow_step_id: "8299fec7-a543-419f-8692-f68652648a0b",
 		fullHosts: "<a href='https://cocap.us/'>Central Oregon Civic Action Project</a>, <a href='https://www.coic.org/'>Central Oregon Intergovernmental Council</a>, <a href='https://cocc.edu/'>Central Oregon Community College</a>, and <a href='https://citizens4community.com/'>Citizens4Community</a>.",
 		events: [
