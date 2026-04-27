@@ -12,7 +12,7 @@
 
 	const formattedDate = $derived.by(() => {
 		const d = new Date(event.date);
-		return `${d.getMonth() + 1}/${d.getDate()}`;
+		return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
 	});
 </script>
 
