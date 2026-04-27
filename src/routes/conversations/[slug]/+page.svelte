@@ -169,7 +169,7 @@
 								<!-- Description Card -->
 								<div class="rounded-[30px] bg-linear-to-b from-white to-white/80 p-7 shadow-[0px_4px_24.3px_0px_rgba(134,101,73,0.20)] overflow-hidden min-h-[240px]">
 									<h2 class="font-sans text-xl font-bold leading-5 text-foreground">Description</h2>
-									<p class="mt-6 font-sans text-sm font-medium leading-5 text-foreground/80 whitespace-pre-line">
+									<p class="mt-3 font-sans text-md font-medium leading-5 text-foreground/80 whitespace-pre-line">
 										{event.fullDescription || event.description}
 									</p>
 								</div>

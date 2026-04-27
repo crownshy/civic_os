@@ -38,7 +38,7 @@
 				Community Conversations in {region.stateName}
 			</h1>
 			<p class="mt-4 text-center font-sans text-base font-medium leading-5 text-foreground">
-				1-1.5 hour conversations with people in {region.stateName} about AI and what it means for our communities.
+				Join your neighbors in a 1-1.5 hour conversation about artificial intelligence and what it means for communities throughout {region.stateName}.
 			</p>
 		</div>
 
