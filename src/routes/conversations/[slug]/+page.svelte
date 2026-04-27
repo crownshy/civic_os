@@ -228,7 +228,7 @@
 					{/if}
 					<iframe
 						title='event signup form'
-						src={`https://forms.bloomproject.us/form/IspxhmX8?event_id=${encodeURIComponent(event.slug)}&hideAfterSubmit=true&autoClose=1`}
+						src={`https://forms.bloomproject.us/form/IspxhmX8?event_id=${encodeURIComponent(event.slug)}&region=${region.slug}&hideAfterSubmit=true&autoClose=1`}
 						width="100%"
 						height="100%"
 						frameborder="0"
