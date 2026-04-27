@@ -136,16 +136,20 @@ export const REGIONS: Record<string, RegionConfig> = {
 		fullHosts: "<a href='https://www.utahcommonground.org/home'>Utah Common Ground</a>",
 		events: [
 			{
-				slug: 'may-18-springville',
-				title: 'May 18 (In-Person) Conversation',
-				topic: 'AI & OUR COMMUNITIES',
-				location: 'Springville, UT',
-				time: '1:00PM',
-				date: '2026-05-18T13:00:00-06:00',
-				format: 'in-person',
-				description: 'Join us for small group conversations for Utah Common Ground!',
-				fullDescription: 'This is a 1.5 hour conversation with people in Utah about AI. We\u2019ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
-			},
+                slug: 'may-02-springville',
+                title: 'AI & Springville',
+                topic: 'COMMUNITY CONVERSATION',
+                location: 'Springville, UT',
+                venueName: 'Springville Library',
+                address: '45 S Main St, Springville, UT 84663',
+                time: '1:30PM',
+                endTime: '3:00PM',
+                date: '2026-05-02T13:00:00-06:00',
+                duration: '1.5 hours',
+                format: 'in-person',
+                description: 'Join us for small group conversations about AI for Utah Common Ground!',
+                fullDescription: 'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
+            },
 			{
 				slug: 'may-05-online',
 				title: 'AI & Our Communities',
@@ -158,8 +162,8 @@ export const REGIONS: Record<string, RegionConfig> = {
 				date: '2026-05-05T12:00:00-06:00',
 				duration: '1 hour',
 				format: 'online',
-				description: 'Join us for small group conversations for Utah Common Ground!',
-				fullDescription: 'This is a 1 hour virtual conversation about AI with fellow Utahns. We\u2019ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
+				description: 'Join us for small group conversations about AI for Utah Common Ground!',
+				fullDescription: 'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
 			},
 			{
 				slug: 'may-07-online',
@@ -173,8 +177,8 @@ export const REGIONS: Record<string, RegionConfig> = {
 				date: '2026-05-07T19:00:00-06:00',
 				duration: '1 hour',
 				format: 'online',
-				description: 'Join us for virtual small group conversations for Utah Common Ground!',
-				fullDescription: 'This is a 1 hour virtual conversation about AI with fellow Utahns. We\u2019ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
+				description: 'Join us for virtual small group conversations about AI for Utah Common Ground!',
+				fullDescription: 'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
 			},
 			{
 				slug: 'may-09-kearns',
@@ -188,8 +192,8 @@ export const REGIONS: Record<string, RegionConfig> = {
 				date: '2026-05-09T12:00:00-06:00',
 				duration: '1.5 hours',
 				format: 'in-person',
-				description: 'Join us for small group conversations for Utah Common Ground!',
-				fullDescription: 'This is a 1.5 hour conversation with people in Utah about AI. We\u2019ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
+				description: 'Join us for small group conversations about AI for Utah Common Ground!',
+				fullDescription: 'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
 			},
 			{
 				slug: 'may-12-online',
@@ -203,8 +207,8 @@ export const REGIONS: Record<string, RegionConfig> = {
 				date: '2026-05-12T12:00:00-06:00',
 				duration: '1 hour',
 				format: 'online',
-				description: 'Join us for small group conversations for Utah Common Ground!',
-				fullDescription: 'This is a 1 hour virtual conversation about AI with fellow Utahns. We\u2019ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
+				description: 'Join us for small group conversations about AI for Utah Common Ground!',
+				fullDescription: 'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
 			},
 			{
 				slug: 'may-14-online',
@@ -218,8 +222,8 @@ export const REGIONS: Record<string, RegionConfig> = {
 				date: '2026-05-14T19:00:00-06:00',
 				duration: '1 hour',
 				format: 'online',
-				description: 'Join us for virtual small group conversations for Utah Common Ground!',
-				fullDescription: 'This is a 1 hour virtual conversation about AI with fellow Utahns. We\u2019ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
+				description: 'Join us for virtual small group conversations about AI for Utah Common Ground!',
+				fullDescription: 'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
 			},
 			{
 				slug: 'may-16-logan',
@@ -233,8 +237,8 @@ export const REGIONS: Record<string, RegionConfig> = {
 				date: '2026-05-16T15:30:00-06:00',
 				duration: '1.5 hours',
 				format: 'in-person',
-				description: 'Join us for small group conversations for Utah Common Ground!',
-				fullDescription: 'This is a 1.5 hour conversation with people in Utah about AI. We\u2019ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
+				description: 'Join us for small group conversations about AI for Utah Common Ground!',
+				fullDescription: 'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
 			}
 		],
 		phaseLabels: { phase1: 'APRIL 2026', phase2: 'MAY 2026', phase3: 'SEPTEMBER 2026' }
@@ -317,7 +321,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 				date: '2026-05-16T13:00:00-07:00',
 				duration: '1.5 hours',
 				format: 'in-person',
-				description: 'Join us for small group conversations in Central Oregon!',
+				description: 'Join us for small group conversations about AI in Central Oregon!',
 				fullDescription: 'This is a 1.5 hour conversation with people in Central Oregon about AI. We\'ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
 			},
 			{
@@ -331,7 +335,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 				date: '2026-05-30T13:00:00-07:00',
 				duration: '1.5 hours',
 				format: 'in-person',
-				description: 'Join us for small group conversations in Central Oregon!',
+				description: 'Join us for small group conversations about AI in Central Oregon!',
 				fullDescription: 'This is a 1.5 hour conversation with people in Central Oregon about AI. We\'ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
 			},
 			{
@@ -345,7 +349,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 				date: '2026-06-06T13:00:00-07:00',
 				duration: '1.5 hours',
 				format: 'in-person',
-				description: 'Join us for small group conversations in Central Oregon!',
+				description: 'Join us for small group conversations about AI in Central Oregon!',
 				fullDescription: 'This is a 1.5 hour conversation with people in Central Oregon about AI. We\'ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
 			},
 			{
@@ -360,7 +364,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 				date: '2026-05-19T12:00:00-07:00',
 				duration: '1 hour',
 				format: 'online',
-				description: 'Join us for small group conversations in Central Oregon!',
+				description: 'Join us for small group conversations about AIin Central Oregon!',
 				fullDescription: 'This is a 1 hour online conversation with people in Central Oregon about AI. We\'ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
 			},
 			{
@@ -375,7 +379,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 				date: '2026-06-04T19:00:00-07:00',
 				duration: '1 hour',
 				format: 'online',
-				description: 'Join us for small group conversations in Central Oregon!',
+				description: 'Join us for small group conversations about AIin Central Oregon!',
 				fullDescription: 'This is a 1 hour online conversation with people in Central Oregon about AI. We\'ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
 			},
 		],
