@@ -86,15 +86,15 @@
 				backLabel="← BACK"
 			/>
 
-			<!-- Content -->
-			<div class="flex flex-1 flex-col items-center px-6 pt-2 md:px-12">
+			<!-- Header -->
+			<div class="flex flex-col items-center px-6 pt-6 pb-0 md:px-12">
 				<!-- Topic pill -->
 				<div class="rounded-full bg-foreground px-3.5 py-1 overflow-hidden">
 					<span class="font-mono text-sm font-medium text-white">{event.topic}</span>
 				</div>
 
 				<!-- Title -->
-				<h1 class="mt-6 text-center font-sans text-5xl font-extrabold leading-10 text-foreground">
+				<h1 class="mt-3 text-center font-sans text-5xl font-extrabold leading-[2.75rem] text-foreground">
 					{event.title}
 				</h1>
 
@@ -102,9 +102,12 @@
 				<p class="mt-4 text-center font-sans text-base font-medium leading-5 text-foreground">
 					{event.description}
 				</p>
+			</div>
 
+			<!-- Content -->
+			<div class="flex flex-1 flex-col items-center px-6 pt-3 md:px-12">
 				<!-- Tab switcher -->
-				<div class="mt-6 flex items-center gap-2.5">
+				<div class="flex items-center gap-2.5">
 					<button
 						onclick={() => (activeTab = 0)}
 						class="rounded-[20px] px-2.5 py-[3px] font-mono text-sm font-medium transition-colors overflow-hidden {activeTab === 0
@@ -166,7 +169,7 @@
 								<!-- Description Card -->
 								<div class="rounded-[30px] bg-linear-to-b from-white to-white/80 p-7 shadow-[0px_4px_24.3px_0px_rgba(134,101,73,0.20)] overflow-hidden min-h-[240px]">
 									<h2 class="font-sans text-xl font-bold leading-5 text-foreground">Description</h2>
-									<p class="mt-6 font-sans text-sm font-medium leading-5 text-foreground/80 whitespace-pre-line">
+									<p class="mt-3 font-sans text-md font-medium leading-5 text-foreground/80 whitespace-pre-line">
 										{event.fullDescription || event.description}
 									</p>
 								</div>
@@ -225,7 +228,7 @@
 					{/if}
 					<iframe
 						title='event signup form'
-						src={`https://forms.bloomproject.us/form/IspxhmX8?event_id=${encodeURIComponent(event.slug)}&hideAfterSubmit=true&autoClose=1`}
+						src={`https://forms.bloomproject.us/form/IspxhmX8?event_id=${encodeURIComponent(event.slug)}&region=${region.slug}&hideAfterSubmit=true&autoClose=1`}
 						width="100%"
 						height="100%"
 						frameborder="0"

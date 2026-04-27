@@ -19,9 +19,10 @@
 	];
 
 	const filtered = $derived(
-		activeFilter === 'all'
+		(activeFilter === 'all'
 			? region.events
 			: region.events.filter((e) => e.format === activeFilter)
+		).toSorted((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 	);
 </script>
 
@@ -30,15 +31,15 @@
 		<InfoBar countyName={region.stateName} {region} />
 
 		<!-- Header -->
-		<div class="px-6 pt-6 pb-2 md:px-12">
-			<span class="font-mono text-base font-medium uppercase text-foreground/70">
-				AI &amp; OUR COMMUNITIES
-			</span>
-			<h1 class="mt-1 font-sans text-5xl font-extrabold leading-tight text-foreground">
+		<div class="flex flex-col items-center px-6 pt-6 pb-0 md:px-12">
+			<div class="rounded-full bg-foreground px-3.5 py-1 overflow-hidden">
+				<span class="font-mono text-sm font-medium text-white">AI &amp; OUR COMMUNITIES</span>
+			</div>
+			<h1 class="mt-3 text-center font-sans text-5xl font-extrabold leading-[2.75rem] text-foreground">
 				Community Conversations in {region.stateName}
 			</h1>
-			<p class="mt-4 font-sans text-lg font-medium leading-7 text-muted-foreground">
-				These are 1-1.5 hour conversations with regular people in {region.stateName} about AI. We'll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.
+			<p class="mt-4 text-center font-sans text-base font-medium leading-5 text-foreground">
+				Join other residents in a 1-1.5 hour conversation about artificial intelligence and what it means for communities throughout {region.stateName}.
 			</p>
 		</div>
 
@@ -47,7 +48,7 @@
 			{#each filters as f (f.value)}
 				<button
 					onclick={() => (activeFilter = f.value)}
-					class="rounded-[20px] px-2 py-0.5 font-mono text-base font-medium transition-colors overflow-hidden {activeFilter === f.value
+					class="rounded-[20px] px-2 py-0.5 font-mono text-sm font-medium transition-colors overflow-hidden {activeFilter === f.value
 						? 'bg-foreground text-white'
 						: 'bg-secondary/10 text-foreground/50'}"
 				>
