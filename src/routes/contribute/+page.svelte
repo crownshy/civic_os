@@ -3,7 +3,7 @@
 	import { cubicOut } from 'svelte/easing';
 	import { page } from '$app/state';
 	import { AppShell } from '$lib/components/layout';
-	import { PopQuiz, InfoBar, Header, VoteBar } from '$lib/components/ui';
+	import { PopQuiz, InfoBar, VoteBar } from '$lib/components/ui';
 	import { popQuizQuestions, aboutYouQuestions } from '$lib/data/mock';
 	import { getRegionByZipcode } from '$lib/config/regions';
 	import type { RegionConfig } from '$lib/config/regions';
@@ -207,29 +207,22 @@
 		{#if polis.currentStatement}
 			<VotingScreen
 				countyName={session.county}
-				question={question}
 				statementText={polis.currentStatement.txt}
 				remaining={displayedRemaining}
 				total={displayedTotal}
 				loading={polis.loading}
 				onVote={handleVote}
 				onEnd={handleEnd}
-				onCompose={() => (screen = 'compose')}
 				region={subdomainRegion}
 			/>
 		{:else}
 			<!-- Skeleton that reuses real components so layout stays in sync -->
 			<div class="flex h-full flex-col bg-muted">
-				<Header
-					countyName={session.county}
-					region={subdomainRegion}
-					question={question}
-					onCompose={() => {}}
-					about
-				/>
+				<InfoBar countyName={session.county} region={subdomainRegion} />
 
 				<!-- Skeleton statement area -->
 				<div class="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-8">
+					<div class="absolute top-0 left-0 h-[3px] w-full bg-secondary/30"></div>
 					<div class="w-full animate-pulse text-left">
 						<div class="flex items-center gap-2">
 							<span class="h-5 w-5 rounded-full bg-muted-foreground/20"></span>
@@ -243,11 +236,7 @@
 					</div>
 				</div>
 
-				<VoteBar
-					remaining={FIRST_BATCH}
-					total={FIRST_BATCH}
-					skeleton
-				/>
+				<VoteBar skeleton />
 			</div>
 		{/if}
 
