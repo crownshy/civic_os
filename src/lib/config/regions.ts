@@ -54,6 +54,8 @@ export interface RegionConfig {
 	fullHosts: string;
 	/** Upcoming conversation events for this region */
 	events: ConversationEvent[];
+	/** Whether live conversations are open for registration. Defaults to true when omitted. */
+	conversationsActive?: boolean;
 	/** Date labels for the three campaign phases */
 	phaseLabels?: { phase1: string; phase2: string; phase3: string };
 }
@@ -383,6 +385,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 				fullDescription: 'This is a 1 hour online conversation with people in Central Oregon about AI. We\'ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
 			},
 		],
+		conversationsActive: false,
 		phaseLabels: { phase1: 'APRIL 2026', phase2: 'MAY 2026', phase3: 'SEPTEMBER 2026' }
 
 	}
