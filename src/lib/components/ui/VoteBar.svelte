@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
-	import { Check, X } from 'lucide-svelte';
+	import { Check, X, ArrowRight } from 'lucide-svelte';
+	import smiley from '$lib/assets/smiley.svg';
 	import Button from './Button.svelte';
 
 	interface Props {
 		onAgree?: () => void;
 		onDisagree?: () => void;
 		onSkip?: () => void;
+		onCompose?: () => void;
 		disabled?: boolean;
 		skeleton?: boolean;
 		class?: string;
@@ -16,6 +18,7 @@
 		onAgree,
 		onDisagree,
 		onSkip,
+		onCompose,
 		disabled = false,
 		skeleton = false,
 		class: className
@@ -50,12 +53,13 @@
 	</div>
 
 	<!-- Compose area -->
-	<div class="rounded-t-[20px] border-t border-[#86654933] bg-[#FFE9C8] p-4">
+	<button onclick={onCompose} class="w-full rounded-t-[30px] border-t border-[#86654933] bg-[#FFE9C8] p-4 text-left">
 		<div class="flex items-center gap-3">
-			<div class="h-10 w-10 shrink-0 rounded-full bg-[#866549]"></div>
-			<div class="flex flex-1 items-center rounded-full bg-white px-4 py-2.5">
-				<span class="font-sans text-base font-medium text-[#866549]/60">What do you think?</span>
+			<img src={smiley} alt="" class="h-10 w-10 shrink-0 rounded-full shadow-[0px_4px_10px_0px_rgba(83,42,14,0.25)]" />
+			<div class="flex flex-1 items-center justify-between rounded-full bg-[linear-gradient(to_bottom,white_0%,white_80%,#E8EAED_100%)] px-4 py-2.5 shadow-[0px_4px_10px_0px_rgba(83,42,14,0.25)]">
+				<span class="font-sans text-lg font-bold text-[#664025]">What do you think?</span>
+				<ArrowRight class="h-6 w-6 shrink-0 text-[#664025]" />
 			</div>
 		</div>
-	</div>
+	</button>
 </div>

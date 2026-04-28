@@ -12,6 +12,7 @@
 		loading?: boolean;
 		onVote: (type: 'agree' | 'disagree' | 'pass') => void;
 		onEnd: () => void;
+		onCompose: () => void;
 		region: RegionConfig
 	}
 
@@ -23,6 +24,7 @@
 		loading = false,
 		onVote,
 		onEnd,
+		onCompose,
 		region
 	}: Props = $props();
 
@@ -104,5 +106,6 @@
 		onAgree={() => doVote('agree')}
 		onDisagree={() => doVote('disagree')}
 		onSkip={() => doVote('pass')}
+		{onCompose}
 	/>
 </div>

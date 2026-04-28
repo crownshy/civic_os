@@ -213,6 +213,7 @@
 				loading={polis.loading}
 				onVote={handleVote}
 				onEnd={handleEnd}
+				onCompose={() => (screen = 'compose')}
 				region={subdomainRegion}
 			/>
 		{:else}
