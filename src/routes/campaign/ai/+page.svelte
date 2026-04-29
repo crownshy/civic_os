@@ -3,10 +3,10 @@
 	import { goto } from '$app/navigation';
 	import type { RegionConfig } from '$lib/config/regions';
 	import { AppShell } from '$lib/components/layout';
-	import { Button, Badge, Card } from '$lib/components/ui';
+	import { Button, Card } from '$lib/components/ui';
 	import { Input } from '$lib/components/ui/input';
 	import { session } from '$lib/services/session.svelte';
-	import { Mail, MapPin } from 'lucide-svelte';
+	import { Mail, MessageSquare } from 'lucide-svelte';
 	import { fade } from 'svelte/transition';
 
 	const region: RegionConfig = page.data.region;
@@ -27,6 +27,9 @@
 	function isValidEmail(value: string): boolean {
 		return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 	}
+
+	const emailHref = `mailto:?subject=${encodeURIComponent('Make your voice heard on the impact of AI. I did!')}&body=${encodeURIComponent("Hi ___, I just filled out this short poll about managing AI impact in Central Oregon — it was fast, and it actually made me think. Since this stuff is going to affect all of us, I figured you might want to share your perspective too. Here's the link: oregon.bloomproject.us")}`;
+	const smsHref = `sms:?body=${encodeURIComponent("I just did this quick poll about managing AI in Central Oregon. It only took a couple of minutes — thought you might want to weigh in too. oregon.bloomproject.us")}`;
 
 	async function handleSignUp() {
 		emailError = '';
@@ -144,10 +147,10 @@
 							<span class="font-mono text-xs font-medium text-destructive/70">PHASE ONE ({region.phaseLabels?.phase1 ?? 'APRIL 2026'})</span>
 							<h3 class="font-sans text-3xl font-bold leading-tight mt-1 mb-3 text-muted-foreground">Open Poll</h3>
 							<p class="font-sans text-md font-medium leading-5 mb-6 text-muted-foreground">
-							  Share your thoughts in as little as 2 minutes on how artificial intelligence should be managed to benefit our communities, and see what fellow community members think.
+							  Share your thoughts in as little as 2 minutes on how artificial intelligence should be managed to benefit our communities. Vote on statements by other community members and add your own for consideration.
 							</p>
 							<Button href='/' variant="destructive" size="md" fullWidth>
-								JOIN CONVERSATION
+								TAKE THE OPEN POLL
 							</Button>
 						</div>
 					</div>
@@ -166,7 +169,7 @@
 							  Join live conversations in-person or online to discuss what is actionable from the first phase and listen and learn with other community members.
 							</p>
 							<Button href={region.slug === 'utah' ? 'https://www.utahcommonground.org/get-involved' : '/conversations?utm_source=campaign'} variant="destructive" size="md" fullWidth>
-								SIGN UP
+								JOIN A CONVERSATION
 							</Button>
 						</div>
 					</div>
@@ -179,7 +182,7 @@
 				<span class="font-mono text-xs font-medium text-white/70">PHASE THREE ({region.phaseLabels?.phase3 ?? 'SEPTEMBER 2026'})</span>
 				<h3 class="font-sans text-3xl font-bold leading-tight mt-1 mb-3 text-white">Solutions Forum</h3>
 				<p class="font-sans text-md font-medium leading-5 mb-6 text-white">
-				  30 residents, selected by lottery to represent all walks of life in {region.stateName}, will work together over a long weekend to prioritize the top policies and practices  the region should pursue.
+				  Interested residents, selected by lottery to represent all walks of life in {region.stateName}, will work together to prioritize the top policies and practices  the region should pursue.
 				</p>
 				<Button size="md" class='text-white bg-white/20 border border-white/10' variant="gradient" fullWidth disabled>
 					REGISTRATIONS TBA
@@ -226,41 +229,25 @@
 			</div>
 		</div>
 
-		<!-- Community Section -->
-		<div class="py-10 bg-card/30">
-			<div class="flex flex-col gap-2.5 px-6 md:px-12">
+		<!-- Tell Your Friends Section -->
+		<div class="py-10 px-6 md:px-12 bg-white/30">
+			<div class="flex flex-col gap-4">
 				<h2 class="font-sans text-3xl font-bold text-muted-foreground leading-8">
-					This conversation is taking place in communities across the country.
+					Tell your friends
 				</h2>
 				<p class="font-sans text-lg font-medium text-muted-foreground leading-7">
-				  Want to bring this to your community? Get in touch with us at hello@bloom-project.org.
+					The more input we have from our fellow Central Oregonians, the better our results will be. Please take a moment to call, text or email your friends and neighbors asking them to share their thoughts on this important issue with us.
 				</p>
-			</div>
-
-			<!-- Scrolling community badges -->
-			<div class="overflow-hidden my-6">
-				<div class="community-marquee flex gap-2 w-max">
-					{#each { length: 4 } as _}
-						<Badge variant="soft" size="md">
-							<MapPin class="size-2.5 mr-1 text-muted-foreground/50" />
-							UTAH COUNTIES
-						</Badge>
-						<Badge variant="soft" size="md">
-							<MapPin class="size-2.5 mr-1 text-muted-foreground/50" />
-							SAN FRANCISCO
-						</Badge>
-						<Badge variant="soft" size="md">
-							<MapPin class="size-2.5 mr-1 text-muted-foreground/50" />
-							CENTRAL OREGON
-						</Badge>
-					{/each}
+				<div class="flex flex-col gap-3 sm:flex-row">
+					<Button href={emailHref} variant="primary" size="md" fullWidth class="gap-2">
+						<Mail class="size-4 shrink-0" />
+						EMAIL A FRIEND
+					</Button>
+					<Button href={smsHref} variant="primary" size="md" fullWidth class="gap-2">
+						<MessageSquare class="size-4 shrink-0" />
+						TEXT A FRIEND
+					</Button>
 				</div>
-			</div>
-
-			<div class="px-6 md:px-12">
-				<Button href="mailto:hello@bloom-project.org" variant="destructive" fullWidth size="lg">
-					START IN YOUR COMMUNITY
-				</Button>
 			</div>
 		</div>
 
@@ -268,18 +255,6 @@
 </AppShell>
 
 <style>
-	.community-marquee {
-		animation: community-scroll 20s linear infinite;
-	}
-	@keyframes community-scroll {
-		0% {
-			transform: translateX(0);
-		}
-		100% {
-			transform: translateX(-50%);
-		}
-	}
-
 	.pulse-ring {
 		animation: phase-pulse 2s ease-out infinite;
 	}
@@ -295,11 +270,6 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.community-marquee {
-			animation: none;
-			transform: none;
-		}
-
 		.pulse-ring {
 			animation: none;
 			transform: scale(1.5);
