@@ -53,7 +53,7 @@
 	</div>
 
 	<!-- Compose area -->
-	<button onclick={onCompose} class="w-full rounded-t-[30px] border-t border-[#86654933] bg-[#FFE9C8] p-4 text-left">
+	<button onclick={onCompose} data-umami-event="compose-click" class="w-full rounded-t-[30px] border-t border-[#86654933] bg-[#FFE9C8] p-4 text-left">
 		<div class="flex items-center gap-3">
 			<img src={smiley} alt="" class="h-10 w-10 shrink-0 rounded-full shadow-[0px_4px_10px_0px_rgba(83,42,14,0.25)]" />
 			<div class="flex flex-1 items-center justify-between rounded-full bg-[linear-gradient(to_bottom,white_0%,white_80%,#E8EAED_100%)] px-4 py-2.5 shadow-[0px_4px_10px_0px_rgba(83,42,14,0.25)]">

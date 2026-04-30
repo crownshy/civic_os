@@ -6,7 +6,7 @@
 	type Variant = 'primary' | 'secondary' | 'destructive' | 'outline' | 'pill' | 'soft' | 'ghost' | 'gradient';
 	type Size = 'xs' | 'sm' | 'md' | 'lg';
 
-	interface Props {
+	interface Props extends Omit<HTMLButtonAttributes, 'class' | 'onclick' | 'disabled' | 'type'> {
 		variant?: Variant;
 		size?: Size;
 		fullWidth?: boolean;
@@ -27,7 +27,8 @@
 		href,
 		onclick,
 		class: className,
-		children
+		children,
+		...restProps
 	}: Props = $props();
 
 	const base = 'inline-flex items-center justify-center rounded-full font-mono font-medium transition-colors';
@@ -78,7 +79,7 @@
 		{@render children()}
 	</a>
 {:else}
-	<button {type} {disabled} {onclick} class={classes}>
+	<button {type} {disabled} {onclick} class={classes} {...restProps}>
 		{@render children()}
 	</button>
 {/if}

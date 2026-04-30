@@ -86,7 +86,7 @@
 
 		<!-- Buttons -->
 		<div class="flex gap-3 pt-8 pb-4">
-			<Button variant="destructive" class="flex-1" onclick={onBack}>
+			<Button variant="destructive" data-umami-event="compose-back" class="flex-1" onclick={onBack}>
 				GO BACK
 			</Button>
 			{#if submitted}
@@ -94,7 +94,7 @@
 					SUBMITTED!
 				</Button>
 			{:else}
-				<Button type="submit" variant="primary" class="flex-1" disabled={!canSubmit}>
+				<Button type="submit" data-umami-event="compose-submit" variant="primary" class="flex-1" disabled={!canSubmit}>
 					SUBMIT
 				</Button>
 			{/if}
