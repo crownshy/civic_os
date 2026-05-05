@@ -57,7 +57,7 @@
 		<div class="flex items-center gap-[15px]">
 			<img src={smiley} alt="" class="h-[50px] w-[50px] shrink-0 rounded-full shadow-[0px_4px_10px_0px_rgba(83,42,14,0.25)]" />
 			<div class="flex flex-1 items-center justify-between rounded-full bg-[linear-gradient(to_bottom,white_0%,white_72%,#C5BBB4_100%)] px-5 py-4 shadow-[0px_4px_10px_0px_rgba(83,42,14,0.25),inset_0_0_0_2px_rgba(255,255,255,0.4)]">
-				<span class="font-sans text-xl font-bold text-[#664025]">Share your perspective...</span>
+				<span class="truncate font-sans text-xl font-bold text-[#664025]">Share your perspective...</span>
 				<ArrowRight class="h-[30px] w-[30px] shrink-0 text-[#664025]" />
 			</div>
 		</div>
