@@ -257,7 +257,7 @@
 			countyName={session.county}
 			remaining={anchoredRemaining ?? polis.remaining}
 			onKeepVoting={resumeVoting}
-			onDone={goToEndFlow}
+			onDone={() => { screen = 'compose'; }}
 		/>
 
 	{:else if screen === 'about-you'}
