@@ -81,7 +81,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 		carouselHeader: 'AI and the Future of Our Communities',
 		slides: [
 			'This conversation is about how everyone can direct the growing impact of artificial intelligence to benefit our communities.',
-			'You\u2019ll see statements from your neighbors and other community members about this question. You can vote: agree, disagree, or unsure on each one.',
+			'You\u2019ll see statements from other community members about this question. You can vote: agree, disagree, or unsure... or add your own thoughts.',
 			'This \u201COpen Poll\u201D will reveal shared concerns and values that will be the basis of action-oriented community conversations in the coming months.'
 		],
 		hostMessage: [
@@ -117,7 +117,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 		carouselHeader: 'AI and the Future of Our Communities',
 		slides: [
 			'This conversation is about how Utahns can direct the growing impact of artificial intelligence to benefit our communities.',
-			'You\u2019ll see statements from your neighbors and other community members about this question. You can vote: agree, disagree, or unsure on each one.',
+			'You\u2019ll see statements from other community members about this question. You can vote: agree, disagree, or unsure... or add your own thoughts.',
 			'This \u201COpen Poll\u201D will reveal shared concerns and values that will be the basis of action-oriented community conversations in the coming months.'
 		],
 		hostMessage: [
@@ -263,7 +263,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 		carouselHeader: 'AI and Our Future',
 		slides: [
 			'AI is reshaping Central Oregon — and we have a choice in how we respond. This is a place for us to weigh in.',
-			'You\'ll see statements from community members. For each one, you can respond: agree, disagree, or are unsure.',
+			'You\u2019ll see statements from other community members about this question. You can vote: agree, disagree, or unsure... or add your own thoughts.',
 			'Your responses — combined with everyone else\'s — will help surface what Central Oregonians have in common, where we differ, and what we might tackle together.',
 			'This is the first step. What we discover here leads to live conversations and a community Solutions Assembly.'
 		],

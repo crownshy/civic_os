@@ -9,6 +9,7 @@
         onBack?: () => void;
         backLabel?: string;
         buttonText?: string;
+        onEnd?: () => void;
         variant?: 'default' | 'light' | 'dark';
         class?: string;
 		region:RegionConfig;
@@ -19,6 +20,7 @@
         onBack,
         backLabel = '← BACK TO VOTING',
         buttonText = 'ABOUT →',
+        onEnd,
         variant = 'default',
         class: className,
 		region
@@ -33,7 +35,7 @@
     };
 </script>
 
-<div class={cn('flex items-center justify-between pr-3.75 pl-6 pt-3.75', variantStyles[variant], className)}>
+<div class={cn('flex items-center justify-between pr-3.75 pl-6 py-3.75', variantStyles[variant], className)}>
     {#if onBack}
         <Button variant="soft" size="xs" onclick={onBack}>
             {backLabel}
@@ -47,9 +49,16 @@
         </div>
     {/if}
     
-    <Button variant={variant === 'light' ? 'ghost' : 'soft'} size="xs" href='/campaign/ai' class={variant === 'light' ? 'bg-white/10 text-white/80' : ''}>
-        {buttonText}
-    </Button>
+    <div class="flex items-center gap-1.5">
+        <Button variant={variant === 'light' ? 'ghost' : 'soft'} size="xs" href='/campaign/ai' class={variant === 'light' ? 'bg-white/10 text-white/80' : ''}>
+            {buttonText}
+        </Button>
+        {#if onEnd}
+            <Button variant="destructive" size="xs" onclick={onEnd}>
+                END
+            </Button>
+        {/if}
+    </div>
 </div>
 
 <Dialog

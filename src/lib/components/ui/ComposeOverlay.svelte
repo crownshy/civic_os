@@ -48,26 +48,25 @@
 
 </script>
 
-<div class={cn('relative flex h-dvh flex-col bg-background', className)}>
-	<div class="flex flex-1 flex-col rounded-bl-[30px] rounded-br-[30px] bg-gradient-primary shadow-[0px_4px_16.6px_0px_rgba(0,0,0,0.20)]">
-		<!-- Header -->
-		<InfoBar region={region} {countyName} />
+<div class={cn('relative flex h-dvh flex-col bg-gradient-primary', className)}>
+	<!-- Header -->
+	<InfoBar region={region} {countyName} />
 
-		<!-- Question -->
-		<div class="px-5 pt-4">
-			<p class="font-sans text-3xl font-bold leading-10 text-foreground">
-				{question}
-			</p>
-		</div>
+	<!-- Question -->
+	<div class="px-5 pt-4">
+		<p class="font-sans text-3xl font-bold leading-10 text-foreground">
+			{question}
+		</p>
+	</div>
 
-		<!-- Instructions toggle -->
-		<div class="px-6 pt-4">
-			<button onclick={onShowInstructions} class="font-mono text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
-				SHOW INSTRUCTIONS &rarr;
-			</button>
-		</div>
+	<!-- Instructions toggle -->
+	<div class="px-6 pt-4">
+		<button onclick={onShowInstructions} class="font-mono text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
+			SHOW INSTRUCTIONS &rarr;
+		</button>
+	</div>
 
-		<form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }} class="mx-4 mt-4 flex flex-1 flex-col gap-0">
+	<form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }} class="mx-4 mt-4 flex flex-1 flex-col gap-0">
 		<!-- White textarea card -->
 		<div class="flex flex-1 flex-col overflow-hidden rounded-[20px] bg-card shadow-[0px_10px_15px_0px_rgba(12,34,95,0.25)] outline-2 outline-white">
 			<textarea
@@ -85,26 +84,20 @@
 			</div>
 		</div>
 
-		<!-- Submit button -->
-		<div class="px-0 pt-4 pb-4">
+		<!-- Buttons -->
+		<div class="flex gap-3 pt-8 pb-4">
+			<Button variant="destructive" data-umami-event="compose-back" class="flex-1" onclick={onBack}>
+				GO BACK
+			</Button>
 			{#if submitted}
-				<Button variant="primary" fullWidth disabled>
+				<Button variant="primary" class="flex-1" disabled>
 					SUBMITTED!
 				</Button>
 			{:else}
-				<Button type="submit" variant="primary" fullWidth disabled={!canSubmit}>
+				<Button type="submit" data-umami-event="compose-submit" variant="primary" class="flex-1" disabled={!canSubmit}>
 					SUBMIT
 				</Button>
 			{/if}
 		</div>
-		</form>
-	</div>
-
-	<!-- Back link — pinned to bottom -->
-	<div class="shrink-0 py-5 text-center">
-		<Button variant="pill" class="bg-destructive/5 text-destructive" size="sm" onclick={onBack}>
-			<span class="text-base font-medium">&lt;&lt; BACK TO THE CONVERSATION</span>
-		</Button>
-	</div>
-
+	</form>
 </div>

@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { fly, fade } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
-	import { Header, VoteBar } from '$lib/components/ui';
+	import { InfoBar, VoteBar } from '$lib/components/ui';
 	import type { RegionConfig } from '$lib/config/regions';
 
 	interface Props {
 		countyName: string;
-		question: string;
 		statementText: string;
 		remaining: number;
 		total: number;
@@ -19,7 +18,6 @@
 
 	let {
 		countyName,
-		question,
 		statementText,
 		remaining,
 		total,
@@ -29,6 +27,8 @@
 		onCompose,
 		region
 	}: Props = $props();
+
+	const progress = $derived(total > 0 ? ((total - remaining) / total) * 100 : 0);
 
 	let previousText = statementText;
 	let waitingForNext = $state(false);
@@ -61,18 +61,17 @@
 </script>
 
 <div class="flex h-full flex-col bg-muted">
-	<Header
-		{countyName}
-		{region}
-		{question}
-		{onCompose}
-		about
-		rounded
-		marquee={false}
-	/>
+	<InfoBar {countyName} {region} {onEnd} />
 
 	<!-- Statement content (white, centered) -->
 	<div class="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-8">
+		<div class="absolute top-0 left-0 h-[3px] w-full bg-secondary/30">
+			<div class="h-full bg-secondary transition-all duration-300" style="width: {progress}%"></div>
+		</div>
+		<div class="absolute top-[3px] left-0 w-full flex items-start justify-between px-4 py-2">
+			<span class="font-mono text-sm font-medium uppercase text-muted-foreground/70 pr-4">{region.carouselHeader}</span>
+			<span class="font-mono text-sm font-medium uppercase text-muted-foreground/70 shrink-0">{remaining} LEFT</span>
+		</div>
 		{#if waitingForNext}
 			<!-- Loading skeleton between statements -->
 			<div in:fade={{ duration: 200 }} class="w-full animate-pulse text-left">
@@ -107,12 +106,10 @@
 	</div>
 
 	<VoteBar
-		{remaining}
-		{total}
 		{disabled}
 		onAgree={() => doVote('agree')}
 		onDisagree={() => doVote('disagree')}
 		onSkip={() => doVote('pass')}
-		{onEnd}
+		{onCompose}
 	/>
 </div>

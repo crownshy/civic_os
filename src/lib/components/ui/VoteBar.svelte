@@ -1,16 +1,14 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
-	import { SkipForward, Check, X } from 'lucide-svelte';
+	import { Check, X, ArrowRight } from 'lucide-svelte';
+	import smiley from '$lib/assets/smiley.svg';
 	import Button from './Button.svelte';
-
 
 	interface Props {
 		onAgree?: () => void;
 		onDisagree?: () => void;
 		onSkip?: () => void;
-		onEnd?: () => void;
-		remaining?: number;
-		total?: number;
+		onCompose?: () => void;
 		disabled?: boolean;
 		skeleton?: boolean;
 		class?: string;
@@ -20,83 +18,48 @@
 		onAgree,
 		onDisagree,
 		onSkip,
-		onEnd,
-		remaining = 0,
-		total = 10,
+		onCompose,
 		disabled = false,
 		skeleton = false,
 		class: className
 	}: Props = $props();
-
-	const progress = $derived(total > 0 ? ((total - remaining) / total) * 100 : 0);
 </script>
 
-<div class={cn('shrink-0 overflow-hidden', skeleton && 'pointer-events-none opacity-40', className)}>
-	<!-- Remaining / End pills row -->
-	<div class="flex items-center justify-between px-6 py-2 pb-3">
-		<span class="inline-flex items-center rounded-[20px] bg-secondary px-3 py-1.5">
-			<span class="font-mono text-base font-medium text-secondary-foreground">{remaining} LEFT</span>
-		</span>
-
-		
-		<Button onclick={onEnd} size="sm" variant="pill" class="bg-accent text-secondary" >
-			<span class="font-mono text-base font-medium">END</span>
+<div class={cn('shrink-0', skeleton && 'pointer-events-none opacity-40', className)}>
+	<!-- Vote buttons row (sits between statement and compose area) -->
+	<div class="flex items-center gap-2 px-4 py-3">
+		<Button
+			{disabled}
+			onclick={onAgree}
+			class="min-w-0 flex-1 h-auto gap-1.5 rounded-[30px] px-4 py-3.5 shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)] disabled:cursor-not-allowed disabled:opacity-50"
+		>
+			<span>AGREE</span>
+		</Button>
+		<Button
+			{disabled}
+			variant="destructive"
+			onclick={onDisagree}
+			class="min-w-0 flex-1 h-auto gap-1.5 rounded-[30px] px-4 py-3.5 shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)] disabled:cursor-not-allowed disabled:opacity-50"
+		>
+			<span>DISAGREE</span>
+		</Button>
+		<Button
+			{disabled}
+			onclick={onSkip}
+			class="min-w-0 flex-1 h-auto rounded-[30px] bg-[#FFE9C8] px-4 py-3.5 text-secondary shadow-none disabled:cursor-not-allowed disabled:opacity-50"
+		>
+			<span>UNSURE</span>
 		</Button>
 	</div>
 
-	<!-- Progress bar -->
-	<div class="relative h-1.5 w-full bg-secondary/30">
-		<div
-			class="absolute left-0 top-0 h-full bg-secondary transition-all duration-300"
-			style="width: {progress}%"
-		></div>
-	</div>
-
-	<!-- Vote buttons row -->
-	<div class="border-t border-background bg-[#FFEDD3] px-5 py-8">
-	
-		<div class="flex flex-nowrap items-end justify-center gap-2.5">
-			<Button
-				{disabled}
-				onclick={onAgree}
-				class="flex min-w-0 flex-1 items-center justify-center gap-1.5 whitespace-nowrap overflow-hidden rounded-[30px] bg-primary px-4 py-3.5 shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)] disabled:cursor-not-allowed disabled:opacity-50"
-			>
-				<Check class="h-5 w-5" />
-				<span>AGREE</span>
-			</Button>
-			<Button
-				{disabled}
-				variant="destructive"
-				onclick={onDisagree}
-				class="flex min-w-0 flex-1 items-center justify-center gap-1.5 whitespace-nowrap overflow-hidden rounded-[30px] px-4 py-3.5 shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)] disabled:cursor-not-allowed disabled:opacity-50"
-			>
-				<X class="h-5 w-5" />
-				<span>DISAGREE</span>
-		</Button>
-			
-		<!-- Skip button -->
-		<div class="relative inline-flex items-center justify-center">
-			<Button {disabled} aria-label="Skip" onclick={onSkip} variant="outline" 
-				class="h-13 w-13 shrink-0 overflow-visible">
-				<SkipForward fill="currentColor" class="h-6 w-6 text-secondary" />
-			</Button>
-			<svg
-			viewBox="0 0 100 100"
-			xmlns="http://www.w3.org/2000/svg"
-			class="pointer-events-none absolute h-20 w-20 font-mono"
-			>
-				<path 
-					id="circlePath"
-					d="M 50,90 a 40,40 0 1,1 0,-80 a 40,40 0 1,1 0,80"
-					fill="none"
-				/>
-				<text fill="#A6722E" opacity={`${disabled ? 0.5 : 1}`} font-size="14">
-					<textPath href="#circlePath" text-anchor="middle" startOffset="50%">
-					UNSURE
-					</textPath>
-				</text>
-			</svg>
+	<!-- Compose area -->
+	<button onclick={onCompose} data-umami-event="compose-click" class="w-full rounded-t-[40px] border-t border-[#86654933] bg-[#532A0E] p-5 text-left">
+		<div class="flex items-center gap-[15px]">
+			<img src={smiley} alt="" class="h-[50px] w-[50px] shrink-0 rounded-full shadow-[0px_4px_10px_0px_rgba(83,42,14,0.25)]" />
+			<div class="flex flex-1 items-center justify-between rounded-full bg-[linear-gradient(to_bottom,white_0%,white_72%,#C5BBB4_100%)] px-5 py-4 shadow-[0px_4px_10px_0px_rgba(83,42,14,0.25),inset_0_0_0_2px_rgba(255,255,255,0.4)]">
+				<span class="font-sans text-xl font-bold text-[#664025]">Share your perspective...</span>
+				<ArrowRight class="h-[30px] w-[30px] shrink-0 text-[#664025]" />
+			</div>
 		</div>
-		</div>
-	</div>
+	</button>
 </div>
