@@ -28,8 +28,8 @@
 		return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 	}
 
-	const emailHref = `mailto:?subject=${encodeURIComponent('Make your voice heard on the impact of AI. I did!')}&body=${encodeURIComponent("Hi ___, I just filled out this short poll about managing AI impact in Central Oregon — it was fast, and it actually made me think. Since this stuff is going to affect all of us, I figured you might want to share your perspective too. Here's the link: oregon.bloomproject.us")}`;
-	const smsHref = `sms:?body=${encodeURIComponent("I just did this quick poll about managing AI in Central Oregon. It only took a couple of minutes — thought you might want to weigh in too. oregon.bloomproject.us")}`;
+	const emailHref = `mailto:?subject=${encodeURIComponent('Make your voice heard on the impact of AI. I did!')}&body=${encodeURIComponent(`Hi ___, I just filled out this short poll about managing AI impact in ${region.stateName} — it was fast, and it actually made me think. Since this stuff is going to affect all of us, I figured you might want to share your perspective too. Here's the link: ${region.shareUrl}`)}`;
+	const smsHref = `sms:?body=${encodeURIComponent(`I just did this quick poll about managing AI in ${region.stateName}. It only took a couple of minutes — thought you might want to weigh in too. ${region.shareUrl}`)}`;
 
 	async function handleSignUp() {
 		emailError = '';

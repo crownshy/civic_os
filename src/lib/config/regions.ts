@@ -58,6 +58,8 @@ export interface RegionConfig {
 	conversationsActive?: boolean;
 	/** Date labels for the three campaign phases */
 	phaseLabels?: { phase1: string; phase2: string; phase3: string };
+	/** Public share URL for this region (e.g. "utah.bloomproject.us") */
+	shareUrl: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -99,6 +101,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 		goDeeper: "Nothing",
 		polis_workflow_step_id: "68425b0d-21e9-4f36-8c13-229dab4508bc",
 		fullHosts: '',
+		shareUrl: 'https://testing.bloomproject.us',
 		events: []
 	},
 	utah: {
@@ -136,6 +139,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 
 		polis_workflow_step_id: "9d1041f9-fda6-4597-b4b0-c1260e4b7268",
 		fullHosts: "<a href='https://www.utahcommonground.org/home'>Utah Common Ground</a>",
+		shareUrl: 'https://utah.bloomproject.us',
 		events: [
 			{
                 slug: 'may-02-springville',
@@ -310,6 +314,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 		whatsNext: "<a href=\"/conversations?utm_source=whatsNext\">Join us</a> in May and June for small group conversations taking place in Deschutes, Jefferson, and Crook counties — both in-person and online. They'll build on the themes and common ground that emerge from this poll. Share your email above to stay in the loop, or visit <a href=\"https://cocap.us\" target=\"_blank\">cocap.us</a> to learn more.",
 		goDeeper: "This process is ultimately about finding common ground and turning it into action that benefits Central Oregon communities. If you'd like to get more involved, reach out to us at <a href=\"mailto:hello@cocap.us\">hello@cocap.us</a>.",
 		polis_workflow_step_id: "8299fec7-a543-419f-8692-f68652648a0b",
+		shareUrl: 'https://oregon.bloomproject.us',
 		fullHosts: "<a href='https://cocap.us/'>Central Oregon Civic Action Project</a>, <a href='https://www.coic.org/'>Central Oregon Intergovernmental Council</a>, <a href='https://cocc.edu/'>Central Oregon Community College</a>, and <a href='https://citizens4community.com/'>Citizens4Community</a>.",
 		events: [
 			{
@@ -430,6 +435,7 @@ export const GENERIC_REGION: RegionConfig = {
 	whatsNext: "When this conversation closes, Bloom will publish the results publicly — showing where Americans agree, where we differ, and what the opinion landscape looks like across different groups. We’ll share a link when it’s ready.",
 	goDeeper: "If you’d like to host this conversation in your own community, reach out at <a href='mailto:hello@bloom-project.org'>hello@bloom-project.org</a> or visit <a href='https://www.bloom-project.org'>https://www.bloom-project.org</a>.",
 	polis_workflow_step_id: "f553a7b9-b3ac-4159-b88d-198f609b110c",
+	shareUrl: 'https://all.bloomproject.us',
 	fullHosts: "<a href='https://www.bloom-project.org/'>The Bloom Project</a>.",
 	events: [
 		{
