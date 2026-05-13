@@ -5,7 +5,8 @@ on:
     tags:
       - 'v*' # Runs only when a new tag starting with 'v' is pushed
     branches:
-      - main # Runs when there is an update to the main branch
+      - main  # Runs when there is an update to the main branch
+      - stage  # Runs when there is an update to the stage branch
   workflow_dispatch:
 
 jobs:
