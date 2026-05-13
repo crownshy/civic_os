@@ -76,7 +76,7 @@ jobs:
         name: Update GitOps manifests
         run: |
             git clone https://${{ secrets.GITOPS_TOKEN }}@github.com/crownshy/bloom_charts.git
-            cd helm_charts
+            cd bloom_charts
             sed -i "s|dockerTag:.*|dockerTag: \"${{ github.sha }}\"|g" civic-os/civic-os-staging.yaml
             git add .
             git config --global user.email "stuart.lynn@gmail.com"
@@ -118,7 +118,7 @@ jobs:
         name: Update GitOps manifests
         run: |
             git clone https://${{ secrets.GITOPS_TOKEN }}@github.com/crownshy/bloom_charts.git
-            cd helm_charts
+            cd bloom_charts
             sed -i "s|dockerTag:.*|dockerTag: \"${{ github.sha }}\"|g" civic-os/values.yaml
             git add .
             git config --global user.email "stuart.lynn@gmail.com"
