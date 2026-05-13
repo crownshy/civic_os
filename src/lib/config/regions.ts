@@ -142,20 +142,20 @@ export const REGIONS: Record<string, RegionConfig> = {
 		shareUrl: 'https://utah.bloomproject.us',
 		events: [
 			{
-                slug: 'may-02-springville',
-                title: 'AI & Springville',
-                topic: 'COMMUNITY CONVERSATION',
-                location: 'Springville, UT',
-                venueName: 'Springville Library',
-                address: '45 S Main St, Springville, UT 84663',
-                time: '1:30PM',
-                endTime: '3:00PM',
-                date: '2026-05-02T13:00:00-06:00',
-                duration: '1.5 hours',
-                format: 'in-person',
-                description: 'Join us for small group conversations about AI for Utah Common Ground!',
-                fullDescription: 'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
-            },
+				slug: 'may-02-springville',
+				title: 'AI & Springville',
+				topic: 'COMMUNITY CONVERSATION',
+				location: 'Springville, UT',
+				venueName: 'Springville Library',
+				address: '45 S Main St, Springville, UT 84663',
+				time: '1:30PM',
+				endTime: '3:00PM',
+				date: '2026-05-02T13:00:00-06:00',
+				duration: '1.5 hours',
+				format: 'in-person',
+				description: 'Join us for small group conversations about AI for Utah Common Ground!',
+				fullDescription: 'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
+			},
 			{
 				slug: 'may-05-online',
 				title: 'AI & Our Communities',
@@ -428,6 +428,98 @@ export const REGIONS: Record<string, RegionConfig> = {
 				time: '1:00PM',
 				endTime: '2:30PM',
 				date: '2026-06-13T13:00:00-07:00',
+				duration: '1.5 hours',
+				format: 'in-person',
+				description: 'Join us for small group conversations about AI in Central Oregon!',
+				fullDescription: 'This is a 1.5 hour conversation with people in Central Oregon about AI. We\'ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
+			},
+		],
+		phaseLabels: { phase1: 'APRIL 2026', phase2: 'MAY 2026', phase3: 'SEPTEMBER 2026' }
+
+	},
+
+	stage: {
+		slug: 'stage',
+		stateName: 'Bloom Stage State',
+		demonym: 'Stagies',
+		question:
+			'How can Bloom Staging project members ensure benefits of AI are widely shared and risks are responsibly managed?',
+		polisId: '8h3zyzktmd',
+		conversationId: '1b68f5d8-1580-4a21-8a08-8bab18e567fd',
+		inviteId: '9f529e7-9b2f-4d4d-909d-aad9ad0b91a0',
+		hostName: 'Bloom Stage Project',
+		hostUrl: 'https://cocap.us/',
+		zipPrefixes: [''],
+		carouselPreHeader: 'Bloom Staging Speaks:',
+		carouselHeader: 'AI and Our Future',
+		slides: [
+			'AI is reshaping Central Oregon — and we have a choice in how we respond. This is a place for us to weigh in.',
+			'You\u2019ll see statements from other community members about this question. You can vote: agree, disagree, or unsure... or add your own thoughts.',
+			'Your responses — combined with everyone else\'s — will help surface what Central Oregonians have in common, where we differ, and what we might tackle together.',
+			'This is the first step. What we discover here leads to live conversations and a community Solutions Assembly.'
+		],
+		hostMessage: [
+			`
+		  <p>YOUR HOSTS:</p>
+		  <ul class='list-disc list-inside'>
+			<li>
+			  Bloom Staging 	  
+			</li>
+		  </ul>
+		  `,
+			'First, thank you for being here and for caring about the future of our region.',
+			'AI is already reshaping Central Oregon — bringing real promise alongside real concerns. Many see new economic opportunities, better tools for innovation, and new ways to tackle longstanding challenges. Others worry about jobs, education, mental health, water and natural resources, and access to trustworthy information. Both are true, and both matter.',
+			'Central Oregonians should have a say in changes that shape their lives. This poll is a first step — a way to understand where our community stands, find common ground, and build toward solutions together.',
+			'Central Oregon Civic Action Project believes people should have a say in the changes that shape their lives. This Open Poll is a first step — a way to understand where our community stands, find common ground, and build toward solutions together.',
+			'This conversation is open to all Central Oregon residents, regardless of background or belief. It only takes a few minutes. We hope you\u2019ll add your voice — and pass it on.',
+			`Questions? Reach Josh at <a href="mailto:josh@cocap.us">josh@cocap.us</a>.`
+		],
+		aboutConversation: [
+			"This Open Poll is hosted by the <a href='http://cocap.us'>Central Oregon Civic Action Project</a> — a coalition of community organizations from across the region.",
+			"Central Oregon is navigating big questions about AI and how it's shaping our communities. This is a space for residents to share what matters most — what you're hopeful about, what concerns you, and what you think our region needs.",
+			"There are no right answers here. This poll is a first step toward understanding where Central Oregonians stand, finding common ground, and building toward solutions together.",
+			"<span class='font-bold'>OPEN POLL (now) → LIVE CONVERSATIONS (May/June) → SOLUTIONS FORUM (Fall)</span>",
+			"<span class='font-bold >Step 1: This Poll</span>",
+			"Share your views now. Your responses help surface what we agree on, where we differ, and what questions deserve deeper conversation.",
+			"<span class='font-bold'>Step 2: Live Conversations (May/June)</span>",
+			"Small group discussions — in person and online — open to anyone in the region. A chance to hear from neighbors, think out loud, and go deeper than a poll allows.",
+			"<span class='font-bold'>Solutions Forum (Fall 2026)</span>",
+			"A representative group of 30–50 residents will come together to deliberate on what this process surfaced — and work toward recommendations with broad, cross-party support.",
+			"Questions or want to get involved? Reach us at <a href='mailto:hello@cocap.us'>hello@cocap.us</a>."
+		],
+		campaignPageDescription: 'This Assembly is about making sure Central Oregonians have a real say in how artificial intelligence shapes our lives — who it benefits, who gets left behind, and what we can do about it at every level, from families and schools to city and state policy.',
+		campaignPageHosts: '',
+		whatsNext: "<a href=\"/conversations?utm_source=whatsNext\">Join us</a> in May and June for small group conversations taking place in Deschutes, Jefferson, and Crook counties — both in-person and online. They'll build on the themes and common ground that emerge from this poll. Share your email above to stay in the loop, or visit <a href=\"https://cocap.us\" target=\"_blank\">cocap.us</a> to learn more.",
+		goDeeper: "This process is ultimately about finding common ground and turning it into action that benefits Central Oregon communities. If you'd like to get more involved, reach out to us at <a href=\"mailto:hello@cocap.us\">hello@cocap.us</a>.",
+		polis_workflow_step_id: "4a91d652-5d97-468e-b432-d8fc0141df19",
+		shareUrl: 'https://oregon.bloomproject.us',
+		fullHosts: "<a href='https://cocap.us/'>Central Oregon Civic Action Project</a>, <a href='https://www.coic.org/'>Central Oregon Intergovernmental Council</a>, <a href='https://cocc.edu/'>Central Oregon Community College</a>, and <a href='https://citizens4community.com/'>Citizens4Community</a>.",
+		events: [
+			{
+				slug: 'stage-event-1',
+				title: 'Staged event1 ',
+				topic: 'COMMUNITY CONVERSATION',
+				location: 'Sisters, OR',
+				venueName: 'The Hub by Citizens4Community',
+				address: '291 E. Main Avenue, Sisters, OR 97759',
+				time: '10:00AM',
+				endTime: '11:30AM',
+				date: '2026-05-30T10:00:00-07:00',
+				duration: '1.5 hours',
+				format: 'in-person',
+				description: 'Join us for small group conversations about AI in Central Oregon!',
+				fullDescription: 'This is a 1.5 hour conversation with people in Central Oregon about AI. We\'ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
+			},
+			{
+				slug: 'stage-event-2',
+				title: 'Staged event 2',
+				topic: 'COMMUNITY CONVERSATION',
+				location: 'Prineville, OR',
+				venueName: 'Broughton Room, Crook County Library',
+				address: '175 NW Meadow Lakes Drive, Prineville, OR 97754',
+				time: '1:00PM',
+				endTime: '2:30PM',
+				date: '2026-05-30T13:00:00-07:00',
 				duration: '1.5 hours',
 				format: 'in-person',
 				description: 'Join us for small group conversations about AI in Central Oregon!',

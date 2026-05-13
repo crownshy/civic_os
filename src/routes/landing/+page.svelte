@@ -55,12 +55,14 @@
         const zipRegion = getRegionByZipcode(zipCode.trim());
 
         // Check if we need to redirect to a different subdomain
-        if (zipRegion.slug !== region.slug) {
-            // Redirect to the appropriate subdomain with zipcode parameter
-            const redirectUrl = getRegionUrl(zipRegion, zipCode.trim(), window.location.hostname);
-            window.location.href = redirectUrl;
-            return;
-        }
+		if (region.slug !=='stage'){
+		  if (zipRegion.slug !== region.slug ) {
+			  // Redirect to the appropriate subdomain with zipcode parameter
+			  const redirectUrl = getRegionUrl(zipRegion, zipCode.trim(), window.location.hostname);
+			  window.location.href = redirectUrl;
+			  return;
+		  }
+		}
 
         // Zipcode matches current region - proceed with registration
         joining = true;
