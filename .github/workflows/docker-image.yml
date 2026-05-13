@@ -77,11 +77,11 @@ jobs:
         run: |
             git clone https://${{ secrets.GITOPS_TOKEN }}@github.com/crownshy/bloom_charts.git
             cd helm_charts
-            sed -i "s|dockerTag:.*|dockerTag: \"${{ github.sha }}\"|g" civic-os/values.yaml
+            sed -i "s|dockerTag:.*|dockerTag: \"${{ github.sha }}\"|g" civic-os/civic-os-staging.yaml
             git add .
             git config --global user.email "stuart.lynn@gmail.com"
             git config --global user.name "Stuart Lynn"
-            git commit -m "Updating civic-os image tag to ${{ github.sha }}"
+            git commit -m "Updating civic-os-staging image tag to ${{ github.sha }}"
             git push
   build-and-run-main:
     if: github.ref == 'refs/heads/main'
