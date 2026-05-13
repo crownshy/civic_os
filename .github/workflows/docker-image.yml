@@ -40,6 +40,49 @@ jobs:
         with:
           push: true
           tags: crownshy/civic_os:${{ github.ref_name }}
+
+  build-and-run-staging:
+    if: github.ref == 'refs/heads/stage'
+    runs-on: ubuntu-latest
+    environment: base
+    steps:
+      - 
+        name: Set Swap Space 
+        uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: 10
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      -
+        name: Build and push API image (main)
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: crownshy/civic_os_stage:${{github.sha}}
+      - 
+        name: Update GitOps manifests
+        run: |
+            git clone https://${{ secrets.GITOPS_TOKEN }}@github.com/crownshy/bloom_charts.git
+            cd helm_charts
+            sed -i "s|dockerTag:.*|dockerTag: \"${{ github.sha }}\"|g" civic-os/values.yaml
+            git add .
+            git config --global user.email "stuart.lynn@gmail.com"
+            git config --global user.name "Stuart Lynn"
+            git commit -m "Updating civic-os image tag to ${{ github.sha }}"
+            git push
   build-and-run-main:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -71,3 +114,14 @@ jobs:
         with:
           push: true
           tags: crownshy/civic_os:${{github.sha}}
+      - 
+        name: Update GitOps manifests
+        run: |
+            git clone https://${{ secrets.GITOPS_TOKEN }}@github.com/crownshy/bloom_charts.git
+            cd helm_charts
+            sed -i "s|dockerTag:.*|dockerTag: \"${{ github.sha }}\"|g" civic-os/values.yaml
+            git add .
+            git config --global user.email "stuart.lynn@gmail.com"
+            git config --global user.name "Stuart Lynn"
+            git commit -m "Updating civic-os image tag to ${{ github.sha }}"
+            git push
