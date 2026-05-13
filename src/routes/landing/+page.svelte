@@ -62,17 +62,20 @@
 		// In prod, route by zipcode prefix. See regions.ts for details.
 		const zipRegion = REGIONS.dev ? REGIONS.dev : getRegionByZipcode(zipCode.trim());
 
-		// Different region than current subdomain → redirect.
-		if (zipRegion.slug !== region.slug) {
-			// Redirect to the appropriate subdomain with zipcode parameter
-			trackEvent('UnsupportedZipCode', {
-				zipCode,
-				regionSlug: region.slug,
-				zipRegion: zipRegion.slug
-			});
-			const redirectUrl = getRegionUrl(zipRegion, zipCode.trim(), window.location.hostname);
-			window.location.href = redirectUrl;
-			return;
+		// Check if we need to redirect to a different subdomain
+		// Skip redirect for stage region to allow testing with any zip
+		if (region.slug !== 'stage') {
+			if (zipRegion.slug !== region.slug) {
+				// Redirect to the appropriate subdomain with zipcode parameter
+				trackEvent('UnsupportedZipCode', {
+					zipCode,
+					regionSlug: region.slug,
+					zipRegion: zipRegion.slug
+				});
+				const redirectUrl = getRegionUrl(zipRegion, zipCode.trim(), window.location.hostname);
+				window.location.href = redirectUrl;
+				return;
+			}
 		}
 
 		joining = true;
