@@ -319,7 +319,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 		events: [
 			{
 				slug: 'may-30-sisters',
-				title: 'AI & Sisters',
+				title: 'Sisters Community Conversation on AI',
 				topic: 'COMMUNITY CONVERSATION',
 				location: 'Sisters, OR',
 				venueName: 'The Hub by Citizens4Community',
@@ -334,7 +334,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 			},
 			{
 				slug: 'may-30-prineville',
-				title: 'AI & Prineville',
+				title: 'Prineville Community Conversation on AI',
 				topic: 'COMMUNITY CONVERSATION',
 				location: 'Prineville, OR',
 				venueName: 'Broughton Room, Crook County Library',
@@ -349,7 +349,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 			},
 			{
 				slug: 'jun-04-central-oregon-online',
-				title: 'AI & Central Oregon (Online)',
+				title: 'Central Oregon Community Conversation on AI – Online #1',
 				topic: 'COMMUNITY CONVERSATION',
 				location: 'Online',
 				venueName: 'Online',
@@ -364,7 +364,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 			},
 			{
 				slug: 'jun-06-bend',
-				title: 'AI & Bend',
+				title: 'Bend Community Conversation on AI',
 				topic: 'COMMUNITY CONVERSATION',
 				location: 'Bend, OR',
 				venueName: 'TBD',
@@ -378,7 +378,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 			},
 			{
 				slug: 'jun-06-madras',
-				title: 'AI & Madras',
+				title: 'Madras Community Conversation on AI',
 				topic: 'COMMUNITY CONVERSATION',
 				location: 'Madras, OR',
 				venueName: 'TBD',
@@ -392,7 +392,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 			},
 			{
 				slug: 'jun-09-central-oregon-online',
-				title: 'AI & Central Oregon (Online)',
+				title: 'Central Oregon Community Conversation on AI – Online #2',
 				topic: 'COMMUNITY CONVERSATION',
 				location: 'Online',
 				venueName: 'Online',
@@ -407,7 +407,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 			},
 			{
 				slug: 'jun-13-la-pine',
-				title: 'AI & La Pine',
+				title: 'La Pine Community Conversation on AI',
 				topic: 'COMMUNITY CONVERSATION',
 				location: 'La Pine, OR',
 				venueName: 'TBD',
@@ -421,7 +421,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 			},
 			{
 				slug: 'jun-13-redmond',
-				title: 'AI & Redmond',
+				title: 'Redmond Community Conversation on AI',
 				topic: 'COMMUNITY CONVERSATION',
 				location: 'Redmond, OR',
 				venueName: 'TBD',
