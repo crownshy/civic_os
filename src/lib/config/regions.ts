@@ -330,7 +330,6 @@ export const REGIONS: Record<string, RegionConfig> = {
 				duration: '1.5 hours',
 				format: 'in-person',
 				description: 'Join us for small group conversations about AI in Central Oregon!',
-				fullDescription: 'This is a 1.5 hour conversation with people in Central Oregon about AI. We\'ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
 			},
 			{
 				slug: 'may-30-prineville',
@@ -345,7 +344,6 @@ export const REGIONS: Record<string, RegionConfig> = {
 				duration: '1.5 hours',
 				format: 'in-person',
 				description: 'Join us for small group conversations about AI in Central Oregon!',
-				fullDescription: 'This is a 1.5 hour conversation with people in Central Oregon about AI. We\'ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
 			},
 			{
 				slug: 'jun-04-central-oregon-online',
@@ -360,7 +358,6 @@ export const REGIONS: Record<string, RegionConfig> = {
 				duration: '1 hour',
 				format: 'online',
 				description: 'Join us for small group conversations about AI in Central Oregon!',
-				fullDescription: 'This is a 1 hour online conversation with people in Central Oregon about AI. We\'ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
 			},
 			{
 				slug: 'jun-06-bend',
@@ -374,7 +371,6 @@ export const REGIONS: Record<string, RegionConfig> = {
 				duration: '1.5 hours',
 				format: 'in-person',
 				description: 'Join us for small group conversations about AI in Central Oregon!',
-				fullDescription: 'This is a 1.5 hour conversation with people in Central Oregon about AI. We\'ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
 			},
 			{
 				slug: 'jun-06-madras',
@@ -388,7 +384,6 @@ export const REGIONS: Record<string, RegionConfig> = {
 				duration: '1.5 hours',
 				format: 'in-person',
 				description: 'Join us for small group conversations about AI in Central Oregon!',
-				fullDescription: 'This is a 1.5 hour conversation with people in Central Oregon about AI. We\'ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
 			},
 			{
 				slug: 'jun-09-central-oregon-online',
@@ -403,7 +398,6 @@ export const REGIONS: Record<string, RegionConfig> = {
 				duration: '1 hour',
 				format: 'online',
 				description: 'Join us for small group conversations about AI in Central Oregon!',
-				fullDescription: 'This is a 1 hour online conversation with people in Central Oregon about AI. We\'ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
 			},
 			{
 				slug: 'jun-13-la-pine',
@@ -417,7 +411,6 @@ export const REGIONS: Record<string, RegionConfig> = {
 				duration: '1.5 hours',
 				format: 'in-person',
 				description: 'Join us for small group conversations about AI in Central Oregon!',
-				fullDescription: 'This is a 1.5 hour conversation with people in Central Oregon about AI. We\'ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
 			},
 			{
 				slug: 'jun-13-redmond',
@@ -431,7 +424,6 @@ export const REGIONS: Record<string, RegionConfig> = {
 				duration: '1.5 hours',
 				format: 'in-person',
 				description: 'Join us for small group conversations about AI in Central Oregon!',
-				fullDescription: 'This is a 1.5 hour conversation with people in Central Oregon about AI. We\'ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
 			},
 		],
 		phaseLabels: { phase1: 'APRIL 2026', phase2: 'MAY 2026', phase3: 'SEPTEMBER 2026' }
@@ -517,6 +509,14 @@ export const GENERIC_REGION: RegionConfig = {
 // ---------------------------------------------------------------------------
 // Lookup helpers
 // ---------------------------------------------------------------------------
+
+/** Generates a full event description from its format, duration, and location. */
+export function getEventFullDescription(event: import('$lib/types/mock-data').ConversationEvent, stateName: string): string {
+	const locationLabel = event.format === 'online' ? stateName : event.location.split(',')[0];
+	const duration = event.duration ?? (event.format === 'online' ? '1 hour' : '1.5 hours');
+	const onlineAdj = event.format === 'online' ? 'online ' : '';
+	return `This is a ${duration} ${onlineAdj}conversation with your neighbors in ${locationLabel} about AI. We'll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.`;
+}
 
 /** Resolve a subdomain string (e.g. "utah", "oregon") to a region config. */
 export function getRegionBySubdomain(subdomain: string): RegionConfig {

@@ -2,7 +2,7 @@
 	import { page } from '$app/state';
 	import { AppShell } from '$lib/components/layout';
 	import { Button, InfoBar, SwipeCarousel } from '$lib/components/ui';
-	import type { RegionConfig } from '$lib/config/regions';
+	import { getEventFullDescription, type RegionConfig } from '$lib/config/regions';
 	import type { ConversationEvent } from '$lib/types/mock-data';
 	import { differenceInDays, differenceInHours, differenceInMinutes, addHours, isBefore, format } from 'date-fns';
 	import { onMount, onDestroy } from 'svelte';
@@ -22,6 +22,7 @@
 	let activeTab = $state(0);
 
 	const formattedDate = $derived(event ? format(new Date(event.date), 'EEEE, MMMM d') : '');
+	const locationLabel = $derived(event ? (event.format === 'online' ? region.stateName : event.location.split(',')[0]) : '');
 	let iframeLoaded = $state(false);
 
 	function updateCountdown() {
@@ -99,8 +100,8 @@
 				</h1>
 
 				<!-- Description -->
-				<p class="mt-4 text-center font-sans text-base font-medium leading-5 text-foreground">
-					{event.description}
+				<p class="mt-4 text-center font-sans text-base font-medium leading-6 text-foreground">
+					Join your neighbors  in {locationLabel} for a conversation about AI's impact on our lives. Hosted by <a href={region.hostUrl} target="_blank" rel="noopener noreferrer" class="text-destructive">{region.hostName}</a>.
 				</p>
 			</div>
 
@@ -169,7 +170,7 @@
 								<!-- Description Card -->
 								<div class="rounded-[30px] bg-linear-to-b from-white to-white/80 p-7 shadow-[0px_4px_24.3px_0px_rgba(134,101,73,0.20)] overflow-hidden min-h-[240px]">
 									<p class="mt-3 font-sans text-md font-medium leading-6 text-foreground/80 whitespace-pre-line">
-										{event.fullDescription || event.description}
+										{event.fullDescription ?? getEventFullDescription(event, region.stateName)}
 									</p>
 								</div>
 							{/if}
