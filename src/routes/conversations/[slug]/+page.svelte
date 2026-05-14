@@ -94,7 +94,7 @@
 				</div>
 
 				<!-- Title -->
-				<h1 class="mt-3 text-center font-sans text-5xl font-extrabold leading-[2.75rem] text-foreground">
+				<h1 class="mt-3 text-center font-sans text-4xl font-extrabold leading-[2rem] text-foreground">
 					{event.title}
 				</h1>
 
@@ -105,7 +105,7 @@
 			</div>
 
 			<!-- Content -->
-			<div class="flex flex-1 flex-col items-center px-6 pt-3 md:px-12">
+			<div class="flex flex-1 flex-col items-center px-6 pt-6 md:px-12">
 				<!-- Tab switcher -->
 				<div class="flex items-center gap-2.5">
 					<button
@@ -168,8 +168,7 @@
 							{:else}
 								<!-- Description Card -->
 								<div class="rounded-[30px] bg-linear-to-b from-white to-white/80 p-7 shadow-[0px_4px_24.3px_0px_rgba(134,101,73,0.20)] overflow-hidden min-h-[240px]">
-									<h2 class="font-sans text-xl font-bold leading-5 text-foreground">Description</h2>
-									<p class="mt-3 font-sans text-md font-medium leading-5 text-foreground/80 whitespace-pre-line">
+									<p class="mt-3 font-sans text-md font-medium leading-6 text-foreground/80 whitespace-pre-line">
 										{event.fullDescription || event.description}
 									</p>
 								</div>
@@ -182,15 +181,15 @@
 			<!-- Bottom CTA -->
 			<div class="shrink-0 px-6 pb-6 pt-8 md:px-12">
 				<!-- Countdown -->
-				<p class="mb-3 text-center font-mono text-base font-medium uppercase text-foreground">
+				<p class="mb-3 text-center text-base font-medium text-foreground">
 					{#if isPast}
-						EVENT HAS PASSED
+						Event has passed.
 					{:else if daysLeft > 0}
-						EVENT STARTS IN {daysLeft} {daysLeft === 1 ? 'DAY' : 'DAYS'}
+						Event starts in {daysLeft} {daysLeft === 1 ? 'day' : 'days'}
 					{:else if hoursLeft > 0}
-						EVENT STARTS IN {hoursLeft}H {minutesLeft}M
+						Event starts in {hoursLeft}h {minutesLeft}m
 					{:else if minutesLeft > 0}
-						EVENT STARTS IN {minutesLeft} {minutesLeft === 1 ? 'MIN' : 'MINS'}
+						Event starts in {minutesLeft} {minutesLeft === 1 ? 'min' : 'mins'}
 					{:else}
 						HAPPENING NOW
 					{/if}
