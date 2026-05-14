@@ -27,7 +27,7 @@
 			{event.title}
 		</h2>
 		<p class="mt-1 font-sans text-base font-bold leading-4 text-foreground/70">
-			<span class="text-primary">{formattedDate}</span> &bull; {event.location}
+			<span class="text-primary">{formattedDate}</span> &bull; {event.time}
 		</p>
 	</div>
 

@@ -52,10 +52,10 @@
 				<span class="font-mono text-sm font-medium text-white">AI &amp; OUR COMMUNITIES</span>
 			</div>
 			<h1 class="mt-3 text-center font-sans text-5xl font-extrabold leading-[2.75rem] text-foreground">
-				Community Conversations in {region.stateName}
+				Conversations in {region.stateName}
 			</h1>
 			<p class="mt-4 text-center font-sans text-base font-medium leading-5 text-foreground">
-				Join other residents in a 1-1.5 hour conversation about artificial intelligence and what it means for communities throughout {region.stateName}.
+				Join other residents in a 60-90 minute conversation about artificial intelligence and what it means for communities throughout {region.stateName}.
 			</p>
 		</div>
 
