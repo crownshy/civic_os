@@ -2,7 +2,7 @@
 	import { page } from '$app/state';
 	import { AppShell } from '$lib/components/layout';
 	import { Button, InfoBar, SwipeCarousel } from '$lib/components/ui';
-	import type { RegionConfig } from '$lib/config/regions';
+	import { getEventFullDescription, type RegionConfig } from '$lib/config/regions';
 	import type { ConversationEvent } from '$lib/types/mock-data';
 	import { differenceInDays, differenceInHours, differenceInMinutes, addHours, isBefore, format } from 'date-fns';
 	import { onMount, onDestroy } from 'svelte';
@@ -22,6 +22,7 @@
 	let activeTab = $state(0);
 
 	const formattedDate = $derived(event ? format(new Date(event.date), 'EEEE, MMMM d') : '');
+	const locationLabel = $derived(event ? (event.format === 'online' ? region.stateName : event.location.split(',')[0]) : '');
 	let iframeLoaded = $state(false);
 
 	function updateCountdown() {
@@ -94,18 +95,18 @@
 				</div>
 
 				<!-- Title -->
-				<h1 class="mt-3 text-center font-sans text-5xl font-extrabold leading-[2.75rem] text-foreground">
+				<h1 class="mt-3 text-center font-sans text-4xl font-extrabold leading-[2rem] text-foreground">
 					{event.title}
 				</h1>
 
 				<!-- Description -->
-				<p class="mt-4 text-center font-sans text-base font-medium leading-5 text-foreground">
-					{event.description}
+				<p class="mt-4 text-center font-sans text-base font-medium leading-6 text-foreground">
+					Join your neighbors  in {locationLabel} for a conversation about AI's impact on our lives. Hosted by <a href={region.hostUrl} target="_blank" rel="noopener noreferrer" class="text-destructive">{region.hostName}</a>.
 				</p>
 			</div>
 
 			<!-- Content -->
-			<div class="flex flex-1 flex-col items-center px-6 pt-3 md:px-12">
+			<div class="flex flex-1 flex-col items-center px-6 pt-6 md:px-12">
 				<!-- Tab switcher -->
 				<div class="flex items-center gap-2.5">
 					<button
@@ -168,9 +169,8 @@
 							{:else}
 								<!-- Description Card -->
 								<div class="rounded-[30px] bg-linear-to-b from-white to-white/80 p-7 shadow-[0px_4px_24.3px_0px_rgba(134,101,73,0.20)] overflow-hidden min-h-[240px]">
-									<h2 class="font-sans text-xl font-bold leading-5 text-foreground">Description</h2>
-									<p class="mt-3 font-sans text-md font-medium leading-5 text-foreground/80 whitespace-pre-line">
-										{event.fullDescription || event.description}
+									<p class="mt-3 font-sans text-md font-medium leading-6 text-foreground/80 whitespace-pre-line">
+										{event.fullDescription ?? getEventFullDescription(event, region.stateName)}
 									</p>
 								</div>
 							{/if}
@@ -182,15 +182,15 @@
 			<!-- Bottom CTA -->
 			<div class="shrink-0 px-6 pb-6 pt-8 md:px-12">
 				<!-- Countdown -->
-				<p class="mb-3 text-center font-mono text-base font-medium uppercase text-foreground">
+				<p class="mb-3 text-center text-base font-medium text-foreground">
 					{#if isPast}
-						EVENT HAS PASSED
+						Event has passed.
 					{:else if daysLeft > 0}
-						EVENT STARTS IN {daysLeft} {daysLeft === 1 ? 'DAY' : 'DAYS'}
+						Event starts in {daysLeft} {daysLeft === 1 ? 'day' : 'days'}
 					{:else if hoursLeft > 0}
-						EVENT STARTS IN {hoursLeft}H {minutesLeft}M
+						Event starts in {hoursLeft}h {minutesLeft}m
 					{:else if minutesLeft > 0}
-						EVENT STARTS IN {minutesLeft} {minutesLeft === 1 ? 'MIN' : 'MINS'}
+						Event starts in {minutesLeft} {minutesLeft === 1 ? 'min' : 'mins'}
 					{:else}
 						HAPPENING NOW
 					{/if}
