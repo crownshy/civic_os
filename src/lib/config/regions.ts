@@ -23,7 +23,7 @@ export interface DemographicTargets {
 	ethnicity: Array<DemographicTarget>,
 	politicalParty: Array<DemographicTarget>,
 	age: Array<DemographicTarget>,
-	geneder: Array<DemographicTarget>
+	gender: Array<DemographicTarget>
 }
 
 export interface RegionConfig {
@@ -265,15 +265,18 @@ export const REGIONS: Record<string, RegionConfig> = {
 		],
 		targets: {
 			county: [
-
 				{ id: "1000", total: 100, target: 10 },
 			],
 			ethnicity: [
-				{ id: "white", total: 100, target: 10 },
-				{ id: "black", total: 100, target: 10 }
+				{ id: "White or Caucasian", total: 100, target: 10 },
+				{ id: "White", total: 100, target: 10 },
+				{ id: "Multiracial", total: 100, target: 10 },
+				{ id: "Hispanic or Latino", total: 100, target: 20 }
 			],
 			politicalParty: [
-				{ id: "white", total: 100, target: 10 }
+				{ id: "No Party Preference / Independent", total: 100, target: 10 },
+				{ id: "Democrat / Progressive / Liberal", total: 100, target: 10 },
+				{ id: "Republican / Conservative", total: 100, target: 10 },
 			],
 			age: [
 				{ id: "Under 18", total: 100, target: 10 },
@@ -284,9 +287,11 @@ export const REGIONS: Record<string, RegionConfig> = {
 				{ id: "55-64", total: 100, target: 10 },
 				{ id: "65+", total: 100, target: 10 },
 			],
-			geneder: [
+			gender: [
+				{ id: "Male", total: 100, target: 10 },
+				{ id: "Female", total: 100, target: 10 },
+				{ id: "Other", total: 100, target: 10 }
 
-				{ id: "white", total: 100, target: 10 }
 			]
 		},
 		phaseLabels: { phase1: 'APRIL 2026', phase2: 'MAY 2026', phase3: 'SEPTEMBER 2026' }
