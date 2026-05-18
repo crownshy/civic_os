@@ -15,6 +15,7 @@
   let region = $derived(data.region)
   let selectedSubregionId = $state<undefined | string>(undefined)
   console.log(demographics)
+  console.log(region.targets)
 </script>
 
 <AppShell class="overflow-y-hidden!">
