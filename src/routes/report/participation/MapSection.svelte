@@ -137,7 +137,6 @@
 </script>
 
 <div class="relative">
-  {#if countiesLoaded && coloredCounties}
     <MapLibre
       bind:map
       center={mapCenter}
@@ -146,6 +145,7 @@
       standardControls
       style="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
     >
+	{#if countiesLoaded && coloredCounties}
       <GeoJSON id="counties" data={coloredCounties} promoteId="GEOID">
         <FillLayer
           id="counties-fill"
@@ -175,6 +175,7 @@
           beforeLayerType="symbol"
         />
       </GeoJSON>
+	{/if}
     </MapLibre>
 
     <!-- Tooltip -->
@@ -225,7 +226,6 @@
         {/each}
       </div>
     </div>
-  {/if}
 </div>
 
 <style>

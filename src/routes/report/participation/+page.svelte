@@ -21,7 +21,10 @@
 <AppShell class="overflow-y-hidden!">
 
   <div class="h-full overflow-y-auto overflow-x-hidden">
-	<h1>Participation report</h1>
+
+  <h1 class="my-4 px-4 font-sans text-4xl font-bold leading-[1.01]">
+	Participation report</h1>
+	
 	<MapSection {region} data={demographics?.zipcodeCounts} targets={region?.targets?.county} />
 
 	<DemographicsComparison title='Age' data={age} targets={region?.targets['age']}/>
