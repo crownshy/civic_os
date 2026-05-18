@@ -12,6 +12,20 @@
 
 import type { ConversationEvent } from '$lib/types/mock-data';
 
+export interface DemographicTarget {
+	id: string,
+	total: number,
+	target: number
+}
+
+export interface DemographicTargets {
+	county: Array<DemographicTarget>,
+	ethnicity: Array<DemographicTarget>,
+	politicalParty: Array<DemographicTarget>,
+	age: Array<DemographicTarget>,
+	geneder: Array<DemographicTarget>
+}
+
 export interface RegionConfig {
 	/** Slug used in subdomain and as map key */
 	slug: string;
@@ -60,6 +74,8 @@ export interface RegionConfig {
 	phaseLabels?: { phase1: string; phase2: string; phase3: string };
 	/** Public share URL for this region (e.g. "utah.bloomproject.us") */
 	shareUrl: string;
+	/** The target numbers we want for each of our demographics */
+	targets?: DemographicTargets
 }
 
 // ---------------------------------------------------------------------------
@@ -247,6 +263,32 @@ export const REGIONS: Record<string, RegionConfig> = {
 				fullDescription: 'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
 			}
 		],
+		targets: {
+			county: [
+
+				{ id: "1000", total: 100, target: 10 },
+			],
+			ethnicity: [
+				{ id: "white", total: 100, target: 10 },
+				{ id: "black", total: 100, target: 10 }
+			],
+			politicalParty: [
+				{ id: "white", total: 100, target: 10 }
+			],
+			age: [
+				{ id: "Under 18", total: 100, target: 10 },
+				{ id: "18-24", total: 100, target: 10 },
+				{ id: "25-34", total: 100, target: 10 },
+				{ id: "35-44", total: 100, target: 10 },
+				{ id: "45-54", total: 100, target: 10 },
+				{ id: "55-64", total: 100, target: 10 },
+				{ id: "65+", total: 100, target: 10 },
+			],
+			geneder: [
+
+				{ id: "white", total: 100, target: 10 }
+			]
+		},
 		phaseLabels: { phase1: 'APRIL 2026', phase2: 'MAY 2026', phase3: 'SEPTEMBER 2026' }
 
 	},
