@@ -12,7 +12,7 @@
 
   let { targets, data, title }: Props = $props();
 
-  console.log({targets,data,title})
+  $effect(() => { console.log({targets,data,title}) });
 
   let targetLookup = $derived(
     targets?.reduce(
@@ -27,20 +27,32 @@
     (data ?? []).find((datum) => datum.value == null)?.count ?? null
   );
 
-  let chartData = $derived(
-    (data ?? [])
-      .filter((datum) => datum.value != null)
-      .map((datum) => {
-        const targetInfo = targetLookup[datum.value];
+  let chartData = $derived.by(() => {
+    const dataMap = new Map(
+      (data ?? []).filter((d) => d.value != null).map((d) => [d.value, d.count])
+    );
+
+    const rows = (data ?? [])
+      .filter((d) => d.value != null)
+      .map((d) => {
+        const targetInfo = targetLookup[d.value];
         return {
-          label: datum.value,
-          count: datum.count,
+          label: d.value,
+          count: d.count,
           target: targetInfo?.target ?? null,
           total: targetInfo?.total ?? null,
-          progress: targetInfo ? Math.min(datum.count / targetInfo.target, 1) : null
+          progress: targetInfo ? d.count / targetInfo.target : null
         };
-      })
-  );
+      });
+
+    for (const t of targets ?? []) {
+      if (!dataMap.has(t.id)) {
+        rows.push({ label: t.id, count: 0, target: t.target, total: t.total, progress: 0 });
+      }
+    }
+
+    return rows;
+  });
 
   const BAR_HEIGHT = 36;
   const BAR_GAP = 12;

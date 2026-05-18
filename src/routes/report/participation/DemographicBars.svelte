@@ -35,7 +35,7 @@
     {@const barY = $yGet(row)}
     {@const barH = $yScale.bandwidth()}
     {@const targetWidth = row.target != null ? $xScale(1) : null}
-    {@const progressWidth = row.progress != null ? $xGet(row) : 0}
+    {@const progressWidth = row.progress != null ? Math.min($xGet(row), $xScale(1)) : 0}
     {@const progressPct = row.progress != null ? Math.round(row.progress * 100) : null}
 
     <!-- Target background bar -->

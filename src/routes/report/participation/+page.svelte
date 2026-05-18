@@ -22,7 +22,7 @@
 
   <div class="h-full overflow-y-auto overflow-x-hidden">
 	<h1>Participation report</h1>
-	<MapSection {region} data={demographics?.zipcodeCounts} />
+	<MapSection {region} data={demographics?.zipcodeCounts} targets={region?.targets?.county} />
 
 	<DemographicsComparison title='Age' data={age} targets={region?.targets['age']}/>
 	<DemographicsComparison title='Gender' data={gender} targets={region?.targets['gender']}/>

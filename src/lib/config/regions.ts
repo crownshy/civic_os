@@ -265,13 +265,30 @@ export const REGIONS: Record<string, RegionConfig> = {
 		],
 		targets: {
 			county: [
-				{ id: "1000", total: 100, target: 10 },
+				{ id: "49049", total: 100, target: 118 },
+				{ id: "49035", total: 100, target: 57 },
+				{ id: "49011", total: 100, target: 57 },
+				{ id: "49057", total: 100, target: 17 },
+				{ id: "49021", total: 100, target: 13 },
+				{ id: "49013", total: 100, target: 4 },
+				{ id: "49045", total: 100, target: 3 },
+				{ id: "49005", total: 100, target: 2 },
+				{ id: "49003", total: 100, target: 1 },
+				{ id: "49009", total: 100, target: 1 },
+				{ id: "49023", total: 100, target: 1 },
+				{ id: "49037", total: 100, target: 1 },
+				{ id: "49039", total: 100, target: 1 },
+				{ id: "49053", total: 100, target: 1 },
 			],
 			ethnicity: [
 				{ id: "White or Caucasian", total: 100, target: 10 },
-				{ id: "White", total: 100, target: 10 },
+				{ id: "Black or African American", total: 100, target: 10 },
+				{ id: "Asian / Pacific Islander", total: 100, target: 10 },
+				{ id: "Native American", total: 100, target: 10 },
+				{ id: "Middle Eastern / North African", total: 100, target: 10 },
+				{ id: "Hispanic or Latino", total: 100, target: 20 },
 				{ id: "Multiracial", total: 100, target: 10 },
-				{ id: "Hispanic or Latino", total: 100, target: 20 }
+				{ id: "Other", total: 100, target: 10 },
 			],
 			politicalParty: [
 				{ id: "No Party Preference / Independent", total: 100, target: 10 },
