@@ -23,6 +23,7 @@
 	let calendarReady = $state(false);
 
 	const formattedDate = $derived(event ? format(new Date(event.date), 'EEEE, MMMM d') : '');
+	const headerDate = $derived(event ? format(new Date(event.date), 'MMMM d') : '');
 	const locationLabel = $derived(event ? (event.format === 'online' ? region.stateName : event.location.split(',')[0]) : '');
 	let iframeLoaded = $state(false);
 
@@ -138,20 +139,72 @@
 
 			<!-- Header -->
 			<div class="flex flex-col items-center px-6 pt-6 pb-0 md:px-12">
-				<!-- Topic pill -->
-				<div class="rounded-full bg-foreground px-3.5 py-1 overflow-hidden">
-					<span class="font-mono text-sm font-medium text-white">{event.topic}</span>
-				</div>
-
 				<!-- Title -->
-				<h1 class="mt-3 text-center font-sans text-4xl font-extrabold leading-[2rem] text-foreground">
+				<h1 class="text-center font-sans text-4xl font-extrabold leading-[2rem] text-foreground">
 					{event.title}
 				</h1>
 
+				<!-- Date & time -->
+				<p class="mt-2 font-mono text-sm font-medium text-foreground/70">
+					{headerDate} | {event.time}
+				</p>
+
 				<!-- Description -->
 				<p class="mt-4 text-center font-sans text-base font-medium leading-6 text-foreground">
-					Join your neighbors  in {locationLabel} for a conversation about AI's impact on our lives. Hosted by <a href={region.hostUrl} target="_blank" rel="noopener noreferrer" class="text-destructive">{region.hostName}</a>.
+					Join your neighbors in {locationLabel} for a conversation about AI's impact on our lives. Hosted by <a href={region.hostUrl} target="_blank" rel="noopener noreferrer" class="text-destructive">{region.hostName}</a>.
 				</p>
+
+				<!-- CTA -->
+				<div class="mt-5 w-full">
+					<!-- <p class="mb-3 text-center text-base font-medium text-foreground">
+						{#if isPast}
+							Event has passed.
+						{:else if daysLeft > 0}
+							Event starts in {daysLeft} {daysLeft === 1 ? 'day' : 'days'}
+						{:else if hoursLeft > 0}
+							Event starts in {hoursLeft}h {minutesLeft}m
+						{:else if minutesLeft > 0}
+							Event starts in {minutesLeft} {minutesLeft === 1 ? 'min' : 'mins'}
+						{:else}
+							HAPPENING NOW
+						{/if}
+					</p> -->
+
+					{#if isRegistered}
+						<button
+							class="w-full rounded-full bg-secondary/20 px-7 py-3.5 font-mono text-lg font-medium text-foreground"
+							disabled
+						>
+							ALREADY REGISTERED <span class="text-2xl">✓</span>
+						</button>
+					{:else}
+						<Button variant="primary" fullWidth size="lg" onclick={() => { showForm = true; iframeLoaded = false; }}>
+							SIGN UP TODAY
+						</Button>
+					{/if}
+
+					{#if calendarReady && !isPast}
+						<div class="mt-3 flex justify-center">
+							<add-to-calendar-button
+								name={event.title}
+								startDate={calStartDate}
+								startTime={calStartTime}
+								endTime={calEndTime || undefined}
+								location={calLocation}
+								description={calDescription}
+								timeZone={calTimeZone}
+								options="'Google','Apple','iCal','Outlook.com'"
+								label="ADD TO CALENDAR"
+								buttonStyle="round"
+								size="3"
+								lightMode="bodyScheme"
+							></add-to-calendar-button>
+						</div>
+					{/if}
+				</div>
+
+				<!-- Divider -->
+				<div class="mt-6 h-px w-full bg-[rgba(134,101,73,0.20)]"></div>
 			</div>
 
 			<!-- Content -->
@@ -228,55 +281,6 @@
 				</div>
 			</div>
 
-			<!-- Bottom CTA -->
-			<div class="shrink-0 px-6 pb-6 pt-8 md:px-12">
-				<!-- Countdown -->
-				<p class="mb-3 text-center text-base font-medium text-foreground">
-					{#if isPast}
-						Event has passed.
-					{:else if daysLeft > 0}
-						Event starts in {daysLeft} {daysLeft === 1 ? 'day' : 'days'}
-					{:else if hoursLeft > 0}
-						Event starts in {hoursLeft}h {minutesLeft}m
-					{:else if minutesLeft > 0}
-						Event starts in {minutesLeft} {minutesLeft === 1 ? 'min' : 'mins'}
-					{:else}
-						HAPPENING NOW
-					{/if}
-				</p>
-
-				{#if isRegistered}
-					<button
-						class="w-full rounded-full bg-secondary/20 px-7 py-3.5 font-mono text-lg font-medium text-foreground"
-						disabled
-					>
-						ALREADY REGISTERED <span class="text-2xl">✓</span>
-					</button>
-				{:else}
-				  <Button variant="primary" fullWidth size="lg" onclick={() => { showForm = true; iframeLoaded = false; }}>
-					  SIGN UP TODAY
-				  </Button>
-				{/if}
-
-				{#if calendarReady && !isPast}
-					<div class="mt-3 flex justify-center">
-						<add-to-calendar-button
-							name={event.title}
-							startDate={calStartDate}
-							startTime={calStartTime}
-							endTime={calEndTime || undefined}
-							location={calLocation}
-							description={calDescription}
-							timeZone={calTimeZone}
-							options="'Google','Apple','iCal','Outlook.com'"
-							label="ADD TO CALENDAR"
-							buttonStyle="round"
-							size="3"
-							lightMode="bodyScheme"
-						></add-to-calendar-button>
-					</div>
-				{/if}
-			</div>
 		</div>
 
 		{#if showForm}
