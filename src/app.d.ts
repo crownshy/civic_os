@@ -25,4 +25,9 @@ declare global {
 	}
 }
 
+// Custom element declarations for web components
+interface HTMLElementTagNameMap {
+	'add-to-calendar-button': HTMLElement;
+}
+
 export {};
