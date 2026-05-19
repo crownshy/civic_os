@@ -20,10 +20,56 @@
 	let showForm = $state(false);
 	let isRegistered = $state(false);
 	let activeTab = $state(0);
+	let calendarReady = $state(false);
 
 	const formattedDate = $derived(event ? format(new Date(event.date), 'EEEE, MMMM d') : '');
 	const locationLabel = $derived(event ? (event.format === 'online' ? region.stateName : event.location.split(',')[0]) : '');
 	let iframeLoaded = $state(false);
+
+	// Calendar-specific derived values
+	const calStartDate = $derived(event ? event.date.split('T')[0] : '');
+
+	const calStartTime = $derived.by(() => {
+		if (!event) return '';
+		return event.date.split('T')[1].slice(0, 5);
+	});
+
+	function parseTime12To24(t: string): string {
+		const m = t.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+		if (!m) return '';
+		let h = parseInt(m[1]);
+		const min = m[2];
+		if (m[3].toUpperCase() === 'PM' && h !== 12) h += 12;
+		else if (m[3].toUpperCase() === 'AM' && h === 12) h = 0;
+		return `${String(h).padStart(2, '0')}:${min}`;
+	}
+
+	const calEndTime = $derived(event?.endTime ? parseTime12To24(event.endTime) : '');
+
+	const calLocation = $derived.by(() => {
+		if (!event) return '';
+		if (event.format === 'online') return event.location;
+		return [event.venueName, event.address].filter(Boolean).join(' — ');
+	});
+
+	const calTimeZone = $derived.by(() => {
+		if (!event) return 'currentBrowser';
+		const tzMatch = event.date.match(/([+-]\d{2}:\d{2})$/);
+		if (!tzMatch) return 'currentBrowser';
+		const offsets: Record<string, string> = {
+			'-04:00': 'America/New_York',
+			'-05:00': 'America/Chicago',
+			'-06:00': 'America/Denver',
+			'-07:00': 'America/Los_Angeles'
+		};
+		return offsets[tzMatch[1]] ?? 'currentBrowser';
+	});
+
+	const calDescription = $derived(
+		event
+			? `${event.fullDescription ?? getEventFullDescription(event, region.stateName)}\n\nHosted by ${region.hostName}. Visit ${region.hostUrl} for more details.`
+			: ''
+	);
 
 	function updateCountdown() {
 		if (!event) return;
@@ -46,6 +92,9 @@
 		isRegistered = localStorage.getItem(`registered-${slug}`) === 'true';
 		updateCountdown();
 		interval = setInterval(updateCountdown, 60000);
+		import('add-to-calendar-button').then(() => {
+			calendarReady = true;
+		});
 	});
 
 	onDestroy(() => {
@@ -207,6 +256,25 @@
 				  <Button variant="primary" fullWidth size="lg" onclick={() => { showForm = true; iframeLoaded = false; }}>
 					  SIGN UP TODAY
 				  </Button>
+				{/if}
+
+				{#if calendarReady && !isPast}
+					<div class="mt-3 flex justify-center">
+						<add-to-calendar-button
+							name={event.title}
+							startDate={calStartDate}
+							startTime={calStartTime}
+							endTime={calEndTime || undefined}
+							location={calLocation}
+							description={calDescription}
+							timeZone={calTimeZone}
+							options="'Google','Apple','iCal','Outlook.com'"
+							label="ADD TO CALENDAR"
+							buttonStyle="round"
+							size="3"
+							lightMode="bodyScheme"
+						></add-to-calendar-button>
+					</div>
 				{/if}
 			</div>
 		</div>
