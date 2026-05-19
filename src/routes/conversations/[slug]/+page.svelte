@@ -145,7 +145,7 @@
 				</h1>
 
 				<!-- Date & time -->
-				<p class="mt-2 font-mono text-sm font-medium text-foreground/70">
+				<p class="mt-2 font-sans text-md font-medium text-foreground/70">
 					{headerDate} | {event.time}
 				</p>
 
@@ -198,6 +198,7 @@
 								buttonStyle="round"
 								size="3"
 								lightMode="bodyScheme"
+								styleLight="--btn-background: rgba(166,114,46,0.10); --btn-text: #532A0E; --btn-border: transparent; --btn-shadow: none; --btn-hover-background: rgba(166,114,46,0.20); --font: 'DM Mono', monospace;"
 							></add-to-calendar-button>
 						</div>
 					{/if}
