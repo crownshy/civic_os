@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { AppShell } from '$lib/components/layout';
-	import { Button, InfoBar, SwipeCarousel } from '$lib/components/ui';
+	import { Button, InfoBar } from '$lib/components/ui';
 	import { getEventFullDescription, type RegionConfig } from '$lib/config/regions';
 	import type { ConversationEvent } from '$lib/types/mock-data';
 	import { differenceInDays, differenceInHours, differenceInMinutes, addHours, isBefore, format } from 'date-fns';
@@ -19,7 +19,8 @@
 	let interval: ReturnType<typeof setInterval> | null = null;
 	let showForm = $state(false);
 	let isRegistered = $state(false);
-	let activeTab = $state(0);
+	let activeSection = $state<'details' | 'description'>('details');
+	let scrollContainer = $state<HTMLElement | undefined>(undefined);
 	let calendarReady = $state(false);
 
 	const formattedDate = $derived(event ? format(new Date(event.date), 'EEEE, MMMM d') : '');
@@ -98,6 +99,20 @@
 		});
 	});
 
+	onMount(() => {
+		const observer = new IntersectionObserver(
+			(entries) => {
+				for (const entry of entries) {
+					activeSection = entry.isIntersecting ? 'description' : 'details';
+				}
+			},
+			{ root: scrollContainer, rootMargin: '0px 0px -60% 0px', threshold: 0 }
+		);
+		const desc = document.getElementById('description');
+		if (desc) observer.observe(desc);
+		return () => observer.disconnect();
+	});
+
 	onDestroy(() => {
 		if (interval) clearInterval(interval);
 	});
@@ -129,7 +144,7 @@
 
 {#if event}
 	<AppShell>
-		<div class="flex h-full flex-col bg-gradient-primary overflow-y-auto">
+		<div class="flex h-full flex-col bg-gradient-primary overflow-y-auto scroll-smooth" bind:this={scrollContainer}>
 			<InfoBar
 				countyName={region.stateName}
 				{region}
@@ -208,78 +223,68 @@
 				<div class="mt-6 h-px w-full bg-[rgba(134,101,73,0.20)]"></div>
 			</div>
 
-			<!-- Content -->
-			<div class="flex flex-1 flex-col items-center px-6 pt-6 md:px-12">
-				<!-- Tab switcher -->
-				<div class="flex items-center gap-2.5">
-					<button
-						onclick={() => (activeTab = 0)}
-						class="rounded-[20px] px-2.5 py-[3px] font-mono text-sm font-medium transition-colors overflow-hidden {activeTab === 0
-							? 'bg-foreground text-white'
-							: 'bg-secondary/10 text-muted-foreground'}"
-					>
-						DETAILS
-					</button>
-					<button
-						onclick={() => (activeTab = 1)}
-						class="rounded-[20px] px-2.5 py-[3px] font-mono text-sm font-medium transition-colors overflow-hidden {activeTab === 1
-							? 'bg-foreground text-white'
-							: 'bg-secondary/10 text-muted-foreground'}"
-					>
-						DESCRIPTION
-					</button>
-				</div>
+			<!-- Sticky nav pills -->
+			<div class="sticky top-0 z-10 flex w-full items-center justify-center gap-2.5 bg-transparent px-6 py-3 md:px-12">
+				<a
+					href="#details"
+					class="rounded-[20px] px-2.5 py-[3px] font-mono text-sm font-medium transition-colors overflow-hidden {activeSection === 'details' ? 'bg-foreground text-white' : 'bg-secondary/10 text-muted-foreground'}"
+				>
+					DETAILS
+				</a>
+				<a
+					href="#description"
+					class="rounded-[20px] px-2.5 py-[3px] font-mono text-sm font-medium transition-colors overflow-hidden {activeSection === 'description' ? 'bg-foreground text-white' : 'bg-secondary/10 text-muted-foreground'}"
+				>
+					DESCRIPTION
+				</a>
+			</div>
 
-				<!-- Card carousel -->
-				<div class="mt-4 w-full">
-					<SwipeCarousel count={2} bind:index={activeTab} hideDots={true}>
-						{#snippet children(i)}
-							{#if i === 0}
-								<!-- Details Card -->
-								<div class="rounded-[30px] bg-linear-to-b from-white to-white/80 shadow-[0px_4px_24.3px_0px_rgba(134,101,73,0.20)] overflow-hidden">
-									<!-- Location row -->
-									<div class="flex items-start gap-4 border-b border-foreground/10 px-5 py-5">
-										<svg xmlns="http://www.w3.org/2000/svg" width="18" height="22" viewBox="0 0 14 20" fill="currentColor" class="mt-0.5 shrink-0 text-destructive">
-											<path d="M7 0C3.13 0 0 3.13 0 7c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z"/>
-										</svg>
-										<div>
-											<p class="font-sans text-xl font-bold leading-5 text-foreground">{event.venueName || event.location}</p>
-											{#if event.address}
-												<p class="mt-2 font-sans text-sm font-medium leading-4 text-foreground/80">{event.address}</p>
-											{/if}
-										</div>
-									</div>
-									<!-- Date row -->
-									<div class="flex items-center gap-4 border-b border-foreground/10 px-5 py-5">
-										<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="shrink-0 text-destructive">
-											<path d="M9 1v2h6V1h2v2h4a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h4V1h2Zm11 9H4v10h16V10Z"/>
-										</svg>
-										<p class="font-sans text-xl font-bold leading-5 text-foreground">{formattedDate}</p>
-									</div>
-									<!-- Time row -->
-									<div class="flex items-start gap-4 px-5 py-5">
-										<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="mt-0.5 shrink-0 text-destructive">
-											<path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10Zm1-10V7h-2v7h6v-2h-4Z"/>
-										</svg>
-										<div>
-											<p class="font-sans text-xl font-bold leading-5 text-foreground">{event.time}{#if event.endTime} – {event.endTime}{/if}</p>
-											{#if event.duration}
-												<p class="mt-2 font-sans text-sm font-medium leading-4 text-foreground/80">{event.duration}</p>
-											{/if}
-										</div>
-									</div>
-								</div>
-							{:else}
-								<!-- Description Card -->
-								<div class="rounded-[30px] bg-linear-to-b from-white to-white/80 p-7 shadow-[0px_4px_24.3px_0px_rgba(134,101,73,0.20)] overflow-hidden min-h-[240px]">
-									<p class="mt-3 font-sans text-md font-medium leading-6 text-foreground/80 whitespace-pre-line">
-										{event.fullDescription ?? getEventFullDescription(event, region.stateName)}
-									</p>
-								</div>
-							{/if}
-						{/snippet}
-					</SwipeCarousel>
-				</div>
+			<!-- Content sections -->
+			<div class="flex flex-col gap-8 px-6 pb-10 pt-4 md:px-12">
+				<!-- Details section -->
+				<section id="details" class="scroll-mt-12">
+					<div class="rounded-[30px] bg-linear-to-b from-white to-white/80 shadow-[0px_4px_24.3px_0px_rgba(134,101,73,0.20)] overflow-hidden">
+						<!-- Location row -->
+						<div class="flex items-start gap-4 border-b border-foreground/10 px-5 py-5">
+							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="22" viewBox="0 0 14 20" fill="currentColor" class="mt-0.5 shrink-0 text-destructive">
+								<path d="M7 0C3.13 0 0 3.13 0 7c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z"/>
+							</svg>
+							<div>
+								<p class="font-sans text-xl font-bold leading-5 text-foreground">{event.venueName || event.location}</p>
+								{#if event.address}
+									<p class="mt-2 font-sans text-sm font-medium leading-4 text-foreground/80">{event.address}</p>
+								{/if}
+							</div>
+						</div>
+						<!-- Date row -->
+						<div class="flex items-center gap-4 border-b border-foreground/10 px-5 py-5">
+							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="shrink-0 text-destructive">
+								<path d="M9 1v2h6V1h2v2h4a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h4V1h2Zm11 9H4v10h16V10Z"/>
+							</svg>
+							<p class="font-sans text-xl font-bold leading-5 text-foreground">{formattedDate}</p>
+						</div>
+						<!-- Time row -->
+						<div class="flex items-start gap-4 px-5 py-5">
+							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="mt-0.5 shrink-0 text-destructive">
+								<path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10Zm1-10V7h-2v7h6v-2h-4Z"/>
+							</svg>
+							<div>
+								<p class="font-sans text-xl font-bold leading-5 text-foreground">{event.time}{#if event.endTime} – {event.endTime}{/if}</p>
+								{#if event.duration}
+									<p class="mt-2 font-sans text-sm font-medium leading-4 text-foreground/80">{event.duration}</p>
+								{/if}
+							</div>
+						</div>
+					</div>
+				</section>
+
+				<!-- Description section -->
+				<section id="description" class="scroll-mt-12">
+					<p class="mb-4 font-mono text-xs font-medium uppercase text-foreground/50">About This Conversation</p>
+					<p class="font-sans text-base font-medium leading-6 text-foreground/80 whitespace-pre-line">
+						{event.fullDescription ?? getEventFullDescription(event, region.stateName)}
+					</p>
+				</section>
 			</div>
 
 		</div>
