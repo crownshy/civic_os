@@ -48,7 +48,7 @@
 
 	const calLocation = $derived.by(() => {
 		if (!event) return '';
-		if (event.format === 'online') return event.location;
+		if (event.format === 'online') return 'Videoconference link to be sent 1 day before call.';
 		return [event.venueName, event.address].filter(Boolean).join(' — ');
 	});
 
