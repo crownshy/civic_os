@@ -9,6 +9,7 @@
 		onDisagree?: () => void;
 		onSkip?: () => void;
 		onCompose?: () => void;
+		onReport?: () => void;
 		disabled?: boolean;
 		skeleton?: boolean;
 		class?: string;
@@ -19,6 +20,7 @@
 		onDisagree,
 		onSkip,
 		onCompose,
+		onReport,
 		disabled = false,
 		skeleton = false,
 		class: className
@@ -51,6 +53,19 @@
 			<span>UNSURE</span>
 		</Button>
 	</div>
+
+	{#if onReport}
+		<div class="px-4 pb-3 text-center">
+			<button
+				type="button"
+				onclick={onReport}
+				data-umami-event="report-statement-click"
+				class="font-sans text-sm font-medium text-muted-foreground"
+			>
+				Something wrong? <span class="text-destructive underline">Report this statement.</span>
+			</button>
+		</div>
+	{/if}
 
 	<!-- Compose area -->
 	<button onclick={onCompose} data-umami-event="compose-click" class="w-full rounded-t-[40px] border-t border-[#86654933] bg-[#532A0E] p-5 text-left">

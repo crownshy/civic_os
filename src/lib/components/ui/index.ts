@@ -27,3 +27,4 @@ export { default as GradientCard } from './GradientCard.svelte';
 export { default as DonutChart } from './DonutChart.svelte';
 export { default as Card } from './Card.svelte';
 export { default as ConversationEventCard } from './ConversationEventCard.svelte';
+export { default as ReportPanel } from './ReportPanel.svelte';
