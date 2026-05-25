@@ -77,7 +77,7 @@
     }
 </script>
 
-<AppShell>
+<AppShell border={false}>
     <div class="relative flex h-full flex-col bg-gradient-primary overflow-hidden">
         <!-- Host banner -->
         <div class="relative z-10 shrink-0  pt-1">
@@ -94,7 +94,7 @@
 
 		<InfoBar countyName={region.stateName} {region}/>
 
-        <!-- Main content — vertically centered, scrollable on small screens / large fonts -->
+        <!-- Hero — header + CTA centered vertically as one unit, rest flows below -->
         <div class="relative z-10 flex-1 min-h-0 overflow-y-auto">
             <div class="flex min-h-full flex-col items-center justify-center px-9 sm:px-8 py-4 sm:py-6 max-w-xl mx-auto">
                 <span class="text-center font-mono text-base font-medium uppercase text-muted-foreground">
@@ -111,36 +111,34 @@
                         </p>
                     {/snippet}
                 </SwipeCarousel>
+
+                <!-- CTA -->
+                <span class="mt-8 font-mono text-base font-medium uppercase text-muted-foreground/80">YOUR LOCATION</span>
+                <div class="mt-1.5">
+                    <ZipInput bind:value={zipCode} disabled={isReturning} bind:flash={zipFlash} regionPrefixes={region.zipPrefixes} />
+                </div>
+
+                <Button variant="primary" fullWidth disabled={joining} onclick={() => {
+                    if (!hasZip) {
+                        zipFlash = true;
+                        return;
+                    }
+                    if (hasAgreedToTos) {
+                        handleJoin();
+                    } else {
+                        showTermsModal();
+                    }
+                }} class="mt-3">
+                    {isReturning ? 'CONTINUE' : 'JOIN THE CONVERSATION'}
+                </Button>
+
+                <span class="mt-2.5 opacity-50 text-center font-mono text-xs font-medium uppercase">
+                    <span class="text-foreground">POWERED BY </span>
+                    <Link href="https://www.bloom-project.org/" external>BLOOM PROJECT.</Link>
+                    <span class="text-foreground"> SEE THE FULL TERMS AND CONDITIONS </span>
+                    <Link href="https://app.termly.io/policy-viewer/policy.html?policyUUID=ba402bb7-5499-4b37-860b-bbb507d3c3c1" external>HERE.</Link>
+                </span>
             </div>
-        </div>
-
-        <!-- Bottom CTA -->
-        <div class="relative z-10 shrink-0 flex flex-col items-center px-7 pb-3 pt-2">
-            <span class="font-mono text-base font-medium uppercase text-muted-foreground/80">YOUR LOCATION</span>
-            <div class="mt-1.5">
-                <ZipInput bind:value={zipCode} disabled={isReturning} bind:flash={zipFlash} regionPrefixes={region.zipPrefixes} />
-            </div>
-
-            <Button variant="primary" fullWidth disabled={joining} onclick={() => {
-                if (!hasZip) {
-                    zipFlash = true;
-                    return;
-                }
-                if (hasAgreedToTos) {
-                    handleJoin();
-                } else {
-                    showTermsModal();
-                }
-            }} class="mt-3">
-                {isReturning ? 'CONTINUE' : 'JOIN THE CONVERSATION'}
-            </Button>
-
-            <span class="mt-2.5 opacity-50 text-center font-mono text-xs font-medium uppercase">
-                <span class="text-foreground">POWERED BY </span>
-                <Link href="https://www.bloom-project.org/" external>BLOOM PROJECT.</Link>
-                <span class="text-foreground"> SEE THE FULL TERMS AND CONDITIONS </span>
-                <Link href="https://app.termly.io/policy-viewer/policy.html?policyUUID=ba402bb7-5499-4b37-860b-bbb507d3c3c1" external>HERE.</Link>
-            </span>
         </div>
     </div>
 
@@ -193,3 +191,9 @@
         </div>
     </Dialog>
 </AppShell>
+
+<style>
+    :global(body) {
+        background-image: var(--gradient-primary);
+    }
+</style>
