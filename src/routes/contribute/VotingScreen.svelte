@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { fly, fade } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
-	import { InfoBar, VoteBar } from '$lib/components/ui';
+	import { InfoBar, VoteBar, ReportPanel } from '$lib/components/ui';
 	import type { RegionConfig } from '$lib/config/regions';
 
 	interface Props {
 		countyName: string;
 		statementText: string;
+		statementId: number;
 		remaining: number;
 		total: number;
 		loading?: boolean;
@@ -19,6 +20,7 @@
 	let {
 		countyName,
 		statementText,
+		statementId,
 		remaining,
 		total,
 		loading = false,
@@ -27,6 +29,8 @@
 		onCompose,
 		region
 	}: Props = $props();
+
+	let reportOpen = $state(false);
 
 	const progress = $derived(total > 0 ? ((total - remaining) / total) * 100 : 0);
 
@@ -110,6 +114,9 @@
 		onAgree={() => doVote('agree')}
 		onDisagree={() => doVote('disagree')}
 		onSkip={() => doVote('pass')}
+		onReport={() => (reportOpen = true)}
 		{onCompose}
 	/>
+
+	<ReportPanel bind:open={reportOpen} {statementId} {statementText} {region} />
 </div>

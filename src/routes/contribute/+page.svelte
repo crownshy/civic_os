@@ -208,6 +208,7 @@
 			<VotingScreen
 				countyName={session.county}
 				statementText={polis.currentStatement.txt}
+				statementId={polis.currentStatement.tid}
 				remaining={displayedRemaining}
 				total={displayedTotal}
 				loading={polis.loading}
