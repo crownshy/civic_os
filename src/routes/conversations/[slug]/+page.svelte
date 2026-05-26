@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import { AppShell } from '$lib/components/layout';
 	import { Button, InfoBar } from '$lib/components/ui';
+	import EventRegistrationModal from '$lib/components/ui/EventRegistrationModal.svelte';
 	import { getEventFullDescription, type RegionConfig } from '$lib/config/regions';
 	import type { ConversationEvent } from '$lib/types/mock-data';
 	import { differenceInDays, differenceInHours, differenceInMinutes, addHours, isBefore, format } from 'date-fns';
@@ -185,19 +186,6 @@
 						{/if}
 					</p> -->
 
-					{#if isRegistered}
-						<button
-							class="w-full rounded-full bg-secondary/20 px-7 py-3.5 font-mono text-lg font-medium text-foreground"
-							disabled
-						>
-							ALREADY REGISTERED <span class="text-2xl">✓</span>
-						</button>
-					{:else}
-						<Button variant="primary" fullWidth size="lg" onclick={() => { showForm = true; iframeLoaded = false; }}>
-							SIGN UP TODAY
-						</Button>
-					{/if}
-
 					{#if calendarReady && !isPast}
 						<div class="mt-3 flex justify-center">
 							<add-to-calendar-button
@@ -278,6 +266,20 @@
 					</div>
 				</section>
 
+				{#if isRegistered}
+					<button
+						class="w-full rounded-full bg-secondary/20 px-7 py-3.5 font-mono text-lg font-medium text-foreground"
+						disabled
+					>
+						ALREADY REGISTERED <span class="text-2xl">✓</span>
+					</button>
+				{:else}
+					<Button variant="primary" fullWidth size="lg" onclick={() => { showForm = true; iframeLoaded = false; }}>
+						SIGN UP TODAY
+					</Button>
+				{/if}
+
+
 				<!-- Description section -->
 				<section id="description" class="scroll-mt-12">
 					<p class="mb-4 font-mono text-xs font-medium uppercase text-foreground/50">About This Conversation</p>
@@ -289,34 +291,7 @@
 
 		</div>
 
-		{#if showForm}
-			<div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gradient-primary">
-				<button
-					class="absolute z-50 top-4 left-4 font-mono text-sm uppercase text-foreground"
-					onclick={() => (showForm = false)}
-				>
-					← BACK TO CONVERSATIONS
-				</button>
-				<div class="relative flex flex-col items-center gap-4 px-6 py-10 w-full grow">
-					{#if !iframeLoaded}
-						<div class="absolute inset-0 flex flex-col items-center justify-center gap-4">
-							<div class="h-10 w-10 animate-spin rounded-full border-4 border-foreground/20 border-t-foreground"></div>
-							<span class="font-mono text-sm uppercase text-foreground/60">Loading form...</span>
-						</div>
-					{/if}
-					<iframe
-						title='event signup form'
-						src={`https://forms.bloomproject.us/form/IspxhmX8?event_id=${encodeURIComponent(event.slug)}&region=${region.slug}&hideAfterSubmit=true&autoClose=1`}
-						width="100%"
-						height="100%"
-						frameborder="0"
-						style="background: transparent;"
-						class="transition-opacity duration-300 {iframeLoaded ? 'opacity-100' : 'opacity-0'}"
-						onload={() => (iframeLoaded = true)}
-					></iframe>
-				</div>
-			  </div>
-		  {/if}
+		<EventRegistrationModal open={showForm} {event} />
 	  </AppShell>
   {:else}
 	  <AppShell>

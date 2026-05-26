@@ -3,6 +3,7 @@
 	import { cn } from '$lib/utils';
 	import Button from './Button.svelte';
 	import type { Snippet } from 'svelte';
+	import { X } from 'lucide-svelte';
 
 	interface Props {
 		open: boolean;
@@ -114,6 +115,7 @@
 				onOpenAutoFocus={handleOpenAutoFocus}
 				class="fixed inset-0 z-50 mx-auto flex max-w-[800px] flex-col pb-5 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4 duration-300"
 			>
+				<button type="button" class="absolute top-12 right-12 bg-red-100 p-2 rounded-full" onclick={handleClose}><X class="text-red-400" /></button>
 				<div class={cn('mx-4 mt-4 flex flex-1 flex-col overflow-hidden rounded-[20px] bg-card outline-2 -outline-offset-2 outline-card', className)}>
 					<div bind:this={scrollEl} onscroll={handleScroll} class="flex-1 overflow-y-auto pt-10">
 						<DialogPrimitive.Title class="px-7 font-sans text-4xl font-bold leading-10 text-card-foreground">
