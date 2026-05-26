@@ -68,6 +68,7 @@ export interface PopQuizQuestion {
 }
 
 export interface ConversationEvent {
+	id: string;
 	slug: string;
 	title: string;
 	topic: string;
