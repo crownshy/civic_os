@@ -8,7 +8,7 @@
 	});
 </script>
 
-<AppShell>
+<AppShell border={false}>
 	<div class="flex h-full flex-col items-center justify-center bg-gradient-primary">
 		<div class="animate-pulse text-center">
 			<span class="font-mono text-base font-medium uppercase text-muted-foreground/60">LOADING...</span>

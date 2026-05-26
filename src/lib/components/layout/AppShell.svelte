@@ -12,7 +12,7 @@
 
 <div
 	class={cn(
-		'app-shell relative mx-auto h-dvh w-full max-w-[800px] overflow-x-hidden overflow-y-hidden bg-background',
+		'app-shell relative mx-auto h-dvh w-full max-w-[860px] overflow-x-hidden overflow-y-hidden bg-background',
 		border && 'border-x border-x-shell-border/50',
 		className
 	)}
