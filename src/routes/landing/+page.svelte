@@ -78,7 +78,7 @@
 </script>
 
 <AppShell border={false}>
-    <div class="relative flex h-full flex-col bg-gradient-primary overflow-hidden">
+    <div data-landing-page class="relative flex h-full flex-col bg-gradient-primary overflow-hidden">
         <!-- Host banner -->
         <div class="relative z-10 shrink-0  pt-1">
             <button
