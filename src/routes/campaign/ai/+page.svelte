@@ -84,7 +84,7 @@
 			<span class="font-mono text-base font-medium uppercase text-muted-foreground">
 			  {region.stateName.toUpperCase()} Speaks	
 			</span>
-			<h1 class="mt-1 font-sans text-5xl font-extrabold leading-[1.05] text-muted-foreground">
+			<h1 class="mt-1 font-display tracking-display text-5xl font-medium leading-[1.05] text-muted-foreground">
 			  AI and Our Future
 			</h1>
 			<p class="mt-5 font-sans text-lg font-medium leading-7 text-muted-foreground">
@@ -107,7 +107,7 @@
 		<div class="px-6 md:px-12 pb-8">
 			<Card class="p-6">
 				<span class="font-mono text-xs uppercase text-primary">WHO'S BEHIND THIS?</span>
-				<h2 class="font-sans text-3xl font-bold text-muted-foreground leading-8 mt-2 mb-4">
+				<h2 class="font-display tracking-display text-3xl font-medium text-muted-foreground leading-8 mt-2 mb-4">
 					Your Hosts
 				</h2>
 					<p class="font-sans text-md font-medium text-muted-foreground leading-5 mb-6">
@@ -127,7 +127,7 @@
 
 		<!-- Timeline Section -->
 		<div class="py-10 px-6 md:px-12" style="background: var(--gradient-consensus)">
-			<h2 class="font-sans text-4xl font-bold text-primary-foreground text-center leading-9 mb-2">
+			<h2 class="font-display tracking-display text-4xl font-medium text-primary-foreground text-center leading-9 mb-2">
 				Timeline
 			</h2>
 			<p class="font-sans text-base font-bold text-primary-foreground text-center leading-6 mb-8">
@@ -145,7 +145,7 @@
 						<!-- Content -->
 						<div class="flex-1 min-w-0">
 							<span class="font-mono text-xs font-medium text-destructive/70">PHASE ONE ({region.phaseLabels?.phase1 ?? 'APRIL 2026'})</span>
-							<h3 class="font-sans text-3xl font-bold leading-tight mt-1 mb-3 text-muted-foreground">Open Poll</h3>
+							<h3 class="font-display tracking-display text-3xl font-medium leading-tight mt-1 mb-3 text-muted-foreground">Open Poll</h3>
 							<p class="font-sans text-md font-medium leading-5 mb-6 text-muted-foreground">
 							  Share your thoughts in as little as 2 minutes on how artificial intelligence should be managed to benefit our communities. Vote on statements by other community members and add your own for consideration.
 							</p>
@@ -164,7 +164,7 @@
 						{@render phaseIndicator('destructive')}
 						<div class="flex-1 min-w-0">
 							<span class="font-mono text-xs font-medium text-destructive/70">PHASE TWO ({region.phaseLabels?.phase2 ?? 'MAY 2026'})</span>
-							<h3 class="font-sans text-3xl font-bold leading-tight mt-1 mb-3 text-muted-foreground">Community Conversations</h3>
+							<h3 class="font-display tracking-display text-3xl font-medium leading-tight mt-1 mb-3 text-muted-foreground">Community Conversations</h3>
 							<p class="font-sans text-md font-medium leading-5 mb-6 text-muted-foreground">
 							  Join live conversations in-person or online to discuss what is actionable from the first phase and listen and learn with other community members.
 							</p>
@@ -180,7 +180,7 @@
 			<Card class="relative bg-white/10 border-white/20 overflow-hidden pt-6 pr-6 pb-6 pl-12">
 				{@render inactiveIndicator()}
 				<span class="font-mono text-xs font-medium text-white/70">PHASE THREE ({region.phaseLabels?.phase3 ?? 'SEPTEMBER 2026'})</span>
-				<h3 class="font-sans text-3xl font-bold leading-tight mt-1 mb-3 text-white">Solutions Forum</h3>
+				<h3 class="font-display tracking-display text-3xl font-medium leading-tight mt-1 mb-3 text-white">Solutions Forum</h3>
 				<p class="font-sans text-md font-medium leading-5 mb-6 text-white">
 				  Interested residents, selected by lottery to represent all walks of life in {region.stateName}, will work together to prioritize the top policies and practices  the region should pursue.
 				</p>
@@ -232,7 +232,7 @@
 		<!-- Tell Your Friends Section -->
 		<div class="py-10 px-6 md:px-12 bg-white/30">
 			<div class="flex flex-col gap-4">
-				<h2 class="font-sans text-3xl font-bold text-muted-foreground leading-8">
+				<h2 class="font-display tracking-display text-3xl font-medium text-muted-foreground leading-8">
 					Tell your friends
 				</h2>
 				<p class="font-sans text-lg font-medium text-muted-foreground leading-7">

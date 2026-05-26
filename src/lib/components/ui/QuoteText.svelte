@@ -18,7 +18,7 @@
 
 <p
 	class={cn(
-		'font-mono font-medium',
+		'font-display tracking-display font-medium',
 		size === 'md' && 'text-2xl leading-7',
 		size === 'lg' && 'text-3xl leading-9',
 		size === 'xl' && 'text-4xl',

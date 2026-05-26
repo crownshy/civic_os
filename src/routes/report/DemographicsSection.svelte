@@ -80,7 +80,7 @@
 	</div>
 
 	<div class="mt-8 px-8">
-		<h2 class="font-sans text-3xl font-bold leading-8 text-foreground">
+		<h2 class="font-display tracking-display text-3xl font-medium leading-8 text-foreground">
 			This Open Poll engaged people of different backgrounds.
 		</h2>
 	</div>

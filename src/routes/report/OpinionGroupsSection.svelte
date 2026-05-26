@@ -70,7 +70,7 @@
 	</div>
 
 	<div class="relative z-10 mt-8 px-8">
-		<h2 class="font-sans text-3xl font-bold leading-8 text-foreground">
+		<h2 class="font-display tracking-display text-3xl font-medium leading-8 text-foreground">
 			After analyzing
 			<span class="text-destructive"
 				>{totalVotes.toLocaleString()} votes on {statementCount} statements,</span

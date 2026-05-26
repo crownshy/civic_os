@@ -55,7 +55,7 @@
 	</div>
 
 	<div class="mt-4 px-8">
-		<h2 class="text-center font-sans text-3xl font-bold leading-8 text-primary-foreground">
+		<h2 class="text-center font-display tracking-display text-3xl font-medium leading-8 text-primary-foreground">
 			In spite of differences, everyone seemed to agree on certain things.
 		</h2>
 	</div>

@@ -32,7 +32,7 @@
 	</div>
 
 	<div class="mt-3 px-8">
-		<h2 class="font-sans text-3xl font-bold leading-8 text-foreground">
+		<h2 class="font-display tracking-display text-3xl font-medium leading-8 text-foreground">
 			After engaging
 			<span class="text-primary">{participantCount.toLocaleString()} people</span>
 			all over {regionName}, we found a lot of

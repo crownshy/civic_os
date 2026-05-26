@@ -22,7 +22,7 @@
 	<!-- Centered content -->
 	<div class="flex flex-1 flex-col items-center justify-center overflow-y-auto px-8">
 		<EmojiCircle emoji="💬" size="lg" />
-		<p class="mt-8 text-center font-sans text-3xl font-bold leading-10 text-foreground">
+		<p class="mt-8 text-center font-display tracking-display text-3xl font-medium leading-10 text-foreground">
 			You shape the conversation.
 		</p>
 		<p class="mt-4 text-center font-sans text-lg font-medium text-foreground/80">

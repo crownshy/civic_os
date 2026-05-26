@@ -97,7 +97,7 @@
 
 				<!-- Quote -->
 				<p
-					class="mt-4 font-sans text-3xl font-semibold leading-10 text-muted-foreground"
+					class="mt-4 font-display tracking-display text-3xl font-medium leading-10 text-muted-foreground"
 				>
 					&ldquo;{statementText}&rdquo;
 				</p>

@@ -51,7 +51,7 @@
 			<div class="rounded-full bg-foreground px-3.5 py-1 overflow-hidden">
 				<span class="font-mono text-sm font-medium text-white">AI &amp; OUR COMMUNITIES</span>
 			</div>
-			<h1 class="mt-3 text-center font-sans text-5xl font-extrabold leading-[2.75rem] text-foreground">
+			<h1 class="mt-3 text-center font-display tracking-display text-5xl font-medium leading-[2.75rem] text-foreground">
 				Conversations in {region.stateName}
 			</h1>
 			<p class="mt-4 text-center font-sans text-base font-medium leading-5 text-foreground">
@@ -97,7 +97,7 @@
 							<strong>Received! We'll be in touch.</strong>
 						</p>
 					{:else}
-						<h2 class="font-sans text-3xl font-bold text-muted-foreground leading-8 text-center">Coming Soon</h2>
+						<h2 class="font-display tracking-display text-3xl font-medium text-muted-foreground leading-8 text-center">Coming Soon</h2>
 						<p class="font-sans text-base font-medium text-muted-foreground leading-6 text-center">
 							Share your email to get notified when live conversations are open for {region.stateName}.
 						</p>

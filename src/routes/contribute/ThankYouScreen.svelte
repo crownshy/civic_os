@@ -48,7 +48,7 @@
 		<div class="flex flex-col items-center px-8 pt-14">
 			<EmojiCircle emoji="🎉" size="lg" />
 
-			<h1 class="mt-6 text-center font-sans text-4xl font-bold leading-10 text-foreground">
+			<h1 class="mt-6 text-center font-display tracking-display text-4xl font-medium leading-10 text-foreground">
 				Thank you!
 			</h1>
 
@@ -96,7 +96,7 @@
 		<div class="mt-8 px-7 pb-8">
 			<div class="flex items-center gap-2">
 				<span class="rounded-[5px] bg-destructive px-2 py-1 font-sans text-sm font-bold leading-5 text-card">NEXT UP</span>
-				<span class="font-sans text-2xl font-bold leading-9 text-foreground">Live Conversations</span>
+				<span class="font-display tracking-display text-2xl font-medium leading-9 text-foreground">Live Conversations</span>
 			</div>
 
 			<div class="mt-2 font-sans text-lg font-normal leading-7 text-foreground [&_a]:text-destructive">
@@ -106,7 +106,7 @@
 			</div>
 
 			<div class="mt-6 flex items-center gap-2">
-				<span class="font-sans text-2xl font-bold leading-9 text-foreground">Go Deeper</span>
+				<span class="font-display tracking-display text-2xl font-medium leading-9 text-foreground">Go Deeper</span>
 			</div>
 			<div class="mt-2 font-sans text-lg font-normal leading-7 text-foreground [&_a]:text-destructive">
 				<p class="mt-2 [&_a]:text-destructive [&_a]:underline hover:[&_a]:opacity-80">

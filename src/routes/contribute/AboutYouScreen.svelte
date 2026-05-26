@@ -89,7 +89,7 @@
         >BEFORE YOU GO...</span>
         
         <p
-            class="mt-4 font-sans text-4xl font-bold leading-9 text-foreground"
+            class="mt-4 font-display tracking-display text-4xl font-medium leading-9 text-foreground"
             in:fly={{ y: 10, duration: 400, delay: 200, easing: cubicOut }}
         >
 		  Help {region.stateName} see itself.

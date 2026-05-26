@@ -86,7 +86,7 @@
 				class="fixed inset-0 z-50 mx-auto flex max-w-[800px] flex-col items-center justify-center px-4 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 duration-300"
 			>
 				<div class={cn('w-full overflow-hidden max-w-2xl rounded-[20px] bg-card pt-10 pb-8 outline-2 outline-card', className)}>
-					<DialogPrimitive.Title class="px-6 font-sans text-4xl font-bold leading-10 text-card-foreground">
+					<DialogPrimitive.Title class="px-6 font-display tracking-display text-4xl font-medium leading-10 text-card-foreground">
 						{title}
 					</DialogPrimitive.Title>
 					{#if description}
@@ -116,7 +116,7 @@
 			>
 				<div class={cn('mx-4 mt-4 flex flex-1 flex-col overflow-hidden rounded-[20px] bg-card outline-2 -outline-offset-2 outline-card', className)}>
 					<div bind:this={scrollEl} onscroll={handleScroll} class="flex-1 overflow-y-auto pt-10">
-						<DialogPrimitive.Title class="px-7 font-sans text-4xl font-bold leading-10 text-card-foreground">
+						<DialogPrimitive.Title class="px-7 font-display tracking-display text-4xl font-medium leading-10 text-card-foreground">
 							{title}
 						</DialogPrimitive.Title>
 						{#if description}
