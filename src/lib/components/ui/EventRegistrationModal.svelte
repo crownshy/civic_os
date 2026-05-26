@@ -37,7 +37,7 @@
 
             try {
                 status = 'loading';
-                await api.CreateInvite(
+                await api.CreateEventInvite(
                     {
                             invite_type: { email },
                             expires_at: event.date,
@@ -47,6 +47,7 @@
                 );
                 status = 'success';
             } catch (e) {
+                error = 'Something went wrong creating an event invite.';
                 console.error(e);
                 status = 'error';
             }
@@ -77,7 +78,7 @@
                 </ThankYouMessage>
                 <div class="flex gap-4 w-full justify-between px-7">
                     <!-- TODO: <Button variant="soft" class="w-full">Add to calendar</Button>-->
-                    <!-- TODO: <Button class="w-full">Go to poll</Button>-->
+                    <Button class="w-full" href="/landing">Go to poll</Button>
                 </div>
             </div>
         {:else}

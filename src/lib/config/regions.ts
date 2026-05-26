@@ -142,6 +142,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 		shareUrl: 'https://utah.bloomproject.us',
 		events: [
 			{
+				id: '',
 				slug: 'may-02-springville',
 				title: 'AI & Springville',
 				topic: 'COMMUNITY CONVERSATION',
@@ -157,6 +158,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 				fullDescription: 'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
 			},
 			{
+				id: '',
 				slug: 'may-05-online',
 				title: 'AI & Our Communities',
 				topic: 'COMMUNITY CONVERSATION',
@@ -172,6 +174,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 				fullDescription: 'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
 			},
 			{
+				id: '',
 				slug: 'may-07-online',
 				title: 'AI & Our Communities',
 				topic: 'COMMUNITY CONVERSATION',
@@ -187,6 +190,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 				fullDescription: 'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
 			},
 			{
+				id: '',
 				slug: 'may-09-kearns',
 				title: 'AI & Kearns',
 				topic: 'COMMUNITY CONVERSATION',
@@ -202,6 +206,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 				fullDescription: 'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
 			},
 			{
+				id: '',
 				slug: 'may-12-online',
 				title: 'AI & Our Communities',
 				topic: 'COMMUNITY CONVERSATION',
@@ -217,6 +222,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 				fullDescription: 'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
 			},
 			{
+				id: '',
 				slug: 'may-14-online',
 				title: 'AI & Our Communities',
 				topic: 'COMMUNITY CONVERSATION',
@@ -232,6 +238,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 				fullDescription: 'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
 			},
 			{
+				id: '',
 				slug: 'may-16-logan',
 				title: 'AI & Logan',
 				topic: 'COMMUNITY CONVERSATION',
@@ -318,6 +325,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 		fullHosts: "<a href='https://cocap.us/'>Central Oregon Civic Action Project</a>, <a href='https://www.coic.org/'>Central Oregon Intergovernmental Council</a>, <a href='https://cocc.edu/'>Central Oregon Community College</a>, and <a href='https://citizens4community.com/'>Citizens4Community</a>.",
 		events: [
 			{
+				id: '',
 				slug: 'may-30-sisters',
 				title: 'Sisters Community Conversation on AI',
 				topic: 'COMMUNITY CONVERSATION',
@@ -332,6 +340,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 				description: 'Join us for small group conversations about AI in Central Oregon!',
 			},
 			{
+				id: '',
 				slug: 'may-30-prineville',
 				title: 'Prineville Community Conversation on AI',
 				topic: 'COMMUNITY CONVERSATION',
@@ -346,6 +355,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 				description: 'Join us for small group conversations about AI in Central Oregon!',
 			},
 			{
+				id: '',
 				slug: 'jun-04-central-oregon-online',
 				title: 'Central Oregon Community Conversation on AI – Online #1',
 				topic: 'COMMUNITY CONVERSATION',
@@ -360,6 +370,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 				description: 'Join us for small group conversations about AI in Central Oregon!',
 			},
 			{
+				id: '',
 				slug: 'jun-06-bend',
 				title: 'Bend Community Conversation on AI',
 				topic: 'COMMUNITY CONVERSATION',
@@ -374,6 +385,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 				description: 'Join us for small group conversations about AI in Central Oregon!',
 			},
 			{
+				id: '',
 				slug: 'jun-06-madras',
 				title: 'Madras Community Conversation on AI',
 				topic: 'COMMUNITY CONVERSATION',
@@ -387,6 +399,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 				description: 'Join us for small group conversations about AI in Central Oregon!',
 			},
 			{
+				id: '',
 				slug: 'jun-09-central-oregon-online',
 				title: 'Central Oregon Community Conversation on AI – Online #2',
 				topic: 'COMMUNITY CONVERSATION',
@@ -401,6 +414,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 				description: 'Join us for small group conversations about AI in Central Oregon!',
 			},
 			{
+				id: '',
 				slug: 'jun-13-la-pine',
 				title: 'La Pine Community Conversation on AI',
 				topic: 'COMMUNITY CONVERSATION',
@@ -414,6 +428,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 				description: 'Join us for small group conversations about AI in Central Oregon!',
 			},
 			{
+				id: '',
 				slug: 'jun-13-redmond',
 				title: 'Redmond Community Conversation on AI',
 				topic: 'COMMUNITY CONVERSATION',
@@ -489,6 +504,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 		fullHosts: "<a href='https://cocap.us/'>Central Oregon Civic Action Project</a>, <a href='https://www.coic.org/'>Central Oregon Intergovernmental Council</a>, <a href='https://cocc.edu/'>Central Oregon Community College</a>, and <a href='https://citizens4community.com/'>Citizens4Community</a>.",
 		events: [
 			{
+				id: 'd7529234-d628-4435-ba96-05023e409a86',
 				slug: 'stage-event-1',
 				title: 'Staged event1 ',
 				topic: 'COMMUNITY CONVERSATION',
@@ -504,6 +520,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 				fullDescription: 'This is a 1.5 hour conversation with people in Central Oregon about AI. We\'ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
 			},
 			{
+				id: 'd7529234-d628-4435-ba96-05023e409a86',
 				slug: 'stage-event-2',
 				title: 'Staged event 2',
 				topic: 'COMMUNITY CONVERSATION',
