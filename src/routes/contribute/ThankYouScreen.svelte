@@ -7,6 +7,7 @@
 	import { session } from '$lib/services/session.svelte';
 	import { ArrowRight, Check, Mail, MessageSquare, Link as LinkIcon } from 'lucide-svelte';
 	import type { RegionConfig } from '$lib/config/regions';
+	import { isValidEmail } from '$lib/utils/forms';
 
 	// TODO: replace with the real Heyform embed URL once provided.
 	const HEYFORM_EMBED_URL = 'https://forms.bloomproject.us/form/6mdAdmis';
@@ -46,10 +47,6 @@
 
 	let linkCopied = $state(false);
 	let copyTimer: ReturnType<typeof setTimeout> | undefined;
-
-	function isValidEmail(value: string): boolean {
-		return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-	}
 
 	async function handleEmailSubmit() {
 		emailError = '';
