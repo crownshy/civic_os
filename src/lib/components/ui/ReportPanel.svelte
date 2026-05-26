@@ -5,7 +5,7 @@
 	import type { RegionConfig } from '$lib/config/regions';
 
 	// TODO: Swap REPORT_FORM_ID for the real HeyForm form ID once the report form is built.
-	const REPORT_FORM_ID = 'REPLACE_WITH_FORM_ID';
+	const REPORT_FORM_ID = 'SogNEF5B';
 
 	interface Props {
 		open: boolean;
