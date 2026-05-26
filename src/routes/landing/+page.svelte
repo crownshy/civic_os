@@ -193,7 +193,7 @@
 </AppShell>
 
 <style>
-    :global(body) {
+    :global(body:has([data-landing-page])) {
         background-image: var(--gradient-primary);
     }
 </style>
