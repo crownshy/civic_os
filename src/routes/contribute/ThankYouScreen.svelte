@@ -6,6 +6,7 @@
 	import { session } from '$lib/services/session.svelte';
 	import { Mail } from 'lucide-svelte';
 	import type { RegionConfig } from '$lib/config/regions';
+	import { isValidEmail } from '$lib/utils/forms';
 
 	interface Props {
 		countyName: string;
@@ -18,10 +19,6 @@
 	let email = $state('');
 	let submitting = $state(false);
 	let emailError = $state('');
-
-	function isValidEmail(value: string): boolean {
-		return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-	}
 
 	async function handleEmailSubmit() {
 		emailError = '';

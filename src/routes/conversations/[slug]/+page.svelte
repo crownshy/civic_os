@@ -291,7 +291,7 @@
 
 		</div>
 
-		<EventRegistrationModal open={showForm} {event} />
+		<EventRegistrationModal open={showForm} {event} conversationId={region.conversationId} />
 	  </AppShell>
   {:else}
 	  <AppShell>
