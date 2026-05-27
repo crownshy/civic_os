@@ -8,12 +8,7 @@
 		children: import('svelte').Snippet;
 	}
 
-	let {
-		size = 'sm',
-		variant = 'primary',
-		class: className,
-		children
-	}: Props = $props();
+	let { size = 'sm', variant = 'primary', class: className, children }: Props = $props();
 </script>
 
 <span

@@ -14,8 +14,8 @@
 <section class="bg-background px-7 py-6">
 	<div class="flex flex-col items-start gap-4">
 		<p class="text-center font-sans text-base leading-6 text-muted-foreground">
-			<span class="font-bold">Share your email</span> to receive updates on this conversation and
-			opportunities to share your voice on this issue.
+			<span class="font-bold">Share your email</span> to receive updates on this conversation and opportunities
+			to share your voice on this issue.
 		</p>
 
 		<div class="flex w-full flex-col gap-1.5">
@@ -35,9 +35,7 @@
 				/>
 			</form>
 
-			<Button variant="primary" fullWidth onclick={handleSubmit}>
-				SIGN UP FOR UPDATES
-			</Button>
+			<Button variant="primary" fullWidth onclick={handleSubmit}>SIGN UP FOR UPDATES</Button>
 		</div>
 	</div>
 </section>

@@ -20,17 +20,6 @@
 	}));
 </script>
 
-<style>
-	@keyframes confetti-fall {
-		0% { transform: translateY(-20px) rotate(0deg) scale(0); opacity: 1; }
-		15% { transform: translateY(0px) rotate(45deg) scale(1.2); opacity: 1; }
-		100% { transform: translateY(600px) rotate(720deg) scale(0.3); opacity: 0; }
-	}
-	.confetti-piece {
-		animation: confetti-fall 1.6s ease-out forwards;
-	}
-</style>
-
 {#if active}
 	<div class="pointer-events-none absolute inset-0 z-50 overflow-hidden {className}">
 		{#each particles as p}
@@ -41,3 +30,23 @@
 		{/each}
 	</div>
 {/if}
+
+<style>
+	@keyframes confetti-fall {
+		0% {
+			transform: translateY(-20px) rotate(0deg) scale(0);
+			opacity: 1;
+		}
+		15% {
+			transform: translateY(0px) rotate(45deg) scale(1.2);
+			opacity: 1;
+		}
+		100% {
+			transform: translateY(600px) rotate(720deg) scale(0.3);
+			opacity: 0;
+		}
+	}
+	.confetti-piece {
+		animation: confetti-fall 1.6s ease-out forwards;
+	}
+</style>

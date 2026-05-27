@@ -28,7 +28,7 @@
 {#if borderGradient}
 	<!-- Gradient border: outer div is the gradient "border", inner div is the content bg -->
 	<div
-		class={cn('p-px overflow-hidden', roundedClass, borderGradient, shadow, className)}
+		class={cn('overflow-hidden p-px', roundedClass, borderGradient, shadow, className)}
 		style={roundedClass ? undefined : `border-radius: ${radius}px;`}
 	>
 		<div

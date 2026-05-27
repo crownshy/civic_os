@@ -29,11 +29,11 @@
 </div>
 
 <style>
-  div {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  div::-webkit-scrollbar {
-    display: none;
-  }
+	div {
+		scrollbar-width: none;
+		-ms-overflow-style: none;
+	}
+	div::-webkit-scrollbar {
+		display: none;
+	}
 </style>

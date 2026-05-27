@@ -28,7 +28,10 @@
 	startCountdown();
 </script>
 
-<div class="flex h-full flex-col bg-gradient-primary" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
+<div
+	class="flex h-full flex-col bg-gradient-primary"
+	in:fly={{ x: 40, duration: 400, easing: cubicOut }}
+>
 	<Header {countyName} />
 
 	<!-- Scrollable content -->
@@ -39,19 +42,17 @@
 		</p>
 
 		<!-- Body text -->
-		<p class="mt-8 font-sans text-lg font-medium leading-9 text-white">
-			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis finibus purus mollis, ultrices lorem quis, facilisis mauris. Nulla tortor magna, consequat sed pharetra quis, blandit elementum velit. Curabitur finibus et felis nec vehicula. Vivamus facilisis nunc sed dui ultrices, quis vulputate tellus egestas.
+		<p class="mt-8 font-sans text-lg leading-9 font-medium text-white">
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis finibus purus mollis, ultrices
+			lorem quis, facilisis mauris. Nulla tortor magna, consequat sed pharetra quis, blandit
+			elementum velit. Curabitur finibus et felis nec vehicula. Vivamus facilisis nunc sed dui
+			ultrices, quis vulputate tellus egestas.
 		</p>
 	</div>
 
 	<!-- Sticky bottom actions -->
 	<div class="flex shrink-0 flex-col gap-2.5 border-t border-background bg-secondary px-7 py-8">
-		<Button
-			variant="primary"
-			fullWidth
-			disabled={countdown > 0}
-			onclick={onContinue}
-		>
+		<Button variant="primary" fullWidth disabled={countdown > 0} onclick={onContinue}>
 			{#if countdown > 0}
 				CONTINUE IN {countdown}...
 			{:else}

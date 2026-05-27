@@ -10,12 +10,7 @@
 	let { conversation, class: className }: Props = $props();
 </script>
 
-<div
-	class={cn(
-		'flex h-16 flex-col justify-center rounded-[10px] bg-primary px-4',
-		className
-	)}
->
+<div class={cn('flex h-16 flex-col justify-center rounded-[10px] bg-primary px-4', className)}>
 	<span class="font-mono text-lg font-medium text-primary-foreground">
 		{conversation.title}
 	</span>
