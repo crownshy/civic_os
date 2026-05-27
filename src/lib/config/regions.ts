@@ -762,6 +762,7 @@ export const GENERIC_REGION: RegionConfig = {
 	faq: DEFAULT_FAQ,
 	events: [
 		{
+			id: '',
 			slug: 'may-18-springville',
 			title: 'May 18 (In-Person) Conversation',
 			topic: 'AI & OUR COMMUNITIES',
@@ -773,6 +774,7 @@ export const GENERIC_REGION: RegionConfig = {
 				'Join us for an in-person conversation about AI and its impact on our communities. Share your perspective, listen to your neighbors, and help shape actionable next steps.'
 		},
 		{
+			id: '',
 			slug: 'may-24-provo',
 			title: 'May 24 (In-Person) Conversation',
 			topic: 'AI & OUR COMMUNITIES',
@@ -784,6 +786,7 @@ export const GENERIC_REGION: RegionConfig = {
 				'A morning conversation about how AI is shaping our communities. Come ready to listen, share, and find common ground with fellow residents.'
 		},
 		{
+			id: '',
 			slug: 'jun-01-online',
 			title: 'June 1 (Online) Conversation',
 			topic: 'AI & OUR COMMUNITIES',
