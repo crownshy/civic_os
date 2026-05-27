@@ -649,9 +649,9 @@ export function getRegionUrl(region: RegionConfig, zipCode: string, currentHostn
 
 	// Determine base domain
 	let baseDomain: string;
-	if (host.endsWith('.localhost') || host.endsWith('.local')) {
-		// Local dev
-		baseDomain = host.endsWith('.localhost') ? 'localhost' : 'local';
+	if (host === 'localhost' || host === 'local' || host.endsWith('.localhost') || host.endsWith('.local')) {
+		// Local dev (including plain localhost without subdomain)
+		baseDomain = host.endsWith('.localhost') || host === 'localhost' ? 'localhost' : 'local';
 	} else {
 		// Production - extract base domain from current hostname
 		// e.g., utah.bloomproject.us → bloomproject.us
