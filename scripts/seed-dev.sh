@@ -187,6 +187,37 @@ fi
 ok "workflow step: $WORKFLOW_STEP_ID"
 ok "polis poll:    $POLIS_ID"
 
+# --- Polis seed statements ---------------------------------------------------
+# Posts as anonymous participant (xid). Not "true" seed statements — those
+# require owner cookie which script doesn't have. Good enough for dev.
+POLIS_URL="${POLIS_URL:-https://polis.comhairle.scot}"
+SEED_XID="seed-dev-$(date +%s)"
+
+SEED_STATEMENTS=(
+  "(dev) AI should be open source and auditable"
+  "(dev) Risk-based regulation works better than blanket bans"
+  "(dev) Compute access is the real bottleneck for fair AI"
+  "(dev) Training data provenance must be disclosed"
+  "(dev) Small models deployed locally beat large remote ones for privacy"
+)
+
+info "Step 4.5: Seeding Polis statements ($POLIS_URL)..."
+for stmt in "${SEED_STATEMENTS[@]}"; do
+  RESP=$(curl -s -X POST "$POLIS_URL/api/v3/comments" \
+    -H "Content-Type: application/json" \
+    --data "$(jq -nc \
+      --arg t "$stmt" \
+      --arg c "$POLIS_ID" \
+      --arg x "$SEED_XID" \
+      '{txt:$t, conversation_id:$c, xid:$x, agid:1, vote:-1, is_seed:false}')" \
+    || true)
+  if echo "$RESP" | jq -e '.tid // .currentPid' >/dev/null 2>&1; then
+    ok "  + $stmt"
+  else
+    info "  ! failed: $stmt — $RESP"
+  fi
+done
+
 # --- Open invite -------------------------------------------------------------
 info "Step 5: Creating open invite..."
 INVITE_RESPONSE=$(curl -s -X POST "$BACKEND_URL/conversation/$CONVERSATION_ID/invite" \
