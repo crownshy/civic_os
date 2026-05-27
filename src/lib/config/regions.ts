@@ -10,6 +10,7 @@
  *   - Anything else → generic polis
  */
 
+import { env } from '$env/dynamic/public';
 import type { ConversationEvent } from '$lib/types/mock-data';
 
 export interface RegionConfig {
@@ -66,7 +67,61 @@ export interface RegionConfig {
 // Region definitions
 // ---------------------------------------------------------------------------
 
+/**
+ * Local dev region: only registered when all four PUBLIC_DEV_* env vars are
+ * present in `.env`. Run `./scripts/seed-dev.sh` to mint the IDs.
+ *
+ * No production deploy ever sets these vars, so the dev region simply doesn't
+ * exist on staging/prod, meaning we can't accidentally commit local IDs.
+ */
+const devConversationId = env.PUBLIC_DEV_CONVERSATION_ID;
+const devInviteId = env.PUBLIC_DEV_INVITE_ID;
+const devPolisId = env.PUBLIC_DEV_POLIS_ID;
+const devPolisWorkflowStepId = env.PUBLIC_DEV_POLIS_WORKFLOW_STEP_ID;
+
+const DEV_REGION: RegionConfig | null =
+	devConversationId && devInviteId && devPolisId && devPolisWorkflowStepId
+		? {
+				slug: 'dev',
+				stateName: 'Dev',
+				demonym: 'Developers',
+				question:
+					'How can developers ensure the benefits of AI are widely shared and risks are responsibly managed?',
+				polisId: devPolisId,
+				conversationId: devConversationId,
+				inviteId: devInviteId,
+				polis_workflow_step_id: devPolisWorkflowStepId,
+				hostName: 'Local Dev',
+				hostUrl: 'http://localhost:5173',
+				zipPrefixes: [],
+				carouselPreHeader: 'WHAT SHOULD WE DO ABOUT',
+				carouselHeader: 'AI and the Future of Our Communities',
+				slides: [
+					'This is a local development environment for testing new features.',
+					'You can vote on statements, compose your own, and test the full flow.',
+					'Data is stored in your local Postgres database only.'
+				],
+				hostMessage: [
+					'This is your local development environment.',
+					'Changes here only affect your local database.',
+					'Use this to test new features safely.'
+				],
+				aboutConversation: [
+					'This is a local development conversation for testing the Civic OS platform.',
+					'It runs on your local machine with a local Postgres database.'
+				],
+				campaignPageDescription: 'Local development environment for Civic OS.',
+				campaignPageHosts: 'Local development',
+				whatsNext: 'Keep coding!',
+				goDeeper: 'Test everything!',
+				fullHosts: 'Local Development',
+				shareUrl: 'http://dev.localhost:5173',
+				events: []
+			}
+		: null;
+
 export const REGIONS: Record<string, RegionConfig> = {
+	...(DEV_REGION ? { dev: DEV_REGION } : {}),
 	testing: {
 		slug: 'testing',
 		stateName: 'Testing',
@@ -519,17 +574,34 @@ export function getEventFullDescription(event: import('$lib/types/mock-data').Co
 	return `This is a ${duration} ${onlineAdj}conversation with your neighbors in ${locationLabel} about AI. We'll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.`;
 }
 
-/** Resolve a subdomain string (e.g. "utah", "oregon") to a region config. */
+/**
+ * Resolve a subdomain string (e.g. "utah", "oregon") to a region config.
+ *
+ * LOCAL DEV: when DEV_REGION is registered, an empty/unknown subdomain
+ * (e.g. plain `localhost`) falls back to dev instead of the generic prod
+ * region. Named subdomains (`utah.localhost`, `oregon.localhost`) still
+ * resolve normally so you can test region-specific chrome locally.
+ */
 export function getRegionBySubdomain(subdomain: string): RegionConfig {
 	const key = subdomain.toLowerCase();
-	return REGIONS[key] ?? GENERIC_REGION;
+	if (REGIONS[key]) return REGIONS[key];
+	if (DEV_REGION) return DEV_REGION;
+	return GENERIC_REGION;
 }
 
 /**
  * Given a zipcode, determine which region-specific Polis the user should join.
  * Returns the matching region, or GENERIC_REGION if no prefix matches.
+ *
+ * LOCAL DEV: when the `dev` region is registered (all four PUBLIC_DEV_* env
+ * vars set), this ALWAYS returns the dev region — every zipcode resolves to
+ * your local conversation/polis. This is the single source of truth that
+ * keeps the landing redirect, contribute polisId lookup, and any future
+ * caller all pinned to dev. To exercise the real prod redirect logic, comment
+ * out the PUBLIC_DEV_* lines in `.env` and restart `pnpm dev`.
  */
 export function getRegionByZipcode(zip: string): RegionConfig {
+	if (DEV_REGION) return DEV_REGION;
 	const trimmed = zip.trim();
 	for (const region of Object.values(REGIONS)) {
 		for (const prefix of region.zipPrefixes) {
