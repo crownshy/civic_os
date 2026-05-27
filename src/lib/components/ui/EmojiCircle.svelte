@@ -34,7 +34,11 @@
 
 <div class="relative shrink-0 {className}">
 	<div class="{sizeClasses[size]} rounded-full {bgColor}"></div>
-	<span class="absolute inset-0 flex items-center justify-center {emojiSizeClasses[size]} drop-shadow-[0px_4px_24px_rgba(0,0,0,0.25)]">
+	<span
+		class="absolute inset-0 flex items-center justify-center {emojiSizeClasses[
+			size
+		]} drop-shadow-[0px_4px_24px_rgba(0,0,0,0.25)]"
+	>
 		{emoji}
 	</span>
 </div>

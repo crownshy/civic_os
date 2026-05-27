@@ -43,7 +43,7 @@
 		if (api) {
 			selectedSlide = api.selectedScrollSnap() + 1;
 			index = api.selectedScrollSnap();
-			api.on("select", () => {
+			api.on('select', () => {
 				selectedSlide = api!.selectedScrollSnap() + 1;
 				index = api!.selectedScrollSnap();
 			});
@@ -73,7 +73,7 @@
 </script>
 
 <Carousel.Root
-	class={cn("w-full", className)}
+	class={cn('w-full', className)}
 	opts={{ loop: true }}
 	setApi={(emblaApi) => (api = emblaApi)}
 	plugins={autoScrollMs ? [Autoplay({ delay: autoScrollMs })] : []}
@@ -91,15 +91,20 @@
 			{#each { length: count } as _, i (i)}
 				<button
 					onclick={() => handleDotClick(i)}
-					class="h-2 w-2 rounded-full transition-colors {selectedSlide === i + 1 ? 'bg-muted-foreground' : 'bg-muted-foreground/50'}"
+					class="h-2 w-2 rounded-full transition-colors {selectedSlide === i + 1
+						? 'bg-muted-foreground'
+						: 'bg-muted-foreground/50'}"
 					aria-label="Slide {i + 1}"
 				></button>
 			{/each}
-			<button class="bg-muted-foreground rounded-full p-1.5 flex items-center justify-center" onclick={toggleAutoplay}>
+			<button
+				class="flex items-center justify-center rounded-full bg-muted-foreground p-1.5"
+				onclick={toggleAutoplay}
+			>
 				{#if autoplay}
-					<Pause class="stroke-background h-1.5 w-1.5" />
+					<Pause class="h-1.5 w-1.5 stroke-background" />
 				{:else}
-					<Play class="fill-background h-1.5 w-1.5" />
+					<Play class="h-1.5 w-1.5 fill-background" />
 				{/if}
 			</button>
 		</div>

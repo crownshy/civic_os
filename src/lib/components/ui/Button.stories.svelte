@@ -20,7 +20,7 @@
 
 <Story name="All Variants" args={{}}>
 	{#snippet children(args)}
-		<div class="flex flex-col gap-4 bg-primary p-8 rounded-xl">
+		<div class="flex flex-col gap-4 rounded-xl bg-primary p-8">
 			<Button variant="primary">PRIMARY</Button>
 			<Button variant="secondary">SECONDARY</Button>
 			<Button variant="destructive" size="sm">DESTRUCTIVE</Button>

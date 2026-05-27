@@ -11,7 +11,7 @@
 
 <div
 	class={cn(
-		'inline-flex items-center rounded-full bg-secondary/10 px-3 py-2 font-mono text-sm font-medium uppercase text-foreground',
+		'inline-flex items-center rounded-full bg-secondary/10 px-3 py-2 font-mono text-sm font-medium text-foreground uppercase',
 		className
 	)}
 >
