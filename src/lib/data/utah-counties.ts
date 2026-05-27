@@ -3,7 +3,7 @@
  * Covers the three focus counties (Cache, Salt Lake, Utah) plus major others.
  * Falls back to "Utah" (the state) for unknown zips.
  */
-import { GENERIC_REGION, REGIONS } from "$lib/config/regions"
+import { GENERIC_REGION, REGIONS } from '$lib/config/regions';
 
 const ZIP_TO_COUNTY: Record<string, string> = {
 	// --- Salt Lake County ---
@@ -151,6 +151,5 @@ const ZIP_TO_COUNTY: Record<string, string> = {
 	'84745': 'Washington',
 	'84770': 'Washington',
 	'84780': 'Washington',
-	'84790': 'Washington',
+	'84790': 'Washington'
 };
-

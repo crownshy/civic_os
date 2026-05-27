@@ -16,7 +16,13 @@
 	});
 </script>
 
-<Story name="Default" args={{ question: 'What should we do to make sure social media helps us, not hurts us?', countyName: 'UTAH COUNTY' }}>
+<Story
+	name="Default"
+	args={{
+		question: 'What should we do to make sure social media helps us, not hurts us?',
+		countyName: 'UTAH COUNTY'
+	}}
+>
 	{#snippet children(args)}
 		<ComposeOverlay {...args} />
 	{/snippet}

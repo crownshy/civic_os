@@ -11,7 +11,7 @@
 		onSubmit?: (text: string, anonymous: boolean) => void;
 		onBack?: () => void;
 		onShowInstructions?: () => void;
-		region: RegionConfig,
+		region: RegionConfig;
 		class?: string;
 	}
 
@@ -39,46 +39,68 @@
 		submitted = true;
 		onSubmit?.(text, anonymous);
 		// Show SUBMITTED! for 2s then auto-navigate back
-		submitTimer = setTimeout(() => { onBack?.(); }, 2000);
+		submitTimer = setTimeout(() => {
+			onBack?.();
+		}, 2000);
 	}
 
 	onDestroy(() => {
 		clearTimeout(submitTimer);
 	});
-
 </script>
 
 <div class={cn('relative flex h-dvh flex-col bg-gradient-primary', className)}>
 	<!-- Header -->
-	<InfoBar region={region} {countyName} />
+	<InfoBar {region} {countyName} />
 
 	<!-- Question -->
 	<div class="px-5 pt-4">
-		<p class="font-sans text-3xl font-bold leading-10 text-foreground">
+		<p class="font-sans text-3xl leading-10 font-bold text-foreground">
 			{question}
 		</p>
 	</div>
 
 	<!-- Instructions toggle -->
 	<div class="px-6 pt-4">
-		<button onclick={onShowInstructions} class="font-mono text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
+		<button
+			onclick={onShowInstructions}
+			class="font-mono text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
+		>
 			SHOW INSTRUCTIONS &rarr;
 		</button>
 	</div>
 
-	<form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }} class="mx-4 mt-4 flex flex-1 flex-col gap-0">
+	<form
+		onsubmit={(e) => {
+			e.preventDefault();
+			handleSubmit();
+		}}
+		class="mx-4 mt-4 flex flex-1 flex-col gap-0"
+	>
 		<!-- White textarea card -->
-		<div class="flex flex-1 flex-col overflow-hidden rounded-[20px] bg-card shadow-[0px_10px_15px_0px_rgba(12,34,95,0.25)] outline-2 outline-white">
+		<div
+			class="flex flex-1 flex-col overflow-hidden rounded-[20px] bg-card shadow-[0px_10px_15px_0px_rgba(12,34,95,0.25)] outline-2 outline-white"
+		>
 			<textarea
 				bind:value={text}
 				placeholder="Type here – what do you think?"
 				maxlength={maxChars + 10}
 				disabled={submitted}
-				onkeydown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }}
-				class="flex-1 resize-none bg-transparent p-6 font-sans text-2xl font-medium leading-7 text-card-foreground placeholder:text-card-foreground/70 border-0 outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 appearance-none"
+				onkeydown={(e) => {
+					if (e.key === 'Enter' && !e.shiftKey) {
+						e.preventDefault();
+						handleSubmit();
+					}
+				}}
+				class="flex-1 resize-none appearance-none border-0 bg-transparent p-6 font-sans text-2xl leading-7 font-medium text-card-foreground outline-none placeholder:text-card-foreground/70 focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:outline-none"
 			></textarea>
 			<div class="flex items-center justify-end px-5 pt-2 pb-4">
-				<span class={cn('font-mono text-sm font-medium', overLimit ? 'text-destructive' : 'text-card-foreground')}>
+				<span
+					class={cn(
+						'font-mono text-sm font-medium',
+						overLimit ? 'text-destructive' : 'text-card-foreground'
+					)}
+				>
 					{charCount} / {maxChars} CHAR
 				</span>
 			</div>
@@ -90,11 +112,15 @@
 				GO BACK
 			</Button>
 			{#if submitted}
-				<Button variant="primary" class="flex-1" disabled>
-					SUBMITTED!
-				</Button>
+				<Button variant="primary" class="flex-1" disabled>SUBMITTED!</Button>
 			{:else}
-				<Button type="submit" data-umami-event="compose-submit" variant="primary" class="flex-1" disabled={!canSubmit}>
+				<Button
+					type="submit"
+					data-umami-event="compose-submit"
+					variant="primary"
+					class="flex-1"
+					disabled={!canSubmit}
+				>
 					SUBMIT
 				</Button>
 			{/if}

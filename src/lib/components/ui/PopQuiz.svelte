@@ -25,16 +25,17 @@
 		selected = idx;
 		if (idx === quiz.correctIndex) {
 			showCorrectAnim = true;
-			setTimeout(() => { showConfetti = true; }, 200);
+			setTimeout(() => {
+				showConfetti = true;
+			}, 200);
 		}
-		
+
 		setTimeout(() => {
 			if (scrollContainer) {
 				const scrollAmount = window.innerHeight * 0.5;
 				scrollContainer.scrollTo({
 					top: scrollContainer.scrollTop + scrollAmount,
 					behavior: 'smooth'
-
 				});
 			}
 		}, 100);
@@ -50,25 +51,6 @@
 	}
 </script>
 
-<style>
-	@keyframes pulse-glow {
-		0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 40%, transparent); }
-		50% { box-shadow: 0 0 0 12px color-mix(in srgb, var(--primary) 0%, transparent); }
-	}
-	.correct-glow {
-		animation: pulse-glow 0.8s ease-in-out 2;
-	}
-	@keyframes check-draw {
-		0% { stroke-dashoffset: 24; }
-		100% { stroke-dashoffset: 0; }
-	}
-	.check-animate {
-		stroke-dasharray: 24;
-		animation: check-draw 0.4s ease-out 0.2s forwards;
-		stroke-dashoffset: 24;
-	}
-</style>
-
 <div class="relative flex flex-1 flex-col overflow-hidden {className}">
 	<!-- Confetti layer -->
 	<ConfettiOverlay active={showConfetti} />
@@ -76,7 +58,7 @@
 	<!-- Content -->
 	<div bind:this={scrollContainer} class="flex flex-1 flex-col overflow-y-auto px-8 pt-10">
 		<span class="font-mono text-sm font-medium text-white/80">{quiz.label}</span>
-		<p class="mt-4 font-sans text-4xl font-bold leading-10 text-white">
+		<p class="mt-4 font-sans text-4xl leading-10 font-bold text-white">
 			{quiz.question}
 		</p>
 
@@ -89,26 +71,49 @@
 				<button
 					onclick={() => selectOption(i)}
 					disabled={answered}
-					class="relative flex h-16 w-full items-center rounded-[20px] px-6 text-left font-sans text-2xl font-bold leading-7 transition-all duration-300
+					class="relative flex h-16 w-full items-center rounded-[20px] px-6 text-left font-sans text-2xl leading-7 font-bold transition-all duration-300
 						{answered && isCorrect
-							? 'bg-primary text-primary-foreground shadow-[0px_10px_15px_0px_rgba(12,34,95,0.25)]'
-							: isSelected && !isCorrect
-								? 'bg-white/30 text-white'
-								: answered
-									? 'bg-secondary/60 text-white/50'
-									: 'bg-secondary text-white'}
+						? 'bg-primary text-primary-foreground shadow-[0px_10px_15px_0px_rgba(12,34,95,0.25)]'
+						: isSelected && !isCorrect
+							? 'bg-white/30 text-white'
+							: answered
+								? 'bg-secondary/60 text-white/50'
+								: 'bg-secondary text-white'}
 						{answered && isCorrect && showCorrectAnim ? 'correct-glow' : ''}"
 				>
 					{#if answered && isCorrect}
-						<span class="mr-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/30" in:scale={{ duration: 400, easing: elasticOut }}>
-							<svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-								<path class="check-animate" stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+						<span
+							class="mr-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/30"
+							in:scale={{ duration: 400, easing: elasticOut }}
+						>
+							<svg
+								class="h-5 w-5 text-white"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+								stroke-width="3"
+							>
+								<path
+									class="check-animate"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									d="M5 13l4 4L19 7"
+								/>
 							</svg>
 						</span>
 					{/if}
 					{#if answered && isSelected && !isCorrect}
-						<span class="mr-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/20" in:scale={{ duration: 300 }}>
-							<svg class="h-4 w-4 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+						<span
+							class="mr-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/20"
+							in:scale={{ duration: 300 }}
+						>
+							<svg
+								class="h-4 w-4 text-white/70"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+								stroke-width="3"
+							>
 								<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
 							</svg>
 						</span>
@@ -121,7 +126,7 @@
 		<!-- Explanation (shown after selection) -->
 		{#if selected !== null}
 			<div in:fly={{ y: 20, duration: 400, delay: 300, easing: cubicOut }}>
-				<p class="mt-8 font-sans text-lg font-medium leading-9 text-white">
+				<p class="mt-8 font-sans text-lg leading-9 font-medium text-white">
 					{quiz.explanation}
 				</p>
 			</div>
@@ -130,11 +135,35 @@
 
 	<!-- Bottom actions -->
 	<div class="flex shrink-0 items-center gap-3.5 border-t border-background bg-secondary px-7 py-8">
-		<Button variant="primary" class="flex-1" onclick={onContinue}>
-			CONTINUE
-		</Button>
-		<Button variant="secondary" class="flex-1" onclick={onSkip}>
-			SKIP
-		</Button>
+		<Button variant="primary" class="flex-1" onclick={onContinue}>CONTINUE</Button>
+		<Button variant="secondary" class="flex-1" onclick={onSkip}>SKIP</Button>
 	</div>
 </div>
+
+<style>
+	@keyframes pulse-glow {
+		0%,
+		100% {
+			box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 40%, transparent);
+		}
+		50% {
+			box-shadow: 0 0 0 12px color-mix(in srgb, var(--primary) 0%, transparent);
+		}
+	}
+	.correct-glow {
+		animation: pulse-glow 0.8s ease-in-out 2;
+	}
+	@keyframes check-draw {
+		0% {
+			stroke-dashoffset: 24;
+		}
+		100% {
+			stroke-dashoffset: 0;
+		}
+	}
+	.check-animate {
+		stroke-dasharray: 24;
+		animation: check-draw 0.4s ease-out 0.2s forwards;
+		stroke-dashoffset: 24;
+	}
+</style>

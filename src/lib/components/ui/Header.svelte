@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { RegionConfig } from '$lib/config/regions';
 	import InfoBar from './InfoBar.svelte';
-	
+
 	interface Props {
 		countyName: string;
 		region?: RegionConfig;
@@ -24,14 +24,16 @@
 </script>
 
 <header
-	class="shrink-0 overflow-hidden rounded-bl-[20px] rounded-br-[20px] border-b border-secondary bg-linear-to-r from-[#FFEDD3] to-[#FFEDD3]/40 {className}"
+	class="shrink-0 overflow-hidden rounded-br-[20px] rounded-bl-[20px] border-b border-secondary bg-linear-to-r from-[#FFEDD3] to-[#FFEDD3]/40 {className}"
 >
 	<!-- Row 1: County name + ABOUT pill or YOU dot -->
 	{#if about && region}
-		<InfoBar region={region} {countyName} />
+		<InfoBar {region} {countyName} />
 	{:else}
-		<div class="flex items-center justify-between pr-3.75 pl-6 pt-3.75">
-			<span class="font-mono text-sm font-medium text-foreground/70">{countyName.toUpperCase()}</span>
+		<div class="flex items-center justify-between pt-3.75 pr-3.75 pl-6">
+			<span class="font-mono text-sm font-medium text-foreground/70"
+				>{countyName.toUpperCase()}</span
+			>
 			<span class="flex items-center gap-2">
 				<span class="h-3 w-3 rounded-full border border-foreground/20 bg-secondary"></span>
 				<span class="font-mono text-sm font-medium text-foreground/80">YOU</span>
@@ -42,8 +44,10 @@
 	<!-- Row 2: Question text (scrolling marquee or static) -->
 	{#if question}
 		{#if marquee}
-			<div class="overflow-hidden whitespace-nowrap pt-3 pl-3.75">
-				<p class="marquee-text pl-3.75 inline-block font-mono text-sm font-medium uppercase text-card-foreground">
+			<div class="overflow-hidden pt-3 pl-3.75 whitespace-nowrap">
+				<p
+					class="marquee-text inline-block pl-3.75 font-mono text-sm font-medium text-card-foreground uppercase"
+				>
 					<span>{question}</span>
 					<span class="mx-8" aria-hidden="true">·</span>
 					<span aria-hidden="true">{question}</span>
@@ -51,7 +55,9 @@
 				</p>
 			</div>
 		{:else}
-			<p class="pl-5 pr-2 pt-3 font-mono text-sm font-medium uppercase leading-5 text-card-foreground">
+			<p
+				class="pt-3 pr-2 pl-5 font-mono text-sm leading-5 font-medium text-card-foreground uppercase"
+			>
 				{question}
 			</p>
 		{/if}
@@ -59,10 +65,7 @@
 
 	<!-- Row 3: Compose input-->
 	{#if onCompose}
-		<button
-			onclick={onCompose}
-			class="flex w-full items-center gap-3 pr-3.75 pl-6 pt-3.5 pb-3"
-		>
+		<button onclick={onCompose} class="flex w-full items-center gap-3 pt-3.5 pr-3.75 pb-3 pl-6">
 			<div
 				class="flex flex-1 items-center justify-center gap-2.5 overflow-hidden rounded-full bg-foreground px-5 py-2"
 			>

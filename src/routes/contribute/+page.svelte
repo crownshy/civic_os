@@ -60,14 +60,14 @@
 
 	// Returning user: show loading splash until Polis resolves, then decide screen
 	const isReturning = session.pid !== undefined;
-	const initialScreen: Screen = (session.demographicsCompleted && isReturning) ? 'loading' : 'voting';
+	const initialScreen: Screen = session.demographicsCompleted && isReturning ? 'loading' : 'voting';
 	let screen = $state<Screen>(initialScreen);
 	let totalVotes = $state(session.totalVotes);
 	let hasSeenPause = $state(session.hasSeenPause);
 	let votesInRound = $state(hasSeenPause ? 0 : totalVotes);
 	// Tracks when user explicitly pressed END in this session — prevents thank-you→voting loop
 	let userEndedVoting = $state(false);
-	
+
 	// Anchor Polis counts once to avoid fluctuation from parallel vote+nextComment requests.
 	// After anchoring, we decrement client-side instead of reading polis.remaining directly.
 	let anchoredRemaining = $state<number | null>(null);
@@ -91,11 +91,7 @@
 			? Math.max(0, anchoredRemaining ?? polis.remaining)
 			: Math.max(0, FIRST_BATCH - votesInRound)
 	);
-	const displayedTotal = $derived(
-		hasSeenPause
-			? (anchoredTotal ?? polis.total)
-			: FIRST_BATCH
-	);
+	const displayedTotal = $derived(hasSeenPause ? (anchoredTotal ?? polis.total) : FIRST_BATCH);
 
 	// When Polis runs out of statements while voting, go to end flow
 	$effect(() => {
@@ -166,7 +162,12 @@
 		return ageMap[ageRange];
 	}
 
-	async function handleDemographicsDone(demographics?: { age?: string; ethnicity?: string; gender?: string; politicalParty?: string }) {
+	async function handleDemographicsDone(demographics?: {
+		age?: string;
+		ethnicity?: string;
+		gender?: string;
+		politicalParty?: string;
+	}) {
 		// Save demographics to backend profile (awaited so it completes before navigation)
 		if (demographics) {
 			await session.saveProfile({
@@ -199,10 +200,11 @@
 	{#if screen === 'loading'}
 		<div class="flex h-full flex-col items-center justify-center bg-gradient-primary">
 			<div class="animate-pulse text-center">
-				<span class="font-mono text-base font-medium uppercase text-muted-foreground/60">LOADING...</span>
+				<span class="font-mono text-base font-medium text-muted-foreground/60 uppercase"
+					>LOADING...</span
+				>
 			</div>
 		</div>
-
 	{:else if screen === 'voting'}
 		{#if polis.currentStatement}
 			<VotingScreen
@@ -241,26 +243,31 @@
 				<VoteBar skeleton />
 			</div>
 		{/if}
-
 	{:else if screen === 'compose'}
 		<ComposeScreen
-			question={question}
+			{question}
 			countyName={session.county}
 			firstVisit={!session.hasSeenComposeInstructions}
-			onSubmit={(text, anon) => { session.markComposeInstructionsSeen(); handleCompose(text, anon); }}
-			onBack={() => { session.markComposeInstructionsSeen(); screen = 'voting'; }}
+			onSubmit={(text, anon) => {
+				session.markComposeInstructionsSeen();
+				handleCompose(text, anon);
+			}}
+			onBack={() => {
+				session.markComposeInstructionsSeen();
+				screen = 'voting';
+			}}
 			region={subdomainRegion}
 		/>
-
 	{:else if screen === 'pause'}
 		<NiceJobScreen
 			region={subdomainRegion}
 			countyName={session.county}
 			remaining={anchoredRemaining ?? polis.remaining}
 			onKeepVoting={resumeVoting}
-			onDone={() => { screen = 'compose'; }}
+			onDone={() => {
+				screen = 'compose';
+			}}
 		/>
-
 	{:else if screen === 'about-you'}
 		<AboutYouScreen
 			region={subdomainRegion}
@@ -269,7 +276,6 @@
 			zipCode={session.zipCode}
 			onDone={handleDemographicsDone}
 		/>
-
 	{:else if screen === 'thank-you'}
 		<ThankYouScreen
 			countyName={session.county}
@@ -277,14 +283,14 @@
 			region={subdomainRegion}
 		/>
 
-	<!-- Preserved screens (unused in conference flow) -->
+		<!-- Preserved screens (unused in conference flow) -->
 	{:else if screen === 'did-you-know'}
-		<DidYouKnowScreen
-			countyName={session.county}
-			onContinue={resumeVoting}
-		/>
+		<DidYouKnowScreen countyName={session.county} onContinue={resumeVoting} />
 	{:else if screen === 'pop-quiz'}
-		<div class="flex h-full flex-col bg-gradient-primary" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
+		<div
+			class="flex h-full flex-col bg-gradient-primary"
+			in:fly={{ x: 40, duration: 400, easing: cubicOut }}
+		>
 			<InfoBar region={subdomainRegion} countyName={session.county} />
 			<PopQuiz quiz={currentQuiz} onContinue={resumeVoting} onSkip={resumeVoting} />
 		</div>

@@ -45,15 +45,16 @@ export default class PolisApi {
 	}
 
 	tryToGetPidForXid() {
-		fetch(`${this.baseUrl}/api/v3/participationInit?conversation_id=${this.polisId}&xid=${this.userId}`)
+		fetch(
+			`${this.baseUrl}/api/v3/participationInit?conversation_id=${this.polisId}&xid=${this.userId}`
+		)
 			.then((r) => r.json())
 			.then((data) => {
 				if (data.ptpt?.pid) {
-					this.pid = data.ptpt.pid
+					this.pid = data.ptpt.pid;
 				}
-			})
+			});
 	}
-
 
 	fetchNextStatement() {
 		this._loading = true;
@@ -61,8 +62,7 @@ export default class PolisApi {
 
 		// If we have a pid (from a previous vote), filter by it to skip voted statements.
 		// Otherwise, fetch without filter to get the first available statement.
-		const pidParam =
-			this.pid !== undefined ? `&not_voted_by_pid=${this.pid}` : '';
+		const pidParam = this.pid !== undefined ? `&not_voted_by_pid=${this.pid}` : '';
 
 		const url = `${this.baseUrl}/api/v3/nextComment?conversation_id=${this.polisId}${pidParam}`;
 
@@ -114,7 +114,7 @@ export default class PolisApi {
 				txt: statement,
 				vote: -1,
 				is_seed: false,
-				...authType,
+				...authType
 			})
 		})
 			.then((r) => {
@@ -123,8 +123,8 @@ export default class PolisApi {
 			})
 			.then((data) => {
 				if (data.currentPid) {
-					console.log("Setting pid ", data.currentPid)
-					this.pid = data.currentPid
+					console.log('Setting pid ', data.currentPid);
+					this.pid = data.currentPid;
 				}
 			})
 			.catch((err) => {
@@ -172,8 +172,7 @@ export default class PolisApi {
 					this.fetchNextStatement();
 				}
 			})
-			.catch(e => console.log("Error with vote ", e));
-
+			.catch((e) => console.log('Error with vote ', e));
 	}
 
 	get currentStatement() {

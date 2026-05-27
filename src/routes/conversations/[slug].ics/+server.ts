@@ -28,11 +28,7 @@ function endTimeToICSLocal(iso: string, endTime12h: string): string {
 }
 
 function escapeICS(str: string): string {
-	return str
-		.replace(/\\/g, '\\\\')
-		.replace(/;/g, '\\;')
-		.replace(/,/g, '\\,')
-		.replace(/\n/g, '\\n');
+	return str.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
 }
 
 function fold(line: string): string {

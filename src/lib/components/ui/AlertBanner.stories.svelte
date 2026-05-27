@@ -12,7 +12,12 @@
 	});
 </script>
 
-<Story name="Default" args={{ message: 'Your email has not been verified yet. Check your inbox for the verification link.' }}>
+<Story
+	name="Default"
+	args={{
+		message: 'Your email has not been verified yet. Check your inbox for the verification link.'
+	}}
+>
 	{#snippet children(args)}
 		<div class="p-6">
 			<AlertBanner {...args} />

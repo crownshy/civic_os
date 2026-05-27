@@ -75,7 +75,7 @@
 						<div
 							class="h-10 w-10 animate-spin rounded-full border-4 border-foreground/20 border-t-foreground"
 						></div>
-						<span class="font-mono text-sm uppercase text-foreground/60">Loading form...</span>
+						<span class="font-mono text-sm text-foreground/60 uppercase">Loading form...</span>
 					</div>
 				{/if}
 				<iframe
