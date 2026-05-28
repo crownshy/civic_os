@@ -10,14 +10,16 @@
 	import { isValidEmail } from '$lib/utils/forms';
 	import { cn } from '$lib/utils';
 	import ThankYouMessage from './ThankYouMessage.svelte';
+	import EventCalendarInviteButton from './EventCalendarInviteButton.svelte';
+	import type { RegionConfig } from '$lib/config/regions';
 
         type Props = {
             open: boolean,
             event: ConversationEvent,
-            conversationId: string,
+            region: RegionConfig;
         }
 
-        let { open, event, conversationId }: Props = $props();
+        let { open, event, region }: Props = $props();
 
 	const formattedDate = $derived(event ? format(new Date(event.date), 'EEEE, MMMM d') : '');
 
@@ -25,6 +27,7 @@
         let status = $state<'idle' | 'loading' | 'success' | 'error'>('idle');
         let error = $state('');
         let inputError = $state('');
+        let formRef = $state<HTMLFormElement | null>(null);
 
         async function handleSubmit(e: Event) {
             e.preventDefault();
@@ -43,7 +46,7 @@
                             expires_at: event.date,
                             event_id: event.id,
                     },
-                    { params: { conversation_id: conversationId } }
+                    { params: { conversation_id: region.conversationId } }
                 );
                 status = 'success';
             } catch (e) {
@@ -76,14 +79,11 @@
                         </div>
                     {/snippet}
                 </ThankYouMessage>
-                <div class="flex gap-4 w-full justify-between px-7">
-                    <!-- TODO: <Button variant="soft" class="w-full">Add to calendar</Button>-->
-                    <Button class="w-full" href="/landing">Go to poll</Button>
-                </div>
             </div>
         {:else}
             <form
                 class="px-7 flex flex-col gap-4 mt-8 justify-between"
+                bind:this={formRef}
                 onsubmit={handleSubmit}
             >
                     <div class="flex flex-col gap-2">
@@ -98,8 +98,17 @@
                         </span>
                         {#if inputError}<span class="px-12 text-red-500">{inputError}</span>{/if}
                     </div>
-                <Button type="submit" class="w-full" disabled={!email}>Sign up{#if status === 'loading'}<Spinner class="ml-4" />{/if}</Button>
                 {#if error}<span class="font-bold text-lg text-center text-red-500">{error}</span>{/if}
             </form>
         {/if}
+        {#snippet footer()}
+            {#if status === 'success'}
+                <div class="flex gap-4 w-full justify-between px-7 items-center">
+                    <EventCalendarInviteButton {event} {region} popupDirection="up" />
+                    <Button class="w-full" href="/landing">GO TO POLL</Button>
+                </div>
+            {:else}
+                <Button onclick={() => formRef?.requestSubmit()} class="w-full" disabled={!email}>Sign up{#if status === 'loading'}<Spinner class="ml-4" />{/if}</Button>
+            {/if}
+        {/snippet}
 </Dialog>
