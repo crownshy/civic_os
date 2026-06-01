@@ -1,12 +1,15 @@
 import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
+import { dev } from '$app/environment';
 
 const BACKEND_URL = env.API_URL || 'http://localhost:3000';
+// In production, set API_PREFIX=/api so requests go to e.g. bloom.comhairle.scot/api/auth/...
+// Locally, the backend serves routes at the root (e.g. /auth/...), so leave this empty.
+const API_PREFIX = env.API_PREFIX || '';
 
 const handler: RequestHandler = async ({ request, params, cookies }) => {
 	const path = params.path;
-	// Backend API expects /api prefix
-	const target = `${BACKEND_URL}/api/${path}`;
+	const target = `${BACKEND_URL}${API_PREFIX}/${path}`;
 
 	const url = new URL(request.url);
 	const fullTarget = url.search ? `${target}${url.search}` : target;
@@ -18,6 +21,15 @@ const handler: RequestHandler = async ({ request, params, cookies }) => {
 	// Forward origin header so backend CORS accepts the request
 	const origin = request.headers.get('origin') || url.origin;
 	headers.set('origin', origin);
+
+	// Forward client IP so backend rate limiter (tower_governor) can identify the client.
+	// In dev we fall back to 127.0.0.1 since there's no upstream proxy setting the header.
+	// In production we only forward what the proxy gave us — never fabricate an IP.
+	const forwardedFor = request.headers.get('x-forwarded-for') ?? (dev ? '127.0.0.1' : null);
+	if (forwardedFor) {
+		headers.set('x-forwarded-for', forwardedFor);
+		headers.set('x-real-ip', forwardedFor.split(',')[0].trim());
+	}
 
 	const authToken = cookies.get('auth-token');
 	if (authToken) {
