@@ -677,9 +677,12 @@ export function getRegionUrl(
 
 	// Determine base domain
 	let baseDomain: string;
-	if (host === 'localhost' || host === 'local' || host.endsWith('.localhost') || host.endsWith('.local')) {
-		// Local dev (including plain localhost without subdomain)
-		baseDomain = host.endsWith('.localhost') || host === 'localhost' ? 'localhost' : 'local';
+	if (host === 'localhost' || host.endsWith('.localhost')) {
+		// Local dev on .localhost
+		baseDomain = 'localhost';
+	} else if (host === 'local' || host.endsWith('.local')) {
+		// Local dev on .local
+		baseDomain = 'local';
 	} else {
 		// Production - extract base domain from current hostname
 		// e.g., utah.bloomproject.us → bloomproject.us
