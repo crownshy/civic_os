@@ -8,12 +8,7 @@
 		class?: string;
 	}
 
-	let {
-		percentage,
-		label,
-		variant = 'on-white',
-		class: className
-	}: Props = $props();
+	let { percentage, label, variant = 'on-white', class: className }: Props = $props();
 
 	const isPrimary = $derived(variant === 'on-primary');
 </script>
@@ -30,10 +25,7 @@
 		</span>
 	{/if}
 	<div
-		class={cn(
-			'h-1.5 rounded-xl',
-			isPrimary ? 'bg-primary-foreground' : 'bg-primary'
-		)}
+		class={cn('h-1.5 rounded-xl', isPrimary ? 'bg-primary-foreground' : 'bg-primary')}
 		style="width: {Math.min(percentage, 100)}%"
 	></div>
 </div>

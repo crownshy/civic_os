@@ -13,15 +13,21 @@
 	});
 
 	const slides = [
-		{ title: 'Platform Accountability', body: 'Hold companies responsible for the content on their platforms.' },
-		{ title: 'Digital Literacy', body: 'Teach people how to critically evaluate online information.' },
+		{
+			title: 'Platform Accountability',
+			body: 'Hold companies responsible for the content on their platforms.'
+		},
+		{
+			title: 'Digital Literacy',
+			body: 'Teach people how to critically evaluate online information.'
+		},
 		{ title: 'Parental Controls', body: 'Give parents better tools without invading teen privacy.' }
 	];
 </script>
 
 <Story name="Default" args={{ count: 3 }}>
 	{#snippet children(args)}
-		<div class="bg-primary p-8 rounded-xl">
+		<div class="rounded-xl bg-primary p-8">
 			<SwipeCarousel count={slides.length}>
 				{#snippet children(index)}
 					<div class="rounded-[20px] bg-white p-6">
@@ -36,7 +42,7 @@
 
 <Story name="Auto Scroll" args={{ count: 3, autoScrollMs: 3000 }}>
 	{#snippet children(args)}
-		<div class="bg-primary p-8 rounded-xl">
+		<div class="rounded-xl bg-primary p-8">
 			<SwipeCarousel count={slides.length} autoScrollMs={3000}>
 				{#snippet children(index)}
 					<div class="rounded-[20px] bg-white p-6">

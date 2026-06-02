@@ -68,53 +68,64 @@
 	onDestroy(() => {
 		if (timer) clearInterval(timer);
 	});
-
 </script>
 
 <AppShell>
 	{#key seqIndex}
-	{#if current.type === 'learning' && card}
-		<!-- LEARNING / DID YOU KNOW SCREEN -->
-		<div class="flex h-full flex-col bg-gradient-primary" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
-			<Header countyName={county.name} />
+		{#if current.type === 'learning' && card}
+			<!-- LEARNING / DID YOU KNOW SCREEN -->
+			<div
+				class="flex h-full flex-col bg-gradient-primary"
+				in:fly={{ x: 40, duration: 400, easing: cubicOut }}
+			>
+				<Header countyName={county.name} />
 
-			<!-- Content -->
-			<div class="flex flex-1 flex-col overflow-y-auto px-8 pt-10">
-				<span class="font-mono text-sm font-medium text-white/80">{card.label}</span>
-				<p class="mt-4 font-sans text-4xl font-bold leading-10 text-white">
-					{card.body || card.title}
-				</p>
+				<!-- Content -->
+				<div class="flex flex-1 flex-col overflow-y-auto px-8 pt-10">
+					<span class="font-mono text-sm font-medium text-white/80">{card.label}</span>
+					<p class="mt-4 font-sans text-4xl leading-10 font-bold text-white">
+						{card.body || card.title}
+					</p>
 
-				<!-- Lorem body text -->
-				<p class="mt-10 font-sans text-lg font-medium leading-9 text-white">
-					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis finibus purus mollis, ultrices lorem quis, facilisis mauris. Nulla tortor magna, consequat sed pharetra quis, blandit elementum velit. Curabitur finibus et felis nec vehicula. Vivamus facilisis nunc sed dui ultrices, quis vulputate tellus egestas. Donec in elementum dui. Sed ut placerat nunc.
-				</p>
-			</div>
+					<!-- Lorem body text -->
+					<p class="mt-10 font-sans text-lg leading-9 font-medium text-white">
+						Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis finibus purus mollis,
+						ultrices lorem quis, facilisis mauris. Nulla tortor magna, consequat sed pharetra quis,
+						blandit elementum velit. Curabitur finibus et felis nec vehicula. Vivamus facilisis nunc
+						sed dui ultrices, quis vulputate tellus egestas. Donec in elementum dui. Sed ut placerat
+						nunc.
+					</p>
+				</div>
 
-			<!-- Bottom: countdown button -->
-			<div class="flex shrink-0 flex-col gap-2.5 border-t border-background bg-secondary px-7 py-8">
-				<button
-					disabled={countdown > 0}
-					onclick={nextScreen}
-					class="flex w-full items-center justify-center rounded-full px-7 py-3.5 font-mono text-lg font-medium transition-colors {countdown > 0
-						? 'bg-white/20 text-white/70'
-						: 'bg-primary text-primary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]'}"
+				<!-- Bottom: countdown button -->
+				<div
+					class="flex shrink-0 flex-col gap-2.5 border-t border-background bg-secondary px-7 py-8"
 				>
-					{#if countdown > 0}
-						CONTINUE IN {countdown}...
-					{:else}
-						CONTINUE
-					{/if}
-				</button>
+					<button
+						disabled={countdown > 0}
+						onclick={nextScreen}
+						class="flex w-full items-center justify-center rounded-full px-7 py-3.5 font-mono text-lg font-medium transition-colors {countdown >
+						0
+							? 'bg-white/20 text-white/70'
+							: 'bg-primary text-primary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]'}"
+					>
+						{#if countdown > 0}
+							CONTINUE IN {countdown}...
+						{:else}
+							CONTINUE
+						{/if}
+					</button>
+				</div>
 			</div>
-		</div>
-
-	{:else if current.type === 'quiz' && quiz}
-		<!-- POP QUIZ SCREEN -->
-		<div class="flex h-full flex-col bg-gradient-primary overflow-hidden" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
-			<Header countyName={county.name} />
-			<PopQuiz quiz={quiz} onContinue={nextScreen} onSkip={nextScreen} />
-		</div>
-	{/if}
+		{:else if current.type === 'quiz' && quiz}
+			<!-- POP QUIZ SCREEN -->
+			<div
+				class="flex h-full flex-col overflow-hidden bg-gradient-primary"
+				in:fly={{ x: 40, duration: 400, easing: cubicOut }}
+			>
+				<Header countyName={county.name} />
+				<PopQuiz {quiz} onContinue={nextScreen} onSkip={nextScreen} />
+			</div>
+		{/if}
 	{/key}
 </AppShell>
