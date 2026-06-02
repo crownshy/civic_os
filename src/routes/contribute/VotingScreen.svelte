@@ -1,24 +1,26 @@
 <script lang="ts">
 	import { fly, fade } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
-	import { InfoBar, VoteBar } from '$lib/components/ui';
+	import { InfoBar, VoteBar, ReportPanel } from '$lib/components/ui';
 	import type { RegionConfig } from '$lib/config/regions';
 
 	interface Props {
 		countyName: string;
 		statementText: string;
+		statementId: number;
 		remaining: number;
 		total: number;
 		loading?: boolean;
 		onVote: (type: 'agree' | 'disagree' | 'pass') => void;
 		onEnd: () => void;
 		onCompose: () => void;
-		region: RegionConfig
+		region: RegionConfig;
 	}
 
 	let {
 		countyName,
 		statementText,
+		statementId,
 		remaining,
 		total,
 		loading = false,
@@ -28,12 +30,13 @@
 		region
 	}: Props = $props();
 
+	let reportOpen = $state(false);
+
 	const progress = $derived(total > 0 ? ((total - remaining) / total) * 100 : 0);
 
 	let previousText = statementText;
 	let waitingForNext = $state(false);
 	let voteCooldown = $state(false);
-
 
 	$effect(() => {
 		if (statementText !== previousText && !loading) {
@@ -56,7 +59,9 @@
 		waitingForNext = true;
 		voteCooldown = true;
 		onVote(type);
-		setTimeout(() => { voteCooldown = false; }, 1000);
+		setTimeout(() => {
+			voteCooldown = false;
+		}, 1000);
 	}
 </script>
 
@@ -68,9 +73,13 @@
 		<div class="absolute top-0 left-0 h-[3px] w-full bg-secondary/30">
 			<div class="h-full bg-secondary transition-all duration-300" style="width: {progress}%"></div>
 		</div>
-		<div class="absolute top-[3px] left-0 w-full flex items-start justify-between px-4 py-2">
-			<span class="font-mono text-sm font-medium uppercase text-muted-foreground/70 pr-4">{region.carouselHeader}</span>
-			<span class="font-mono text-sm font-medium uppercase text-muted-foreground/70 shrink-0">{remaining} LEFT</span>
+		<div class="absolute top-[3px] left-0 flex w-full items-start justify-between px-4 py-2">
+			<span class="pr-4 font-mono text-sm font-medium text-muted-foreground/70 uppercase"
+				>{region.carouselHeader}</span
+			>
+			<span class="shrink-0 font-mono text-sm font-medium text-muted-foreground/70 uppercase"
+				>{remaining} LEFT</span
+			>
 		</div>
 		{#if waitingForNext}
 			<!-- Loading skeleton between statements -->
@@ -87,7 +96,7 @@
 			</div>
 		{:else}
 			<div
-				class="w-full text-left max-h-[60vh] mt-4 overflow-y-auto"
+				class="mt-4 max-h-[60vh] w-full overflow-y-auto text-left"
 				in:fly={{ y: 20, duration: 500, easing: cubicOut }}
 			>
 				<!-- Attribution -->
@@ -96,9 +105,7 @@
 				</div>
 
 				<!-- Quote -->
-				<p
-					class="mt-4 font-display tracking-display text-3xl font-medium leading-10 text-muted-foreground"
-				>
+				<p class="mt-4 font-sans text-3xl leading-10 font-semibold text-muted-foreground">
 					&ldquo;{statementText}&rdquo;
 				</p>
 			</div>
@@ -110,6 +117,9 @@
 		onAgree={() => doVote('agree')}
 		onDisagree={() => doVote('disagree')}
 		onSkip={() => doVote('pass')}
+		onReport={() => (reportOpen = true)}
 		{onCompose}
 	/>
+
+	<ReportPanel bind:open={reportOpen} {statementId} {statementText} {region} />
 </div>

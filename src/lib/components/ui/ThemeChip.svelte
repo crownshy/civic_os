@@ -9,12 +9,7 @@
 	let { label, class: className }: Props = $props();
 </script>
 
-<div
-	class={cn(
-		'flex h-14 items-center justify-center rounded-[10px] bg-primary px-4',
-		className
-	)}
->
+<div class={cn('flex h-14 items-center justify-center rounded-[10px] bg-primary px-4', className)}>
 	<span class="text-center font-mono text-sm font-medium text-primary-foreground uppercase">
 		{label}
 	</span>

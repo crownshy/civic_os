@@ -28,10 +28,12 @@ export function getCountyFromZip(zip: string): string {
 
 	// Fallback: prefix-based heuristic
 	const prefix = trimmed.slice(0, 2);
-	let region = Object.values(REGIONS).find((region) => region.zipPrefixes.includes(prefix))
-	if (region) { return region.stateName }
-
-	else { return GENERIC_REGION.stateName }
+	let region = Object.values(REGIONS).find((region) => region.zipPrefixes.includes(prefix));
+	if (region) {
+		return region.stateName;
+	} else {
+		return GENERIC_REGION.stateName;
+	}
 }
 
 function loadPersistedSession(): {
@@ -92,20 +94,25 @@ class Session {
 	private persist() {
 		if (typeof window === 'undefined') return;
 		try {
-			localStorage.setItem(STORAGE_KEY, JSON.stringify({
-				userId: this.user?.id,
-				emailProvided: this.emailProvided,
-				zipCode: this.zipCode,
-				pid: this.pid,
-				demographicsCompleted: this.demographicsCompleted,
-				totalVotes: this.totalVotes,
-				hasSeenPause: this.hasSeenPause,
-				hasAgreedToTos: this.hasAgreedToTos,
-				hasSeenComposeInstructions: this.hasSeenComposeInstructions,
-				conversationId: this._conversationId,
-				inviteId: this._inviteId
-			}));
-		} catch { /* ignore */ }
+			localStorage.setItem(
+				STORAGE_KEY,
+				JSON.stringify({
+					userId: this.user?.id,
+					emailProvided: this.emailProvided,
+					zipCode: this.zipCode,
+					pid: this.pid,
+					demographicsCompleted: this.demographicsCompleted,
+					totalVotes: this.totalVotes,
+					hasSeenPause: this.hasSeenPause,
+					hasAgreedToTos: this.hasAgreedToTos,
+					hasSeenComposeInstructions: this.hasSeenComposeInstructions,
+					conversationId: this._conversationId,
+					inviteId: this._inviteId
+				})
+			);
+		} catch {
+			/* ignore */
+		}
 	}
 
 	get conversationId() {
@@ -158,7 +165,12 @@ class Session {
 		this.persist();
 	}
 
-	async join(zipCode: string, email?: string, regionConversationId?: string, regionInviteId?: string): Promise<boolean> {
+	async join(
+		zipCode: string,
+		email?: string,
+		regionConversationId?: string,
+		regionInviteId?: string
+	): Promise<boolean> {
 		this.loading = true;
 		this.error = null;
 		this.zipCode = zipCode;
@@ -247,7 +259,7 @@ class Session {
 			politicalParty: data.politicalParty ?? null
 		};
 		try {
-			const res = await api.UpsertUserProfile(body)
+			const res = await api.UpsertUserProfile(body);
 			this.profile = res;
 			return true;
 		} catch (e) {

@@ -37,7 +37,7 @@ const handler: RequestHandler = async ({ request, params, cookies }) => {
 	const setCookies = res.headers.getSetCookie?.() ?? [];
 	for (const cookieHeader of setCookies) {
 		// Parse cookie name and value
-		const [nameValue, ...attributes] = cookieHeader.split(';').map(s => s.trim());
+		const [nameValue, ...attributes] = cookieHeader.split(';').map((s) => s.trim());
 		const [name, value] = nameValue.split('=');
 
 		// Extract relevant attributes
@@ -47,7 +47,7 @@ const handler: RequestHandler = async ({ request, params, cookies }) => {
 		let secure = false;
 
 		for (const attr of attributes) {
-			const [key, val] = attr.split('=').map(s => s.trim());
+			const [key, val] = attr.split('=').map((s) => s.trim());
 			const lowerKey = key.toLowerCase();
 
 			if (lowerKey === 'max-age' && val) {

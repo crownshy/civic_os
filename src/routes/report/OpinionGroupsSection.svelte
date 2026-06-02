@@ -17,9 +17,7 @@
 	let selectedGroup = $state(0);
 	let currentStatementIndex = $state(0);
 
-	const commentsByTid = $derived(
-		new Map(statements.map((s) => [s.tid, s]))
-	);
+	const commentsByTid = $derived(new Map(statements.map((s) => [s.tid, s])));
 
 	const representativeStatements = $derived.by(() => {
 		const group = groups[selectedGroup];
@@ -59,10 +57,10 @@
 <section class="relative overflow-hidden bg-background py-6">
 	<!-- Decorative circles -->
 	<div
-		class="pointer-events-none absolute -right-20 top-16 h-80 w-80 rounded-full opacity-40 outline outline-foreground"
+		class="pointer-events-none absolute top-16 -right-20 h-80 w-80 rounded-full opacity-40 outline outline-foreground"
 	></div>
 	<div
-		class="pointer-events-none absolute -left-32 -top-5 h-80 w-80 rounded-full opacity-40 outline outline-destructive"
+		class="pointer-events-none absolute -top-5 -left-32 h-80 w-80 rounded-full opacity-40 outline outline-destructive"
 	></div>
 
 	<div class="relative z-10 px-6">
@@ -70,7 +68,7 @@
 	</div>
 
 	<div class="relative z-10 mt-8 px-8">
-		<h2 class="font-display tracking-display text-3xl font-medium leading-8 text-foreground">
+		<h2 class="font-sans text-3xl leading-8 font-bold text-foreground">
 			After analyzing
 			<span class="text-destructive"
 				>{totalVotes.toLocaleString()} votes on {statementCount} statements,</span
@@ -99,7 +97,8 @@
 					{#each groups as _, gi}
 						<button
 							onclick={() => selectGroup(gi)}
-							class="flex h-7 w-7 items-center justify-center rounded-full font-mono text-sm font-medium transition-colors {selectedGroup === gi
+							class="flex h-7 w-7 items-center justify-center rounded-full font-mono text-sm font-medium transition-colors {selectedGroup ===
+							gi
 								? 'bg-foreground text-background'
 								: 'bg-secondary/10 text-foreground'}"
 						>
@@ -117,10 +116,14 @@
 			</div>
 
 			<!-- Swipeable statements -->
-			<SwipeCarousel count={representativeStatements.length} bind:index={currentStatementIndex} hideDots={true}>
+			<SwipeCarousel
+				count={representativeStatements.length}
+				bind:index={currentStatementIndex}
+				hideDots={true}
+			>
 				{#snippet children(i)}
 					{@const statement = representativeStatements[i]}
-					<div class="px-5 pb-2 pt-4">
+					<div class="px-5 pt-4 pb-2">
 						<!-- Statement text card -->
 						<div
 							class="flex items-center gap-5 rounded-[10px] border-b border-muted bg-muted px-5 py-4"
@@ -128,7 +131,7 @@
 							<div
 								class="h-8 w-8 shrink-0 rounded-full bg-linear-to-b from-background to-accent outline outline-[0.54px] outline-border"
 							></div>
-							<p class="font-sans text-sm font-semibold leading-4 text-foreground">
+							<p class="font-sans text-sm leading-4 font-semibold text-foreground">
 								"{statement.text}"
 							</p>
 						</div>
@@ -151,15 +154,15 @@
 								<div class="mb-4">
 									<!-- Group label -->
 									<span
-									class="font-mono text-sm font-medium leading-4 {isSelected
-										? 'text-primary underline'
-										: 'text-muted-foreground'}"
+										class="font-mono text-sm leading-4 font-medium {isSelected
+											? 'text-primary underline'
+											: 'text-muted-foreground'}"
 									>
 										{groupLabels[gi] ?? `GROUP ${String.fromCharCode(65 + gi)}`}
 									</span>
 
 									<!-- Vertical stacked bars with grid -->
-									<div class="relative ml-0 mt-1.5 flex flex-col gap-1">
+									<div class="relative mt-1.5 ml-0 flex flex-col gap-1">
 										<!-- Grid lines -->
 										<div class="pointer-events-none absolute inset-0">
 											{#each [0, 25, 50, 75, 100] as tick}
@@ -171,10 +174,10 @@
 										</div>
 										<!-- Agree bar -->
 										<div class="h-1.5 bg-primary" style="width: {percents.agree}%"></div>
-									<!-- Disagree bar -->
-									<div class="h-1.5 bg-destructive" style="width: {percents.disagree}%"></div>
-									<!-- Pass bar -->
-									<div class="h-1.5 bg-input" style="width: {percents.pass}%"></div>
+										<!-- Disagree bar -->
+										<div class="h-1.5 bg-destructive" style="width: {percents.disagree}%"></div>
+										<!-- Pass bar -->
+										<div class="h-1.5 bg-input" style="width: {percents.pass}%"></div>
 									</div>
 								</div>
 							{/each}
@@ -186,17 +189,17 @@
 			<!-- Legend (outside carousel) -->
 			<div class="flex items-center justify-center gap-5 px-5 pb-5">
 				<div class="flex items-center gap-1.5">
-				<div class="h-3 w-3 rounded-full bg-primary"></div>
-				<span class="font-mono text-xs font-medium text-muted-foreground">AGREE</span>
-			</div>
-			<div class="flex items-center gap-1.5">
-				<div class="h-3 w-3 rounded-full bg-destructive"></div>
-				<span class="font-mono text-xs font-medium text-muted-foreground">DISAGREE</span>
-			</div>
-			<div class="flex items-center gap-1.5">
-				<div class="h-3 w-3 rounded-full bg-input"></div>
-				<span class="font-mono text-xs font-medium text-muted-foreground">PASS/UNSURE</span>
-			</div>
+					<div class="h-3 w-3 rounded-full bg-primary"></div>
+					<span class="font-mono text-xs font-medium text-muted-foreground">AGREE</span>
+				</div>
+				<div class="flex items-center gap-1.5">
+					<div class="h-3 w-3 rounded-full bg-destructive"></div>
+					<span class="font-mono text-xs font-medium text-muted-foreground">DISAGREE</span>
+				</div>
+				<div class="flex items-center gap-1.5">
+					<div class="h-3 w-3 rounded-full bg-input"></div>
+					<span class="font-mono text-xs font-medium text-muted-foreground">PASS/UNSURE</span>
+				</div>
 			</div>
 		</GradientCard>
 	{/if}

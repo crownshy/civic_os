@@ -9,7 +9,7 @@
 
 	interface Props {
 		countyName: string;
-		region:RegionConfig;
+		region: RegionConfig;
 		onBackToVoting?: () => void;
 	}
 
@@ -41,24 +41,31 @@
 	}
 </script>
 
-<div class="flex h-full flex-col bg-gradient-primary" in:scale={{ start: 0.9, duration: 500, easing: cubicOut }}>
+<div
+	class="flex h-full flex-col bg-gradient-primary"
+	in:scale={{ start: 0.9, duration: 500, easing: cubicOut }}
+>
 	<div class="flex flex-1 flex-col overflow-y-auto">
-		<InfoBar region={region} {countyName} onBack={onBackToVoting} />
+		<InfoBar {region} {countyName} onBack={onBackToVoting} />
 		<!-- Hero: emoji + heading -->
 		<div class="flex flex-col items-center px-8 pt-14">
 			<EmojiCircle emoji="🎉" size="lg" />
 
-			<h1 class="mt-6 text-center font-display tracking-display text-4xl font-medium leading-10 text-foreground">
+			<h1 class="mt-6 text-center font-sans text-4xl leading-10 font-bold text-foreground">
 				Thank you!
 			</h1>
 
 			{#if session.emailProvided}
-				<p class="mt-2 text-center font-sans text-base font-medium leading-6 text-foreground/80" in:fade={{ duration: 400, delay: 300 }}>
+				<p
+					class="mt-2 text-center font-sans text-base leading-6 font-medium text-foreground/80"
+					in:fade={{ duration: 400, delay: 300 }}
+				>
 					Received! We'll be in touch.
 				</p>
 			{:else}
-				<p class="mt-2 text-center font-sans text-base font-medium leading-6 text-foreground/80">
-					Share your email to receive updates on this conversation and future opportunities to get involved.
+				<p class="mt-2 text-center font-sans text-base leading-6 font-medium text-foreground/80">
+					Share your email to receive updates on this conversation and future opportunities to get
+					involved.
 				</p>
 			{/if}
 		</div>
@@ -67,26 +74,34 @@
 		{#if !session.emailProvided}
 			<div class="mt-4 flex flex-col gap-3.5 px-7">
 				<form
-					onsubmit={(e) => { e.preventDefault(); handleEmailSubmit(); }}
+					onsubmit={(e) => {
+						e.preventDefault();
+						handleEmailSubmit();
+					}}
 					class="flex w-full items-center rounded-full bg-card px-5 py-3 shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)]"
 					class:ring-2={emailError}
 					class:ring-destructive={emailError}
 				>
-					<Mail class="text-secondary/60 size-4 shrink-0" />
+					<Mail class="size-4 shrink-0 text-secondary/60" />
 					<Input
 						bind:value={email}
-						oninput={() => emailError = ''}
+						oninput={() => (emailError = '')}
 						type="email"
 						placeholder="email@xyz.com"
 						disabled={submitting}
-						class="ml-2.5 flex-1 h-8 rounded-none border-0 bg-transparent font-sans text-lg font-medium text-foreground/80 placeholder:text-foreground/50 shadow-none focus-visible:ring-0"
+						class="ml-2.5 h-8 flex-1 rounded-none border-0 bg-transparent font-sans text-lg font-medium text-foreground/80 shadow-none placeholder:text-foreground/50 focus-visible:ring-0"
 					/>
 				</form>
 				{#if emailError}
 					<p class="-mt-2 px-2 font-sans text-sm text-destructive">{emailError}</p>
 				{/if}
 
-				<Button variant="primary" fullWidth disabled={!email.trim() || submitting} onclick={handleEmailSubmit}>
+				<Button
+					variant="primary"
+					fullWidth
+					disabled={!email.trim() || submitting}
+					onclick={handleEmailSubmit}
+				>
 					SIGN UP FOR UPDATES
 				</Button>
 			</div>
@@ -95,28 +110,41 @@
 		<!-- Live Conversations section -->
 		<div class="mt-8 px-7 pb-8">
 			<div class="flex items-center gap-2">
-				<span class="rounded-[5px] bg-destructive px-2 py-1 font-sans text-sm font-bold leading-5 text-card">NEXT UP</span>
-				<span class="font-display tracking-display text-2xl font-medium leading-9 text-foreground">Live Conversations</span>
+				<span
+					class="rounded-[5px] bg-destructive px-2 py-1 font-sans text-sm leading-5 font-bold text-card"
+					>NEXT UP</span
+				>
+				<span class="font-sans text-2xl leading-9 font-bold text-foreground"
+					>Live Conversations</span
+				>
 			</div>
 
-			<div class="mt-2 font-sans text-lg font-normal leading-7 text-foreground [&_a]:text-destructive">
+			<div
+				class="mt-2 font-sans text-lg leading-7 font-normal text-foreground [&_a]:text-destructive"
+			>
 				<p>
-				  {@html region.whatsNext}
+					{@html region.whatsNext}
 				</p>
 			</div>
 
 			<div class="mt-6 flex items-center gap-2">
-				<span class="font-display tracking-display text-2xl font-medium leading-9 text-foreground">Go Deeper</span>
+				<span class="font-sans text-2xl leading-9 font-bold text-foreground">Go Deeper</span>
 			</div>
-			<div class="mt-2 font-sans text-lg font-normal leading-7 text-foreground [&_a]:text-destructive">
+			<div
+				class="mt-2 font-sans text-lg leading-7 font-normal text-foreground [&_a]:text-destructive"
+			>
 				<p class="mt-2 [&_a]:text-destructive [&_a]:underline hover:[&_a]:opacity-80">
-				  {@html region.goDeeper}
+					{@html region.goDeeper}
 				</p>
-			
+
 				<div class="mt-8 outline-[0.5px] outline-foreground/40"></div>
 
 				<p class="mt-14">
-					Have some feedback or ideas? <Link href="https://form.jotform.com/260746654096062" external class="font-bold">Fill out a survey</Link> about your experience with this website.
+					Have some feedback or ideas? <Link
+						href="https://form.jotform.com/260746654096062"
+						external
+						class="font-bold">Fill out a survey</Link
+					> about your experience with this website.
 				</p>
 			</div>
 		</div>
