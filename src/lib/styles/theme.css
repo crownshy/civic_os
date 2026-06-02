@@ -37,8 +37,11 @@
 	--sidebar-secondary: #a6722e;
 	--sidebar-active-bg: #ffedd3;
 
+	--shell-border: #876449;
+
 	--gradient-hero: radial-gradient(ellipse 69% 69% at 50% 89%, #176a21, #07490f);
 	--gradient-consensus: linear-gradient(to bottom, #1a5c2a, #0a2e14);
+	--gradient-primary: linear-gradient(to bottom, #fff6eb, #ffddaa);
 
 	--font-sans: 'Hanken Grotesk', sans-serif;
 	--font-serif: Merriweather, serif;
@@ -100,6 +103,9 @@
 	--sidebar-secondary: #38bdf8;
 	--sidebar-active-bg: #1e3a5f;
 
+	--shell-border: #876449;
+
 	--gradient-hero: radial-gradient(ellipse 69% 69% at 50% 89%, #4b7cf3, #1e3a8f);
 	--gradient-consensus: linear-gradient(to bottom, #1e40af, #0f1d45);
+	--gradient-primary: linear-gradient(to bottom, #fff6eb, #ffddaa);
 }

@@ -96,7 +96,7 @@
 			</div>
 		{:else}
 			<div
-				class="mt-4 max-h-[60vh] w-full overflow-y-auto text-left"
+				class="mt-6 max-h-[60vh] w-full overflow-y-auto text-left"
 				in:fly={{ y: 20, duration: 500, easing: cubicOut }}
 			>
 				<!-- Attribution -->
@@ -105,7 +105,7 @@
 				</div>
 
 				<!-- Quote -->
-				<p class="mt-4 font-sans text-3xl leading-10 font-semibold text-muted-foreground">
+				<p class="mt-6 font-sans text-3xl leading-[1.25] font-semibold text-muted-foreground">
 					&ldquo;{statementText}&rdquo;
 				</p>
 			</div>
