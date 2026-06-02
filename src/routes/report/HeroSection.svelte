@@ -22,7 +22,9 @@
 		<Badge variant="dark" size="lg" class="px-7">{phase}</Badge>
 	</div>
 
-	<h1 class="mt-4 px-8 font-sans text-5xl leading-[1.01] font-extrabold text-primary-foreground">
+	<h1
+		class="mt-4 px-8 font-display text-5xl leading-[1.01] font-medium tracking-display text-primary-foreground"
+	>
 		{title}
 	</h1>
 

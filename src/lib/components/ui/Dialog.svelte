@@ -92,7 +92,7 @@
 					)}
 				>
 					<DialogPrimitive.Title
-						class="px-6 font-sans text-4xl leading-10 font-bold text-card-foreground"
+						class="px-6 font-display text-4xl leading-10 font-medium tracking-display text-card-foreground"
 					>
 						{title}
 					</DialogPrimitive.Title>
@@ -131,7 +131,7 @@
 				>
 					<div bind:this={scrollEl} onscroll={handleScroll} class="flex-1 overflow-y-auto pt-10">
 						<DialogPrimitive.Title
-							class="px-7 font-sans text-4xl leading-10 font-bold text-card-foreground"
+							class="px-7 font-display text-4xl leading-10 font-medium tracking-display text-card-foreground"
 						>
 							{title}
 						</DialogPrimitive.Title>

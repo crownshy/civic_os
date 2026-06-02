@@ -99,7 +99,9 @@
 			<span class="font-mono text-base font-medium text-muted-foreground uppercase">
 				{region.stateName.toUpperCase()} Speaks
 			</span>
-			<h1 class="mt-1 font-sans text-5xl leading-[1.05] font-extrabold text-muted-foreground">
+			<h1
+				class="mt-1 font-display text-5xl leading-[1.05] font-medium tracking-display text-muted-foreground"
+			>
 				AI and Our Future
 			</h1>
 			<p class="mt-5 font-sans text-lg leading-7 font-medium text-muted-foreground">
@@ -121,7 +123,9 @@
 		<div class="px-6 pb-8 md:px-12">
 			<Card class="p-6">
 				<span class="font-mono text-xs text-primary uppercase">WHO'S BEHIND THIS?</span>
-				<h2 class="mt-2 mb-4 font-sans text-3xl leading-8 font-bold text-muted-foreground">
+				<h2
+					class="mt-2 mb-4 font-display text-3xl leading-8 font-medium tracking-display text-muted-foreground"
+				>
 					Your Hosts
 				</h2>
 				<p class="text-md mb-6 font-sans leading-5 font-medium text-muted-foreground">
@@ -139,7 +143,9 @@
 
 		<!-- Timeline Section -->
 		<div class="px-6 py-10 md:px-12" style="background: var(--gradient-consensus)">
-			<h2 class="mb-2 text-center font-sans text-4xl leading-9 font-bold text-primary-foreground">
+			<h2
+				class="mb-2 text-center font-display text-4xl leading-9 font-medium tracking-display text-primary-foreground"
+			>
 				Timeline
 			</h2>
 			<p class="mb-8 text-center font-sans text-base leading-6 font-bold text-primary-foreground">
@@ -159,7 +165,7 @@
 								>PHASE ONE ({region.phaseLabels?.phase1 ?? 'APRIL 2026'})</span
 							>
 							<h3
-								class="mt-1 mb-3 font-sans text-3xl leading-tight font-bold text-muted-foreground"
+								class="mt-1 mb-3 font-display text-3xl leading-tight font-medium tracking-display text-muted-foreground"
 							>
 								Open Poll
 							</h3>
@@ -184,7 +190,7 @@
 								>PHASE TWO ({region.phaseLabels?.phase2 ?? 'MAY 2026'})</span
 							>
 							<h3
-								class="mt-1 mb-3 font-sans text-3xl leading-tight font-bold text-muted-foreground"
+								class="mt-1 mb-3 font-display text-3xl leading-tight font-medium tracking-display text-muted-foreground"
 							>
 								Community Conversations
 							</h3>
@@ -213,7 +219,9 @@
 				<span class="font-mono text-xs font-medium text-white/70"
 					>PHASE THREE ({region.phaseLabels?.phase3 ?? 'SEPTEMBER 2026'})</span
 				>
-				<h3 class="mt-1 mb-3 font-sans text-3xl leading-tight font-bold text-white">
+				<h3
+					class="mt-1 mb-3 font-display text-3xl leading-tight font-medium tracking-display text-white"
+				>
 					Solutions Forum
 				</h3>
 				<p class="text-md mb-6 font-sans leading-5 font-medium text-white">
@@ -285,7 +293,9 @@
 		<!-- Tell Your Friends Section -->
 		<div class="bg-white/30 px-6 py-10 md:px-12">
 			<div class="flex flex-col gap-4">
-				<h2 class="font-sans text-3xl leading-8 font-bold text-muted-foreground">
+				<h2
+					class="font-display text-3xl leading-8 font-medium tracking-display text-muted-foreground"
+				>
 					Tell your friends
 				</h2>
 				<p class="font-sans text-lg leading-7 font-medium text-muted-foreground">

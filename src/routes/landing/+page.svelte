@@ -104,7 +104,7 @@
 					{region.carouselPreHeader}
 				</span>
 				<h1
-					class="mt-2 text-center font-sans text-4xl leading-tight font-bold text-muted-foreground sm:mt-3"
+					class="mt-2 text-center font-display text-4xl leading-tight font-medium tracking-display text-muted-foreground sm:mt-3"
 				>
 					{region.carouselHeader}
 				</h1>

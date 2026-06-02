@@ -48,6 +48,8 @@
 	--font-sans: var(--font-sans);
 	--font-mono: var(--font-mono);
 	--font-serif: var(--font-serif);
+	--font-display: var(--font-display);
+	--tracking-display: var(--tracking-display);
 }
 
 @utility bg-gradient-primary {

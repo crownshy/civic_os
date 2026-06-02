@@ -83,7 +83,7 @@
 				<!-- Content -->
 				<div class="flex flex-1 flex-col overflow-y-auto px-8 pt-10">
 					<span class="font-mono text-sm font-medium text-white/80">{card.label}</span>
-					<p class="mt-4 font-sans text-4xl leading-10 font-bold text-white">
+					<p class="mt-4 font-display text-4xl leading-10 font-medium tracking-display text-white">
 						{card.body || card.title}
 					</p>
 

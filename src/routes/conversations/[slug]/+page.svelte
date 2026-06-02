@@ -166,7 +166,9 @@
 			<!-- Header -->
 			<div class="flex flex-col items-center px-6 pt-6 pb-0 md:px-12">
 				<!-- Title -->
-				<h1 class="text-center font-sans text-4xl leading-[2rem] font-extrabold text-foreground">
+				<h1
+					class="text-center font-display text-4xl leading-[2rem] font-medium tracking-display text-foreground"
+				>
 					{event.title}
 				</h1>
 
@@ -400,7 +402,9 @@
 {:else}
 	<AppShell>
 		<div class="flex h-full flex-col items-center justify-center bg-gradient-primary px-6">
-			<h1 class="font-display tracking-display text-2xl font-medium text-foreground">Conversation not found</h1>
+			<h1 class="font-display text-2xl font-medium tracking-display text-foreground">
+				Conversation not found
+			</h1>
 			<Button variant="primary" size="md" href="/conversations" class="mt-6">
 				← BACK TO CONVERSATIONS
 			</Button>

@@ -73,7 +73,7 @@
 			{/if}
 
 			<h3
-				class="mb-3 font-sans text-3xl leading-tight font-bold {isPrimary
+				class="mb-3 font-display text-3xl leading-tight font-medium tracking-display {isPrimary
 					? 'text-primary'
 					: 'text-card'}"
 			>

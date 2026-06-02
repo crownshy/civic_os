@@ -4,7 +4,7 @@
 
 <section class="relative overflow-hidden bg-background py-6">
 	<div class="px-8">
-		<h2 class="font-sans text-3xl leading-8 font-bold text-foreground">
+		<h2 class="font-display text-3xl leading-8 font-medium tracking-display text-foreground">
 			Want to get involved? Here's where the conversation is going next...
 		</h2>
 	</div>
@@ -36,7 +36,9 @@
 		</div>
 
 		<div class="px-11 pt-1 pb-5">
-			<h3 class="font-sans text-3xl leading-[48px] font-bold text-primary">Listen & Learn</h3>
+			<h3 class="font-display text-3xl leading-[48px] font-medium tracking-display text-primary">
+				Listen & Learn
+			</h3>
 			<p class="mt-1 font-sans text-sm leading-5 font-medium text-foreground">
 				An opportunity for people to share their thoughts on how artificial intelligence should be
 				managed to protect people's livelihoods.
