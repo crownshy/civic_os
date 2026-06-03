@@ -29,11 +29,11 @@
 
 <div class={cn('shrink-0', skeleton && 'pointer-events-none opacity-40', className)}>
 	<!-- Vote buttons row (sits between statement and compose area) -->
-	<div class="flex items-center gap-2 px-4 py-3">
+	<div class="flex items-center gap-2.5 px-6 py-5">
 		<Button
 			{disabled}
 			onclick={onAgree}
-			class="h-auto min-w-0 flex-1 gap-1.5 rounded-[30px] px-4 py-3.5 shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)] disabled:cursor-not-allowed disabled:opacity-50"
+			class="h-auto min-w-0 flex-1 gap-1.5 rounded-[30px] px-5 py-4 shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)] disabled:cursor-not-allowed disabled:opacity-50"
 		>
 			<span>AGREE</span>
 		</Button>
@@ -41,14 +41,14 @@
 			{disabled}
 			variant="destructive"
 			onclick={onDisagree}
-			class="h-auto min-w-0 flex-1 gap-1.5 rounded-[30px] px-4 py-3.5 shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)] disabled:cursor-not-allowed disabled:opacity-50"
+			class="h-auto min-w-0 flex-1 gap-1.5 rounded-[30px] px-5 py-4 shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)] disabled:cursor-not-allowed disabled:opacity-50"
 		>
 			<span>DISAGREE</span>
 		</Button>
 		<Button
 			{disabled}
 			onclick={onSkip}
-			class="h-auto min-w-0 flex-1 rounded-[30px] bg-[#FFE9C8] px-4 py-3.5 text-secondary shadow-none disabled:cursor-not-allowed disabled:opacity-50"
+			class="h-auto min-w-0 flex-1 rounded-[30px] bg-[#FFE9C8] px-5 py-4 text-secondary shadow-none disabled:cursor-not-allowed disabled:opacity-50"
 		>
 			<span>UNSURE</span>
 		</Button>

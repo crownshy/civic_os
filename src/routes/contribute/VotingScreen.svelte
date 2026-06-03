@@ -69,7 +69,7 @@
 	<InfoBar {countyName} {region} {onEnd} />
 
 	<!-- Statement content (white, centered) -->
-	<div class="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-8">
+	<div class="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-10">
 		<div class="absolute top-0 left-0 h-[3px] w-full bg-secondary/30">
 			<div class="h-full bg-secondary transition-all duration-300" style="width: {progress}%"></div>
 		</div>
@@ -96,7 +96,7 @@
 			</div>
 		{:else}
 			<div
-				class="mt-4 max-h-[60vh] w-full overflow-y-auto text-left"
+				class="mt-6 max-h-[60vh] w-full overflow-y-auto text-left"
 				in:fly={{ y: 20, duration: 500, easing: cubicOut }}
 			>
 				<!-- Attribution -->
@@ -106,7 +106,7 @@
 
 				<!-- Quote -->
 				<p
-					class="mt-4 font-display text-3xl leading-10 font-medium tracking-display text-muted-foreground"
+					class="mt-6 font-display text-3xl leading-tight font-medium tracking-display text-muted-foreground"
 				>
 					&ldquo;{statementText}&rdquo;
 				</p>
