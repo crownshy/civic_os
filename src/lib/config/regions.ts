@@ -13,6 +13,20 @@
 import { env } from '$env/dynamic/public';
 import type { ConversationEvent } from '$lib/types/mock-data';
 
+/** A coalition partner / host organization shown on the landing page. */
+export interface Partner {
+	name: string;
+	url: string;
+	/** Optional logo URL. When set, the landing page renders the logo; when absent, falls back to a linked name. */
+	logo?: string;
+}
+
+/** A FAQ entry shown on the landing page accordion. */
+export interface FaqEntry {
+	question: string;
+	answer: string;
+}
+
 export interface RegionConfig {
 	/** Slug used in subdomain and as map key */
 	slug: string;
@@ -29,18 +43,22 @@ export interface RegionConfig {
 	conversationId: string;
 	/** Bloom backend invite ID (for user registration/tracking) */
 	inviteId: string;
-	/** Host organization name */
+	/** Host organization name (lead org in the coalition) */
 	hostName: string;
 	/** Host organization URL */
 	hostUrl: string;
 	/** Zipcode prefix(es) that belong to this region */
 	zipPrefixes: string[];
-	/** Landing page carousel pre-header */
-	carouselPreHeader: string;
-	/** Landing page carousel header */
-	carouselHeader: string;
-	/** Landing page carousel slides */
-	slides: string[];
+	/** Landing page hero h1 ("AI & Our Communities") */
+	heroHeader: string;
+	/** Landing page hero blurb under the h1 ("Share your thoughts with 300+ others in..."). HTML allowed. */
+	heroBlurb: string;
+	/** Paragraphs for the landing page "Context" section. HTML allowed. */
+	contextParagraphs: string[];
+	/** Narrative blurb for the landing page "Your Hosts" section. HTML allowed. Written to be carousel-agnostic. */
+	hostsBlurb: string;
+	/** All coalition orgs (host + partners) for this region. Rendered as a text list today; logo carousel later. */
+	partners: Partner[];
 	/** Host message paragraphs (for the "A Message from Your Hosts" dialog) */
 	hostMessage: string[];
 	/** Appears in the aboutConversation dialog */
@@ -52,6 +70,8 @@ export interface RegionConfig {
 	/** ending Content */
 	whatsNext: string;
 	goDeeper: string;
+	/** Per-region FAQ. Seeded with DEFAULT_FAQ placeholders; host orgs author their own. */
+	faq: FaqEntry[];
 	/** End-page CTA card descriptions. Only region-flavored cards live here; email + review are hardcoded. */
 	endCtaJoinDescription: string;
 	endCtaShareDescription: string;
@@ -65,6 +85,33 @@ export interface RegionConfig {
 	/** Public share URL for this region (e.g. "utah.bloomproject.us") */
 	shareUrl: string;
 }
+
+/**
+ * Seed FAQ entries — same across all regions until host orgs author their own.
+ * Wrap question/answer in [PLACEHOLDER] so reviewers can tell at a glance these aren't real.
+ */
+const DEFAULT_FAQ: FaqEntry[] = [
+	{
+		question: '[PLACEHOLDER] Who can participate in this poll?',
+		answer:
+			'[PLACEHOLDER] Anyone who lives in the region can vote on statements and contribute their own thoughts. There are no qualifications beyond residency.'
+	},
+	{
+		question: '[PLACEHOLDER] Are my responses anonymous?',
+		answer:
+			'[PLACEHOLDER] Yes. Your votes and any statements you submit are anonymous. If you share an email, that is kept separate from your contributions.'
+	},
+	{
+		question: '[PLACEHOLDER] What happens to the results?',
+		answer:
+			'[PLACEHOLDER] Results are published publicly when the conversation closes, and feed into live conversations and the Solutions Forum later in the campaign.'
+	},
+	{
+		question: '[PLACEHOLDER] How long does this take?',
+		answer:
+			'[PLACEHOLDER] Most people spend 3–5 minutes. You can come back anytime to add more votes or new statements.'
+	}
+];
 
 // ---------------------------------------------------------------------------
 // Region definitions
@@ -97,13 +144,16 @@ const DEV_REGION: RegionConfig | null =
 				hostName: 'Local Dev',
 				hostUrl: 'http://localhost:5173',
 				zipPrefixes: [],
-				carouselPreHeader: 'WHAT SHOULD WE DO ABOUT',
-				carouselHeader: 'AI and the Future of Our Communities',
-				slides: [
-					'This is a local development environment for testing new features.',
-					'You can vote on statements, compose your own, and test the full flow.',
-					'Data is stored in your local Postgres database only.'
+				heroHeader: 'AI and the Future of Our Communities',
+				heroBlurb:
+					'Share your thoughts with other developers who are making sense of this topic together. <a href="#context" class="text-destructive underline">Learn more →</a>',
+				contextParagraphs: [
+					'This is a local development environment for testing the landing page redesign.',
+					'Replace this copy in your local seed if you want to see different states.'
 				],
+				hostsBlurb:
+					'This conversation is hosted by <a href="http://localhost:5173">Local Dev</a>, with no real partners (this is your laptop).',
+				partners: [{ name: 'Local Dev', url: 'http://localhost:5173' }],
 				hostMessage: [
 					'This is your local development environment.',
 					'Changes here only affect your local database.',
@@ -117,6 +167,7 @@ const DEV_REGION: RegionConfig | null =
 				campaignPageHosts: 'Local development',
 				whatsNext: 'Keep coding!',
 				goDeeper: 'Test everything!',
+				faq: DEFAULT_FAQ,
 				endCtaJoinDescription: 'Test conversations are taking place locally.',
 				endCtaShareDescription: 'Anyone running dev is welcome to participate.',
 				fullHosts: 'Local Development',
@@ -139,13 +190,15 @@ export const REGIONS: Record<string, RegionConfig> = {
 		hostName: 'Bloom Testing',
 		hostUrl: 'https://bloomproject.us',
 		zipPrefixes: [],
-		carouselPreHeader: 'WHAT SHOULD WE DO ABOUT',
-		carouselHeader: 'AI and the Future of Our Communities',
-		slides: [
-			'This conversation is about how everyone can direct the growing impact of artificial intelligence to benefit our communities.',
-			'You\u2019ll see statements from other community members about this question. You can vote: agree, disagree, or unsure... or add your own thoughts.',
-			'This \u201COpen Poll\u201D will reveal shared concerns and values that will be the basis of action-oriented community conversations in the coming months.'
+		heroHeader: 'AI and the Future of Our Communities',
+		heroBlurb:
+			'Share your thoughts with other test subjects making sense of this topic together. <a href="#context" class="text-destructive underline">Learn more \u2192</a>',
+		contextParagraphs: [
+			'This is a testing environment for the landing page redesign \u2014 placeholder copy.',
+			'Use this region to validate UI changes without affecting any real conversation.'
 		],
+		hostsBlurb: 'This conversation is hosted by Bloom Testing.',
+		partners: [{ name: 'Bloom Testing', url: 'https://bloomproject.us' }],
 		hostMessage: [
 			'This is a testing version of the site to check things are working and to play with new features with play',
 			'This is mostly just to see if things work',
@@ -162,7 +215,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 		endCtaJoinDescription: 'Conversations with neighbors are taking place in-person and online.',
 		endCtaShareDescription: 'Anyone in your community is welcome to participate.',
 		polis_workflow_step_id: '68425b0d-21e9-4f36-8c13-229dab4508bc',
-		fullHosts: '',
+		faq: DEFAULT_FAQ,
 		shareUrl: 'https://testing.bloomproject.us',
 		events: []
 	},
@@ -178,12 +231,25 @@ export const REGIONS: Record<string, RegionConfig> = {
 		hostName: 'Utah Common Ground',
 		hostUrl: 'https://www.utahcommonground.org/home',
 		zipPrefixes: ['84'],
-		carouselPreHeader: 'WHAT SHOULD WE DO ABOUT',
-		carouselHeader: 'AI and the Future of Our Communities',
-		slides: [
-			'This conversation is about how Utahns can direct the growing impact of artificial intelligence to benefit our communities.',
-			'You\u2019ll see statements from other community members about this question. You can vote: agree, disagree, or unsure... or add your own thoughts.',
-			'This \u201COpen Poll\u201D will reveal shared concerns and values that will be the basis of action-oriented community conversations in the coming months.'
+		heroHeader: 'AI and the Future of Our Communities',
+		heroBlurb:
+			'Share your thoughts with 300+ others in Utah who are making sense of this topic together. <a href="#context" class="text-destructive underline">Learn more \u2192</a>',
+		contextParagraphs: [
+			'AI is reshaping work, school, government services, and daily life across Utah \u2014 and Utahns have a choice in how we respond. This is a place for us to weigh in.',
+			'(Opportunity for more context!)'
+		],
+		hostsBlurb:
+			'This conversation is hosted by <a href="https://www.utahcommonground.org/home" class="text-destructive underline">Utah Common Ground</a>, and supported by many other committed organizations, individuals, and partners across Utah.',
+		partners: [
+			{ name: 'Utah Common Ground', url: 'https://www.utahcommonground.org/home' },
+			{ name: 'AEGIX Institute', url: 'https://www.aegixinstitute.org/' },
+			{ name: 'Braver Angels', url: 'https://braverangels.org/' },
+			{ name: 'Center for Anticipatory Intelligence', url: 'https://www.usu.edu/cai/' },
+			{ name: 'Engage Forum', url: 'https://www.engageforum.org/' },
+			{
+				name: 'Mormon Women for Ethical Government',
+				url: 'https://www.mormonwomenforethicalgovernment.org/'
+			}
 		],
 		hostMessage: [
 			'This space is hosted by <a href="https://www.utahcommonground.org/home" class="text-destructive underline" target="_blank" rel="noopener noreferrer">Utah Common Ground</a>, a coalition of nonprofit organizations from around the state, including Utah State University Center for Anticipatory Intelligence, the AI Ethics and Governance Institute, Engage Forum, Braver Angels and Mormon Women for Ethical Government. We came together to help citizens come together across political differences to identify issues of local concern, consider possible solutions, and take the necessary steps to achieve meaningful, measurable change.',
@@ -207,7 +273,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 		endCtaShareDescription: 'Anyone in Utah is welcome to participate.',
 
 		polis_workflow_step_id: '9d1041f9-fda6-4597-b4b0-c1260e4b7268',
-		fullHosts: "<a href='https://www.utahcommonground.org/home'>Utah Common Ground</a>",
+		faq: DEFAULT_FAQ,
 		shareUrl: 'https://utah.bloomproject.us',
 		events: [
 			{
@@ -340,13 +406,20 @@ export const REGIONS: Record<string, RegionConfig> = {
 		hostName: 'Central Oregon Civic Action Project',
 		hostUrl: 'https://cocap.us/',
 		zipPrefixes: ['97'],
-		carouselPreHeader: 'CENTRAL OREGON SPEAKS:',
-		carouselHeader: 'AI and Our Future',
-		slides: [
+		heroHeader: 'AI & Our Communities',
+		heroBlurb:
+			'Share your thoughts with <strong>300+ others in Central Oregon</strong> who are making sense of this topic together. <a href="#context" class="text-destructive underline">Learn more →</a>',
+		contextParagraphs: [
 			'AI is reshaping Central Oregon — and we have a choice in how we respond. This is a place for us to weigh in.',
-			'You\u2019ll see statements from other community members about this question. You can vote: agree, disagree, or unsure... or add your own thoughts.',
-			"Your responses — combined with everyone else's — will help surface what Central Oregonians have in common, where we differ, and what we might tackle together.",
-			'This is the first step. What we discover here leads to live conversations and a community Solutions Assembly.'
+			'(Opportunity for more context!)'
+		],
+		hostsBlurb:
+			'This conversation is hosted by the <a href="https://cocap.us/" class="text-destructive underline">Central Oregon Civic Action Project</a>, and supported by many other committed organizations, individuals, and partners throughout Central Oregon.',
+		partners: [
+			{ name: 'Central Oregon Civic Action Project', url: 'https://cocap.us/' },
+			{ name: 'Central Oregon Intergovernmental Council', url: 'https://www.coic.org/' },
+			{ name: 'Central Oregon Community College', url: 'https://cocc.edu/' },
+			{ name: 'Citizens4Community', url: 'https://citizens4community.com/' }
 		],
 		hostMessage: [
 			`
@@ -398,8 +471,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 		endCtaShareDescription: 'Anyone in Central Oregon is welcome to participate.',
 		polis_workflow_step_id: '8299fec7-a543-419f-8692-f68652648a0b',
 		shareUrl: 'https://oregon.bloomproject.us',
-		fullHosts:
-			"<a href='https://cocap.us/'>Central Oregon Civic Action Project</a>, <a href='https://www.coic.org/'>Central Oregon Intergovernmental Council</a>, <a href='https://cocc.edu/'>Central Oregon Community College</a>, and <a href='https://citizens4community.com/'>Citizens4Community</a>.",
+		faq: DEFAULT_FAQ,
 		events: [
 			{
 				slug: 'may-30-sisters',
@@ -529,14 +601,16 @@ export const GENERIC_REGION: RegionConfig = {
 	hostName: 'Bloom Project',
 	hostUrl: 'https://bloom-project.org/',
 	zipPrefixes: [],
-	carouselPreHeader: 'WHAT SHOULD WE DO ABOUT',
-	carouselHeader: 'AI and the Future of Our Communities',
-	slides: [
+	heroHeader: 'AI and the Future of Our Communities',
+	heroBlurb:
+		'Share your thoughts with others across America who are weighing in on how AI is changing our country. <a href="#context" class="text-destructive underline">Learn more →</a>',
+	contextParagraphs: [
 		"People across America are weighing in on how AI is changing our country — and what we should do about it. Now it's your turn.",
-		'You\u2019ll see statements from community members on this question. For each one, you can share if you: agree, disagree, or are unsure.',
-		'Your responses — combined with everyone else\u2019s — will help surface what Americans have in common, where we differ, and what we might tackle together.',
-		'Results will be published publicly so anyone can see where people stand.'
+		'Your responses, combined with everyone else\u2019s, will help surface what Americans have in common, where we differ, and what we might tackle together. Results will be published publicly so anyone can see where people stand.'
 	],
+	hostsBlurb:
+		'This Open Poll is hosted by <a href="https://www.bloom-project.org/" class="text-destructive underline">The Bloom Project</a>, a civic technology initiative that uses deliberative polling to surface where the American public actually stands on complex issues.',
+	partners: [{ name: 'The Bloom Project', url: 'https://www.bloom-project.org/' }],
 	hostMessage: [
 		'First, thank you for being here and for caring about the future of our country.',
 		'AI is already reshaping American life — bringing real promise alongside real concerns. Many see new economic opportunities, better tools for healthcare and education, and new ways to tackle longstanding challenges. Others worry about jobs, privacy, democracy, and access to truthful information. Both are true, and both matter.',
@@ -561,7 +635,7 @@ export const GENERIC_REGION: RegionConfig = {
 	endCtaShareDescription: 'Anyone is welcome to participate.',
 	polis_workflow_step_id: 'f553a7b9-b3ac-4159-b88d-198f609b110c',
 	shareUrl: 'https://all.bloomproject.us',
-	fullHosts: "<a href='https://www.bloom-project.org/'>The Bloom Project</a>.",
+	faq: DEFAULT_FAQ,
 	events: [
 		{
 			slug: 'may-18-springville',

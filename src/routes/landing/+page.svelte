@@ -2,38 +2,44 @@
 	import { fade } from 'svelte/transition';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { AppShell } from '$lib/components/layout';
-	import { SwipeCarousel, Button, Dialog, ZipInput, Link } from '$lib/components/ui';
+	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
+	import { Button, Dialog, ZipInput, Accordion, StickyNav } from '$lib/components/ui';
+	import { Input } from '$lib/components/ui/input';
 	import { session } from '$lib/services/session.svelte';
 	import { getRegionByZipcode, getRegionUrl, REGIONS } from '$lib/config/regions';
 	import type { RegionConfig } from '$lib/config/regions';
+	import { OPEN_POLL_EXPLAINER, FOOTER_LINKS } from '$lib/config/landing-copy';
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import InfoBar from '$lib/components/ui/InfoBar.svelte';
 	import { trackEvent } from '@lukulent/svelte-umami';
 
 	const region: RegionConfig = page.data.region;
-
 	const isReturning = session.hasSession;
 
-	// --- Flow steps ---
+	// --- Join (zip → /contribute) state ---
 	let zipCode = $state(isReturning ? session.zipCode : '');
 	let hasZip = $derived(!!zipCode.trim());
-	let slideIndex = $state(0);
 	let joining = $state(false);
-	let showHostMessage = $state(false);
-	let showTermsMessage = $state(false);
 	let zipFlash = $state(false);
 	let hasAgreedToTos = $derived(session.hasAgreedToTos);
+	let showHostMessage = $state(false);
+	let showAboutMessage = $state(false);
+	let showTermsMessage = $state(false);
 
-	// Check for zipcode in URL parameter on mount
+	// --- Email signup (bottom of page) state ---
+	let email = $state('');
+	let emailSubmitting = $state(false);
+	let emailError = $state('');
+	let emailSuccess = $state(false);
+
+	// Pick up zip from URL on mount (used when redirecting between region subdomains)
 	onMount(() => {
 		if (browser && !isReturning) {
-			const urlParams = new URLSearchParams(window.location.search);
-			const zipParam = urlParams.get('zip_code');
-			if (zipParam) {
-				zipCode = zipParam;
-			}
+			const params = new URLSearchParams(window.location.search);
+			const zipParam = params.get('zip_code');
+			if (zipParam) zipCode = zipParam;
 		}
 	});
 
@@ -54,20 +60,11 @@
 			return;
 		}
 
-		// Resolve region from zipcode.
-		//
-		// LOCAL DEV: when the `dev` region is registered (i.e. all four
-		// PUBLIC_DEV_* env vars are set), we FORCE every request to land on
-		// the dev region — no matter which subdomain or zipcode the user
-		// typed. This keeps you on your locally-seeded conversation/polis.
-		//
-		// To test the real prod redirect logic (utah/oregon/generic
-		// routing by zipcode), comment out / remove the four PUBLIC_DEV_*
-		// lines in `.env`, restart `pnpm dev`, then revisit the landing
-		// page — zip 84xxx will redirect to utah, 97xxx to oregon, etc.
+		// LOCAL DEV: when dev region is registered, force every zip to land on dev.
+		// In prod, route by zipcode prefix. See regions.ts for details.
 		const zipRegion = REGIONS.dev ? REGIONS.dev : getRegionByZipcode(zipCode.trim());
 
-		// Check if we need to redirect to a different subdomain
+		// Different region than current subdomain → redirect.
 		if (zipRegion.slug !== region.slug) {
 			// Redirect to the appropriate subdomain with zipcode parameter
 			trackEvent('UnsupportedZipCode', {
@@ -80,7 +77,6 @@
 			return;
 		}
 
-		// Zipcode matches current region - proceed with registration
 		joining = true;
 		const success = await session.join(
 			zipCode.trim(),
@@ -89,175 +85,365 @@
 			zipRegion.inviteId
 		);
 		joining = false;
+    trackEvent('SucccesfullSignup');
+		if (success) goto('/contribute');
+	}
+
+	function isValidEmail(value: string): boolean {
+		return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+	}
+
+	// Email-only signup (no zip). Reuses session.join with empty zip — see
+	// docs/adr/0002-landing-email-reuses-participant-flow.md for the rationale and
+	// follow-up about a dedicated newsletter endpoint.
+	async function handleEmailSignup(e: SubmitEvent) {
+		e.preventDefault();
+		emailError = '';
+		const trimmed = email.trim();
+		if (!trimmed) {
+			emailError = 'Please enter an email address';
+			return;
 		if (success) {
-			trackEvent('SucccesfullSignup');
+			trackEvent('SucccesfullEmailSignup');
 			goto('/contribute');
 		}
+		if (!isValidEmail(trimmed)) {
+			emailError = 'Please enter a valid email address';
+			return;
+		}
+		emailSubmitting = true;
+		// If user already has a session, just register the email against it.
+		// Otherwise, create a minimal session (no zip) so registerEmail has a conversationId.
+		if (session.hasSession) {
+			await session.registerEmail(trimmed);
+		} else {
+			await session.join('', trimmed, region.conversationId, region.inviteId);
+		}
+		emailSubmitting = false;
+		emailSuccess = true;
 	}
+
+	// Comma-separated list of partner names with "and" before the last — fallback
+	// rendering for the Your Hosts section while logo carousel is deferred.
+	const partnersText = (() => {
+		const links = region.partners.map(
+			(p) => `<a href='${p.url}' target='_blank' rel='noopener noreferrer' class='underline'>${p.name}</a>`
+		);
+		if (links.length === 0) return '';
+		if (links.length === 1) return links[0];
+		if (links.length === 2) return `${links[0]} and ${links[1]}`;
+		return `${links.slice(0, -1).join(', ')}, and ${links[links.length - 1]}`;
+	})();
 </script>
 
-<AppShell border={false}>
-	<div data-landing-page class="relative flex h-full flex-col overflow-hidden bg-gradient-primary">
-		<!-- Host banner -->
-		<div class="relative z-10 shrink-0 pt-1">
-			<button
-				onclick={() => (showHostMessage = true)}
-				class="flex w-full items-center gap-3 overflow-hidden rounded-none bg-primary p-3 text-left shadow-[0px_4px_12px_0px_rgba(12,34,95,0.25)] outline-1 outline-white/10 transition-transform active:scale-[0.98]"
+<svelte:head>
+	<title>{region.heroHeader} — {region.stateName}</title>
+</svelte:head>
+
+<div class="min-h-screen bg-gradient-to-b from-orange-50 to-orange-100 text-yellow-950">
+	<!-- Header chip row — bypasses AppShell. See docs/adr/0001-landing-bypasses-appshell.md -->
+	<header class="flex items-center justify-between px-6 pt-4 pb-2">
+		<div class="flex items-center gap-2 font-mono text-sm font-medium text-stone-500 uppercase">
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="14"
+				height="14"
+				viewBox="0 0 24 24"
+				fill="currentColor"
+				aria-hidden="true"
 			>
-				<div class="min-w-0 grow text-center">
-					<p class="truncate font-sans text-base font-medium text-primary-foreground">
-						Hello From <span class="font-bold">{region.hostName}</span> 👋
-					</p>
-				</div>
-			</button>
+				<path
+					d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0Zm-8 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+				/>
+			</svg>
+			{region.stateName.toUpperCase()}
 		</div>
-
-		<InfoBar countyName={region.stateName} {region} />
-
-		<!-- Hero — header + CTA centered vertically as one unit, rest flows below -->
-		<div class="relative z-10 min-h-0 flex-1 overflow-y-auto">
-			<div
-				class="mx-auto flex min-h-full max-w-xl flex-col items-center justify-center px-9 py-4 sm:px-8 sm:py-6"
-			>
-				<span class="text-center font-mono text-base font-medium text-muted-foreground uppercase">
-					{region.carouselPreHeader}
-				</span>
-				<h1
-					class="mt-2 text-center font-display text-4xl leading-tight font-medium tracking-display text-muted-foreground sm:mt-3"
-				>
-					{region.carouselHeader}
-				</h1>
-
-				<SwipeCarousel
-					count={region.slides.length}
-					bind:index={slideIndex}
-					autoScrollMs={5000}
-					class="mt-6 w-full sm:mt-6"
-				>
-					{#snippet children(i)}
-						<p class="font-sans text-lg leading-relaxed font-medium text-muted-foreground">
-							{region.slides[i]}
-						</p>
-					{/snippet}
-				</SwipeCarousel>
-
-				<!-- CTA -->
-				<span class="mt-8 font-mono text-base font-medium text-muted-foreground/80 uppercase"
-					>YOUR LOCATION</span
-				>
-				<div class="mt-1.5">
-					<ZipInput
-						bind:value={zipCode}
-						disabled={isReturning}
-						bind:flash={zipFlash}
-						regionPrefixes={region.zipPrefixes}
-					/>
-				</div>
-
-				<Button
-					variant="primary"
-					fullWidth
-					disabled={joining}
-					onclick={() => {
-						if (!hasZip) {
-							zipFlash = true;
-							return;
-						}
-						if (hasAgreedToTos) {
-							handleJoin();
-						} else {
-							showTermsModal();
-						}
-					}}
-					class="mt-3"
-				>
-					{isReturning ? 'CONTINUE' : 'JOIN THE CONVERSATION'}
-				</Button>
-
-				<span class="mt-2.5 text-center font-mono text-xs font-medium uppercase opacity-50">
-					<span class="text-foreground">POWERED BY </span>
-					<Link href="https://www.bloom-project.org/" external>BLOOM PROJECT.</Link>
-					<span class="text-foreground"> SEE THE FULL TERMS AND CONDITIONS </span>
-					<Link
-						href="https://app.termly.io/policy-viewer/policy.html?policyUUID=ba402bb7-5499-4b37-860b-bbb507d3c3c1"
-						external>HERE.</Link
-					>
-				</span>
-			</div>
-		</div>
-	</div>
-
-	{#if joining}
-		<div
-			class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-primary"
-			transition:fade={{ duration: 200 }}
+		<button
+			type="button"
+			onclick={() => (showAboutMessage = true)}
+			class="rounded-[20px] bg-yellow-600/10 px-2 py-0.5 font-mono text-sm font-medium text-stone-500 hover:bg-yellow-600/20"
 		>
-			<div
-				class="h-10 w-10 animate-spin rounded-full border-4 border-card-foreground/30 border-t-card-foreground"
-			></div>
-			<span class="mt-4 font-mono text-sm font-medium text-card-foreground/80 uppercase"
-				>JOINING...</span
-			>
-		</div>
-	{/if}
+			ABOUT→
+		</button>
+	</header>
 
-	<Dialog bind:open={showHostMessage} title="A Message from Your Hosts" buttonText="GO BACK">
-		<div class="px-7 pt-6">
-			{#each region.hostMessage as paragraph}
-				<p class="mt-4 font-sans text-lg leading-7 font-medium first:mt-0">
-					{@html paragraph}
-				</p>
+	<!-- Hero -->
+	<section id="join" class="scroll-mt-24 px-6 pt-4 pb-10 max-w-4xl mx-auto">
+		<div class="flex justify-center">
+			<span
+				class="rounded-[30px] bg-yellow-950 px-3.5 py-2 font-mono text-sm font-medium text-white"
+			>
+				OPEN POLL
+			</span>
+		</div>
+		<h1
+			class="mt-6 text-center font-display text-5xl leading-[1.05] font-medium tracking-display"
+		>
+			{region.heroHeader}
+		</h1>
+		<p class="mt-6 text-center font-sans text-base leading-5 font-medium">
+			{@html region.heroBlurb}
+		</p>
+
+		<div class="mt-10 flex flex-col items-center">
+			<span class="font-display text-base font-medium opacity-80">Your location</span>
+			<div class="mt-1.5 w-full max-w-sm">
+				<ZipInput
+					bind:value={zipCode}
+					disabled={isReturning}
+					bind:flash={zipFlash}
+					regionPrefixes={region.zipPrefixes}
+				/>
+			</div>
+			<Button
+				variant="primary"
+				fullWidth
+				disabled={joining}
+				onclick={() => {
+					if (!hasZip) {
+						zipFlash = true;
+						return;
+					}
+					if (hasAgreedToTos) handleJoin();
+					else showTermsModal();
+				}}
+				class="mt-4 max-w-sm"
+			>
+				{isReturning ? 'CONTINUE' : 'JOIN THE CONVERSATION'}
+			</Button>
+		</div>
+
+		<!-- Hosted by strip — partner logos deferred. Renders linked names until logo URLs
+		     land on RegionConfig.partners[].logo. See landing redesign follow-ups. -->
+		{#if region.partners.length > 0}
+			<div class="mt-10 flex flex-col items-center gap-3">
+				<span class="font-display text-base font-medium opacity-80">Hosted by</span>
+				<div
+					class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-4 text-center"
+				>
+				<!-- TODO: add logos -->
+					{#each region.partners as partner (partner.url)}
+						{#if partner.logo}
+							<a href={partner.url} target="_blank" rel="noopener noreferrer">
+								<img src={partner.logo} alt={partner.name} class="h-8 max-w-[120px] object-contain" />
+							</a>
+						{:else}
+							<a
+								href={partner.url}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="font-sans text-sm font-medium underline"
+							>
+								{partner.name}
+							</a>
+						{/if}
+					{/each}
+				</div>
+			</div>
+		{/if}
+	</section>
+
+	<!-- Sticky pill nav -->
+	<StickyNav class="max-w-4xl mx-auto" />
+
+	<!-- Context -->
+	<section id="context" class="scroll-mt-24 px-8 py-5  max-w-4xl mx-auto" >
+		<h2 class="font-display text-2xl font-medium">Context</h2>
+		<div class="mt-6 flex flex-col gap-7">
+			{#each region.contextParagraphs as paragraph, i (i)}
+				<p class="font-sans text-base leading-6 font-medium opacity-80">{@html paragraph}</p>
 			{/each}
 		</div>
-	</Dialog>
+	</section>
 
-	<Dialog
-		bind:open={showTermsMessage}
-		title="Our Approach to Personal Data"
-		buttonText="I AGREE TO THESE TERMS"
-		onButtonClick={handleAgreeToTos}
-		requireScrollToBottom
-	>
-		<div class="px-7 pt-6">
-			<p class="font-sans text-lg leading-7 font-medium">
-				We're here to run a community conversation, not collect data on you.
-			</p>
-			<ul class="mt-4 list-[square] pl-6 font-sans text-lg leading-7 font-medium">
-				<li>
-					<span class="font-bold"
-						>We collect your responses and, if you choose, your contact info.</span
-					> That's it.
-				</li>
-				<li>
-					<span class="font-bold">You are in control.</span> You can access or delete your data at
-					any time. Email us at
-					<a href="mailto:hello@bloom-project.org">hello@bloom-project.org</a>.
-				</li>
-				<li><span class="font-bold">We never sell or monetize anything you share.</span></li>
-				<li>
-					<span class="font-bold"
-						>OpenPoll results are public by design — so the whole community can see what people
-						think.</span
-					> Your responses are always anonymous.
-				</li>
-				<li>
-					<span class="font-bold">Want to stay in the loop?</span> We’ll share your contact info (email
-					address) with the local organization(s) hosting this conversation so they can follow up about
-					related opportunities.
-				</li>
-				<li>
-					<span class="font-bold">We look at how people use the platform to make it better</span> — not
-					to profile you or target you with ads.
-				</li>
-			</ul>
-			<p class="mt-4 font-sans text-lg leading-7 font-medium">
-				For more information, please view the full <a
-					href="https://app.termly.io/policy-viewer/policy.html?policyUUID=ba402bb7-5499-4b37-860b-bbb507d3c3c1"
-					class="text-destructive underline"
-					target="_blank"
-					rel="noopener noreferrer">Privacy Policy.</a
-				>
-			</p>
+	<!-- What is an Open Poll? -->
+	<section id="how-it-works" class="scroll-mt-24 px-8 py-5  max-w-4xl mx-auto">
+		<h2 class="font-display text-2xl font-medium">What is an "Open Poll"?</h2>
+		<div class="mt-6 flex flex-col gap-7">
+			{#each OPEN_POLL_EXPLAINER as paragraph, i (i)}
+				<p class="font-sans text-base leading-6 font-medium opacity-80">{paragraph}</p>
+			{/each}
 		</div>
-	</Dialog>
-</AppShell>
+	</section>
+
+	<!-- Your Hosts -->
+	<section id="your-host" class="scroll-mt-24 px-8 py-5  max-w-4xl mx-auto">
+		<h2 class="font-display text-2xl font-medium">Your Hosts</h2>
+		<p class="mt-6 font-sans text-base leading-6 font-medium opacity-80">
+			{@html region.hostsBlurb}
+		</p>
+		{#if partnersText}
+			<p class="mt-4 font-sans text-sm leading-6 font-medium opacity-70">
+				In partnership with: {@html partnersText}.
+			</p>
+		{/if}
+	</section>
+
+	<!-- What's Next? -->
+	<section id="whats-next" class="scroll-mt-24 px-8 py-5  max-w-4xl mx-auto">
+		<h2 class="font-display text-2xl font-medium">What's Next?</h2>
+		<p class="mt-6 font-sans text-base leading-6 font-medium opacity-80">
+			{@html region.whatsNext}
+		</p>
+	</section>
+
+	<!-- FAQ — hide when empty -->
+	{#if region.faq.length > 0}
+		<section class="scroll-mt-24 px-8 py-5  max-w-4xl mx-auto">
+			<h2 class="font-display text-2xl font-medium">Frequently Asked Questions</h2>
+			<div class="mt-6">
+				<Accordion items={region.faq} />
+			</div>
+		</section>
+	{/if}
+
+	<!-- Email signup. Reuses session.registerEmail flow — see ADR 0002. -->
+	<section class="border-y border-stone-500/20 px-8 py-12 max-w-4xl mx-auto">
+		<h2 class="text-center font-display text-3xl font-medium">Join the Conversation</h2>
+		{#if emailSuccess}
+			<p class="mt-6 text-center font-sans text-base font-medium opacity-80">
+				Thanks — you're on the list.
+			</p>
+		{:else}
+			<form onsubmit={handleEmailSignup} class="mt-6 flex flex-col gap-3">
+				<div
+					class="flex items-center gap-2.5 rounded-full bg-white px-5 py-3 shadow-[inset_2px_4px_4.4px_0px_rgba(0,0,0,0.10)]"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="16"
+						height="16"
+						viewBox="0 0 24 24"
+						fill="currentColor"
+						class="text-neutral-600"
+						aria-hidden="true"
+					>
+						<path
+							d="M3 8.5V18a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5l-9 5-9-5ZM21 6.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v.5l9 5 9-5Z"
+						/>
+					</svg>
+					<Input
+						type="email"
+						bind:value={email}
+						placeholder="email@xyz.com"
+						class="border-0 bg-transparent px-0 font-sans text-base font-medium text-stone-600 shadow-none placeholder:text-stone-600/60 focus-visible:ring-0"
+					/>
+				</div>
+				{#if emailError}
+					<p class="px-2 font-sans text-sm text-destructive">{emailError}</p>
+				{/if}
+				<Button variant="primary" fullWidth disabled={emailSubmitting}>
+					{emailSubmitting ? 'SIGNING UP…' : 'SIGN UP FOR UPDATES'}
+				</Button>
+			</form>
+		{/if}
+	</section>
+
+	<!-- Footer -->
+	<footer class="bg-primary px-8 py-12">
+		<ul class="flex flex-col gap-1.5  max-w-4xl mx-auto">
+			{#each FOOTER_LINKS as link (link.label)}
+				<li>
+					<a
+						href={link.href}
+						target={link.external ? '_blank' : undefined}
+						rel={link.external ? 'noopener noreferrer' : undefined}
+						class="font-sans text-base leading-6 font-medium text-white hover:opacity-80"
+					>
+						{link.label}
+					</a>
+				</li>
+			{/each}
+		</ul>
+	</footer>
+</div>
+
+<!-- Loading overlay during join -->
+{#if joining}
+	<div
+		class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-linear-to-b from-orange-50 to-orange-100"
+		transition:fade={{ duration: 200 }}
+	>
+		<div
+			class="h-10 w-10 animate-spin rounded-full border-4 border-yellow-950/30 border-t-yellow-950"
+		></div>
+		<span class="mt-4 font-mono text-sm font-medium text-yellow-950/80 uppercase">JOINING…</span>
+	</div>
+{/if}
+
+<!-- Dialogs preserved from previous /landing -->
+<Dialog bind:open={showHostMessage} title="A Message from Your Hosts" buttonText="GO BACK">
+	<div class="px-7 pt-6">
+		{#each region.hostMessage as paragraph, i (i)}
+			<p class="mt-4 font-sans text-lg leading-7 font-medium first:mt-0">
+				{@html paragraph}
+			</p>
+		{/each}
+	</div>
+</Dialog>
+
+<Dialog bind:open={showAboutMessage} title="About This Conversation" buttonText="GOT IT">
+	<div class="px-7 pt-6">
+		{#each region.aboutConversation as paragraph, i (i)}
+			<p class="mt-4 font-sans text-lg leading-7 font-medium first:mt-0">
+				{@html paragraph}
+			</p>
+		{/each}
+	</div>
+</Dialog>
+
+<Dialog
+	bind:open={showTermsMessage}
+	title="Our Approach to Personal Data"
+	buttonText="I AGREE TO THESE TERMS"
+	onButtonClick={handleAgreeToTos}
+	requireScrollToBottom
+>
+	<div class="px-7 pt-6">
+		<p class="font-sans text-lg leading-7 font-medium">
+			We're here to run a community conversation, not collect data on you.
+		</p>
+		<ul class="mt-4 list-[square] pl-6 font-sans text-lg leading-7 font-medium">
+			<li>
+				<span class="font-bold"
+					>We collect your responses and, if you choose, your contact info.</span
+				> That's it.
+			</li>
+			<li>
+				<span class="font-bold">You are in control.</span> You can access or delete your data at any
+				time. Email us at
+				<a href="mailto:hello@bloom-project.org">hello@bloom-project.org</a>.
+			</li>
+			<li><span class="font-bold">We never sell or monetize anything you share.</span></li>
+			<li>
+				<span class="font-bold"
+					>OpenPoll results are public by design — so the whole community can see what people think.</span
+				> Your responses are always anonymous.
+			</li>
+			<li>
+				<span class="font-bold">Want to stay in the loop?</span> We'll share your contact info (email
+				address) with the local organization(s) hosting this conversation so they can follow up about
+				related opportunities.
+			</li>
+			<li>
+				<span class="font-bold">We look at how people use the platform to make it better</span> — not
+				to profile you or target you with ads.
+			</li>
+		</ul>
+		<p class="mt-4 font-sans text-lg leading-7 font-medium">
+			For more information, please view the full <a
+				href="https://app.termly.io/policy-viewer/policy.html?policyUUID=ba402bb7-5499-4b37-860b-bbb507d3c3c1"
+				class="text-destructive underline"
+				target="_blank"
+				rel="noopener noreferrer">Privacy Policy.</a
+			>
+		</p>
+	</div>
+</Dialog>
+
+<style>
+	/* Smooth anchor scroll for in-page #context style links */
+	:global(html) {
+		scroll-behavior: smooth;
+	}
+</style>
