@@ -309,7 +309,7 @@
 					Tell your friends
 				</h2>
 				<p class="font-sans text-lg leading-7 font-medium text-muted-foreground">
-					The more input we have from our fellow Central Oregonians, the better our results will be.
+					The more input we have from our fellow {region.demonym}, the better our results will be.
 					Please take a moment to call, text or email your friends and neighbors asking them to
 					share their thoughts on this important issue with us.
 				</p>

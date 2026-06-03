@@ -10,6 +10,10 @@
 	import { getRegionByZipcode, getRegionUrl, REGIONS } from '$lib/config/regions';
 	import type { RegionConfig } from '$lib/config/regions';
 	import { OPEN_POLL_EXPLAINER, FOOTER_LINKS } from '$lib/config/landing-copy';
+	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
+	import InfoBar from '$lib/components/ui/InfoBar.svelte';
+	import { trackEvent } from '@lukulent/svelte-umami';
 
 	const region: RegionConfig = page.data.region;
 	const isReturning = session.hasSession;
@@ -40,10 +44,12 @@
 	});
 
 	function showTermsModal() {
+		trackEvent('ShownTermsModal');
 		showTermsMessage = true;
 	}
 
 	function handleAgreeToTos() {
+		trackEvent('AgreedToTerms');
 		session.setSessionField('hasAgreedToTos', true);
 		handleJoin();
 	}
@@ -60,6 +66,12 @@
 
 		// Different region than current subdomain → redirect.
 		if (zipRegion.slug !== region.slug) {
+			// Redirect to the appropriate subdomain with zipcode parameter
+			trackEvent('UnsupportedZipCode', {
+				zipCode,
+				regionSlug: region.slug,
+				zipRegion: zipRegion.slug
+			});
 			const redirectUrl = getRegionUrl(zipRegion, zipCode.trim(), window.location.hostname);
 			window.location.href = redirectUrl;
 			return;
@@ -73,6 +85,7 @@
 			zipRegion.inviteId
 		);
 		joining = false;
+    trackEvent('SucccesfullSignup');
 		if (success) goto('/contribute');
 	}
 
@@ -90,6 +103,9 @@
 		if (!trimmed) {
 			emailError = 'Please enter an email address';
 			return;
+		if (success) {
+			trackEvent('SucccesfullEmailSignup');
+			goto('/contribute');
 		}
 		if (!isValidEmail(trimmed)) {
 			emailError = 'Please enter a valid email address';
