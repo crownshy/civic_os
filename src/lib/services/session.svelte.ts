@@ -48,6 +48,8 @@ function loadPersistedSession(): {
 	hasSeenComposeInstructions?: boolean;
 	conversationId?: string;
 	inviteId?: string;
+	endCtaShareCompleted?: boolean;
+	endCtaReviewCompleted?: boolean;
 } {
 	if (typeof window === 'undefined') return {};
 	try {
@@ -73,6 +75,8 @@ class Session {
 	hasAgreedToTos = $state(false);
 	_conversationId = $state('');
 	_inviteId = $state('');
+	endCtaShareCompleted = $state(false);
+	endCtaReviewCompleted = $state(false);
 
 	constructor() {
 		const saved = loadPersistedSession();
@@ -89,6 +93,8 @@ class Session {
 		if (saved.hasSeenComposeInstructions) this.hasSeenComposeInstructions = true;
 		if (saved.conversationId) this._conversationId = saved.conversationId;
 		if (saved.inviteId) this._inviteId = saved.inviteId;
+		if (saved.endCtaShareCompleted) this.endCtaShareCompleted = true;
+		if (saved.endCtaReviewCompleted) this.endCtaReviewCompleted = true;
 	}
 
 	private persist() {
@@ -107,7 +113,9 @@ class Session {
 					hasAgreedToTos: this.hasAgreedToTos,
 					hasSeenComposeInstructions: this.hasSeenComposeInstructions,
 					conversationId: this._conversationId,
-					inviteId: this._inviteId
+					inviteId: this._inviteId,
+					endCtaShareCompleted: this.endCtaShareCompleted,
+					endCtaReviewCompleted: this.endCtaReviewCompleted
 				})
 			);
 		} catch {
@@ -137,6 +145,16 @@ class Session {
 
 	markComposeInstructionsSeen() {
 		this.hasSeenComposeInstructions = true;
+		this.persist();
+	}
+
+	markEndCtaShareCompleted() {
+		this.endCtaShareCompleted = true;
+		this.persist();
+	}
+
+	markEndCtaReviewCompleted() {
+		this.endCtaReviewCompleted = true;
 		this.persist();
 	}
 
