@@ -10,9 +10,6 @@
 	import { getRegionByZipcode, getRegionUrl, REGIONS } from '$lib/config/regions';
 	import type { RegionConfig } from '$lib/config/regions';
 	import { OPEN_POLL_EXPLAINER, FOOTER_LINKS } from '$lib/config/landing-copy';
-	import { onMount } from 'svelte';
-	import { browser } from '$app/environment';
-	import InfoBar from '$lib/components/ui/InfoBar.svelte';
 	import { trackEvent } from '@lukulent/svelte-umami';
 
 	const region: RegionConfig = page.data.region;
@@ -85,7 +82,7 @@
 			zipRegion.inviteId
 		);
 		joining = false;
-    trackEvent('SucccesfullSignup');
+		trackEvent('SucccesfullSignup');
 		if (success) goto('/contribute');
 	}
 
@@ -103,9 +100,6 @@
 		if (!trimmed) {
 			emailError = 'Please enter an email address';
 			return;
-		if (success) {
-			trackEvent('SucccesfullEmailSignup');
-			goto('/contribute');
 		}
 		if (!isValidEmail(trimmed)) {
 			emailError = 'Please enter a valid email address';
@@ -127,7 +121,8 @@
 	// rendering for the Your Hosts section while logo carousel is deferred.
 	const partnersText = (() => {
 		const links = region.partners.map(
-			(p) => `<a href='${p.url}' target='_blank' rel='noopener noreferrer' class='underline'>${p.name}</a>`
+			(p) =>
+				`<a href='${p.url}' target='_blank' rel='noopener noreferrer' class='underline'>${p.name}</a>`
 		);
 		if (links.length === 0) return '';
 		if (links.length === 1) return links[0];
@@ -168,7 +163,7 @@
 	</header>
 
 	<!-- Hero -->
-	<section id="join" class="scroll-mt-24 px-6 pt-4 pb-10 max-w-4xl mx-auto">
+	<section id="join" class="mx-auto max-w-4xl scroll-mt-24 px-6 pt-4 pb-10">
 		<div class="flex justify-center">
 			<span
 				class="rounded-[30px] bg-yellow-950 px-3.5 py-2 font-mono text-sm font-medium text-white"
@@ -176,9 +171,7 @@
 				OPEN POLL
 			</span>
 		</div>
-		<h1
-			class="mt-6 text-center font-display text-5xl leading-[1.05] font-medium tracking-display"
-		>
+		<h1 class="mt-6 text-center font-display text-5xl leading-[1.05] font-medium tracking-display">
 			{region.heroHeader}
 		</h1>
 		<p class="mt-6 text-center font-sans text-base leading-5 font-medium">
@@ -218,14 +211,16 @@
 		{#if region.partners.length > 0}
 			<div class="mt-10 flex flex-col items-center gap-3">
 				<span class="font-display text-base font-medium opacity-80">Hosted by</span>
-				<div
-					class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-4 text-center"
-				>
-				<!-- TODO: add logos -->
+				<div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-4 text-center">
+					<!-- TODO: add logos -->
 					{#each region.partners as partner (partner.url)}
 						{#if partner.logo}
 							<a href={partner.url} target="_blank" rel="noopener noreferrer">
-								<img src={partner.logo} alt={partner.name} class="h-8 max-w-[120px] object-contain" />
+								<img
+									src={partner.logo}
+									alt={partner.name}
+									class="h-8 max-w-[120px] object-contain"
+								/>
 							</a>
 						{:else}
 							<a
@@ -244,10 +239,10 @@
 	</section>
 
 	<!-- Sticky pill nav -->
-	<StickyNav class="max-w-4xl mx-auto" />
+	<StickyNav class="mx-auto max-w-4xl" />
 
 	<!-- Context -->
-	<section id="context" class="scroll-mt-24 px-8 py-5  max-w-4xl mx-auto" >
+	<section id="context" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
 		<h2 class="font-display text-2xl font-medium">Context</h2>
 		<div class="mt-6 flex flex-col gap-7">
 			{#each region.contextParagraphs as paragraph, i (i)}
@@ -257,7 +252,7 @@
 	</section>
 
 	<!-- What is an Open Poll? -->
-	<section id="how-it-works" class="scroll-mt-24 px-8 py-5  max-w-4xl mx-auto">
+	<section id="how-it-works" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
 		<h2 class="font-display text-2xl font-medium">What is an "Open Poll"?</h2>
 		<div class="mt-6 flex flex-col gap-7">
 			{#each OPEN_POLL_EXPLAINER as paragraph, i (i)}
@@ -267,7 +262,7 @@
 	</section>
 
 	<!-- Your Hosts -->
-	<section id="your-host" class="scroll-mt-24 px-8 py-5  max-w-4xl mx-auto">
+	<section id="your-host" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
 		<h2 class="font-display text-2xl font-medium">Your Hosts</h2>
 		<p class="mt-6 font-sans text-base leading-6 font-medium opacity-80">
 			{@html region.hostsBlurb}
@@ -280,7 +275,7 @@
 	</section>
 
 	<!-- What's Next? -->
-	<section id="whats-next" class="scroll-mt-24 px-8 py-5  max-w-4xl mx-auto">
+	<section id="whats-next" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
 		<h2 class="font-display text-2xl font-medium">What's Next?</h2>
 		<p class="mt-6 font-sans text-base leading-6 font-medium opacity-80">
 			{@html region.whatsNext}
@@ -289,7 +284,7 @@
 
 	<!-- FAQ — hide when empty -->
 	{#if region.faq.length > 0}
-		<section class="scroll-mt-24 px-8 py-5  max-w-4xl mx-auto">
+		<section class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
 			<h2 class="font-display text-2xl font-medium">Frequently Asked Questions</h2>
 			<div class="mt-6">
 				<Accordion items={region.faq} />
@@ -298,7 +293,7 @@
 	{/if}
 
 	<!-- Email signup. Reuses session.registerEmail flow — see ADR 0002. -->
-	<section class="border-y border-stone-500/20 px-8 py-12 max-w-4xl mx-auto">
+	<section class="mx-auto max-w-4xl border-y border-stone-500/20 px-8 py-12">
 		<h2 class="text-center font-display text-3xl font-medium">Join the Conversation</h2>
 		{#if emailSuccess}
 			<p class="mt-6 text-center font-sans text-base font-medium opacity-80">
@@ -341,7 +336,7 @@
 
 	<!-- Footer -->
 	<footer class="bg-primary px-8 py-12">
-		<ul class="flex flex-col gap-1.5  max-w-4xl mx-auto">
+		<ul class="mx-auto flex max-w-4xl flex-col gap-1.5">
 			{#each FOOTER_LINKS as link (link.label)}
 				<li>
 					<a
