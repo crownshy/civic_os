@@ -136,107 +136,112 @@
 </svelte:head>
 
 <div class="min-h-screen bg-gradient-to-b from-orange-50 to-orange-100 text-yellow-950">
-	<!-- Header chip row — bypasses AppShell. See docs/adr/0001-landing-bypasses-appshell.md -->
-	<header class="flex items-center justify-between px-6 pt-4 pb-2">
-		<div class="flex items-center gap-2 font-mono text-sm font-medium text-stone-500 uppercase">
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="14"
-				height="14"
-				viewBox="0 0 24 24"
-				fill="currentColor"
-				aria-hidden="true"
-			>
-				<path
-					d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0Zm-8 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
-				/>
-			</svg>
-			{region.stateName.toUpperCase()}
-		</div>
-		<button
-			type="button"
-			onclick={() => (showAboutMessage = true)}
-			class="rounded-[20px] bg-yellow-600/10 px-2 py-0.5 font-mono text-sm font-medium text-stone-500 hover:bg-yellow-600/20"
-		>
-			ABOUT→
-		</button>
-	</header>
-
-	<!-- Hero -->
-	<section id="join" class="mx-auto max-w-4xl scroll-mt-24 px-6 pt-4 pb-10">
-		<div class="flex justify-center">
-			<span
-				class="rounded-[30px] bg-yellow-950 px-3.5 py-2 font-mono text-sm font-medium text-white"
-			>
-				OPEN POLL
-			</span>
-		</div>
-		<h1 class="mt-6 text-center font-display text-5xl leading-[1.05] font-medium tracking-display">
-			{region.heroHeader}
-		</h1>
-		<p class="mt-6 text-center font-sans text-base leading-5 font-medium">
-			{@html region.heroBlurb}
-		</p>
-
-		<div class="mt-10 flex flex-col items-center">
-			<span class="font-display text-base font-medium opacity-80">Your location</span>
-			<div class="mt-1.5 w-full max-w-sm">
-				<ZipInput
-					bind:value={zipCode}
-					disabled={isReturning}
-					bind:flash={zipFlash}
-					regionPrefixes={region.zipPrefixes}
-				/>
+	<!-- Above-fold container: header + hero fill the viewport on desktop -->
+	<div class="flex flex-col md:h-screen">
+		<!-- Header chip row — bypasses AppShell. See docs/adr/0001-landing-bypasses-appshell.md -->
+		<header class="flex items-center justify-between px-6 pt-4 pb-2">
+			<div class="flex items-center gap-2 font-mono text-sm font-medium text-stone-500 uppercase">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="14"
+					height="14"
+					viewBox="0 0 24 24"
+					fill="currentColor"
+					aria-hidden="true"
+				>
+					<path
+						d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0Zm-8 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+					/>
+				</svg>
+				{region.stateName.toUpperCase()}
 			</div>
-			<Button
-				variant="primary"
-				fullWidth
-				disabled={joining}
-				onclick={() => {
-					if (!hasZip) {
-						zipFlash = true;
-						return;
-					}
-					if (hasAgreedToTos) handleJoin();
-					else showTermsModal();
-				}}
-				class="mt-4 max-w-sm"
+			<button
+				type="button"
+				onclick={() => (showAboutMessage = true)}
+				class="rounded-[20px] bg-yellow-600/10 px-2 py-0.5 font-mono text-sm font-medium text-stone-500 hover:bg-yellow-600/20"
 			>
-				{isReturning ? 'CONTINUE' : 'JOIN THE CONVERSATION'}
-			</Button>
-		</div>
+				ABOUT→
+			</button>
+		</header>
 
-		<!-- Hosted by strip — partner logos deferred. Renders linked names until logo URLs
-		     land on RegionConfig.partners[].logo. See landing redesign follow-ups. -->
-		{#if region.partners.length > 0}
-			<div class="mt-10 flex flex-col items-center gap-3">
-				<span class="font-display text-base font-medium opacity-80">Hosted by</span>
-				<div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-4 text-center">
-					<!-- TODO: add logos -->
-					{#each region.partners as partner (partner.url)}
-						{#if partner.logo}
-							<a href={partner.url} target="_blank" rel="noopener noreferrer">
-								<img
-									src={partner.logo}
-									alt={partner.name}
-									class="h-8 max-w-[120px] object-contain"
-								/>
-							</a>
-						{:else}
-							<a
-								href={partner.url}
-								target="_blank"
-								rel="noopener noreferrer"
-								class="font-sans text-sm font-medium underline"
-							>
-								{partner.name}
-							</a>
-						{/if}
-					{/each}
+		<!-- Hero -->
+		<section id="join" class="mx-auto flex w-full max-w-4xl flex-col scroll-mt-24 px-6 pt-4 pb-10 md:flex-1 md:pb-8">
+			<!-- Chip, headline, blurb, and join form — vertically centered on desktop -->
+			<div class="flex flex-col items-center md:flex-1 md:justify-center">
+				<div class="flex justify-center">
+					<span
+						class="rounded-[30px] bg-yellow-950 px-3.5 py-2 font-mono text-sm font-medium text-white"
+					>
+						OPEN POLL
+					</span>
+				</div>
+				<h1 class="mt-6 text-center font-display text-5xl leading-[1.05] font-medium tracking-display">
+					{region.heroHeader}
+				</h1>
+				<p class="mt-6 text-center font-sans text-base leading-5 font-medium">
+					{@html region.heroBlurb}
+				</p>
+
+				<div class="mt-10 flex flex-col items-center">
+					<span class="font-display text-base font-medium opacity-80">Your location</span>
+					<div class="mt-1.5 w-full max-w-sm">
+						<ZipInput
+							bind:value={zipCode}
+							disabled={isReturning}
+							bind:flash={zipFlash}
+							regionPrefixes={region.zipPrefixes}
+						/>
+					</div>
+					<Button
+						variant="primary"
+						fullWidth
+						disabled={joining}
+						onclick={() => {
+							if (!hasZip) {
+								zipFlash = true;
+								return;
+							}
+							if (hasAgreedToTos) handleJoin();
+							else showTermsModal();
+						}}
+						class="mt-4 max-w-sm"
+					>
+						{isReturning ? 'CONTINUE' : 'JOIN THE CONVERSATION'}
+					</Button>
 				</div>
 			</div>
-		{/if}
-	</section>
+
+			<!-- Hosted by strip — below the centered block, still above the fold on desktop -->
+			<!-- Partner logos deferred. Renders linked names until logo URLs land on RegionConfig.partners[].logo. -->
+			{#if region.partners.length > 0}
+				<div class="mt-10 flex flex-col items-center gap-3 md:mt-6">
+					<span class="font-display text-base font-medium opacity-80">Hosted by</span>
+					<div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-4 text-center">
+						{#each region.partners as partner (partner.url)}
+							{#if partner.logo}
+								<a href={partner.url} target="_blank" rel="noopener noreferrer">
+									<img
+										src={partner.logo}
+										alt={partner.name}
+										class="h-8 max-w-[120px] object-contain"
+									/>
+								</a>
+							{:else}
+								<a
+									href={partner.url}
+									target="_blank"
+									rel="noopener noreferrer"
+									class="font-sans text-sm font-medium underline"
+								>
+									{partner.name}
+								</a>
+							{/if}
+						{/each}
+					</div>
+				</div>
+			{/if}
+		</section>
+	</div>
 
 	<!-- Sticky pill nav -->
 	<StickyNav class="mx-auto max-w-4xl" />
