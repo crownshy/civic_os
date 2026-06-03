@@ -192,7 +192,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 		zipPrefixes: [],
 		heroHeader: 'AI and the Future of Our Communities',
 		heroBlurb:
-			'Share your thoughts with other test subjects making sense of this topic together. <a href="#context" class="text-destructive underline">Learn more \u2192</a>',
+			'Share your thoughts with other test subjects making sense of this topic together. <a href="#context" class="text-destructive">Learn more \u2192</a>',
 		contextParagraphs: [
 			'This is a testing environment for the landing page redesign \u2014 placeholder copy.',
 			'Use this region to validate UI changes without affecting any real conversation.'
@@ -233,7 +233,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 		zipPrefixes: ['84'],
 		heroHeader: 'AI and the Future of Our Communities',
 		heroBlurb:
-			'Share your thoughts with 300+ others in Utah who are making sense of this topic together. <a href="#context" class="text-destructive underline">Learn more \u2192</a>',
+			'Share your thoughts with 400+ Utah residents who are shaping the impact of artificial intelligence together. <a href="#context" class="text-destructive ">Learn more \u2192</a>',
 		contextParagraphs: [
 			'AI is reshaping work, school, government services, and daily life across Utah \u2014 and Utahns have a choice in how we respond. This is a place for us to weigh in.'
 		],
@@ -407,7 +407,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 		zipPrefixes: ['97'],
 		heroHeader: 'AI & Our Communities',
 		heroBlurb:
-			'Share your thoughts with <strong>300+ others in Central Oregon</strong> who are making sense of this topic together. <a href="#context" class="text-destructive underline">Learn more →</a>',
+			'Share your thoughts with <strong>300+ Central Oregon residents</strong> who are shaping the impact of artificial intelligence together. <a href="#context" class="text-destructive">Learn more →</a>',
 		contextParagraphs: [
 			'AI is reshaping Central Oregon — and we have a choice in how we respond. This is a place for us to weigh in.',
 			'The 2026 Community Solutions Assembly on AI asks how Central Oregon can ensure the benefits of AI are widely shared and its risks responsibly managed in our communities. It starts with an Open Poll you can access today; this only takes a few minutes and it shapes everything that follows.'
@@ -602,7 +602,7 @@ export const GENERIC_REGION: RegionConfig = {
 	zipPrefixes: [],
 	heroHeader: 'AI and the Future of Our Communities',
 	heroBlurb:
-		'Share your thoughts with others across America who are weighing in on how AI is changing our country. <a href="#context" class="text-destructive underline">Learn more →</a>',
+		'Share your thoughts with others across America who are weighing in on how AI is changing our country. <a href="#context" class="text-destructive">Learn more →</a>',
 	contextParagraphs: [
 		"People across America are weighing in on how AI is changing our country — and what we should do about it. Now it's your turn.",
 		'Your responses, combined with everyone else\u2019s, will help surface what Americans have in common, where we differ, and what we might tackle together. Results will be published publicly so anyone can see where people stand.'

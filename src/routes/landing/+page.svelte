@@ -175,15 +175,15 @@
 						OPEN POLL
 					</span>
 				</div>
-				<h1 class="mt-6 text-center font-display text-5xl leading-[1.05] font-medium tracking-display">
+				<h1 class="mt-3 text-center font-display text-5xl leading-[1.05] font-medium tracking-display md:text-6xl">
 					{region.heroHeader}
 				</h1>
-				<p class="mt-6 text-center font-sans text-base leading-5 font-medium">
+				<p class="mt-6 text-center font-sans text-base leading-5 font-medium md:text-lg md:leading-6">
 					{@html region.heroBlurb}
 				</p>
 
 				<div class="mt-10 flex flex-col items-center">
-					<span class="font-display text-base font-medium opacity-80">Your location</span>
+					<span class="font-display text-base font-medium opacity-80 md:text-lg">Your location</span>
 					<div class="mt-1.5 w-full max-w-sm">
 						<ZipInput
 							bind:value={zipCode}
@@ -215,7 +215,7 @@
 			<!-- Partner logos deferred. Renders linked names until logo URLs land on RegionConfig.partners[].logo. -->
 			{#if region.partners.length > 0}
 				<div class="mt-10 flex flex-col items-center gap-3 md:mt-6">
-					<span class="font-display text-base font-medium opacity-80">Hosted by</span>
+					<span class="font-display text-base font-medium opacity-80 md:text-lg">Hosted by</span>
 					<div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-4 text-center">
 						{#each region.partners as partner (partner.url)}
 							{#if partner.logo}
@@ -231,7 +231,7 @@
 									href={partner.url}
 									target="_blank"
 									rel="noopener noreferrer"
-									class="font-sans text-sm font-medium underline"
+									class="font-sans text-sm font-medium underline md:text-base"
 								>
 									{partner.name}
 								</a>
@@ -248,32 +248,32 @@
 
 	<!-- Context -->
 	<section id="context" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
-		<h2 class="font-display text-2xl font-medium">Context</h2>
+		<h2 class="font-display text-2xl font-medium md:text-3xl">Context</h2>
 		<div class="mt-6 flex flex-col gap-7">
 			{#each region.contextParagraphs as paragraph, i (i)}
-				<p class="font-sans text-base leading-6 font-medium opacity-80">{@html paragraph}</p>
+				<p class="font-sans text-base leading-6 font-medium opacity-80 md:text-lg md:leading-7">{@html paragraph}</p>
 			{/each}
 		</div>
 	</section>
 
 	<!-- What is an Open Poll? -->
 	<section id="how-it-works" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
-		<h2 class="font-display text-2xl font-medium">What is an "Open Poll"?</h2>
+		<h2 class="font-display text-2xl font-medium md:text-3xl">What is an "Open Poll"?</h2>
 		<div class="mt-6 flex flex-col gap-7">
 			{#each OPEN_POLL_EXPLAINER as paragraph, i (i)}
-				<p class="font-sans text-base leading-6 font-medium opacity-80">{paragraph}</p>
+				<p class="font-sans text-base leading-6 font-medium opacity-80 md:text-lg md:leading-7">{paragraph}</p>
 			{/each}
 		</div>
 	</section>
 
 	<!-- Your Hosts -->
 	<section id="your-host" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
-		<h2 class="font-display text-2xl font-medium">Your Hosts</h2>
+		<h2 class="font-display text-2xl font-medium md:text-3xl">Your Hosts</h2>
 		<p class="mt-6 font-sans text-base leading-6 font-medium opacity-80">
 			{@html region.hostsBlurb}
 		</p>
 		{#if partnersText}
-			<p class="mt-4 font-sans text-sm leading-6 font-medium opacity-70">
+			<p class="mt-4 font-sans text-sm leading-6 font-medium opacity-70 md:text-base">
 				Your local hosts: {@html partnersText}.
 			</p>
 		{/if}
@@ -281,7 +281,7 @@
 
 	<!-- What's Next? -->
 	<section id="whats-next" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
-		<h2 class="font-display text-2xl font-medium">What's Next?</h2>
+		<h2 class="font-display text-2xl font-medium md:text-3xl">What's Next?</h2>
 		<p class="mt-6 font-sans text-base leading-6 font-medium opacity-80">
 			{@html region.whatsNext}
 		</p>
@@ -290,7 +290,7 @@
 	<!-- FAQ — hide when empty -->
 	{#if region.faq.length > 0}
 		<section id="faq" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
-			<h2 class="font-display text-2xl font-medium">Frequently Asked Questions</h2>
+			<h2 class="font-display text-2xl font-medium md:text-3xl">Frequently Asked Questions</h2>
 			<div class="mt-6">
 				<Accordion items={region.faq} />
 			</div>
@@ -300,16 +300,16 @@
 	<!-- Email signup. Reuses session.registerEmail flow — see ADR 0002. -->
 	<section class="mx-auto max-w-4xl border-y border-stone-500/20 px-8 py-12">
 		<div class="mx-auto flex max-w-md flex-col gap-4">
-			<h2 class="text-center font-display text-3xl font-medium">Stay in touch.</h2>
+			<h2 class="text-center font-display text-3xl font-medium md:text-4xl">Stay in touch.</h2>
 			{#if emailSuccess}
 				<p
-					class="text-center font-sans text-base leading-6 font-medium opacity-80"
+					class="text-center font-sans text-base leading-6 font-medium opacity-80 md:text-lg md:leading-7"
 					in:fade={{ duration: 400, delay: 300 }}
 				>
 					<strong>Thanks — you're on the list.</strong>
 				</p>
 			{:else}
-				<p class="text-center font-sans text-base leading-6 font-medium opacity-80">
+				<p class="text-center font-sans text-base leading-6 font-medium opacity-80 md:text-lg md:leading-7">
 					Share your email to receive updates on this conversation and more opportunities to share
 					your voice on this issue.
 				</p>
@@ -358,7 +358,7 @@
 						href={link.href}
 						target={link.external ? '_blank' : undefined}
 						rel={link.external ? 'noopener noreferrer' : undefined}
-						class="font-sans text-base leading-6 font-medium text-white hover:opacity-80"
+						class="font-sans text-base leading-6 font-medium text-white hover:opacity-80 md:text-lg"
 					>
 						{link.label}
 					</a>
