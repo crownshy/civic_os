@@ -235,8 +235,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 		heroBlurb:
 			'Share your thoughts with 300+ others in Utah who are making sense of this topic together. <a href="#context" class="text-destructive underline">Learn more \u2192</a>',
 		contextParagraphs: [
-			'AI is reshaping work, school, government services, and daily life across Utah \u2014 and Utahns have a choice in how we respond. This is a place for us to weigh in.',
-			'(Opportunity for more context!)'
+			'AI is reshaping work, school, government services, and daily life across Utah \u2014 and Utahns have a choice in how we respond. This is a place for us to weigh in.'
 		],
 		hostsBlurb:
 			'This conversation is hosted by <a href="https://www.utahcommonground.org/home" class="text-destructive underline">Utah Common Ground</a>, and supported by many other committed organizations, individuals, and partners across Utah.',
@@ -411,7 +410,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 			'Share your thoughts with <strong>300+ others in Central Oregon</strong> who are making sense of this topic together. <a href="#context" class="text-destructive underline">Learn more →</a>',
 		contextParagraphs: [
 			'AI is reshaping Central Oregon — and we have a choice in how we respond. This is a place for us to weigh in.',
-			'(Opportunity for more context!)'
+			'The 2026 Community Solutions Assembly on AI asks how Central Oregon can ensure the benefits of AI are widely shared and its risks responsibly managed in our communities. It starts with an Open Poll you can access today; this only takes a few minutes and it shapes everything that follows.'
 		],
 		hostsBlurb:
 			'This conversation is hosted by the <a href="https://cocap.us/" class="text-destructive underline">Central Oregon Civic Action Project</a>, and supported by many other committed organizations, individuals, and partners throughout Central Oregon.',

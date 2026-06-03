@@ -5,6 +5,7 @@
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { Button, Dialog, ZipInput, Accordion, StickyNav } from '$lib/components/ui';
+	import { Mail } from 'lucide-svelte';
 	import { Input } from '$lib/components/ui/input';
 	import { session } from '$lib/services/session.svelte';
 	import { getRegionByZipcode, getRegionUrl, REGIONS } from '$lib/config/regions';
@@ -93,8 +94,7 @@
 	// Email-only signup (no zip). Reuses session.join with empty zip — see
 	// docs/adr/0002-landing-email-reuses-participant-flow.md for the rationale and
 	// follow-up about a dedicated newsletter endpoint.
-	async function handleEmailSignup(e: SubmitEvent) {
-		e.preventDefault();
+	async function handleEmailSignup() {
 		emailError = '';
 		const trimmed = email.trim();
 		if (!trimmed) {
@@ -269,7 +269,7 @@
 		</p>
 		{#if partnersText}
 			<p class="mt-4 font-sans text-sm leading-6 font-medium opacity-70">
-				In partnership with: {@html partnersText}.
+				Your local hosts: {@html partnersText}.
 			</p>
 		{/if}
 	</section>
@@ -294,44 +294,54 @@
 
 	<!-- Email signup. Reuses session.registerEmail flow — see ADR 0002. -->
 	<section class="mx-auto max-w-4xl border-y border-stone-500/20 px-8 py-12">
-		<h2 class="text-center font-display text-3xl font-medium">Join the Conversation</h2>
-		{#if emailSuccess}
-			<p class="mt-6 text-center font-sans text-base font-medium opacity-80">
-				Thanks — you're on the list.
-			</p>
-		{:else}
-			<form onsubmit={handleEmailSignup} class="mt-6 flex flex-col gap-3">
-				<div
-					class="flex items-center gap-2.5 rounded-full bg-white px-5 py-3 shadow-[inset_2px_4px_4.4px_0px_rgba(0,0,0,0.10)]"
+		<div class="mx-auto flex max-w-md flex-col gap-4">
+			<h2 class="text-center font-display text-3xl font-medium">Stay in touch.</h2>
+			{#if emailSuccess}
+				<p
+					class="text-center font-sans text-base leading-6 font-medium opacity-80"
+					in:fade={{ duration: 400, delay: 300 }}
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="16"
-						height="16"
-						viewBox="0 0 24 24"
-						fill="currentColor"
-						class="text-neutral-600"
-						aria-hidden="true"
+					<strong>Thanks — you're on the list.</strong>
+				</p>
+			{:else}
+				<p class="text-center font-sans text-base leading-6 font-medium opacity-80">
+					Share your email to receive updates on this conversation and more opportunities to share
+					your voice on this issue.
+				</p>
+				<div class="flex flex-col gap-3.5">
+					<form
+						onsubmit={(e) => {
+							e.preventDefault();
+							handleEmailSignup();
+						}}
+						class="flex w-full items-center rounded-full bg-card px-5 py-3 shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)]"
+						class:ring-2={emailError}
+						class:ring-destructive={emailError}
 					>
-						<path
-							d="M3 8.5V18a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5l-9 5-9-5ZM21 6.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v.5l9 5 9-5Z"
+						<Mail class="size-4 shrink-0 text-muted-foreground/60" />
+						<Input
+							bind:value={email}
+							oninput={() => (emailError = '')}
+							type="email"
+							placeholder="email@xyz.com"
+							disabled={emailSubmitting}
+							class="ml-2.5 h-8 flex-1 rounded-none border-0 bg-transparent font-sans text-lg font-medium text-muted-foreground shadow-none placeholder:text-muted-foreground/50 focus-visible:ring-0"
 						/>
-					</svg>
-					<Input
-						type="email"
-						bind:value={email}
-						placeholder="email@xyz.com"
-						class="border-0 bg-transparent px-0 font-sans text-base font-medium text-stone-600 shadow-none placeholder:text-stone-600/60 focus-visible:ring-0"
-					/>
+					</form>
+					{#if emailError}
+						<p class="-mt-2 px-2 font-sans text-sm text-destructive">{emailError}</p>
+					{/if}
+					<Button
+						variant="primary"
+						fullWidth
+						disabled={!email.trim() || emailSubmitting}
+						onclick={handleEmailSignup}
+					>
+						{emailSubmitting ? 'SIGNING UP…' : 'SIGN UP FOR UPDATES'}
+					</Button>
 				</div>
-				{#if emailError}
-					<p class="px-2 font-sans text-sm text-destructive">{emailError}</p>
-				{/if}
-				<Button variant="primary" fullWidth disabled={emailSubmitting}>
-					{emailSubmitting ? 'SIGNING UP…' : 'SIGN UP FOR UPDATES'}
-				</Button>
-			</form>
-		{/if}
+			{/if}
+		</div>
 	</section>
 
 	<!-- Footer -->
