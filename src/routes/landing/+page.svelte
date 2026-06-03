@@ -10,6 +10,7 @@
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import InfoBar from '$lib/components/ui/InfoBar.svelte';
+	import { trackEvent } from '@lukulent/svelte-umami';
 
 	const region: RegionConfig = page.data.region;
 
@@ -37,10 +38,12 @@
 	});
 
 	function showTermsModal() {
+		trackEvent('ShownTermsModal');
 		showTermsMessage = true;
 	}
 
 	function handleAgreeToTos() {
+		trackEvent('AgreedToTerms');
 		session.setSessionField('hasAgreedToTos', true);
 		handleJoin();
 	}
@@ -67,6 +70,11 @@
 		// Check if we need to redirect to a different subdomain
 		if (zipRegion.slug !== region.slug) {
 			// Redirect to the appropriate subdomain with zipcode parameter
+			trackEvent('UnsupportedZipCode', {
+				zipCode,
+				regionSlug: region.slug,
+				zipRegion: zipRegion.slug
+			});
 			const redirectUrl = getRegionUrl(zipRegion, zipCode.trim(), window.location.hostname);
 			window.location.href = redirectUrl;
 			return;
@@ -82,6 +90,7 @@
 		);
 		joining = false;
 		if (success) {
+			trackEvent('SucccesfullSignup');
 			goto('/contribute');
 		}
 	}
