@@ -17,7 +17,8 @@ export const NAV_SECTIONS = [
 	{ id: 'context', label: 'CONTEXT' },
 	{ id: 'how-it-works', label: 'HOW IT WORKS' },
 	{ id: 'your-host', label: 'YOUR HOST' },
-	{ id: 'whats-next', label: "WHAT'S NEXT" }
+	{ id: 'whats-next', label: "WHAT'S NEXT" },
+	{ id: 'faq', label: 'FAQ' }
 ] as const;
 
 export type NavSectionId = (typeof NAV_SECTIONS)[number]['id'];

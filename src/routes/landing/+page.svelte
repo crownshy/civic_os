@@ -284,7 +284,7 @@
 
 	<!-- FAQ — hide when empty -->
 	{#if region.faq.length > 0}
-		<section class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
+		<section id="faq" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
 			<h2 class="font-display text-2xl font-medium">Frequently Asked Questions</h2>
 			<div class="mt-6">
 				<Accordion items={region.faq} />
