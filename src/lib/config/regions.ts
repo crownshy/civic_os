@@ -52,6 +52,9 @@ export interface RegionConfig {
 	/** ending Content */
 	whatsNext: string;
 	goDeeper: string;
+	/** End-page CTA card descriptions. Only region-flavored cards live here; email + review are hardcoded. */
+	endCtaJoinDescription: string;
+	endCtaShareDescription: string;
 	fullHosts: string;
 	/** Upcoming conversation events for this region */
 	events: ConversationEvent[];
@@ -114,6 +117,8 @@ const DEV_REGION: RegionConfig | null =
 				campaignPageHosts: 'Local development',
 				whatsNext: 'Keep coding!',
 				goDeeper: 'Test everything!',
+				endCtaJoinDescription: 'Test conversations are taking place locally.',
+				endCtaShareDescription: 'Anyone running dev is welcome to participate.',
 				fullHosts: 'Local Development',
 				shareUrl: 'http://dev.localhost:5173',
 				events: []
@@ -154,6 +159,8 @@ export const REGIONS: Record<string, RegionConfig> = {
 		campaignPageHosts: '',
 		whatsNext: 'Nothing',
 		goDeeper: 'Nothing',
+		endCtaJoinDescription: 'Conversations with neighbors are taking place in-person and online.',
+		endCtaShareDescription: 'Anyone in your community is welcome to participate.',
 		polis_workflow_step_id: '68425b0d-21e9-4f36-8c13-229dab4508bc',
 		fullHosts: '',
 		shareUrl: 'https://testing.bloomproject.us',
@@ -195,6 +202,9 @@ export const REGIONS: Record<string, RegionConfig> = {
 			'<a href="https://www.utahcommonground.org/get-involved" class="font-bold underline">Sign up↗</a> for live conversations about this topic, taking place both online and in-person across Salt Lake, Utah, and Cache counties. These conversations will be an opportunity to connect with your neighbors and develop shared values around AI\'s influence on the people we care about.',
 		goDeeper:
 			'The ultimate goal of this campaign is to surface common ground that lets Utahns take action from the local to state levels and beyond. If you are interested in getting involved in a deeper way, let us know at <Link href="mailto:hello@bloom-project.org" external class="font-bold">hello@bloom-project.org</Link>.',
+		endCtaJoinDescription:
+			'Conversations with neighbors in Utah are taking place in-person and online.',
+		endCtaShareDescription: 'Anyone in Utah is welcome to participate.',
 
 		polis_workflow_step_id: '9d1041f9-fda6-4597-b4b0-c1260e4b7268',
 		fullHosts: "<a href='https://www.utahcommonground.org/home'>Utah Common Ground</a>",
@@ -383,6 +393,9 @@ export const REGIONS: Record<string, RegionConfig> = {
 			'<a href="/conversations?utm_source=whatsNext">Join us</a> in May and June for small group conversations taking place in Deschutes, Jefferson, and Crook counties — both in-person and online. They\'ll build on the themes and common ground that emerge from this poll. Share your email above to stay in the loop, or visit <a href="https://cocap.us" target="_blank">cocap.us</a> to learn more.',
 		goDeeper:
 			'This process is ultimately about finding common ground and turning it into action that benefits Central Oregon communities. If you\'d like to get more involved, reach out to us at <a href="mailto:hello@cocap.us">hello@cocap.us</a>.',
+		endCtaJoinDescription:
+			'Conversations with neighbors in Central Oregon are taking place in-person and online.',
+		endCtaShareDescription: 'Anyone in Central Oregon is welcome to participate.',
 		polis_workflow_step_id: '8299fec7-a543-419f-8692-f68652648a0b',
 		shareUrl: 'https://oregon.bloomproject.us',
 		fullHosts:
@@ -544,6 +557,8 @@ export const GENERIC_REGION: RegionConfig = {
 		'When this conversation closes, Bloom will publish the results publicly — showing where Americans agree, where we differ, and what the opinion landscape looks like across different groups. We’ll share a link when it’s ready.',
 	goDeeper:
 		"If you’d like to host this conversation in your own community, reach out at <a href='mailto:hello@bloom-project.org'>hello@bloom-project.org</a> or visit <a href='https://www.bloom-project.org'>https://www.bloom-project.org</a>.",
+	endCtaJoinDescription: 'Community conversations are taking place in-person and online.',
+	endCtaShareDescription: 'Anyone is welcome to participate.',
 	polis_workflow_step_id: 'f553a7b9-b3ac-4159-b88d-198f609b110c',
 	shareUrl: 'https://all.bloomproject.us',
 	fullHosts: "<a href='https://www.bloom-project.org/'>The Bloom Project</a>.",
