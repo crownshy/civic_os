@@ -28,3 +28,5 @@ export { default as DonutChart } from './DonutChart.svelte';
 export { default as Card } from './Card.svelte';
 export { default as ConversationEventCard } from './ConversationEventCard.svelte';
 export { default as ReportPanel } from './ReportPanel.svelte';
+export { default as Accordion } from './Accordion.svelte';
+export { default as StickyNav } from './StickyNav.svelte';

@@ -75,7 +75,7 @@
 		</div>
 		<div class="absolute top-[3px] left-0 flex w-full items-start justify-between px-4 py-2">
 			<span class="pr-4 font-mono text-sm font-medium text-muted-foreground/70 uppercase"
-				>{region.carouselHeader}</span
+				>{region.heroHeader}</span
 			>
 			<span class="shrink-0 font-mono text-sm font-medium text-muted-foreground/70 uppercase"
 				>{remaining} LEFT</span
