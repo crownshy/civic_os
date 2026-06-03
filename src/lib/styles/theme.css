@@ -46,6 +46,8 @@
 	--font-sans: 'Hanken Grotesk', sans-serif;
 	--font-serif: Merriweather, serif;
 	--font-mono: 'DM Mono', monospace;
+	--font-display: 'Geom', 'Hanken Grotesk', sans-serif;
+	--tracking-display: -0.01em;
 
 	--radius: 0.5rem;
 	--radius-xs: calc(0.5rem - 6px);

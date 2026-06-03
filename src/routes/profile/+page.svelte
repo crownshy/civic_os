@@ -16,7 +16,11 @@
 				</span>
 			</div>
 
-			<h1 class="mt-4 font-sans text-3xl leading-9 font-bold text-primary-foreground">PROFILE</h1>
+			<h1
+				class="mt-4 font-display text-3xl leading-9 font-medium tracking-display text-primary-foreground"
+			>
+				PROFILE
+			</h1>
 
 			<!-- User card -->
 			<div class="mt-4 flex items-center gap-4 rounded-2xl bg-card p-4">

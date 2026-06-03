@@ -16,7 +16,9 @@
 		<!-- Key question label + question -->
 		<div class="bg-primary px-8 pb-4">
 			<MonoLabel size="sm" variant="white">KEY QUESTION</MonoLabel>
-			<h1 class="mt-2 font-sans text-3xl leading-9 font-semibold text-primary-foreground">
+			<h1
+				class="mt-2 font-display text-3xl leading-9 font-medium tracking-display text-primary-foreground"
+			>
 				{region.question}
 			</h1>
 			<div class="mt-6">
@@ -27,7 +29,7 @@
 		<div class="w-full rounded-t-lg bg-card">
 			<!-- Participant count -->
 			<div class="px-8 pt-8">
-				<h2 class="font-sans text-4xl font-bold text-primary">
+				<h2 class="font-display text-4xl font-medium tracking-display text-primary">
 					{county.participantCount} PARTICIPANTS
 				</h2>
 				<MonoLabel size="sm" variant="primary" class="mt-1">

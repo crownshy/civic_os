@@ -105,7 +105,9 @@
 				</div>
 
 				<!-- Quote -->
-				<p class="mt-6 font-sans text-3xl leading-[1.25] font-semibold text-muted-foreground">
+				<p
+					class="mt-6 font-display text-3xl leading-tight font-medium tracking-display text-muted-foreground"
+				>
 					&ldquo;{statementText}&rdquo;
 				</p>
 			</div>

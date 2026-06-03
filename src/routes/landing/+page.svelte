@@ -5,7 +5,7 @@
 	import { AppShell } from '$lib/components/layout';
 	import { SwipeCarousel, Button, Dialog, ZipInput, Link } from '$lib/components/ui';
 	import { session } from '$lib/services/session.svelte';
-	import { getRegionByZipcode, getRegionUrl } from '$lib/config/regions';
+	import { getRegionByZipcode, getRegionUrl, REGIONS } from '$lib/config/regions';
 	import type { RegionConfig } from '$lib/config/regions';
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
@@ -51,8 +51,18 @@
 			return;
 		}
 
-		// Resolve region from zipcode
-		const zipRegion = getRegionByZipcode(zipCode.trim());
+		// Resolve region from zipcode.
+		//
+		// LOCAL DEV: when the `dev` region is registered (i.e. all four
+		// PUBLIC_DEV_* env vars are set), we FORCE every request to land on
+		// the dev region — no matter which subdomain or zipcode the user
+		// typed. This keeps you on your locally-seeded conversation/polis.
+		//
+		// To test the real prod redirect logic (utah/oregon/generic
+		// routing by zipcode), comment out / remove the four PUBLIC_DEV_*
+		// lines in `.env`, restart `pnpm dev`, then revisit the landing
+		// page — zip 84xxx will redirect to utah, 97xxx to oregon, etc.
+		const zipRegion = REGIONS.dev ? REGIONS.dev : getRegionByZipcode(zipCode.trim());
 
 		// Check if we need to redirect to a different subdomain
 		if (zipRegion.slug !== region.slug) {
@@ -104,7 +114,7 @@
 					{region.carouselPreHeader}
 				</span>
 				<h1
-					class="mt-2 text-center font-sans text-4xl leading-tight font-bold text-muted-foreground sm:mt-3"
+					class="mt-2 text-center font-display text-4xl leading-tight font-medium tracking-display text-muted-foreground sm:mt-3"
 				>
 					{region.carouselHeader}
 				</h1>

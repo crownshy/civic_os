@@ -98,7 +98,7 @@
 			<div class="flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
 				<span class="text-2xl">!</span>
 			</div>
-			<h2 class="text-center font-sans text-2xl font-bold text-foreground">
+			<h2 class="text-center font-display text-2xl font-medium tracking-display text-foreground">
 				Report data unavailable
 			</h2>
 			<p class="max-w-md text-center font-sans text-sm text-muted-foreground">
