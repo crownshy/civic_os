@@ -19,6 +19,10 @@ const handler: RequestHandler = async ({ request, params, cookies }) => {
 	const origin = request.headers.get('origin') || url.origin;
 	headers.set('origin', origin);
 
+	if (env.COMHAIRLE_API_KEY) {
+		headers.set("Authorization", `Bearer ${env.COMHAIRLE_API_KEY}`);
+	}
+
 	const authToken = cookies.get('auth-token');
 	if (authToken) {
 		headers.set('cookie', `auth-token=${authToken}`);
