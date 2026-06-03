@@ -16,7 +16,7 @@
 		<AccordionPrimitive.Item value={`item-${i}`} class="border-b border-foreground/10">
 			<AccordionPrimitive.Header>
 				<AccordionPrimitive.Trigger
-					class="group flex w-full items-center justify-between gap-4 py-4 text-left font-sans text-base font-medium text-foreground transition hover:opacity-80"
+					class="group flex w-full items-center justify-between gap-4 py-4 text-left font-sans text-base font-medium text-foreground transition hover:opacity-80 md:text-lg"
 				>
 					<span>{item.question}</span>
 					<svg
@@ -37,7 +37,7 @@
 				</AccordionPrimitive.Trigger>
 			</AccordionPrimitive.Header>
 			<AccordionPrimitive.Content
-				class="overflow-hidden font-sans text-base leading-6 font-medium text-foreground/80 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+				class="overflow-hidden font-sans text-base leading-6 font-medium text-foreground/80 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down md:text-lg md:leading-7"
 			>
 				<div class="pb-4">{@html item.answer}</div>
 			</AccordionPrimitive.Content>

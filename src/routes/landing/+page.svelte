@@ -5,6 +5,7 @@
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { Button, Dialog, ZipInput, Accordion, StickyNav } from '$lib/components/ui';
+	import { Mail } from 'lucide-svelte';
 	import { Input } from '$lib/components/ui/input';
 	import { session } from '$lib/services/session.svelte';
 	import { getRegionByZipcode, getRegionUrl, REGIONS } from '$lib/config/regions';
@@ -93,8 +94,7 @@
 	// Email-only signup (no zip). Reuses session.join with empty zip — see
 	// docs/adr/0002-landing-email-reuses-participant-flow.md for the rationale and
 	// follow-up about a dedicated newsletter endpoint.
-	async function handleEmailSignup(e: SubmitEvent) {
-		e.preventDefault();
+	async function handleEmailSignup() {
 		emailError = '';
 		const trimmed = email.trim();
 		if (!trimmed) {
@@ -136,147 +136,152 @@
 </svelte:head>
 
 <div class="min-h-screen bg-gradient-to-b from-orange-50 to-orange-100 text-yellow-950">
-	<!-- Header chip row — bypasses AppShell. See docs/adr/0001-landing-bypasses-appshell.md -->
-	<header class="flex items-center justify-between px-6 pt-4 pb-2">
-		<div class="flex items-center gap-2 font-mono text-sm font-medium text-stone-500 uppercase">
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="14"
-				height="14"
-				viewBox="0 0 24 24"
-				fill="currentColor"
-				aria-hidden="true"
-			>
-				<path
-					d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0Zm-8 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
-				/>
-			</svg>
-			{region.stateName.toUpperCase()}
-		</div>
-		<button
-			type="button"
-			onclick={() => (showAboutMessage = true)}
-			class="rounded-[20px] bg-yellow-600/10 px-2 py-0.5 font-mono text-sm font-medium text-stone-500 hover:bg-yellow-600/20"
-		>
-			ABOUT→
-		</button>
-	</header>
-
-	<!-- Hero -->
-	<section id="join" class="mx-auto max-w-4xl scroll-mt-24 px-6 pt-4 pb-10">
-		<div class="flex justify-center">
-			<span
-				class="rounded-[30px] bg-yellow-950 px-3.5 py-2 font-mono text-sm font-medium text-white"
-			>
-				OPEN POLL
-			</span>
-		</div>
-		<h1 class="mt-6 text-center font-display text-5xl leading-[1.05] font-medium tracking-display">
-			{region.heroHeader}
-		</h1>
-		<p class="mt-6 text-center font-sans text-base leading-5 font-medium">
-			{@html region.heroBlurb}
-		</p>
-
-		<div class="mt-10 flex flex-col items-center">
-			<span class="font-display text-base font-medium opacity-80">Your location</span>
-			<div class="mt-1.5 w-full max-w-sm">
-				<ZipInput
-					bind:value={zipCode}
-					disabled={isReturning}
-					bind:flash={zipFlash}
-					regionPrefixes={region.zipPrefixes}
-				/>
+	<!-- Above-fold container: header + hero fill the viewport on desktop -->
+	<div class="flex flex-col md:h-screen">
+		<!-- Header chip row — bypasses AppShell. See docs/adr/0001-landing-bypasses-appshell.md -->
+		<header class="flex items-center justify-between px-6 pt-4 pb-2">
+			<div class="flex items-center gap-2 font-mono text-sm font-medium text-stone-500 uppercase">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="14"
+					height="14"
+					viewBox="0 0 24 24"
+					fill="currentColor"
+					aria-hidden="true"
+				>
+					<path
+						d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0Zm-8 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+					/>
+				</svg>
+				{region.stateName.toUpperCase()}
 			</div>
-			<Button
-				variant="primary"
-				fullWidth
-				disabled={joining}
-				onclick={() => {
-					if (!hasZip) {
-						zipFlash = true;
-						return;
-					}
-					if (hasAgreedToTos) handleJoin();
-					else showTermsModal();
-				}}
-				class="mt-4 max-w-sm"
+			<button
+				type="button"
+				onclick={() => (showAboutMessage = true)}
+				class="rounded-[20px] bg-yellow-600/10 px-2 py-0.5 font-mono text-sm font-medium text-stone-500 hover:bg-yellow-600/20"
 			>
-				{isReturning ? 'CONTINUE' : 'JOIN THE CONVERSATION'}
-			</Button>
-		</div>
+				ABOUT→
+			</button>
+		</header>
 
-		<!-- Hosted by strip — partner logos deferred. Renders linked names until logo URLs
-		     land on RegionConfig.partners[].logo. See landing redesign follow-ups. -->
-		{#if region.partners.length > 0}
-			<div class="mt-10 flex flex-col items-center gap-3">
-				<span class="font-display text-base font-medium opacity-80">Hosted by</span>
-				<div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-4 text-center">
-					<!-- TODO: add logos -->
-					{#each region.partners as partner (partner.url)}
-						{#if partner.logo}
-							<a href={partner.url} target="_blank" rel="noopener noreferrer">
-								<img
-									src={partner.logo}
-									alt={partner.name}
-									class="h-8 max-w-[120px] object-contain"
-								/>
-							</a>
-						{:else}
-							<a
-								href={partner.url}
-								target="_blank"
-								rel="noopener noreferrer"
-								class="font-sans text-sm font-medium underline"
-							>
-								{partner.name}
-							</a>
-						{/if}
-					{/each}
+		<!-- Hero -->
+		<section id="join" class="mx-auto flex w-full max-w-4xl flex-col scroll-mt-24 px-6 pt-4 pb-10 md:flex-1 md:pb-8">
+			<!-- Chip, headline, blurb, and join form — vertically centered on desktop -->
+			<div class="flex flex-col items-center md:flex-1 md:justify-center">
+				<div class="flex justify-center">
+					<span
+						class="rounded-[30px] bg-yellow-950 px-3.5 py-2 font-mono text-sm font-medium text-white"
+					>
+						OPEN POLL
+					</span>
+				</div>
+				<h1 class="mt-3 text-center font-display text-5xl leading-[1.05] font-medium tracking-display md:text-6xl">
+					{region.heroHeader}
+				</h1>
+				<p class="mt-6 text-center font-sans text-base leading-5 font-medium md:text-lg md:leading-6">
+					{@html region.heroBlurb}
+				</p>
+
+				<div class="mt-10 flex flex-col items-center">
+					<span class="font-display text-base font-medium opacity-80 md:text-lg">Your location</span>
+					<div class="mt-1.5 w-full max-w-sm">
+						<ZipInput
+							bind:value={zipCode}
+							disabled={isReturning}
+							bind:flash={zipFlash}
+							regionPrefixes={region.zipPrefixes}
+						/>
+					</div>
+					<Button
+						variant="primary"
+						fullWidth
+						disabled={joining}
+						onclick={() => {
+							if (!hasZip) {
+								zipFlash = true;
+								return;
+							}
+							if (hasAgreedToTos) handleJoin();
+							else showTermsModal();
+						}}
+						class="mt-4 max-w-sm"
+					>
+						{isReturning ? 'CONTINUE' : 'JOIN THE CONVERSATION'}
+					</Button>
 				</div>
 			</div>
-		{/if}
-	</section>
+
+			<!-- Hosted by strip — below the centered block, still above the fold on desktop -->
+			<!-- Partner logos deferred. Renders linked names until logo URLs land on RegionConfig.partners[].logo. -->
+			{#if region.partners.length > 0}
+				<div class="mt-10 flex flex-col items-center gap-3 md:mt-6">
+					<span class="font-display text-base font-medium opacity-80 md:text-lg">Hosted by</span>
+					<div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-4 text-center">
+						{#each region.partners as partner (partner.url)}
+							{#if partner.logo}
+								<a href={partner.url} target="_blank" rel="noopener noreferrer">
+									<img
+										src={partner.logo}
+										alt={partner.name}
+										class="h-8 max-w-[120px] object-contain"
+									/>
+								</a>
+							{:else}
+								<a
+									href={partner.url}
+									target="_blank"
+									rel="noopener noreferrer"
+									class="font-sans text-sm font-medium underline md:text-base"
+								>
+									{partner.name}
+								</a>
+							{/if}
+						{/each}
+					</div>
+				</div>
+			{/if}
+		</section>
+	</div>
 
 	<!-- Sticky pill nav -->
 	<StickyNav class="mx-auto max-w-4xl" />
 
 	<!-- Context -->
 	<section id="context" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
-		<h2 class="font-display text-2xl font-medium">Context</h2>
+		<h2 class="font-display text-2xl font-medium md:text-3xl">Context</h2>
 		<div class="mt-6 flex flex-col gap-7">
 			{#each region.contextParagraphs as paragraph, i (i)}
-				<p class="font-sans text-base leading-6 font-medium opacity-80">{@html paragraph}</p>
+				<p class="font-sans text-base leading-6 font-medium opacity-80 md:text-lg md:leading-7">{@html paragraph}</p>
 			{/each}
 		</div>
 	</section>
 
 	<!-- What is an Open Poll? -->
 	<section id="how-it-works" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
-		<h2 class="font-display text-2xl font-medium">What is an "Open Poll"?</h2>
+		<h2 class="font-display text-2xl font-medium md:text-3xl">What is an "Open Poll"?</h2>
 		<div class="mt-6 flex flex-col gap-7">
 			{#each OPEN_POLL_EXPLAINER as paragraph, i (i)}
-				<p class="font-sans text-base leading-6 font-medium opacity-80">{paragraph}</p>
+				<p class="font-sans text-base leading-6 font-medium opacity-80 md:text-lg md:leading-7">{paragraph}</p>
 			{/each}
 		</div>
 	</section>
 
 	<!-- Your Hosts -->
 	<section id="your-host" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
-		<h2 class="font-display text-2xl font-medium">Your Hosts</h2>
+		<h2 class="font-display text-2xl font-medium md:text-3xl">Your Hosts</h2>
 		<p class="mt-6 font-sans text-base leading-6 font-medium opacity-80">
 			{@html region.hostsBlurb}
 		</p>
 		{#if partnersText}
-			<p class="mt-4 font-sans text-sm leading-6 font-medium opacity-70">
-				In partnership with: {@html partnersText}.
+			<p class="mt-4 font-sans text-sm leading-6 font-medium opacity-70 md:text-base">
+				Your local hosts: {@html partnersText}.
 			</p>
 		{/if}
 	</section>
 
 	<!-- What's Next? -->
 	<section id="whats-next" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
-		<h2 class="font-display text-2xl font-medium">What's Next?</h2>
+		<h2 class="font-display text-2xl font-medium md:text-3xl">What's Next?</h2>
 		<p class="mt-6 font-sans text-base leading-6 font-medium opacity-80">
 			{@html region.whatsNext}
 		</p>
@@ -284,8 +289,8 @@
 
 	<!-- FAQ — hide when empty -->
 	{#if region.faq.length > 0}
-		<section class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
-			<h2 class="font-display text-2xl font-medium">Frequently Asked Questions</h2>
+		<section id="faq" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
+			<h2 class="font-display text-2xl font-medium md:text-3xl">Frequently Asked Questions</h2>
 			<div class="mt-6">
 				<Accordion items={region.faq} />
 			</div>
@@ -294,44 +299,54 @@
 
 	<!-- Email signup. Reuses session.registerEmail flow — see ADR 0002. -->
 	<section class="mx-auto max-w-4xl border-y border-stone-500/20 px-8 py-12">
-		<h2 class="text-center font-display text-3xl font-medium">Join the Conversation</h2>
-		{#if emailSuccess}
-			<p class="mt-6 text-center font-sans text-base font-medium opacity-80">
-				Thanks — you're on the list.
-			</p>
-		{:else}
-			<form onsubmit={handleEmailSignup} class="mt-6 flex flex-col gap-3">
-				<div
-					class="flex items-center gap-2.5 rounded-full bg-white px-5 py-3 shadow-[inset_2px_4px_4.4px_0px_rgba(0,0,0,0.10)]"
+		<div class="mx-auto flex max-w-md flex-col gap-4">
+			<h2 class="text-center font-display text-3xl font-medium md:text-4xl">Stay in touch.</h2>
+			{#if emailSuccess}
+				<p
+					class="text-center font-sans text-base leading-6 font-medium opacity-80 md:text-lg md:leading-7"
+					in:fade={{ duration: 400, delay: 300 }}
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="16"
-						height="16"
-						viewBox="0 0 24 24"
-						fill="currentColor"
-						class="text-neutral-600"
-						aria-hidden="true"
+					<strong>Thanks — you're on the list.</strong>
+				</p>
+			{:else}
+				<p class="text-center font-sans text-base leading-6 font-medium opacity-80 md:text-lg md:leading-7">
+					Share your email to receive updates on this conversation and more opportunities to share
+					your voice on this issue.
+				</p>
+				<div class="flex flex-col gap-3.5">
+					<form
+						onsubmit={(e) => {
+							e.preventDefault();
+							handleEmailSignup();
+						}}
+						class="flex w-full items-center rounded-full bg-card px-5 py-3 shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)]"
+						class:ring-2={emailError}
+						class:ring-destructive={emailError}
 					>
-						<path
-							d="M3 8.5V18a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5l-9 5-9-5ZM21 6.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v.5l9 5 9-5Z"
+						<Mail class="size-4 shrink-0 text-muted-foreground/60" />
+						<Input
+							bind:value={email}
+							oninput={() => (emailError = '')}
+							type="email"
+							placeholder="email@xyz.com"
+							disabled={emailSubmitting}
+							class="ml-2.5 h-8 flex-1 rounded-none border-0 bg-transparent font-sans text-lg font-medium text-muted-foreground shadow-none placeholder:text-muted-foreground/50 focus-visible:ring-0"
 						/>
-					</svg>
-					<Input
-						type="email"
-						bind:value={email}
-						placeholder="email@xyz.com"
-						class="border-0 bg-transparent px-0 font-sans text-base font-medium text-stone-600 shadow-none placeholder:text-stone-600/60 focus-visible:ring-0"
-					/>
+					</form>
+					{#if emailError}
+						<p class="-mt-2 px-2 font-sans text-sm text-destructive">{emailError}</p>
+					{/if}
+					<Button
+						variant="primary"
+						fullWidth
+						disabled={!email.trim() || emailSubmitting}
+						onclick={handleEmailSignup}
+					>
+						{emailSubmitting ? 'SIGNING UP…' : 'SIGN UP FOR UPDATES'}
+					</Button>
 				</div>
-				{#if emailError}
-					<p class="px-2 font-sans text-sm text-destructive">{emailError}</p>
-				{/if}
-				<Button variant="primary" fullWidth disabled={emailSubmitting}>
-					{emailSubmitting ? 'SIGNING UP…' : 'SIGN UP FOR UPDATES'}
-				</Button>
-			</form>
-		{/if}
+			{/if}
+		</div>
 	</section>
 
 	<!-- Footer -->
@@ -343,7 +358,7 @@
 						href={link.href}
 						target={link.external ? '_blank' : undefined}
 						rel={link.external ? 'noopener noreferrer' : undefined}
-						class="font-sans text-base leading-6 font-medium text-white hover:opacity-80"
+						class="font-sans text-base leading-6 font-medium text-white hover:opacity-80 md:text-lg"
 					>
 						{link.label}
 					</a>

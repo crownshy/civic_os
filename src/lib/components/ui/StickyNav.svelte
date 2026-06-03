@@ -68,7 +68,10 @@
 	$effect(() => {
 		const pill = pillRefs.get(activeId);
 		if (pill && scrollContainer) {
-			pill.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+			const pillRect = pill.getBoundingClientRect();
+			const containerRect = scrollContainer.getBoundingClientRect();
+			const target = pillRect.left - containerRect.left + scrollContainer.scrollLeft - 15;
+			scrollContainer.scrollTo({ left: target, behavior: 'smooth' });
 		}
 	});
 </script>
@@ -83,7 +86,7 @@
 	style:top="{topOffset}px"
 	bind:this={scrollContainer}
 >
-	<div class="flex items-center gap-2.5 px-6 py-2.5">
+	<div class="flex items-center gap-2.5 px-6 py-2.5 md:justify-center">
 		{#each NAV_SECTIONS as section (section.id)}
 			{@const isActive = activeId === section.id}
 			<button
