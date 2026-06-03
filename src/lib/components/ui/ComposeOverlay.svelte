@@ -55,7 +55,7 @@
 
 	<!-- Question -->
 	<div class="px-5 pt-4">
-		<p class="font-sans text-3xl leading-10 font-bold text-foreground">
+		<p class="font-display text-3xl leading-10 font-medium tracking-display text-foreground">
 			{question}
 		</p>
 	</div>

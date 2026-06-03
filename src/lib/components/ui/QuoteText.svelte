@@ -13,7 +13,7 @@
 
 <p
 	class={cn(
-		'font-mono font-medium',
+		'font-display font-medium tracking-display',
 		size === 'md' && 'text-2xl leading-7',
 		size === 'lg' && 'text-3xl leading-9',
 		size === 'xl' && 'text-4xl',

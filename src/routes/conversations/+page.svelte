@@ -52,7 +52,7 @@
 				<span class="font-mono text-sm font-medium text-white">AI &amp; OUR COMMUNITIES</span>
 			</div>
 			<h1
-				class="mt-3 text-center font-sans text-5xl leading-[2.75rem] font-extrabold text-foreground"
+				class="mt-3 text-center font-display text-5xl leading-[2.75rem] font-medium tracking-display text-foreground"
 			>
 				Conversations in {region.stateName}
 			</h1>
@@ -104,7 +104,9 @@
 							<strong>Received! We'll be in touch.</strong>
 						</p>
 					{:else}
-						<h2 class="text-center font-sans text-3xl leading-8 font-bold text-muted-foreground">
+						<h2
+							class="text-center font-display text-3xl leading-8 font-medium tracking-display text-muted-foreground"
+						>
 							Coming Soon
 						</h2>
 						<p class="text-center font-sans text-base leading-6 font-medium text-muted-foreground">

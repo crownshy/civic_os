@@ -23,7 +23,7 @@
 	)}
 >
 	<div class="min-w-0 flex-1">
-		<h2 class="pr-7 font-sans text-2xl leading-7 font-bold text-foreground">
+		<h2 class="pr-7 font-display text-2xl leading-7 font-medium tracking-display text-foreground">
 			{event.title}
 		</h2>
 		<p class="mt-1 font-sans text-base leading-4 font-bold text-foreground/70">

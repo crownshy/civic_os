@@ -100,7 +100,7 @@
 		>
 
 		<p
-			class="mt-4 font-sans text-4xl leading-9 font-bold text-foreground"
+			class="mt-4 font-display text-4xl leading-9 font-medium tracking-display text-foreground"
 			in:fly={{ y: 10, duration: 400, delay: 200, easing: cubicOut }}
 		>
 			Help {region.stateName} see itself.

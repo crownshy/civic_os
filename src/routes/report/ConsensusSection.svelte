@@ -49,7 +49,9 @@
 	</div>
 
 	<div class="mt-4 px-8">
-		<h2 class="text-center font-sans text-3xl leading-8 font-bold text-primary-foreground">
+		<h2
+			class="text-center font-display text-3xl leading-8 font-medium tracking-display text-primary-foreground"
+		>
 			In spite of differences, everyone seemed to agree on certain things.
 		</h2>
 	</div>
