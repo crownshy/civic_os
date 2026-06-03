@@ -557,24 +557,12 @@ export const REGIONS: Record<string, RegionConfig> = {
 				description: 'Join us for small group conversations about AI in Central Oregon!'
 			},
 			{
-				slug: 'jun-13-la-pine',
-				title: 'La Pine Community Conversation on AI',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'La Pine, OR',
-				venueName: 'TBD',
-				time: '1:00PM',
-				endTime: '2:30PM',
-				date: '2026-06-13T13:00:00-07:00',
-				duration: '1.5 hours',
-				format: 'in-person',
-				description: 'Join us for small group conversations about AI in Central Oregon!'
-			},
-			{
 				slug: 'jun-13-redmond',
 				title: 'Redmond Community Conversation on AI',
 				topic: 'COMMUNITY CONVERSATION',
 				location: 'Redmond, OR',
-				venueName: 'TBD',
+				venueName: 'NeighborImpact Boardroom',
+				address: '2303 SW First Street, Redmond, OR',
 				time: '1:00PM',
 				endTime: '2:30PM',
 				date: '2026-06-13T13:00:00-07:00',
