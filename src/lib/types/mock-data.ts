@@ -83,6 +83,7 @@ export interface ConversationEvent {
 	duration?: string;
 	imageUrl?: string;
 	signupUrl?: string;
+	joinUrl?: string;
 }
 
 export interface AboutYouQuestion {

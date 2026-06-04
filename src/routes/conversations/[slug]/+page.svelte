@@ -23,6 +23,7 @@
 	let hoursLeft = $state(0);
 	let minutesLeft = $state(0);
 	let isPast = $state(false);
+	let isInProgress = $state(false);
 	let interval: ReturnType<typeof setInterval> | null = null;
 	let showForm = $state(false);
 	let isRegistered = $state(false);
@@ -82,12 +83,26 @@
 			: ''
 	);
 
+	function getEventEnd(target: Date): Date {
+		if (!event?.endTime) return addHours(target, 2); // fallback: 2h window
+		const hhmm = parseTime12To24(event.endTime);
+		if (!hhmm) return addHours(target, 2);
+		const [h, m] = hhmm.split(':').map(Number);
+		const end = new Date(target);
+		end.setHours(h, m, 0, 0);
+		// if end time of day is before start (shouldn't happen, but guard), bump a day
+		if (end.getTime() <= target.getTime()) end.setDate(end.getDate() + 1);
+		return end;
+	}
+
 	function updateCountdown() {
 		if (!event) return;
 		const now = new Date();
 		const target = new Date(event.date);
-		isPast = isBefore(addHours(target, 2), now); // past if >2h after start
-		if (isPast || isBefore(target, now)) {
+		const endsAt = getEventEnd(target);
+		isPast = isBefore(endsAt, now);
+		isInProgress = !isPast && !isBefore(now, target); // now in [start, end)
+		if (isPast || isInProgress) {
 			daysLeft = 0;
 			hoursLeft = 0;
 			minutesLeft = 0;
@@ -97,6 +112,12 @@
 		hoursLeft = differenceInHours(target, now) % 24;
 		minutesLeft = differenceInMinutes(target, now) % 60;
 	}
+
+	const mapsUrl = $derived(
+		event?.address
+			? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.address)}`
+			: undefined
+	);
 
 	onMount(() => {
 		if (!event) return;
@@ -191,9 +212,11 @@
 
 				<!-- CTA -->
 				<div class="mt-5 w-full">
-					<!-- <p class="mb-3 text-center text-base font-medium text-foreground">
+					<p class="mb-3 text-center font-mono text-xs font-medium tracking-wider text-foreground/60 uppercase">
 						{#if isPast}
-							Event has passed.
+							Event has passed
+						{:else if isInProgress}
+							Event is in progress!
 						{:else if daysLeft > 0}
 							Event starts in {daysLeft} {daysLeft === 1 ? 'day' : 'days'}
 						{:else if hoursLeft > 0}
@@ -201,11 +224,31 @@
 						{:else if minutesLeft > 0}
 							Event starts in {minutesLeft} {minutesLeft === 1 ? 'min' : 'mins'}
 						{:else}
-							HAPPENING NOW
+							Happening now
 						{/if}
-					</p> -->
+					</p>
 
-					{#if isRegistered}
+					{#if isPast}
+						<Button variant="primary" fullWidth size="lg" disabled>EVENT HAS PASSED</Button>
+					{:else if isInProgress}
+						{#if event.format === 'online' && event.joinUrl}
+							<Button
+								variant="primary"
+								fullWidth
+								size="lg"
+								href={event.joinUrl}
+								target="_blank"
+							>
+								JOIN NOW
+							</Button>
+						{:else if event.format !== 'online' && mapsUrl}
+							<Button variant="primary" fullWidth size="lg" href={mapsUrl} target="_blank">
+								GET DIRECTIONS
+							</Button>
+						{:else}
+							<Button variant="primary" fullWidth size="lg" disabled>HAPPENING NOW</Button>
+						{/if}
+					{:else if isRegistered}
 						<button
 							class="w-full rounded-full bg-secondary/20 px-7 py-3.5 font-mono text-lg font-medium text-foreground"
 							disabled

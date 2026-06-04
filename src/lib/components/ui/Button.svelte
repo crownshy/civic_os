@@ -21,6 +21,8 @@
 		disabled?: boolean;
 		type?: 'button' | 'submit' | 'reset';
 		href?: string;
+		target?: HTMLAnchorAttributes['target'];
+		rel?: string;
 		onclick?: (e: MouseEvent) => void;
 		class?: string;
 		children: Snippet;
@@ -33,6 +35,8 @@
 		disabled = false,
 		type = 'button',
 		href,
+		target,
+		rel,
 		onclick,
 		class: className,
 		children,
@@ -85,7 +89,7 @@
 </script>
 
 {#if href && !disabled}
-	<a {href} class={classes}>
+	<a {href} {target} rel={rel ?? (target === '_blank' ? 'noopener noreferrer' : undefined)} class={classes}>
 		{@render children()}
 	</a>
 {:else}
