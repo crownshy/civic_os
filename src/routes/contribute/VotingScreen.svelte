@@ -8,8 +8,14 @@
 		countyName: string;
 		statementText: string;
 		statementId: number;
+		/** Statements left in the current batch — drives the progress bar (cycles 0…BATCH_SIZE). */
 		remaining: number;
+		/** Total statements in the current batch (typically BATCH_SIZE). */
 		total: number;
+		/** True remaining count from Polis. If provided, shown in the top-right "X LEFT" label
+		 *  instead of `remaining`. The progress bar stays batch-based; this is honest about
+		 *  the actual pool. Falls back to `remaining` when omitted (older callers). */
+		realRemaining?: number;
 		loading?: boolean;
 		onVote: (type: 'agree' | 'disagree' | 'pass') => void;
 		onEnd: () => void;
@@ -23,6 +29,7 @@
 		statementId,
 		remaining,
 		total,
+		realRemaining,
 		loading = false,
 		onVote,
 		onEnd,
@@ -33,6 +40,7 @@
 	let reportOpen = $state(false);
 
 	const progress = $derived(total > 0 ? ((total - remaining) / total) * 100 : 0);
+	const topRightCount = $derived(realRemaining ?? remaining);
 
 	let previousText = statementText;
 	let waitingForNext = $state(false);
@@ -78,7 +86,7 @@
 				>{region.heroHeader}</span
 			>
 			<span class="shrink-0 font-mono text-sm font-medium text-muted-foreground/70 uppercase"
-				>{remaining} LEFT</span
+				>{topRightCount} LEFT</span
 			>
 		</div>
 		{#if waitingForNext}
