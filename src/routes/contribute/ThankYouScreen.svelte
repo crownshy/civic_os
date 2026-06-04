@@ -9,7 +9,7 @@
 	import type { RegionConfig } from '$lib/config/regions';
 
 	// TODO: replace with the real Heyform embed URL once provided.
-	const HEYFORM_EMBED_URL = 'https://heyform.net/f/REPLACE_ME';
+	const HEYFORM_EMBED_URL = 'https://heyform.net/f/6mdAdmis';
 
 	// TODO(post-#216): import from '$lib/config/landing-copy' once branch 216 lands.
 	const FOOTER_LINKS: { label: string; href: string; external?: boolean }[] = [
@@ -115,7 +115,9 @@
 			// string sentinel or an object with a recognizable type.
 			const data = event.data;
 			const isHeyformSubmit =
-				(typeof data === 'string' && data.toLowerCase().includes('heyform') && data.includes('submit')) ||
+				(typeof data === 'string' &&
+					data.toLowerCase().includes('heyform') &&
+					data.includes('submit')) ||
 				(typeof data === 'object' &&
 					data !== null &&
 					'type' in data &&
@@ -153,9 +155,7 @@
 			>
 				Thank you!
 			</h1>
-			<p
-				class="mt-2 text-center font-sans text-base leading-6 font-medium text-secondary/80"
-			>
+			<p class="mt-2 text-center font-sans text-base leading-6 font-medium text-secondary/80">
 				Your perspectives will shape the conversations that come next. What you can do now:
 			</p>
 		</div>

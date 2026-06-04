@@ -28,6 +28,16 @@
 		return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 	}
 
+	// Build a comma-separated linked list of partners, ending with "and" — replaces the old
+	// `region.fullHosts` HTML string. Order follows whatever the region config lists.
+	const partnersHtml = (() => {
+		const links = region.partners.map((p) => `<a href='${p.url}'>${p.name}</a>`);
+		if (links.length === 0) return '';
+		if (links.length === 1) return `${links[0]}.`;
+		if (links.length === 2) return `${links[0]} and ${links[1]}.`;
+		return `${links.slice(0, -1).join(', ')}, and ${links[links.length - 1]}.`;
+	})();
+
 	const emailHref = `mailto:?subject=${encodeURIComponent('Make your voice heard on the impact of AI. I did!')}&body=${encodeURIComponent(`Hi ___, I just filled out this short poll about managing AI impact in ${region.stateName} — it was fast, and it actually made me think. Since this stuff is going to affect all of us, I figured you might want to share your perspective too. Here's the link: ${region.shareUrl}`)}`;
 	const smsHref = `sms:?body=${encodeURIComponent(`I just did this quick poll about managing AI in ${region.stateName}. It only took a couple of minutes — thought you might want to weigh in too. ${region.shareUrl}`)}`;
 
@@ -132,7 +142,7 @@
 					{#if region.campaignPageHosts}
 						{@html region.campaignPageHosts}
 					{:else}
-						Hosted by {@html region.fullHosts}
+						Hosted by {@html partnersHtml}
 					{/if}
 				</p>
 				<a href={region.hostUrl} target="_blank" rel="noopener noreferrer">

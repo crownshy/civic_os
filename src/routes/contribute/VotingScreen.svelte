@@ -75,7 +75,7 @@
 		</div>
 		<div class="absolute top-[3px] left-0 flex w-full items-start justify-between px-4 py-2">
 			<span class="pr-4 font-mono text-sm font-medium text-muted-foreground/70 uppercase"
-				>{region.carouselHeader}</span
+				>{region.heroHeader}</span
 			>
 			<span class="shrink-0 font-mono text-sm font-medium text-muted-foreground/70 uppercase"
 				>{remaining} LEFT</span
@@ -99,11 +99,11 @@
 				class="mt-6 max-h-[60vh] w-full overflow-y-auto text-left"
 				in:fly={{ y: 20, duration: 500, easing: cubicOut }}
 			>
-				<!-- Attribution -->
+				<!-- Attribution 
 				<div class="flex items-center gap-2">
 					<span class="font-mono text-sm font-medium text-muted-foreground">SOMEONE SAYS... </span>
 				</div>
-
+				-->
 				<!-- Quote -->
 				<p
 					class="mt-6 font-display text-3xl leading-tight font-medium tracking-display text-muted-foreground"

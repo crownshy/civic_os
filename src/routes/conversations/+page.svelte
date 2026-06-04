@@ -9,6 +9,7 @@
 	import { flip } from 'svelte/animate';
 	import { cubicOut, backOut } from 'svelte/easing';
 	import { Mail } from 'lucide-svelte';
+	import { isBefore, addHours } from 'date-fns';
 
 	const region: RegionConfig = page.data.region;
 
@@ -27,7 +28,9 @@
 		(activeFilter === 'all'
 			? region.events
 			: region.events.filter((e) => e.format === activeFilter)
-		).toSorted((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+		)
+			.filter((e) => !isBefore(addHours(new Date(e.date), 2), new Date()))
+			.toSorted((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 	);
 
 	let email = $state('');
