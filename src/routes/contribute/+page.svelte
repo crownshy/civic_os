@@ -64,12 +64,14 @@
 		| 'nice-job';
 
 	const BATCH_SIZE = 10;
-	// Order of checkpoints. Index i fires after vote (i+1) * BATCH_SIZE.
-	//   index 0 → vote 10 → 'contribute'  (no done-flag; always fires)
-	//   index 1 → vote 20 → 'email'       (skipped if session.emailProvided)
-	//   index 2 → vote 30 → 'feedback'    (skipped if session.endCtaReviewCompleted)
-	//   index 3 → vote 40 → 'share'       (skipped if session.endCtaShareCompleted)
-	// Past vote 40: no more pauses.
+	// Order of checkpoints. Each batch boundary consumes the next variant whose action
+	// isn't already done (rolling past completed ones), so a returning user with email
+	// already provided sees `contribute → feedback → share` instead of `contribute → (silent skip) → feedback → share`.
+	//   contribute  — always shows (composing is repeatable)
+	//   email       — skipped if session.emailProvided
+	//   feedback    — skipped if session.endCtaReviewCompleted
+	//   share       — skipped if session.endCtaShareCompleted
+	// Once all four are consumed: no more pauses.
 	const CHECKPOINT_VARIANTS: CheckpointVariant[] = ['contribute', 'email', 'feedback', 'share'];
 
 	/** Whether a checkpoint variant should be skipped because its action is already done. */
@@ -93,11 +95,12 @@
 	let totalVotes = $state(session.totalVotes);
 	let hasSeenPause = $state(session.hasSeenPause);
 	let votesInRound = $state(hasSeenPause ? 0 : totalVotes);
-	// Checkpoints reached so far (1..4). Drives which variant the pause shows.
-	let checkpointsReached = $state(Math.floor(totalVotes / BATCH_SIZE));
-	const currentVariant: CheckpointVariant = $derived(
-		CHECKPOINT_VARIANTS[Math.min(checkpointsReached, CHECKPOINT_VARIANTS.length) - 1] ?? 'contribute'
-	);
+	// Index into CHECKPOINT_VARIANTS for the *next* variant to consider showing.
+	// Advances past variants that have actually been shown (or skipped because all later ones
+	// were also already-done). Returning users approximate from totalVotes.
+	let nextCheckpointIdx = $state(Math.min(Math.floor(totalVotes / BATCH_SIZE), CHECKPOINT_VARIANTS.length));
+	// Variant currently displayed on the pause screen. Set when entering 'pause'.
+	let currentVariant = $state<CheckpointVariant>('contribute');
 	// Tracks when user explicitly pressed END in this session — prevents thank-you→voting loop
 	let userEndedVoting = $state(false);
 
@@ -165,20 +168,24 @@
 
 		if (votesInRound >= BATCH_SIZE) {
 			votesInRound = 0;
-			checkpointsReached++;
 			if (!hasSeenPause) {
 				hasSeenPause = true;
 				session.saveVoteProgress(totalVotes, hasSeenPause);
 			}
-			if (checkpointsReached <= CHECKPOINT_VARIANTS.length) {
-				// Skip if the action this checkpoint promotes is already done (e.g. email already given).
-				// Contribute always shows; email/feedback/share defer to session flags.
-				const variant = CHECKPOINT_VARIANTS[checkpointsReached - 1];
-				if (!isCheckpointAlreadyDone(variant)) {
-					screen = 'pause';
-				}
+			// Roll forward to the next variant whose action isn't already done.
+			// 'contribute' never reports done, so this loop always terminates if any slots remain.
+			while (
+				nextCheckpointIdx < CHECKPOINT_VARIANTS.length &&
+				isCheckpointAlreadyDone(CHECKPOINT_VARIANTS[nextCheckpointIdx])
+			) {
+				nextCheckpointIdx++;
 			}
-			// Past the last checkpoint: keep voting, no more pauses.
+			if (nextCheckpointIdx < CHECKPOINT_VARIANTS.length) {
+				currentVariant = CHECKPOINT_VARIANTS[nextCheckpointIdx];
+				nextCheckpointIdx++;
+				screen = 'pause';
+			}
+			// All checkpoints used: keep voting, no more pauses.
 		}
 	}
 
