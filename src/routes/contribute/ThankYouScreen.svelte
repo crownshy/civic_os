@@ -208,10 +208,7 @@
 				type="button"
 				data-umami-event="end-cta-share-click"
 				onclick={() => (sharePanelOpen = true)}
-				class={[
-					'group flex flex-col gap-2 rounded-[30px] bg-gradient-to-b from-card to-card/70 p-6 text-left shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-all hover:scale-[1.01]',
-					shareDone && 'opacity-60'
-				]}
+				class="group flex flex-col gap-2 rounded-[30px] bg-linear-to-b from-card to-card/70 p-6 text-left shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-all hover:scale-[1.01]"
 			>
 				<div class="flex items-center gap-2">
 					<span
@@ -233,10 +230,7 @@
 				type="button"
 				data-umami-event="end-cta-review-click"
 				onclick={openReview}
-				class={[
-					'group flex flex-col gap-2 rounded-[30px] bg-gradient-to-b from-card to-card/70 p-6 text-left shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-all hover:scale-[1.01]',
-					reviewDone && 'opacity-60'
-				]}
+				class="group flex flex-col gap-2 rounded-[30px] bg-gradient-to-b from-card to-card/70 p-6 text-left shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-all hover:scale-[1.01]"
 			>
 				<div class="flex items-center gap-2">
 					<span
