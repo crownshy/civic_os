@@ -9,7 +9,7 @@
 	import type { RegionConfig } from '$lib/config/regions';
 
 	// TODO: replace with the real Heyform embed URL once provided.
-	const HEYFORM_EMBED_URL = 'https://heyform.net/f/6mdAdmis';
+	const HEYFORM_EMBED_URL = 'https://forms.bloomproject.us/form/6mdAdmis';
 
 	// TODO(post-#216): import from '$lib/config/landing-copy' once branch 216 lands.
 	const FOOTER_LINKS: { label: string; href: string; external?: boolean }[] = [
