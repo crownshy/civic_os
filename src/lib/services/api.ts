@@ -9,4 +9,3 @@ export const config = {
 	polisUrl: env.PUBLIC_POLIS_URL || 'https://polis.comhairle.scot',
 	polisId: env.PUBLIC_POLIS_ID || '3itaahejzh'
 };
-

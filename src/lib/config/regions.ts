@@ -10,7 +10,22 @@
  *   - Anything else → generic polis
  */
 
+import { env } from '$env/dynamic/public';
 import type { ConversationEvent } from '$lib/types/mock-data';
+
+/** A coalition partner / host organization shown on the landing page. */
+export interface Partner {
+	name: string;
+	url: string;
+	/** Optional logo URL. When set, the landing page renders the logo; when absent, falls back to a linked name. */
+	logo?: string;
+}
+
+/** A FAQ entry shown on the landing page accordion. */
+export interface FaqEntry {
+	question: string;
+	answer: string;
+}
 
 export interface RegionConfig {
 	/** Slug used in subdomain and as map key */
@@ -28,18 +43,22 @@ export interface RegionConfig {
 	conversationId: string;
 	/** Bloom backend invite ID (for user registration/tracking) */
 	inviteId: string;
-	/** Host organization name */
+	/** Host organization name (lead org in the coalition) */
 	hostName: string;
 	/** Host organization URL */
 	hostUrl: string;
 	/** Zipcode prefix(es) that belong to this region */
 	zipPrefixes: string[];
-	/** Landing page carousel pre-header */
-	carouselPreHeader: string;
-	/** Landing page carousel header */
-	carouselHeader: string;
-	/** Landing page carousel slides */
-	slides: string[];
+	/** Landing page hero h1 ("AI & Our Communities") */
+	heroHeader: string;
+	/** Landing page hero blurb under the h1 ("Share your thoughts with 300+ others in..."). HTML allowed. */
+	heroBlurb: string;
+	/** Paragraphs for the landing page "Context" section. HTML allowed. */
+	contextParagraphs: string[];
+	/** Narrative blurb for the landing page "Your Hosts" section. HTML allowed. Written to be carousel-agnostic. */
+	hostsBlurb: string;
+	/** All coalition orgs (host + partners) for this region. Rendered as a text list today; logo carousel later. */
+	partners: Partner[];
 	/** Host message paragraphs (for the "A Message from Your Hosts" dialog) */
 	hostMessage: string[];
 	/** Appears in the aboutConversation dialog */
@@ -51,6 +70,11 @@ export interface RegionConfig {
 	/** ending Content */
 	whatsNext: string;
 	goDeeper: string;
+	/** Per-region FAQ. Seeded with DEFAULT_FAQ placeholders; host orgs author their own. */
+	faq: FaqEntry[];
+	/** End-page CTA card descriptions. Only region-flavored cards live here; email + review are hardcoded. */
+	endCtaJoinDescription: string;
+	endCtaShareDescription: string;
 	fullHosts: string;
 	/** Upcoming conversation events for this region */
 	events: ConversationEvent[];
@@ -62,11 +86,98 @@ export interface RegionConfig {
 	shareUrl: string;
 }
 
+/**
+ * Seed FAQ entries — same across all regions until host orgs author their own.
+ * Wrap question/answer in [PLACEHOLDER] so reviewers can tell at a glance these aren't real.
+ */
+const DEFAULT_FAQ: FaqEntry[] = [
+	{
+		question: 'Who can participate in this poll?',
+		answer:
+			'Anyone who lives in the region can vote on statements and contribute their own thoughts. There are no qualifications beyond residency.'
+	},
+	{
+		question: 'Are my responses anonymous?',
+		answer:
+			'Yes. Your votes and any statements you submit are anonymous. If you share an email, that is kept separate from your contributions.'
+	},
+	{
+		question: 'What happens to the results?',
+		answer:
+			'Results are published publicly when the conversation closes, and feed into live conversations and the Solutions Forum later in the campaign.'
+	},
+	{
+		question: 'How long does this take?',
+		answer:
+			'Most people spend 3–5 minutes. You can come back anytime to add more votes or new statements.'
+	}
+];
+
 // ---------------------------------------------------------------------------
 // Region definitions
 // ---------------------------------------------------------------------------
 
+/**
+ * Local dev region: only registered when all four PUBLIC_DEV_* env vars are
+ * present in `.env`. Run `./scripts/seed-dev.sh` to mint the IDs.
+ *
+ * No production deploy ever sets these vars, so the dev region simply doesn't
+ * exist on staging/prod, meaning we can't accidentally commit local IDs.
+ */
+const devConversationId = env.PUBLIC_DEV_CONVERSATION_ID;
+const devInviteId = env.PUBLIC_DEV_INVITE_ID;
+const devPolisId = env.PUBLIC_DEV_POLIS_ID;
+const devPolisWorkflowStepId = env.PUBLIC_DEV_POLIS_WORKFLOW_STEP_ID;
+
+const DEV_REGION: RegionConfig | null =
+	devConversationId && devInviteId && devPolisId && devPolisWorkflowStepId
+		? {
+			slug: 'dev',
+			stateName: 'Dev',
+			demonym: 'Developers',
+			question:
+				'How can developers ensure the benefits of AI are widely shared and risks are responsibly managed?',
+			polisId: devPolisId,
+			conversationId: devConversationId,
+			inviteId: devInviteId,
+			polis_workflow_step_id: devPolisWorkflowStepId,
+			hostName: 'Local Dev',
+			hostUrl: 'http://localhost:5173',
+			zipPrefixes: [],
+			heroHeader: 'AI and the Future of Our Communities',
+			heroBlurb:
+				'Share your thoughts with other developers who are making sense of this topic together. <a href="#context" class="text-destructive underline">Learn more →</a>',
+			contextParagraphs: [
+				'This is a local development environment for testing the landing page redesign.',
+				'Replace this copy in your local seed if you want to see different states.'
+			],
+			hostsBlurb:
+				'This conversation is hosted by <a href="http://localhost:5173">Local Dev</a>, with no real partners (this is your laptop).',
+			partners: [{ name: 'Local Dev', url: 'http://localhost:5173' }],
+			hostMessage: [
+				'This is your local development environment.',
+				'Changes here only affect your local database.',
+				'Use this to test new features safely.'
+			],
+			aboutConversation: [
+				'This is a local development conversation for testing the Civic OS platform.',
+				'It runs on your local machine with a local Postgres database.'
+			],
+			campaignPageDescription: 'Local development environment for Civic OS.',
+			campaignPageHosts: 'Local development',
+			whatsNext: 'Keep coding!',
+			goDeeper: 'Test everything!',
+			faq: DEFAULT_FAQ,
+			endCtaJoinDescription: 'Test conversations are taking place locally.',
+			endCtaShareDescription: 'Anyone running dev is welcome to participate.',
+			fullHosts: 'Local Development',
+			shareUrl: 'http://dev.localhost:5173',
+			events: []
+		}
+		: null;
+
 export const REGIONS: Record<string, RegionConfig> = {
+	...(DEV_REGION ? { dev: DEV_REGION } : {}),
 	testing: {
 		slug: 'testing',
 		stateName: 'Testing',
@@ -79,13 +190,15 @@ export const REGIONS: Record<string, RegionConfig> = {
 		hostName: 'Bloom Testing',
 		hostUrl: 'https://bloomproject.us',
 		zipPrefixes: [],
-		carouselPreHeader: 'WHAT SHOULD WE DO ABOUT',
-		carouselHeader: 'AI and the Future of Our Communities',
-		slides: [
-			'This conversation is about how everyone can direct the growing impact of artificial intelligence to benefit our communities.',
-			'You\u2019ll see statements from other community members about this question. You can vote: agree, disagree, or unsure... or add your own thoughts.',
-			'This \u201COpen Poll\u201D will reveal shared concerns and values that will be the basis of action-oriented community conversations in the coming months.'
+		heroHeader: 'AI and the Future of Our Communities',
+		heroBlurb:
+			'Share your thoughts with other test subjects making sense of this topic together. <a href="#context" class="text-destructive">Learn more \u2192</a>',
+		contextParagraphs: [
+			'This is a testing environment for the landing page redesign \u2014 placeholder copy.',
+			'Use this region to validate UI changes without affecting any real conversation.'
 		],
+		hostsBlurb: 'This conversation is hosted by Bloom Testing.',
+		partners: [{ name: 'Bloom Testing', url: 'https://bloomproject.us' }],
 		hostMessage: [
 			'This is a testing version of the site to check things are working and to play with new features with play',
 			'This is mostly just to see if things work',
@@ -97,10 +210,12 @@ export const REGIONS: Record<string, RegionConfig> = {
 		],
 		campaignPageDescription: '',
 		campaignPageHosts: '',
-		whatsNext: "Nothing",
-		goDeeper: "Nothing",
-		polis_workflow_step_id: "68425b0d-21e9-4f36-8c13-229dab4508bc",
-		fullHosts: '',
+		whatsNext: 'Nothing',
+		goDeeper: 'Nothing',
+		endCtaJoinDescription: 'Conversations with neighbors are taking place in-person and online.',
+		endCtaShareDescription: 'Anyone in your community is welcome to participate.',
+		polis_workflow_step_id: '68425b0d-21e9-4f36-8c13-229dab4508bc',
+		faq: DEFAULT_FAQ,
 		shareUrl: 'https://testing.bloomproject.us',
 		events: []
 	},
@@ -116,12 +231,24 @@ export const REGIONS: Record<string, RegionConfig> = {
 		hostName: 'Utah Common Ground',
 		hostUrl: 'https://www.utahcommonground.org/home',
 		zipPrefixes: ['84'],
-		carouselPreHeader: 'WHAT SHOULD WE DO ABOUT',
-		carouselHeader: 'AI and the Future of Our Communities',
-		slides: [
-			'This conversation is about how Utahns can direct the growing impact of artificial intelligence to benefit our communities.',
-			'You\u2019ll see statements from other community members about this question. You can vote: agree, disagree, or unsure... or add your own thoughts.',
-			'This \u201COpen Poll\u201D will reveal shared concerns and values that will be the basis of action-oriented community conversations in the coming months.'
+		heroHeader: 'AI and the Future of Our Communities',
+		heroBlurb:
+			'Share your thoughts with 400+ Utah residents who are shaping the impact of artificial intelligence together. <a href="#context" class="text-destructive ">Learn more \u2192</a>',
+		contextParagraphs: [
+			'AI is reshaping work, school, government services, and daily life across Utah \u2014 and Utahns have a choice in how we respond. This is a place for us to weigh in.'
+		],
+		hostsBlurb:
+			'This conversation is hosted by <a href="https://www.utahcommonground.org/home" class="text-destructive underline">Utah Common Ground</a>, and supported by many other committed organizations, individuals, and partners across Utah.',
+		partners: [
+			{ name: 'Utah Common Ground', url: 'https://www.utahcommonground.org/home' },
+			{ name: 'AEGIX Institute', url: 'https://www.aegixinstitute.org/' },
+			{ name: 'Braver Angels', url: 'https://braverangels.org/' },
+			{ name: 'Center for Anticipatory Intelligence', url: 'https://www.usu.edu/cai/' },
+			{ name: 'Engage Forum', url: 'https://www.engageforum.org/' },
+			{
+				name: 'Mormon Women for Ethical Government',
+				url: 'https://www.mormonwomenforethicalgovernment.org/'
+			}
 		],
 		hostMessage: [
 			'This space is hosted by <a href="https://www.utahcommonground.org/home" class="text-destructive underline" target="_blank" rel="noopener noreferrer">Utah Common Ground</a>, a coalition of nonprofit organizations from around the state, including Utah State University Center for Anticipatory Intelligence, the AI Ethics and Governance Institute, Engage Forum, Braver Angels and Mormon Women for Ethical Government. We came together to help citizens come together across political differences to identify issues of local concern, consider possible solutions, and take the necessary steps to achieve meaningful, measurable change.',
@@ -132,17 +259,23 @@ export const REGIONS: Record<string, RegionConfig> = {
 			'This conversation is about how Utah can prepare for the growing impact of AI in so many aspects of our lives (work and the economy, education, wellbeing, information quality, government services, etc).',
 			'            It is hosted by Utah Common Ground, a collaboration of diverse nonpartisan organizations across Utah. You can find out more about them at utahcommonground.org.'
 		],
-		campaignPageDescription: 'This Assembly is about making sure Utahns have a real say in how artificial intelligence shapes our lives —ensuring that all Utahns can benefit from new technologies while mitigating risks to families, schools, and communities.',
-		campaignPageHosts: 'Hosted by Utah Common Ground, a project led by a coalition of organizations, including <a href="https://www.aegixinstitute.org/">AEGIX</a>, <a href="https://braverangels.org/">Braver Angels</a>, <a href="https://www.usu.edu/cai/">Center for Anticipatory Intelligence</a>, <a href="https://www.engageforum.org/">Engage Forum</a>, and <a href="https://www.mormonwomenforethicalgovernment.org/">Mormon Women for Ethical Government</a>.',
-		whatsNext: "<a href=\"https://www.utahcommonground.org/get-involved\" class=\"font-bold underline\">Sign up↗</a> for live conversations about this topic, taking place both online and in-person across Salt Lake, Utah, and Cache counties. These conversations will be an opportunity to connect with your neighbors and develop shared values around AI's influence on the people we care about.",
-		goDeeper: "The ultimate goal of this campaign is to surface common ground that lets Utahns take action from the local to state levels and beyond. If you are interested in getting involved in a deeper way, let us know at <Link href=\"mailto:hello@bloom-project.org\" external class=\"font-bold\">hello@bloom-project.org</Link>.",
+		campaignPageDescription:
+			'This Assembly is about making sure Utahns have a real say in how artificial intelligence shapes our lives —ensuring that all Utahns can benefit from new technologies while mitigating risks to families, schools, and communities.',
+		campaignPageHosts:
+			'Hosted by Utah Common Ground, a project led by a coalition of organizations, including <a href="https://www.aegixinstitute.org/">AEGIX</a>, <a href="https://braverangels.org/">Braver Angels</a>, <a href="https://www.usu.edu/cai/">Center for Anticipatory Intelligence</a>, <a href="https://www.engageforum.org/">Engage Forum</a>, and <a href="https://www.mormonwomenforethicalgovernment.org/">Mormon Women for Ethical Government</a>.',
+		whatsNext:
+			'<a href="https://www.utahcommonground.org/get-involved" class="font-bold underline">Sign up↗</a> for live conversations about this topic, taking place both online and in-person across Salt Lake, Utah, and Cache counties. These conversations will be an opportunity to connect with your neighbors and develop shared values around AI\'s influence on the people we care about.',
+		goDeeper:
+			'The ultimate goal of this campaign is to surface common ground that lets Utahns take action from the local to state levels and beyond. If you are interested in getting involved in a deeper way, let us know at <Link href="mailto:hello@bloom-project.org" external class="font-bold">hello@bloom-project.org</Link>.',
+		endCtaJoinDescription:
+			'Conversations with neighbors in Utah are taking place in-person and online.',
+		endCtaShareDescription: 'Anyone in Utah is welcome to participate.',
 
-		polis_workflow_step_id: "9d1041f9-fda6-4597-b4b0-c1260e4b7268",
-		fullHosts: "<a href='https://www.utahcommonground.org/home'>Utah Common Ground</a>",
+		polis_workflow_step_id: '9d1041f9-fda6-4597-b4b0-c1260e4b7268',
+		faq: DEFAULT_FAQ,
 		shareUrl: 'https://utah.bloomproject.us',
 		events: [
 			{
-				id: '',
 				slug: 'may-02-springville',
 				title: 'AI & Springville',
 				topic: 'COMMUNITY CONVERSATION',
@@ -155,10 +288,10 @@ export const REGIONS: Record<string, RegionConfig> = {
 				duration: '1.5 hours',
 				format: 'in-person',
 				description: 'Join us for small group conversations about AI for Utah Common Ground!',
-				fullDescription: 'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
+				fullDescription:
+					'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
 			},
 			{
-				id: '',
 				slug: 'may-05-online',
 				title: 'AI & Our Communities',
 				topic: 'COMMUNITY CONVERSATION',
@@ -171,10 +304,10 @@ export const REGIONS: Record<string, RegionConfig> = {
 				duration: '1 hour',
 				format: 'online',
 				description: 'Join us for small group conversations about AI for Utah Common Ground!',
-				fullDescription: 'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
+				fullDescription:
+					'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
 			},
 			{
-				id: '',
 				slug: 'may-07-online',
 				title: 'AI & Our Communities',
 				topic: 'COMMUNITY CONVERSATION',
@@ -186,11 +319,12 @@ export const REGIONS: Record<string, RegionConfig> = {
 				date: '2026-05-07T19:00:00-06:00',
 				duration: '1 hour',
 				format: 'online',
-				description: 'Join us for virtual small group conversations about AI for Utah Common Ground!',
-				fullDescription: 'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
+				description:
+					'Join us for virtual small group conversations about AI for Utah Common Ground!',
+				fullDescription:
+					'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
 			},
 			{
-				id: '',
 				slug: 'may-09-kearns',
 				title: 'AI & Kearns',
 				topic: 'COMMUNITY CONVERSATION',
@@ -203,10 +337,10 @@ export const REGIONS: Record<string, RegionConfig> = {
 				duration: '1.5 hours',
 				format: 'in-person',
 				description: 'Join us for small group conversations about AI for Utah Common Ground!',
-				fullDescription: 'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
+				fullDescription:
+					'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
 			},
 			{
-				id: '',
 				slug: 'may-12-online',
 				title: 'AI & Our Communities',
 				topic: 'COMMUNITY CONVERSATION',
@@ -219,10 +353,10 @@ export const REGIONS: Record<string, RegionConfig> = {
 				duration: '1 hour',
 				format: 'online',
 				description: 'Join us for small group conversations about AI for Utah Common Ground!',
-				fullDescription: 'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
+				fullDescription:
+					'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
 			},
 			{
-				id: '',
 				slug: 'may-14-online',
 				title: 'AI & Our Communities',
 				topic: 'COMMUNITY CONVERSATION',
@@ -234,11 +368,12 @@ export const REGIONS: Record<string, RegionConfig> = {
 				date: '2026-05-14T19:00:00-06:00',
 				duration: '1 hour',
 				format: 'online',
-				description: 'Join us for virtual small group conversations about AI for Utah Common Ground!',
-				fullDescription: 'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
+				description:
+					'Join us for virtual small group conversations about AI for Utah Common Ground!',
+				fullDescription:
+					'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
 			},
 			{
-				id: '',
 				slug: 'may-16-logan',
 				title: 'AI & Logan',
 				topic: 'COMMUNITY CONVERSATION',
@@ -251,11 +386,11 @@ export const REGIONS: Record<string, RegionConfig> = {
 				duration: '1.5 hours',
 				format: 'in-person',
 				description: 'Join us for small group conversations about AI for Utah Common Ground!',
-				fullDescription: 'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
+				fullDescription:
+					'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
 			}
 		],
 		phaseLabels: { phase1: 'APRIL 2026', phase2: 'MAY 2026', phase3: 'SEPTEMBER 2026' }
-
 	},
 
 	oregon: {
@@ -270,13 +405,20 @@ export const REGIONS: Record<string, RegionConfig> = {
 		hostName: 'Central Oregon Civic Action Project',
 		hostUrl: 'https://cocap.us/',
 		zipPrefixes: ['97'],
-		carouselPreHeader: 'CENTRAL OREGON SPEAKS:',
-		carouselHeader: 'AI and Our Future',
-		slides: [
+		heroHeader: 'AI & Our Communities',
+		heroBlurb:
+			'Share your thoughts with <strong>300+ Central Oregon residents</strong> who are shaping the impact of artificial intelligence together. <a href="#context" class="text-destructive">Learn more →</a>',
+		contextParagraphs: [
 			'AI is reshaping Central Oregon — and we have a choice in how we respond. This is a place for us to weigh in.',
-			'You\u2019ll see statements from other community members about this question. You can vote: agree, disagree, or unsure... or add your own thoughts.',
-			'Your responses — combined with everyone else\'s — will help surface what Central Oregonians have in common, where we differ, and what we might tackle together.',
-			'This is the first step. What we discover here leads to live conversations and a community Solutions Assembly.'
+			'The 2026 Community Solutions Assembly on AI asks how Central Oregon can ensure the benefits of AI are widely shared and its risks responsibly managed in our communities. It starts with an Open Poll you can access today; this only takes a few minutes and it shapes everything that follows.'
+		],
+		hostsBlurb:
+			'This conversation is hosted by the <a href="https://cocap.us/" class="text-destructive underline">Central Oregon Civic Action Project</a>, and supported by many other committed organizations, individuals, and partners throughout Central Oregon.',
+		partners: [
+			{ name: 'Central Oregon Civic Action Project', url: 'https://cocap.us/' },
+			{ name: 'Central Oregon Intergovernmental Council', url: 'https://www.coic.org/' },
+			{ name: 'Central Oregon Community College', url: 'https://cocc.edu/' },
+			{ name: 'Citizens4Community', url: 'https://citizens4community.com/' }
 		],
 		hostMessage: [
 			`
@@ -306,26 +448,31 @@ export const REGIONS: Record<string, RegionConfig> = {
 		aboutConversation: [
 			"This Open Poll is hosted by the <a href='http://cocap.us'>Central Oregon Civic Action Project</a> — a coalition of community organizations from across the region.",
 			"Central Oregon is navigating big questions about AI and how it's shaping our communities. This is a space for residents to share what matters most — what you're hopeful about, what concerns you, and what you think our region needs.",
-			"There are no right answers here. This poll is a first step toward understanding where Central Oregonians stand, finding common ground, and building toward solutions together.",
+			'There are no right answers here. This poll is a first step toward understanding where Central Oregonians stand, finding common ground, and building toward solutions together.',
 			"<span class='font-bold'>OPEN POLL (now) → LIVE CONVERSATIONS (May/June) → SOLUTIONS FORUM (Fall)</span>",
 			"<span class='font-bold >Step 1: This Poll</span>",
-			"Share your views now. Your responses help surface what we agree on, where we differ, and what questions deserve deeper conversation.",
+			'Share your views now. Your responses help surface what we agree on, where we differ, and what questions deserve deeper conversation.',
 			"<span class='font-bold'>Step 2: Live Conversations (May/June)</span>",
-			"Small group discussions — in person and online — open to anyone in the region. A chance to hear from neighbors, think out loud, and go deeper than a poll allows.",
+			'Small group discussions — in person and online — open to anyone in the region. A chance to hear from neighbors, think out loud, and go deeper than a poll allows.',
 			"<span class='font-bold'>Solutions Forum (Fall 2026)</span>",
-			"A representative group of 30–50 residents will come together to deliberate on what this process surfaced — and work toward recommendations with broad, cross-party support.",
-			"Questions or want to get involved? Reach us at <a href='mailto:hello@cocap.us'>hello@cocap.us</a>."
+			'A representative group of 30–50 residents will come together to deliberate on what this process surfaced — and work toward recommendations with broad, cross-party support.',
+			"Questions or want to get involved? Reach us at <a href='mailto:info@cocap.us'>info@cocap.us</a>."
 		],
-		campaignPageDescription: 'This Assembly is about making sure Central Oregonians have a real say in how artificial intelligence shapes our lives — who it benefits, who gets left behind, and what we can do about it at every level, from families and schools to city and state policy.',
+		campaignPageDescription:
+			'This Assembly is about making sure Central Oregonians have a real say in how artificial intelligence shapes our lives — who it benefits, who gets left behind, and what we can do about it at every level, from families and schools to city and state policy.',
 		campaignPageHosts: '',
-		whatsNext: "<a href=\"/conversations?utm_source=whatsNext\">Join us</a> in May and June for small group conversations taking place in Deschutes, Jefferson, and Crook counties — both in-person and online. They'll build on the themes and common ground that emerge from this poll. Share your email above to stay in the loop, or visit <a href=\"https://cocap.us\" target=\"_blank\">cocap.us</a> to learn more.",
-		goDeeper: "This process is ultimately about finding common ground and turning it into action that benefits Central Oregon communities. If you'd like to get more involved, reach out to us at <a href=\"mailto:hello@cocap.us\">hello@cocap.us</a>.",
-		polis_workflow_step_id: "8299fec7-a543-419f-8692-f68652648a0b",
+		whatsNext:
+			'<a href="/conversations?utm_source=whatsNext">Join us</a> in May and June for small group conversations taking place in Deschutes, Jefferson, and Crook counties — both in-person and online. They\'ll build on the themes and common ground that emerge from this poll. Share your email above to stay in the loop, or visit <a href="https://cocap.us" target="_blank">cocap.us</a> to learn more.',
+		goDeeper:
+			'This process is ultimately about finding common ground and turning it into action that benefits Central Oregon communities. If you\'d like to get more involved, reach out to us at <a href="mailto:info@cocap.us">info@cocap.us</a>.',
+		endCtaJoinDescription:
+			'Conversations with neighbors in Central Oregon are taking place in-person and online.',
+		endCtaShareDescription: 'Anyone in Central Oregon is welcome to participate.',
+		polis_workflow_step_id: '8299fec7-a543-419f-8692-f68652648a0b',
 		shareUrl: 'https://oregon.bloomproject.us',
-		fullHosts: "<a href='https://cocap.us/'>Central Oregon Civic Action Project</a>, <a href='https://www.coic.org/'>Central Oregon Intergovernmental Council</a>, <a href='https://cocc.edu/'>Central Oregon Community College</a>, and <a href='https://citizens4community.com/'>Citizens4Community</a>.",
+		faq: DEFAULT_FAQ,
 		events: [
 			{
-				id: '',
 				slug: 'may-30-sisters',
 				title: 'Sisters Community Conversation on AI',
 				topic: 'COMMUNITY CONVERSATION',
@@ -337,10 +484,9 @@ export const REGIONS: Record<string, RegionConfig> = {
 				date: '2026-05-30T10:00:00-07:00',
 				duration: '1.5 hours',
 				format: 'in-person',
-				description: 'Join us for small group conversations about AI in Central Oregon!',
+				description: 'Join us for small group conversations about AI in Central Oregon!'
 			},
 			{
-				id: '',
 				slug: 'may-30-prineville',
 				title: 'Prineville Community Conversation on AI',
 				topic: 'COMMUNITY CONVERSATION',
@@ -352,10 +498,9 @@ export const REGIONS: Record<string, RegionConfig> = {
 				date: '2026-05-30T13:00:00-07:00',
 				duration: '1.5 hours',
 				format: 'in-person',
-				description: 'Join us for small group conversations about AI in Central Oregon!',
+				description: 'Join us for small group conversations about AI in Central Oregon!'
 			},
 			{
-				id: '',
 				slug: 'jun-04-central-oregon-online',
 				title: 'Central Oregon Community Conversation on AI – Online #1',
 				topic: 'COMMUNITY CONVERSATION',
@@ -367,10 +512,9 @@ export const REGIONS: Record<string, RegionConfig> = {
 				date: '2026-06-04T19:00:00-07:00',
 				duration: '1 hour',
 				format: 'online',
-				description: 'Join us for small group conversations about AI in Central Oregon!',
+				description: 'Join us for small group conversations about AI in Central Oregon!'
 			},
 			{
-				id: '',
 				slug: 'jun-06-bend',
 				title: 'Bend Community Conversation on AI',
 				topic: 'COMMUNITY CONVERSATION',
@@ -382,24 +526,23 @@ export const REGIONS: Record<string, RegionConfig> = {
 				date: '2026-06-06T13:00:00-07:00',
 				duration: '1.5 hours',
 				format: 'in-person',
-				description: 'Join us for small group conversations about AI in Central Oregon!',
+				description: 'Join us for small group conversations about AI in Central Oregon!'
 			},
 			{
-				id: '',
 				slug: 'jun-06-madras',
 				title: 'Madras Community Conversation on AI',
 				topic: 'COMMUNITY CONVERSATION',
 				location: 'Madras, OR',
-				venueName: 'TBD',
+				venueName: 'Jefferson County Public Health – Conference Room',
+				address: '500 NE A Street, Madras, OR 97741',
 				time: '1:00PM',
 				endTime: '2:30PM',
 				date: '2026-06-06T13:00:00-07:00',
 				duration: '1.5 hours',
 				format: 'in-person',
-				description: 'Join us for small group conversations about AI in Central Oregon!',
+				description: 'Join us for small group conversations about AI in Central Oregon!'
 			},
 			{
-				id: '',
 				slug: 'jun-09-central-oregon-online',
 				title: 'Central Oregon Community Conversation on AI – Online #2',
 				topic: 'COMMUNITY CONVERSATION',
@@ -411,133 +554,24 @@ export const REGIONS: Record<string, RegionConfig> = {
 				date: '2026-06-09T12:00:00-07:00',
 				duration: '1 hour',
 				format: 'online',
-				description: 'Join us for small group conversations about AI in Central Oregon!',
+				description: 'Join us for small group conversations about AI in Central Oregon!'
 			},
 			{
-				id: '',
-				slug: 'jun-13-la-pine',
-				title: 'La Pine Community Conversation on AI',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'La Pine, OR',
-				venueName: 'TBD',
-				time: '1:00PM',
-				endTime: '2:30PM',
-				date: '2026-06-13T13:00:00-07:00',
-				duration: '1.5 hours',
-				format: 'in-person',
-				description: 'Join us for small group conversations about AI in Central Oregon!',
-			},
-			{
-				id: '',
 				slug: 'jun-13-redmond',
 				title: 'Redmond Community Conversation on AI',
 				topic: 'COMMUNITY CONVERSATION',
 				location: 'Redmond, OR',
-				venueName: 'TBD',
+				venueName: 'NeighborImpact Boardroom',
+				address: '2303 SW First Street, Redmond, OR',
 				time: '1:00PM',
 				endTime: '2:30PM',
 				date: '2026-06-13T13:00:00-07:00',
 				duration: '1.5 hours',
 				format: 'in-person',
-				description: 'Join us for small group conversations about AI in Central Oregon!',
-			},
+				description: 'Join us for small group conversations about AI in Central Oregon!'
+			}
 		],
 		phaseLabels: { phase1: 'APRIL 2026', phase2: 'MAY 2026', phase3: 'SEPTEMBER 2026' }
-
-	},
-
-	stage: {
-		slug: 'stage',
-		stateName: 'Bloom Stage State',
-		demonym: 'Stagies',
-		question:
-			'How can Bloom Staging project members ensure benefits of AI are widely shared and risks are responsibly managed?',
-		polisId: '8h3zyzktmd',
-		conversationId: '1b68f5d8-1580-4a21-8a08-8bab18e567fd',
-		inviteId: '9f529e7-9b2f-4d4d-909d-aad9ad0b91a0',
-		hostName: 'Bloom Stage Project',
-		hostUrl: 'https://cocap.us/',
-		zipPrefixes: [''],
-		carouselPreHeader: 'Bloom Staging Speaks:',
-		carouselHeader: 'AI and Our Future',
-		slides: [
-			'AI is reshaping Central Oregon — and we have a choice in how we respond. This is a place for us to weigh in.',
-			'You\u2019ll see statements from other community members about this question. You can vote: agree, disagree, or unsure... or add your own thoughts.',
-			'Your responses — combined with everyone else\'s — will help surface what Central Oregonians have in common, where we differ, and what we might tackle together.',
-			'This is the first step. What we discover here leads to live conversations and a community Solutions Assembly.'
-		],
-		hostMessage: [
-			`
-		  <p>YOUR HOSTS:</p>
-		  <ul class='list-disc list-inside'>
-			<li>
-			  Bloom Staging 	  
-			</li>
-		  </ul>
-		  `,
-			'First, thank you for being here and for caring about the future of our region.',
-			'AI is already reshaping Central Oregon — bringing real promise alongside real concerns. Many see new economic opportunities, better tools for innovation, and new ways to tackle longstanding challenges. Others worry about jobs, education, mental health, water and natural resources, and access to trustworthy information. Both are true, and both matter.',
-			'Central Oregonians should have a say in changes that shape their lives. This poll is a first step — a way to understand where our community stands, find common ground, and build toward solutions together.',
-			'Central Oregon Civic Action Project believes people should have a say in the changes that shape their lives. This Open Poll is a first step — a way to understand where our community stands, find common ground, and build toward solutions together.',
-			'This conversation is open to all Central Oregon residents, regardless of background or belief. It only takes a few minutes. We hope you\u2019ll add your voice — and pass it on.',
-			`Questions? Reach Josh at <a href="mailto:josh@cocap.us">josh@cocap.us</a>.`
-		],
-		aboutConversation: [
-			"This Open Poll is hosted by the <a href='http://cocap.us'>Central Oregon Civic Action Project</a> — a coalition of community organizations from across the region.",
-			"Central Oregon is navigating big questions about AI and how it's shaping our communities. This is a space for residents to share what matters most — what you're hopeful about, what concerns you, and what you think our region needs.",
-			"There are no right answers here. This poll is a first step toward understanding where Central Oregonians stand, finding common ground, and building toward solutions together.",
-			"<span class='font-bold'>OPEN POLL (now) → LIVE CONVERSATIONS (May/June) → SOLUTIONS FORUM (Fall)</span>",
-			"<span class='font-bold >Step 1: This Poll</span>",
-			"Share your views now. Your responses help surface what we agree on, where we differ, and what questions deserve deeper conversation.",
-			"<span class='font-bold'>Step 2: Live Conversations (May/June)</span>",
-			"Small group discussions — in person and online — open to anyone in the region. A chance to hear from neighbors, think out loud, and go deeper than a poll allows.",
-			"<span class='font-bold'>Solutions Forum (Fall 2026)</span>",
-			"A representative group of 30–50 residents will come together to deliberate on what this process surfaced — and work toward recommendations with broad, cross-party support.",
-			"Questions or want to get involved? Reach us at <a href='mailto:hello@cocap.us'>hello@cocap.us</a>."
-		],
-		campaignPageDescription: 'This Assembly is about making sure Central Oregonians have a real say in how artificial intelligence shapes our lives — who it benefits, who gets left behind, and what we can do about it at every level, from families and schools to city and state policy.',
-		campaignPageHosts: '',
-		whatsNext: "<a href=\"/conversations?utm_source=whatsNext\">Join us</a> in May and June for small group conversations taking place in Deschutes, Jefferson, and Crook counties — both in-person and online. They'll build on the themes and common ground that emerge from this poll. Share your email above to stay in the loop, or visit <a href=\"https://cocap.us\" target=\"_blank\">cocap.us</a> to learn more.",
-		goDeeper: "This process is ultimately about finding common ground and turning it into action that benefits Central Oregon communities. If you'd like to get more involved, reach out to us at <a href=\"mailto:hello@cocap.us\">hello@cocap.us</a>.",
-		polis_workflow_step_id: "4a91d652-5d97-468e-b432-d8fc0141df19",
-		shareUrl: 'https://oregon.bloomproject.us',
-		fullHosts: "<a href='https://cocap.us/'>Central Oregon Civic Action Project</a>, <a href='https://www.coic.org/'>Central Oregon Intergovernmental Council</a>, <a href='https://cocc.edu/'>Central Oregon Community College</a>, and <a href='https://citizens4community.com/'>Citizens4Community</a>.",
-		events: [
-			{
-				id: 'd7529234-d628-4435-ba96-05023e409a86',
-				slug: 'stage-event-1',
-				title: 'Staged event1 ',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Sisters, OR',
-				venueName: 'The Hub by Citizens4Community',
-				address: '291 E. Main Avenue, Sisters, OR 97759',
-				time: '10:00AM',
-				endTime: '11:30AM',
-				date: '2026-05-30T10:00:00-07:00',
-				duration: '1.5 hours',
-				format: 'in-person',
-				description: 'Join us for small group conversations about AI in Central Oregon!',
-				fullDescription: 'This is a 1.5 hour conversation with people in Central Oregon about AI. We\'ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
-			},
-			{
-				id: 'd7529234-d628-4435-ba96-05023e409a86',
-				slug: 'stage-event-2',
-				title: 'Staged event 2',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Prineville, OR',
-				venueName: 'Broughton Room, Crook County Library',
-				address: '175 NW Meadow Lakes Drive, Prineville, OR 97754',
-				time: '1:00PM',
-				endTime: '2:30PM',
-				date: '2026-05-30T13:00:00-07:00',
-				duration: '1.5 hours',
-				format: 'in-person',
-				description: 'Join us for small group conversations about AI in Central Oregon!',
-				fullDescription: 'This is a 1.5 hour conversation with people in Central Oregon about AI. We\'ll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.'
-			},
-		],
-		phaseLabels: { phase1: 'APRIL 2026', phase2: 'MAY 2026', phase3: 'SEPTEMBER 2026' }
-
 	}
 };
 
@@ -546,45 +580,51 @@ export const GENERIC_REGION: RegionConfig = {
 	slug: 'all',
 	stateName: 'USA',
 	demonym: 'Americans',
-	question: 'How can Americans ensure the benefits of AI are widely shared and its risks are responsibly managed?',
+	question:
+		'How can Americans ensure the benefits of AI are widely shared and its risks are responsibly managed?',
 	polisId: '58wekdkx9u',
 	conversationId: '30f5c285-a538-4ed7-9565-61f8e4b9d998',
 	inviteId: '0571cc17-64ad-4949-9034-76c74be254ce',
 	hostName: 'Bloom Project',
 	hostUrl: 'https://bloom-project.org/',
 	zipPrefixes: [],
-	carouselPreHeader: 'WHAT SHOULD WE DO ABOUT',
-	carouselHeader: 'AI and the Future of Our Communities',
-	slides: [
-		'People across America are weighing in on how AI is changing our country — and what we should do about it. Now it\'s your turn.',
-		'You\u2019ll see statements from community members on this question. For each one, you can share if you: agree, disagree, or are unsure.',
-		'Your responses — combined with everyone else\u2019s — will help surface what Americans have in common, where we differ, and what we might tackle together.',
-		'Results will be published publicly so anyone can see where people stand.',
+	heroHeader: 'AI and the Future of Our Communities',
+	heroBlurb:
+		'Share your thoughts with others across America who are weighing in on how AI is changing our country. <a href="#context" class="text-destructive">Learn more →</a>',
+	contextParagraphs: [
+		"People across America are weighing in on how AI is changing our country — and what we should do about it. Now it's your turn.",
+		'Your responses, combined with everyone else\u2019s, will help surface what Americans have in common, where we differ, and what we might tackle together. Results will be published publicly so anyone can see where people stand.'
 	],
+	hostsBlurb:
+		'This Open Poll is hosted by <a href="https://www.bloom-project.org/" class="text-destructive underline">The Bloom Project</a>, a civic technology initiative that uses deliberative polling to surface where the American public actually stands on complex issues.',
+	partners: [{ name: 'The Bloom Project', url: 'https://www.bloom-project.org/' }],
 	hostMessage: [
-		"First, thank you for being here and for caring about the future of our country.",
-		"AI is already reshaping American life — bringing real promise alongside real concerns. Many see new economic opportunities, better tools for healthcare and education, and new ways to tackle longstanding challenges. Others worry about jobs, privacy, democracy, and access to truthful information. Both are true, and both matter.",
-		"Americans should have a say in changes that shape their lives. This poll is a way to understand where our country stands and to put that picture in front of the public, policymakers, and the companies building these tools.",
-		"This conversation is open to all U.S. residents, regardless of background or belief. It only takes a few minutes. We hope you’ll add your voice — and pass it on.",
+		'First, thank you for being here and for caring about the future of our country.',
+		'AI is already reshaping American life — bringing real promise alongside real concerns. Many see new economic opportunities, better tools for healthcare and education, and new ways to tackle longstanding challenges. Others worry about jobs, privacy, democracy, and access to truthful information. Both are true, and both matter.',
+		'Americans should have a say in changes that shape their lives. This poll is a way to understand where our country stands and to put that picture in front of the public, policymakers, and the companies building these tools.',
+		'This conversation is open to all U.S. residents, regardless of background or belief. It only takes a few minutes. We hope you’ll add your voice — and pass it on.',
 		"Questions? Reach us at <a href='mailto:hello@bloom-project.org'>hello@bloom-project.org</a>."
 	],
 	aboutConversation: [
-		"This Open Poll is hosted by The Bloom Project, a civic technology initiative that uses deliberative polling to surface where the American public actually stands on complex issues.",
-		"America is navigating big questions about AI and how it’s shaping our lives. This is a space for residents to share what matters most — what you’re hopeful about, what concerns you, and what you think our country needs.",
-		"There are no right answers here. This poll is designed to reveal where Americans agree, where we differ, and what the genuine fault lines are — in a format that anyone can understand.",
-		"Results will be published publicly when the conversation closes.",
+		'This Open Poll is hosted by The Bloom Project, a civic technology initiative that uses deliberative polling to surface where the American public actually stands on complex issues.',
+		'America is navigating big questions about AI and how it’s shaping our lives. This is a space for residents to share what matters most — what you’re hopeful about, what concerns you, and what you think our country needs.',
+		'There are no right answers here. This poll is designed to reveal where Americans agree, where we differ, and what the genuine fault lines are — in a format that anyone can understand.',
+		'Results will be published publicly when the conversation closes.',
 		"Questions or want to get involved? Reach us at <a href='mailto:hello@bloom-project.org'>hello@bloom-project.org</a>."
 	],
 	campaignPageDescription: '',
 	campaignPageHosts: '',
-	whatsNext: "When this conversation closes, Bloom will publish the results publicly — showing where Americans agree, where we differ, and what the opinion landscape looks like across different groups. We’ll share a link when it’s ready.",
-	goDeeper: "If you’d like to host this conversation in your own community, reach out at <a href='mailto:hello@bloom-project.org'>hello@bloom-project.org</a> or visit <a href='https://www.bloom-project.org'>https://www.bloom-project.org</a>.",
-	polis_workflow_step_id: "f553a7b9-b3ac-4159-b88d-198f609b110c",
+	whatsNext:
+		'When this conversation closes, Bloom will publish the results publicly — showing where Americans agree, where we differ, and what the opinion landscape looks like across different groups. We’ll share a link when it’s ready.',
+	goDeeper:
+		"If you’d like to host this conversation in your own community, reach out at <a href='mailto:hello@bloom-project.org'>hello@bloom-project.org</a> or visit <a href='https://www.bloom-project.org'>https://www.bloom-project.org</a>.",
+	endCtaJoinDescription: 'Community conversations are taking place in-person and online.',
+	endCtaShareDescription: 'Anyone is welcome to participate.',
+	polis_workflow_step_id: 'f553a7b9-b3ac-4159-b88d-198f609b110c',
 	shareUrl: 'https://all.bloomproject.us',
-	fullHosts: "<a href='https://www.bloom-project.org/'>The Bloom Project</a>.",
+	faq: DEFAULT_FAQ,
 	events: [
 		{
-			id: '',
 			slug: 'may-18-springville',
 			title: 'May 18 (In-Person) Conversation',
 			topic: 'AI & OUR COMMUNITIES',
@@ -592,10 +632,10 @@ export const GENERIC_REGION: RegionConfig = {
 			time: '1:00PM',
 			date: '2026-05-18T13:00:00-06:00',
 			format: 'in-person',
-			description: 'Join us for an in-person conversation about AI and its impact on our communities. Share your perspective, listen to your neighbors, and help shape actionable next steps.'
+			description:
+				'Join us for an in-person conversation about AI and its impact on our communities. Share your perspective, listen to your neighbors, and help shape actionable next steps.'
 		},
 		{
-			id: '',
 			slug: 'may-24-provo',
 			title: 'May 24 (In-Person) Conversation',
 			topic: 'AI & OUR COMMUNITIES',
@@ -603,10 +643,10 @@ export const GENERIC_REGION: RegionConfig = {
 			time: '10:00AM',
 			date: '2026-05-24T10:00:00-06:00',
 			format: 'in-person',
-			description: 'A morning conversation about how AI is shaping our communities. Come ready to listen, share, and find common ground with fellow residents.'
+			description:
+				'A morning conversation about how AI is shaping our communities. Come ready to listen, share, and find common ground with fellow residents.'
 		},
 		{
-			id: '',
 			slug: 'jun-01-online',
 			title: 'June 1 (Online) Conversation',
 			topic: 'AI & OUR COMMUNITIES',
@@ -614,7 +654,8 @@ export const GENERIC_REGION: RegionConfig = {
 			time: '6:00PM',
 			date: '2026-06-01T18:00:00-06:00',
 			format: 'online',
-			description: 'Can\'t make it in person? Join this virtual conversation from anywhere. Same great discussion, from the comfort of your home.'
+			description:
+				"Can't make it in person? Join this virtual conversation from anywhere. Same great discussion, from the comfort of your home."
 		}
 	]
 };
@@ -624,24 +665,44 @@ export const GENERIC_REGION: RegionConfig = {
 // ---------------------------------------------------------------------------
 
 /** Generates a full event description from its format, duration, and location. */
-export function getEventFullDescription(event: import('$lib/types/mock-data').ConversationEvent, stateName: string): string {
+export function getEventFullDescription(
+	event: import('$lib/types/mock-data').ConversationEvent,
+	stateName: string
+): string {
 	const locationLabel = event.format === 'online' ? stateName : event.location.split(',')[0];
 	const duration = event.duration ?? (event.format === 'online' ? '1 hour' : '1.5 hours');
 	const onlineAdj = event.format === 'online' ? 'online ' : '';
 	return `This is a ${duration} ${onlineAdj}conversation with your neighbors in ${locationLabel} about AI. We'll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.`;
 }
 
-/** Resolve a subdomain string (e.g. "utah", "oregon") to a region config. */
+/**
+ * Resolve a subdomain string (e.g. "utah", "oregon") to a region config.
+ *
+ * LOCAL DEV: when DEV_REGION is registered, an empty/unknown subdomain
+ * (e.g. plain `localhost`) falls back to dev instead of the generic prod
+ * region. Named subdomains (`utah.localhost`, `oregon.localhost`) still
+ * resolve normally so you can test region-specific chrome locally.
+ */
 export function getRegionBySubdomain(subdomain: string): RegionConfig {
 	const key = subdomain.toLowerCase();
-	return REGIONS[key] ?? GENERIC_REGION;
+	if (REGIONS[key]) return REGIONS[key];
+	if (DEV_REGION) return DEV_REGION;
+	return GENERIC_REGION;
 }
 
 /**
  * Given a zipcode, determine which region-specific Polis the user should join.
  * Returns the matching region, or GENERIC_REGION if no prefix matches.
+ *
+ * LOCAL DEV: when the `dev` region is registered (all four PUBLIC_DEV_* env
+ * vars set), this ALWAYS returns the dev region — every zipcode resolves to
+ * your local conversation/polis. This is the single source of truth that
+ * keeps the landing redirect, contribute polisId lookup, and any future
+ * caller all pinned to dev. To exercise the real prod redirect logic, comment
+ * out the PUBLIC_DEV_* lines in `.env` and restart `pnpm dev`.
  */
 export function getRegionByZipcode(zip: string): RegionConfig {
+	if (DEV_REGION) return DEV_REGION;
 	const trimmed = zip.trim();
 	for (const region of Object.values(REGIONS)) {
 		for (const prefix of region.zipPrefixes) {
@@ -683,15 +744,22 @@ export function extractSubdomain(hostname: string): string {
  * Build the full URL for a region's subdomain with zipcode parameter.
  * Handles both production and local development environments.
  */
-export function getRegionUrl(region: RegionConfig, zipCode: string, currentHostname: string): string {
+export function getRegionUrl(
+	region: RegionConfig,
+	zipCode: string,
+	currentHostname: string
+): string {
 	const host = currentHostname.split(':')[0];
 	const port = currentHostname.includes(':') ? ':' + currentHostname.split(':')[1] : '';
 
 	// Determine base domain
 	let baseDomain: string;
-	if (host.endsWith('.localhost') || host.endsWith('.local')) {
-		// Local dev
-		baseDomain = host.endsWith('.localhost') ? 'localhost' : 'local';
+	if (host === 'localhost' || host.endsWith('.localhost')) {
+		// Local dev on .localhost
+		baseDomain = 'localhost';
+	} else if (host === 'local' || host.endsWith('.local')) {
+		// Local dev on .local
+		baseDomain = 'local';
 	} else {
 		// Production - extract base domain from current hostname
 		// e.g., utah.bloomproject.us → bloomproject.us

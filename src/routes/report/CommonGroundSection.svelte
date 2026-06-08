@@ -26,13 +26,13 @@
 	);
 </script>
 
-<section class="relative overflow-hidden bg-background -px-10 py-8">
+<section class="-px-10 relative overflow-hidden bg-background py-8">
 	<div class="px-6">
 		<Badge variant="soft" size="lg">COMMON GROUND</Badge>
 	</div>
 
 	<div class="mt-3 px-8">
-		<h2 class="font-sans text-3xl font-bold leading-8 text-foreground">
+		<h2 class="font-display text-3xl leading-8 font-medium tracking-display text-foreground">
 			After engaging
 			<span class="text-primary">{participantCount.toLocaleString()} people</span>
 			all over {regionName}, we found a lot of
@@ -46,7 +46,7 @@
 	</p>
 
 	<!-- Carousel -->
-	<div class="mt-5 px-6 select-none" >
+	<div class="mt-5 px-6 select-none">
 		<SwipeCarousel count={consensusStatements.length} hideDots={true} autoScrollMs={4000}>
 			{#snippet children(i)}
 				{@const statement = consensusStatements[i]}
@@ -62,11 +62,11 @@
 						class="-mt-5"
 					>
 						<div class="flex min-h-48 w-full flex-col justify-between px-7 pt-10 pb-7">
-							<p class="font-sans text-xl font-semibold leading-6 text-foreground">
+							<p class="font-sans text-xl leading-6 font-semibold text-foreground">
 								"{statement.text}"
 							</p>
 							<div class="mt-4 flex justify-center">
-								<Badge variant="primary" size="md" class="px-2 py-0.5 text-sm rounded-[10px]">
+								<Badge variant="primary" size="md" class="rounded-[10px] px-2 py-0.5 text-sm">
 									{getAgreementPercent(statement)}% AGREEMENT
 								</Badge>
 							</div>

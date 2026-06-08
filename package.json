@@ -73,6 +73,7 @@
 		"@crownshy/api-client": "^0.0.7",
 		"@lukulent/svelte-umami": "^0.0.4",
 		"add-to-calendar-button": "^2.14.0",
+		"bits-ui": "^2.15.7",
 		"clsx": "^2.1.1",
 		"d3-scale": "^4.0.2",
 		"d3-shape": "^3.2.0",

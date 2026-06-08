@@ -15,14 +15,16 @@
 		{
 			id: 'about-001',
 			question: 'What is your age?',
-			description: 'This information helps us make sure everyone is represented in the conversation. You can revoke access to this at any time.',
+			description:
+				'This information helps us make sure everyone is represented in the conversation. You can revoke access to this at any time.',
 			options: ['Under 18', '18 - 24', '25-39', '40-64', '65 and older'],
 			multiSelect: false
 		},
 		{
 			id: 'about-002',
 			question: 'Which of the following ethnicities do you identify with?',
-			description: 'This information helps us make sure everyone is represented in the conversation. You can revoke access to this at any time.',
+			description:
+				'This information helps us make sure everyone is represented in the conversation. You can revoke access to this at any time.',
 			options: ['Asian', 'Black', 'White', 'Hispanic', 'Other'],
 			multiSelect: true
 		}

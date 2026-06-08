@@ -14,17 +14,14 @@
 	const filteredStatements = $derived(
 		statements
 			.filter((s) => {
-				const total =
-					s.overall_votes.agrees + s.overall_votes.disagrees + s.overall_votes.passes;
+				const total = s.overall_votes.agrees + s.overall_votes.disagrees + s.overall_votes.passes;
 				if (total === 0) return false;
 				const agreePercent = (s.overall_votes.agrees / total) * 100;
 				return agreePercent >= activeThreshold;
 			})
 			.sort((a, b) => {
-				const totalA =
-					a.overall_votes.agrees + a.overall_votes.disagrees + a.overall_votes.passes;
-				const totalB =
-					b.overall_votes.agrees + b.overall_votes.disagrees + b.overall_votes.passes;
+				const totalA = a.overall_votes.agrees + a.overall_votes.disagrees + a.overall_votes.passes;
+				const totalB = b.overall_votes.agrees + b.overall_votes.disagrees + b.overall_votes.passes;
 				return b.overall_votes.agrees / totalB - a.overall_votes.agrees / totalA;
 			})
 	);
@@ -36,10 +33,7 @@
 	}
 </script>
 
-<section
-	class="relative overflow-hidden px-0 py-12"
-	style="background: var(--gradient-consensus);"
->
+<section class="relative overflow-hidden px-0 py-12" style="background: var(--gradient-consensus);">
 	<!-- Decorative circles -->
 	<div class="pointer-events-none absolute inset-0 flex justify-center overflow-hidden">
 		<div
@@ -55,7 +49,9 @@
 	</div>
 
 	<div class="mt-4 px-8">
-		<h2 class="text-center font-sans text-3xl font-bold leading-8 text-primary-foreground">
+		<h2
+			class="text-center font-display text-3xl leading-8 font-medium tracking-display text-primary-foreground"
+		>
 			In spite of differences, everyone seemed to agree on certain things.
 		</h2>
 	</div>
@@ -73,10 +69,7 @@
 			<span class="font-mono text-sm font-medium text-muted-foreground">BRIDGING THRESHOLD</span>
 			<div class="flex items-center gap-1.5">
 				{#each thresholds as threshold}
-					<button
-						onclick={() => (activeThreshold = threshold)}
-						class="transition-colors"
-					>
+					<button onclick={() => (activeThreshold = threshold)} class="transition-colors">
 						<Badge variant={activeThreshold === threshold ? 'dark' : 'soft'} size="md">
 							{threshold}%
 						</Badge>
@@ -90,10 +83,10 @@
 			{#each filteredStatements as statement (statement.tid)}
 				<div class="flex items-start gap-4 border-y border-border px-0 py-4">
 					<div
-						class="ml-5 mt-2 h-8 w-8 shrink-0 rounded-full border border-border bg-linear-to-b from-muted-foreground to-accent/0"
+						class="mt-2 ml-5 h-8 w-8 shrink-0 rounded-full border border-border bg-linear-to-b from-muted-foreground to-accent/0"
 					></div>
 					<div class="flex flex-1 flex-col pr-5">
-						<p class="font-sans text-sm font-semibold leading-6 text-foreground">
+						<p class="font-sans text-sm leading-6 font-semibold text-foreground">
 							"{statement.text}"
 						</p>
 						<div class="mt-1">
