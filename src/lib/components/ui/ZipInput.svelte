@@ -2,10 +2,10 @@
 	import CheckIcon from '@lucide/svelte/icons/check';
 	import MapPinIcon from '@lucide/svelte/icons/map-pin';
 	import { ZIPCODES, ZIP_LOOKUP, type ZipEntry } from '$lib/data/zipcodes';
-	import * as Command from '$lib/components/ui/command/index.js';
-	import * as Popover from '$lib/components/ui/popover/index.js';
+	import * as Command from '@civicos/shared/ui/command';
+	import * as Popover from '@civicos/shared/ui/popover';
 	import { cn } from '$lib/utils.js';
-	import Input from './input/input.svelte';
+	import { Input } from '@civicos/shared/ui/input';
 	import { LucideX } from 'lucide-svelte';
 
 	interface Props {

@@ -1,13 +1,13 @@
 <script lang="ts">
 	import Dialog from '$lib/components/ui/Dialog.svelte';
-	import Input from '$lib/components/ui/input/input.svelte';
+	import { Input } from '@civicos/shared/ui/input';
 	import { Mail, User } from 'lucide-svelte';
 	import { Button } from '$lib/components/ui';
 	import { format } from 'date-fns';
-	import * as Form from '$lib/components/ui/form';
+	import * as Form from '@civicos/shared/ui/form';
 	import { api } from '$lib/services/api';
 	import type { ConversationEvent } from '$lib/types/mock-data';
-	import { Spinner } from './spinner';
+	import { Spinner } from '@civicos/shared/ui/spinner';
 	import ThankYouMessage from './ThankYouMessage.svelte';
 	import EventCalendarInviteButton from './EventCalendarInviteButton.svelte';
 	import type { RegionConfig } from '$lib/config/regions';

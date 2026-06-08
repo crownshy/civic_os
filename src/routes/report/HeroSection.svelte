@@ -1,6 +1,6 @@
 <script lang="ts">
 	import InfoBar from '$lib/components/ui/InfoBar.svelte';
-	import Badge from '$lib/components/ui/Badge.svelte';
+	import Badge from '@civicos/shared/ui/Badge.svelte';
 
 	interface Props {
 		title: string;

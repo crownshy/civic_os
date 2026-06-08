@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
-	import { Input } from './input';
+	import { Input } from '@civicos/shared/ui/input';
 
 	interface Props {
 		placeholder?: string;

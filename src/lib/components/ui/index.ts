@@ -1,4 +1,8 @@
-export { default as MonoLabel } from './MonoLabel.svelte';
+// Promoted to @civicos/shared (see ADR 0002). Re-exported here for back-compat.
+export { default as MonoLabel } from '@civicos/shared/ui/MonoLabel.svelte';
+export { default as Badge } from '@civicos/shared/ui/Badge.svelte';
+export { default as Card } from '@civicos/shared/ui/Card.svelte';
+export { default as Link } from '@civicos/shared/ui/Link.svelte';
 export { default as QuoteText } from './QuoteText.svelte';
 export { default as VoteBar } from './VoteBar.svelte';
 export { default as ThemeChip } from './ThemeChip.svelte';
@@ -16,17 +20,14 @@ export { default as Header } from './Header.svelte';
 export { default as ConfettiOverlay } from './ConfettiOverlay.svelte';
 export { default as PopQuiz } from './PopQuiz.svelte';
 export { default as EmailCapture } from './EmailCapture.svelte';
-export { default as Badge } from './Badge.svelte';
 export { default as Button } from './Button.svelte';
 export { default as EmojiCircle } from './EmojiCircle.svelte';
 export { default as InfoBar } from './InfoBar.svelte';
 export { default as Dialog } from './Dialog.svelte';
 export { default as ActionPanel } from './ActionPanel.svelte';
 export { default as ZipInput } from './ZipInput.svelte';
-export { default as Link } from './Link.svelte';
 export { default as GradientCard } from './GradientCard.svelte';
 export { default as DonutChart } from './DonutChart.svelte';
-export { default as Card } from './Card.svelte';
 export { default as ConversationEventCard } from './ConversationEventCard.svelte';
 export { default as ReportPanel } from './ReportPanel.svelte';
 export { default as Accordion } from './Accordion.svelte';

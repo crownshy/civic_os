@@ -43,7 +43,12 @@ export default defineConfig({
 	],
 	server: {
 		// Allow subdomain-based local dev: utah.localhost, oregon.localhost, etc.
-		allowedHosts: ['.localhost']
+		allowedHosts: ['.localhost'],
+		fs: {
+			// Permit Vite to serve files from sibling workspace packages
+			// (e.g. @civicos/shared at ./packages/shared).
+			allow: ['./packages']
+		}
 	},
 	test: {
 		expect: {

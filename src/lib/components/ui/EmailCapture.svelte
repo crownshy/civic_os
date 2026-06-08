@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 	import Button from './Button.svelte';
-	import { Input } from './input';
+	import { Input } from '@civicos/shared/ui/input';
 
 	interface Props {
 		onSubmit: (email: string) => void;

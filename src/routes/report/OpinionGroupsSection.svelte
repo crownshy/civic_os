@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { CommentReportData, GroupReportData } from '$lib/types/report';
-	import Badge from '$lib/components/ui/Badge.svelte';
+	import Badge from '@civicos/shared/ui/Badge.svelte';
 	import GradientCard from '$lib/components/ui/GradientCard.svelte';
 	import SwipeCarousel from '$lib/components/ui/SwipeCarousel.svelte';
 

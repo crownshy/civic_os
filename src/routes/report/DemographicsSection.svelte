@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Badge from '$lib/components/ui/Badge.svelte';
+	import Badge from '@civicos/shared/ui/Badge.svelte';
 	import GradientCard from '$lib/components/ui/GradientCard.svelte';
 	import SwipeCarousel from '$lib/components/ui/SwipeCarousel.svelte';
 	import DonutChart from '$lib/components/ui/DonutChart.svelte';

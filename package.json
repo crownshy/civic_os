@@ -70,6 +70,7 @@
 		"vitest-browser-svelte": "^2.0.2"
 	},
 	"dependencies": {
+		"@civicos/shared": "workspace:*",
 		"@crownshy/api-client": "^0.0.7",
 		"@lukulent/svelte-umami": "^0.0.4",
 		"add-to-calendar-button": "^2.14.0",

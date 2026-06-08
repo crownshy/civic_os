@@ -3,7 +3,7 @@
 	import { cubicOut } from 'svelte/easing';
 	import { onMount } from 'svelte';
 	import { InfoBar, Button, EmojiCircle, ActionPanel } from '$lib/components/ui';
-	import { Input } from '$lib/components/ui/input';
+	import { Input } from '@civicos/shared/ui/input';
 	import { session } from '$lib/services/session.svelte';
 	import { ArrowRight, Check, Mail, MessageSquare, Link as LinkIcon } from 'lucide-svelte';
 	import type { RegionConfig } from '$lib/config/regions';

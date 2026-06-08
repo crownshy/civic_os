@@ -4,7 +4,7 @@
 	import type { RegionConfig } from '$lib/config/regions';
 	import { AppShell } from '$lib/components/layout';
 	import { Button, Card } from '$lib/components/ui';
-	import { Input } from '$lib/components/ui/input';
+	import { Input } from '@civicos/shared/ui/input';
 	import { session } from '$lib/services/session.svelte';
 	import { Mail, MessageSquare } from 'lucide-svelte';
 	import { fade } from 'svelte/transition';

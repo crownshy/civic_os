@@ -2,7 +2,7 @@
 	import { page } from '$app/state';
 	import { AppShell } from '$lib/components/layout';
 	import { InfoBar, ConversationEventCard, Button } from '$lib/components/ui';
-	import { Input } from '$lib/components/ui/input';
+	import { Input } from '@civicos/shared/ui/input';
 	import type { RegionConfig } from '$lib/config/regions';
 	import { session } from '$lib/services/session.svelte';
 	import { fly, fade } from 'svelte/transition';

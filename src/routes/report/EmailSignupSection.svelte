@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/Button.svelte';
-	import { Input } from '$lib/components/ui/input';
+	import { Input } from '@civicos/shared/ui/input';
 
 	let email = $state('');
 

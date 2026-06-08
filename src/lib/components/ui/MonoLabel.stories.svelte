@@ -1,6 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import MonoLabel from './MonoLabel.svelte';
+	import MonoLabel from '@civicos/shared/ui/MonoLabel.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Primitives/MonoLabel',

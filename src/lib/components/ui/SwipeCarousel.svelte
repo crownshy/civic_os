@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import * as Carousel from '$lib/components/ui/carousel';
-	import { type CarouselAPI } from './carousel/context';
+	import * as Carousel from '@civicos/shared/ui/carousel';
+	import { type CarouselAPI } from '@civicos/shared/ui/carousel/context';
 	import Autoplay from 'embla-carousel-autoplay';
 	import Play from '$lib/assets/icons/play.svelte';
 	import Pause from '$lib/assets/icons/pause.svelte';

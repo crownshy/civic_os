@@ -6,7 +6,7 @@
 	import { browser } from '$app/environment';
 	import { Button, Dialog, ZipInput, Accordion, StickyNav } from '$lib/components/ui';
 	import { Mail } from 'lucide-svelte';
-	import { Input } from '$lib/components/ui/input';
+	import { Input } from '@civicos/shared/ui/input';
 	import { session } from '$lib/services/session.svelte';
 	import { getRegionByZipcode, getRegionUrl, REGIONS } from '$lib/config/regions';
 	import type { RegionConfig } from '$lib/config/regions';

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { CommentReportData } from '$lib/types/report';
-	import Badge from '$lib/components/ui/Badge.svelte';
+	import Badge from '@civicos/shared/ui/Badge.svelte';
 
 	interface Props {
 		statements: CommentReportData[];
