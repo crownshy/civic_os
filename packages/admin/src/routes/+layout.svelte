@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '../app.css';
 	import { LayoutDashboard, Plus } from '@lucide/svelte';
 
 	let { children } = $props();
@@ -18,7 +19,6 @@
 </script>
 
 <div class="bg-background text-foreground flex h-screen w-screen overflow-hidden font-sans">
-	<!-- Sidebar (light) -->
 	<aside class="border-border bg-background flex w-56 shrink-0 flex-col border-r">
 		<div class="border-border flex items-center gap-2.5 border-b p-4">
 			<div class="bg-destructive size-8 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl"></div>
@@ -27,7 +27,7 @@
 
 		<nav class="py-2.5">
 			<a
-				href="/admin/test"
+				href="/"
 				class="bg-muted-foreground/20 flex items-center gap-2.5 px-2.5 py-2 text-sm font-medium"
 			>
 				<LayoutDashboard class="size-4" />
@@ -42,7 +42,7 @@
 		<div class="border-border flex flex-col gap-0.5 border-b pb-2.5">
 			{#each conversations as conv}
 				<a
-					href={`/admin/c/${conv.slug}`}
+					href={`/c/${conv.slug}`}
 					class="hover:bg-muted/50 flex items-center gap-2 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-2.5 py-2 text-sm font-medium"
 				>
 					<span class={`size-1.5 rounded-full ${statusDot[conv.status]}`}></span>
@@ -54,7 +54,7 @@
 		<div class="p-2.5">
 			<button
 				type="button"
-				class="bg-foreground text-background inline-flex items-center gap-1 rounded-[10px] p-2 text-sm font-medium"
+				class="bg-primary text-primary-foreground inline-flex items-center gap-1 rounded-[10px] p-2 text-sm font-medium"
 			>
 				<Plus class="size-4" />
 				<span class="font-mono">New Conversation</span>
@@ -69,15 +69,7 @@
 		</div>
 	</aside>
 
-	<!-- Main -->
 	<main class="flex flex-1 flex-col overflow-hidden">
 		{@render children?.()}
 	</main>
 </div>
-
-<style>
-	/* Reusable card shadow matching wireframe */
-	:global(.shadow-card) {
-		box-shadow: 0px 5px 15px 0px rgba(12, 34, 95, 0.13);
-	}
-</style>

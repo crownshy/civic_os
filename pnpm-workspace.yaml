@@ -4,3 +4,4 @@ onlyBuiltDependencies:
   - esbuild
 packages:
   - .
+  - packages/*
