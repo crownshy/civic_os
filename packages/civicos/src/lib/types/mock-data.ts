@@ -67,24 +67,9 @@ export interface PopQuizQuestion {
 	explanation: string;
 }
 
-export interface ConversationEvent {
-	id: string;
-	slug: string;
-	title: string;
-	topic: string;
-	location: string;
-	time: string;
-	endTime?: string;
-	date: string; // ISO date string for countdown
-	format: 'in-person' | 'online';
-	description: string;
-	fullDescription?: string;
-	venueName?: string;
-	address?: string;
-	duration?: string;
-	imageUrl?: string;
-	signupUrl?: string;
-}
+// ConversationEvent moved to @civicos/shared so admin can consume it too.
+// Re-exported here for back-compat with civicos imports of $lib/types/mock-data.
+export type { ConversationEvent } from '@civicos/shared/types';
 
 export interface AboutYouQuestion {
 	id: string;

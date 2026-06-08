@@ -24,6 +24,10 @@ function fixApiClientPlugin() {
 export default defineConfig({
 	plugins: [fixApiClientPlugin(), tailwindcss(), sveltekit()],
 	server: {
-		allowedHosts: ['.localhost']
+		allowedHosts: ['.localhost'],
+		fs: {
+			// Allow serving from sibling workspace packages (e.g. @civicos/shared).
+			allow: ['..']
+		}
 	}
 });

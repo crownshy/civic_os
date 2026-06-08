@@ -7,6 +7,7 @@
 		".": "./src/index.ts",
 		"./types": "./src/types/index.ts",
 		"./utils": "./src/utils.ts",
+		"./data/regions": "./src/data/regions.ts",
 		"./styles/theme.css": "./src/styles/theme.css",
 		"./ui/button": "./src/ui/button/index.ts",
 		"./ui/dialog": "./src/ui/dialog/index.ts",
