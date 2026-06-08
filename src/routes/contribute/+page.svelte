@@ -3,7 +3,15 @@
 	import { cubicOut } from 'svelte/easing';
 	import { page } from '$app/state';
 	import { AppShell } from '$lib/components/layout';
-	import { PopQuiz, InfoBar, VoteBar } from '$lib/components/ui';
+	import {
+		PopQuiz,
+		InfoBar,
+		VoteBar,
+		ActionPanel,
+		EmailPanelContent,
+		SharePanelContent,
+		ReviewPanelContent
+	} from '$lib/components/ui';
 	import { popQuizQuestions, aboutYouQuestions } from '$lib/data/mock';
 	import { getRegionByZipcode } from '$lib/config/regions';
 	import type { RegionConfig } from '$lib/config/regions';
@@ -14,7 +22,7 @@
 	import ComposeScreen from './ComposeScreen.svelte';
 	import DidYouKnowScreen from './DidYouKnowScreen.svelte';
 	import AboutYouScreen from './AboutYouScreen.svelte';
-	import NiceJobScreen from './NiceJobScreen.svelte';
+	import CheckpointScreen, { type CheckpointVariant } from './CheckpointScreen.svelte';
 	import ThankYouScreen from './ThankYouScreen.svelte';
 
 	// Region from subdomain (layout server load)
@@ -40,7 +48,7 @@
 	});
 
 	// --- simplified flow ---
-	// voting → (after FIRST_BATCH) pause → voting (SECOND_BATCH more) → ...
+	// voting → (every BATCH_SIZE votes) pause → voting → ...
 	// END at any point or out of statements → about-you → email-capture (if needed) → thank-you
 
 	type Screen =
@@ -55,8 +63,30 @@
 		| 'pop-quiz'
 		| 'nice-job';
 
-	const FIRST_BATCH = 10;
-	const SECOND_BATCH = 20;
+	const BATCH_SIZE = 10;
+	// Order of checkpoints. Each batch boundary consumes the next variant whose action
+	// isn't already done (rolling past completed ones), so a returning user with email
+	// already provided sees `contribute → feedback → share` instead of `contribute → (silent skip) → feedback → share`.
+	//   contribute  — always shows (composing is repeatable)
+	//   email       — skipped if session.emailProvided
+	//   feedback    — skipped if session.endCtaReviewCompleted
+	//   share       — skipped if session.endCtaShareCompleted
+	// Once all four are consumed: no more pauses.
+	const CHECKPOINT_VARIANTS: CheckpointVariant[] = ['contribute', 'email', 'feedback', 'share'];
+
+	/** Whether a checkpoint variant should be skipped because its action is already done. */
+	function isCheckpointAlreadyDone(variant: CheckpointVariant): boolean {
+		switch (variant) {
+			case 'contribute':
+				return false; // composing is repeatable; always show
+			case 'email':
+				return session.emailProvided;
+			case 'feedback':
+				return session.endCtaReviewCompleted;
+			case 'share':
+				return session.endCtaShareCompleted;
+		}
+	}
 
 	// Returning user: show loading splash until Polis resolves, then decide screen
 	const isReturning = session.pid !== undefined;
@@ -65,33 +95,54 @@
 	let totalVotes = $state(session.totalVotes);
 	let hasSeenPause = $state(session.hasSeenPause);
 	let votesInRound = $state(hasSeenPause ? 0 : totalVotes);
+	// Index into CHECKPOINT_VARIANTS for the *next* variant to consider showing.
+	// Advances past variants that have actually been shown (or skipped because all later ones
+	// were also already-done). Returning users approximate from totalVotes.
+	let nextCheckpointIdx = $state(Math.min(Math.floor(totalVotes / BATCH_SIZE), CHECKPOINT_VARIANTS.length));
+	// Variant currently displayed on the pause screen. Set when entering 'pause'.
+	let currentVariant = $state<CheckpointVariant>('contribute');
 	// Tracks when user explicitly pressed END in this session — prevents thank-you→voting loop
 	let userEndedVoting = $state(false);
 
-	// Anchor Polis counts once to avoid fluctuation from parallel vote+nextComment requests.
-	// After anchoring, we decrement client-side instead of reading polis.remaining directly.
-	let anchoredRemaining = $state<number | null>(null);
-	let anchoredTotal = $state<number | null>(null);
+	// Checkpoint action panels (also reused on the end-page ThankYouScreen)
+	let emailPanelOpen = $state(false);
+	let sharePanelOpen = $state(false);
+	let reviewPanelOpen = $state(false);
 
-	$effect(() => {
-		if (polis.ready && !polis.loading && anchoredRemaining === null) {
-			anchoredRemaining = polis.remaining;
-			anchoredTotal = polis.total;
+	function handleCheckpointPrimary() {
+		switch (currentVariant) {
+			case 'contribute':
+				screen = 'compose';
+				break;
+			case 'email':
+				emailPanelOpen = true;
+				break;
+			case 'feedback':
+				reviewPanelOpen = true;
+				break;
+			case 'share':
+				sharePanelOpen = true;
+				break;
 		}
-	});
+	}
+
+	/** Called by panel content components when the user completes the action. Closes panel + resumes voting.
+	 * Order matters: swap to voting *before* closing the panel so the panel's slide-down animation
+	 * reveals the voting screen underneath instead of flashing the checkpoint screen behind it. */
+	function handlePanelComplete() {
+		resumeVoting();
+		emailPanelOpen = false;
+		sharePanelOpen = false;
+		reviewPanelOpen = false;
+	}
 
 	// Pop quiz state (preserved for future use)
 	let quizIndex = $state(0);
 	const currentQuiz = $derived(popQuizQuestions[quizIndex % popQuizQuestions.length]);
 
-	// In the first phase, cap displayed remaining/total at FIRST_BATCH.
-	// After pause, use anchored counts that decrement client-side (no Polis fluctuation).
-	const displayedRemaining = $derived(
-		hasSeenPause
-			? Math.max(0, anchoredRemaining ?? polis.remaining)
-			: Math.max(0, FIRST_BATCH - votesInRound)
-	);
-	const displayedTotal = $derived(hasSeenPause ? (anchoredTotal ?? polis.total) : FIRST_BATCH);
+	// Progress bar reflects current batch of BATCH_SIZE votes.
+	const displayedRemaining = $derived(Math.max(0, BATCH_SIZE - votesInRound));
+	const displayedTotal = BATCH_SIZE;
 
 	// When Polis runs out of statements while voting, go to end flow
 	$effect(() => {
@@ -112,24 +163,29 @@
 		totalVotes++;
 		votesInRound++;
 
-		// Decrement anchored remaining so counter is smooth and predictable
-		if (anchoredRemaining !== null && anchoredRemaining > 0) {
-			anchoredRemaining--;
-		}
-
 		// Persist vote progress so it survives page refresh
 		session.saveVoteProgress(totalVotes, hasSeenPause);
 
-		const batchLimit = hasSeenPause ? SECOND_BATCH : FIRST_BATCH;
-		if (votesInRound >= batchLimit) {
+		if (votesInRound >= BATCH_SIZE) {
 			votesInRound = 0;
 			if (!hasSeenPause) {
-				// First batch done → soft pause
 				hasSeenPause = true;
 				session.saveVoteProgress(totalVotes, hasSeenPause);
+			}
+			// Roll forward to the next variant whose action isn't already done.
+			// 'contribute' never reports done, so this loop always terminates if any slots remain.
+			while (
+				nextCheckpointIdx < CHECKPOINT_VARIANTS.length &&
+				isCheckpointAlreadyDone(CHECKPOINT_VARIANTS[nextCheckpointIdx])
+			) {
+				nextCheckpointIdx++;
+			}
+			if (nextCheckpointIdx < CHECKPOINT_VARIANTS.length) {
+				currentVariant = CHECKPOINT_VARIANTS[nextCheckpointIdx];
+				nextCheckpointIdx++;
 				screen = 'pause';
 			}
-			// After second batch, keep voting until they press END or run out
+			// All checkpoints used: keep voting, no more pauses.
 		}
 	}
 
@@ -213,6 +269,7 @@
 				statementId={polis.currentStatement.tid}
 				remaining={displayedRemaining}
 				total={displayedTotal}
+				realRemaining={polis.remaining}
 				loading={polis.loading}
 				onVote={handleVote}
 				onEnd={handleEnd}
@@ -259,14 +316,14 @@
 			region={subdomainRegion}
 		/>
 	{:else if screen === 'pause'}
-		<NiceJobScreen
+		<CheckpointScreen
 			region={subdomainRegion}
 			countyName={session.county}
-			remaining={anchoredRemaining ?? polis.remaining}
-			onKeepVoting={resumeVoting}
-			onDone={() => {
-				screen = 'compose';
-			}}
+			variant={currentVariant}
+			remaining={polis.remaining}
+			onPrimary={handleCheckpointPrimary}
+			onKeepGoing={resumeVoting}
+			onEnd={handleEnd}
 		/>
 	{:else if screen === 'about-you'}
 		<AboutYouScreen
@@ -295,11 +352,53 @@
 			<PopQuiz quiz={currentQuiz} onContinue={resumeVoting} onSkip={resumeVoting} />
 		</div>
 	{:else if screen === 'nice-job'}
-		<NiceJobScreen
+		<CheckpointScreen
 			region={subdomainRegion}
 			countyName={session.county}
-			onKeepVoting={resumeVoting}
-			onDone={handleEnd}
+			onPrimary={handleEnd}
+			onKeepGoing={resumeVoting}
 		/>
 	{/if}
 </AppShell>
+
+<!-- Checkpoint action panels (also reused on the end-page ThankYouScreen) -->
+<ActionPanel
+	bind:open={emailPanelOpen}
+	title={session.emailProvided ? "You're on the list." : 'Stay in touch.'}
+	description={session.emailProvided
+		? 'Thanks — we’ll be in touch with updates on this conversation.'
+		: 'Share your email to receive updates on this conversation and opportunities to share your voice on this issue.'}
+	umamiDismissEvent="checkpoint-panel-dismiss-email"
+>
+	<EmailPanelContent
+		umamiSubmitEvent="checkpoint-email-submit"
+		onComplete={handlePanelComplete}
+	/>
+</ActionPanel>
+
+<ActionPanel
+	bind:open={sharePanelOpen}
+	title="Help bring everyone into the fold."
+	umamiDismissEvent="checkpoint-panel-dismiss-share"
+>
+	<SharePanelContent
+		region={subdomainRegion}
+		umamiTextEvent="checkpoint-share-text"
+		umamiEmailEvent="checkpoint-share-email"
+		umamiLinkEvent="checkpoint-share-link"
+		onComplete={handlePanelComplete}
+	/>
+</ActionPanel>
+
+<ActionPanel
+	bind:open={reviewPanelOpen}
+	title="Rate your experience."
+	description="Tell us what worked, what didn’t, and what would make this better."
+	umamiDismissEvent="checkpoint-panel-dismiss-review"
+	class="md:w-[560px]"
+>
+	<ReviewPanelContent
+		umamiSubmitEvent="checkpoint-review-submit"
+		onComplete={handlePanelComplete}
+	/>
+</ActionPanel>
