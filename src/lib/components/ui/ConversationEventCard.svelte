@@ -1,19 +1,18 @@
 <script lang="ts">
-	import type { ConversationEvent } from '$lib/types/mock-data';
 	import { cn } from '$lib/utils';
 	import ArrowRight from '$lib/assets/icons/arrow-right.svelte';
+	import type { LocalizedEventDto } from '@crownshy/api-client/api';
 
 	interface Props {
-		event: ConversationEvent;
+		event: LocalizedEventDto;
 		class?: string;
+		dateFormatter: Intl.DateTimeFormat;
+		timeFormatter: Intl.DateTimeFormat;
 	}
 
-	let { event, class: className }: Props = $props();
+	let { event, class: className, dateFormatter, timeFormatter }: Props = $props();
 
-	const formattedDate = $derived.by(() => {
-		const d = new Date(event.date);
-		return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
-	});
+	const eventDate = $derived(new Date(event.startTime));
 </script>
 
 <div
@@ -27,7 +26,9 @@
 			{event.title}
 		</h2>
 		<p class="mt-1 font-sans text-base leading-4 font-bold text-foreground/70">
-			<span class="text-primary">{formattedDate}</span> &bull; {event.time}
+			<span class="text-primary">{dateFormatter.format(eventDate)}</span> &bull; {timeFormatter.format(
+				eventDate
+			)}
 		</p>
 	</div>
 
