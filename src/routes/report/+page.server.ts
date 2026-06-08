@@ -12,8 +12,8 @@ interface WorkflowStepDto {
 	id: string;
 	name: string;
 	stepOrder: number;
-	previewToolConfig: { type: string; poll_id?: string;[key: string]: unknown };
-	toolConfig?: { type: string; poll_id?: string;[key: string]: unknown } | null;
+	previewToolConfig: { type: string; poll_id?: string; [key: string]: unknown };
+	toolConfig?: { type: string; poll_id?: string; [key: string]: unknown } | null;
 }
 
 interface DemographicCategory {
@@ -35,7 +35,12 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 	const region = locals.region;
 	const conversationId = region.conversationId;
 
-	console.log('[Report] Loading report for region:', region.slug, '| conversationId:', conversationId);
+	console.log(
+		'[Report] Loading report for region:',
+		region.slug,
+		'| conversationId:',
+		conversationId
+	);
 
 	async function fetchApi<T>(path: string): Promise<T> {
 		const apiUrl = `${url.origin}/api${path}`;
@@ -57,9 +62,7 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 	}
 
 	try {
-		const workflows = await fetchApi<WorkflowDto[]>(
-			`/conversation/${conversationId}/workflow`
-		);
+		const workflows = await fetchApi<WorkflowDto[]>(`/conversation/${conversationId}/workflow`);
 
 		if (!workflows.length) {
 			const msg = `No workflows found for conversation ${conversationId}`;
@@ -91,7 +94,15 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 		const report = await fetchApi<WikiPollReport>(
 			`/tools/polis/report_data?workflow_step_id=${region.polis_workflow_step_id}`
 		);
-		console.log('[Report] Got report:', report.comments?.length, 'comments,', report.groups?.length, 'groups,', report.participants?.length, 'participants');
+		console.log(
+			'[Report] Got report:',
+			report.comments?.length,
+			'comments,',
+			report.groups?.length,
+			'groups,',
+			report.participants?.length,
+			'participants'
+		);
 
 		let demographics: DemographicReport | null = null;
 		try {

@@ -26,22 +26,28 @@
 
 	let { demographics, participantCount }: Props = $props();
 
-	const chartColors = ['bg-chart-1', 'bg-chart-2', 'bg-chart-3', 'bg-chart-4', 'bg-chart-5', 'bg-chart-6'];
+	const chartColors = [
+		'bg-chart-1',
+		'bg-chart-2',
+		'bg-chart-3',
+		'bg-chart-4',
+		'bg-chart-5',
+		'bg-chart-6'
+	];
 
 	const tabs = ['Age', 'Location', 'Gender', 'Race & Ethnicity', 'Political'] as const;
 	let activeTab = $state(1);
 
-
 	function toCategoryItems(categories: DemographicCategory[]) {
 		return categories.map((c, i) => ({
-			label: c.value ? c.value : "Not Provided",
-			color: c.value ? chartColors[i % chartColors.length] : 'bg-chart-undefined' ,
+			label: c.value ? c.value : 'Not Provided',
+			color: c.value ? chartColors[i % chartColors.length] : 'bg-chart-undefined',
 			count: c.count
 		}));
 	}
 
 	const ageData = $derived(
-		demographics?.ageRanges?.length ? toCategoryItems(demographics.ageRanges) : [] 
+		demographics?.ageRanges?.length ? toCategoryItems(demographics.ageRanges) : []
 	);
 
 	const genderData = $derived(
@@ -56,8 +62,7 @@
 		demographics?.politicalParty?.length ? toCategoryItems(demographics.politicalParty) : []
 	);
 
-	console.log({ageData, ethnicityData, politicalData,genderData})
-
+	console.log({ ageData, ethnicityData, politicalData, genderData });
 
 	const totalDisplay = $derived(
 		demographics?.totalParticipants
@@ -80,7 +85,7 @@
 	</div>
 
 	<div class="mt-8 px-8">
-		<h2 class="font-sans text-3xl font-bold leading-8 text-foreground">
+		<h2 class="font-display text-3xl leading-8 font-medium tracking-display text-foreground">
 			This Open Poll engaged people of different backgrounds.
 		</h2>
 	</div>
@@ -100,7 +105,8 @@
 			{#each tabs as tab, i (tab)}
 				<button
 					onclick={() => handleTabClick(i)}
-					class="shrink-0 whitespace-nowrap font-sans text-2xl font-bold leading-7 transition-opacity {activeTab === i
+					class="shrink-0 font-sans text-2xl leading-7 font-bold whitespace-nowrap transition-opacity {activeTab ===
+					i
 						? 'text-foreground opacity-100'
 						: 'text-foreground opacity-40'}"
 				>
@@ -141,21 +147,27 @@
 						{#if genderData.length}
 							<DonutChart data={genderData} size={200} />
 						{:else}
-							<p class="mt-8 font-sans text-sm text-muted-foreground">No gender data available yet.</p>
+							<p class="mt-8 font-sans text-sm text-muted-foreground">
+								No gender data available yet.
+							</p>
 						{/if}
 					{:else if i === 3}
 						<!-- Race & Ethnicity -->
 						{#if ethnicityData.length}
 							<DonutChart data={ethnicityData} size={200} />
 						{:else}
-							<p class="mt-8 font-sans text-sm text-muted-foreground">No ethnicity data available yet.</p>
+							<p class="mt-8 font-sans text-sm text-muted-foreground">
+								No ethnicity data available yet.
+							</p>
 						{/if}
 					{:else}
 						<!-- Political -->
 						{#if politicalData.length}
 							<DonutChart data={politicalData} size={200} />
 						{:else}
-							<p class="mt-8 font-sans text-sm text-muted-foreground">No political affiliation data available yet.</p>
+							<p class="mt-8 font-sans text-sm text-muted-foreground">
+								No political affiliation data available yet.
+							</p>
 						{/if}
 					{/if}
 				</div>

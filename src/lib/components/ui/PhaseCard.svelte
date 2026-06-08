@@ -25,9 +25,9 @@
 </script>
 
 <div
-	class="relative rounded-xl p-6 border {isPrimary
-		? 'bg-card border-muted-foreground/20'
-		: 'bg-card/10 border-card/20'}"
+	class="relative rounded-xl border p-6 {isPrimary
+		? 'border-muted-foreground/20 bg-card'
+		: 'border-card/20 bg-card/10'}"
 >
 	<div class="flex gap-4">
 		{#if hasProgressIndicator}
@@ -38,40 +38,42 @@
 					{#if subheading}
 						<!-- Pulsing indicator for LIVE NOW -->
 						<div class="relative">
-							<div class="absolute inset-0 bg-destructive/20 rounded-full blur-sm"></div>
-							<div class="relative w-4 h-4 {subheadingColor || 'bg-destructive'} rounded-full"></div>
+							<div class="absolute inset-0 rounded-full bg-destructive/20 blur-sm"></div>
+							<div
+								class="relative h-4 w-4 {subheadingColor || 'bg-destructive'} rounded-full"
+							></div>
 						</div>
 					{:else}
 						<!-- Simple circle for other states -->
-						<div class="w-4 h-4 bg-muted-foreground/20 rounded-full"></div>
+						<div class="h-4 w-4 rounded-full bg-muted-foreground/20"></div>
 					{/if}
 					<!-- Vertical line that fills remaining height -->
 					<div class="w-px flex-1 {subheadingColor || 'bg-destructive'}"></div>
 				{:else}
 					<!-- Secondary: Line spans full height, circle overlays it -->
-					<div class="relative flex-1 flex flex-col items-center">
+					<div class="relative flex flex-1 flex-col items-center">
 						<!-- Full-height line -->
 						<div class="absolute inset-y-0 w-px {subheadingColor || 'bg-card/20'}"></div>
 						<!-- Circle overlaid on line -->
-						<div class="relative w-4 h-4 bg-card/20 rounded-full mt-3"></div>
+						<div class="relative mt-3 h-4 w-4 rounded-full bg-card/20"></div>
 					</div>
 				{/if}
 			</div>
 		{/if}
 
 		<!-- Content Column -->
-		<div class="flex-1 min-w-0">
+		<div class="min-w-0 flex-1">
 			{#if subheading}
 				<span
 					class="font-mono text-xs font-medium {subheadingColor ||
-						(isPrimary ? 'text-destructive' : 'text-card/70')} block mb-3"
+						(isPrimary ? 'text-destructive' : 'text-card/70')} mb-3 block"
 				>
 					{subheading}
 				</span>
 			{/if}
 
 			<h3
-				class="font-sans text-3xl font-bold leading-tight mb-3 {isPrimary
+				class="mb-3 font-display text-3xl leading-tight font-medium tracking-display {isPrimary
 					? 'text-primary'
 					: 'text-card'}"
 			>
@@ -79,7 +81,7 @@
 			</h3>
 
 			<p
-				class="font-sans text-sm font-medium leading-5 mb-6 {isPrimary
+				class="mb-6 font-sans text-sm leading-5 font-medium {isPrimary
 					? 'text-muted-foreground'
 					: 'text-card'}"
 			>

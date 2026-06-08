@@ -21,7 +21,7 @@
 
 <Story name="White" args={{ variant: 'white' }}>
 	{#snippet children(args)}
-		<div class="bg-primary p-6 rounded-xl">
+		<div class="rounded-xl bg-primary p-6">
 			<MonoLabel {...args}>YOU</MonoLabel>
 		</div>
 	{/snippet}

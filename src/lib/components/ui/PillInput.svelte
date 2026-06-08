@@ -35,9 +35,7 @@
 	<div
 		class={cn(
 			'flex h-14 flex-1 items-center rounded-full border-[3px] px-5',
-			isPrimary
-				? 'border-white bg-white/10'
-				: 'border-primary bg-transparent'
+			isPrimary ? 'border-white bg-white/10' : 'border-primary bg-transparent'
 		)}
 	>
 		{#if isPrimary}
@@ -49,10 +47,8 @@
 			bind:value
 			{oninput}
 			class={cn(
-				'w-full rounded-none border-0 bg-transparent font-mono text-lg font-medium shadow-none focus-visible:ring-0 placeholder:opacity-100',
-				isPrimary
-					? 'text-white placeholder:text-white'
-					: 'text-primary placeholder:text-primary'
+				'w-full rounded-none border-0 bg-transparent font-mono text-lg font-medium shadow-none placeholder:opacity-100 focus-visible:ring-0',
+				isPrimary ? 'text-white placeholder:text-white' : 'text-primary placeholder:text-primary'
 			)}
 		/>
 	</div>

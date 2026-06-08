@@ -17,7 +17,8 @@
 		question: 'What percentage of people do you think trust AI more than their elected officials?',
 		options: ['Less than 30%', '50-70%', 'More than 70%'],
 		correctIndex: 2,
-		explanation: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis finibus purus mollis, ultrices lorem quis, facilisis mauris.'
+		explanation:
+			'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis finibus purus mollis, ultrices lorem quis, facilisis mauris.'
 	};
 </script>
 

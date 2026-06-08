@@ -17,7 +17,8 @@ export const county: County = {
 export const deliberation: Deliberation = {
 	id: 'delib-001',
 	title: 'AI & Online Safety',
-	question: 'How can Utahns ensure benefits of AI are widely shared and risks are responsibly managed?',
+	question:
+		'How can Utahns ensure benefits of AI are widely shared and risks are responsibly managed?',
 	county
 };
 
@@ -87,7 +88,8 @@ export const popQuizQuestions: PopQuizQuestion[] = [
 		question: 'What percentage of people do you think trust AI more than their elected officials?',
 		options: ['Less than 30%', '50-70%', 'More than 70%'],
 		correctIndex: 2,
-		explanation: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis finibus purus mollis, ultrices lorem quis, facilisis mauris. Nulla tortor magna, consequat sed pharetra quis, blandit elementum velit. Curabitur finibus et felis nec vehicula.'
+		explanation:
+			'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis finibus purus mollis, ultrices lorem quis, facilisis mauris. Nulla tortor magna, consequat sed pharetra quis, blandit elementum velit. Curabitur finibus et felis nec vehicula.'
 	}
 ];
 
@@ -103,7 +105,16 @@ export const aboutYouQuestions: AboutYouQuestion[] = [
 		id: 'about-002',
 		question: 'What is your ethnicity?',
 		description: 'Select the one that best describes you.',
-		options: ['White or Caucasian', 'Black or African American', 'Hispanic or Latino', 'Asian / Pacific Islander', 'Native American', 'Middle Eastern / North African', 'Multiracial', 'Other'],
+		options: [
+			'White or Caucasian',
+			'Black or African American',
+			'Hispanic or Latino',
+			'Asian / Pacific Islander',
+			'Native American',
+			'Middle Eastern / North African',
+			'Multiracial',
+			'Other'
+		],
 		multiSelect: false
 	},
 	{
@@ -117,7 +128,11 @@ export const aboutYouQuestions: AboutYouQuestion[] = [
 		id: 'about-004',
 		question: 'Which of the following best describes your political leaning?',
 		description: 'Select the one that best describes you.',
-		options: ['Republican / Conservative', 'Democrat / Progressive / Liberal', 'No Party Preference / Independent'],
+		options: [
+			'Republican / Conservative',
+			'Democrat / Progressive / Liberal',
+			'No Party Preference / Independent'
+		],
 		multiSelect: false
 	}
 ];

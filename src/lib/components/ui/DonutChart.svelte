@@ -78,11 +78,13 @@
 
 		<!-- Center label -->
 		<div
-			class="pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center"
+			class="pointer-events-none absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center"
 		>
 			{#if hoveredSlice}
 				<div class="font-mono text-2xl font-medium text-foreground">
-					{hoveredSlice.count >= 1000 ? `${(hoveredSlice.count / 1000).toFixed(1)}K` : hoveredSlice.count}
+					{hoveredSlice.count >= 1000
+						? `${(hoveredSlice.count / 1000).toFixed(1)}K`
+						: hoveredSlice.count}
 				</div>
 				<div class="font-mono text-[10px] font-medium text-foreground uppercase">
 					{hoveredSlice.label}

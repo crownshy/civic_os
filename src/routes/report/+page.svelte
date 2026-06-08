@@ -17,13 +17,19 @@
 	const error: string | null = $derived(page.data.error ?? null);
 	const region: RegionConfig = page.data.region;
 
-	const participantCount = $derived(report?.groups?.reduce((a,b)=> a + b.total_members, 0) ?? 0);
+	const participantCount = $derived(report?.groups?.reduce((a, b) => a + b.total_members, 0) ?? 0);
 	const statementCount = $derived(report?.comments?.length ?? 0);
 	const totalVotes = $derived(
-		report?.comments?.reduce((sum: number, c: { overall_votes: { agrees: number; disagrees: number; passes: number } }) => {
-			const v = c.overall_votes;
-			return sum + v.agrees + v.disagrees + v.passes;
-		}, 0) ?? 0
+		report?.comments?.reduce(
+			(
+				sum: number,
+				c: { overall_votes: { agrees: number; disagrees: number; passes: number } }
+			) => {
+				const v = c.overall_votes;
+				return sum + v.agrees + v.disagrees + v.passes;
+			},
+			0
+		) ?? 0
 	);
 	const groupLabels = $derived(
 		report?.groups?.map((_: unknown, i: number) => `Group ${String.fromCharCode(65 + i)}`) ?? []
@@ -32,7 +38,8 @@
 	const heroTitle = 'AI and the Future of Our Communities';
 	const heroRegion = region?.stateName?.toUpperCase() || '';
 	const heroPhase = 'PHASE 1: IDEAS REPORT';
-	const heroDescription = 'This is what this poll is about. Write a few sentence to describe what this topic is about, why is it important. Maybe in a very high-level, summarise how it went.';
+	const heroDescription =
+		'This is what this poll is about. Write a few sentence to describe what this topic is about, why is it important. Maybe in a very high-level, summarise how it went.';
 
 	const sectionIds = [
 		'hero',
@@ -48,7 +55,7 @@
 		'common-ground': 'Demographics 👇🏾',
 		demographics: 'Opinion Groups 👇🏾',
 		'opinion-groups': 'Consensus 👇🏾',
-		consensus: "What's Next 👇🏾",
+		consensus: "What's Next 👇🏾"
 	};
 
 	let currentSection = $state<string>('hero');
@@ -91,7 +98,7 @@
 			<div class="flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
 				<span class="text-2xl">!</span>
 			</div>
-			<h2 class="text-center font-sans text-2xl font-bold text-foreground">
+			<h2 class="text-center font-display text-2xl font-medium tracking-display text-foreground">
 				Report data unavailable
 			</h2>
 			<p class="max-w-md text-center font-sans text-sm text-muted-foreground">
@@ -114,7 +121,7 @@
 		<div
 			bind:this={scrollContainer}
 			onscroll={handleScroll}
-			class="h-full overflow-y-auto overflow-x-hidden"
+			class="h-full overflow-x-hidden overflow-y-auto"
 		>
 			<div id="hero">
 				<HeroSection

@@ -1,11 +1,6 @@
 <script lang="ts">
 	import { AppShell, AppHeader } from '$lib/components/layout';
-	import {
-		MonoLabel,
-		AlertBanner,
-		ContributionRow,
-		ConversationCard
-	} from '$lib/components/ui';
+	import { MonoLabel, AlertBanner, ContributionRow, ConversationCard } from '$lib/components/ui';
 	import { county, userProfile, conversations } from '$lib/data/mock';
 </script>
 
@@ -21,13 +16,17 @@
 				</span>
 			</div>
 
-			<h1 class="mt-4 font-sans text-3xl font-bold leading-9 text-primary-foreground">
+			<h1
+				class="mt-4 font-display text-3xl leading-9 font-medium tracking-display text-primary-foreground"
+			>
 				PROFILE
 			</h1>
 
 			<!-- User card -->
 			<div class="mt-4 flex items-center gap-4 rounded-2xl bg-card p-4">
-				<div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-lg text-primary-foreground">
+				<div
+					class="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-lg text-primary-foreground"
+				>
 					🦊
 				</div>
 				<div>
@@ -45,9 +44,7 @@
 		<!-- Email verification alert -->
 		{#if !userProfile.emailVerified}
 			<div class="px-5 pt-4">
-				<AlertBanner
-					message="You have not verified your email yet! Click here to complete."
-				/>
+				<AlertBanner message="You have not verified your email yet! Click here to complete." />
 			</div>
 		{/if}
 
@@ -78,7 +75,7 @@
 				<MonoLabel size="sm" variant="primary">RECENT CONTRIBUTIONS</MonoLabel>
 			</div>
 			<div class="mt-2">
-					<ContributionRow
+				<ContributionRow
 					text="Social media companies should be held more accountable."
 					meta="DELIBERATION 01"
 					onDelete={() => {}}
