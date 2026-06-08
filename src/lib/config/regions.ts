@@ -456,7 +456,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 			'Small group discussions — in person and online — open to anyone in the region. A chance to hear from neighbors, think out loud, and go deeper than a poll allows.',
 			"<span class='font-bold'>Solutions Forum (Fall 2026)</span>",
 			'A representative group of 30–50 residents will come together to deliberate on what this process surfaced — and work toward recommendations with broad, cross-party support.',
-			"Questions or want to get involved? Reach us at <a href='mailto:hello@cocap.us'>hello@cocap.us</a>."
+			"Questions or want to get involved? Reach us at <a href='mailto:info@cocap.us'>info@cocap.us</a>."
 		],
 		campaignPageDescription:
 			'This Assembly is about making sure Central Oregonians have a real say in how artificial intelligence shapes our lives — who it benefits, who gets left behind, and what we can do about it at every level, from families and schools to city and state policy.',
@@ -464,7 +464,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 		whatsNext:
 			'<a href="/conversations?utm_source=whatsNext">Join us</a> in May and June for small group conversations taking place in Deschutes, Jefferson, and Crook counties — both in-person and online. They\'ll build on the themes and common ground that emerge from this poll. Share your email above to stay in the loop, or visit <a href="https://cocap.us" target="_blank">cocap.us</a> to learn more.',
 		goDeeper:
-			'This process is ultimately about finding common ground and turning it into action that benefits Central Oregon communities. If you\'d like to get more involved, reach out to us at <a href="mailto:hello@cocap.us">hello@cocap.us</a>.',
+			'This process is ultimately about finding common ground and turning it into action that benefits Central Oregon communities. If you\'d like to get more involved, reach out to us at <a href="mailto:info@cocap.us">info@cocap.us</a>.',
 		endCtaJoinDescription:
 			'Conversations with neighbors in Central Oregon are taking place in-person and online.',
 		endCtaShareDescription: 'Anyone in Central Oregon is welcome to participate.',
