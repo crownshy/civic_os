@@ -46,8 +46,8 @@ export default defineConfig({
 		allowedHosts: ['.localhost'],
 		fs: {
 			// Permit Vite to serve files from sibling workspace packages
-			// (e.g. @civicos/shared at ./packages/shared).
-			allow: ['./packages']
+			// (e.g. @civicos/shared at ../shared).
+			allow: ['..']
 		}
 	},
 	test: {

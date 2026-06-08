@@ -25,12 +25,14 @@
 	},
 	"files": ["src"],
 	"dependencies": {
+		"@lucide/svelte": "^1.16.0",
 		"bits-ui": "^2.18.1",
 		"clsx": "^2.1.1",
+		"embla-carousel-svelte": "^8.6.0",
 		"formsnap": "^2.0.1",
+		"sveltekit-superforms": "2.30.1",
 		"tailwind-merge": "^3.0.0",
-		"tailwind-variants": "^3.2.2",
-		"@lucide/svelte": "^1.16.0"
+		"tailwind-variants": "^3.2.2"
 	},
 	"peerDependencies": {
 		"svelte": "^5.0.0"
