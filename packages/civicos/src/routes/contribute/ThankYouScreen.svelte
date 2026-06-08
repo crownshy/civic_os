@@ -1,15 +1,17 @@
 <script lang="ts">
-	import { scale, fade } from 'svelte/transition';
+	import { scale } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
-	import { onMount } from 'svelte';
-	import { InfoBar, Button, EmojiCircle, ActionPanel } from '$lib/components/ui';
-	import { Input } from '@civicos/shared/ui/input';
+	import {
+		InfoBar,
+		EmojiCircle,
+		ActionPanel,
+		EmailPanelContent,
+		SharePanelContent,
+		ReviewPanelContent
+	} from '$lib/components/ui';
 	import { session } from '$lib/services/session.svelte';
-	import { ArrowRight, Check, Mail, MessageSquare, Link as LinkIcon } from 'lucide-svelte';
+	import { ArrowRight, Check } from 'lucide-svelte';
 	import type { RegionConfig } from '$lib/config/regions';
-
-	// TODO: replace with the real Heyform embed URL once provided.
-	const HEYFORM_EMBED_URL = 'https://forms.bloomproject.us/form/6mdAdmis';
 
 	// TODO(post-#216): import from '$lib/config/landing-copy' once branch 216 lands.
 	const FOOTER_LINKS: { label: string; href: string; external?: boolean }[] = [
@@ -40,100 +42,12 @@
 	let sharePanelOpen = $state(false);
 	let reviewPanelOpen = $state(false);
 
-	let email = $state('');
-	let submittingEmail = $state(false);
-	let emailError = $state('');
-
-	let linkCopied = $state(false);
-	let copyTimer: ReturnType<typeof setTimeout> | undefined;
-
-	function isValidEmail(value: string): boolean {
-		return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-	}
-
-	async function handleEmailSubmit() {
-		emailError = '';
-		const trimmed = email.trim();
-		if (!trimmed) {
-			emailError = 'Please enter an email address';
-			return;
-		}
-		if (!isValidEmail(trimmed)) {
-			emailError = 'Please enter a valid email address';
-			return;
-		}
-		submittingEmail = true;
-		await session.registerEmail(trimmed);
-		session.emailProvided = true;
-		submittingEmail = false;
-		emailPanelOpen = false;
-	}
-
-	const shareSubject = $derived(`Have your say about AI in ${region.stateName}`);
-	const shareBody = $derived(
-		`I just shared what I think about how ${region.demonym} should approach AI. Add your voice: ${region.shareUrl}`
-	);
-
-	function shareViaText() {
-		window.location.href = `sms:?&body=${encodeURIComponent(shareBody)}`;
-		session.markEndCtaShareCompleted();
-		sharePanelOpen = false;
-	}
-
-	function shareViaEmail() {
-		window.location.href = `mailto:?subject=${encodeURIComponent(shareSubject)}&body=${encodeURIComponent(shareBody)}`;
-		session.markEndCtaShareCompleted();
-		sharePanelOpen = false;
-	}
-
-	async function copyLink() {
-		try {
-			await navigator.clipboard.writeText(region.shareUrl);
-		} catch {
-			/* clipboard may be blocked; we still mark complete because intent was clear */
-		}
-		linkCopied = true;
-		session.markEndCtaShareCompleted();
-		clearTimeout(copyTimer);
-		copyTimer = setTimeout(() => {
-			linkCopied = false;
-		}, 2000);
-	}
-
 	function openReview() {
 		reviewPanelOpen = true;
-		// Spec: mark completed on open as the fallback signal. A real postMessage
-		// from Heyform (when its embed URL is configured) will also fire below,
-		// which is idempotent.
+		// Spec: also mark on open as a weak fallback. A real Heyform submission
+		// postMessage (handled inside ReviewPanelContent) is idempotent.
 		session.markEndCtaReviewCompleted();
 	}
-
-	onMount(() => {
-		function handleMessage(event: MessageEvent) {
-			// Heyform posts messages from its own origin when a form is submitted.
-			// Shape isn't fully documented across versions, so we accept either a
-			// string sentinel or an object with a recognizable type.
-			const data = event.data;
-			const isHeyformSubmit =
-				(typeof data === 'string' &&
-					data.toLowerCase().includes('heyform') &&
-					data.includes('submit')) ||
-				(typeof data === 'object' &&
-					data !== null &&
-					'type' in data &&
-					typeof (data as { type: unknown }).type === 'string' &&
-					((data as { type: string }).type.startsWith('heyform') ||
-						(data as { type: string }).type.includes('form-submit')));
-			if (isHeyformSubmit) {
-				session.markEndCtaReviewCompleted();
-			}
-		}
-		window.addEventListener('message', handleMessage);
-		return () => {
-			window.removeEventListener('message', handleMessage);
-			clearTimeout(copyTimer);
-		};
-	});
 
 	const emailDone = $derived(session.emailProvided);
 	const shareDone = $derived(session.endCtaShareCompleted);
@@ -291,49 +205,10 @@
 		: 'Share your email to receive updates on this conversation and opportunities to share your voice on this issue.'}
 	umamiDismissEvent="end-panel-dismiss-email"
 >
-	{#if emailDone}
-		<div in:fade={{ duration: 300 }} class="flex flex-col items-center py-3">
-			<div class="flex size-14 items-center justify-center rounded-full bg-primary/10">
-				<Check class="size-7 text-primary" />
-			</div>
-		</div>
-	{:else}
-		<form
-			onsubmit={(e) => {
-				e.preventDefault();
-				handleEmailSubmit();
-			}}
-			class="flex flex-col gap-3"
-		>
-			<div
-				class="flex w-full items-center rounded-full bg-card px-5 py-3 shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)]"
-				class:ring-2={emailError}
-				class:ring-destructive={emailError}
-			>
-				<Mail class="size-4 shrink-0 text-secondary/60" />
-				<Input
-					bind:value={email}
-					oninput={() => (emailError = '')}
-					type="email"
-					placeholder="email@xyz.com"
-					disabled={submittingEmail}
-					class="ml-2.5 h-8 flex-1 rounded-none border-0 bg-transparent font-sans text-lg font-medium text-foreground/80 shadow-none placeholder:text-foreground/50 focus-visible:ring-0"
-				/>
-			</div>
-			{#if emailError}
-				<p class="-mt-1 px-2 font-sans text-sm text-destructive">{emailError}</p>
-			{/if}
-			<Button
-				variant="primary"
-				fullWidth
-				disabled={!email.trim() || submittingEmail}
-				onclick={handleEmailSubmit}
-				data-umami-event="end-email-submit"
-			>
-				SIGN UP FOR UPDATES
-			</Button>
-		</form>
-	{/if}
+	<EmailPanelContent
+		umamiSubmitEvent="end-email-submit"
+		onComplete={() => (emailPanelOpen = false)}
+	/>
 </ActionPanel>
 
 <!-- Share panel -->
@@ -342,55 +217,13 @@
 	title="Help bring everyone into the fold."
 	umamiDismissEvent="end-panel-dismiss-share"
 >
-	<div class="flex justify-around pt-2">
-		<button
-			type="button"
-			data-umami-event="end-share-text"
-			onclick={shareViaText}
-			class="flex flex-col items-center gap-2"
-		>
-			<span
-				class="flex size-16 items-center justify-center rounded-full bg-secondary/10 transition-colors hover:bg-secondary/20"
-			>
-				<MessageSquare class="size-7 text-secondary" />
-			</span>
-			<span class="font-mono text-sm font-medium text-secondary/70">TEXT</span>
-		</button>
-
-		<button
-			type="button"
-			data-umami-event="end-share-email"
-			onclick={shareViaEmail}
-			class="flex flex-col items-center gap-2"
-		>
-			<span
-				class="flex size-16 items-center justify-center rounded-full bg-secondary/10 transition-colors hover:bg-secondary/20"
-			>
-				<Mail class="size-7 text-secondary" />
-			</span>
-			<span class="font-mono text-sm font-medium text-secondary/70">EMAIL</span>
-		</button>
-
-		<button
-			type="button"
-			data-umami-event="end-share-link"
-			onclick={copyLink}
-			class="flex flex-col items-center gap-2"
-		>
-			<span
-				class="flex size-16 items-center justify-center rounded-full bg-secondary/10 transition-colors hover:bg-secondary/20"
-			>
-				{#if linkCopied}
-					<Check class="size-7 text-primary" />
-				{:else}
-					<LinkIcon class="size-7 text-secondary" />
-				{/if}
-			</span>
-			<span class="font-mono text-sm font-medium text-secondary/70">
-				{linkCopied ? 'COPIED!' : 'LINK'}
-			</span>
-		</button>
-	</div>
+	<SharePanelContent
+		{region}
+		umamiTextEvent="end-share-text"
+		umamiEmailEvent="end-share-email"
+		umamiLinkEvent="end-share-link"
+		onComplete={() => (sharePanelOpen = false)}
+	/>
 </ActionPanel>
 
 <!-- Review panel -->
@@ -401,12 +234,5 @@
 	umamiDismissEvent="end-panel-dismiss-review"
 	class="md:w-[560px]"
 >
-	<div class="-mx-7 -mb-2 h-[420px] md:mx-0 md:h-[480px]">
-		<iframe
-			src={HEYFORM_EMBED_URL}
-			title="Leave a review"
-			class="size-full border-0"
-			data-umami-event="end-review-submit"
-		></iframe>
-	</div>
+	<ReviewPanelContent umamiSubmitEvent="end-review-submit" />
 </ActionPanel>
