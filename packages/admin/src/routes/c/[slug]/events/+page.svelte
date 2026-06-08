@@ -51,10 +51,10 @@
 	}
 </script>
 
-<div class="flex-1 space-y-3.5 overflow-y-auto px-5 py-5">
+<div class="flex-1 space-y-3.5 overflow-y-auto px-4 py-5 sm:px-5">
 	<!-- Filters / view mode -->
-	<div class="flex items-center justify-between">
-		<div class="flex items-center gap-1.5">
+	<div class="flex flex-col items-stretch justify-between gap-2 sm:flex-row sm:items-center">
+		<div class="flex flex-wrap items-center gap-1.5">
 			{#each [['upcoming', counts.upcoming], ['drafts', counts.drafts], ['past', counts.past]] as const as [label, n]}
 				<button
 					type="button"
@@ -69,7 +69,7 @@
 				</button>
 			{/each}
 		</div>
-		<div class="flex items-center gap-2">
+		<div class="flex flex-wrap items-center gap-2">
 			{#each (['list', 'calendar'] as const) as mode}
 				<button
 					type="button"
@@ -98,15 +98,17 @@
 				{@const rsvp = rsvpFor(event.slug)}
 				<a
 					href={`/c/${region.slug}/events/${event.slug}`}
-					class="bg-card shadow-card flex items-center gap-4 rounded-lg p-4 transition hover:translate-y-[-1px]"
+					class="bg-card shadow-card grid grid-cols-[auto_1fr] gap-x-3 gap-y-2 rounded-lg p-4 transition hover:translate-y-[-1px] sm:flex sm:items-center sm:gap-4"
 				>
-					<div class="w-16 text-center">
+					<div
+						class="flex items-baseline gap-1.5 sm:block sm:w-16 sm:shrink-0 sm:text-center"
+					>
 						<div class="text-muted-foreground text-xs tracking-wide">{fmtWeekday(event.date)}</div>
 						<div class="text-lg font-bold leading-5">{fmtMonthDay(event.date)}</div>
 					</div>
-					<div class="border-border h-9 self-center border-l"></div>
-					<div class="flex-1 space-y-1">
-						<div class="flex items-center gap-2">
+					<div class="border-border hidden h-9 self-center border-l sm:block"></div>
+					<div class="col-span-2 min-w-0 space-y-1 sm:col-auto sm:flex-1">
+						<div class="flex flex-wrap items-center gap-2">
 							<span class="text-sm font-bold">{event.title}</span>
 							{#if event.format === 'in-person'}
 								<span
@@ -129,18 +131,27 @@
 								</span>
 							{/if}
 						</div>
-						<div class="text-muted-foreground flex items-center gap-2.5 text-xs">
+						<div class="text-muted-foreground flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs">
 							<span>{event.time}{event.endTime ? `–${event.endTime}` : ''}</span>
-							<span>·</span>
+							<span class="hidden sm:inline">·</span>
 							<span>{event.venueName ?? event.location}{event.address ? ` · ${event.address}` : ''}</span>
 						</div>
 					</div>
-					<div class="w-24 text-right">
-						<div class="text-muted-foreground text-xs tracking-wide">RSVP'D</div>
-						<div class="text-base font-bold">{rsvp.current} / {rsvp.capacity}</div>
+					<div
+						class="col-span-2 flex items-center justify-between gap-3 sm:col-auto sm:block sm:w-24 sm:text-right"
+					>
+						<div class="flex items-baseline gap-1.5 sm:block">
+							<div class="text-muted-foreground text-xs tracking-wide">RSVP'D</div>
+							<div class="text-base font-bold">{rsvp.current} / {rsvp.capacity}</div>
+						</div>
+						<span
+							class="bg-primary text-primary-foreground inline-flex items-center gap-0.5 rounded-full px-3 py-1.5 text-xs sm:hidden"
+						>
+							open <ChevronRight class="size-3" />
+						</span>
 					</div>
 					<span
-						class="bg-primary text-primary-foreground inline-flex items-center gap-0.5 rounded-full px-3 py-1.5 text-xs"
+						class="bg-primary text-primary-foreground hidden items-center gap-0.5 rounded-full px-3 py-1.5 text-xs sm:inline-flex"
 					>
 						open <ChevronRight class="size-3" />
 					</span>
