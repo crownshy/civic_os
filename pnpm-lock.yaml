@@ -9,14 +9,17 @@ importers:
   .:
     dependencies:
       '@crownshy/api-client':
-        specifier: ^0.0.7
-        version: 0.0.7(axios@1.13.6)(zod@3.25.76)
+        specifier: ^0.0.8
+        version: 0.0.8(axios@1.13.6)(zod@3.25.76)
       '@lukulent/svelte-umami':
         specifier: ^0.0.4
         version: 0.0.4(svelte@5.50.1)
       add-to-calendar-button:
         specifier: ^2.14.0
         version: 2.14.0
+      bits-ui:
+        specifier: ^2.15.7
+        version: 2.18.1(@internationalized/date@3.12.1)(@sveltejs/kit@2.50.2(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.50.1)(vite@7.3.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.50.1)(typescript@5.9.3)(vite@7.3.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.50.1)
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -114,9 +117,6 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^4.0.18
         version: 4.0.18(@vitest/browser@4.0.18(vite@7.3.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.30.2))(vitest@4.0.18))(vitest@4.0.18)
-      bits-ui:
-        specifier: ^2.18.1
-        version: 2.18.1(@internationalized/date@3.12.1)(@sveltejs/kit@2.50.2(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.50.1)(vite@7.3.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.50.1)(typescript@5.9.3)(vite@7.3.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.50.1)
       embla-carousel-svelte:
         specifier: ^8.6.0
         version: 8.6.0(svelte@5.50.1)
@@ -233,8 +233,8 @@ packages:
     peerDependencies:
       storybook: ^0.0.0-0 || ^10.1.0 || ^10.1.0-0 || ^10.2.0-0 || ^10.3.0-0
 
-  '@crownshy/api-client@0.0.7':
-    resolution: {integrity: sha512-tDRngbORCeaLLmcIG/u0cNqk/HfTA3xBtYtsAFmBMiB2R1bmpyE0N+0tuZTq2JuYOoOcHFgCC/8ZXEVMj3totQ==}
+  '@crownshy/api-client@0.0.8':
+    resolution: {integrity: sha512-D9GcJUERFwUpAFLfinJ+6BjFGGBgJAsnRqInuB3H+qYGGc8wgBTFhXwoeIO7PXq6+17VIDQP9CGg3j7xDeIK0g==}
 
   '@esbuild/aix-ppc64@0.27.3':
     resolution: {integrity: sha512-9fJMTNFTWZMh5qwrBItuziu834eOCUcEqymSH7pY+zoMVEZg3gcPuBNxH1EvfVYe9h0x/Ptw8KBzv7qxb7l8dg==}
@@ -2824,7 +2824,7 @@ snapshots:
       - '@chromatic-com/cypress'
       - '@chromatic-com/playwright'
 
-  '@crownshy/api-client@0.0.7(axios@1.13.6)(zod@3.25.76)':
+  '@crownshy/api-client@0.0.8(axios@1.13.6)(zod@3.25.76)':
     dependencies:
       '@zodios/core': 10.9.6(axios@1.13.6)(zod@3.25.76)
       typescript: 5.9.3
