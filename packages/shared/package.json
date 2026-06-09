@@ -1,0 +1,41 @@
+{
+	"name": "@civicos/shared",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts",
+		"./types": "./src/types/index.ts",
+		"./utils": "./src/utils.ts",
+		"./data/regions": "./src/data/regions.ts",
+		"./styles/theme.css": "./src/styles/theme.css",
+		"./ui/button": "./src/ui/button/index.ts",
+		"./ui/dialog": "./src/ui/dialog/index.ts",
+		"./ui/input": "./src/ui/input/index.ts",
+		"./ui/label": "./src/ui/label/index.ts",
+		"./ui/popover": "./src/ui/popover/index.ts",
+		"./ui/form": "./src/ui/form/index.ts",
+		"./ui/command": "./src/ui/command/index.ts",
+		"./ui/carousel": "./src/ui/carousel/index.ts",
+		"./ui/carousel/context": "./src/ui/carousel/context.ts",
+		"./ui/spinner": "./src/ui/spinner/index.ts",
+		"./ui/Badge.svelte": "./src/ui/Badge.svelte",
+		"./ui/Card.svelte": "./src/ui/Card.svelte",
+		"./ui/Link.svelte": "./src/ui/Link.svelte",
+		"./ui/MonoLabel.svelte": "./src/ui/MonoLabel.svelte"
+	},
+	"files": ["src"],
+	"dependencies": {
+		"@lucide/svelte": "^1.16.0",
+		"bits-ui": "^2.18.1",
+		"clsx": "^2.1.1",
+		"embla-carousel-svelte": "^8.6.0",
+		"formsnap": "^2.0.1",
+		"sveltekit-superforms": "2.30.1",
+		"tailwind-merge": "^3.0.0",
+		"tailwind-variants": "^3.2.2"
+	},
+	"peerDependencies": {
+		"svelte": "^5.0.0"
+	}
+}

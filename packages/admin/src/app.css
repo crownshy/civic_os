@@ -1,0 +1,54 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import '@civicos/shared/styles/theme.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-dark: var(--primary-dark);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-destructive-foreground: var(--destructive-foreground);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+	--font-sans: var(--font-sans);
+	--font-mono: var(--font-mono);
+	--radius: var(--radius);
+}
+
+/* Admin-only text scale: bump every text-* utility one step up
+   so admin reads bigger than civicos without touching spacing. */
+@theme {
+	--text-xs: 1rem;
+	--text-sm: 1.125rem;
+	--text-base: 1.25rem;
+	--text-lg: 1.5rem;
+	--text-xl: 1.875rem;
+	--text-2xl: 2.25rem;
+	--text-3xl: 3rem;
+	--text-4xl: 3.75rem;
+	--text-5xl: 4.5rem;
+	--text-6xl: 6rem;
+	--text-7xl: 8rem;
+	--text-8xl: 10rem;
+	--text-9xl: 12rem;
+}
+
+/* Card shadow matching wireframe spec */
+.shadow-card {
+	box-shadow: 0px 5px 15px 0px rgba(12, 34, 95, 0.13);
+}

@@ -3,4 +3,4 @@ allowBuilds:
 onlyBuiltDependencies:
   - esbuild
 packages:
-  - .
+  - packages/*

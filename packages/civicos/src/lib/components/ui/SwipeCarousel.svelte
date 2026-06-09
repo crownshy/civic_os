@@ -1,0 +1,112 @@
+<script lang="ts">
+	import type { Snippet } from 'svelte';
+	import * as Carousel from '@civicos/shared/ui/carousel';
+	import { type CarouselAPI } from '@civicos/shared/ui/carousel/context';
+	import Autoplay from 'embla-carousel-autoplay';
+	import Play from '$lib/assets/icons/play.svelte';
+	import Pause from '$lib/assets/icons/pause.svelte';
+	import { cn } from '$lib/utils';
+
+	interface Props {
+		/** Total number of slides */
+		count: number;
+		/** Current active index (bindable) */
+		index?: number;
+		/** Render function receiving the current index */
+		children: Snippet<[number]>;
+		/** Optional extra class on the outer wrapper */
+		class?: string;
+		/** Auto-advance interval in ms (e.g. 4000). Disabled if not set. */
+		autoScrollMs?: number;
+		/** Hide the dots */
+		hideDots?: boolean;
+	}
+
+	let {
+		count,
+		index = $bindable(0),
+		children,
+		class: className = '',
+		autoScrollMs,
+		hideDots = false
+	}: Props = $props();
+
+	let api = $state<CarouselAPI>();
+
+	function handleDotClick(i: number) {
+		api?.scrollTo(i);
+	}
+
+	let selectedSlide = $state(0);
+
+	$effect(() => {
+		if (api) {
+			selectedSlide = api.selectedScrollSnap() + 1;
+			index = api.selectedScrollSnap();
+			api.on('select', () => {
+				selectedSlide = api!.selectedScrollSnap() + 1;
+				index = api!.selectedScrollSnap();
+			});
+		}
+	});
+
+	// Scroll to slide when index changes externally
+	$effect(() => {
+		if (api && api.selectedScrollSnap() !== index) {
+			api.scrollTo(index);
+		}
+	});
+
+	let autoplay = $state(true);
+
+	function toggleAutoplay() {
+		if (!api) return;
+
+		if (autoplay) {
+			api.plugins().autoplay?.stop();
+			autoplay = false;
+		} else {
+			api.plugins().autoplay?.play();
+			autoplay = true;
+		}
+	}
+</script>
+
+<Carousel.Root
+	class={cn('w-full', className)}
+	opts={{ loop: true }}
+	setApi={(emblaApi) => (api = emblaApi)}
+	plugins={autoScrollMs ? [Autoplay({ delay: autoScrollMs })] : []}
+>
+	<Carousel.Content>
+		{#each { length: count } as _, i (i)}
+			<Carousel.Item>
+				<div>{@render children(i)}</div>
+			</Carousel.Item>
+		{/each}
+	</Carousel.Content>
+	<!-- Dots -->
+	{#if !hideDots}
+		<div class="mt-6 flex shrink-0 items-center justify-center gap-[23px]">
+			{#each { length: count } as _, i (i)}
+				<button
+					onclick={() => handleDotClick(i)}
+					class="h-2 w-2 rounded-full transition-colors {selectedSlide === i + 1
+						? 'bg-muted-foreground'
+						: 'bg-muted-foreground/50'}"
+					aria-label="Slide {i + 1}"
+				></button>
+			{/each}
+			<button
+				class="flex items-center justify-center rounded-full bg-muted-foreground p-1.5"
+				onclick={toggleAutoplay}
+			>
+				{#if autoplay}
+					<Pause class="h-1.5 w-1.5 stroke-background" />
+				{:else}
+					<Play class="h-1.5 w-1.5 fill-background" />
+				{/if}
+			</button>
+		</div>
+	{/if}
+</Carousel.Root>
