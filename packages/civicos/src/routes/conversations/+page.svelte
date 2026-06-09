@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { page } from '$app/state';
 	import { AppShell } from '$lib/components/layout';
 	import { InfoBar, ConversationEventCard, Button } from '$lib/components/ui';
 	import { Input } from '@civicos/shared/ui/input';
@@ -9,28 +8,28 @@
 	import { flip } from 'svelte/animate';
 	import { cubicOut, backOut } from 'svelte/easing';
 	import { Mail } from 'lucide-svelte';
-	import { isBefore, addHours } from 'date-fns';
+	import { addHours, isBefore } from 'date-fns';
 
-	const region: RegionConfig = page.data.region;
+	const { data } = $props();
+	const { events, region, eventDateFormatter, eventTimeFormatter } = data;
 
 	const conversationsActive = region.conversationsActive !== false;
 
-	type Filter = 'all' | 'online' | 'in-person';
+	type Filter = 'all' | 'online' | 'in_person';
 	let activeFilter: Filter = $state('all');
 
 	const filters: { label: string; value: Filter }[] = [
 		{ label: 'ALL', value: 'all' },
 		{ label: 'ONLINE', value: 'online' },
-		{ label: 'IN PERSON', value: 'in-person' }
+		{ label: 'IN PERSON', value: 'in_person' }
 	];
 
-	const filtered = $derived(
-		(activeFilter === 'all'
-			? region.events
-			: region.events.filter((e) => e.format === activeFilter)
-		)
-			.filter((e) => !isBefore(addHours(new Date(e.date), 2), new Date()))
-			.toSorted((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+	const filteredEvents = $derived(
+		activeFilter === 'all'
+			? events
+			: events
+					.filter((e) => e.format === activeFilter)
+					.filter((e) => !isBefore(addHours(new Date(e.startTime), 2), new Date()))
 	);
 
 	let email = $state('');
@@ -83,15 +82,19 @@
 
 			<!-- Conversation Cards -->
 			<div class="flex flex-col gap-4 px-7 pt-4 pb-8 md:px-12">
-				{#each filtered as event, i (event.slug)}
+				{#each filteredEvents as event, i (event.id)}
 					<a
-						href="/conversations/{event.slug}"
+						href="/conversations/{event.id}"
 						class="block transition-transform active:scale-[0.98]"
 						in:fly={{ y: 30, duration: 350, delay: i * 80, easing: backOut }}
 						out:fade={{ duration: 200 }}
 						animate:flip={{ duration: 300, easing: cubicOut }}
 					>
-						<ConversationEventCard {event} />
+						<ConversationEventCard
+							{event}
+							dateFormatter={eventDateFormatter}
+							timeFormatter={eventTimeFormatter}
+						/>
 					</a>
 				{/each}
 			</div>

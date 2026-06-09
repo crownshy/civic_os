@@ -6,7 +6,6 @@
 	import { format } from 'date-fns';
 	import * as Form from '@civicos/shared/ui/form';
 	import { api } from '$lib/services/api';
-	import type { ConversationEvent } from '$lib/types/mock-data';
 	import { Spinner } from '@civicos/shared/ui/spinner';
 	import ThankYouMessage from './ThankYouMessage.svelte';
 	import EventCalendarInviteButton from './EventCalendarInviteButton.svelte';
@@ -14,16 +13,17 @@
 	import { defaults, superForm } from 'sveltekit-superforms';
 	import { zod, zodClient } from 'sveltekit-superforms/adapters';
 	import otpUserSignupSchema from './OtpUserSignupSchema';
+	import type { LocalizedEventDto } from '@crownshy/api-client/api';
 
 	type Props = {
 		open: boolean;
-		event: ConversationEvent;
+		event: LocalizedEventDto;
 		region: RegionConfig;
 	};
 
 	let { open, event, region }: Props = $props();
 
-	const formattedDate = $derived(event ? format(new Date(event.date), 'EEEE, MMMM d') : '');
+	const formattedDate = $derived(event ? format(new Date(event.startTime), 'EEEE, MMMM d') : '');
 
 	const form = superForm(defaults(zod(otpUserSignupSchema)), {
 		validators: zodClient(otpUserSignupSchema),

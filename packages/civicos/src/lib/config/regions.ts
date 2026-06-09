@@ -16,12 +16,13 @@ import {
 	getRegionByZipcode as baseGetRegionByZipcode,
 	extractSubdomain,
 	getRegionUrl,
-	getEventFullDescription
+	getEventFullDescription,
+	formatDurationLabel
 } from '@civicos/shared/data/regions';
 import type { RegionConfig, Partner, FaqEntry } from '@civicos/shared/data/regions';
 
 export type { RegionConfig, Partner, FaqEntry };
-export { GENERIC_REGION, extractSubdomain, getRegionUrl, getEventFullDescription };
+export { GENERIC_REGION, extractSubdomain, getRegionUrl, getEventFullDescription, formatDurationLabel };
 
 const DEFAULT_FAQ: FaqEntry[] = [
 	{

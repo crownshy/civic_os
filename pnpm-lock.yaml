@@ -14,8 +14,8 @@ importers:
         specifier: workspace:*
         version: link:../shared
       '@crownshy/api-client':
-        specifier: ^0.0.7
-        version: 0.0.7(axios@1.13.6)(zod@4.4.3)
+        specifier: ^0.0.8
+        version: 0.0.8(axios@1.13.6)(zod@4.4.3)
       '@lucide/svelte':
         specifier: ^1.16.0
         version: 1.16.0(svelte@5.50.1)
@@ -60,8 +60,8 @@ importers:
         specifier: workspace:*
         version: link:../shared
       '@crownshy/api-client':
-        specifier: ^0.0.7
-        version: 0.0.7(axios@1.13.6)(zod@3.25.76)
+        specifier: ^0.0.8
+        version: 0.0.8(axios@1.13.6)(zod@3.25.76)
       '@lukulent/svelte-umami':
         specifier: ^0.0.4
         version: 0.0.4(svelte@5.50.1)
@@ -314,8 +314,8 @@ packages:
     peerDependencies:
       storybook: ^0.0.0-0 || ^10.1.0 || ^10.1.0-0 || ^10.2.0-0 || ^10.3.0-0
 
-  '@crownshy/api-client@0.0.7':
-    resolution: {integrity: sha512-tDRngbORCeaLLmcIG/u0cNqk/HfTA3xBtYtsAFmBMiB2R1bmpyE0N+0tuZTq2JuYOoOcHFgCC/8ZXEVMj3totQ==}
+  '@crownshy/api-client@0.0.8':
+    resolution: {integrity: sha512-D9GcJUERFwUpAFLfinJ+6BjFGGBgJAsnRqInuB3H+qYGGc8wgBTFhXwoeIO7PXq6+17VIDQP9CGg3j7xDeIK0g==}
 
   '@esbuild/aix-ppc64@0.27.3':
     resolution: {integrity: sha512-9fJMTNFTWZMh5qwrBItuziu834eOCUcEqymSH7pY+zoMVEZg3gcPuBNxH1EvfVYe9h0x/Ptw8KBzv7qxb7l8dg==}
@@ -2928,7 +2928,7 @@ snapshots:
       - '@chromatic-com/cypress'
       - '@chromatic-com/playwright'
 
-  '@crownshy/api-client@0.0.7(axios@1.13.6)(zod@3.25.76)':
+  '@crownshy/api-client@0.0.8(axios@1.13.6)(zod@3.25.76)':
     dependencies:
       '@zodios/core': 10.9.6(axios@1.13.6)(zod@3.25.76)
       typescript: 5.9.3
@@ -2936,7 +2936,7 @@ snapshots:
       - axios
       - zod
 
-  '@crownshy/api-client@0.0.7(axios@1.13.6)(zod@4.4.3)':
+  '@crownshy/api-client@0.0.8(axios@1.13.6)(zod@4.4.3)':
     dependencies:
       '@zodios/core': 10.9.6(axios@1.13.6)(zod@4.4.3)
       typescript: 5.9.3

@@ -621,6 +621,11 @@ export function getEventFullDescription(
 	return `This is a ${duration} ${onlineAdj}conversation with your neighbors in ${locationLabel} about AI. We'll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.`;
 }
 
+export function formatDurationLabel(hours: number, minutes: number) {
+	const hoursQualifier = hours > 1 ? 'hours' : 'hour';
+	return `${hours} ${hoursQualifier}${minutes > 0 ? `${minutes} mins` : ''}`;
+}
+
 /**
  * Resolve a subdomain string (e.g. "utah", "oregon") to a region config.
  * Pass an optional `devFallback` (civicos does, from env) for the dev region.

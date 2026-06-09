@@ -71,7 +71,7 @@
 	},
 	"dependencies": {
 		"@civicos/shared": "workspace:*",
-		"@crownshy/api-client": "^0.0.7",
+		"@crownshy/api-client": "^0.0.8",
 		"@lukulent/svelte-umami": "^0.0.4",
 		"add-to-calendar-button": "^2.14.0",
 		"bits-ui": "^2.15.7",

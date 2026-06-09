@@ -2,8 +2,14 @@
 	import { page } from '$app/state';
 	import { AppShell } from '$lib/components/layout';
 	import { Button, InfoBar } from '$lib/components/ui';
-	import { getEventFullDescription, type RegionConfig } from '$lib/config/regions';
-	import type { ConversationEvent } from '$lib/types/mock-data';
+	import EventCalendarInviteButton from '$lib/components/ui/EventCalendarInviteButton.svelte';
+	import EventRegistrationModal from '$lib/components/ui/EventRegistrationModal.svelte';
+	import {
+		formatDurationLabel,
+		getEventFullDescription,
+		type RegionConfig
+	} from '$lib/config/regions';
+	import { formatTimeDuration } from '$lib/utils/dates.js';
 	import {
 		differenceInDays,
 		differenceInHours,
@@ -17,7 +23,13 @@
 	const region: RegionConfig = page.data.region;
 	const slug = $derived(page.params.slug);
 
-	const event: ConversationEvent | undefined = $derived(region.events.find((e) => e.slug === slug));
+	const { data } = $props();
+	const { event, eventDateFormatter, eventTimeFormatter } = data;
+
+	const eventStartDate = $derived(new Date(event.startTime));
+	const eventEndDate = $derived(new Date(event.endTime));
+	let startTime = $derived(eventTimeFormatter.format(eventStartDate));
+	let endTime = $derived(eventTimeFormatter.format(eventEndDate));
 
 	let daysLeft = $state(0);
 	let hoursLeft = $state(0);
@@ -28,64 +40,21 @@
 	let isRegistered = $state(false);
 	let activeSection = $state<'details' | 'description'>('details');
 	let scrollContainer = $state<HTMLElement | undefined>(undefined);
-	let calendarReady = $state(false);
 
-	const formattedDate = $derived(event ? format(new Date(event.date), 'EEEE, MMMM d') : '');
-	const headerDate = $derived(event ? format(new Date(event.date), 'MMMM d') : '');
+	const formattedDate = $derived(event ? format(new Date(event.startTime), 'EEEE, MMMM d') : '');
 	const locationLabel = $derived(
-		event ? (event.format === 'online' ? region.stateName : event.location.split(',')[0]) : ''
+		event.format === 'online' ? region.stateName : `in ${event.location?.city}`
 	);
-	let iframeLoaded = $state(false);
 
-	// Calendar-specific derived values
-	const calStartDate = $derived(event ? event.date.split('T')[0] : '');
-
-	const calStartTime = $derived.by(() => {
-		if (!event) return '';
-		return event.date.split('T')[1].slice(0, 5);
-	});
-
-	function parseTime12To24(t: string): string {
-		const m = t.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-		if (!m) return '';
-		let h = parseInt(m[1]);
-		const min = m[2];
-		if (m[3].toUpperCase() === 'PM' && h !== 12) h += 12;
-		else if (m[3].toUpperCase() === 'AM' && h === 12) h = 0;
-		return `${String(h).padStart(2, '0')}:${min}`;
-	}
-
-	const calEndTime = $derived(event?.endTime ? parseTime12To24(event.endTime) : '');
-
-	const calLocation = $derived.by(() => {
-		if (!event) return '';
-		if (event.format === 'online') return 'Videoconference link to be sent 1 day before call.';
-		return [event.venueName, event.address].filter(Boolean).join(' — ');
-	});
-
-	const calTimeZone = $derived.by(() => {
-		if (!event) return 'currentBrowser';
-		const tzMatch = event.date.match(/([+-]\d{2}:\d{2})$/);
-		if (!tzMatch) return 'currentBrowser';
-		const offsets: Record<string, string> = {
-			'-04:00': 'America/New_York',
-			'-05:00': 'America/Chicago',
-			'-06:00': 'America/Denver',
-			'-07:00': 'America/Los_Angeles'
-		};
-		return offsets[tzMatch[1]] ?? 'currentBrowser';
-	});
-
-	const calDescription = $derived(
-		event
-			? `${event.fullDescription ?? getEventFullDescription(event, region.stateName)}\n\nHosted by ${region.hostName}. Visit ${region.hostUrl} for more details.`
-			: ''
+	const { hours: durationHours, minutes: durationMinutes } = formatTimeDuration(
+		eventStartDate,
+		eventEndDate
 	);
 
 	function updateCountdown() {
 		if (!event) return;
 		const now = new Date();
-		const target = new Date(event.date);
+		const target = new Date(event.startTime);
 		isPast = isBefore(addHours(target, 2), now); // past if >2h after start
 		if (isPast || isBefore(target, now)) {
 			daysLeft = 0;
@@ -103,9 +72,6 @@
 		isRegistered = localStorage.getItem(`registered-${slug}`) === 'true';
 		updateCountdown();
 		interval = setInterval(updateCountdown, 60000);
-		import('add-to-calendar-button').then(() => {
-			calendarReady = true;
-		});
 	});
 
 	onMount(() => {
@@ -167,19 +133,19 @@
 			<div class="flex flex-col items-center px-6 pt-6 pb-0 md:px-12">
 				<!-- Title -->
 				<h1
-					class="text-center font-display text-4xl leading-[2rem] font-medium tracking-display text-foreground"
+					class="text-center font-display text-4xl leading-8 font-medium tracking-display text-foreground"
 				>
-					{event.title}
+					{event.name}
 				</h1>
 
 				<!-- Date & time -->
 				<p class="text-md mt-2 font-sans font-medium text-foreground/70">
-					{headerDate} | {event.time}
+					{eventDateFormatter.format(eventStartDate)} | {startTime}
 				</p>
 
 				<!-- Description -->
 				<p class="mt-4 text-center font-sans text-base leading-6 font-medium text-foreground">
-					Join your neighbors in {locationLabel} for a conversation about AI's impact on our lives. Hosted
+					Join your neighbors {locationLabel} for a conversation about AI's impact on our lives. Hosted
 					by
 					<a
 						href={region.hostUrl}
@@ -219,30 +185,17 @@
 							size="lg"
 							onclick={() => {
 								showForm = true;
-								iframeLoaded = false;
 							}}
+							class="uppercase"
+							disabled={isPast}
 						>
-							SIGN UP TODAY
+							{#if isPast}Event has past{:else}SIGN UP TODAY{/if}
 						</Button>
 					{/if}
 
-					{#if calendarReady && !isPast}
+					{#if !isPast}
 						<div class="mt-3 flex justify-center">
-							<add-to-calendar-button
-								name={event.title}
-								startDate={calStartDate}
-								startTime={calStartTime}
-								endTime={calEndTime || undefined}
-								location={calLocation}
-								description={calDescription}
-								timeZone={calTimeZone}
-								options="'Google','Apple','iCal','Outlook.com'"
-								label="ADD TO CALENDAR"
-								buttonStyle="round"
-								size="3"
-								lightMode="bodyScheme"
-								styleLight="--btn-background: rgba(166,114,46,0.10); --btn-text: #532A0E; --btn-border: transparent; --btn-shadow: none; --btn-hover-background: rgba(166,114,46,0.20); --font: 'DM Mono', monospace;"
-							></add-to-calendar-button>
+							<EventCalendarInviteButton {event} {region} />
 						</div>
 					{/if}
 				</div>
@@ -298,11 +251,13 @@
 							</svg>
 							<div>
 								<p class="font-sans text-xl leading-5 font-bold text-foreground">
-									{event.venueName || event.location}
+									{event.location
+										? `${event.location.venue_name}, ${event.location.city}`
+										: 'Online'}
 								</p>
-								{#if event.address}
+								{#if event.location?.address_line_1}
 									<p class="mt-2 font-sans text-sm leading-4 font-medium text-foreground/80">
-										{event.address}
+										{event.location.address_line_1}
 									</p>
 								{/if}
 							</div>
@@ -321,7 +276,9 @@
 									d="M9 1v2h6V1h2v2h4a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h4V1h2Zm11 9H4v10h16V10Z"
 								/>
 							</svg>
-							<p class="font-sans text-xl leading-5 font-bold text-foreground">{formattedDate}</p>
+							<p class="font-sans text-xl leading-5 font-bold text-foreground">
+								{formattedDate}
+							</p>
 						</div>
 						<!-- Time row -->
 						<div class="flex items-start gap-4 px-5 py-5">
@@ -339,14 +296,11 @@
 							</svg>
 							<div>
 								<p class="font-sans text-xl leading-5 font-bold text-foreground">
-									{event.time}{#if event.endTime}
-										– {event.endTime}{/if}
+									{startTime} – {endTime}
 								</p>
-								{#if event.duration}
-									<p class="mt-2 font-sans text-sm leading-4 font-medium text-foreground/80">
-										{event.duration}
-									</p>
-								{/if}
+								<p class="mt-2 font-sans text-sm leading-4 font-medium text-foreground/80">
+									{formatDurationLabel(durationHours, durationMinutes)}
+								</p>
 							</div>
 						</div>
 					</div>
@@ -360,44 +314,13 @@
 					<p
 						class="font-sans text-base leading-6 font-medium whitespace-pre-line text-foreground/80"
 					>
-						{event.fullDescription ?? getEventFullDescription(event, region.stateName)}
+						{event.description ?? getEventFullDescription(event, region.stateName)}
 					</p>
 				</section>
 			</div>
 		</div>
 
-		{#if showForm}
-			<div
-				class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gradient-primary"
-			>
-				<button
-					class="absolute top-4 left-4 z-50 font-mono text-sm text-foreground uppercase"
-					onclick={() => (showForm = false)}
-				>
-					← BACK TO CONVERSATIONS
-				</button>
-				<div class="relative flex w-full grow flex-col items-center gap-4 px-6 py-10">
-					{#if !iframeLoaded}
-						<div class="absolute inset-0 flex flex-col items-center justify-center gap-4">
-							<div
-								class="h-10 w-10 animate-spin rounded-full border-4 border-foreground/20 border-t-foreground"
-							></div>
-							<span class="font-mono text-sm text-foreground/60 uppercase">Loading form...</span>
-						</div>
-					{/if}
-					<iframe
-						title="event signup form"
-						src={`https://forms.bloomproject.us/form/IspxhmX8?event_id=${encodeURIComponent(event.slug)}&region=${region.slug}&hideAfterSubmit=true&autoClose=1`}
-						width="100%"
-						height="100%"
-						frameborder="0"
-						style="background: transparent;"
-						class="transition-opacity duration-300 {iframeLoaded ? 'opacity-100' : 'opacity-0'}"
-						onload={() => (iframeLoaded = true)}
-					></iframe>
-				</div>
-			</div>
-		{/if}
+		<EventRegistrationModal open={showForm} {event} {region} />
 	</AppShell>
 {:else}
 	<AppShell>
