@@ -190,8 +190,10 @@
 							onclick={() => {
 								showForm = true;
 							}}
+							class="uppercase"
+							disabled={isPast}
 						>
-							SIGN UP TODAY
+							{#if isPast}Event has past{:else}SIGN UP TODAY{/if}
 						</Button>
 					{/if}
 
