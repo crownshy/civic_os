@@ -1,29 +1,23 @@
 <script lang="ts">
-	import { ChevronRight, MapPin, Monitor } from '@lucide/svelte';
-	import { page } from '$app/state';
-	import { REGIONS } from '@civicos/shared/data/regions';
-	import type { ConversationEvent } from '@civicos/shared/types';
+	import { ChevronRight } from '@lucide/svelte';
+	import type { PageData } from './$types';
 
-	const region = $derived(REGIONS[page.params.slug ?? '']);
+	let { data }: { data: PageData } = $props();
 
-	// Mock RSVP totals + draft/past flags layered on top of regions data.
-	// Phase 3 replaces with API-backed currentAttendance + published.
-	const rsvpFor = (slug: string) => {
-		// Deterministic-ish placeholder so each event has a number.
-		const seed = slug.length * 7 + slug.charCodeAt(0);
-		return { current: (seed * 3) % 90 + 5, capacity: ((seed * 5) % 80) + 30 };
-	};
+	const region = $derived(data.region);
+
+	type ApiEvent = (typeof data.events)[number];
 
 	const partitioned = $derived.by(() => {
 		const now = Date.now();
-		const events = (region?.events ?? []) as ConversationEvent[];
-		const upcoming: ConversationEvent[] = [];
-		const past: ConversationEvent[] = [];
-		for (const e of events) {
-			if (new Date(e.date).getTime() < now) past.push(e);
+		const upcoming: ApiEvent[] = [];
+		const past: ApiEvent[] = [];
+		for (const e of data.events) {
+			const t = new Date(e.endTime ?? e.startTime).getTime();
+			if (t < now) past.push(e);
 			else upcoming.push(e);
 		}
-		return { upcoming, past, drafts: [] as ConversationEvent[] };
+		return { upcoming, past, drafts: [] as ApiEvent[] };
 	});
 
 	const counts = $derived({
@@ -49,13 +43,19 @@
 	function fmtMonthDay(iso: string) {
 		return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 	}
+	function fmtTime(iso: string) {
+		return new Date(iso).toLocaleTimeString('en-US', {
+			hour: 'numeric',
+			minute: '2-digit',
+			hour12: true
+		});
+	}
 </script>
 
 <div class="flex-1 space-y-3.5 overflow-y-auto px-4 py-5 sm:px-5">
-	<!-- Filters / view mode -->
 	<div class="flex flex-col items-stretch justify-between gap-2 sm:flex-row sm:items-center">
 		<div class="flex flex-wrap items-center gap-1.5">
-			{#each [['upcoming', counts.upcoming], ['drafts', counts.drafts], ['past', counts.past]] as const as [label, n]}
+			{#each [['upcoming', counts.upcoming], ['drafts', counts.drafts], ['past', counts.past]] as const as [label, n] (label)}
 				<button
 					type="button"
 					onclick={() => (activeFilter = label)}
@@ -70,12 +70,14 @@
 			{/each}
 		</div>
 		<div class="flex flex-wrap items-center gap-2">
-			{#each (['list', 'calendar'] as const) as mode}
+			{#each ['list', 'calendar'] as const as mode (mode)}
 				<button
 					type="button"
 					onclick={() => (viewMode = mode)}
 					class={`rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-3 py-1.5 text-xs ${
-						viewMode === mode ? 'bg-destructive/10' : 'bg-muted-foreground/10 hover:bg-muted-foreground/15'
+						viewMode === mode
+							? 'bg-destructive/10'
+							: 'bg-muted-foreground/10 hover:bg-muted-foreground/15'
 					}`}
 				>
 					{mode}
@@ -94,35 +96,21 @@
 		</div>
 	{:else}
 		<div class="space-y-2.5">
-			{#each visible as event}
-				{@const rsvp = rsvpFor(event.slug)}
+			{#each visible as event (event.id)}
 				<a
-					href={`/c/${region.slug}/events/${event.slug}`}
+					href={`/c/${region.slug}/events/${event.id}`}
 					class="bg-card shadow-card grid grid-cols-[auto_1fr] gap-x-3 gap-y-2 rounded-lg p-4 transition hover:translate-y-[-1px] sm:flex sm:items-center sm:gap-4"
 				>
-					<div
-						class="flex items-baseline gap-1.5 sm:block sm:w-16 sm:shrink-0 sm:text-center"
-					>
-						<div class="text-muted-foreground text-xs tracking-wide">{fmtWeekday(event.date)}</div>
-						<div class="text-lg font-bold leading-5">{fmtMonthDay(event.date)}</div>
+					<div class="flex items-baseline gap-1.5 sm:block sm:w-16 sm:shrink-0 sm:text-center">
+						<div class="text-muted-foreground text-xs tracking-wide">
+							{fmtWeekday(event.startTime)}
+						</div>
+						<div class="text-lg leading-5 font-bold">{fmtMonthDay(event.startTime)}</div>
 					</div>
 					<div class="border-border hidden h-9 self-center border-l sm:block"></div>
 					<div class="col-span-2 min-w-0 space-y-1 sm:col-auto sm:flex-1">
 						<div class="flex flex-wrap items-center gap-2">
-							<span class="text-sm font-bold">{event.title}</span>
-							{#if event.format === 'in-person'}
-								<span
-									class="bg-accent inline-flex items-center gap-1 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-3 py-1.5 text-xs"
-								>
-									<MapPin class="size-3" />in-person
-								</span>
-							{:else}
-								<span
-									class="bg-muted-foreground/10 text-muted-foreground inline-flex items-center gap-1 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-3 py-1.5 text-xs"
-								>
-									<Monitor class="size-3" />online
-								</span>
-							{/if}
+							<span class="text-sm font-bold">{event.name}</span>
 							{#if activeFilter === 'past'}
 								<span
 									class="bg-destructive/10 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-3 py-1.5 text-xs"
@@ -131,10 +119,10 @@
 								</span>
 							{/if}
 						</div>
-						<div class="text-muted-foreground flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs">
-							<span>{event.time}{event.endTime ? `–${event.endTime}` : ''}</span>
-							<span class="hidden sm:inline">·</span>
-							<span>{event.venueName ?? event.location}{event.address ? ` · ${event.address}` : ''}</span>
+						<div
+							class="text-muted-foreground flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs"
+						>
+							<span>{fmtTime(event.startTime)}{event.endTime ? `–${fmtTime(event.endTime)}` : ''}</span>
 						</div>
 					</div>
 					<div
@@ -142,7 +130,9 @@
 					>
 						<div class="flex items-baseline gap-1.5 sm:block">
 							<div class="text-muted-foreground text-xs tracking-wide">RSVP'D</div>
-							<div class="text-base font-bold">{rsvp.current} / {rsvp.capacity}</div>
+							<div class="text-base font-bold">
+								{event.currentAttendance ?? 0}{event.capacity ? ` / ${event.capacity}` : ''}
+							</div>
 						</div>
 						<span
 							class="bg-primary text-primary-foreground inline-flex items-center gap-0.5 rounded-full px-3 py-1.5 text-xs sm:hidden"
