@@ -40,7 +40,6 @@
 	let isRegistered = $state(false);
 	let activeSection = $state<'details' | 'description'>('details');
 	let scrollContainer = $state<HTMLElement | undefined>(undefined);
-	let calendarReady = $state(false);
 
 	const formattedDate = $derived(event ? format(new Date(event.startTime), 'EEEE, MMMM d') : '');
 	const locationLabel = $derived(
@@ -73,9 +72,6 @@
 		isRegistered = localStorage.getItem(`registered-${slug}`) === 'true';
 		updateCountdown();
 		interval = setInterval(updateCountdown, 60000);
-		import('add-to-calendar-button').then(() => {
-			calendarReady = true;
-		});
 	});
 
 	onMount(() => {
@@ -197,7 +193,7 @@
 						</Button>
 					{/if}
 
-					{#if calendarReady && !isPast}
+					{#if !isPast}
 						<div class="mt-3 flex justify-center">
 							<EventCalendarInviteButton {event} {region} />
 						</div>
