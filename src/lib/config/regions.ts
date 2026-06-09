@@ -11,7 +11,8 @@
  */
 
 import { env } from '$env/dynamic/public';
-import type { ConversationEvent } from '$lib/types/mock-data';
+import { formatTimeDuration } from '$lib/utils/dates';
+import type { LocalizedEventDto } from '@crownshy/api-client/api';
 
 /** A coalition partner / host organization shown on the landing page. */
 export interface Partner {
@@ -76,8 +77,6 @@ export interface RegionConfig {
 	endCtaJoinDescription: string;
 	endCtaShareDescription: string;
 	fullHosts: string;
-	/** Upcoming conversation events for this region */
-	events: ConversationEvent[];
 	/** Whether live conversations are open for registration. Defaults to true when omitted. */
 	conversationsActive?: boolean;
 	/** Date labels for the three campaign phases */
@@ -132,48 +131,47 @@ const devPolisWorkflowStepId = env.PUBLIC_DEV_POLIS_WORKFLOW_STEP_ID;
 const DEV_REGION: RegionConfig | null =
 	devConversationId && devInviteId && devPolisId && devPolisWorkflowStepId
 		? {
-			slug: 'dev',
-			stateName: 'Dev',
-			demonym: 'Developers',
-			question:
-				'How can developers ensure the benefits of AI are widely shared and risks are responsibly managed?',
-			polisId: devPolisId,
-			conversationId: devConversationId,
-			inviteId: devInviteId,
-			polis_workflow_step_id: devPolisWorkflowStepId,
-			hostName: 'Local Dev',
-			hostUrl: 'http://localhost:5173',
-			zipPrefixes: [],
-			heroHeader: 'AI and the Future of Our Communities',
-			heroBlurb:
-				'Share your thoughts with other developers who are making sense of this topic together. <a href="#context" class="text-destructive underline">Learn more →</a>',
-			contextParagraphs: [
-				'This is a local development environment for testing the landing page redesign.',
-				'Replace this copy in your local seed if you want to see different states.'
-			],
-			hostsBlurb:
-				'This conversation is hosted by <a href="http://localhost:5173">Local Dev</a>, with no real partners (this is your laptop).',
-			partners: [{ name: 'Local Dev', url: 'http://localhost:5173' }],
-			hostMessage: [
-				'This is your local development environment.',
-				'Changes here only affect your local database.',
-				'Use this to test new features safely.'
-			],
-			aboutConversation: [
-				'This is a local development conversation for testing the Civic OS platform.',
-				'It runs on your local machine with a local Postgres database.'
-			],
-			campaignPageDescription: 'Local development environment for Civic OS.',
-			campaignPageHosts: 'Local development',
-			whatsNext: 'Keep coding!',
-			goDeeper: 'Test everything!',
-			faq: DEFAULT_FAQ,
-			endCtaJoinDescription: 'Test conversations are taking place locally.',
-			endCtaShareDescription: 'Anyone running dev is welcome to participate.',
-			fullHosts: 'Local Development',
-			shareUrl: 'http://dev.localhost:5173',
-			events: []
-		}
+				slug: 'dev',
+				stateName: 'Dev',
+				demonym: 'Developers',
+				question:
+					'How can developers ensure the benefits of AI are widely shared and risks are responsibly managed?',
+				polisId: devPolisId,
+				conversationId: devConversationId,
+				inviteId: devInviteId,
+				polis_workflow_step_id: devPolisWorkflowStepId,
+				hostName: 'Local Dev',
+				hostUrl: 'http://localhost:5173',
+				zipPrefixes: [],
+				heroHeader: 'AI and the Future of Our Communities',
+				heroBlurb:
+					'Share your thoughts with other developers who are making sense of this topic together. <a href="#context" class="text-destructive underline">Learn more →</a>',
+				contextParagraphs: [
+					'This is a local development environment for testing the landing page redesign.',
+					'Replace this copy in your local seed if you want to see different states.'
+				],
+				hostsBlurb:
+					'This conversation is hosted by <a href="http://localhost:5173">Local Dev</a>, with no real partners (this is your laptop).',
+				partners: [{ name: 'Local Dev', url: 'http://localhost:5173' }],
+				hostMessage: [
+					'This is your local development environment.',
+					'Changes here only affect your local database.',
+					'Use this to test new features safely.'
+				],
+				aboutConversation: [
+					'This is a local development conversation for testing the Civic OS platform.',
+					'It runs on your local machine with a local Postgres database.'
+				],
+				campaignPageDescription: 'Local development environment for Civic OS.',
+				campaignPageHosts: 'Local development',
+				whatsNext: 'Keep coding!',
+				goDeeper: 'Test everything!',
+				faq: DEFAULT_FAQ,
+				endCtaJoinDescription: 'Test conversations are taking place locally.',
+				endCtaShareDescription: 'Anyone running dev is welcome to participate.',
+				fullHosts: 'Local Development',
+				shareUrl: 'http://dev.localhost:5173'
+			}
 		: null;
 
 export const REGIONS: Record<string, RegionConfig> = {
@@ -216,8 +214,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 		endCtaShareDescription: 'Anyone in your community is welcome to participate.',
 		polis_workflow_step_id: '68425b0d-21e9-4f36-8c13-229dab4508bc',
 		faq: DEFAULT_FAQ,
-		shareUrl: 'https://testing.bloomproject.us',
-		events: []
+		shareUrl: 'https://testing.bloomproject.us'
 	},
 	utah: {
 		slug: 'utah',
@@ -274,122 +271,6 @@ export const REGIONS: Record<string, RegionConfig> = {
 		polis_workflow_step_id: '9d1041f9-fda6-4597-b4b0-c1260e4b7268',
 		faq: DEFAULT_FAQ,
 		shareUrl: 'https://utah.bloomproject.us',
-		events: [
-			{
-				slug: 'may-02-springville',
-				title: 'AI & Springville',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Springville, UT',
-				venueName: 'Springville Library',
-				address: '45 S Main St, Springville, UT 84663',
-				time: '1:30PM',
-				endTime: '3:00PM',
-				date: '2026-05-02T13:00:00-06:00',
-				duration: '1.5 hours',
-				format: 'in-person',
-				description: 'Join us for small group conversations about AI for Utah Common Ground!',
-				fullDescription:
-					'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
-			},
-			{
-				slug: 'may-05-online',
-				title: 'AI & Our Communities',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Online',
-				venueName: 'Online',
-				address: 'Video link sent upon registration',
-				time: '12:00PM',
-				endTime: '1:00PM',
-				date: '2026-05-05T12:00:00-06:00',
-				duration: '1 hour',
-				format: 'online',
-				description: 'Join us for small group conversations about AI for Utah Common Ground!',
-				fullDescription:
-					'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
-			},
-			{
-				slug: 'may-07-online',
-				title: 'AI & Our Communities',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Online',
-				venueName: 'Online',
-				address: 'Video link sent upon registration',
-				time: '7:00PM',
-				endTime: '8:00PM',
-				date: '2026-05-07T19:00:00-06:00',
-				duration: '1 hour',
-				format: 'online',
-				description:
-					'Join us for virtual small group conversations about AI for Utah Common Ground!',
-				fullDescription:
-					'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
-			},
-			{
-				slug: 'may-09-kearns',
-				title: 'AI & Kearns',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Kearns, UT',
-				venueName: 'Kearns Library',
-				address: '4015 S 4400 W, Kearns, UT 84118',
-				time: '12:00PM',
-				endTime: '1:30PM',
-				date: '2026-05-09T12:00:00-06:00',
-				duration: '1.5 hours',
-				format: 'in-person',
-				description: 'Join us for small group conversations about AI for Utah Common Ground!',
-				fullDescription:
-					'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
-			},
-			{
-				slug: 'may-12-online',
-				title: 'AI & Our Communities',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Online',
-				venueName: 'Online',
-				address: 'Video link sent upon registration',
-				time: '12:00PM',
-				endTime: '1:00PM',
-				date: '2026-05-12T12:00:00-06:00',
-				duration: '1 hour',
-				format: 'online',
-				description: 'Join us for small group conversations about AI for Utah Common Ground!',
-				fullDescription:
-					'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
-			},
-			{
-				slug: 'may-14-online',
-				title: 'AI & Our Communities',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Online',
-				venueName: 'Online',
-				address: 'Video link sent upon registration',
-				time: '7:00PM',
-				endTime: '8:00PM',
-				date: '2026-05-14T19:00:00-06:00',
-				duration: '1 hour',
-				format: 'online',
-				description:
-					'Join us for virtual small group conversations about AI for Utah Common Ground!',
-				fullDescription:
-					'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
-			},
-			{
-				slug: 'may-16-logan',
-				title: 'AI & Logan',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Logan, UT',
-				venueName: 'Logan Library',
-				address: '255 N Main St, Logan, UT 84321',
-				time: '3:30PM',
-				endTime: '5:00PM',
-				date: '2026-05-16T15:30:00-06:00',
-				duration: '1.5 hours',
-				format: 'in-person',
-				description: 'Join us for small group conversations about AI for Utah Common Ground!',
-				fullDescription:
-					'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
-			}
-		],
 		phaseLabels: { phase1: 'APRIL 2026', phase2: 'MAY 2026', phase3: 'SEPTEMBER 2026' }
 	},
 
@@ -471,106 +352,6 @@ export const REGIONS: Record<string, RegionConfig> = {
 		polis_workflow_step_id: '8299fec7-a543-419f-8692-f68652648a0b',
 		shareUrl: 'https://oregon.bloomproject.us',
 		faq: DEFAULT_FAQ,
-		events: [
-			{
-				slug: 'may-30-sisters',
-				title: 'Sisters Community Conversation on AI',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Sisters, OR',
-				venueName: 'The Hub by Citizens4Community',
-				address: '291 E. Main Avenue, Sisters, OR 97759',
-				time: '10:00AM',
-				endTime: '11:30AM',
-				date: '2026-05-30T10:00:00-07:00',
-				duration: '1.5 hours',
-				format: 'in-person',
-				description: 'Join us for small group conversations about AI in Central Oregon!'
-			},
-			{
-				slug: 'may-30-prineville',
-				title: 'Prineville Community Conversation on AI',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Prineville, OR',
-				venueName: 'Broughton Room, Crook County Library',
-				address: '175 NW Meadow Lakes Drive, Prineville, OR 97754',
-				time: '1:00PM',
-				endTime: '2:30PM',
-				date: '2026-05-30T13:00:00-07:00',
-				duration: '1.5 hours',
-				format: 'in-person',
-				description: 'Join us for small group conversations about AI in Central Oregon!'
-			},
-			{
-				slug: 'jun-04-central-oregon-online',
-				title: 'Central Oregon Community Conversation on AI – Online #1',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Online',
-				venueName: 'Online',
-				address: 'Video link sent upon registration',
-				time: '7:00PM',
-				endTime: '8:00PM',
-				date: '2026-06-04T19:00:00-07:00',
-				duration: '1 hour',
-				format: 'online',
-				description: 'Join us for small group conversations about AI in Central Oregon!'
-			},
-			{
-				slug: 'jun-06-bend',
-				title: 'Bend Community Conversation on AI',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Bend, OR',
-				venueName: 'Haven Coworking',
-				address: '1001 SW Disk Drive, Suite 250, Bend, OR 97702',
-				time: '1:00PM',
-				endTime: '2:30PM',
-				date: '2026-06-06T13:00:00-07:00',
-				duration: '1.5 hours',
-				format: 'in-person',
-				description: 'Join us for small group conversations about AI in Central Oregon!'
-			},
-			{
-				slug: 'jun-06-madras',
-				title: 'Madras Community Conversation on AI',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Madras, OR',
-				venueName: 'Jefferson County Public Health – Conference Room',
-				address: '500 NE A Street, Madras, OR 97741',
-				time: '1:00PM',
-				endTime: '2:30PM',
-				date: '2026-06-06T13:00:00-07:00',
-				duration: '1.5 hours',
-				format: 'in-person',
-				description: 'Join us for small group conversations about AI in Central Oregon!'
-			},
-			{
-				slug: 'jun-09-central-oregon-online',
-				title: 'Central Oregon Community Conversation on AI – Online #2',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Online',
-				venueName: 'Online',
-				address: 'Video link sent upon registration',
-				time: '12:00PM',
-				endTime: '1:00PM',
-				date: '2026-06-09T12:00:00-07:00',
-				duration: '1 hour',
-				format: 'online',
-				description: 'Join us for small group conversations about AI in Central Oregon!'
-			},
-			{
-				slug: 'jun-13-redmond',
-				title: 'Redmond Community Conversation on AI',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Redmond, OR',
-				venueName: 'NeighborImpact Boardroom',
-				address: '2303 SW First Street, Redmond, OR',
-				time: '1:00PM',
-				endTime: '2:30PM',
-				date: '2026-06-13T13:00:00-07:00',
-				duration: '1.5 hours',
-				format: 'in-person',
-				description: 'Join us for small group conversations about AI in Central Oregon!'
-			}
-		],
 		phaseLabels: { phase1: 'APRIL 2026', phase2: 'MAY 2026', phase3: 'SEPTEMBER 2026' }
 	}
 };
@@ -622,42 +403,7 @@ export const GENERIC_REGION: RegionConfig = {
 	endCtaShareDescription: 'Anyone is welcome to participate.',
 	polis_workflow_step_id: 'f553a7b9-b3ac-4159-b88d-198f609b110c',
 	shareUrl: 'https://all.bloomproject.us',
-	faq: DEFAULT_FAQ,
-	events: [
-		{
-			slug: 'may-18-springville',
-			title: 'May 18 (In-Person) Conversation',
-			topic: 'AI & OUR COMMUNITIES',
-			location: 'Generic Location',
-			time: '1:00PM',
-			date: '2026-05-18T13:00:00-06:00',
-			format: 'in-person',
-			description:
-				'Join us for an in-person conversation about AI and its impact on our communities. Share your perspective, listen to your neighbors, and help shape actionable next steps.'
-		},
-		{
-			slug: 'may-24-provo',
-			title: 'May 24 (In-Person) Conversation',
-			topic: 'AI & OUR COMMUNITIES',
-			location: 'Generic Location',
-			time: '10:00AM',
-			date: '2026-05-24T10:00:00-06:00',
-			format: 'in-person',
-			description:
-				'A morning conversation about how AI is shaping our communities. Come ready to listen, share, and find common ground with fellow residents.'
-		},
-		{
-			slug: 'jun-01-online',
-			title: 'June 1 (Online) Conversation',
-			topic: 'AI & OUR COMMUNITIES',
-			location: 'Online (Zoom)',
-			time: '6:00PM',
-			date: '2026-06-01T18:00:00-06:00',
-			format: 'online',
-			description:
-				"Can't make it in person? Join this virtual conversation from anywhere. Same great discussion, from the comfort of your home."
-		}
-	]
+	faq: DEFAULT_FAQ
 };
 
 // ---------------------------------------------------------------------------
@@ -665,14 +411,17 @@ export const GENERIC_REGION: RegionConfig = {
 // ---------------------------------------------------------------------------
 
 /** Generates a full event description from its format, duration, and location. */
-export function getEventFullDescription(
-	event: import('$lib/types/mock-data').ConversationEvent,
-	stateName: string
-): string {
-	const locationLabel = event.format === 'online' ? stateName : event.location.split(',')[0];
-	const duration = event.duration ?? (event.format === 'online' ? '1 hour' : '1.5 hours');
+export function getEventFullDescription(event: LocalizedEventDto, stateName: string): string {
+	const locationLabel = event.format === 'online' ? stateName : event.location?.city;
+	const { hours, minutes } = formatTimeDuration(new Date(event.startTime), new Date(event.endTime));
+	const durationLabel = formatDurationLabel(hours, minutes);
 	const onlineAdj = event.format === 'online' ? 'online ' : '';
-	return `This is a ${duration} ${onlineAdj}conversation with your neighbors in ${locationLabel} about AI. We'll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.`;
+	return `This is a ${durationLabel} ${onlineAdj}conversation with your neighbors in ${locationLabel} about AI. We'll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.`;
+}
+
+export function formatDurationLabel(hours: number, minutes: number) {
+	const hoursQualifier = hours > 1 ? 'hours' : 'hour';
+	return `${hours} ${hoursQualifier}${minutes > 0 ? `${minutes} mins` : ''}`;
 }
 
 /**
