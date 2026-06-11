@@ -1,13 +1,10 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { MapPin, Monitor } from '@lucide/svelte';
-	import { REGIONS } from '@civicos/shared/data/regions';
-	import type { ConversationEvent } from '@civicos/shared/types';
 
-	let { children } = $props();
+	let { data, children } = $props();
 
-	const region = $derived(REGIONS[page.params.slug ?? '']);
-	const event = $derived(region?.events.find((e: ConversationEvent) => e.slug === page.params.eventSlug));
+	const event = $derived(data.event);
 
 	const subTabs = [
 		{ label: 'Setup', href: '' },
@@ -19,13 +16,14 @@
 	const eventBase = $derived(`/c/${page.params.slug}/events/${page.params.eventSlug}`);
 	const activeSubTab = $derived(
 		subTabs.find((t) =>
-			t.href === '' ? page.url.pathname === eventBase : page.url.pathname.startsWith(eventBase + t.href)
+			t.href === ''
+				? page.url.pathname === eventBase
+				: page.url.pathname.startsWith(eventBase + t.href)
 		)?.href ?? ''
 	);
 
 	function fmtDateLine(iso: string) {
-		const d = new Date(iso);
-		return d
+		return new Date(iso)
 			.toLocaleDateString('en-US', { weekday: 'short', month: 'short' })
 			.toUpperCase()
 			.replace(',', '');
@@ -33,18 +31,22 @@
 	function fmtDay(iso: string) {
 		return new Date(iso).getDate();
 	}
+	function fmtTime(iso: string) {
+		return new Date(iso).toLocaleTimeString('en-US', {
+			hour: 'numeric',
+			minute: '2-digit',
+			hour12: true
+		});
+	}
 
-	const rsvpFor = (slug: string) => {
-		const seed = slug.length * 7 + slug.charCodeAt(0);
-		return { current: (seed * 3) % 90 + 5, capacity: ((seed * 5) % 80) + 30 };
-	};
-	const rsvp = $derived(event ? rsvpFor(event.slug) : null);
+	const isInPerson = $derived(
+		event ? String(event.format).toLowerCase().includes('person') : false
+	);
+	const venueName = $derived(event?.location?.name ?? (isInPerson ? '' : 'Online'));
 </script>
 
 <!-- Event sub-tabs strip -->
-<nav
-	class="border-border bg-destructive/5 flex items-center gap-1.5 border-b px-5"
->
+<nav class="border-border bg-destructive/5 flex items-center gap-1.5 border-b px-5">
 	{#each subTabs as tab}
 		<a
 			href={eventBase + tab.href}
@@ -62,20 +64,20 @@
 {:else}
 	<div class="flex-1 overflow-y-auto px-5 py-5">
 		<!-- Event header card -->
-		<div class="bg-card shadow-card flex items-center gap-3.5 rounded-lg p-4 mb-4">
+		<div class="bg-card shadow-card mb-4 flex items-center gap-3.5 rounded-lg p-4">
 			<div class="w-14 text-center">
-				<div class="text-muted-foreground text-[9.8px]">{fmtDateLine(event.date)}</div>
-				<div class="text-xl font-bold leading-5">{fmtDay(event.date)}</div>
+				<div class="text-muted-foreground text-[9.8px]">{fmtDateLine(event.startTime)}</div>
+				<div class="text-xl font-bold leading-5">{fmtDay(event.startTime)}</div>
 			</div>
 			<div class="border-border h-9 border-l"></div>
 			<div class="flex-1">
-				<div class="text-base font-bold">{event.title}</div>
+				<div class="text-base font-bold">{event.name}</div>
 				<div class="text-muted-foreground flex items-center gap-2 text-xs">
-					<span>{event.time}{event.endTime ? ` – ${event.endTime}` : ''}</span>
+					<span>{fmtTime(event.startTime)} – {fmtTime(event.endTime)}</span>
 					<span>·</span>
-					<span>{event.venueName ?? event.location}</span>
+					<span>{venueName}</span>
 					<span>·</span>
-					{#if event.format === 'in-person'}
+					{#if isInPerson}
 						<span
 							class="bg-accent text-foreground inline-flex items-center gap-1 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-2.5 py-1 text-xs"
 						>
@@ -90,17 +92,9 @@
 					{/if}
 				</div>
 			</div>
-			<div class="text-muted-foreground text-xs">{rsvp!.current} / {rsvp!.capacity} rsvp'd</div>
-			<button
-				type="button"
-				class="bg-primary text-primary-foreground rounded-full px-3 py-1.5 text-xs"
-				onclick={() =>
-					navigator.clipboard?.writeText(
-						`civicos.app/c/${page.params.slug}/e/${event.slug}`
-					)}
-			>
-				copy rsvp link
-			</button>
+			<div class="text-muted-foreground text-xs">
+				{event.currentAttendance ?? 0} / {event.capacity ?? '—'} rsvp'd
+			</div>
 		</div>
 
 		{@render children?.()}

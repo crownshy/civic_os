@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { REGIONS } from '@civicos/shared/data/regions';
-	import type { ConversationEvent } from '@civicos/shared/types';
 
-	const region = $derived(REGIONS[page.params.slug ?? '']);
-	const event = $derived(region?.events.find((e: ConversationEvent) => e.slug === page.params.eventSlug));
+	let { data } = $props();
+
+	const event = $derived(data.event);
+	const region = $derived(data.region);
 
 	function fmtFullDate(iso: string) {
 		return new Date(iso).toLocaleDateString('en-US', {
@@ -14,15 +14,18 @@
 			year: 'numeric'
 		});
 	}
+	function fmtTime(iso: string) {
+		return new Date(iso).toLocaleTimeString('en-US', {
+			hour: 'numeric',
+			minute: '2-digit',
+			hour12: true
+		});
+	}
 
-	const rsvpLink = $derived(
-		event ? `civicos.app/c/${page.params.slug}/e/${event.slug}` : ''
+	const isInPerson = $derived(
+		event ? String(event.format).toLowerCase().includes('person') : false
 	);
-	const rsvpFor = (slug: string) => {
-		const seed = slug.length * 7 + slug.charCodeAt(0);
-		return ((seed * 5) % 80) + 30;
-	};
-	const capacityGuess = $derived(event ? rsvpFor(event.slug) : 0);
+	const rsvpLink = $derived(event ? `civicos.app/c/${page.params.slug}/e/${event.id}` : '');
 </script>
 
 {#if event}
@@ -30,17 +33,19 @@
 		<!-- Mode toggle -->
 		<div>
 			<label class="text-muted-foreground text-xs tracking-tight">MODE</label>
-			<div class="border-foreground/30 mt-1 inline-flex items-center rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl border p-1">
+			<div
+				class="border-foreground/30 mt-1 inline-flex items-center rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl border p-1"
+			>
 				<span
 					class={`rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-3 py-1.5 text-xs ${
-						event.format === 'in-person' ? 'bg-accent text-foreground' : 'text-muted-foreground'
+						isInPerson ? 'bg-accent text-foreground' : 'text-muted-foreground'
 					}`}
 				>
 					◉ in-person
 				</span>
 				<span
 					class={`rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-4 py-1.5 text-xs ${
-						event.format === 'online' ? 'bg-accent text-foreground' : 'text-muted-foreground'
+						!isInPerson ? 'bg-accent text-foreground' : 'text-muted-foreground'
 					}`}
 				>
 					◴ online
@@ -52,13 +57,13 @@
 			<div class="flex-1 space-y-1">
 				<label class="text-muted-foreground text-xs tracking-tight">DATE</label>
 				<div class="bg-muted/30 border-foreground/20 rounded-lg border px-3 py-2.5 text-sm">
-					{fmtFullDate(event.date)}
+					{fmtFullDate(event.startTime)}
 				</div>
 			</div>
 			<div class="flex-1 space-y-1">
 				<label class="text-muted-foreground text-xs tracking-tight">TIME — START / END</label>
 				<div class="bg-muted/30 border-foreground/20 rounded-lg border px-3 py-2.5 text-sm">
-					{event.time}{event.endTime ? ` → ${event.endTime}` : ''}
+					{fmtTime(event.startTime)} → {fmtTime(event.endTime)}
 				</div>
 			</div>
 		</div>
@@ -66,23 +71,23 @@
 		<div class="space-y-1">
 			<label class="text-muted-foreground text-xs tracking-tight">LOCATION NAME</label>
 			<div class="bg-muted/30 border-foreground/20 rounded-lg border px-3 py-2.5 text-sm">
-				{event.venueName ?? event.location}
+				{event.location?.name ?? (isInPerson ? '' : 'Online')}
 			</div>
 		</div>
 
 		<div class="space-y-1">
 			<label class="text-muted-foreground text-xs tracking-tight">LOCATION ADDRESS</label>
 			<div class="bg-muted/30 border-foreground/20 rounded-lg border px-3 py-2.5 text-sm">
-				{event.address ?? event.location}
+				{event.location?.address ?? ''}
 			</div>
 		</div>
 
 		<div class="space-y-1">
 			<label class="text-muted-foreground text-xs tracking-tight">DESCRIPTION</label>
 			<div
-				class="bg-muted/30 border-foreground/20 min-h-28 rounded-lg border px-3 py-2.5 text-sm leading-relaxed"
+				class="bg-muted/30 border-foreground/20 min-h-28 rounded-lg border px-3 py-2.5 text-sm leading-relaxed whitespace-pre-line"
 			>
-				{event.fullDescription ?? event.description}
+				{event.description}
 			</div>
 		</div>
 
@@ -92,7 +97,7 @@
 				<div
 					class="bg-card shadow-card rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-3 py-3 text-sm"
 				>
-					{capacityGuess}
+					{event.capacity ?? '—'}
 				</div>
 			</div>
 			<div class="flex-1 space-y-1">

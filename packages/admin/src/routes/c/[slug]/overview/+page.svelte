@@ -1,8 +1,12 @@
 <script lang="ts">
-	import { page } from '$app/state';
-	import { REGIONS } from '@civicos/shared/data/regions';
+	let { data } = $props();
 
-	const region = $derived(REGIONS[page.params.slug ?? '']);
+	const region = $derived(data.region);
+	const conversation = $derived(data.conversation);
+
+	const title = $derived(conversation?.title ?? region.heroHeader);
+	const description = $derived(conversation?.description ?? region.contextParagraphs.join('\n\n'));
+	const slug = $derived(conversation?.slug ?? region.slug);
 </script>
 
 {#if region}
@@ -11,11 +15,11 @@
 
 		<div class="space-y-1">
 			<label class="text-muted-foreground text-xs tracking-tight">SLUG</label>
-			<div class="bg-card shadow-card rounded-lg px-3 py-3 text-xs">{region.slug}</div>
+			<div class="bg-card shadow-card rounded-lg px-3 py-3 text-xs">{slug}</div>
 		</div>
 		<div class="space-y-1">
 			<label class="text-muted-foreground text-xs tracking-tight">TITLE</label>
-			<div class="bg-card shadow-card rounded-lg px-3 py-3 text-sm">{region.heroHeader}</div>
+			<div class="bg-card shadow-card rounded-lg px-3 py-3 text-sm">{title}</div>
 		</div>
 		<div class="space-y-1">
 			<label class="text-muted-foreground text-xs tracking-tight">KEY QUESTION</label>
@@ -23,8 +27,8 @@
 		</div>
 		<div class="space-y-1">
 			<label class="text-muted-foreground text-xs tracking-tight">CONTEXT</label>
-			<div class="bg-card shadow-card rounded-lg px-3 py-3 text-sm leading-relaxed">
-				{@html region.contextParagraphs.join('<br/><br/>')}
+			<div class="bg-card shadow-card rounded-lg px-3 py-3 text-sm leading-relaxed whitespace-pre-line">
+				{description}
 			</div>
 		</div>
 		<div class="space-y-1">

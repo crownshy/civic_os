@@ -11,6 +11,7 @@ const API_PREFIX = env.API_PREFIX || '';
 const handler: RequestHandler = async ({ request, params, cookies }) => {
 	const path = params.path;
 	const target = `${BACKEND_URL}${API_PREFIX}/${path}`;
+	// const target = `${BACKEND_URL}/api/${path}`;
 
 	const url = new URL(request.url);
 	const fullTarget = url.search ? `${target}${url.search}` : target;

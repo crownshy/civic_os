@@ -1,20 +1,21 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { REGIONS } from '@civicos/shared/data/regions';
 
-	let { children } = $props();
+	let { data, children } = $props();
 
-	const region = $derived(REGIONS[page.params.slug ?? '']);
+	const region = $derived(data.region);
+	const conversation = $derived(data.conversation);
 
-	const isLive = $derived(region && region.conversationsActive !== false);
+	const title = $derived(conversation?.title ?? region.heroHeader);
+	const isLive = $derived(
+		conversation ? conversation.is_live : region.conversationsActive !== false
+	);
 
-	// Main conversation tabs (Events is the only one wired today)
+	// Main conversation tabs
 	const tabs = [
 		{ label: 'Overview', href: 'overview' },
 		{ label: 'Open Poll', href: 'open-poll' },
-		{ label: 'Participants', href: 'participants' },
-		{ label: 'Events', href: 'events' },
-		{ label: 'Learnings', href: 'learnings' }
+		{ label: 'Events', href: 'events' }
 	];
 
 	const activeTab = $derived(
@@ -32,7 +33,7 @@
 		<h1
 			class="min-w-0 flex-1 text-2xl font-bold leading-tight text-balance sm:text-3xl lg:text-4xl"
 		>
-			{region.heroHeader}
+			{title}
 		</h1>
 		<div class="flex max-w-full shrink-0 items-center gap-1 overflow-hidden">
 			{#if isLive}
