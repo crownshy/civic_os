@@ -59,52 +59,60 @@
 	);
 </script>
 
-<div class="border-border relative flex items-stretch gap-4 border-b py-4 pl-4">
+<div
+	class="border-border group hover:bg-muted/40 relative grid grid-cols-[1.5rem_minmax(0,1fr)_minmax(10rem,14rem)_2.5rem_auto] items-start gap-4 border-b py-4 pl-4 transition-colors duration-150"
+>
 	<!-- Left accent bar -->
-	<div class={`absolute top-0 bottom-0 left-0 w-1.5 ${accentClass}`}></div>
+	<div
+		class={`absolute top-0 bottom-0 left-0 w-1.5 transition-all duration-150 group-hover:w-2 ${accentClass}`}
+	></div>
 
 	<!-- Index -->
-	<div class="text-muted-foreground w-6 shrink-0 pt-0.5 text-center text-xs">
+	<div class="text-muted-foreground pt-0.5 text-center text-caption">
 		{index}
 	</div>
 
-	<!-- Statement text + tags -->
-	<div class="min-w-0 flex-1">
-		<p class="text-foreground text-sm leading-5">{comment.text}</p>
-		<div class="mt-2 flex flex-wrap items-center gap-1.5">
-			{#if showVerdictPill && verdictPill}
-				<span
-					class={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium ${verdictPill.class}`}
-				>
-					{verdictPill.label}
-				</span>
-			{/if}
-			{#if picker}
-				<ThemePicker
-					themes={comment.topics ?? []}
-					availableThemes={picker.availableThemes}
-					disabled={picker.disabled}
-					onChange={picker.onChange}
-				/>
-			{:else}
+	<!-- Statement text + verdict pill -->
+	<div class="min-w-0">
+		<p class="text-foreground text-body leading-5">{comment.text}</p>
+		{#if showVerdictPill && verdictPill}
+			<span
+				class={`mt-2 inline-flex items-center rounded px-1.5 py-0.5 text-caption font-medium ${verdictPill.class}`}
+			>
+				{verdictPill.label}
+			</span>
+		{/if}
+	</div>
+
+	<!-- Theme column: picker for editable rows, read-only chips otherwise -->
+	<div class="min-w-0 pt-0.5">
+		{#if picker}
+			<ThemePicker
+				themes={comment.topics ?? []}
+				availableThemes={picker.availableThemes}
+				disabled={picker.disabled}
+				onChange={picker.onChange}
+			/>
+		{:else}
+			<div class="flex flex-wrap items-center gap-1.5">
 				{#each comment.topics ?? [] as topic (topic)}
 					<span
-						class="bg-muted text-foreground/80 inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium"
+						class="bg-muted text-foreground/80 inline-flex items-center rounded px-1.5 py-0.5 text-caption font-medium"
 					>
 						{topic}
 					</span>
 				{/each}
-			{/if}
-		</div>
+			</div>
+		{/if}
 	</div>
 
 	<!-- Count -->
-	<div class="text-foreground w-10 shrink-0 self-center text-sm font-bold tabular-nums">
+	<div class="text-foreground self-center text-body font-bold tabular-nums">
 		{count}
 	</div>
 
 	<!-- Per-group circles -->
-	<div class="flex shrink-0 items-center gap-3 self-center pr-4">
+	<div class="flex items-center gap-3 self-center pr-4">
 		{#each groupPcts as g (g.group_id)}
 			<GroupCircle
 				label={g.label}

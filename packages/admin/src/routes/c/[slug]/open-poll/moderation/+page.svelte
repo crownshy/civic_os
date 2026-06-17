@@ -2,6 +2,10 @@
 	import type { PageProps } from './$types';
 	import type { ModerationStatus, PolisStatementAux } from '$lib/types/aux';
 	import { updateStatementAux } from '$lib/api/aux';
+	import ThemePicker from '$lib/components/insights/ThemePicker.svelte';
+	import Card from '@civicos/shared/ui/Card.svelte';
+	import { Button } from '@civicos/shared/ui/button';
+	import { Check, X, Plus, Upload } from '@lucide/svelte';
 
 	let { data }: PageProps = $props();
 
@@ -12,6 +16,13 @@
 	// or navigating between conversations).
 	$effect(() => {
 		statements = data.statements;
+	});
+
+	// Union of every theme used on any row — drives the picker dropdown.
+	const availableThemes = $derived.by(() => {
+		const set = new Set<string>();
+		for (const s of statements) for (const t of s.themes) set.add(t);
+		return [...set].sort();
 	});
 
 	type Filter = 'all' | 'seeded' | 'accepted' | 'pending' | 'rejected';
@@ -39,7 +50,6 @@
 		if (pending[row.id] || row.moderation_status === status) return;
 		pending = { ...pending, [row.id]: true };
 
-		// Optimistic update.
 		const prevStatus = row.moderation_status;
 		statements = statements.map((s) =>
 			s.id === row.id ? { ...s, moderation_status: status } : s
@@ -49,11 +59,9 @@
 			const updated = await updateStatementAux(row.id, {
 				moderation_status: status
 			});
-			// Reconcile with server truth.
 			statements = statements.map((s) => (s.id === row.id ? updated : s));
 		} catch (e) {
 			console.error('updateStatementAux failed', e);
-			// Roll back.
 			statements = statements.map((s) =>
 				s.id === row.id ? { ...s, moderation_status: prevStatus } : s
 			);
@@ -62,46 +70,26 @@
 		}
 	}
 
+	async function setThemes(row: PolisStatementAux, next: string[]) {
+		const prev = row.themes;
+		statements = statements.map((s) => (s.id === row.id ? { ...s, themes: next } : s));
+		try {
+			const updated = await updateStatementAux(row.id, { themes: next });
+			statements = statements.map((s) => (s.id === row.id ? updated : s));
+		} catch (e) {
+			console.error('updateStatementAux(themes) failed', e);
+			statements = statements.map((s) => (s.id === row.id ? { ...s, themes: prev } : s));
+		}
+	}
+
 	const filters: { key: Filter; label: string }[] = [
-		{ key: 'all', label: 'all' },
+		{ key: 'all', label: 'All' },
 		{ key: 'seeded', label: 'Seeded' },
-		{ key: 'accepted', label: 'accepted' },
-		{ key: 'pending', label: 'pending' },
-		{ key: 'rejected', label: 'rejected' }
+		{ key: 'accepted', label: 'Accepted' },
+		{ key: 'pending', label: 'Pending' },
+		{ key: 'rejected', label: 'Rejected' }
 	];
 </script>
-
-{#snippet statusIcon(status: ModerationStatus, isSeed: boolean)}
-	{#if isSeed}
-		<span
-			class="border-muted-foreground/40 bg-muted-foreground/10 text-muted-foreground text-label inline-flex size-6 items-center justify-center rounded-full border font-bold"
-			title="Seed statement"
-		>
-			A
-		</span>
-	{:else if status === 'accepted'}
-		<span
-			class="border-primary bg-primary/10 text-primary text-label inline-flex size-6 items-center justify-center rounded-full border font-bold"
-			title="Accepted"
-		>
-			✓
-		</span>
-	{:else if status === 'rejected'}
-		<span
-			class="border-destructive text-destructive text-label inline-flex size-6 items-center justify-center rounded-full border font-bold"
-			title="Rejected"
-		>
-			!
-		</span>
-	{:else}
-		<span
-			class="border-destructive/60 bg-destructive/10 text-destructive text-label inline-flex size-6 items-center justify-center rounded-full border font-bold"
-			title="Pending"
-		>
-			?
-		</span>
-	{/if}
-{/snippet}
 
 <div class="flex flex-col gap-6 px-8 py-8">
 	{#if data.error}
@@ -111,38 +99,41 @@
 	<!-- Page heading -->
 	<div class="flex max-w-3xl flex-col gap-1">
 		<h2 class="text-foreground text-section font-bold">Statements moderation</h2>
-		<p class="text-muted-foreground text-caption">Moderate and view all statements.</p>
+		<p class="text-muted-foreground text-body">Moderate and view all statements.</p>
 	</div>
 
-	<!-- Add-a-statement card (UI only for now; seed authoring lands later) -->
-	<section
-		class="border-ring bg-muted/40 flex max-w-3xl items-center justify-between gap-3 rounded-xl border px-4 py-3"
+	<!-- Add-a-statement card -->
+	<Card
+		class="border-ring/60 bg-muted/40 hover:border-ring hover:bg-muted/60 max-w-3xl transition-colors duration-200"
 	>
-		<div class="min-w-0">
-			<div class="text-foreground text-caption font-bold">Add a statement</div>
-			<div class="text-muted-foreground text-label">
-				As moderator, you can seed the discussion.
+		<div class="flex items-center justify-between gap-3 px-4 py-3">
+			<div class="min-w-0">
+				<div class="text-foreground text-body font-bold">Add a statement</div>
+				<div class="text-muted-foreground text-caption">
+					As moderator, you can seed the discussion.
+				</div>
+			</div>
+			<div class="flex shrink-0 items-center gap-2">
+				<Button
+					disabled
+					class="rounded-full px-5 py-2.5"
+					title="Seed statement authoring not yet wired up"
+				>
+					<Plus class="size-4" />
+					Add statement
+				</Button>
+				<Button
+					variant="outline"
+					disabled
+					class="text-primary border-primary rounded-full bg-white px-5 py-2.5"
+					title="CSV import not yet wired up"
+				>
+					<Upload class="size-4" />
+					Import CSV
+				</Button>
 			</div>
 		</div>
-		<div class="flex shrink-0 items-center gap-2">
-			<button
-				type="button"
-				disabled
-				class="bg-primary/90 text-primary-foreground text-label inline-flex h-8 cursor-not-allowed items-center rounded-full px-3 font-medium opacity-60"
-				title="Seed statement authoring not yet wired up"
-			>
-				+ Add statement
-			</button>
-			<button
-				type="button"
-				disabled
-				class="text-primary border-primary text-label inline-flex h-8 cursor-not-allowed items-center rounded-full border bg-white px-3 font-medium opacity-60"
-				title="CSV import not yet wired up"
-			>
-				import csv
-			</button>
-		</div>
-	</section>
+	</Card>
 
 	<!-- Status filter chips -->
 	<div class="flex flex-wrap items-center gap-1.5">
@@ -150,67 +141,96 @@
 			<button
 				type="button"
 				onclick={() => (filter = f.key)}
-				class={`text-label inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-medium ${
+				class={`text-caption inline-flex cursor-pointer items-center rounded-full px-3 py-1.5 font-medium transition-all duration-150 hover:scale-[1.03] active:scale-[0.97] ${
 					filter === f.key
-						? 'bg-foreground/80 text-background'
-						: 'bg-muted text-foreground hover:bg-muted/70'
+						? 'bg-foreground text-background shadow-sm'
+						: 'bg-muted text-foreground hover:bg-muted-foreground/15'
 				}`}
 			>
-				{#if f.key === 'seeded'}
-					{@render statusIcon('pending', true)}
-				{:else if f.key !== 'all'}
-					{@render statusIcon(f.key as ModerationStatus, false)}
-				{/if}
 				<span>{f.label} · {counts[f.key]}</span>
 			</button>
 		{/each}
 	</div>
 
-	<!-- Table -->
-	<div class="max-w-3xl">
-		<div
-			class="border-foreground text-muted-foreground text-label grid grid-cols-[3rem_2.25rem_1fr_6rem] items-center gap-2 border-b px-3.5 py-2.5 font-semibold tracking-wide uppercase"
-		>
-			<div>Status</div>
-			<div>#</div>
-			<div>Statement</div>
-			<div>Action</div>
-		</div>
-
-		{#if visible.length === 0}
-			<p class="text-muted-foreground text-caption px-3.5 py-6 italic">
-				No statements match this filter.
-			</p>
-		{:else}
-			{#each visible as row (row.id)}
+	<!-- Statements list (matches Insights StatementSection card style) -->
+	<div class="max-w-6xl">
+		<Card class="hover:border-muted-foreground/40 shadow-card transition-colors duration-200">
+			<div class="flex flex-col">
+				<!-- Column headings -->
 				<div
-					class="border-border grid grid-cols-[3rem_2.25rem_1fr_6rem] items-center gap-2 border-b px-3.5 pt-2.5 pb-3"
+					class="text-muted-foreground/60 text-label grid grid-cols-[1.5rem_minmax(0,1fr)_minmax(11rem,16rem)_auto] items-center gap-4 px-4 py-2 font-semibold uppercase"
 				>
-					<div>{@render statusIcon(row.moderation_status, row.is_seed)}</div>
-					<div class="text-muted-foreground text-label">{row.polis_statement_id}</div>
-					<div class="text-foreground text-caption min-w-0">
-						{row.statement_text}
-					</div>
-					<div class="text-caption flex items-center gap-4 font-medium">
-						<button
-							type="button"
-							disabled={pending[row.id] || row.moderation_status === 'accepted'}
-							onclick={() => setStatus(row, 'accepted')}
-							class="text-primary disabled:opacity-40"
-						>
-							Accept
-						</button>
-						<button
-							type="button"
-							disabled={pending[row.id] || row.moderation_status === 'rejected'}
-							onclick={() => setStatus(row, 'rejected')}
-							class="text-destructive disabled:opacity-40"
-						>
-							Reject
-						</button>
-					</div>
+					<div>#</div>
+					<div>Statement</div>
+					<div>Theme</div>
+					<div class="pr-4">Action</div>
 				</div>
-			{/each}
-		{/if}
+
+				{#if visible.length === 0}
+					<p class="text-muted-foreground text-caption px-4 py-6 italic">
+						No statements match this filter.
+					</p>
+				{:else}
+					{#each visible as row (row.id)}
+						{@const accent = row.is_seed
+							? 'bg-muted-foreground/40'
+							: row.moderation_status === 'accepted'
+								? 'bg-primary'
+								: row.moderation_status === 'rejected'
+									? 'bg-destructive'
+									: 'bg-destructive/60'}
+						<div
+							class="border-border group hover:bg-muted/40 relative grid grid-cols-[1.5rem_minmax(0,1fr)_minmax(11rem,16rem)_auto] items-start gap-4 border-b py-4 pl-4 transition-colors duration-150"
+						>
+							<!-- Left accent bar (status color) -->
+							<div
+								class={`absolute top-0 bottom-0 left-0 w-1.5 transition-all duration-150 group-hover:w-2 ${accent}`}
+							></div>
+
+							<!-- # -->
+							<div class="text-muted-foreground pt-0.5 text-center text-caption">
+								{row.polis_statement_id}
+							</div>
+
+							<!-- Statement text -->
+							<div class="min-w-0">
+								<p class="text-foreground text-body leading-5">{row.statement_text}</p>
+							</div>
+
+							<!-- Theme picker -->
+							<div class="min-w-0 pt-0.5">
+								<ThemePicker
+									themes={row.themes}
+									{availableThemes}
+									onChange={(next) => setThemes(row, next)}
+								/>
+							</div>
+
+							<!-- Action -->
+							<div class="flex items-center gap-1 self-center pr-4">
+								<button
+									type="button"
+									disabled={pending[row.id] || row.moderation_status === 'accepted'}
+									onclick={() => setStatus(row, 'accepted')}
+									title="Accept"
+									class="text-primary hover:bg-primary/15 inline-flex size-7 cursor-pointer items-center justify-center rounded-full transition-all duration-150 hover:scale-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-transparent"
+								>
+									<Check class="size-4" />
+								</button>
+								<button
+									type="button"
+									disabled={pending[row.id] || row.moderation_status === 'rejected'}
+									onclick={() => setStatus(row, 'rejected')}
+									title="Reject"
+									class="text-destructive hover:bg-destructive/15 inline-flex size-7 cursor-pointer items-center justify-center rounded-full transition-all duration-150 hover:scale-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-transparent"
+								>
+									<X class="size-4" />
+								</button>
+							</div>
+						</div>
+					{/each}
+				{/if}
+			</div>
+		</Card>
 	</div>
 </div>

@@ -1,7 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
-// /c/[slug] redirects to Events tab (the only live tab today).
+// /c/[slug] redirects to Overview tab.
 export const load: PageServerLoad = ({ params }) => {
-	throw redirect(307, `/c/${params.slug}/events`);
+	throw redirect(307, `/c/${params.slug}/overview`);
 };

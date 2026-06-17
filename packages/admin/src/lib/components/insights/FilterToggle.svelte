@@ -19,10 +19,10 @@
 	role="switch"
 	aria-checked={checked}
 	onclick={toggle}
-	class={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
+	class={`inline-flex cursor-pointer items-center gap-2 rounded-full px-3 py-1.5 text-body font-medium transition-all duration-150 hover:scale-[1.04] hover:shadow-sm active:scale-[0.97] ${
 		checked
-			? 'bg-destructive/80 text-destructive-foreground'
-			: 'bg-muted text-destructive'
+			? 'bg-destructive/80 text-destructive-foreground hover:bg-destructive'
+			: 'bg-muted text-destructive hover:bg-muted-foreground/15'
 	}`}
 >
 	<span>{label}</span>

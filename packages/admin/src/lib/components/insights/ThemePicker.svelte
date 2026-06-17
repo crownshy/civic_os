@@ -22,12 +22,25 @@
 	let open = $state(false);
 	let newDraft = $state('');
 	let containerEl: HTMLDivElement | undefined = $state();
+	let dropdownPos = $state<{ top: number; left: number } | null>(null);
 
 	const themeSet = $derived(new Set(themes));
 
 	function toggleOpen() {
 		if (disabled) return;
 		open = !open;
+		if (open) reposition();
+	}
+
+	/**
+	 * Dropdown uses `position: fixed` to escape ancestor `overflow: hidden`
+	 * (e.g. the Card wrapping the statements list). So we have to position it
+	 * manually from the trigger's bbox, and re-position on scroll/resize.
+	 */
+	function reposition() {
+		if (!containerEl) return;
+		const rect = containerEl.getBoundingClientRect();
+		dropdownPos = { top: rect.bottom + 4, left: rect.left };
 	}
 
 	function applyToggle(theme: string) {
@@ -44,7 +57,7 @@
 		newDraft = '';
 	}
 
-	// Close on outside click.
+	// Close on outside click + reposition on scroll/resize while open.
 	$effect(() => {
 		if (!open) return;
 		function onDocClick(e: MouseEvent) {
@@ -53,14 +66,20 @@
 			}
 		}
 		document.addEventListener('mousedown', onDocClick);
-		return () => document.removeEventListener('mousedown', onDocClick);
+		window.addEventListener('scroll', reposition, true);
+		window.addEventListener('resize', reposition);
+		return () => {
+			document.removeEventListener('mousedown', onDocClick);
+			window.removeEventListener('scroll', reposition, true);
+			window.removeEventListener('resize', reposition);
+		};
 	});
 </script>
 
 <div class="relative inline-flex flex-wrap items-center gap-1" bind:this={containerEl}>
 	{#each themes as t (t)}
 		<span
-			class="bg-muted text-foreground inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium"
+			class="bg-muted text-foreground inline-flex items-center rounded px-1.5 py-0.5 text-caption font-medium"
 		>
 			{t}
 		</span>
@@ -70,22 +89,24 @@
 		<button
 			type="button"
 			onclick={toggleOpen}
-			class="text-destructive bg-destructive/10 hover:bg-destructive/20 inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium"
+			class="text-destructive bg-destructive/10 hover:bg-destructive/20 inline-flex items-center rounded px-1.5 py-0.5 text-caption font-medium"
 		>
 			Add new+
 		</button>
 	{/if}
 
-	{#if open}
+	{#if open && dropdownPos}
 		<div
-			class="border-border bg-popover text-popover-foreground absolute top-full left-0 z-20 mt-1 w-48 overflow-hidden rounded-md border shadow-lg"
+			style:top="{dropdownPos.top}px"
+			style:left="{dropdownPos.left}px"
+			class="border-border bg-popover text-popover-foreground fixed z-50 w-48 overflow-hidden rounded-md border shadow-lg"
 		>
 			{#each availableThemes as t (t)}
 				{@const checked = themeSet.has(t)}
 				<button
 					type="button"
 					onclick={() => applyToggle(t)}
-					class="hover:bg-muted/60 flex w-full items-center justify-between border-b border-black/10 px-2.5 py-1.5 text-left text-xs last:border-b-0"
+					class="hover:bg-muted/60 flex w-full items-center justify-between border-b border-black/10 px-2.5 py-1.5 text-left text-caption last:border-b-0"
 				>
 					<span>#{t}</span>
 					{#if checked}
@@ -99,13 +120,13 @@
 					bind:value={newDraft}
 					onkeydown={(e) => e.key === 'Enter' && applyAdd()}
 					placeholder="Add new…"
-					class="border-border focus:ring-destructive/40 min-w-0 flex-1 rounded border px-1.5 py-1 text-xs focus:ring-2 focus:outline-none"
+					class="border-border focus:ring-destructive/40 min-w-0 flex-1 rounded border px-1.5 py-1 text-caption focus:ring-2 focus:outline-none"
 				/>
 				<button
 					type="button"
 					onclick={applyAdd}
 					disabled={!newDraft.trim()}
-					class="bg-destructive text-destructive-foreground rounded px-1.5 py-1 text-xs font-medium disabled:opacity-40"
+					class="bg-destructive text-destructive-foreground rounded px-1.5 py-1 text-caption font-medium disabled:opacity-40"
 				>
 					Add
 				</button>

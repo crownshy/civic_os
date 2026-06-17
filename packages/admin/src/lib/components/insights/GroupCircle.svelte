@@ -40,7 +40,7 @@
 	<div
 		class={`relative ${ringSize} rounded-full border-4 ${ringClass} flex items-center justify-center`}
 	>
-		<span class="text-foreground text-[10px] font-bold leading-none">{Math.round(pct)}</span>
+		<span class="text-foreground text-caption font-bold leading-none">{Math.round(pct)}</span>
 	</div>
-	<span class="text-muted-foreground text-[10px] font-semibold uppercase">{label}</span>
+	<span class="text-muted-foreground text-caption font-semibold uppercase">{label}</span>
 </div>

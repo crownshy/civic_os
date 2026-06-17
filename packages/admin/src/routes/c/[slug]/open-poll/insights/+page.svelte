@@ -17,6 +17,7 @@
 	import ThemeChip from '$lib/components/insights/ThemeChip.svelte';
 	import FilterToggle from '$lib/components/insights/FilterToggle.svelte';
 	import PollStatRow from '$lib/components/PollStatRow.svelte';
+	import Card from '@civicos/shared/ui/Card.svelte';
 
 	let { data }: PageProps = $props();
 
@@ -43,11 +44,54 @@
 		};
 	});
 
+	let themesExcludeHosts = $state(false);
+
 	const stats = $derived(reportData ? getEngagementStats(reportData) : null);
-	const themes = $derived(reportData ? getThemeSummaries(reportData) : []);
+	const themes = $derived.by(() => {
+		if (!reportData) return [];
+		const source = themesExcludeHosts
+			? { ...reportData, comments: reportData.comments.filter((c) => !c.is_seed) }
+			: reportData;
+		return getThemeSummaries(source);
+	});
 	const consensus = $derived(reportData ? getConsensusStatements(reportData) : []);
 	const differences = $derived(reportData ? getDifferenceStatements(reportData) : []);
 	const uncertain = $derived(reportData ? getUncertaintyStatements(reportData) : []);
+
+	// --- Section filter state (Consensus / Difference / Uncertainty) ---
+	// `is_seed` default matches StatementSection's `excludeHosts = true` default.
+	let consensusExcludeHosts = $state(true);
+	let consensusExcludePasses = $state(false);
+	let differencesExcludeHosts = $state(true);
+	let differencesExcludePasses = $state(false);
+	let uncertainExcludeHosts = $state(true);
+	let uncertainExcludePasses = $state(false);
+
+	function applySectionFilters(
+		list: ReportComment[],
+		excludeHosts: boolean,
+		excludePasses: boolean
+	): ReportComment[] {
+		let r = list;
+		if (excludeHosts) r = r.filter((c) => !c.is_seed);
+		if (excludePasses) {
+			r = r.filter((c) => {
+				const t = totalVotes(c);
+				return t > 0 && c.overall_votes.passes / t < 0.4;
+			});
+		}
+		return r;
+	}
+
+	const consensusFiltered = $derived(
+		applySectionFilters(consensus, consensusExcludeHosts, consensusExcludePasses)
+	);
+	const differencesFiltered = $derived(
+		applySectionFilters(differences, differencesExcludeHosts, differencesExcludePasses)
+	);
+	const uncertainFiltered = $derived(
+		applySectionFilters(uncertain, uncertainExcludeHosts, uncertainExcludePasses)
+	);
 
 	/** All themes used anywhere on this conversation — powers the picker dropdown. */
 	const availableThemes = $derived.by(() => {
@@ -62,7 +106,6 @@
 	let selectedTheme = $state<string | null>(null);
 	let explorerExcludePasses = $state(false);
 	let explorerExcludeHosts = $state(false);
-	let themesExcludeHosts = $state(false);
 
 	const explorerStatements = $derived.by(() => {
 		if (!reportData) return [] as ReportComment[];
@@ -119,7 +162,9 @@
 		/>
 
 		<!-- ===== Themes card ===== -->
-		<section class="border-border bg-card shadow-card overflow-hidden rounded-2xl border">
+		<Card
+			class="hover:border-muted-foreground/40 bg-card shadow-card transition-colors duration-200"
+		>
 			<header class="flex items-start justify-between gap-4 px-6 pt-6">
 				<div>
 					<h2 class="text-foreground text-section font-bold">Themes</h2>
@@ -152,23 +197,30 @@
 					{/each}
 				{/if}
 			</div>
-		</section>
+		</Card>
 
 		<!-- ===== Areas of Consensus ===== -->
 		<StatementSection
 			title="Areas of Consensus"
 			description="Statements where all groups strongly agreed with the statement (80%+)."
+			bind:excludeHosts={consensusExcludeHosts}
+			bind:excludePasses={consensusExcludePasses}
 		>
-			{#if consensus.length === 0}
+			{#if consensusFiltered.length === 0}
 				<p class="text-muted-foreground text-caption px-4 py-6 italic">No consensus statements yet.</p>
 			{:else}
-				{#each consensus as c, i (c.tid)}
+				{#each consensusFiltered as c, i (c.tid)}
 					<StatementRow
 						index={i + 1}
 						comment={c}
 						groups={reportData.groups}
 						variant="consensus"
 						showVerdictPill
+						picker={{
+							availableThemes,
+							disabled: !auxByTid[c.tid],
+							onChange: (next) => setThemesFor(c.tid, next)
+						}}
 					/>
 				{/each}
 			{/if}
@@ -178,17 +230,24 @@
 		<StatementSection
 			title="Areas of Difference"
 			description="Statements where the spread between the groups was equal to or greater than 30%."
+			bind:excludeHosts={differencesExcludeHosts}
+			bind:excludePasses={differencesExcludePasses}
 		>
-			{#if differences.length === 0}
+			{#if differencesFiltered.length === 0}
 				<p class="text-muted-foreground text-caption px-4 py-6 italic">No clear differences yet.</p>
 			{:else}
-				{#each differences as c, i (c.tid)}
+				{#each differencesFiltered as c, i (c.tid)}
 					<StatementRow
 						index={i + 1}
 						comment={c}
 						groups={reportData.groups}
 						variant="difference"
 						showVerdictPill
+						picker={{
+							availableThemes,
+							disabled: !auxByTid[c.tid],
+							onChange: (next) => setThemesFor(c.tid, next)
+						}}
 					/>
 				{/each}
 			{/if}
@@ -198,19 +257,26 @@
 		<StatementSection
 			title="Areas of Uncertainty"
 			description="Statements where the percentage of people who passed was significantly higher than average."
+			bind:excludeHosts={uncertainExcludeHosts}
+			bind:excludePasses={uncertainExcludePasses}
 		>
-			{#if uncertain.length === 0}
+			{#if uncertainFiltered.length === 0}
 				<p class="text-muted-foreground text-caption px-4 py-6 italic">
 					No statements of unusual uncertainty yet.
 				</p>
 			{:else}
-				{#each uncertain as c, i (c.tid)}
+				{#each uncertainFiltered as c, i (c.tid)}
 					<StatementRow
 						index={i + 1}
 						comment={c}
 						groups={reportData.groups}
 						variant="uncertainty"
 						showVerdictPill
+						picker={{
+							availableThemes,
+							disabled: !auxByTid[c.tid],
+							onChange: (next) => setThemesFor(c.tid, next)
+						}}
 					/>
 				{/each}
 			{/if}
@@ -243,35 +309,40 @@
 				</div>
 			</div>
 
-			<div class="flex flex-col">
-				<div
-					class="text-muted-foreground/60 text-label grid grid-cols-[1.5rem_1fr_2.5rem_auto] items-center gap-4 px-4 py-2 font-semibold uppercase"
-				>
-					<div>#</div>
-					<div>Statement</div>
-					<div class="text-right">Count</div>
-					<div class="pr-4">Groups</div>
-				</div>
+			<Card
+				class="hover:border-muted-foreground/40 shadow-card transition-colors duration-200"
+			>
+				<div class="flex flex-col">
+					<div
+						class="text-muted-foreground/60 text-label grid grid-cols-[1.5rem_minmax(0,1fr)_minmax(10rem,14rem)_2.5rem_auto] items-center gap-4 px-4 py-2 font-semibold uppercase"
+					>
+						<div>#</div>
+						<div>Statement</div>
+						<div>Theme</div>
+						<div class="text-right">Count</div>
+						<div class="pr-4">Groups</div>
+					</div>
 
-				{#if explorerStatements.length === 0}
-					<p class="text-muted-foreground text-caption px-4 py-6 italic">
-						No statements match the current filters.
-					</p>
-				{:else}
-					{#each explorerStatements.slice(0, 50) as c, i (c.tid)}
-						<StatementRow
-							index={i + 1}
-							comment={c}
-							groups={reportData.groups}
-							picker={{
-								availableThemes,
-								disabled: !auxByTid[c.tid],
-								onChange: (next) => setThemesFor(c.tid, next)
-							}}
-						/>
-					{/each}
-				{/if}
-			</div>
+					{#if explorerStatements.length === 0}
+						<p class="text-muted-foreground text-caption px-4 py-6 italic">
+							No statements match the current filters.
+						</p>
+					{:else}
+						{#each explorerStatements.slice(0, 50) as c, i (c.tid)}
+							<StatementRow
+								index={i + 1}
+								comment={c}
+								groups={reportData.groups}
+								picker={{
+									availableThemes,
+									disabled: !auxByTid[c.tid],
+									onChange: (next) => setThemesFor(c.tid, next)
+								}}
+							/>
+						{/each}
+					{/if}
+				</div>
+			</Card>
 		</section>
 	</div>
 {/if}

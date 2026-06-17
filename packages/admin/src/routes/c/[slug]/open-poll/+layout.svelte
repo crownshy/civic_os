@@ -20,7 +20,7 @@
 	{#each subTabs as tab}
 		<a
 			href={openPollBase + tab.href}
-			class={`px-3.5 py-3.5 text-sm font-medium ${
+			class={`px-3.5 py-3.5 text-body font-medium ${
 				activeSubTab === tab.href ? 'text-destructive' : 'text-foreground/70 hover:text-foreground'
 			}`}
 		>

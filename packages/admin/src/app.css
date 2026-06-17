@@ -31,10 +31,8 @@
 }
 
 /* Admin semantic type scale.
-   Prefer these over raw text-xs/sm/base/3xl/7xl on admin pages so
-   the four open-poll sub-pages (and future settings screens) share
-   one consistent scale. Raw Tailwind text-* utilities still work
-   but should be reserved for one-offs.
+   Use these on admin pages instead of raw text-sm/2xl/4xl utilities so
+   role-and-size live in one named token. Retune the var, whole app shifts.
 
    label    12px  small caps eyebrow labels ("TOTAL STATEMENTS")
    caption  13px  table cells, helper copy
@@ -43,18 +41,18 @@
    display  36px  page H1 (conversation title)
    stat     48px  hero metric numbers */
 @theme {
-	--text-label: 0.75rem;
-	--text-label--line-height: 1rem;
-	--text-caption: 0.8125rem;
-	--text-caption--line-height: 1.15rem;
-	--text-body: 1rem;
-	--text-body--line-height: 1.5rem;
-	--text-section: 1.5rem;
-	--text-section--line-height: 1.875rem;
-	--text-display: 2.25rem;
-	--text-display--line-height: 2.5rem;
-	--text-stat: 3rem;
-	--text-stat--line-height: 1;
+	--text-label: var(--text-xs);
+	--text-label--line-height: var(--text-xs--line-height);
+	--text-caption: var(--text-sm);
+	--text-caption--line-height: var(--text-sm--line-height);
+	--text-body: var(--text-base);
+	--text-body--line-height: var(--text-base--line-height);
+	--text-section: var(--text-2xl);
+	--text-section--line-height: var(--text-2xl--line-height);
+	--text-display: var(--text-4xl);
+	--text-display--line-height: var(--text-4xl--line-height);
+	--text-stat: var(--text-5xl);
+	--text-stat--line-height: var(--text-5xl--line-height);
 }
 
 /* Card shadow matching wireframe spec */
