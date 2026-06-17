@@ -39,6 +39,29 @@
 			const zipParam = params.get('zip_code');
 			if (zipParam) zipCode = zipParam;
 		}
+
+		if (region.slug === 'utah') {
+			/* eslint-disable */
+			(function (f: any, b: any, e: any, v: any, n?: any, t?: any, s?: any) {
+				if (f.fbq) return;
+				n = f.fbq = function () {
+					n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+				};
+				if (!f._fbq) f._fbq = n;
+				n.push = n;
+				n.loaded = true;
+				n.version = '2.0';
+				n.queue = [];
+				t = b.createElement(e);
+				t.async = true;
+				t.src = v;
+				s = b.getElementsByTagName(e)[0];
+				s.parentNode.insertBefore(t, s);
+			})(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+			/* eslint-enable */
+			(window as any).fbq('init', '1345205920866889');
+			(window as any).fbq('track', 'PageView');
+		}
 	});
 
 	function showTermsModal() {
@@ -133,6 +156,17 @@
 
 <svelte:head>
 	<title>{region.heroHeader} — {region.stateName}</title>
+	{#if region.slug === 'utah'}
+		<noscript
+			><img
+				height="1"
+				width="1"
+				style="display:none"
+				src="https://www.facebook.com/tr?id=1345205920866889&ev=PageView&noscript=1"
+				alt=""
+			/></noscript
+		>
+	{/if}
 </svelte:head>
 
 <div class="min-h-screen bg-gradient-to-b from-orange-50 to-orange-100 text-yellow-950">
