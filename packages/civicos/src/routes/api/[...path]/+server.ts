@@ -2,11 +2,13 @@ import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
 
 const BACKEND_URL = env.API_URL || 'http://localhost:3000';
+// In production, set API_PREFIX=/api so requests go to e.g. bloom.comhairle.scot/api/auth/...
+// Locally, the backend serves routes at the root (e.g. /auth/...), so leave this empty.
+const API_PREFIX = env.API_PREFIX || '';
 
 const handler: RequestHandler = async ({ request, params, cookies }) => {
 	const path = params.path;
-	// Backend API expects /api prefix
-	const target = `${BACKEND_URL}/api/${path}`;
+	const target = `${BACKEND_URL}${API_PREFIX}/${path}`;
 
 	const url = new URL(request.url);
 	const fullTarget = url.search ? `${target}${url.search}` : target;
