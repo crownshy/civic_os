@@ -30,22 +30,31 @@
 	--radius: var(--radius);
 }
 
-/* Admin-only text scale: bump every text-* utility one step up
-   so admin reads bigger than civicos without touching spacing. */
+/* Admin semantic type scale.
+   Prefer these over raw text-xs/sm/base/3xl/7xl on admin pages so
+   the four open-poll sub-pages (and future settings screens) share
+   one consistent scale. Raw Tailwind text-* utilities still work
+   but should be reserved for one-offs.
+
+   label    12px  small caps eyebrow labels ("TOTAL STATEMENTS")
+   caption  13px  table cells, helper copy
+   body     16px  paragraph body
+   section  24px  card / section H2 ("Themes")
+   display  36px  page H1 (conversation title)
+   stat     48px  hero metric numbers */
 @theme {
-	--text-xs: 1rem;
-	--text-sm: 1.125rem;
-	--text-base: 1.25rem;
-	--text-lg: 1.5rem;
-	--text-xl: 1.875rem;
-	--text-2xl: 2.25rem;
-	--text-3xl: 3rem;
-	--text-4xl: 3.75rem;
-	--text-5xl: 4.5rem;
-	--text-6xl: 6rem;
-	--text-7xl: 8rem;
-	--text-8xl: 10rem;
-	--text-9xl: 12rem;
+	--text-label: 0.75rem;
+	--text-label--line-height: 1rem;
+	--text-caption: 0.8125rem;
+	--text-caption--line-height: 1.15rem;
+	--text-body: 1rem;
+	--text-body--line-height: 1.5rem;
+	--text-section: 1.5rem;
+	--text-section--line-height: 1.875rem;
+	--text-display: 2.25rem;
+	--text-display--line-height: 2.5rem;
+	--text-stat: 3rem;
+	--text-stat--line-height: 1;
 }
 
 /* Card shadow matching wireframe spec */

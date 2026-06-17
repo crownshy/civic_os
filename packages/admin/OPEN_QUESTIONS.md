@@ -113,6 +113,7 @@ Hard-coded in `packages/admin/src/lib/utils/report.ts`:
 
 ## 6. T3C ("Talk to the City") integration
 
+
 ### What we do today
 
 Nothing. We parked it. The page reads `comment.topics?: string[]` from Polis NLP when present, otherwise themes are empty. The design's subtopic links and AI-generated theme summaries are not rendered.
@@ -177,4 +178,93 @@ So the UI plumbing exists end-to-end, but:
 
 ### Questions
 
-- **Q9.1**  Where do we store it? 
+- **Q9.1**  Where do we store it?
+
+---
+
+## 10. Theme assignment & statement moderation
+
+### Background
+
+Comhairle PR #467 (`aux_polis_data_table`, merged) introduced the
+`polis_statement_aux` table, which augments each polis statement with
+fields polis doesn't store — most importantly `themes TEXT[]` and
+`moderation_status`. That table is now the source of truth for both.
+
+Endpoints comhairle ships today:
+
+- `POST   /tools/polis/statement_aux` — create one row (used by the custom polis embed at submission time)
+- `PUT    /tools/polis/statement_aux/:id` — update text, themes, moderation status/reason
+- `GET    /tools/polis/statement_aux` — list, filtered by `workflow_step_id` and/or `polis_conversation_id`
+- `POST   /tools/polis/statement_aux/sync` — backport polis statements into aux (one-shot or recurring; preserves themes/moderation on existing rows)
+- `GET    /tools/polis/statement_aux/theme_stats` — per-theme statement counts
+
+A separate **moderation push-through endpoint** (admin moderates in
+comhairle → comhairle calls polis admin API → polis hides/shows the
+statement) is in flight from Stuart; not yet shipped.
+
+### Decisions resolved (grilling session, 2026-06-17)
+
+- **Source of truth is `polis_statement_aux`.** Drop the speculative
+  `comment.topics` (polis NLP) wiring on the admin Insights page; replace
+  with aux themes.
+- **Themes are free-form for v1.** No taxonomy table. Picker on Insights
+  rows shows themes already used on this conversation, plus an inline
+  "Add new" affordance. Drift (e.g. `news` vs `News`) is accepted as a
+  v1 cost; revisit if it bites.
+- **Tagging ≠ moderation.** Two independent actions on the same row;
+  admin can do either without the other. Confirmed with Stuart.
+- **Surface split:**
+    - `Open Poll → Moderation` — a new sub-tab. Owns accept/reject and
+      eventually seed-statement authoring. **Stubbed at functional level
+      for now** (basic list with status dropdown, no polished UX) so
+      data can be manipulated during dev. Calls Stuart's moderation
+      endpoint when it lands; until then writes only to aux.
+    - `Open Poll → Insights` — keeps owning analysis, and now also owns
+      **inline theme assignment** on each statement row (chip picker +
+      "Add new"). Tagging happens here because it's an analytical act.
+- **Insights data flow:** assume comhairle's `/tools/polis/report_data`
+  endpoint joins aux themes onto `comments[].topics` (server-side join)
+  so the admin frontend keeps reading `comment.topics` and the Themes
+  card / Theme Explorer aggregate cleanly. If the server-side join
+  doesn't ship, fallback is a second `GET /statement_aux` call from the
+  admin load function and a client-side join. **Needs confirmation with
+  Stuart.**
+
+### Open questions
+
+- **Q10.1 — Sync defaults for backfilled statements.** When sync runs on
+  Utah/Oregon for the first time, every existing polis statement gets a
+  new aux row defaulting to `moderation_status = 'pending'` and
+  `themes = '{}'`. But these statements are *already live* in polis.
+  Three options:
+    - (A) Extend sync to read polis's moderation state and map it into
+      aux (`accepted` for shown, `rejected` for hidden). Right answer
+      long-term; mirrors polis truth into aux.
+    - (B) Sync defaults backfilled rows to `accepted` (assumes "exists
+      in polis → already moderated through polis"). Crude but cheap.
+    - (C) Leave as `pending`, add a bulk-accept button. Bad UX first run.
+  Decision deferred; raise with Stuart while he's working on the
+  moderation endpoint.
+
+- **Q10.2 — Label manager (rename / merge / delete themes).** Deferred
+  to v2. The Insights chip picker + "Add new" is enough to ship Bloom.
+  When drift hurts someone, add a side-drawer manager on the Insights
+  page (recommended UX) that uses
+  `UPDATE polis_statement_aux SET themes = array_replace(themes, OLD, NEW) ...`
+  for renames and `array_remove` for deletes. Backend ops are one-liners.
+
+- **Q10.3 — Top-stats bar additions.** Design shows
+  `TOTAL STATEMENTS / THEMES / AREAS OF CONSENSUS`. Should it also show
+  `AREAS OF DIFFERENCE` and `AREAS OF UNCERTAINTY` counts? Trivial to
+  add — no real decision, just product confirmation.
+
+- **Q10.4 — "Brief description".** Per the design mockup commentary —
+  unclear what's being described. Per-theme description? Per-conversation
+  tagline? Per-section explanatory text (Areas of Consensus / Difference
+  / Uncertainty already have inline subtitles)? Needs one-sentence clarification.
+
+- **Q10.5 — Insights row visual weight for themes.** Design suggests
+  de-emphasizing theme chips on Areas of Consensus / Difference /
+  Uncertainty rows (small inline tag, not a dominant column). Implement
+  in the redesign pass on `StatementRow.svelte`. 

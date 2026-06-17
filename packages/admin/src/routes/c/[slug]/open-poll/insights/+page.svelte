@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
-	import type { ReportComment } from '$lib/types/report';
+	import type { ReportComment, PolisReportData } from '$lib/types/report';
+	import type { PolisStatementAux } from '$lib/types/aux';
+	import { updateStatementAux } from '$lib/api/aux';
 	import {
 		getEngagementStats,
 		getConsensusStatements,
@@ -14,16 +16,47 @@
 	import ThemeBar from '$lib/components/insights/ThemeBar.svelte';
 	import ThemeChip from '$lib/components/insights/ThemeChip.svelte';
 	import FilterToggle from '$lib/components/insights/FilterToggle.svelte';
+	import PollStatRow from '$lib/components/PollStatRow.svelte';
 
 	let { data }: PageProps = $props();
 
-	const reportData = $derived(data.reportData);
+	// Local mutable aux map so picker edits re-render without a refetch.
+	// Re-seeded on every load (e.g. when slug changes).
+	let auxByTid = $state<Record<number, PolisStatementAux>>(data.auxByTid);
+	$effect(() => {
+		auxByTid = data.auxByTid;
+	});
+
+	/**
+	 * Overlay aux.themes onto each comment so the existing utils (which read
+	 * `comment.topics`) get aux-sourced themes for free. Falls back to
+	 * `comment.topics` when there's no aux row (e.g. sync hasn't been run).
+	 */
+	const reportData = $derived.by<PolisReportData | null>(() => {
+		if (!data.reportData) return null;
+		return {
+			...data.reportData,
+			comments: data.reportData.comments.map((c) => {
+				const aux = auxByTid[c.tid];
+				return aux ? { ...c, topics: aux.themes } : c;
+			})
+		};
+	});
 
 	const stats = $derived(reportData ? getEngagementStats(reportData) : null);
 	const themes = $derived(reportData ? getThemeSummaries(reportData) : []);
 	const consensus = $derived(reportData ? getConsensusStatements(reportData) : []);
 	const differences = $derived(reportData ? getDifferenceStatements(reportData) : []);
 	const uncertain = $derived(reportData ? getUncertaintyStatements(reportData) : []);
+
+	/** All themes used anywhere on this conversation — powers the picker dropdown. */
+	const availableThemes = $derived.by(() => {
+		const set = new Set<string>();
+		for (const row of Object.values(auxByTid)) {
+			for (const t of row.themes) set.add(t);
+		}
+		return [...set].sort();
+	});
 
 	// --- Theme Explorer state ---
 	let selectedTheme = $state<string | null>(null);
@@ -49,48 +82,55 @@
 	function toggleTheme(theme: string) {
 		selectedTheme = selectedTheme === theme ? null : theme;
 	}
+
+	/**
+	 * Persist a picker edit. Optimistic + roll-back on failure. No aux row
+	 * means the statement hasn't been backfilled into comhairle yet — the
+	 * picker is disabled for those, so this only fires for taggable rows.
+	 */
+	async function setThemesFor(tid: number, next: string[]) {
+		const row = auxByTid[tid];
+		if (!row) return;
+		const prevThemes = row.themes;
+		auxByTid = { ...auxByTid, [tid]: { ...row, themes: next } };
+		try {
+			const updated = await updateStatementAux(row.id, { themes: next });
+			auxByTid = { ...auxByTid, [tid]: updated };
+		} catch (e) {
+			console.error('updateStatementAux themes failed', e);
+			auxByTid = { ...auxByTid, [tid]: { ...row, themes: prevThemes } };
+		}
+	}
 </script>
 
 {#if data.error}
-	<div class="text-destructive p-8">Could not load report: {data.error}</div>
+	<div class="text-destructive text-body p-8">Could not load report: {data.error}</div>
 {:else if !reportData || !stats}
-	<div class="text-muted-foreground p-8">Loading report…</div>
+	<div class="text-muted-foreground text-body p-8">Loading report…</div>
 {:else}
-	<div class="flex flex-col gap-12 px-8 py-8">
+	<div class="flex flex-col gap-10 px-8 py-8">
 		<!-- ===== Top stats ===== -->
-		<section class="flex flex-wrap items-end gap-x-16 gap-y-6">
-			<div>
-				<div class="text-foreground/70 text-base font-medium">TOTAL STATEMENTS</div>
-				<div class="text-foreground text-7xl font-extrabold">{stats.totalStatements}</div>
-			</div>
-			<div>
-				<div class="text-foreground/70 text-base font-medium">THEMES</div>
-				<div class="text-foreground text-7xl font-extrabold">{themes.length}</div>
-			</div>
-			<div>
-				<div class="text-foreground/70 text-base font-medium">AREAS OF CONSENSUS</div>
-				<div class="text-foreground text-7xl font-extrabold">{consensus.length}</div>
-			</div>
-		</section>
+		<PollStatRow
+			stats={[
+				{ label: 'Total Statements', value: stats.totalStatements },
+				{ label: 'Themes', value: themes.length },
+				{ label: 'Areas of Consensus', value: consensus.length }
+			]}
+		/>
 
 		<!-- ===== Themes card ===== -->
-		<section
-			class="border-border bg-card overflow-hidden rounded-2xl border"
-		>
-			<header class="flex items-start justify-between gap-4 px-8 pt-8">
+		<section class="border-border bg-card shadow-card overflow-hidden rounded-2xl border">
+			<header class="flex items-start justify-between gap-4 px-6 pt-6">
 				<div>
-					<h2 class="text-foreground font-display text-3xl font-extrabold">Themes</h2>
-					<p class="text-foreground/80 mt-2 text-base">What people were talking about.</p>
+					<h2 class="text-foreground text-section font-bold">Themes</h2>
+					<p class="text-foreground/70 text-caption mt-1">What people were talking about.</p>
 				</div>
-				<FilterToggle
-					label="Exclude host statements"
-					bind:checked={themesExcludeHosts}
-				/>
+				<FilterToggle label="Exclude host statements" bind:checked={themesExcludeHosts} />
 			</header>
 
-			<div class="px-8 pt-6 pb-2">
+			<div class="px-6 pt-4 pb-2">
 				<div
-					class="text-muted-foreground/60 grid grid-cols-[10rem_2.5rem_3rem_1fr_2rem] items-center gap-6 px-0 py-2 text-xs font-semibold uppercase"
+					class="text-muted-foreground/60 text-label grid grid-cols-[10rem_2.5rem_3rem_1fr_2rem] items-center gap-6 px-0 py-2 font-semibold uppercase"
 				>
 					<div>Theme</div>
 					<div class="text-right">Count</div>
@@ -99,7 +139,7 @@
 					<div></div>
 				</div>
 				{#if themes.length === 0}
-					<p class="text-muted-foreground py-6 text-sm italic">
+					<p class="text-muted-foreground text-caption py-6 italic">
 						No themes have been generated yet for this conversation.
 					</p>
 				{:else}
@@ -120,7 +160,7 @@
 			description="Statements where all groups strongly agreed with the statement (80%+)."
 		>
 			{#if consensus.length === 0}
-				<p class="text-muted-foreground px-4 py-6 text-sm italic">No consensus statements yet.</p>
+				<p class="text-muted-foreground text-caption px-4 py-6 italic">No consensus statements yet.</p>
 			{:else}
 				{#each consensus as c, i (c.tid)}
 					<StatementRow
@@ -140,7 +180,7 @@
 			description="Statements where the spread between the groups was equal to or greater than 30%."
 		>
 			{#if differences.length === 0}
-				<p class="text-muted-foreground px-4 py-6 text-sm italic">No clear differences yet.</p>
+				<p class="text-muted-foreground text-caption px-4 py-6 italic">No clear differences yet.</p>
 			{:else}
 				{#each differences as c, i (c.tid)}
 					<StatementRow
@@ -160,7 +200,7 @@
 			description="Statements where the percentage of people who passed was significantly higher than average."
 		>
 			{#if uncertain.length === 0}
-				<p class="text-muted-foreground px-4 py-6 text-sm italic">
+				<p class="text-muted-foreground text-caption px-4 py-6 italic">
 					No statements of unusual uncertainty yet.
 				</p>
 			{:else}
@@ -178,7 +218,7 @@
 
 		<!-- ===== Theme Explorer ===== -->
 		<section class="flex flex-col gap-4">
-			<h2 class="text-foreground text-3xl font-semibold">Theme Explorer</h2>
+			<h2 class="text-foreground text-section font-bold">Theme Explorer</h2>
 
 			<div class="flex flex-wrap items-center justify-between gap-3">
 				<div class="flex flex-wrap gap-2">
@@ -190,7 +230,7 @@
 						/>
 					{/each}
 					{#if themes.length === 0}
-						<span class="text-muted-foreground text-sm italic">No themes yet.</span>
+						<span class="text-muted-foreground text-caption italic">No themes yet.</span>
 					{/if}
 				</div>
 
@@ -205,7 +245,7 @@
 
 			<div class="flex flex-col">
 				<div
-					class="text-muted-foreground/60 grid grid-cols-[1.5rem_1fr_2.5rem_auto] items-center gap-4 px-4 py-2 text-xs font-semibold uppercase"
+					class="text-muted-foreground/60 text-label grid grid-cols-[1.5rem_1fr_2.5rem_auto] items-center gap-4 px-4 py-2 font-semibold uppercase"
 				>
 					<div>#</div>
 					<div>Statement</div>
@@ -214,7 +254,7 @@
 				</div>
 
 				{#if explorerStatements.length === 0}
-					<p class="text-muted-foreground px-4 py-6 text-sm italic">
+					<p class="text-muted-foreground text-caption px-4 py-6 italic">
 						No statements match the current filters.
 					</p>
 				{:else}
@@ -223,6 +263,11 @@
 							index={i + 1}
 							comment={c}
 							groups={reportData.groups}
+							picker={{
+								availableThemes,
+								disabled: !auxByTid[c.tid],
+								onChange: (next) => setThemesFor(c.tid, next)
+							}}
 						/>
 					{/each}
 				{/if}

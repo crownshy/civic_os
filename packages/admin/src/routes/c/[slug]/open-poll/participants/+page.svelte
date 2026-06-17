@@ -1,6 +1,7 @@
 <script lang="ts">
 	import DemographicTable from '$lib/components/DemographicTable.svelte';
 	import RegionMap from '$lib/components/RegionMap.svelte';
+	import PollStatRow from '$lib/components/PollStatRow.svelte';
 	import { zipCentroid } from '$lib/utils/zip-centroids';
 
 	let { data } = $props();
@@ -65,65 +66,53 @@
 </script>
 
 {#if error}
-	<div class="text-destructive p-8 text-sm">Failed to load participants: {error}</div>
+	<div class="text-destructive text-caption p-8">Failed to load participants: {error}</div>
 {:else if !demographics}
-	<div class="text-muted-foreground p-8 text-sm">Loading participants…</div>
+	<div class="text-muted-foreground text-caption p-8">Loading participants…</div>
 {:else}
-	<div class="flex-1 overflow-y-auto px-12 py-10">
+	<div class="flex-1 overflow-y-auto px-8 py-8">
 		<!-- Hero metric row -->
-		<div class="flex items-baseline gap-12 pb-6">
-			<div class="space-y-2">
-				<div class="text-foreground/70 text-sm font-medium uppercase tracking-tight">
-					Total Participants
-				</div>
-				<div class="flex items-baseline gap-3">
-					<span class="text-7xl font-extrabold">{totalParticipants}</span>
-					{#if participantsDelta > 0}
-						<span class="text-4xl font-extrabold text-green-600"
-							>(+{participantsDelta})</span
-						>
-					{/if}
-				</div>
-			</div>
-			<div class="space-y-2">
-				<div class="text-foreground/70 text-sm font-medium uppercase tracking-tight">
-					Goal (modify)
-				</div>
-				<div class="text-7xl font-extrabold">{participantsGoal}</div>
-			</div>
+		<div class="pb-8">
+			<PollStatRow
+				stats={[
+					{
+						label: 'Total Participants',
+						value: totalParticipants,
+						accent: participantsDelta > 0 ? ` (+${participantsDelta})` : undefined
+					},
+					{ label: 'Goal', value: participantsGoal }
+				]}
+			/>
 		</div>
 
 		<!-- Jump-to pills -->
 		<div class="flex items-center gap-2 pb-6">
-			<span class="text-foreground/70 pr-2 text-base font-medium">Jump to:</span>
-			<a
-				href="#geography"
-				class="bg-muted rounded-full px-3 py-2 text-sm font-medium">Geography</a
+			<span class="text-foreground/70 text-caption pr-2 font-medium">Jump to:</span>
+			<a href="#geography" class="bg-muted text-caption rounded-full px-3 py-1.5 font-medium"
+				>Geography</a
 			>
-			<a
-				href="#ethnicity"
-				class="bg-muted rounded-full px-3 py-2 text-sm font-medium"
+			<a href="#ethnicity" class="bg-muted text-caption rounded-full px-3 py-1.5 font-medium"
 				>Race / Ethnicity</a
 			>
-			<a href="#gender" class="bg-muted rounded-full px-3 py-2 text-sm font-medium">Gender</a>
-			<a
-				href="#political"
-				class="bg-muted rounded-full px-3 py-2 text-sm font-medium"
+			<a href="#gender" class="bg-muted text-caption rounded-full px-3 py-1.5 font-medium"
+				>Gender</a
+			>
+			<a href="#political" class="bg-muted text-caption rounded-full px-3 py-1.5 font-medium"
 				>Political Affiliation</a
 			>
-			<a href="#age" class="bg-muted rounded-full px-3 py-2 text-sm font-medium">Age</a>
+			<a href="#age" class="bg-muted text-caption rounded-full px-3 py-1.5 font-medium">Age</a>
 		</div>
 
 		<div class="space-y-8">
 			<!-- Geography card: table + map -->
 			<section
 				id="geography"
-				class="border-border overflow-hidden rounded-2xl border bg-background"
+				class="border-border shadow-card overflow-hidden rounded-2xl border bg-card"
 			>
 				<header class="flex items-start justify-between gap-4 px-6 pt-6 pb-2">
 					<div>
-						<h2 class="text-3xl font-bold leading-tight">Geography</h2>
-						<p class="mt-2 text-sm">
+						<h2 class="text-section font-bold">Geography</h2>
+						<p class="text-caption mt-1">
 							<span class="font-medium">n = {totalGeography}</span>
 							{#if totalParticipants}
 								<span class="text-foreground/50 font-medium"
@@ -136,7 +125,7 @@
 					</div>
 					<button
 						type="button"
-						class="bg-muted text-destructive flex shrink-0 items-center gap-2 rounded-full px-3 py-2 text-sm font-medium"
+						class="bg-muted text-destructive text-caption flex shrink-0 items-center gap-2 rounded-full px-3 py-1.5 font-medium"
 					>
 						Modify Goals
 					</button>
@@ -144,7 +133,7 @@
 				<div class="grid grid-cols-1 gap-6 px-6 pb-6 lg:grid-cols-2">
 					<div class="divide-border divide-y">
 						<div
-							class="text-foreground/30 grid grid-cols-[2fr_auto_auto] items-center gap-4 py-2 text-xs font-semibold uppercase"
+							class="text-foreground/40 text-label grid grid-cols-[2fr_auto_auto] items-center gap-4 py-2 font-semibold uppercase"
 						>
 							<div>Zip Code</div>
 							<div class="w-12 text-right">Count</div>
@@ -152,11 +141,11 @@
 						</div>
 						{#each geographyRows as row}
 							<div
-								class="grid grid-cols-[2fr_auto_auto] items-center gap-4 py-3"
+								class="text-caption grid grid-cols-[2fr_auto_auto] items-center gap-4 py-2.5"
 							>
-								<div class="truncate text-sm font-bold">{row.label}</div>
-								<div class="w-12 text-right text-sm font-bold">{row.count}</div>
-								<div class="w-20 text-right text-sm font-bold">
+								<div class="truncate font-semibold">{row.label}</div>
+								<div class="w-12 text-right font-semibold">{row.count}</div>
+								<div class="w-20 text-right font-semibold">
 									{totalGeography
 										? Math.round((row.count / totalGeography) * 100)
 										: 0}%
@@ -164,7 +153,7 @@
 							</div>
 						{/each}
 						{#if !geographyRows.length}
-							<div class="text-muted-foreground py-6 text-sm">
+							<div class="text-muted-foreground text-caption py-6">
 								No zipcode data yet.
 							</div>
 						{/if}

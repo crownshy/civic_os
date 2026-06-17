@@ -30,9 +30,7 @@
 	<header
 		class="border-border flex min-h-28 flex-col items-start justify-between gap-3 border-b px-4 py-4 sm:flex-row sm:items-center sm:gap-4 sm:px-7 sm:py-5"
 	>
-		<h1
-			class="min-w-0 flex-1 text-2xl font-bold leading-tight text-balance sm:text-3xl lg:text-4xl"
-		>
+		<h1 class="text-display min-w-0 flex-1 font-bold leading-tight text-balance">
 			{title}
 		</h1>
 		<div class="flex max-w-full shrink-0 items-center gap-1 overflow-hidden">

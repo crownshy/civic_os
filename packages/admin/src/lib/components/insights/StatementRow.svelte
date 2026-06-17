@@ -2,6 +2,7 @@
 	import type { ReportComment, ReportGroup } from '$lib/types/report';
 	import { computeGroupVotePercents, totalVotes } from '$lib/utils/report';
 	import GroupCircle from './GroupCircle.svelte';
+	import ThemePicker from './ThemePicker.svelte';
 
 	type Variant = 'consensus' | 'difference' | 'uncertainty' | 'neutral';
 
@@ -12,9 +13,27 @@
 		variant?: Variant;
 		/** Show the "consensus" / "difference" pill on the left of the text. */
 		showVerdictPill?: boolean;
+		/**
+		 * When provided, render the inline ThemePicker (Insights' Theme
+		 * Explorer rows). When omitted, render small read-only theme chips
+		 * (Areas of Consensus / Difference / Uncertainty rows).
+		 */
+		picker?: {
+			availableThemes: string[];
+			onChange: (next: string[]) => void | Promise<void>;
+			/** Disable when there's no aux row to write to. */
+			disabled?: boolean;
+		};
 	}
 
-	let { index, comment, groups, variant = 'neutral', showVerdictPill = false }: Props = $props();
+	let {
+		index,
+		comment,
+		groups,
+		variant = 'neutral',
+		showVerdictPill = false,
+		picker
+	}: Props = $props();
 
 	const groupPcts = $derived(computeGroupVotePercents(comment, groups));
 	const count = $derived(totalVotes(comment));
@@ -60,13 +79,22 @@
 					{verdictPill.label}
 				</span>
 			{/if}
-			{#each comment.topics ?? [] as topic (topic)}
-				<span
-					class="bg-destructive/10 text-destructive inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium"
-				>
-					{topic}
-				</span>
-			{/each}
+			{#if picker}
+				<ThemePicker
+					themes={comment.topics ?? []}
+					availableThemes={picker.availableThemes}
+					disabled={picker.disabled}
+					onChange={picker.onChange}
+				/>
+			{:else}
+				{#each comment.topics ?? [] as topic (topic)}
+					<span
+						class="bg-muted text-foreground/80 inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium"
+					>
+						{topic}
+					</span>
+				{/each}
+			{/if}
 		</div>
 	</div>
 

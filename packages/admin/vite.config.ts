@@ -24,6 +24,7 @@ function fixApiClientPlugin() {
 export default defineConfig({
 	plugins: [fixApiClientPlugin(), tailwindcss(), sveltekit()],
 	server: {
+		port: 5173,
 		allowedHosts: ['.localhost'],
 		fs: {
 			// Allow serving from sibling workspace packages (e.g. @civicos/shared).

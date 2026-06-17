@@ -5,6 +5,7 @@
 
 	const subTabs = [
 		{ label: 'Participants', href: '/participants' },
+		{ label: 'Moderation', href: '/moderation' },
 		{ label: 'Insights', href: '/insights' }
 	];
 

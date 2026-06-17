@@ -3,7 +3,9 @@ import { REGIONS } from '$lib/config/regions';
 import { fetchConversation } from '$lib/server/comhairle';
 import type { LayoutServerLoad } from './$types';
 
-export const load: LayoutServerLoad = async ({ params, cookies }) => {
+export const load: LayoutServerLoad = async ({ params, cookies, depends }) => {
+	depends(`region:conversation:${params.slug}`);
+
 	const region = REGIONS[params.slug];
 	if (!region) {
 		error(404, `Unknown conversation: ${params.slug}`);

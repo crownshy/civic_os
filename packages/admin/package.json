@@ -12,7 +12,7 @@
 	},
 	"dependencies": {
 		"@civicos/shared": "workspace:*",
-		"@crownshy/api-client": "^0.0.8",
+		"@crownshy/api-client": "^0.0.9",
 		"@lucide/svelte": "^1.16.0",
 		"layercake": "^10.0.2",
 		"maplibre-gl": "^5.24.0"

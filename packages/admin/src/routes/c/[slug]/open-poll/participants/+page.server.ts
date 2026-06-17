@@ -23,7 +23,9 @@ interface WorkflowDto {
 	isActive: boolean;
 }
 
-export const load: PageServerLoad = async ({ parent, cookies }) => {
+export const load: PageServerLoad = async ({ parent, cookies, depends }) => {
+	depends('open-poll:demographics');
+
 	const { region } = await parent();
 	const authToken = cookies.get('auth-token');
 	const conversationId = region.conversationId;

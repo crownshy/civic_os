@@ -1,6 +1,8 @@
 import type { LayoutLoad } from './$types';
 
-export const load: LayoutLoad = async ({ parent, params }) => {
+export const load: LayoutLoad = async ({ parent, params, depends }) => {
+	depends(`events:detail:${params.eventSlug}`);
+
 	const { api, region } = await parent();
 
 	try {
