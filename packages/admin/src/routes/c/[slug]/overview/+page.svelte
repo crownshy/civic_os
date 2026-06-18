@@ -1,73 +1,115 @@
 <script lang="ts">
-	import { page } from '$app/state';
-	import { REGIONS } from '@civicos/shared/data/regions';
+	import Card from '@civicos/shared/ui/Card.svelte';
+	import { Button } from '@civicos/shared/ui/button';
+	import { Trash2, ExternalLink } from '@lucide/svelte';
 
-	const region = $derived(REGIONS[page.params.slug ?? '']);
+	let { data } = $props();
+
+	const region = $derived(data.region);
+	const conversation = $derived(data.conversation);
+
+	const title = $derived(conversation?.title ?? region.heroHeader);
+	const description = $derived(conversation?.description ?? region.contextParagraphs.join('\n\n'));
+	const slug = $derived(conversation?.slug ?? region.slug);
 </script>
 
 {#if region}
 	<div class="flex-1 space-y-5 overflow-y-auto px-5 py-5">
-		<h2 class="text-base font-bold">Settings</h2>
+		<h2 class="text-body font-bold">Settings</h2>
 
 		<div class="space-y-1">
-			<label class="text-muted-foreground text-xs tracking-tight">SLUG</label>
-			<div class="bg-card shadow-card rounded-lg px-3 py-3 text-xs">{region.slug}</div>
-		</div>
-		<div class="space-y-1">
-			<label class="text-muted-foreground text-xs tracking-tight">TITLE</label>
-			<div class="bg-card shadow-card rounded-lg px-3 py-3 text-sm">{region.heroHeader}</div>
-		</div>
-		<div class="space-y-1">
-			<label class="text-muted-foreground text-xs tracking-tight">KEY QUESTION</label>
-			<div class="bg-card shadow-card rounded-lg px-3 py-3 text-sm">{region.question}</div>
-		</div>
-		<div class="space-y-1">
-			<label class="text-muted-foreground text-xs tracking-tight">CONTEXT</label>
-			<div class="bg-card shadow-card rounded-lg px-3 py-3 text-sm leading-relaxed">
-				{@html region.contextParagraphs.join('<br/><br/>')}
-			</div>
-		</div>
-		<div class="space-y-1">
-			<label class="text-muted-foreground text-xs tracking-tight">HOST</label>
-			<div class="bg-card shadow-card rounded-lg px-3 py-3 text-sm">
-				<a href={region.hostUrl} class="text-destructive underline" target="_blank" rel="noopener">
-					{region.hostName}
-				</a>
-			</div>
-		</div>
-		<div class="space-y-1">
-			<label class="text-muted-foreground text-xs tracking-tight"
-				>PARTNERS ({region.partners.length})</label
+			<label class="text-muted-foreground text-caption tracking-tight">SLUG</label>
+			<Card
+				class="hover:border-muted-foreground/40 hover:bg-muted/30 transition-colors duration-150"
 			>
-			<div class="bg-card shadow-card flex flex-wrap gap-2 rounded-lg px-3 py-3 text-xs">
-				{#each region.partners as p}
+				<div class="px-3 py-3 text-caption">{slug}</div>
+			</Card>
+		</div>
+		<div class="space-y-1">
+			<label class="text-muted-foreground text-caption tracking-tight">TITLE</label>
+			<Card
+				class="hover:border-muted-foreground/40 hover:bg-muted/30 transition-colors duration-150"
+			>
+				<div class="px-3 py-3 text-body">{title}</div>
+			</Card>
+		</div>
+		<div class="space-y-1">
+			<label class="text-muted-foreground text-caption tracking-tight">KEY QUESTION</label>
+			<Card
+				class="hover:border-muted-foreground/40 hover:bg-muted/30 transition-colors duration-150"
+			>
+				<div class="px-3 py-3 text-body">{region.question}</div>
+			</Card>
+		</div>
+		<div class="space-y-1">
+			<label class="text-muted-foreground text-caption tracking-tight">CONTEXT</label>
+			<Card
+				class="hover:border-muted-foreground/40 hover:bg-muted/30 transition-colors duration-150"
+			>
+				<div class="px-3 py-3 text-body leading-relaxed whitespace-pre-line">{description}</div>
+			</Card>
+		</div>
+		<div class="space-y-1">
+			<label class="text-muted-foreground text-caption tracking-tight">HOST</label>
+			<Card
+				class="hover:border-muted-foreground/40 hover:bg-muted/30 transition-colors duration-150"
+			>
+				<div class="px-3 py-3 text-body">
 					<a
-						href={p.url}
+						href={region.hostUrl}
+						class="text-destructive group inline-flex items-center gap-1 underline-offset-2 hover:underline"
 						target="_blank"
 						rel="noopener"
-						class="bg-muted-foreground/10 rounded-full px-2.5 py-1">{p.name}</a
 					>
-				{/each}
-			</div>
+						{region.hostName}
+						<ExternalLink class="size-3 opacity-0 transition-opacity group-hover:opacity-100" />
+					</a>
+				</div>
+			</Card>
+		</div>
+		<div class="space-y-1">
+			<label class="text-muted-foreground text-caption tracking-tight"
+				>PARTNERS ({region.partners.length})</label
+			>
+			<Card
+				class="hover:border-muted-foreground/40 hover:bg-muted/30 transition-colors duration-150"
+			>
+				<div class="flex flex-wrap gap-2 px-3 py-3 text-caption">
+					{#each region.partners as p (p.url)}
+						<a
+							href={p.url}
+							target="_blank"
+							rel="noopener"
+							class="bg-muted-foreground/10 hover:bg-muted-foreground/20 inline-flex items-center gap-1 rounded-full px-2.5 py-1 transition-all hover:scale-105 active:scale-95"
+						>
+							{p.name}
+						</a>
+					{/each}
+				</div>
+			</Card>
 		</div>
 
 		<div class="border-border my-4 border-t"></div>
 
-		<div
-			class="bg-destructive/5 border-destructive/30 flex items-center justify-between rounded-lg border px-4 py-3.5"
+		<Card
+			class="bg-destructive/5 border-destructive/30 hover:border-destructive/60 hover:bg-destructive/10 transition-colors duration-200"
 		>
-			<div>
-				<div class="text-destructive text-xs font-bold tracking-tight">DANGER ZONE</div>
-				<div class="text-muted-foreground text-xs">
-					Permanently delete this conversation and all its data.
+			<div class="flex items-center justify-between gap-3 px-4 py-3.5">
+				<div>
+					<div class="text-destructive text-caption font-bold tracking-tight">DANGER ZONE</div>
+					<div class="text-muted-foreground text-caption">
+						Permanently delete this conversation and all its data.
+					</div>
 				</div>
+				<Button
+					size="sm"
+					variant="outline"
+					class="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground rounded-full bg-card transition-all hover:scale-105 active:scale-95"
+				>
+					<Trash2 class="size-3.5" />
+					delete conversation…
+				</Button>
 			</div>
-			<button
-				type="button"
-				class="bg-card text-destructive border-destructive rounded-full border px-3 py-1.5 text-xs"
-			>
-				delete conversation…
-			</button>
-		</div>
+		</Card>
 	</div>
 {/if}

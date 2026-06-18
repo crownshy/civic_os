@@ -1,10 +1,12 @@
 <script lang="ts">
 	import '../app.css';
-	import { LayoutDashboard, Plus, Menu, PanelLeftClose, PanelLeftOpen, X } from '@lucide/svelte';
+	import { LayoutDashboard, Plus, Menu, PanelLeftClose, PanelLeftOpen, X, LogOut } from '@lucide/svelte';
 	import { page } from '$app/state';
-	import { REGIONS } from '@civicos/shared/data/regions';
+	import { REGIONS } from '$lib/config/regions';
 
 	let { children } = $props();
+
+	const isLogin = $derived(page.url.pathname === '/login');
 
 	// Sidebar UI state.
 	// `collapsed` toggles icon-rail vs full sidebar on md+.
@@ -42,6 +44,9 @@
 	});
 </script>
 
+{#if isLogin}
+	{@render children?.()}
+{:else}
 <div class="bg-background text-foreground flex h-screen w-screen overflow-hidden font-sans">
 	<!-- Mobile drawer backdrop -->
 	{#if mobileOpen}
@@ -74,7 +79,7 @@
 					class="bg-destructive size-8 shrink-0 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl"
 				></div>
 				{#if !collapsed || mobileOpen}
-					<span class="truncate text-sm font-bold">CivicOS</span>
+					<span class="truncate text-body font-bold">CivicOS</span>
 				{/if}
 			</div>
 
@@ -120,7 +125,7 @@
 				href="/"
 				title="Dashboard"
 				class={[
-					'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm font-medium',
+					'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-body font-medium',
 					onDashboard ? 'bg-muted-foreground/20' : 'hover:bg-muted/50',
 					collapsed && !mobileOpen ? 'justify-center px-0' : ''
 				].join(' ')}
@@ -133,7 +138,7 @@
 		</nav>
 
 		{#if !collapsed || mobileOpen}
-			<div class="text-muted-foreground px-2.5 py-2 text-[10px] font-semibold tracking-wider">
+			<div class="text-muted-foreground px-2.5 py-2 text-caption font-semibold tracking-wider">
 				CONVERSATIONS
 			</div>
 		{/if}
@@ -144,7 +149,7 @@
 					href={`/c/${conv.slug}/events`}
 					title={conv.title}
 					class={[
-						'flex items-center gap-2 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-2.5 py-2 text-sm font-medium',
+						'flex items-center gap-2 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-2.5 py-2 text-body font-medium',
 						currentSlug === conv.slug ? 'bg-muted-foreground/20' : 'hover:bg-muted/50',
 						collapsed && !mobileOpen ? 'justify-center px-0' : ''
 					].join(' ')}
@@ -162,7 +167,7 @@
 				type="button"
 				title="New Conversation"
 				class={[
-					'bg-primary text-primary-foreground inline-flex items-center gap-1 rounded-[10px] text-sm font-medium',
+					'bg-primary text-primary-foreground inline-flex items-center gap-1 rounded-[10px] text-body font-medium',
 					collapsed && !mobileOpen ? 'size-9 justify-center p-0' : 'p-2'
 				].join(' ')}
 			>
@@ -185,7 +190,17 @@
 				class="bg-foreground size-7 shrink-0 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl"
 			></div>
 			{#if !collapsed || mobileOpen}
-				<span class="text-sm font-medium">Admin</span>
+				<span class="flex-1 text-body font-medium">Admin</span>
+				<form method="POST" action="/logout">
+					<button
+						type="submit"
+						title="Sign out"
+						aria-label="Sign out"
+						class="hover:bg-muted/50 rounded-md p-1.5"
+					>
+						<LogOut class="size-4" />
+					</button>
+				</form>
 			{/if}
 		</div>
 	</aside>
@@ -201,9 +216,10 @@
 			>
 				<Menu class="size-5" />
 			</button>
-			<span class="text-sm font-bold">CivicOS</span>
+			<span class="text-body font-bold">CivicOS</span>
 		</div>
 
 		{@render children?.()}
 	</main>
 </div>
+{/if}

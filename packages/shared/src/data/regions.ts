@@ -338,7 +338,6 @@ export const REGIONS: Record<string, RegionConfig> = {
 		],
 		phaseLabels: { phase1: 'APRIL 2026', phase2: 'MAY 2026', phase3: 'SEPTEMBER 2026' }
 	},
-
 	oregon: {
 		slug: 'oregon',
 		stateName: 'Central Oregon',

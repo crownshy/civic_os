@@ -45,8 +45,8 @@
 
 <div class="space-y-4">
 	<div>
-		<h3 class="text-base font-bold">Registration</h3>
-		<p class="text-muted-foreground text-xs">
+		<h3 class="text-body font-bold">Registration</h3>
+		<p class="text-muted-foreground text-caption">
 			People who are invited to the event and their registration status
 		</p>
 	</div>
@@ -57,7 +57,7 @@
 				<button
 					type="button"
 					onclick={() => (activeFilter = f)}
-					class={`rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-3 py-1.5 text-xs ${
+					class={`rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-3 py-1.5 text-caption ${
 						activeFilter === f
 							? 'bg-destructive/10 text-foreground'
 							: 'bg-muted-foreground/10 text-foreground'
@@ -76,12 +76,12 @@
 					type="search"
 					bind:value={search}
 					placeholder="search…"
-					class="bg-transparent w-44 text-sm outline-none"
+					class="bg-transparent w-44 text-body outline-none"
 				/>
 			</div>
 			<button
 				type="button"
-				class="bg-primary text-primary-foreground inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs"
+				class="bg-primary text-primary-foreground inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-caption"
 			>
 				<Plus class="size-3" /> add by email
 			</button>
@@ -90,7 +90,7 @@
 
 	<div class="bg-card shadow-card overflow-hidden rounded-lg">
 		<div
-			class="bg-muted-foreground/15 text-foreground grid grid-cols-[24px_1fr_1fr_140px_100px_120px_24px] items-center gap-2 px-3.5 py-2.5 text-xs tracking-wide"
+			class="bg-muted-foreground/15 text-foreground grid grid-cols-[24px_1fr_1fr_140px_100px_120px_24px] items-center gap-2 px-3.5 py-2.5 text-caption tracking-wide"
 		>
 			<div></div>
 			<div>NAME</div>
@@ -102,7 +102,7 @@
 		</div>
 		{#each visible as row}
 			<div
-				class="border-border grid grid-cols-[24px_1fr_1fr_140px_100px_120px_24px] items-center gap-2 border-b px-3.5 py-2.5 text-xs last:border-b-0"
+				class="border-border grid grid-cols-[24px_1fr_1fr_140px_100px_120px_24px] items-center gap-2 border-b px-3.5 py-2.5 text-caption last:border-b-0"
 			>
 				<input type="checkbox" class="size-4" />
 				<div class="font-bold">{row.name}</div>

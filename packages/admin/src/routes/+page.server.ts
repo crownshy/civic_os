@@ -1,8 +1,23 @@
-import { redirect } from '@sveltejs/kit';
-import { REGIONS } from '@civicos/shared/data/regions';
+import { REGIONS } from '$lib/config/regions';
+import type { PageServerLoad } from './$types';
 
-export function load() {
-	// Default landing → first available conversation's events list.
-	const first = Object.values(REGIONS).find((r) => r.events.length > 0) ?? Object.values(REGIONS)[0];
-	if (first) throw redirect(307, `/c/${first.slug}/events`);
-}
+export const load: PageServerLoad = () => {
+	const conversations = Object.values(REGIONS).map((r) => {
+		const status: 'live' | 'idle' | 'draft' =
+			r.slug === 'testing' || r.slug === 'dev'
+				? 'idle'
+				: r.conversationsActive === false
+					? 'draft'
+					: 'live';
+		return {
+			slug: r.slug,
+			title: r.heroHeader,
+			stateName: r.stateName,
+			shareUrl: r.shareUrl,
+			status,
+			eventCount: r.events.length
+		};
+	});
+
+	return { conversations };
+};

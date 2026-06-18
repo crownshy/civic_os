@@ -103,23 +103,33 @@ fi
 AUTH_HEADER="Cookie: auth-token=$AUTH_COOKIE"
 
 # --- Conversation ------------------------------------------------------------
-info "Step 2: Creating conversation..."
+# Slug has a uniqueness constraint backend-side, so suffix with a timestamp so
+# the script is re-runnable without wiping the db first. Override with
+# SEED_SLUG=my-slug to pin it.
+SEED_TS="$(date +%s)"
+SEED_SLUG="${SEED_SLUG:-local-dev-$SEED_TS}"
+SEED_TITLE="${SEED_TITLE:-Local Dev Conversation ($SEED_TS)}"
+
+info "Step 2: Creating conversation (slug: $SEED_SLUG)..."
 CONV_RESPONSE=$(curl -s -X POST "$BACKEND_URL/conversation" \
   -H "Content-Type: application/json" \
   -H "$AUTH_HEADER" \
-  -d '{
-    "title": "Local Dev Conversation",
-    "short_description": "A conversation for local development",
-    "description": "Local development conversation for testing Civic OS features. All data is stored in your local Postgres database.",
-    "image_url": "https://fakeimg.pl/1000x600",
-    "tags": ["dev", "local", "testing"],
-    "is_public": true,
-    "is_live": false,
-    "is_invite_only": false,
-    "slug": "local-dev",
-    "primary_locale": "en",
-    "supported_languages": ["en"]
-  }')
+  -d "$(jq -nc \
+    --arg title "$SEED_TITLE" \
+    --arg slug "$SEED_SLUG" \
+    '{
+      title: $title,
+      short_description: "A conversation for local development",
+      description: "Local development conversation for testing Civic OS features. All data is stored in your local Postgres database.",
+      image_url: "https://fakeimg.pl/1000x600",
+      tags: ["dev", "local", "testing"],
+      is_public: true,
+      is_live: false,
+      is_invite_only: false,
+      slug: $slug,
+      primary_locale: "en",
+      supported_languages: ["en"]
+    }')")
 
 CONVERSATION_ID=$(echo "$CONV_RESPONSE" | jq -r '.id // empty')
 if [ -z "$CONVERSATION_ID" ]; then
@@ -246,6 +256,42 @@ if ! echo "$LAUNCH_STATUS" | grep -qE '^2[0-9][0-9]$'; then
   exit 1
 fi
 ok "conversation is live"
+
+# --- Aux sync ----------------------------------------------------------------
+# Pull the just-seeded polis statements into the comhairle aux table so the
+# admin moderation tab has rows to work with on first open. Without this, the
+# aux table starts empty after every re-seed even though polis has statements.
+# Endpoint is from comhairle PR #467 — skipped (with a warning) on older
+# backends that don't have it.
+info "Step 7: Syncing polis statements into aux table..."
+SYNC_RESPONSE=$(curl -s -w '\n%{http_code}' -X POST \
+  "$BACKEND_URL/tools/polis/statement_aux/sync" \
+  -H "Content-Type: application/json" \
+  -H "$AUTH_HEADER" \
+  -d "$(jq -nc --arg w "$WORKFLOW_STEP_ID" '{workflow_step_id:$w}')")
+SYNC_STATUS=$(printf '%s' "$SYNC_RESPONSE" | tail -n1)
+SYNC_BODY=$(printf '%s' "$SYNC_RESPONSE" | sed '$d')
+
+if echo "$SYNC_STATUS" | grep -qE '^2[0-9][0-9]$'; then
+  SYNC_COUNT=$(echo "$SYNC_BODY" | jq -r '.synced // 0')
+  ok "synced $SYNC_COUNT statements into aux"
+
+  # Workflow-step creation returns `previewToolConfig.poll_id`, which is a
+  # *preview* polis id and NOT the conversation the backend actually wires the
+  # workflow_step to. Sync's response is ground truth — each row carries the
+  # real polis_conversation_id. Override $POLIS_ID with it so the public app's
+  # embed targets the same polis conversation admin moderation watches.
+  REAL_POLIS_ID=$(echo "$SYNC_BODY" | jq -r '.statements[0].polis_conversation_id // empty')
+  if [ -n "$REAL_POLIS_ID" ] && [ "$REAL_POLIS_ID" != "$POLIS_ID" ]; then
+    info "  ! workflow_step's real polis_conversation_id is $REAL_POLIS_ID (preview id $POLIS_ID was wrong) — using real one for env"
+    POLIS_ID="$REAL_POLIS_ID"
+  fi
+elif [ "$SYNC_STATUS" = "404" ]; then
+  info "  ! aux sync endpoint not found — backend may predate comhairle PR #467, skipping"
+  info "  ! WARN: PUBLIC_DEV_POLIS_ID will be the workflow_step's previewToolConfig.poll_id, which is likely NOT the real conversation. Public-app submissions won't appear in admin moderation."
+else
+  info "  ! aux sync failed (HTTP $SYNC_STATUS): $SYNC_BODY"
+fi
 
 # --- Done --------------------------------------------------------------------
 echo ""
