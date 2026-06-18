@@ -3,6 +3,7 @@
 	import RegionMap from '$lib/components/RegionMap.svelte';
 	import PollStatRow from '$lib/components/PollStatRow.svelte';
 	import { zipCentroid } from '$lib/utils/zip-centroids';
+	import { getRegionGoals } from '$lib/config/representation-goals';
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import { Button } from '@civicos/shared/ui/button';
 	import { Pencil } from '@lucide/svelte';
@@ -12,6 +13,7 @@
 	const region = $derived(data.region);
 	const demographics = $derived(data.demographics);
 	const error = $derived(data.error);
+	const goals = $derived(getRegionGoals(region.slug));
 
 	const mapCenter = $derived<[number, number]>(
 		region.slug === 'utah'
@@ -23,24 +25,26 @@
 	const mapZoom = 3;
 
 	const totalParticipants = $derived(demographics?.totalParticipants ?? 0);
-	const participantsGoal = 700;
+	const participantsGoal = $derived(goals?.totalParticipants ?? 0);
 	const participantsDelta = 0;
 
 	function rowsFor(
 		categories: { value?: string | null; count: number }[] | undefined,
+		goalMap: Record<string, number> | undefined,
 		fallbackLabel = 'Not Provided'
 	) {
 		if (!categories || !categories.length) return [];
-		return categories.map((c) => ({
-			label: c.value || fallbackLabel,
-			count: c.count
-		}));
+		return categories.map((c) => {
+			const label = c.value || fallbackLabel;
+			const goal = goalMap?.[label];
+			return goal !== undefined ? { label, count: c.count, goal } : { label, count: c.count };
+		});
 	}
 
-	const ethnicityRows = $derived(rowsFor(demographics?.ethnicity));
-	const genderRows = $derived(rowsFor(demographics?.gender));
-	const politicalRows = $derived(rowsFor(demographics?.politicalParty));
-	const ageRows = $derived(rowsFor(demographics?.ageRanges));
+	const ethnicityRows = $derived(rowsFor(demographics?.ethnicity, goals?.ethnicity));
+	const genderRows = $derived(rowsFor(demographics?.gender, goals?.gender));
+	const politicalRows = $derived(rowsFor(demographics?.politicalParty, goals?.politicalParty));
+	const ageRows = $derived(rowsFor(demographics?.ageRanges, goals?.ageRanges));
 
 	const geographyRows = $derived(
 		Object.entries(demographics?.zipcodeCounts ?? {})
