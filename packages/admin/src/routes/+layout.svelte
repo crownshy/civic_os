@@ -1,10 +1,12 @@
 <script lang="ts">
 	import '../app.css';
-	import { LayoutDashboard, Plus, Menu, PanelLeftClose, PanelLeftOpen, X } from '@lucide/svelte';
+	import { LayoutDashboard, Plus, Menu, PanelLeftClose, PanelLeftOpen, X, LogOut } from '@lucide/svelte';
 	import { page } from '$app/state';
 	import { REGIONS } from '$lib/config/regions';
 
 	let { children } = $props();
+
+	const isLogin = $derived(page.url.pathname === '/login');
 
 	// Sidebar UI state.
 	// `collapsed` toggles icon-rail vs full sidebar on md+.
@@ -42,6 +44,9 @@
 	});
 </script>
 
+{#if isLogin}
+	{@render children?.()}
+{:else}
 <div class="bg-background text-foreground flex h-screen w-screen overflow-hidden font-sans">
 	<!-- Mobile drawer backdrop -->
 	{#if mobileOpen}
@@ -186,6 +191,16 @@
 			></div>
 			{#if !collapsed || mobileOpen}
 				<span class="flex-1 text-body font-medium">Admin</span>
+				<form method="POST" action="/logout">
+					<button
+						type="submit"
+						title="Sign out"
+						aria-label="Sign out"
+						class="hover:bg-muted/50 rounded-md p-1.5"
+					>
+						<LogOut class="size-4" />
+					</button>
+				</form>
 			{/if}
 		</div>
 	</aside>
@@ -207,3 +222,4 @@
 		{@render children?.()}
 	</main>
 </div>
+{/if}
