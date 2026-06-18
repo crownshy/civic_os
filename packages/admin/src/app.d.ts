@@ -1,9 +1,5 @@
 declare global {
-	namespace App {
-		interface Locals {
-			isAdmin: boolean;
-		}
-	}
+	namespace App {}
 }
 
 export {};
