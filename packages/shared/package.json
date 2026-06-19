@@ -21,6 +21,8 @@
 		"./ui/carousel/context": "./src/ui/carousel/context.ts",
 		"./ui/spinner": "./src/ui/spinner/index.ts",
 		"./ui/toggle-group": "./src/ui/toggle-group/index.ts",
+		"./ui/accordion": "./src/ui/accordion/index.ts",
+		"./ui/slider": "./src/ui/slider/index.ts",
 		"./ui/Badge.svelte": "./src/ui/Badge.svelte",
 		"./ui/Card.svelte": "./src/ui/Card.svelte",
 		"./ui/Link.svelte": "./src/ui/Link.svelte",
