@@ -2,6 +2,7 @@ allowBuilds:
   esbuild: true
 minimumReleaseAgeExclude:
   - '@crownshy/api-client@0.0.8'
+  - '@crownshy/api-client@0.0.10'
 onlyBuiltDependencies:
   - esbuild
 packages:
