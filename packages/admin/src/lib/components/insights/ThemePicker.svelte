@@ -50,6 +50,11 @@
 		onChange?.(next);
 	}
 
+	function applyRemove(theme: string) {
+		if (disabled) return;
+		onChange?.(themes.filter((t) => t !== theme));
+	}
+
 	function applyAdd() {
 		const t = newDraft.trim();
 		if (!t || themeSet.has(t)) return;
@@ -79,9 +84,19 @@
 <div class="relative inline-flex flex-wrap items-center gap-1" bind:this={containerEl}>
 	{#each themes as t (t)}
 		<span
-			class="bg-muted text-foreground inline-flex items-center rounded px-1.5 py-0.5 text-caption font-medium"
+			class="bg-muted text-foreground inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-caption font-medium"
 		>
 			{t}
+			{#if !disabled}
+				<button
+					type="button"
+					onclick={() => applyRemove(t)}
+					aria-label={`Remove theme ${t}`}
+					class="text-muted-foreground hover:text-destructive -mr-0.5 leading-none"
+				>
+					×
+				</button>
+			{/if}
 		</span>
 	{/each}
 
