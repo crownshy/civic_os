@@ -22,7 +22,8 @@
 		 */
 		picker?: {
 			availableThemes: string[];
-			onChange: (next: string[]) => void | Promise<void>;
+			onAddTheme: (theme: string) => void | Promise<void>;
+			onRemoveTheme: (theme: string) => void | Promise<void>;
 			/** Disable when there's no aux row to write to. */
 			disabled?: boolean;
 		};
@@ -106,7 +107,8 @@
 				themes={comment.topics ?? []}
 				availableThemes={picker.availableThemes}
 				disabled={picker.disabled}
-				onChange={picker.onChange}
+				onAddTheme={picker.onAddTheme}
+				onRemoveTheme={picker.onRemoveTheme}
 			/>
 		{:else}
 			<div class="flex flex-wrap items-center gap-1.5">

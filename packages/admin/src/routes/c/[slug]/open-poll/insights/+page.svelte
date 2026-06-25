@@ -2,7 +2,11 @@
 	import type { PageProps } from './$types';
 	import type { ReportComment, PolisReportData } from '$lib/types/report';
 	import type { PolisStatementAux } from '$lib/types/aux';
-	import { moderateStatementAux, updateStatementAux } from '$lib/api/aux';
+	import {
+		addStatementAuxTheme,
+		moderateStatementAux,
+		removeStatementAuxTheme
+	} from '$lib/api/aux';
 	import {
 		getEngagementStats,
 		getConsensusStatements,
@@ -131,16 +135,33 @@
 	 * means the statement hasn't been backfilled into comhairle yet — the
 	 * picker is disabled for those, so this only fires for taggable rows.
 	 */
-	async function setThemesFor(tid: number, next: string[]) {
+	async function addThemeFor(tid: number, theme: string) {
 		const row = auxByTid[tid];
-		if (!row) return;
+		if (!row || row.themes.includes(theme)) return;
 		const prevThemes = row.themes;
-		auxByTid = { ...auxByTid, [tid]: { ...row, themes: next } };
+		auxByTid = { ...auxByTid, [tid]: { ...row, themes: [...prevThemes, theme] } };
 		try {
-			const updated = await updateStatementAux(row.id, { themes: next });
+			const updated = await addStatementAuxTheme(row.id, theme);
 			auxByTid = { ...auxByTid, [tid]: updated };
 		} catch (e) {
-			console.error('updateStatementAux themes failed', e);
+			console.error('addStatementAuxTheme failed', e);
+			auxByTid = { ...auxByTid, [tid]: { ...row, themes: prevThemes } };
+		}
+	}
+
+	async function removeThemeFor(tid: number, theme: string) {
+		const row = auxByTid[tid];
+		if (!row || !row.themes.includes(theme)) return;
+		const prevThemes = row.themes;
+		auxByTid = {
+			...auxByTid,
+			[tid]: { ...row, themes: prevThemes.filter((t) => t !== theme) }
+		};
+		try {
+			const updated = await removeStatementAuxTheme(row.id, theme);
+			auxByTid = { ...auxByTid, [tid]: updated };
+		} catch (e) {
+			console.error('removeStatementAuxTheme failed', e);
 			auxByTid = { ...auxByTid, [tid]: { ...row, themes: prevThemes } };
 		}
 	}
@@ -257,7 +278,8 @@
 						picker={{
 							availableThemes,
 							disabled: !auxByTid[c.tid],
-							onChange: (next) => setThemesFor(c.tid, next)
+							onAddTheme: (theme) => addThemeFor(c.tid, theme),
+							onRemoveTheme: (theme) => removeThemeFor(c.tid, theme)
 						}}
 						moderation={moderationProp(c.tid)}
 					/>
@@ -285,7 +307,8 @@
 						picker={{
 							availableThemes,
 							disabled: !auxByTid[c.tid],
-							onChange: (next) => setThemesFor(c.tid, next)
+							onAddTheme: (theme) => addThemeFor(c.tid, theme),
+							onRemoveTheme: (theme) => removeThemeFor(c.tid, theme)
 						}}
 						moderation={moderationProp(c.tid)}
 					/>
@@ -315,7 +338,8 @@
 						picker={{
 							availableThemes,
 							disabled: !auxByTid[c.tid],
-							onChange: (next) => setThemesFor(c.tid, next)
+							onAddTheme: (theme) => addThemeFor(c.tid, theme),
+							onRemoveTheme: (theme) => removeThemeFor(c.tid, theme)
 						}}
 						moderation={moderationProp(c.tid)}
 					/>
@@ -378,7 +402,8 @@
 								picker={{
 									availableThemes,
 									disabled: !auxByTid[c.tid],
-									onChange: (next) => setThemesFor(c.tid, next)
+									onAddTheme: (theme) => addThemeFor(c.tid, theme),
+									onRemoveTheme: (theme) => removeThemeFor(c.tid, theme)
 								}}
 								moderation={moderationProp(c.tid)}
 							/>

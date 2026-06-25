@@ -46,8 +46,8 @@ export async function updateStatementAux(
  *
  * Unlike `updateStatementAux`, this forwards the accept/reject decision to the
  * Polis server using the admin account, then updates the aux row. Use this for
- * accept/reject; use `updateStatementAux` for local-only edits (themes,
- * statement_text, etc.).
+ * accept/reject; use `updateStatementAux` for local-only edits to
+ * `statement_text`, etc.
  */
 export async function moderateStatementAux(
 	id: string,
@@ -60,6 +60,44 @@ export async function moderateStatementAux(
 	});
 	if (!res.ok) {
 		throw new Error(`moderateStatementAux ${id} → ${res.status}`);
+	}
+	return (await res.json()) as PolisStatementAux;
+}
+
+/**
+ * Client-side: POST /api/tools/polis/statement_aux/:id/themes. Idempotent —
+ * adding a theme that is already present is a no-op on the server.
+ */
+export async function addStatementAuxTheme(
+	id: string,
+	theme: string
+): Promise<PolisStatementAux> {
+	const res = await fetch(`/api/tools/polis/statement_aux/${id}/themes`, {
+		method: 'POST',
+		headers: { 'content-type': 'application/json' },
+		body: JSON.stringify({ theme })
+	});
+	if (!res.ok) {
+		throw new Error(`addStatementAuxTheme ${id} → ${res.status}`);
+	}
+	return (await res.json()) as PolisStatementAux;
+}
+
+/**
+ * Client-side: DELETE /api/tools/polis/statement_aux/:id/themes. Idempotent —
+ * removing a theme that is not present is a no-op on the server.
+ */
+export async function removeStatementAuxTheme(
+	id: string,
+	theme: string
+): Promise<PolisStatementAux> {
+	const res = await fetch(`/api/tools/polis/statement_aux/${id}/themes`, {
+		method: 'DELETE',
+		headers: { 'content-type': 'application/json' },
+		body: JSON.stringify({ theme })
+	});
+	if (!res.ok) {
+		throw new Error(`removeStatementAuxTheme ${id} → ${res.status}`);
 	}
 	return (await res.json()) as PolisStatementAux;
 }
