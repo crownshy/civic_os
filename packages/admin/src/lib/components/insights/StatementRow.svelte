@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { ReportComment, ReportGroup } from '$lib/types/report';
+	import type { ModerationStatus } from '$lib/types/aux';
 	import { computeGroupVotePercents, totalVotes } from '$lib/utils/report';
+	import { Check, X } from '@lucide/svelte';
 	import GroupCircle from './GroupCircle.svelte';
 	import ThemePicker from './ThemePicker.svelte';
 
@@ -24,6 +26,18 @@
 			/** Disable when there's no aux row to write to. */
 			disabled?: boolean;
 		};
+		/**
+		 * When provided, render accept/reject buttons that forward the
+		 * decision to Polis via the moderate endpoint. Omit (or pass
+		 * `disabled: true`) on rows without an aux row to write to.
+		 */
+		moderation?: {
+			status: ModerationStatus | null;
+			pending?: boolean;
+			disabled?: boolean;
+			onAccept: () => void | Promise<void>;
+			onReject: () => void | Promise<void>;
+		};
 	}
 
 	let {
@@ -32,7 +46,8 @@
 		groups,
 		variant = 'neutral',
 		showVerdictPill = false,
-		picker
+		picker,
+		moderation
 	}: Props = $props();
 
 	const groupPcts = $derived(computeGroupVotePercents(comment, groups));
@@ -60,7 +75,7 @@
 </script>
 
 <div
-	class="border-border group hover:bg-muted/40 relative grid grid-cols-[1.5rem_minmax(0,1fr)_minmax(10rem,14rem)_2.5rem_auto] items-start gap-4 border-b py-4 pl-4 transition-colors duration-150"
+	class="border-border group hover:bg-muted/40 relative grid grid-cols-[1.5rem_minmax(0,1fr)_minmax(10rem,14rem)_2.5rem_auto_auto] items-start gap-4 border-b py-4 pl-4 transition-colors duration-150"
 >
 	<!-- Left accent bar -->
 	<div
@@ -112,7 +127,7 @@
 	</div>
 
 	<!-- Per-group circles -->
-	<div class="flex items-center gap-3 self-center pr-4">
+	<div class="flex items-center gap-3 self-center">
 		{#each groupPcts as g (g.group_id)}
 			<GroupCircle
 				label={g.label}
@@ -121,5 +136,29 @@
 				passed={g.passed}
 			/>
 		{/each}
+	</div>
+
+	<!-- Accept / reject (moderation) -->
+	<div class="flex items-center gap-1 self-center pr-4">
+		{#if moderation}
+			<button
+				type="button"
+				disabled={moderation.disabled || moderation.pending || moderation.status === 'accepted'}
+				onclick={() => moderation?.onAccept()}
+				title="Accept"
+				class="text-primary hover:bg-primary/15 inline-flex size-7 cursor-pointer items-center justify-center rounded-full transition-all duration-150 hover:scale-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-transparent"
+			>
+				<Check class="size-4" />
+			</button>
+			<button
+				type="button"
+				disabled={moderation.disabled || moderation.pending || moderation.status === 'rejected'}
+				onclick={() => moderation?.onReject()}
+				title="Reject"
+				class="text-destructive hover:bg-destructive/15 inline-flex size-7 cursor-pointer items-center justify-center rounded-full transition-all duration-150 hover:scale-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-transparent"
+			>
+				<X class="size-4" />
+			</button>
+		{/if}
 	</div>
 </div>
