@@ -2,6 +2,12 @@
 @import 'tw-animate-css';
 @import '@civicos/shared/styles/theme.css';
 
+/* Tailwind 4 only scans this package's src/ by default. The shared
+   shadcn-svelte primitives (Dialog, etc.) live in a sibling workspace
+   package, so their arbitrary-value classes (top-[50%], translate-x-[-50%], …)
+   are missed without this. */
+@source "../../shared/src/**/*.{svelte,ts,js}";
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

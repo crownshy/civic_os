@@ -1,10 +1,11 @@
 /**
- * Hardcoded representation goals per region.
+ * Representation-goal shape + canonical bucket lists.
  *
- * Keys MUST match the `value` strings the comhairle participation_report
- * returns for each demographic category. See `aboutYouQuestions` in
- * packages/civicos/src/lib/data/mock.ts for the option labels participants
- * actually pick from.
+ * Goal *values* are now loaded per-workflow from comhairle's
+ * `recruitment_targets` API (see participants/+page.server.ts).
+ * The bucket *labels* below define the categories an admin can edit
+ * in the Modify Goals modal — they must match the `value` strings that
+ * the participation_report SQL returns so counts and goals line up.
  */
 
 export interface RegionGoals {
@@ -15,51 +16,49 @@ export interface RegionGoals {
 	gender: Record<string, number>;
 }
 
-const oregon: RegionGoals = {
-	totalParticipants: 300,
-	ethnicity: {
-		'Asian / Pacific Islander': 4,
-		'Black or African American': 1,
-		'Hispanic or Latino': 31,
-		'Middle Eastern / North African': 0,
-		Multiracial: 15,
-		'Native American': 10,
-		Other: 1,
-		'White or Caucasian': 233
-	},
-	politicalParty: {
-		'Democrat / Progressive / Liberal': 74,
-		'No Party Preference / Independent': 99,
-		'Republican / Conservative': 126
-	},
-	ageRanges: {
-		'18-24': 28,
-		'25-34': 48,
-		'35-44': 51,
-		'45-54': 43,
-		'55-64': 52,
-		'65+': 75
-	},
-	gender: {
-		Female: 150,
-		Male: 149,
-		Other: 0
-	}
+export type GoalMetric =
+	| 'totalParticipants'
+	| 'ethnicity'
+	| 'politicalParty'
+	| 'ageRanges'
+	| 'gender';
+
+export const TOTAL_PARTICIPANTS_BUCKET = 'total';
+
+export const METRIC_BUCKETS: Record<Exclude<GoalMetric, 'totalParticipants'>, string[]> = {
+	ethnicity: [
+		'White or Caucasian',
+		'Black or African American',
+		'Hispanic or Latino',
+		'Asian / Pacific Islander',
+		'Native American',
+		'Middle Eastern / North African',
+		'Multiracial',
+		'Other'
+	],
+	politicalParty: [
+		'Democrat / Progressive / Liberal',
+		'No Party Preference / Independent',
+		'Republican / Conservative'
+	],
+	ageRanges: ['Under 18', '18-24', '25-34', '35-44', '45-54', '55-64', '65+'],
+	gender: ['Female', 'Male', 'Other']
 };
 
-const utah: RegionGoals = {
-	totalParticipants: 0,
-	ethnicity: {},
-	politicalParty: {},
-	ageRanges: {},
-	gender: {}
+export const METRIC_LABELS: Record<GoalMetric, string> = {
+	totalParticipants: 'Total Participants',
+	ethnicity: 'Race / Ethnicity',
+	gender: 'Gender',
+	politicalParty: 'Political Affiliation',
+	ageRanges: 'Age'
 };
 
-export const REPRESENTATION_GOALS: Record<string, RegionGoals> = {
-	oregon,
-	utah
-};
-
-export function getRegionGoals(slug: string): RegionGoals | null {
-	return REPRESENTATION_GOALS[slug] ?? null;
+export function emptyGoals(): RegionGoals {
+	return {
+		totalParticipants: 0,
+		ethnicity: {},
+		politicalParty: {},
+		ageRanges: {},
+		gender: {}
+	};
 }
