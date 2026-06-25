@@ -14,8 +14,8 @@ importers:
         specifier: workspace:*
         version: link:../shared
       '@crownshy/api-client':
-        specifier: ^0.0.10
-        version: 0.0.10(axios@1.17.0)(zod@4.4.3)
+        specifier: ^0.0.11
+        version: 0.0.11(axios@1.17.0)(zod@4.4.3)
       '@lucide/svelte':
         specifier: ^1.16.0
         version: 1.17.0(svelte@5.56.3(@typescript-eslint/types@8.61.0))
@@ -69,8 +69,8 @@ importers:
         specifier: workspace:*
         version: link:../shared
       '@crownshy/api-client':
-        specifier: ^0.0.10
-        version: 0.0.10(axios@1.17.0)(zod@3.25.76)
+        specifier: ^0.0.11
+        version: 0.0.11(axios@1.17.0)(zod@3.25.76)
       '@lukulent/svelte-umami':
         specifier: ^0.0.4
         version: 0.0.4(svelte@5.56.3(@typescript-eslint/types@8.61.0))
@@ -326,8 +326,8 @@ packages:
     peerDependencies:
       storybook: ^0.0.0-0 || ^10.1.0 || ^10.1.0-0 || ^10.2.0-0 || ^10.3.0-0 || ^10.4.0-0 || ^10.5.0-0 || ^10.6.0-0
 
-  '@crownshy/api-client@0.0.10':
-    resolution: {integrity: sha512-hx8TE0yyt7zwTVMVosmSzknUCM+GGOg09NFWfSXWz6KRs0Qptu/n0L4sMF1N2Uu1a3gR1Iy7t1n+OfqyCWCeCg==}
+  '@crownshy/api-client@0.0.11':
+    resolution: {integrity: sha512-18oIxGWRakR9dnvg3w6a7KoEECM8C5TlXecJ4hnpNc6BEMC7xRx3bsyJ6AnXu20Wfy+nBReF0pxHTBvmiBMH0g==}
 
   '@emnapi/core@1.10.0':
     resolution: {integrity: sha512-yq6OkJ4p82CAfPl0u9mQebQHKPJkY7WrIuk205cTYnYe+k2Z8YBh11FrbRG/H6ihirqcacOgl2BIO8oyMQLeXw==}
@@ -3361,7 +3361,7 @@ snapshots:
       - '@chromatic-com/playwright'
       - '@chromatic-com/vitest'
 
-  '@crownshy/api-client@0.0.10(axios@1.17.0)(zod@3.25.76)':
+  '@crownshy/api-client@0.0.11(axios@1.17.0)(zod@3.25.76)':
     dependencies:
       '@zodios/core': 10.9.6(axios@1.17.0)(zod@3.25.76)
       typescript: 5.9.3
@@ -3369,7 +3369,7 @@ snapshots:
       - axios
       - zod
 
-  '@crownshy/api-client@0.0.10(axios@1.17.0)(zod@4.4.3)':
+  '@crownshy/api-client@0.0.11(axios@1.17.0)(zod@4.4.3)':
     dependencies:
       '@zodios/core': 10.9.6(axios@1.17.0)(zod@4.4.3)
       typescript: 5.9.3
