@@ -1,7 +1,11 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
 	import type { PolisStatementAux } from '$lib/types/aux';
-	import { moderateStatementAux, updateStatementAux } from '$lib/api/aux';
+	import {
+		addStatementAuxTheme,
+		moderateStatementAux,
+		removeStatementAuxTheme
+	} from '$lib/api/aux';
 	import ThemePicker from '$lib/components/insights/ThemePicker.svelte';
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import { Button } from '@civicos/shared/ui/button';
@@ -69,14 +73,32 @@
 		}
 	}
 
-	async function setThemes(row: PolisStatementAux, next: string[]) {
+	async function addTheme(row: PolisStatementAux, theme: string) {
+		if (row.themes.includes(theme)) return;
 		const prev = row.themes;
-		statements = statements.map((s) => (s.id === row.id ? { ...s, themes: next } : s));
+		statements = statements.map((s) =>
+			s.id === row.id ? { ...s, themes: [...prev, theme] } : s
+		);
 		try {
-			const updated = await updateStatementAux(row.id, { themes: next });
+			const updated = await addStatementAuxTheme(row.id, theme);
 			statements = statements.map((s) => (s.id === row.id ? updated : s));
 		} catch (e) {
-			console.error('updateStatementAux(themes) failed', e);
+			console.error('addStatementAuxTheme failed', e);
+			statements = statements.map((s) => (s.id === row.id ? { ...s, themes: prev } : s));
+		}
+	}
+
+	async function removeTheme(row: PolisStatementAux, theme: string) {
+		if (!row.themes.includes(theme)) return;
+		const prev = row.themes;
+		statements = statements.map((s) =>
+			s.id === row.id ? { ...s, themes: prev.filter((t) => t !== theme) } : s
+		);
+		try {
+			const updated = await removeStatementAuxTheme(row.id, theme);
+			statements = statements.map((s) => (s.id === row.id ? updated : s));
+		} catch (e) {
+			console.error('removeStatementAuxTheme failed', e);
 			statements = statements.map((s) => (s.id === row.id ? { ...s, themes: prev } : s));
 		}
 	}
@@ -201,7 +223,8 @@
 								<ThemePicker
 									themes={row.themes}
 									{availableThemes}
-									onChange={(next) => setThemes(row, next)}
+									onAddTheme={(theme) => addTheme(row, theme)}
+									onRemoveTheme={(theme) => removeTheme(row, theme)}
 								/>
 							</div>
 
