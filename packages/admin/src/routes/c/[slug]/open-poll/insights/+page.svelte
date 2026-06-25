@@ -2,7 +2,7 @@
 	import type { PageProps } from './$types';
 	import type { ReportComment, PolisReportData } from '$lib/types/report';
 	import type { PolisStatementAux } from '$lib/types/aux';
-	import { updateStatementAux } from '$lib/api/aux';
+	import { moderateStatementAux, updateStatementAux } from '$lib/api/aux';
 	import {
 		getEngagementStats,
 		getConsensusStatements,
@@ -144,6 +144,44 @@
 			auxByTid = { ...auxByTid, [tid]: { ...row, themes: prevThemes } };
 		}
 	}
+
+	// Per-aux-row in-flight flag so accept/reject buttons can disable mid-call.
+	let moderationPending = $state<Record<string, boolean>>({});
+
+	/**
+	 * Forward an accept/reject to Polis via /statement_aux/:id/moderate.
+	 * Optimistic + roll-back on failure. No-ops for tids without an aux row.
+	 */
+	async function moderateFor(tid: number, decision: 'accept' | 'reject') {
+		const row = auxByTid[tid];
+		if (!row || moderationPending[row.id]) return;
+		const nextStatus = decision === 'accept' ? 'accepted' : 'rejected';
+		if (row.moderation_status === nextStatus) return;
+
+		const prevStatus = row.moderation_status;
+		moderationPending = { ...moderationPending, [row.id]: true };
+		auxByTid = { ...auxByTid, [tid]: { ...row, moderation_status: nextStatus } };
+		try {
+			const updated = await moderateStatementAux(row.id, { decision });
+			auxByTid = { ...auxByTid, [tid]: updated };
+		} catch (e) {
+			console.error('moderateStatementAux failed', e);
+			auxByTid = { ...auxByTid, [tid]: { ...row, moderation_status: prevStatus } };
+		} finally {
+			moderationPending = { ...moderationPending, [row.id]: false };
+		}
+	}
+
+	function moderationProp(tid: number) {
+		const row = auxByTid[tid];
+		return {
+			status: row?.moderation_status ?? null,
+			pending: row ? !!moderationPending[row.id] : false,
+			disabled: !row,
+			onAccept: () => moderateFor(tid, 'accept'),
+			onReject: () => moderateFor(tid, 'reject')
+		};
+	}
 </script>
 
 {#if data.error}
@@ -221,6 +259,7 @@
 							disabled: !auxByTid[c.tid],
 							onChange: (next) => setThemesFor(c.tid, next)
 						}}
+						moderation={moderationProp(c.tid)}
 					/>
 				{/each}
 			{/if}
@@ -248,6 +287,7 @@
 							disabled: !auxByTid[c.tid],
 							onChange: (next) => setThemesFor(c.tid, next)
 						}}
+						moderation={moderationProp(c.tid)}
 					/>
 				{/each}
 			{/if}
@@ -277,6 +317,7 @@
 							disabled: !auxByTid[c.tid],
 							onChange: (next) => setThemesFor(c.tid, next)
 						}}
+						moderation={moderationProp(c.tid)}
 					/>
 				{/each}
 			{/if}
@@ -314,13 +355,14 @@
 			>
 				<div class="flex flex-col">
 					<div
-						class="text-muted-foreground/60 text-label grid grid-cols-[1.5rem_minmax(0,1fr)_minmax(10rem,14rem)_2.5rem_auto] items-center gap-4 px-4 py-2 font-semibold uppercase"
+						class="text-muted-foreground/60 text-label grid grid-cols-[1.5rem_minmax(0,1fr)_minmax(10rem,14rem)_2.5rem_auto_auto] items-center gap-4 px-4 py-2 font-semibold uppercase"
 					>
 						<div>#</div>
 						<div>Statement</div>
 						<div>Theme</div>
 						<div class="text-right">Count</div>
-						<div class="pr-4">Groups</div>
+						<div>Groups</div>
+						<div class="pr-4">Action</div>
 					</div>
 
 					{#if explorerStatements.length === 0}
@@ -338,6 +380,7 @@
 									disabled: !auxByTid[c.tid],
 									onChange: (next) => setThemesFor(c.tid, next)
 								}}
+								moderation={moderationProp(c.tid)}
 							/>
 						{/each}
 					{/if}

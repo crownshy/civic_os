@@ -1,6 +1,7 @@
 import type {
 	PolisStatementAux,
-	UpdatePolisStatementAux
+	UpdatePolisStatementAux,
+	ModerateStatementAuxRequest
 } from '$lib/types/aux';
 
 /**
@@ -36,6 +37,29 @@ export async function updateStatementAux(
 	});
 	if (!res.ok) {
 		throw new Error(`updateStatementAux ${id} → ${res.status}`);
+	}
+	return (await res.json()) as PolisStatementAux;
+}
+
+/**
+ * Client-side: POST /api/tools/polis/statement_aux/:id/moderate.
+ *
+ * Unlike `updateStatementAux`, this forwards the accept/reject decision to the
+ * Polis server using the admin account, then updates the aux row. Use this for
+ * accept/reject; use `updateStatementAux` for local-only edits (themes,
+ * statement_text, etc.).
+ */
+export async function moderateStatementAux(
+	id: string,
+	body: ModerateStatementAuxRequest
+): Promise<PolisStatementAux> {
+	const res = await fetch(`/api/tools/polis/statement_aux/${id}/moderate`, {
+		method: 'POST',
+		headers: { 'content-type': 'application/json' },
+		body: JSON.stringify(body)
+	});
+	if (!res.ok) {
+		throw new Error(`moderateStatementAux ${id} → ${res.status}`);
 	}
 	return (await res.json()) as PolisStatementAux;
 }
