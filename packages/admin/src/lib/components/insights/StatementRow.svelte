@@ -1,6 +1,11 @@
 <script lang="ts">
 	import type { ReportComment, ReportGroup } from '$lib/types/report';
-	import { computeGroupVotePercents, totalVotes } from '$lib/utils/report';
+	import {
+		computeGroupVotePercents,
+		totalVotes,
+		CONSENSUS_AGREE,
+		CONSENSUS_DISAGREE
+	} from '$lib/utils/report';
 	import GroupCircle from './GroupCircle.svelte';
 	import ThemePicker from './ThemePicker.svelte';
 
@@ -11,6 +16,8 @@
 		comment: ReportComment;
 		groups: ReportGroup[];
 		variant?: Variant;
+		/** Drop passes from the agree% denominator (agrees/(agrees+disagrees)). */
+		excludePasses?: boolean;
 		/** Show the "consensus" / "difference" pill on the left of the text. */
 		showVerdictPill?: boolean;
 		/**
@@ -31,12 +38,25 @@
 		comment,
 		groups,
 		variant = 'neutral',
+		excludePasses = false,
 		showVerdictPill = false,
 		picker
 	}: Props = $props();
 
-	const groupPcts = $derived(computeGroupVotePercents(comment, groups));
+	const groupPcts = $derived(computeGroupVotePercents(comment, groups, { excludePasses }));
 	const count = $derived(totalVotes(comment));
+
+	// Consensus direction: '+' when every group agrees, '−' when every group
+	// disagrees. Mirrors consensusDirection() in utils/report.ts.
+	const consensusSign = $derived(
+		variant === 'consensus' && groupPcts.length > 0
+			? groupPcts.every((p) => p.agreed >= CONSENSUS_AGREE)
+				? '+'
+				: groupPcts.every((p) => p.agreed < CONSENSUS_DISAGREE)
+					? '−'
+					: null
+			: null
+	);
 
 	const accentClass = $derived(
 		variant === 'consensus'
@@ -50,7 +70,10 @@
 
 	const verdictPill = $derived(
 		variant === 'consensus'
-			? { label: 'consensus', class: 'bg-primary text-primary-foreground' }
+			? {
+					label: consensusSign ? `consensus (${consensusSign})` : 'consensus',
+					class: 'bg-primary text-primary-foreground'
+				}
 			: variant === 'difference'
 				? { label: 'difference', class: 'bg-destructive text-destructive-foreground' }
 				: variant === 'uncertainty'

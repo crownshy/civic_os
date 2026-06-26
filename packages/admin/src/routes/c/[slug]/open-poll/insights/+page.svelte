@@ -54,12 +54,10 @@
 			: reportData;
 		return getThemeSummaries(source);
 	});
-	const consensus = $derived(reportData ? getConsensusStatements(reportData) : []);
-	const differences = $derived(reportData ? getDifferenceStatements(reportData) : []);
-	const uncertain = $derived(reportData ? getUncertaintyStatements(reportData) : []);
-
 	// --- Section filter state (Consensus / Difference / Uncertainty) ---
 	// `is_seed` default matches StatementSection's `excludeHosts = true` default.
+	// "Exclude passes" switches the agree% denominator to agrees/(agrees+disagrees),
+	// which re-runs the consensus/difference selection — not a row filter.
 	let consensusExcludeHosts = $state(true);
 	let consensusExcludePasses = $state(false);
 	let differencesExcludeHosts = $state(true);
@@ -67,31 +65,22 @@
 	let uncertainExcludeHosts = $state(true);
 	let uncertainExcludePasses = $state(false);
 
-	function applySectionFilters(
-		list: ReportComment[],
-		excludeHosts: boolean,
-		excludePasses: boolean
-	): ReportComment[] {
-		let r = list;
-		if (excludeHosts) r = r.filter((c) => !c.is_seed);
-		if (excludePasses) {
-			r = r.filter((c) => {
-				const t = totalVotes(c);
-				return t > 0 && c.overall_votes.passes / t < 0.4;
-			});
-		}
-		return r;
-	}
+	const consensus = $derived(
+		reportData ? getConsensusStatements(reportData, { excludePasses: consensusExcludePasses }) : []
+	);
+	const differences = $derived(
+		reportData
+			? getDifferenceStatements(reportData, { excludePasses: differencesExcludePasses })
+			: []
+	);
+	const uncertain = $derived(reportData ? getUncertaintyStatements(reportData) : []);
 
-	const consensusFiltered = $derived(
-		applySectionFilters(consensus, consensusExcludeHosts, consensusExcludePasses)
-	);
-	const differencesFiltered = $derived(
-		applySectionFilters(differences, differencesExcludeHosts, differencesExcludePasses)
-	);
-	const uncertainFiltered = $derived(
-		applySectionFilters(uncertain, uncertainExcludeHosts, uncertainExcludePasses)
-	);
+	const filterHosts = (list: ReportComment[], excludeHosts: boolean) =>
+		excludeHosts ? list.filter((c) => !c.is_seed) : list;
+
+	const consensusFiltered = $derived(filterHosts(consensus, consensusExcludeHosts));
+	const differencesFiltered = $derived(filterHosts(differences, differencesExcludeHosts));
+	const uncertainFiltered = $derived(filterHosts(uncertain, uncertainExcludeHosts));
 
 	/** All themes used anywhere on this conversation — powers the picker dropdown. */
 	const availableThemes = $derived.by(() => {
@@ -113,12 +102,6 @@
 		if (explorerExcludeHosts) list = list.filter((c) => !c.is_seed);
 		const theme = selectedTheme;
 		if (theme) list = list.filter((c) => c.topics?.includes(theme));
-		if (explorerExcludePasses) {
-			list = list.filter((c) => {
-				const t = totalVotes(c);
-				return t > 0 && c.overall_votes.passes / t < 0.4;
-			});
-		}
 		return list.sort((a, b) => totalVotes(b) - totalVotes(a));
 	});
 
@@ -215,6 +198,7 @@
 						comment={c}
 						groups={reportData.groups}
 						variant="consensus"
+						excludePasses={consensusExcludePasses}
 						showVerdictPill
 						picker={{
 							availableThemes,
@@ -242,6 +226,7 @@
 						comment={c}
 						groups={reportData.groups}
 						variant="difference"
+						excludePasses={differencesExcludePasses}
 						showVerdictPill
 						picker={{
 							availableThemes,
@@ -271,6 +256,7 @@
 						comment={c}
 						groups={reportData.groups}
 						variant="uncertainty"
+						excludePasses={uncertainExcludePasses}
 						showVerdictPill
 						picker={{
 							availableThemes,
@@ -333,6 +319,7 @@
 								index={i + 1}
 								comment={c}
 								groups={reportData.groups}
+								excludePasses={explorerExcludePasses}
 								picker={{
 									availableThemes,
 									disabled: !auxByTid[c.tid],

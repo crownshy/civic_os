@@ -12,24 +12,40 @@ export function groupLabel(groupId: number): string {
 	return String.fromCharCode(65 + groupId);
 }
 
-/** Per-group vote percentages for a single comment. */
+/**
+ * Thresholds for the Insights consensus/difference labels. Defined in the
+ * ticket (286), tunable here. Not Polis concepts — our own classification.
+ */
+export const CONSENSUS_AGREE = 80; // all groups agree% ≥ this → consensus (+)
+export const CONSENSUS_DISAGREE = 20; // all groups agree% < this → consensus (−)
+export const DIFFERENCE_SPREAD = 30; // max−min agree% > this → difference
+
+/**
+ * Per-group vote percentages for a single comment.
+ *
+ * Percentages are taken over the votes cast on THIS statement, not the
+ * group's total membership. With `excludePasses`, the denominator drops
+ * passes too — agree% becomes agrees / (agrees + disagrees).
+ */
 export function computeGroupVotePercents(
 	comment: ReportComment,
-	groups: ReportGroup[]
+	groups: ReportGroup[],
+	{ excludePasses = false }: { excludePasses?: boolean } = {}
 ): GroupVotePercent[] {
 	return comment.group_votes.map((gv) => {
 		const group = groups.find((g) => g.group_id === gv.group_id);
 		const totalMembers = group ? group.total_members : gv.agrees + gv.disagrees + gv.passes;
 		const totalVoted = gv.agrees + gv.disagrees + gv.passes;
-		const denom = Math.max(totalMembers, totalVoted, 1);
+		const denom = excludePasses ? gv.agrees + gv.disagrees : totalVoted;
+		const pct = (n: number) => (denom > 0 ? (n / denom) * 100 : 0);
 		return {
 			group_id: gv.group_id,
 			label: groupLabel(gv.group_id),
 			totalMembers,
 			totalVoted,
-			agreed: (gv.agrees / denom) * 100,
-			disagreed: (gv.disagrees / denom) * 100,
-			passed: (gv.passes / denom) * 100
+			agreed: pct(gv.agrees),
+			disagreed: pct(gv.disagrees),
+			passed: excludePasses ? 0 : pct(gv.passes)
 		};
 	});
 }
@@ -57,19 +73,32 @@ function withMinVotes(comments: ReportComment[], minVotes: number) {
 }
 
 /**
- * Areas of consensus: every group agreed strongly with the statement.
- * Default threshold = 80% agree across ALL groups.
+ * Consensus direction for a statement, or null if it isn't a consensus.
+ *   '+' → every group agrees (agree% ≥ CONSENSUS_AGREE)
+ *   '−' → every group disagrees (agree% < CONSENSUS_DISAGREE)
+ */
+export function consensusDirection(
+	comment: ReportComment,
+	groups: ReportGroup[],
+	{ excludePasses = false }: { excludePasses?: boolean } = {}
+): '+' | '−' | null {
+	const agreed = computeGroupVotePercents(comment, groups, { excludePasses }).map((p) => p.agreed);
+	if (agreed.length === 0) return null;
+	if (agreed.every((a) => a >= CONSENSUS_AGREE)) return '+';
+	if (agreed.every((a) => a < CONSENSUS_DISAGREE)) return '−';
+	return null;
+}
+
+/**
+ * Areas of consensus: ALL groups land on the same side — either all agree
+ * (agree% ≥ 80) or all disagree (agree% < 20). See CONTEXT.md / ticket 286.
  */
 export function getConsensusStatements(
 	data: PolisReportData,
-	{ threshold = 80, minVotes = 5 }: { threshold?: number; minVotes?: number } = {}
+	{ minVotes = 5, excludePasses = false }: { minVotes?: number; excludePasses?: boolean } = {}
 ): ReportComment[] {
 	return withMinVotes(data.comments, minVotes)
-		.filter((c) => {
-			const pcts = computeGroupVotePercents(c, data.groups);
-			if (pcts.length === 0) return false;
-			return pcts.every((p) => p.agreed >= threshold);
-		})
+		.filter((c) => consensusDirection(c, data.groups, { excludePasses }) !== null)
 		.sort(
 			(a, b) =>
 				(b.group_informed_consensus ?? 0) - (a.group_informed_consensus ?? 0)
@@ -77,20 +106,25 @@ export function getConsensusStatements(
 }
 
 /**
- * Areas of difference: spread of agree% between groups ≥ threshold (30 by
- * default). Sorted by spread, descending.
+ * Areas of difference: the largest agree% gap between any two groups exceeds
+ * the threshold (30 by default). With >2 groups this is max(agree%) −
+ * min(agree%), i.e. ONE diverging pair is enough. Sorted by spread, desc.
  */
 export function getDifferenceStatements(
 	data: PolisReportData,
-	{ threshold = 30, minVotes = 5 }: { threshold?: number; minVotes?: number } = {}
+	{ threshold = DIFFERENCE_SPREAD, minVotes = 5, excludePasses = false }: {
+		threshold?: number;
+		minVotes?: number;
+		excludePasses?: boolean;
+	} = {}
 ): ReportComment[] {
 	return withMinVotes(data.comments, minVotes)
 		.map((c) => {
-			const pcts = computeGroupVotePercents(c, data.groups).map((p) => p.agreed);
+			const pcts = computeGroupVotePercents(c, data.groups, { excludePasses }).map((p) => p.agreed);
 			const spread = pcts.length ? Math.max(...pcts) - Math.min(...pcts) : 0;
 			return { c, spread };
 		})
-		.filter(({ spread }) => spread >= threshold)
+		.filter(({ spread }) => spread > threshold)
 		.sort((a, b) => b.spread - a.spread)
 		.map(({ c }) => c);
 }
