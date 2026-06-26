@@ -146,7 +146,7 @@
 		<div class="border-border flex flex-col gap-0.5 border-b pb-2.5">
 			{#each conversations as conv}
 				<a
-					href={`/c/${conv.slug}/events`}
+					href={`/c/${conv.slug}/overview`}
 					title={conv.title}
 					class={[
 						'flex items-center gap-2 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-2.5 py-2 text-body font-medium',

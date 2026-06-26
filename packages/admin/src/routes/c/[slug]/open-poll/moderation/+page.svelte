@@ -1,7 +1,11 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
-	import type { ModerationStatus, PolisStatementAux } from '$lib/types/aux';
-	import { updateStatementAux } from '$lib/api/aux';
+	import type { PolisStatementAux } from '$lib/types/aux';
+	import {
+		addStatementAuxTheme,
+		moderateStatementAux,
+		removeStatementAuxTheme
+	} from '$lib/api/aux';
 	import ThemePicker from '$lib/components/insights/ThemePicker.svelte';
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import { Button } from '@civicos/shared/ui/button';
@@ -46,8 +50,9 @@
 	// Track in-flight requests per aux row so the buttons can disable mid-call.
 	let pending = $state<Record<string, boolean>>({});
 
-	async function setStatus(row: PolisStatementAux, status: ModerationStatus) {
+	async function setStatus(row: PolisStatementAux, status: 'accepted' | 'rejected') {
 		if (pending[row.id] || row.moderation_status === status) return;
+		const decision = status === 'accepted' ? 'accept' : 'reject';
 		pending = { ...pending, [row.id]: true };
 
 		const prevStatus = row.moderation_status;
@@ -56,12 +61,10 @@
 		);
 
 		try {
-			const updated = await updateStatementAux(row.id, {
-				moderation_status: status
-			});
+			const updated = await moderateStatementAux(row.id, { decision });
 			statements = statements.map((s) => (s.id === row.id ? updated : s));
 		} catch (e) {
-			console.error('updateStatementAux failed', e);
+			console.error('moderateStatementAux failed', e);
 			statements = statements.map((s) =>
 				s.id === row.id ? { ...s, moderation_status: prevStatus } : s
 			);
@@ -70,14 +73,32 @@
 		}
 	}
 
-	async function setThemes(row: PolisStatementAux, next: string[]) {
+	async function addTheme(row: PolisStatementAux, theme: string) {
+		if (row.themes.includes(theme)) return;
 		const prev = row.themes;
-		statements = statements.map((s) => (s.id === row.id ? { ...s, themes: next } : s));
+		statements = statements.map((s) =>
+			s.id === row.id ? { ...s, themes: [...prev, theme] } : s
+		);
 		try {
-			const updated = await updateStatementAux(row.id, { themes: next });
+			const updated = await addStatementAuxTheme(row.id, theme);
 			statements = statements.map((s) => (s.id === row.id ? updated : s));
 		} catch (e) {
-			console.error('updateStatementAux(themes) failed', e);
+			console.error('addStatementAuxTheme failed', e);
+			statements = statements.map((s) => (s.id === row.id ? { ...s, themes: prev } : s));
+		}
+	}
+
+	async function removeTheme(row: PolisStatementAux, theme: string) {
+		if (!row.themes.includes(theme)) return;
+		const prev = row.themes;
+		statements = statements.map((s) =>
+			s.id === row.id ? { ...s, themes: prev.filter((t) => t !== theme) } : s
+		);
+		try {
+			const updated = await removeStatementAuxTheme(row.id, theme);
+			statements = statements.map((s) => (s.id === row.id ? updated : s));
+		} catch (e) {
+			console.error('removeStatementAuxTheme failed', e);
 			statements = statements.map((s) => (s.id === row.id ? { ...s, themes: prev } : s));
 		}
 	}
@@ -202,7 +223,8 @@
 								<ThemePicker
 									themes={row.themes}
 									{availableThemes}
-									onChange={(next) => setThemes(row, next)}
+									onAddTheme={(theme) => addTheme(row, theme)}
+									onRemoveTheme={(theme) => removeTheme(row, theme)}
 								/>
 							</div>
 

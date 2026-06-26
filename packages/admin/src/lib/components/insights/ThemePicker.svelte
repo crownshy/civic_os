@@ -5,7 +5,8 @@
 	 * on this conversation, with toggle checkmarks and an "Add new" affordance.
 	 *
 	 * The component is dumb — the parent owns the source of truth and the
-	 * persistence call. We just emit `onChange(nextThemes)`.
+	 * persistence call. We just emit per-theme add/remove events that map 1:1
+	 * onto the comhairle /themes endpoints.
 	 */
 	interface Props {
 		/** Themes currently assigned to this statement. */
@@ -14,10 +15,17 @@
 		availableThemes: string[];
 		/** Disabled when there's no aux row to write to. */
 		disabled?: boolean;
-		onChange?: (next: string[]) => void | Promise<void>;
+		onAddTheme?: (theme: string) => void | Promise<void>;
+		onRemoveTheme?: (theme: string) => void | Promise<void>;
 	}
 
-	let { themes, availableThemes, disabled = false, onChange }: Props = $props();
+	let {
+		themes,
+		availableThemes,
+		disabled = false,
+		onAddTheme,
+		onRemoveTheme
+	}: Props = $props();
 
 	let open = $state(false);
 	let newDraft = $state('');
@@ -44,16 +52,22 @@
 	}
 
 	function applyToggle(theme: string) {
-		const next = themeSet.has(theme)
-			? themes.filter((t) => t !== theme)
-			: [...themes, theme];
-		onChange?.(next);
+		if (themeSet.has(theme)) {
+			onRemoveTheme?.(theme);
+		} else {
+			onAddTheme?.(theme);
+		}
+	}
+
+	function applyRemove(theme: string) {
+		if (disabled) return;
+		onRemoveTheme?.(theme);
 	}
 
 	function applyAdd() {
 		const t = newDraft.trim();
 		if (!t || themeSet.has(t)) return;
-		onChange?.([...themes, t]);
+		onAddTheme?.(t);
 		newDraft = '';
 	}
 
@@ -79,9 +93,19 @@
 <div class="relative inline-flex flex-wrap items-center gap-1" bind:this={containerEl}>
 	{#each themes as t (t)}
 		<span
-			class="bg-muted text-foreground inline-flex items-center rounded px-1.5 py-0.5 text-caption font-medium"
+			class="bg-muted text-foreground inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-caption font-medium"
 		>
 			{t}
+			{#if !disabled}
+				<button
+					type="button"
+					onclick={() => applyRemove(t)}
+					aria-label={`Remove theme ${t}`}
+					class="text-muted-foreground hover:text-destructive -mr-0.5 leading-none"
+				>
+					×
+				</button>
+			{/if}
 		</span>
 	{/each}
 
