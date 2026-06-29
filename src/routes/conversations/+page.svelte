@@ -93,6 +93,15 @@
 					>
 						<ConversationEventCard {event} />
 					</a>
+				{:else}
+					<div class="mt-4 flex flex-col items-center gap-3 py-10 text-center" in:fade={{ duration: 300 }}>
+						<p class="font-display text-2xl font-medium tracking-display text-foreground/60">
+							No upcoming events
+						</p>
+						<p class="font-sans text-sm font-medium text-foreground/40">
+							Check back soon for new conversations in {region.stateName}.
+						</p>
+					</div>
 				{/each}
 			</div>
 		{:else}
