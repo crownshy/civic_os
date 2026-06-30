@@ -10,7 +10,8 @@
 		{ label: 'Setup', href: '' },
 		{ label: 'Agenda', href: '/agenda' },
 		{ label: 'Registrations', href: '/registrations' },
-		{ label: 'Insights', href: '/insights' }
+		{ label: 'Insights', href: '/insights' },
+		{ label: 'Recordings', href: '/recordings' }
 	];
 
 	const eventBase = $derived(`/c/${page.params.slug}/events/${page.params.eventSlug}`);

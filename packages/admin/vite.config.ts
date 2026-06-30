@@ -1,6 +1,8 @@
+/// <reference types="vitest/config" />
 import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
+import { playwright } from '@vitest/browser-playwright';
 
 // Mirror the api-client ESM resolution fix from civicos.
 // dist/client.js imports './api' without .js extension.
@@ -30,5 +32,26 @@ export default defineConfig({
 			// Allow serving from sibling workspace packages (e.g. @civicos/shared).
 			allow: ['..']
 		}
+	},
+	test: {
+		expect: {
+			// Every test must make at least one assertion (mirrors civicos).
+			requireAssertions: true
+		},
+		projects: [
+			{
+				extends: './vite.config.ts',
+				test: {
+					name: 'client',
+					browser: {
+						enabled: true,
+						provider: playwright(),
+						instances: [{ browser: 'chromium', headless: true }]
+					},
+					include: ['src/**/*.svelte.{test,spec}.{js,ts}'],
+					exclude: ['src/lib/server/**']
+				}
+			}
+		]
 	}
 });
