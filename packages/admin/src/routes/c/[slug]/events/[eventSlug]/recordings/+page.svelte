@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { FileAudio, Plus } from '@lucide/svelte';
+	import { FileAudio, LoaderCircle, Plus, TriangleAlert } from '@lucide/svelte';
 	import type { AudioRecordingStatus } from '@crownshy/api-client/api';
 
 	let { data } = $props();
@@ -17,9 +17,9 @@
 			case 'complete':
 				return 'complete';
 			case 'transcription_failed':
-				return 'transcription failed';
+				return 'transcript error';
 			case 'categorization_failed':
-				return 'categorization failed';
+				return 'report error';
 		}
 	}
 
@@ -69,8 +69,17 @@
 	{:else}
 		<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
 			{#each recordings as rec, i (rec.id)}
+				{@const tone = statusTone(rec.status)}
 				<div class="flex items-start gap-3 rounded-lg bg-card p-4 shadow-card">
-					<div class="text-caption w-4 shrink-0 font-bold text-muted-foreground">{i + 1}</div>
+					<div class="flex w-4 shrink-0 items-center justify-center pt-0.5">
+						{#if tone === 'progress'}
+							<LoaderCircle class="size-4 animate-spin text-muted-foreground" aria-label="Processing" />
+						{:else if tone === 'failed'}
+							<TriangleAlert class="size-4 text-destructive" aria-label="Error" />
+						{:else}
+							<span class="text-caption font-bold text-primary">{i + 1}</span>
+						{/if}
+					</div>
 					<div class="min-w-0 flex-1 space-y-1.5">
 						<div class="flex items-center gap-1.5">
 							<FileAudio class="size-3.5 shrink-0 text-muted-foreground" />
@@ -78,9 +87,9 @@
 						</div>
 						<div class="text-caption flex items-center gap-2 text-muted-foreground">
 							<span
-								class={`inline-flex shrink-0 items-center gap-1 rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl px-2.5 py-0.5 ${toneClass[statusTone(rec.status)]}`}
+								class={`inline-flex shrink-0 items-center gap-1 rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl px-2.5 py-0.5 ${toneClass[tone]}`}
 							>
-								<span class={`size-1.5 rounded-full ${toneDot[statusTone(rec.status)]}`}></span>
+								<span class={`size-1.5 rounded-full ${toneDot[tone]}`}></span>
 								{statusLabel(rec.status)}
 							</span>
 						</div>
