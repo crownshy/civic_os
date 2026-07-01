@@ -1,14 +1,27 @@
-import { page } from 'vitest/browser';
-import { describe, expect, it } from 'vitest';
+import { page, userEvent } from 'vitest/browser';
+import { describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import type { AudioRecordingDto, AudioRecordingStatus } from '@crownshy/api-client/api';
 import type { PageData } from './$types';
 import Page from './+page.svelte';
 
+// The page calls invalidate() from the polling $effect and after a successful upload; stub it so
+// tests don't trigger real navigation.
+vi.mock('$app/navigation', () => ({ invalidate: vi.fn(() => Promise.resolve()) }));
+
 function makeData(recordings: AudioRecordingDto[], recordingsFailed: boolean): PageData {
-    // we only create the pieces of data that are relevant to the view, but have to cast it to keep the compiler happy.
+	// we only create the pieces of data that are relevant to the view, but have to cast it to keep the compiler happy.
     // i'd love to find a better way to do this!
-	return { recordings, recordingsFailed } as unknown as PageData;
+	return {
+		recordings,
+		recordingsFailed,
+		eventId: 'event-1',
+		region: { conversationId: 'conv-1' },
+		api: {
+			CreateAudioRecording: vi.fn(),
+			ProcessAudioRecording: vi.fn()
+		}
+	} as unknown as PageData;
 }
 
 function makeRecording(
@@ -55,5 +68,20 @@ describe('recordings /+page.svelte', () => {
 		// Status-pill labels come from statusLabel()/statusTone() — the component's real logic.
 		await expect.element(page.getByText('complete')).toBeInTheDocument();
 		await expect.element(page.getByText('transcribing')).toBeInTheDocument();
+	});
+
+	it('opens the upload modal when the Upload New Recording button is clicked', async () => {
+		render(Page, { props: { data: makeData([], false) } });
+
+		// Modal is closed initially — its description is not rendered.
+		await expect
+			.element(page.getByText('Name the recording and choose an audio file', { exact: false }))
+			.not.toBeInTheDocument();
+
+		await userEvent.click(page.getByRole('button', { name: /upload new recording/i }));
+
+		await expect
+			.element(page.getByText('Name the recording and choose an audio file', { exact: false }))
+			.toBeInTheDocument();
 	});
 });

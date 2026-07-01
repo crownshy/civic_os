@@ -1,10 +1,33 @@
 <script lang="ts">
 	import { FileAudio, LoaderCircle, Plus, TriangleAlert } from '@lucide/svelte';
 	import type { AudioRecordingStatus } from '@crownshy/api-client/api';
+	import { invalidate } from '$app/navigation';
+	import UploadRecordingModal from '$lib/components/UploadRecordingModal.svelte';
 
 	let { data } = $props();
 
 	const recordings = $derived(data.recordings ?? []);
+
+	const api = $derived(data.api);
+	const conversationId = $derived(data.region.conversationId);
+	const eventId = $derived(data.eventId);
+	const existingNames = $derived(recordings.map((r) => r.name));
+
+	let uploadOpen = $state(false);
+
+	function refreshRecordings() {
+		return invalidate(`recordings:list:${eventId}`);
+	}
+
+	const hasInFlight = $derived(
+		recordings.some((r) => r.status === 'transcribing' || r.status === 'categorizing')
+	);
+
+	$effect(() => {
+		if (!hasInFlight) return;
+		const interval = setInterval(refreshRecordings, 10000);
+		return () => clearInterval(interval);
+	});
 
 	function statusLabel(status: AudioRecordingStatus): string {
 		switch (status) {
@@ -52,11 +75,21 @@
 		</div>
 		<button
 			type="button"
-			class="text-caption inline-flex shrink-0 items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-primary-foreground"
+			onclick={() => (uploadOpen = true)}
+			class="text-caption inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-primary-foreground"
 		>
 			<Plus class="size-3" /> Upload New Recording
 		</button>
 	</div>
+
+	<UploadRecordingModal
+		bind:open={uploadOpen}
+		{api}
+		{conversationId}
+		{eventId}
+		{existingNames}
+		onUploaded={refreshRecordings}
+	/>
 
 	{#if data.recordingsFailed}
 		<div class="text-body rounded-lg bg-card p-6 text-muted-foreground shadow-card">
