@@ -15,6 +15,7 @@
 		getThemeSummaries,
 		totalVotes
 	} from '$lib/utils/report';
+	import { buildStatementsCsv, downloadCsv } from '$lib/utils/report-csv';
 	import StatementRow from '$lib/components/insights/StatementRow.svelte';
 	import StatementSection from '$lib/components/insights/StatementSection.svelte';
 	import ThemeBar from '$lib/components/insights/ThemeBar.svelte';
@@ -22,6 +23,8 @@
 	import FilterToggle from '$lib/components/insights/FilterToggle.svelte';
 	import PollStatRow from '$lib/components/PollStatRow.svelte';
 	import Card from '@civicos/shared/ui/Card.svelte';
+	import { Button } from '@civicos/shared/ui/button';
+	import { Download } from '@lucide/svelte';
 
 	let { data }: PageProps = $props();
 
@@ -176,6 +179,13 @@
 		}
 	}
 
+	function handleDownloadCsv() {
+		if (!reportData) return;
+		const csv = buildStatementsCsv(reportData, auxByTid);
+		const ts = new Date().toISOString().slice(0, 10);
+		downloadCsv(`polis-statements-${ts}.csv`, csv);
+	}
+
 	function moderationProp(tid: number) {
 		const row = auxByTid[tid];
 		return {
@@ -195,13 +205,19 @@
 {:else}
 	<div class="flex flex-col gap-10 px-8 py-8">
 		<!-- ===== Top stats ===== -->
-		<PollStatRow
-			stats={[
-				{ label: 'Total Statements', value: stats.totalStatements },
-				{ label: 'Themes', value: themes.length },
-				{ label: 'Areas of Consensus', value: consensus.length }
-			]}
-		/>
+		<div class="flex flex-wrap items-end justify-between gap-4">
+			<PollStatRow
+				stats={[
+					{ label: 'Total Statements', value: stats.totalStatements },
+					{ label: 'Themes', value: themes.length },
+					{ label: 'Areas of Consensus', value: consensus.length }
+				]}
+			/>
+			<Button variant="outline" size="sm" onclick={handleDownloadCsv}>
+				<Download class="size-4" />
+				Download CSV
+			</Button>
+		</div>
 
 		<!-- ===== Themes card ===== -->
 		<Card
