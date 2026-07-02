@@ -1,23 +1,3 @@
-<svelte:head>
-  <!-- Meta Pixel Code -->
-  <script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '1345205920866889');
-    fbq('track', 'PageView');
-  </script>
-  <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=1345205920866889&ev=PageView&noscript=1"
-  /></noscript>
-  <!-- End Meta Pixel Code -->
-</svelte:head>
-
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 	import { goto } from '$app/navigation';
@@ -175,6 +155,36 @@
 </script>
 
 <svelte:head>
+	<!-- Meta Pixel Code -->
+	<script>
+		!(function (f, b, e, v, n, t, s) {
+			if (f.fbq) return;
+			n = f.fbq = function () {
+				n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+			};
+			if (!f._fbq) f._fbq = n;
+			n.push = n;
+			n.loaded = !0;
+			n.version = '2.0';
+			n.queue = [];
+			t = b.createElement(e);
+			t.async = !0;
+			t.src = v;
+			s = b.getElementsByTagName(e)[0];
+			s.parentNode.insertBefore(t, s);
+		})(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+		fbq('init', '1345205920866889');
+		fbq('track', 'PageView');
+	</script>
+	<noscript
+		><img
+			height="1"
+			width="1"
+			style="display:none"
+			src="https://www.facebook.com/tr?id=1345205920866889&ev=PageView&noscript=1"
+		/></noscript
+	>
+	<!-- End Meta Pixel Code -->
 	<title>{region.heroHeader} — {region.stateName}</title>
 	{#if region.slug === 'utah'}
 		<noscript
@@ -219,7 +229,10 @@
 		</header>
 
 		<!-- Hero -->
-		<section id="join" class="mx-auto flex w-full max-w-4xl flex-col scroll-mt-24 px-6 pt-4 pb-10 md:flex-1 md:pb-8">
+		<section
+			id="join"
+			class="mx-auto flex w-full max-w-4xl scroll-mt-24 flex-col px-6 pt-4 pb-10 md:flex-1 md:pb-8"
+		>
 			<!-- Chip, headline, blurb, and join form — vertically centered on desktop -->
 			<div class="flex flex-col items-center md:flex-1 md:justify-center">
 				<div class="flex justify-center">
@@ -229,15 +242,20 @@
 						OPEN POLL
 					</span>
 				</div>
-				<h1 class="mt-3 text-center font-display text-5xl leading-[1.05] font-medium tracking-display md:text-6xl">
+				<h1
+					class="mt-3 text-center font-display text-5xl leading-[1.05] font-medium tracking-display md:text-6xl"
+				>
 					{region.heroHeader}
 				</h1>
-				<p class="mt-6 text-center font-sans text-base leading-5 font-medium md:text-lg md:leading-6">
+				<p
+					class="mt-6 text-center font-sans text-base leading-5 font-medium md:text-lg md:leading-6"
+				>
 					{@html region.heroBlurb}
 				</p>
 
 				<div class="mt-10 flex flex-col items-center">
-					<span class="font-display text-base font-medium opacity-80 md:text-lg">Your location</span>
+					<span class="font-display text-base font-medium opacity-80 md:text-lg">Your location</span
+					>
 					<div class="mt-1.5 w-full max-w-sm">
 						<ZipInput
 							bind:value={zipCode}
@@ -305,7 +323,9 @@
 		<h2 class="font-display text-2xl font-medium md:text-3xl">Context</h2>
 		<div class="mt-6 flex flex-col gap-7">
 			{#each region.contextParagraphs as paragraph, i (i)}
-				<p class="font-sans text-base leading-6 font-medium opacity-80 md:text-lg md:leading-7">{@html paragraph}</p>
+				<p class="font-sans text-base leading-6 font-medium opacity-80 md:text-lg md:leading-7">
+					{@html paragraph}
+				</p>
 			{/each}
 		</div>
 	</section>
@@ -315,7 +335,9 @@
 		<h2 class="font-display text-2xl font-medium md:text-3xl">What is an "Open Poll"?</h2>
 		<div class="mt-6 flex flex-col gap-7">
 			{#each OPEN_POLL_EXPLAINER as paragraph, i (i)}
-				<p class="font-sans text-base leading-6 font-medium opacity-80 md:text-lg md:leading-7">{paragraph}</p>
+				<p class="font-sans text-base leading-6 font-medium opacity-80 md:text-lg md:leading-7">
+					{paragraph}
+				</p>
 			{/each}
 		</div>
 	</section>
@@ -363,7 +385,9 @@
 					<strong>Thanks — you're on the list.</strong>
 				</p>
 			{:else}
-				<p class="text-center font-sans text-base leading-6 font-medium opacity-80 md:text-lg md:leading-7">
+				<p
+					class="text-center font-sans text-base leading-6 font-medium opacity-80 md:text-lg md:leading-7"
+				>
 					Share your email to receive updates on this conversation and more opportunities to share
 					your voice on this issue.
 				</p>
