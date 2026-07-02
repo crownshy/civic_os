@@ -9,9 +9,9 @@ export const load: PageLoad = async ({ parent, params, depends }) => {
 		const recordings = await api.ListAudioRecordings({
 			params: { conversation_id: region.conversationId, event_id: params.eventSlug }
 		});
-		return { recordings, recordingsFailed: false };
+		return { recordings, recordingsFailed: false, eventId: params.eventSlug };
 	} catch (e) {
 		console.error('ListAudioRecordings failed', e);
-		return { recordings: [], recordingsFailed: true };
+		return { recordings: [], recordingsFailed: true, eventId: params.eventSlug };
 	}
 };
