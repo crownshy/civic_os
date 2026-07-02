@@ -45,88 +45,46 @@
 
 	<div class="min-h-0 flex-1 overflow-y-auto">
 		<div class="p-4">
-			<Accordion type="multiple" class="flex flex-col gap-2">
-				{#each topics as topic (topic.id)}
-					<AccordionItem
-						value={topic.id}
-						class="bg-secondary/50 border-border rounded-md border px-3"
-					>
-						<AccordionTrigger
-							class="text-foreground py-3 text-sm font-medium hover:no-underline"
-						>
-							{topic.title}
-						</AccordionTrigger>
-						<AccordionContent>
-							<p class="text-muted-foreground mb-3 text-sm leading-relaxed">
-								{topic.description}
-							</p>
+			{#each topics as topic (topic.id)}
+				{#if topic.subtopics && topic.subtopics.length > 0}
+					{#each topic.subtopics as subtopic (subtopic.id)}
+						<h2 class="text-foreground font-semibold mt-10">
+							{subtopic.title}
+						</h2>
 
-							{#if topic.subtopics && topic.subtopics.length > 0}
-								<Accordion type="multiple" class="flex flex-col gap-1.5">
-									{#each topic.subtopics as subtopic (subtopic.id)}
-										<AccordionItem
-											value={subtopic.id}
-											class="bg-background border-border/50 rounded border px-3"
-										>
-											<AccordionTrigger
-												class="text-foreground py-2.5 text-xs font-medium hover:no-underline"
+						{#if subtopic.claims && subtopic.claims.length > 0}
+							<div class="mt-2 flex flex-col gap-2">
+								{#each subtopic.claims.slice(0, 3) as claim}
+									{#if claim.quotes && claim.quotes.length > 0}
+										{#each claim.quotes as quote}
+											<button
+												type="button"
+												class="group mt-1 w-full text-left"
+												onclick={() => onQuoteClick(quote)}
+												title="Jump to this moment in the audio"
 											>
-												{subtopic.title}
-											</AccordionTrigger>
-											<AccordionContent>
-												<p
-													class="text-muted-foreground mb-2 text-xs leading-relaxed"
+												<h3 class="text-sm text-accent-foreground">
+													{claim.title}
+												</h3>
+												<blockquote
+													class="text-muted-foreground border-primary group-hover:text-foreground group-hover:border-primary/80 border-l-2 pl-2 leading-relaxed italic transition-colors"
 												>
-													{subtopic.description}
-												</p>
-
-												{#if subtopic.claims && subtopic.claims.length > 0}
-													<div class="mt-2 flex flex-col gap-2">
-														<span
-															class="text-primary text-xs font-semibold tracking-wide uppercase"
-														>
-															Key Claims ({subtopic.claims.length})
-														</span>
-														{#each subtopic.claims.slice(0, 3) as claim}
-															<div class="bg-card rounded p-2.5">
-																<p
-																	class="text-foreground mb-1.5 text-xs leading-snug"
-																>
-																	{claim.title}
-																</p>
-																{#if claim.quotes && claim.quotes.length > 0}
-																	<button
-																		type="button"
-																		class="group mt-1 w-full text-left"
-																		onclick={() =>
-																			onQuoteClick(claim.quotes![0])}
-																		title="Jump to this moment in the audio"
-																	>
-																		<blockquote
-																			class="text-muted-foreground border-primary group-hover:text-foreground group-hover:border-primary/80 border-l-2 pl-2 text-xs leading-relaxed italic transition-colors"
-																		>
-																			"{claim.quotes[0].text}"
-																		</blockquote>
-																		<span
-																			class="text-primary/60 group-hover:text-primary mt-0.5 flex items-center gap-1 text-[10px] transition-colors"
-																		>
-																			▶ play in context
-																		</span>
-																	</button>
-																{/if}
-															</div>
-														{/each}
-													</div>
-												{/if}
-											</AccordionContent>
-										</AccordionItem>
-									{/each}
-								</Accordion>
-							{/if}
-						</AccordionContent>
-					</AccordionItem>
-				{/each}
-			</Accordion>
+													"{quote.text}"
+												</blockquote>
+												<span
+													class="text-primary/60 group-hover:text-primary mt-0.5 flex items-center gap-1 text-[10px] transition-colors"
+												>
+													▶ play in context
+												</span>
+											</button>
+										{/each}
+									{/if}
+								{/each}
+							</div>
+						{/if}
+					{/each}
+				{/if}
+			{/each}
 		</div>
 	</div>
 </div>

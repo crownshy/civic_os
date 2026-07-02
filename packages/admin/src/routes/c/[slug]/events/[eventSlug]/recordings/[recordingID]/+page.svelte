@@ -16,5 +16,4 @@
 		reportUrl={recording.downloads.reportUrl}
 		audioUrl={recording.downloads.recordingUrl}
 	/>
-	<pre>{JSON.stringify(recording, null, 2)}</pre>
 {/if}

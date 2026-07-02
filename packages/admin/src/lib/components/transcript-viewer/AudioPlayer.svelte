@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { Button } from '@civicos/shared/ui/button';
-	import { Slider } from '@civicos/shared/ui/slider';
-	import SkipBack from '@lucide/svelte/icons/skip-back';
-	import SkipForward from '@lucide/svelte/icons/skip-forward';
-	import Play from '@lucide/svelte/icons/play';
-	import Pause from '@lucide/svelte/icons/pause';
-	import Volume2 from '@lucide/svelte/icons/volume-2';
+	import { Button } from "@civicos/shared/ui/button";
+	import { Slider } from "@civicos/shared/ui/slider";
+	import SkipBack from "@lucide/svelte/icons/skip-back";
+	import SkipForward from "@lucide/svelte/icons/skip-forward";
+	import Play from "@lucide/svelte/icons/play";
+	import Pause from "@lucide/svelte/icons/pause";
+	import Volume2 from "@lucide/svelte/icons/volume-2";
 
 	interface Props {
 		audioSrc?: string;
@@ -15,10 +15,10 @@
 	}
 
 	let {
-		audioSrc = '',
+		audioSrc = "",
 		currentTime = $bindable(0),
 		onTimeUpdate = () => {},
-		onSeek = () => {}
+		onSeek = () => {},
 	}: Props = $props();
 
 	let audio = $state<HTMLAudioElement | undefined>();
@@ -81,15 +81,18 @@
 	}
 
 	function formatTime(seconds: number) {
-		if (!seconds || isNaN(seconds)) return '0:00';
+		if (!seconds || isNaN(seconds)) return "0:00";
 		const mins = Math.floor(seconds / 60);
 		const secs = Math.floor(seconds % 60);
-		return `${mins}:${secs.toString().padStart(2, '0')}`;
+		return `${mins}:${secs.toString().padStart(2, "0")}`;
 	}
 
 	function skip(seconds: number) {
 		if (audio) {
-			audio.currentTime = Math.max(0, Math.min(duration, audio.currentTime + seconds));
+			audio.currentTime = Math.max(
+				0,
+				Math.min(duration, audio.currentTime + seconds),
+			);
 		}
 	}
 
@@ -118,7 +121,12 @@
 	></audio>
 
 	<div class="flex items-center gap-3">
-		<Button variant="ghost" size="icon-sm" title="Back 10s" onclick={() => skip(-10)}>
+		<Button
+			variant="ghost"
+			size="icon-sm"
+			title="Back 10s"
+			onclick={() => skip(-10)}
+		>
 			<SkipBack />
 		</Button>
 
@@ -130,7 +138,12 @@
 			{/if}
 		</Button>
 
-		<Button variant="ghost" size="icon-sm" title="Forward 10s" onclick={() => skip(10)}>
+		<Button
+			variant="ghost"
+			size="icon-sm"
+			title="Forward 10s"
+			onclick={() => skip(10)}
+		>
 			<SkipForward />
 		</Button>
 
@@ -146,18 +159,6 @@
 				value={seekBarValue}
 				onValueChange={handleSeekChange}
 				onValueCommit={handleSeekCommit}
-			/>
-		</div>
-
-		<div class="flex w-28 shrink-0 items-center gap-2">
-			<Volume2 class="text-muted-foreground size-4 shrink-0" />
-			<Slider
-				type="multiple"
-				min={0}
-				max={1}
-				step={0.01}
-				value={[volume]}
-				onValueChange={handleVolumeChange}
 			/>
 		</div>
 	</div>

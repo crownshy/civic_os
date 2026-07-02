@@ -48,10 +48,11 @@
 				}
 
 				transcriptData = await transcriptResponse.json();
-				reportData = await reportResponse.json();
-				if (typeof reportData === "string") {
+				let rawReportData = await reportResponse.json();
+				console.log("raw Report Data", typeof rawReportData);
+				if (typeof rawReportData === "string") {
 					console.log("Parsing report data");
-					reportData = JSON.parse(reportData);
+					reportData = JSON.parse(rawReportData).result;
 				}
 				loading = false;
 			} catch (err) {
@@ -123,19 +124,24 @@
 			</p>
 		</div>
 	{:else}
-		<AudioPlayer
-			bind:this={audioPlayer}
-			audioSrc={audioUrl}
-			bind:currentTime
-			{onTimeUpdate}
-			{onSeek}
-		/>
-
 		<div
 			class="grid min-h-0 flex-1 grid-cols-2 grid-rows-1 gap-5 max-lg:grid-cols-1 max-lg:grid-rows-[auto_auto] max-lg:overflow-y-auto"
 		>
-			<TranscriptViewer events={transcriptData.events} {currentTime} {onSeek} />
 			<CategoriesPanel {topics} {onQuoteClick} />
+			<div class="flex flex-col">
+				<AudioPlayer
+					bind:this={audioPlayer}
+					audioSrc={audioUrl}
+					bind:currentTime
+					{onTimeUpdate}
+					{onSeek}
+				/>
+				<TranscriptViewer
+					events={transcriptData.events}
+					{currentTime}
+					{onSeek}
+				/>
+			</div>
 		</div>
 	{/if}
 </div>

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Badge from '@civicos/shared/ui/Badge.svelte';
-	import { cn } from '@civicos/shared/utils';
+	import Badge from "@civicos/shared/ui/Badge.svelte";
+	import { cn } from "@civicos/shared/utils";
 
 	export interface TranscriptEvent {
 		start_time: number;
@@ -21,40 +21,41 @@
 		events.findIndex((event, index) => {
 			const nextEvent = events[index + 1];
 			return (
-				currentTime >= event.start_time && (!nextEvent || currentTime < nextEvent.start_time)
+				currentTime >= event.start_time &&
+				(!nextEvent || currentTime < nextEvent.start_time)
 			);
-		})
+		}),
 	);
 
 	const speakerColors: Record<string, string> = {
-		spk_0: 'bg-red-500/20 text-red-700 border border-red-500/30',
-		spk_1: 'bg-teal-500/20 text-teal-700 border border-teal-500/30',
-		spk_2: 'bg-yellow-500/20 text-yellow-700 border border-yellow-500/30',
-		spk_3: 'bg-emerald-500/20 text-emerald-700 border border-emerald-500/30',
-		spk_4: 'bg-indigo-500/20 text-indigo-700 border border-indigo-500/30',
-		spk_5: 'bg-pink-500/20 text-pink-700 border border-pink-500/30'
+		spk_0: "bg-red-500/20 text-red-700 border border-red-500/30",
+		spk_1: "bg-teal-500/20 text-teal-700 border border-teal-500/30",
+		spk_2: "bg-yellow-500/20 text-yellow-700 border border-yellow-500/30",
+		spk_3: "bg-emerald-500/20 text-emerald-700 border border-emerald-500/30",
+		spk_4: "bg-indigo-500/20 text-indigo-700 border border-indigo-500/30",
+		spk_5: "bg-pink-500/20 text-pink-700 border border-pink-500/30",
 	};
 
 	function getSpeakerClass(speakerId: string) {
-		return speakerColors[speakerId] ?? 'bg-muted text-muted-foreground';
+		return speakerColors[speakerId] ?? "bg-muted text-muted-foreground";
 	}
 
 	function formatTime(seconds: number) {
 		const mins = Math.floor(seconds / 60);
 		const secs = Math.floor(seconds % 60);
-		return `${mins}:${secs.toString().padStart(2, '0')}`;
+		return `${mins}:${secs.toString().padStart(2, "0")}`;
 	}
 
 	function scrollToActive(node: HTMLElement, isActive: boolean) {
 		if (isActive) {
-			node.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+			node.scrollIntoView({ behavior: "smooth", block: "nearest" });
 		}
 		return {
 			update(isActive: boolean) {
 				if (isActive) {
-					node.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+					node.scrollIntoView({ behavior: "smooth", block: "nearest" });
 				}
-			}
+			},
 		};
 	}
 </script>
@@ -71,9 +72,11 @@
 				<button
 					type="button"
 					class={cn(
-						'w-full cursor-pointer rounded-md border px-3 py-2.5 text-left transition-colors',
-						'hover:bg-muted/50',
-						isActive ? 'bg-primary/10 border-primary/40' : 'bg-secondary/50 border-transparent'
+						"w-full cursor-pointer rounded-md border px-3 py-2.5 text-left transition-colors",
+						"hover:bg-muted/50",
+						isActive
+							? "bg-primary/10 border-primary/40"
+							: "bg-secondary/50 border-transparent",
 					)}
 					onclick={() => onSeek(event.start_time)}
 					use:scrollToActive={isActive}
