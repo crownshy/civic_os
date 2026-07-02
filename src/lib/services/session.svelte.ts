@@ -42,6 +42,7 @@ function loadPersistedSession(): {
 	zipCode?: string;
 	pid?: number;
 	demographicsCompleted?: boolean;
+	politicalParty?: string;
 	totalVotes?: number;
 	hasSeenPause?: boolean;
 	hasAgreedToTos?: boolean;
@@ -67,6 +68,8 @@ class Session {
 	zipCode = $state('');
 	pid = $state<number | undefined>(undefined);
 	demographicsCompleted = $state(false);
+	/** Political leaning captured up front (Utah). Empty string = not yet answered. */
+	politicalParty = $state('');
 	totalVotes = $state(0);
 	hasSeenPause = $state(false);
 	hasSeenComposeInstructions = $state(false);
@@ -87,6 +90,7 @@ class Session {
 		if (saved.zipCode) this.zipCode = saved.zipCode;
 		if (saved.pid !== undefined) this.pid = saved.pid;
 		if (saved.demographicsCompleted) this.demographicsCompleted = true;
+		if (saved.politicalParty) this.politicalParty = saved.politicalParty;
 		if (saved.totalVotes) this.totalVotes = saved.totalVotes;
 		if (saved.hasSeenPause) this.hasSeenPause = saved.hasSeenPause;
 		if (saved.hasAgreedToTos) this.hasAgreedToTos = saved.hasAgreedToTos;
@@ -108,6 +112,7 @@ class Session {
 					zipCode: this.zipCode,
 					pid: this.pid,
 					demographicsCompleted: this.demographicsCompleted,
+					politicalParty: this.politicalParty,
 					totalVotes: this.totalVotes,
 					hasSeenPause: this.hasSeenPause,
 					hasAgreedToTos: this.hasAgreedToTos,
@@ -169,6 +174,17 @@ class Session {
 
 	markDemographicsCompleted() {
 		this.demographicsCompleted = true;
+		this.persist();
+	}
+
+	/** Whether the up-front political leaning question has been answered. */
+	get politicalPartyAnswered(): boolean {
+		return !!this.politicalParty;
+	}
+
+	/** Persist the up-front political leaning locally so the end screen can prefill it. */
+	savePoliticalParty(value: string) {
+		this.politicalParty = value;
 		this.persist();
 	}
 

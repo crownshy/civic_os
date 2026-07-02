@@ -10,9 +10,11 @@
 	import PolisApi from '$lib/services/polis-api.svelte';
 	import { session } from '$lib/services/session.svelte';
 	import { config } from '$lib/services/api';
+	import { trackEvent } from '@lukulent/svelte-umami';
 	import VotingScreen from './VotingScreen.svelte';
 	import ComposeScreen from './ComposeScreen.svelte';
 	import DidYouKnowScreen from './DidYouKnowScreen.svelte';
+	import PoliticalScreen from './PoliticalScreen.svelte';
 	import AboutYouScreen from './AboutYouScreen.svelte';
 	import NiceJobScreen from './NiceJobScreen.svelte';
 	import ThankYouScreen from './ThankYouScreen.svelte';
@@ -45,6 +47,7 @@
 
 	type Screen =
 		| 'loading'
+		| 'political'
 		| 'voting'
 		| 'compose'
 		| 'pause'
@@ -60,7 +63,18 @@
 
 	// Returning user: show loading splash until Polis resolves, then decide screen
 	const isReturning = session.pid !== undefined;
-	const initialScreen: Screen = session.demographicsCompleted && isReturning ? 'loading' : 'voting';
+
+	// Utah-only: the political-leaning question is mandatory and asked up front,
+	// before Polis. Any Utah user who hasn't answered yet is gated here — including
+	// returning users who joined before this shipped. See CONTEXT.md ("Political leaning").
+	const politicalQuestion = aboutYouQuestions.find((q) => q.id === 'about-004');
+	const needsPolitical =
+		subdomainRegion.slug === 'utah' && !session.politicalPartyAnswered && !!politicalQuestion;
+
+	// Where to land once the political gate (if any) is cleared.
+	const postPoliticalScreen: Screen =
+		session.demographicsCompleted && isReturning ? 'loading' : 'voting';
+	const initialScreen: Screen = needsPolitical ? 'political' : postPoliticalScreen;
 	let screen = $state<Screen>(initialScreen);
 	let totalVotes = $state(session.totalVotes);
 	let hasSeenPause = $state(session.hasSeenPause);
@@ -162,6 +176,15 @@
 		return ageMap[ageRange];
 	}
 
+	/** Utah up-front political-leaning step: save immediately, then continue to Polis. */
+	async function handlePoliticalDone(politicalParty: string) {
+		session.savePoliticalParty(politicalParty);
+		// Re-send the known zip so this partial write can't null it out (see plan / ADR).
+		await session.saveProfile({ zipcode: session.zipCode, politicalParty });
+		trackEvent('AnsweredPoliticalLeaning');
+		screen = postPoliticalScreen;
+	}
+
 	async function handleDemographicsDone(demographics?: {
 		age?: string;
 		ethnicity?: string;
@@ -197,7 +220,14 @@
 </script>
 
 <AppShell>
-	{#if screen === 'loading'}
+	{#if screen === 'political' && politicalQuestion}
+		<PoliticalScreen
+			question={politicalQuestion}
+			countyName={session.county}
+			region={subdomainRegion}
+			onDone={handlePoliticalDone}
+		/>
+	{:else if screen === 'loading'}
 		<div class="flex h-full flex-col items-center justify-center bg-gradient-primary">
 			<div class="animate-pulse text-center">
 				<span class="font-mono text-base font-medium text-muted-foreground/60 uppercase"
@@ -274,6 +304,7 @@
 			countyName={session.county}
 			questions={aboutYouQuestions}
 			zipCode={session.zipCode}
+			initialPoliticalParty={session.politicalParty}
 			onDone={handleDemographicsDone}
 		/>
 	{:else if screen === 'thank-you'}
