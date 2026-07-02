@@ -3,8 +3,8 @@
 		Accordion,
 		AccordionItem,
 		AccordionTrigger,
-		AccordionContent
-	} from '@civicos/shared/ui/accordion';
+		AccordionContent,
+	} from "@civicos/shared/ui/accordion";
 
 	export interface Quote {
 		text: string;
@@ -51,11 +51,15 @@
 						value={topic.id}
 						class="bg-secondary/50 border-border rounded-md border px-3"
 					>
-						<AccordionTrigger class="text-foreground py-3 text-sm font-medium hover:no-underline">
+						<AccordionTrigger
+							class="text-foreground py-3 text-sm font-medium hover:no-underline"
+						>
 							{topic.title}
 						</AccordionTrigger>
 						<AccordionContent>
-							<p class="text-muted-foreground mb-3 text-sm leading-relaxed">{topic.description}</p>
+							<p class="text-muted-foreground mb-3 text-sm leading-relaxed">
+								{topic.description}
+							</p>
 
 							{#if topic.subtopics && topic.subtopics.length > 0}
 								<Accordion type="multiple" class="flex flex-col gap-1.5">
@@ -70,25 +74,32 @@
 												{subtopic.title}
 											</AccordionTrigger>
 											<AccordionContent>
-												<p class="text-muted-foreground mb-2 text-xs leading-relaxed">
+												<p
+													class="text-muted-foreground mb-2 text-xs leading-relaxed"
+												>
 													{subtopic.description}
 												</p>
 
 												{#if subtopic.claims && subtopic.claims.length > 0}
 													<div class="mt-2 flex flex-col gap-2">
-														<span class="text-primary text-xs font-semibold tracking-wide uppercase">
+														<span
+															class="text-primary text-xs font-semibold tracking-wide uppercase"
+														>
 															Key Claims ({subtopic.claims.length})
 														</span>
 														{#each subtopic.claims.slice(0, 3) as claim}
 															<div class="bg-card rounded p-2.5">
-																<p class="text-foreground mb-1.5 text-xs leading-snug">
+																<p
+																	class="text-foreground mb-1.5 text-xs leading-snug"
+																>
 																	{claim.title}
 																</p>
 																{#if claim.quotes && claim.quotes.length > 0}
 																	<button
 																		type="button"
 																		class="group mt-1 w-full text-left"
-																		onclick={() => onQuoteClick(claim.quotes![0])}
+																		onclick={() =>
+																			onQuoteClick(claim.quotes![0])}
 																		title="Jump to this moment in the audio"
 																	>
 																		<blockquote

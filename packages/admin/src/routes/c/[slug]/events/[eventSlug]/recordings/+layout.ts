@@ -1,6 +1,7 @@
-import type { PageLoad } from './$types';
 
-export const load: PageLoad = async ({ parent, params, depends }) => {
+import type { LayoutLoad } from './$types';
+
+export const load: LayoutLoad = async ({ parent, params, depends }) => {
 	depends(`recordings:list:${params.eventSlug}`);
 
 	const { api, region } = await parent();

@@ -49,6 +49,10 @@
 
 				transcriptData = await transcriptResponse.json();
 				reportData = await reportResponse.json();
+				if (typeof reportData === "string") {
+					console.log("Parsing report data");
+					reportData = JSON.parse(reportData);
+				}
 				loading = false;
 			} catch (err) {
 				error = err.message;
@@ -68,6 +72,7 @@
 		}
 	}
 
+	$inspect(reportData);
 	let topics = $derived(reportData?.data?.[1]?.topics ?? []);
 
 	let sourceIdToTime = $derived.by(() => {
