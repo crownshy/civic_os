@@ -12,8 +12,6 @@
 		questions: AboutYouQuestion[];
 		zipCode?: string;
 		region: RegionConfig;
-		/** Prefills the political-leaning question when captured earlier. */
-		initialPoliticalParty?: string;
 		onDone: (demographics?: {
 			age?: string;
 			ethnicity?: string;
@@ -23,31 +21,11 @@
 		onSkip?: () => void;
 	}
 
-	let {
-		countyName,
-		questions,
-		zipCode = '',
-		onDone,
-		onSkip,
-		region,
-		initialPoliticalParty
-	}: Props = $props();
+	let { countyName, questions, zipCode = '', onDone, onSkip, region }: Props = $props();
 
 	let openDialog = $state<string | null>(null);
 	let dialogOpen = $derived(openDialog !== null);
-
-	// Seed the political-leaning question when it was already answered up front.
-	function buildInitialSelections(): Record<string, SvelteSet<number>> {
-		const init: Record<string, SvelteSet<number>> = {};
-		if (initialPoliticalParty) {
-			const q = questions.find((question) => question.id === 'about-004');
-			const idx = q ? q.options.indexOf(initialPoliticalParty) : -1;
-			if (q && idx >= 0) init[q.id] = new SvelteSet<number>([idx]);
-		}
-		return init;
-	}
-
-	let selections = $state<Record<string, SvelteSet<number>>>(buildInitialSelections());
+	let selections = $state<Record<string, SvelteSet<number>>>({});
 
 	function openCategory(id: string) {
 		openDialog = id;
