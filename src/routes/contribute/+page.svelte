@@ -10,11 +10,9 @@
 	import PolisApi from '$lib/services/polis-api.svelte';
 	import { session } from '$lib/services/session.svelte';
 	import { config } from '$lib/services/api';
-	import { trackEvent } from '@lukulent/svelte-umami';
 	import VotingScreen from './VotingScreen.svelte';
 	import ComposeScreen from './ComposeScreen.svelte';
 	import DidYouKnowScreen from './DidYouKnowScreen.svelte';
-	import PoliticalScreen from './PoliticalScreen.svelte';
 	import AboutYouScreen from './AboutYouScreen.svelte';
 	import NiceJobScreen from './NiceJobScreen.svelte';
 	import ThankYouScreen from './ThankYouScreen.svelte';
@@ -42,12 +40,12 @@
 	});
 
 	// --- simplified flow ---
-	// voting → (after FIRST_BATCH) pause → voting (SECOND_BATCH more) → ...
-	// END at any point or out of statements → about-you → email-capture (if needed) → thank-you
+	// voting → (after FIRST_BATCH) about-you (demographics, optional) → pause CTA →
+	//   voting (SECOND_BATCH more) → ... → END/out of statements → thank-you.
+	// Early-enders who never reached FIRST_BATCH still see about-you once at the end.
 
 	type Screen =
 		| 'loading'
-		| 'political'
 		| 'voting'
 		| 'compose'
 		| 'pause'
@@ -63,24 +61,16 @@
 
 	// Returning user: show loading splash until Polis resolves, then decide screen
 	const isReturning = session.pid !== undefined;
-
-	// Utah-only: the political-leaning question is mandatory and asked up front,
-	// before Polis. Any Utah user who hasn't answered yet is gated here — including
-	// returning users who joined before this shipped. See CONTEXT.md ("Political leaning").
-	const politicalQuestion = aboutYouQuestions.find((q) => q.id === 'about-004');
-	const needsPolitical =
-		subdomainRegion.slug === 'utah' && !session.politicalPartyAnswered && !!politicalQuestion;
-
-	// Where to land once the political gate (if any) is cleared.
-	const postPoliticalScreen: Screen =
-		session.demographicsCompleted && isReturning ? 'loading' : 'voting';
-	const initialScreen: Screen = needsPolitical ? 'political' : postPoliticalScreen;
+	const initialScreen: Screen = session.demographicsCompleted && isReturning ? 'loading' : 'voting';
 	let screen = $state<Screen>(initialScreen);
 	let totalVotes = $state(session.totalVotes);
 	let hasSeenPause = $state(session.hasSeenPause);
 	let votesInRound = $state(hasSeenPause ? 0 : totalVotes);
 	// Tracks when user explicitly pressed END in this session — prevents thank-you→voting loop
 	let userEndedVoting = $state(false);
+	// Where the demographics screen returns to: the statement-CTA pause when shown at the
+	// FIRST_BATCH mark, or thank-you when shown as the end-of-flow fallback.
+	let demographicsReturnTo = $state<'pause' | 'thank-you'>('thank-you');
 
 	// Anchor Polis counts once to avoid fluctuation from parallel vote+nextComment requests.
 	// After anchoring, we decrement client-side instead of reading polis.remaining directly.
@@ -138,21 +128,28 @@
 		if (votesInRound >= batchLimit) {
 			votesInRound = 0;
 			if (!hasSeenPause) {
-				// First batch done → soft pause
+				// First batch done → demographics (optional), then the statement-CTA pause.
 				hasSeenPause = true;
 				session.saveVoteProgress(totalVotes, hasSeenPause);
-				screen = 'pause';
+				if (session.demographicsCompleted) {
+					screen = 'pause';
+				} else {
+					demographicsReturnTo = 'pause';
+					screen = 'about-you';
+				}
 			}
 			// After second batch, keep voting until they press END or run out
 		}
 	}
 
-	/** Transition to the ending sequence: demographics → email → thank-you */
+	/** Transition to the ending sequence. Fallback: show demographics here if the user
+	 *  ended before FIRST_BATCH and never saw it. */
 	function goToEndFlow() {
 		userEndedVoting = true;
 		if (session.demographicsCompleted) {
 			screen = 'thank-you';
 		} else {
+			demographicsReturnTo = 'thank-you';
 			screen = 'about-you';
 		}
 	}
@@ -176,15 +173,6 @@
 		return ageMap[ageRange];
 	}
 
-	/** Utah up-front political-leaning step: save immediately, then continue to Polis. */
-	async function handlePoliticalDone(politicalParty: string) {
-		session.savePoliticalParty(politicalParty);
-		// Re-send the known zip so this partial write can't null it out (see plan / ADR).
-		await session.saveProfile({ zipcode: session.zipCode, politicalParty });
-		trackEvent('AnsweredPoliticalLeaning');
-		screen = postPoliticalScreen;
-	}
-
 	async function handleDemographicsDone(demographics?: {
 		age?: string;
 		ethnicity?: string;
@@ -202,7 +190,7 @@
 		}
 
 		session.markDemographicsCompleted();
-		screen = 'thank-you';
+		screen = demographicsReturnTo;
 	}
 
 	function resumeVoting() {
@@ -220,14 +208,7 @@
 </script>
 
 <AppShell>
-	{#if screen === 'political' && politicalQuestion}
-		<PoliticalScreen
-			question={politicalQuestion}
-			countyName={session.county}
-			region={subdomainRegion}
-			onDone={handlePoliticalDone}
-		/>
-	{:else if screen === 'loading'}
+	{#if screen === 'loading'}
 		<div class="flex h-full flex-col items-center justify-center bg-gradient-primary">
 			<div class="animate-pulse text-center">
 				<span class="font-mono text-base font-medium text-muted-foreground/60 uppercase"
@@ -304,7 +285,6 @@
 			countyName={session.county}
 			questions={aboutYouQuestions}
 			zipCode={session.zipCode}
-			initialPoliticalParty={session.politicalParty}
 			onDone={handleDemographicsDone}
 		/>
 	{:else if screen === 'thank-you'}
