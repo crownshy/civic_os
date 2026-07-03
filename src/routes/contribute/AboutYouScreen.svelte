@@ -103,22 +103,22 @@
 			class="mt-4 font-display text-4xl leading-9 font-medium tracking-display text-foreground"
 			in:fly={{ y: 10, duration: 400, delay: 200, easing: cubicOut }}
 		>
-			Help {region.stateName} see itself.
+			Please share a bit about yourself.
 		</p>
 
 		<p
 			class="mt-3 font-sans text-sm font-medium text-foreground"
 			in:fly={{ y: 10, duration: 400, delay: 300, easing: cubicOut }}
 		>
-			This conversation is richer when it reflects the full range of {region.stateName}. Sharing a
-			little about yourself helps the whole community see who's in this conversation — and whose
-			voices might still be missing.
+			In order to ensure we are hearing from people with diverse perspectives and experiences, we
+			ask that you answer a few questions that will tell us something about the views included here,
+			and who we still need to hear from.
 		</p>
 		<p
 			class="mt-3 font-sans text-sm font-medium text-foreground"
 			in:fly={{ y: 10, duration: 400, delay: 300, easing: cubicOut }}
 		>
-			Every question is optional. Share only what you're comfortable with.
+			Thanks very much!
 		</p>
 
 		<p
