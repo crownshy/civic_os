@@ -2,45 +2,42 @@
 	/**
 	 * Visual indicator for one group's vote breakdown on a single statement.
 	 * Renders a colored ring showing the dominant vote (agree/disagree/pass)
-	 * with a small "remainder" arc beneath it, and the dominant percentage
-	 * inside the ring.
+	 * with the dominant percentage inside the ring.
 	 */
 	interface Props {
-		label: string;
+		label?: string;
 		agreed: number;
 		disagreed: number;
 		passed: number;
 		size?: 'sm' | 'md';
+		/** Show the group label beneath the ring. Off in dense statement rows. */
+		showLabel?: boolean;
 	}
 
-	let { label, agreed, disagreed, passed, size = 'sm' }: Props = $props();
+	let { label = '', agreed, disagreed, passed, size = 'sm', showLabel = true }: Props = $props();
 
 	type Verdict = 'agree' | 'disagree' | 'pass';
 	const verdict = $derived<Verdict>(
-		agreed >= disagreed && agreed >= passed
-			? 'agree'
-			: disagreed >= passed
-				? 'disagree'
-				: 'pass'
+		agreed >= disagreed && agreed >= passed ? 'agree' : disagreed >= passed ? 'disagree' : 'pass'
 	);
-	const pct = $derived(
-		verdict === 'agree' ? agreed : verdict === 'disagree' ? disagreed : passed
-	);
+	const pct = $derived(verdict === 'agree' ? agreed : verdict === 'disagree' ? disagreed : passed);
 	const ringClass = $derived(
 		verdict === 'agree'
-			? 'border-primary'
+			? 'border-consensus'
 			: verdict === 'disagree'
 				? 'border-destructive'
-				: 'border-input'
+				: 'border-border'
 	);
-	const ringSize = $derived(size === 'md' ? 'size-9' : 'size-8');
+	const ringSize = $derived(size === 'md' ? 'size-11' : 'size-10');
 </script>
 
 <div class="flex flex-col items-center gap-0.5">
 	<div
-		class={`relative ${ringSize} rounded-full border-4 ${ringClass} flex items-center justify-center`}
+		class={`relative ${ringSize} rounded-full border-[5px] ${ringClass} flex items-center justify-center`}
 	>
-		<span class="text-foreground text-caption font-bold leading-none">{Math.round(pct)}</span>
+		<span class="font-ui text-foreground text-caption font-bold leading-none">{Math.round(pct)}</span>
 	</div>
-	<span class="text-muted-foreground text-caption font-semibold uppercase">{label}</span>
+	{#if showLabel && label}
+		<span class="text-muted-foreground text-caption font-semibold uppercase">{label}</span>
+	{/if}
 </div>

@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { Pencil } from '@lucide/svelte';
+	import { Target } from '@lucide/svelte';
 	import Card from '@civicos/shared/ui/Card.svelte';
-	import { Button } from '@civicos/shared/ui/button';
 	import Meter from './Meter.svelte';
 
 	interface Row {
@@ -43,10 +42,10 @@
 	const GOAL_ANCHOR = 75;
 </script>
 
-<Card class="hover:border-muted-foreground/40 shadow-card transition-colors duration-200">
-	<header class="flex items-start justify-between gap-4 px-6 pt-6 pb-2">
+<Card class="hover:border-muted-foreground/40 shadow-card rounded-[20px] transition-colors duration-200">
+	<header class="flex items-start justify-between gap-4 px-8 pt-8 pb-2">
 		<div>
-			<h2 class="text-display font-semibold">{title}</h2>
+			<h2 class="font-display text-display font-semibold">{title}</h2>
 			<p class="text-section mt-1">
 				<span class="font-medium">n = {total}</span>
 				{#if respondentPct !== null}
@@ -55,21 +54,20 @@
 			</p>
 		</div>
 		{#if showGoals}
-			<Button
-				size="sm"
-				variant="outline"
+			<button
+				type="button"
 				onclick={onModifyGoals}
-				class="bg-muted border-transparent text-destructive hover:bg-muted-foreground/20 hover:border-destructive/40 rounded-full transition-all hover:scale-105 active:scale-95"
+				class="bg-muted text-destructive inline-flex shrink-0 items-center gap-1.5 rounded-[30px] px-3 py-2 text-body font-semibold transition-all hover:scale-105 active:scale-95"
 			>
-				<Pencil class="size-3.5" />
+				<Target class="size-4" />
 				Modify Goals
-			</Button>
+			</button>
 		{/if}
 	</header>
 
 	<!-- Column headings -->
 	<div
-		class="text-foreground/40 text-caption grid grid-cols-[2fr_3fr_auto_auto_auto_auto] items-center gap-6 px-6 pt-4 pb-2 font-semibold uppercase"
+		class="text-foreground/40 text-caption font-ui grid grid-cols-[2fr_3fr_auto_auto_auto_auto] items-center gap-6 px-8 pt-4 pb-2 font-semibold uppercase"
 	>
 		<div>Category</div>
 		<div>Progress</div>
@@ -90,20 +88,20 @@
 			{@const pctToGoal = row.goal && row.goal > 0 ? (row.count / row.goal) * 100 : null}
 			{@const barColor =
 				pctToGoal === null
-					? 'bg-orange-600'
+					? 'bg-meter-under'
 					: pctToGoal >= 100
-						? 'bg-green-600'
+						? 'bg-meter-met'
 						: pctToGoal >= 50
-							? 'bg-amber-500'
-							: 'bg-orange-600'}
+							? 'bg-meter-near'
+							: 'bg-meter-under'}
 			{@const goalTextColor =
 				pctToGoal === null
-					? 'text-orange-600'
+					? 'text-meter-under'
 					: pctToGoal >= 100
-						? 'text-green-600'
+						? 'text-meter-met'
 						: pctToGoal >= 50
-							? 'text-amber-500'
-							: 'text-orange-600'}
+							? 'text-meter-near'
+							: 'text-meter-under'}
 			<!-- Goal-relative fill: hitting the goal reaches the marker (GOAL_ANCHOR%),
 			     overshoot extends past it. No goal → plain share-of-total. -->
 			{@const fillPct =
@@ -111,9 +109,9 @@
 					? Math.min(100, pctOfTotal)
 					: Math.min(100, (pctToGoal / 100) * GOAL_ANCHOR)}
 			<div
-				class="text-section hover:bg-muted/40 grid grid-cols-[2fr_3fr_auto_auto_auto_auto] items-center gap-6 px-6 py-4 transition-colors duration-150"
+				class="text-section font-ui hover:bg-muted/40 grid grid-cols-[2fr_3fr_auto_auto_auto_auto] items-center gap-6 px-8 py-4 transition-colors duration-150"
 			>
-				<div class="truncate font-bold">{row.label}</div>
+				<div class="font-sans truncate font-bold">{row.label}</div>
 
 				<!-- Distribution bar -->
 				<Meter

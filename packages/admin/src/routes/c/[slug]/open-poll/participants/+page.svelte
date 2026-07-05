@@ -6,8 +6,6 @@
 	import { zipCentroid } from "$lib/utils/zip-centroids";
 	import type { GoalMetric } from "$lib/config/representation-goals";
 	import Card from "@civicos/shared/ui/Card.svelte";
-	import { Button } from "@civicos/shared/ui/button";
-	import { Pencil } from "@lucide/svelte";
 
 	let { data } = $props();
 
@@ -117,7 +115,7 @@
 {:else}
 	<div class="flex-1 overflow-y-auto px-8 py-8">
 		<!-- Hero metric row -->
-		<div class="flex items-end justify-between gap-4 pb-8">
+		<div class="pb-8">
 			<PollStatRow
 				stats={[
 					{
@@ -126,31 +124,27 @@
 						accent:
 							participantsDelta > 0 ? ` (+${participantsDelta})` : undefined,
 					},
-					{ label: "Goal", value: participantsGoal || "—" },
+					{
+						label: "Goal",
+						value: participantsGoal || "—",
+						action: {
+							label: "MODIFY",
+							onclick: () => openModal("totalParticipants"),
+						},
+					},
 				]}
 			/>
-			<Button
-				size="sm"
-				variant="outline"
-				onclick={() => openModal("totalParticipants")}
-				class="bg-muted border-transparent text-destructive hover:bg-muted-foreground/20 hover:border-destructive/40 rounded-full transition-all hover:scale-105 active:scale-95"
-			>
-				<Pencil class="size-3.5" />
-				Modify Goal
-			</Button>
 		</div>
 
 		<!-- Jump-to pills -->
 		<div
 			class="bg-background/85 sticky top-0 z-10 -mx-8 flex flex-wrap items-center gap-2 px-8 py-3 backdrop-blur"
 		>
-			<span class="text-foreground/70 text-caption pr-2 font-medium"
-				>Jump to:</span
-			>
+			<span class="text-foreground/70 text-body pr-2 font-medium">Jump to:</span>
 			{#each jumpLinks as link (link.href)}
 				<a
 					href={link.href}
-					class="bg-muted text-caption hover:bg-muted-foreground/20 inline-flex cursor-pointer items-center rounded-full px-3 py-1.5 font-medium transition-all duration-150 hover:scale-[1.04] hover:shadow-sm active:scale-[0.97]"
+					class="bg-muted text-body inline-flex cursor-pointer items-center rounded-[30px] px-3 py-2 font-medium transition-all duration-150 hover:scale-[1.04] hover:shadow-sm active:scale-[0.97]"
 				>
 					{link.label}
 				</a>
@@ -161,12 +155,12 @@
 			<!-- Geography card: table + map (no goals — zipcode buckets are open-ended) -->
 			<div id="geography" class="scroll-mt-4">
 				<Card
-					class="hover:border-muted-foreground/40 shadow-card transition-colors duration-200"
+					class="hover:border-muted-foreground/40 shadow-card rounded-[20px] transition-colors duration-200"
 				>
-					<header class="flex items-start justify-between gap-4 px-6 pt-6 pb-2">
+					<header class="flex items-start justify-between gap-4 px-8 pt-8 pb-2">
 						<div>
-							<h2 class="text-section font-bold">Geography</h2>
-							<p class="text-caption mt-1">
+							<h2 class="font-display text-display font-semibold">Geography</h2>
+							<p class="text-section mt-1">
 								<span class="font-medium">n = {totalGeography}</span>
 								{#if totalParticipants}
 									<span class="text-foreground/50 font-medium"
@@ -177,10 +171,10 @@
 							</p>
 						</div>
 					</header>
-					<div class="grid grid-cols-1 gap-6 px-6 pb-6 lg:grid-cols-2">
+					<div class="grid grid-cols-1 gap-6 px-8 pb-8 lg:grid-cols-2">
 						<div class="divide-border divide-y">
 							<div
-								class="text-foreground/40 text-label grid grid-cols-[2fr_auto_auto] items-center gap-4 py-2 font-semibold uppercase"
+								class="text-foreground/40 text-label font-ui grid grid-cols-[2fr_auto_auto] items-center gap-4 py-2 font-semibold uppercase"
 							>
 								<div>Zip Code</div>
 								<div class="w-12 text-right">Count</div>
@@ -188,7 +182,7 @@
 							</div>
 							{#each geographyRows as row (row.label)}
 								<div
-									class="text-caption hover:bg-muted/40 grid grid-cols-[2fr_auto_auto] items-center gap-4 rounded-md px-1 py-2.5 transition-colors duration-150"
+									class="text-caption font-ui hover:bg-muted/40 grid grid-cols-[2fr_auto_auto] items-center gap-4 rounded-md px-1 py-2.5 transition-colors duration-150"
 								>
 									<div class="truncate font-semibold">{row.label}</div>
 									<div class="w-12 text-right font-semibold">{row.count}</div>

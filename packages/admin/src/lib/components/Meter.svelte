@@ -10,17 +10,17 @@
 		class?: string;
 	}
 
-	let { fill, fillClass = 'bg-primary', marker = null, class: className = '' }: Props = $props();
+	let { fill, fillClass = 'bg-meter-met', marker = null, class: className = '' }: Props = $props();
 
 	const clampedFill = $derived(Math.min(100, Math.max(0, fill)));
 </script>
 
-<div class={`bg-muted border-border relative h-[11px] overflow-hidden border ${className}`}>
+<div class={`bg-meter-track relative h-2.5 overflow-hidden rounded ${className}`}>
 	<div
-		class={`h-full transition-all duration-300 ${fillClass}`}
+		class={`h-full rounded transition-all duration-300 ${fillClass}`}
 		style:width={`${clampedFill}%`}
 	></div>
 	{#if marker !== null}
-		<div class="absolute top-0 bottom-0 w-px bg-stone-400" style:left={`${marker}%`}></div>
+		<div class="absolute top-0 bottom-0 w-px bg-stone-300" style:left={`${marker}%`}></div>
 	{/if}
 </div>

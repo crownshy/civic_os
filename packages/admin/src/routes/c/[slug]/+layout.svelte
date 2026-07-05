@@ -28,15 +28,15 @@
 {:else}
 	<!-- Top bar -->
 	<header
-		class="border-border flex min-h-28 flex-col items-start justify-between gap-3 border-b px-4 py-4 sm:flex-row sm:items-center sm:gap-4 sm:px-7 sm:py-5"
+		class="border-foreground/30 flex min-h-28 flex-col items-start justify-between gap-3 border-b px-4 py-4 sm:flex-row sm:items-center sm:gap-4 sm:px-7 sm:py-5"
 	>
-		<h1 class="text-display min-w-0 flex-1 font-bold leading-tight text-balance">
+		<h1 class="font-display min-w-0 flex-1 text-5xl font-bold leading-tight text-balance">
 			{title}
 		</h1>
-		<div class="flex max-w-full shrink-0 items-center gap-1 overflow-hidden">
+		<div class="font-ui flex max-w-full shrink-0 items-center gap-1 overflow-hidden">
 			{#if isLive}
 				<span
-					class="bg-primary text-primary-foreground shrink-0 px-1.5 py-0.5 text-body font-semibold leading-5"
+					class="bg-primary shrink-0 px-2 py-0.5 text-body font-semibold leading-6 text-white"
 				>
 					LIVE
 				</span>
@@ -45,7 +45,7 @@
 				href={region.shareUrl}
 				target="_blank"
 				rel="noopener noreferrer"
-				class="bg-destructive/10 text-destructive truncate px-1.5 py-0.5 text-body font-medium leading-5 underline"
+				class="bg-destructive/10 text-destructive truncate px-2 py-0.5 text-body font-medium leading-6 underline"
 			>
 				{region.shareUrl.replace(/^https?:\/\//, '')} ↗
 			</a>
@@ -53,13 +53,13 @@
 	</header>
 
 	<!-- Main tabs -->
-	<nav class="border-border flex flex-nowrap items-center overflow-x-auto border-b px-5">
+	<nav class="border-foreground/30 font-ui flex flex-nowrap items-center overflow-x-auto border-b px-5">
 		{#each tabs as tab}
 			<a
 				href={`/c/${region.slug}/${tab.href}`}
-				class={`relative h-11 shrink-0 px-2.5 py-3 text-body font-medium whitespace-nowrap ${
+				class={`relative h-12 shrink-0 px-3 py-3 text-body font-medium whitespace-nowrap ${
 					activeTab === tab.href
-						? 'text-foreground border-destructive border-b-2'
+						? 'text-destructive border-destructive border-b-[3px]'
 						: 'text-foreground/50 hover:text-foreground/80'
 				}`}
 			>

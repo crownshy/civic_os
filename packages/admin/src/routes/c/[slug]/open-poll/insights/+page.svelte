@@ -11,7 +11,6 @@
 		getEngagementStats,
 		getConsensusStatements,
 		getDifferenceStatements,
-		getUncertaintyStatements,
 		getThemeSummaries,
 		totalVotes
 	} from '$lib/utils/report';
@@ -24,7 +23,7 @@
 	import PollStatRow from '$lib/components/PollStatRow.svelte';
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import { Button } from '@civicos/shared/ui/button';
-	import { Download } from '@lucide/svelte';
+	import { Download, ChevronDown } from '@lucide/svelte';
 
 	let { data }: PageProps = $props();
 
@@ -69,8 +68,12 @@
 	let consensusExcludePasses = $state(false);
 	let differencesExcludeHosts = $state(true);
 	let differencesExcludePasses = $state(false);
-	let uncertainExcludeHosts = $state(true);
-	let uncertainExcludePasses = $state(false);
+
+	// Collapse long lists to a preview; "See all" expands in place.
+	const COLLAPSED_ROWS = 5;
+	let consensusExpanded = $state(false);
+	let differencesExpanded = $state(false);
+	let showAllThemes = $state(false);
 
 	const consensus = $derived(
 		reportData ? getConsensusStatements(reportData, { excludePasses: consensusExcludePasses }) : []
@@ -80,14 +83,12 @@
 			? getDifferenceStatements(reportData, { excludePasses: differencesExcludePasses })
 			: []
 	);
-	const uncertain = $derived(reportData ? getUncertaintyStatements(reportData) : []);
 
 	const filterHosts = (list: ReportComment[], excludeHosts: boolean) =>
 		excludeHosts ? list.filter((c) => !c.is_seed) : list;
 
 	const consensusFiltered = $derived(filterHosts(consensus, consensusExcludeHosts));
 	const differencesFiltered = $derived(filterHosts(differences, differencesExcludeHosts));
-	const uncertainFiltered = $derived(filterHosts(uncertain, uncertainExcludeHosts));
 
 	/** All themes used anywhere on this conversation — powers the picker dropdown. */
 	const availableThemes = $derived.by(() => {
@@ -111,6 +112,19 @@
 		if (theme) list = list.filter((c) => c.topics?.includes(theme));
 		return list.sort((a, b) => totalVotes(b) - totalVotes(a));
 	});
+
+	// "Low data quality" = statements with too few votes to be reliable. There's
+	// no quality field in the report payload, so this is a tunable heuristic
+	// (documented in CONTEXT.md). Low-quality rows are split out of the main
+	// Explorer list into a collapsed group.
+	const LOW_QUALITY_VOTES = 7;
+	let showLowQuality = $state(false);
+	const explorerMain = $derived(
+		explorerStatements.filter((c) => totalVotes(c) >= LOW_QUALITY_VOTES)
+	);
+	const explorerLowQuality = $derived(
+		explorerStatements.filter((c) => totalVotes(c) < LOW_QUALITY_VOTES)
+	);
 
 	function toggleTheme(theme: string) {
 		selectedTheme = selectedTheme === theme ? null : theme;
@@ -221,23 +235,24 @@
 
 		<!-- ===== Themes card ===== -->
 		<Card
-			class="hover:border-muted-foreground/40 bg-card shadow-card transition-colors duration-200"
+			class="hover:border-muted-foreground/40 shadow-card rounded-[20px] transition-colors duration-200"
 		>
-			<header class="flex items-start justify-between gap-4 px-6 pt-6">
+			<header class="flex items-start justify-between gap-4 px-8 pt-8">
 				<div>
-					<h2 class="text-foreground text-section font-bold">Themes</h2>
-					<p class="text-foreground/70 text-caption mt-1">What people were talking about.</p>
+					<h2 class="font-display text-foreground text-display font-semibold">Themes</h2>
+					<p class="text-foreground/70 text-section mt-2 font-medium">
+						Click a theme to see all of the statements associated with it.
+					</p>
 				</div>
 				<FilterToggle label="Exclude host statements" bind:checked={themesExcludeHosts} />
 			</header>
 
-			<div class="px-6 pt-4 pb-2">
+			<div class="px-8 pt-6 pb-2">
 				<div
-					class="text-muted-foreground/60 text-label grid grid-cols-[10rem_2.5rem_3rem_1fr_2rem] items-center gap-6 px-0 py-2 font-semibold uppercase"
+					class="font-ui text-muted-foreground/60 text-label grid grid-cols-[10rem_3rem_1fr_2.5rem] items-center gap-6 px-2 py-2 font-semibold uppercase"
 				>
 					<div>Theme</div>
 					<div class="text-right">Count</div>
-					<div class="text-right">Share</div>
 					<div></div>
 					<div></div>
 				</div>
@@ -246,13 +261,25 @@
 						No themes have been generated yet for this conversation.
 					</p>
 				{:else}
-					{#each themes as t (t.theme)}
+					{#each showAllThemes ? themes : themes.slice(0, COLLAPSED_ROWS) as t (t.theme)}
 						<ThemeBar
 							summary={t}
 							total={stats.totalStatements}
 							onclick={() => toggleTheme(t.theme)}
 						/>
 					{/each}
+					{#if themes.length > COLLAPSED_ROWS}
+						<button
+							type="button"
+							onclick={() => (showAllThemes = !showAllThemes)}
+							class="text-foreground/70 hover:text-foreground text-section flex w-full items-center justify-center gap-2 py-4 transition-colors"
+						>
+							{showAllThemes ? 'Show fewer themes' : `See all ${themes.length} themes`}
+							<ChevronDown
+								class={`text-destructive size-4 transition-transform ${showAllThemes ? 'rotate-180' : ''}`}
+							/>
+						</button>
+					{/if}
 				{/if}
 			</div>
 		</Card>
@@ -261,13 +288,17 @@
 		<StatementSection
 			title="Areas of Consensus"
 			description="Statements where all groups strongly agreed with the statement (80%+)."
+			metricLabel="Min Agree"
+			total={consensusFiltered.length}
+			collapsedCount={COLLAPSED_ROWS}
+			bind:expanded={consensusExpanded}
 			bind:excludeHosts={consensusExcludeHosts}
 			bind:excludePasses={consensusExcludePasses}
 		>
 			{#if consensusFiltered.length === 0}
 				<p class="text-muted-foreground text-caption px-4 py-6 italic">No consensus statements yet.</p>
 			{:else}
-				{#each consensusFiltered as c, i (c.tid)}
+				{#each (consensusExpanded ? consensusFiltered : consensusFiltered.slice(0, COLLAPSED_ROWS)) as c, i (c.tid)}
 					<StatementRow
 						index={i + 1}
 						comment={c}
@@ -291,13 +322,17 @@
 		<StatementSection
 			title="Areas of Difference"
 			description="Statements where the spread between the groups was equal to or greater than 30%."
+			metricLabel="Difference"
+			total={differencesFiltered.length}
+			collapsedCount={COLLAPSED_ROWS}
+			bind:expanded={differencesExpanded}
 			bind:excludeHosts={differencesExcludeHosts}
 			bind:excludePasses={differencesExcludePasses}
 		>
 			{#if differencesFiltered.length === 0}
 				<p class="text-muted-foreground text-caption px-4 py-6 italic">No clear differences yet.</p>
 			{:else}
-				{#each differencesFiltered as c, i (c.tid)}
+				{#each (differencesExpanded ? differencesFiltered : differencesFiltered.slice(0, COLLAPSED_ROWS)) as c, i (c.tid)}
 					<StatementRow
 						index={i + 1}
 						comment={c}
@@ -317,41 +352,12 @@
 			{/if}
 		</StatementSection>
 
-		<!-- ===== Areas of Uncertainty ===== -->
-		<StatementSection
-			title="Areas of Uncertainty"
-			description="Statements where the percentage of people who passed was significantly higher than average."
-			bind:excludeHosts={uncertainExcludeHosts}
-			bind:excludePasses={uncertainExcludePasses}
-		>
-			{#if uncertainFiltered.length === 0}
-				<p class="text-muted-foreground text-caption px-4 py-6 italic">
-					No statements of unusual uncertainty yet.
-				</p>
-			{:else}
-				{#each uncertainFiltered as c, i (c.tid)}
-					<StatementRow
-						index={i + 1}
-						comment={c}
-						groups={reportData.groups}
-						variant="uncertainty"
-						excludePasses={uncertainExcludePasses}
-						showVerdictPill
-						picker={{
-							availableThemes,
-							disabled: !auxByTid[c.tid],
-							onAddTheme: (theme) => addThemeFor(c.tid, theme),
-							onRemoveTheme: (theme) => removeThemeFor(c.tid, theme)
-						}}
-						moderation={moderationProp(c.tid)}
-					/>
-				{/each}
-			{/if}
-		</StatementSection>
+		<!-- Areas of Uncertainty is deferred — see CONTEXT.md. Ships as Consensus +
+		     Difference only for now. -->
 
 		<!-- ===== Theme Explorer ===== -->
 		<section class="flex flex-col gap-4">
-			<h2 class="text-foreground text-section font-bold">Theme Explorer</h2>
+			<h2 class="font-display text-foreground text-display font-semibold">Theme Explorer</h2>
 
 			<div class="flex flex-wrap items-center justify-between gap-3">
 				<div class="flex flex-wrap gap-2">
@@ -377,26 +383,25 @@
 			</div>
 
 			<Card
-				class="hover:border-muted-foreground/40 shadow-card transition-colors duration-200"
+				class="hover:border-muted-foreground/40 shadow-card rounded-[20px] transition-colors duration-200"
 			>
 				<div class="flex flex-col">
 					<div
-						class="text-muted-foreground/60 text-label grid grid-cols-[1.5rem_minmax(0,1fr)_minmax(10rem,14rem)_2.5rem_auto_auto] items-center gap-4 px-4 py-2 font-semibold uppercase"
+						class="font-ui text-muted-foreground/60 text-caption grid grid-cols-[2.5rem_minmax(0,1fr)_4rem_5rem_auto] items-center gap-4 px-5 py-3 font-semibold uppercase"
 					>
 						<div>#</div>
 						<div>Statement</div>
-						<div>Theme</div>
-						<div class="text-right">Count</div>
-						<div>Groups</div>
-						<div class="pr-4">Action</div>
+						<div>Author</div>
+						<div class="text-center">Count</div>
+						<div class="text-right">Agree %</div>
 					</div>
 
-					{#if explorerStatements.length === 0}
+					{#if explorerMain.length === 0 && explorerLowQuality.length === 0}
 						<p class="text-muted-foreground text-caption px-4 py-6 italic">
 							No statements match the current filters.
 						</p>
 					{:else}
-						{#each explorerStatements.slice(0, 50) as c, i (c.tid)}
+						{#each explorerMain.slice(0, 50) as c, i (c.tid)}
 							<StatementRow
 								index={i + 1}
 								comment={c}
@@ -411,6 +416,38 @@
 								moderation={moderationProp(c.tid)}
 							/>
 						{/each}
+
+						{#if explorerLowQuality.length > 0}
+							<button
+								type="button"
+								onclick={() => (showLowQuality = !showLowQuality)}
+								class="text-section flex w-full items-center justify-center gap-2 bg-yellow-400/5 py-5 text-yellow-600 transition-colors hover:bg-yellow-400/10"
+							>
+								{showLowQuality
+									? 'Hide low data quality statements'
+									: `See ${explorerLowQuality.length} statements with low data quality`}
+								<ChevronDown
+									class={`size-4 transition-transform ${showLowQuality ? 'rotate-180' : ''}`}
+								/>
+							</button>
+							{#if showLowQuality}
+								{#each explorerLowQuality.slice(0, 50) as c, i (c.tid)}
+									<StatementRow
+										index={i + 1}
+										comment={c}
+										groups={reportData.groups}
+										excludePasses={explorerExcludePasses}
+										picker={{
+											availableThemes,
+											disabled: !auxByTid[c.tid],
+											onAddTheme: (theme) => addThemeFor(c.tid, theme),
+											onRemoveTheme: (theme) => removeThemeFor(c.tid, theme)
+										}}
+										moderation={moderationProp(c.tid)}
+									/>
+								{/each}
+							{/if}
+						{/if}
 					{/if}
 				</div>
 			</Card>

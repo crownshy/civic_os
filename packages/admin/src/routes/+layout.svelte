@@ -60,7 +60,7 @@
 
 	<aside
 		class={[
-			'border-border bg-background flex shrink-0 flex-col border-r transition-[width] duration-200',
+			'border-foreground bg-background font-ui flex shrink-0 flex-col border-r transition-[width] duration-200',
 			// Mobile: fixed drawer
 			'fixed inset-y-0 left-0 z-40 md:static',
 			mobileOpen ? 'flex w-72 px-3' : 'hidden md:flex',
@@ -70,13 +70,13 @@
 	>
 		<div
 			class={[
-				'border-border flex items-center border-b py-4',
+				'border-foreground flex items-center border-b py-4',
 				collapsed && !mobileOpen ? 'justify-center px-0' : 'justify-between gap-2.5 px-1'
 			].join(' ')}
 		>
 			<div class="flex min-w-0 items-center gap-2.5">
 				<div
-					class="bg-destructive size-8 shrink-0 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl"
+					class="bg-destructive border-foreground size-9 shrink-0 rounded-tl-2xl rounded-tr-xl rounded-bl-2xl rounded-br-2xl border"
 				></div>
 				{#if !collapsed || mobileOpen}
 					<span class="truncate text-body font-bold">CivicOS</span>
@@ -126,7 +126,7 @@
 				title="Dashboard"
 				class={[
 					'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-body font-medium',
-					onDashboard ? 'bg-muted-foreground/20' : 'hover:bg-muted/50',
+					onDashboard ? 'bg-destructive/5' : 'hover:bg-muted/50',
 					collapsed && !mobileOpen ? 'justify-center px-0' : ''
 				].join(' ')}
 			>
@@ -138,7 +138,7 @@
 		</nav>
 
 		{#if !collapsed || mobileOpen}
-			<div class="text-muted-foreground px-2.5 py-2 text-caption font-semibold tracking-wider">
+			<div class="text-muted-foreground/70 px-2.5 py-2 text-label font-semibold tracking-wider">
 				CONVERSATIONS
 			</div>
 		{/if}
@@ -167,13 +167,13 @@
 				type="button"
 				title="New Conversation"
 				class={[
-					'bg-primary text-primary-foreground inline-flex items-center gap-1 rounded-[10px] text-body font-medium',
-					collapsed && !mobileOpen ? 'size-9 justify-center p-0' : 'p-2'
+					'text-muted-foreground inline-flex items-center gap-1 rounded-xl outline outline-1 outline-stone-400 text-body font-medium',
+					collapsed && !mobileOpen ? 'size-9 justify-center p-0' : 'p-2.5'
 				].join(' ')}
 			>
 				<Plus class="size-4 shrink-0" />
 				{#if !collapsed || mobileOpen}
-					<span class="font-mono">New Conversation</span>
+					<span>New Conversation</span>
 				{/if}
 			</button>
 		</div>
