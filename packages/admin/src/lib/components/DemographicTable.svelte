@@ -31,13 +31,22 @@
 	const respondentPct = $derived(
 		participantCount ? Math.round((total / participantCount) * 100) : null
 	);
+
+	/**
+	 * Fraction of the track where the goal line sits. The fill reaches this point
+	 * exactly when a category hits 100% of its goal; exceeding the goal extends
+	 * the fill past the marker into the remaining headroom (fill caps at the track
+	 * end, i.e. once a category reaches ~133% of goal). Categories with no goal
+	 * fall back to plain share-of-total and render no marker.
+	 */
+	const GOAL_ANCHOR = 75;
 </script>
 
 <Card class="hover:border-muted-foreground/40 shadow-card transition-colors duration-200">
 	<header class="flex items-start justify-between gap-4 px-6 pt-6 pb-2">
 		<div>
-			<h2 class="text-section font-bold">{title}</h2>
-			<p class="text-caption mt-1">
+			<h2 class="text-display font-semibold">{title}</h2>
+			<p class="text-section mt-1">
 				<span class="font-medium">n = {total}</span>
 				{#if respondentPct !== null}
 					<span class="text-foreground/50 font-medium">({respondentPct}% of respondents)</span>
@@ -59,15 +68,15 @@
 
 	<!-- Column headings -->
 	<div
-		class="text-foreground/40 text-label grid grid-cols-[2fr_3fr_auto_auto_auto_auto] items-center gap-6 px-6 pt-4 pb-2 font-semibold uppercase"
+		class="text-foreground/40 text-caption grid grid-cols-[2fr_3fr_auto_auto_auto_auto] items-center gap-6 px-6 pt-4 pb-2 font-semibold uppercase"
 	>
 		<div>Category</div>
 		<div>Progress</div>
-		<div class="w-12 text-right">Count</div>
+		<div class="w-14 text-right">Count</div>
 		<div class="w-20 text-right">% of total</div>
 		{#if showGoals}
-			<div class="w-12 text-right">Goal</div>
-			<div class="w-16 text-right">% to goal</div>
+			<div class="w-14 text-right">Goal</div>
+			<div class="w-20 text-right">% to goal</div>
 		{:else}
 			<div></div>
 			<div></div>
@@ -78,37 +87,55 @@
 		{#each rows as row (row.label)}
 			{@const pctOfTotal = total > 0 ? (row.count / total) * 100 : 0}
 			{@const pctToGoal = row.goal && row.goal > 0 ? (row.count / row.goal) * 100 : null}
-			{@const reachedGoal = pctToGoal !== null && pctToGoal >= 100}
+			{@const barColor =
+				pctToGoal === null
+					? 'bg-orange-600'
+					: pctToGoal >= 100
+						? 'bg-green-600'
+						: pctToGoal >= 50
+							? 'bg-amber-500'
+							: 'bg-orange-600'}
+			{@const goalTextColor =
+				pctToGoal === null
+					? 'text-orange-600'
+					: pctToGoal >= 100
+						? 'text-green-600'
+						: pctToGoal >= 50
+							? 'text-amber-500'
+							: 'text-orange-600'}
+			<!-- Goal-relative fill: hitting the goal reaches the marker (GOAL_ANCHOR%),
+			     overshoot extends past it. No goal → plain share-of-total. -->
+			{@const fillPct =
+				pctToGoal === null
+					? Math.min(100, pctOfTotal)
+					: Math.min(100, (pctToGoal / 100) * GOAL_ANCHOR)}
 			<div
-				class="text-caption hover:bg-muted/40 grid grid-cols-[2fr_3fr_auto_auto_auto_auto] items-center gap-6 px-6 py-2.5 transition-colors duration-150"
+				class="text-section hover:bg-muted/40 grid grid-cols-[2fr_3fr_auto_auto_auto_auto] items-center gap-6 px-6 py-4 transition-colors duration-150"
 			>
-				<div class="truncate font-semibold">{row.label}</div>
+				<div class="truncate font-bold">{row.label}</div>
 
 				<!-- Progress bar -->
 				<div
-					class="relative h-3 w-full max-w-[220px] overflow-hidden rounded border border-zinc-100 bg-neutral-100"
+					class="relative h-3 w-full overflow-hidden rounded border border-zinc-100 bg-neutral-100"
 				>
 					<div
-						class={`h-full transition-all duration-300 ${reachedGoal ? 'bg-green-500' : 'bg-orange-600'}`}
-						style:width={`${Math.min(100, pctOfTotal)}%`}
+						class={`h-full transition-all duration-300 ${barColor}`}
+						style:width={`${fillPct}%`}
 					></div>
-					{#if row.goal !== undefined && row.goal > 0 && total > 0}
-						{@const goalPct = (row.goal / total) * 100}
+					{#if pctToGoal !== null}
 						<div
 							class="absolute top-0 bottom-0 w-px bg-stone-400"
-							style:left={`${Math.min(100, goalPct)}%`}
+							style:left={`${GOAL_ANCHOR}%`}
 						></div>
 					{/if}
 				</div>
 
-				<div class="w-12 text-right font-semibold">{row.count}</div>
-				<div class="w-20 text-right font-semibold">{Math.round(pctOfTotal)}%</div>
+				<div class="w-14 text-right font-bold">{row.count}</div>
+				<div class="w-20 text-right font-bold">{Math.round(pctOfTotal)}%</div>
 
 				{#if showGoals}
-					<div class="w-12 text-right font-semibold">{row.goal ?? '—'}</div>
-					<div
-						class={`w-16 text-right font-semibold ${reachedGoal ? 'text-green-600' : 'text-orange-600'}`}
-					>
+					<div class="w-14 text-right font-bold">{row.goal ?? '—'}</div>
+					<div class={`w-20 text-right font-bold ${goalTextColor}`}>
 						{pctToGoal === null ? '—' : `${Math.round(pctToGoal)}%`}
 					</div>
 				{:else}

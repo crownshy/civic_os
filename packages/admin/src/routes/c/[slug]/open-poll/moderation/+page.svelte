@@ -4,14 +4,38 @@
 	import {
 		addStatementAuxTheme,
 		moderateStatementAux,
-		removeStatementAuxTheme
+		removeStatementAuxTheme,
+		syncStatementAux
 	} from '$lib/api/aux';
 	import ThemePicker from '$lib/components/insights/ThemePicker.svelte';
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import { Button } from '@civicos/shared/ui/button';
-	import { Check, X, Plus, Upload } from '@lucide/svelte';
+	import { invalidate } from '$app/navigation';
+	import { Check, X, Plus, Upload, RefreshCw } from '@lucide/svelte';
 
 	let { data }: PageProps = $props();
+
+	// Pull latest Polis submissions into the aux table. Submissions don't appear
+	// in moderation until this runs — the aux rows are synced, not created live.
+	let syncing = $state(false);
+	let syncMessage = $state<string | null>(null);
+
+	async function syncFromPolis() {
+		const stepId = data.region?.polis_workflow_step_id;
+		if (!stepId || syncing) return;
+		syncing = true;
+		syncMessage = null;
+		try {
+			const res = await syncStatementAux(data.api, stepId);
+			syncMessage = `Synced ${res.synced} statement${res.synced === 1 ? '' : 's'} from Polis.`;
+			await invalidate('open-poll:aux');
+		} catch (e) {
+			console.error('syncStatementAux failed', e);
+			syncMessage = 'Sync failed — see console for details.';
+		} finally {
+			syncing = false;
+		}
+	}
 
 	// Local mutable copy so optimistic accept/reject re-renders without a refetch.
 	let statements = $state<PolisStatementAux[]>(data.statements);
@@ -61,7 +85,7 @@
 		);
 
 		try {
-			const updated = await moderateStatementAux(row.id, { decision });
+			const updated = await moderateStatementAux(data.api, row.id, { decision });
 			statements = statements.map((s) => (s.id === row.id ? updated : s));
 		} catch (e) {
 			console.error('moderateStatementAux failed', e);
@@ -80,7 +104,7 @@
 			s.id === row.id ? { ...s, themes: [...prev, theme] } : s
 		);
 		try {
-			const updated = await addStatementAuxTheme(row.id, theme);
+			const updated = await addStatementAuxTheme(data.api, row.id, theme);
 			statements = statements.map((s) => (s.id === row.id ? updated : s));
 		} catch (e) {
 			console.error('addStatementAuxTheme failed', e);
@@ -95,7 +119,7 @@
 			s.id === row.id ? { ...s, themes: prev.filter((t) => t !== theme) } : s
 		);
 		try {
-			const updated = await removeStatementAuxTheme(row.id, theme);
+			const updated = await removeStatementAuxTheme(data.api, row.id, theme);
 			statements = statements.map((s) => (s.id === row.id ? updated : s));
 		} catch (e) {
 			console.error('removeStatementAuxTheme failed', e);
@@ -131,10 +155,24 @@
 			<div class="min-w-0">
 				<div class="text-foreground text-body font-bold">Add a statement</div>
 				<div class="text-muted-foreground text-caption">
-					As moderator, you can seed the discussion.
+					{#if syncMessage}
+						{syncMessage}
+					{:else}
+						As moderator, you can seed the discussion.
+					{/if}
 				</div>
 			</div>
 			<div class="flex shrink-0 items-center gap-2">
+				<Button
+					variant="outline"
+					onclick={syncFromPolis}
+					disabled={syncing || !data.region?.polis_workflow_step_id}
+					class="rounded-full px-5 py-2.5"
+					title="Pull the latest submitted statements from Polis"
+				>
+					<RefreshCw class={`size-4 ${syncing ? 'animate-spin' : ''}`} />
+					{syncing ? 'Syncing…' : 'Sync from Polis'}
+				</Button>
 				<Button
 					disabled
 					class="rounded-full px-5 py-2.5"

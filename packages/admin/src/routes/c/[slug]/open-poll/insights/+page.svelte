@@ -127,7 +127,7 @@
 		const prevThemes = row.themes;
 		auxByTid = { ...auxByTid, [tid]: { ...row, themes: [...prevThemes, theme] } };
 		try {
-			const updated = await addStatementAuxTheme(row.id, theme);
+			const updated = await addStatementAuxTheme(data.api, row.id, theme);
 			auxByTid = { ...auxByTid, [tid]: updated };
 		} catch (e) {
 			console.error('addStatementAuxTheme failed', e);
@@ -144,7 +144,7 @@
 			[tid]: { ...row, themes: prevThemes.filter((t) => t !== theme) }
 		};
 		try {
-			const updated = await removeStatementAuxTheme(row.id, theme);
+			const updated = await removeStatementAuxTheme(data.api, row.id, theme);
 			auxByTid = { ...auxByTid, [tid]: updated };
 		} catch (e) {
 			console.error('removeStatementAuxTheme failed', e);
@@ -169,7 +169,7 @@
 		moderationPending = { ...moderationPending, [row.id]: true };
 		auxByTid = { ...auxByTid, [tid]: { ...row, moderation_status: nextStatus } };
 		try {
-			const updated = await moderateStatementAux(row.id, { decision });
+			const updated = await moderateStatementAux(data.api, row.id, { decision });
 			auxByTid = { ...auxByTid, [tid]: updated };
 		} catch (e) {
 			console.error('moderateStatementAux failed', e);
