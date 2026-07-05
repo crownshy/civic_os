@@ -2,10 +2,10 @@ import { listStatementAux } from '$lib/api/aux';
 import type { PolisStatementAux } from '$lib/types/aux';
 import type { LayoutLoad } from './$types';
 
-export const load: LayoutLoad = async ({ parent, depends, fetch }) => {
+export const load: LayoutLoad = async ({ parent, depends }) => {
 	depends('open-poll:aux');
 
-	const { region } = await parent();
+	const { region, api } = await parent();
 
 	const stepId = region.polis_workflow_step_id;
 	if (!stepId) {
@@ -16,7 +16,7 @@ export const load: LayoutLoad = async ({ parent, depends, fetch }) => {
 	}
 
 	try {
-		const aux = await listStatementAux(fetch, stepId);
+		const aux = await listStatementAux(api, stepId);
 		return { aux, auxError: null as string | null };
 	} catch (e) {
 		const auxError = e instanceof Error ? e.message : String(e);

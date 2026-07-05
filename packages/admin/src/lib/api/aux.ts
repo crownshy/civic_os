@@ -1,3 +1,4 @@
+import type { createApiClient } from '@crownshy/api-client/client';
 import type {
 	PolisStatementAux,
 	UpdatePolisStatementAux,
@@ -6,120 +7,67 @@ import type {
 } from '$lib/types/aux';
 
 /**
- * Wrappers around comhairle's /tools/polis/statement_aux endpoints.
+ * Thin, typed wrappers around comhairle's /tools/polis/statement_aux endpoints.
  *
- * Both reads and mutations go through SvelteKit's `fetch` against the admin's
- * `/api` proxy. In `load` functions, pass the `fetch` argument so cookies are
- * forwarded during SSR; on the client, the global `fetch` works fine.
- *
- * Types come from `@crownshy/api-client/api` (added in 0.0.9).
+ * These delegate to the generated `@crownshy/api-client` (zodios) client, which
+ * handles the `/api` base URL, cookie forwarding during SSR, and zod validation
+ * of both request and response. Pass the `api` instance from the root layout
+ * load (`data.api`, or `const { api } = await parent()` inside a load).
  */
 
-export async function listStatementAux(
-	fetchFn: typeof fetch,
-	workflow_step_id: string
-): Promise<PolisStatementAux[]> {
-	const res = await fetchFn(
-		`/api/tools/polis/statement_aux?workflow_step_id=${encodeURIComponent(workflow_step_id)}`
-	);
-	if (!res.ok) throw new Error(`listStatementAux → ${res.status}`);
-	return (await res.json()) as PolisStatementAux[];
+type Api = ReturnType<typeof createApiClient>;
+
+export function listStatementAux(api: Api, workflow_step_id: string): Promise<PolisStatementAux[]> {
+	return api.PolisListStatementAux({ queries: { workflow_step_id } });
+}
+
+export function updateStatementAux(
+	api: Api,
+	id: string,
+	patch: UpdatePolisStatementAux
+): Promise<PolisStatementAux> {
+	return api.PolisUpdateStatementAux(patch, { params: { id } });
 }
 
 /**
- * Client-side: POST /api/tools/polis/statement_aux/sync.
- *
+ * Forwards the accept/reject decision to the Polis server using the admin
+ * account, then updates the aux row. Use this for accept/reject; use
+ * `updateStatementAux` for local-only edits to `statement_text`, etc.
+ */
+export function moderateStatementAux(
+	api: Api,
+	id: string,
+	body: ModerateStatementAuxRequest
+): Promise<PolisStatementAux> {
+	return api.PolisModerateStatementAux(body, { params: { id } });
+}
+
+/** Idempotent — adding a theme that is already present is a no-op on the server. */
+export function addStatementAuxTheme(
+	api: Api,
+	id: string,
+	theme: string
+): Promise<PolisStatementAux> {
+	return api.PolisAddStatementAuxTheme({ theme }, { params: { id } });
+}
+
+/** Idempotent — removing a theme that is not present is a no-op on the server. */
+export function removeStatementAuxTheme(
+	api: Api,
+	id: string,
+	theme: string
+): Promise<PolisStatementAux> {
+	return api.PolisRemoveStatementAuxTheme({ theme }, { params: { id } });
+}
+
+/**
  * Pulls the latest comments + xid mappings from Polis and upserts an aux row
  * per statement. New participant submissions only appear in moderation after
  * this runs; existing rows keep their moderation_status, themes, etc.
  */
-export async function syncStatementAux(
+export function syncStatementAux(
+	api: Api,
 	workflow_step_id: string
 ): Promise<SyncStatementAuxResponse> {
-	const res = await fetch(`/api/tools/polis/statement_aux/sync`, {
-		method: 'POST',
-		headers: { 'content-type': 'application/json' },
-		body: JSON.stringify({ workflow_step_id })
-	});
-	if (!res.ok) {
-		throw new Error(`syncStatementAux → ${res.status}`);
-	}
-	return (await res.json()) as SyncStatementAuxResponse;
-}
-
-/** Client-side: PUT /api/tools/polis/statement_aux/:id. */
-export async function updateStatementAux(
-	id: string,
-	patch: UpdatePolisStatementAux
-): Promise<PolisStatementAux> {
-	const res = await fetch(`/api/tools/polis/statement_aux/${id}`, {
-		method: 'PUT',
-		headers: { 'content-type': 'application/json' },
-		body: JSON.stringify(patch)
-	});
-	if (!res.ok) {
-		throw new Error(`updateStatementAux ${id} → ${res.status}`);
-	}
-	return (await res.json()) as PolisStatementAux;
-}
-
-/**
- * Client-side: POST /api/tools/polis/statement_aux/:id/moderate.
- *
- * Unlike `updateStatementAux`, this forwards the accept/reject decision to the
- * Polis server using the admin account, then updates the aux row. Use this for
- * accept/reject; use `updateStatementAux` for local-only edits to
- * `statement_text`, etc.
- */
-export async function moderateStatementAux(
-	id: string,
-	body: ModerateStatementAuxRequest
-): Promise<PolisStatementAux> {
-	const res = await fetch(`/api/tools/polis/statement_aux/${id}/moderate`, {
-		method: 'POST',
-		headers: { 'content-type': 'application/json' },
-		body: JSON.stringify(body)
-	});
-	if (!res.ok) {
-		throw new Error(`moderateStatementAux ${id} → ${res.status}`);
-	}
-	return (await res.json()) as PolisStatementAux;
-}
-
-/**
- * Client-side: POST /api/tools/polis/statement_aux/:id/themes. Idempotent —
- * adding a theme that is already present is a no-op on the server.
- */
-export async function addStatementAuxTheme(
-	id: string,
-	theme: string
-): Promise<PolisStatementAux> {
-	const res = await fetch(`/api/tools/polis/statement_aux/${id}/themes`, {
-		method: 'POST',
-		headers: { 'content-type': 'application/json' },
-		body: JSON.stringify({ theme })
-	});
-	if (!res.ok) {
-		throw new Error(`addStatementAuxTheme ${id} → ${res.status}`);
-	}
-	return (await res.json()) as PolisStatementAux;
-}
-
-/**
- * Client-side: DELETE /api/tools/polis/statement_aux/:id/themes. Idempotent —
- * removing a theme that is not present is a no-op on the server.
- */
-export async function removeStatementAuxTheme(
-	id: string,
-	theme: string
-): Promise<PolisStatementAux> {
-	const res = await fetch(`/api/tools/polis/statement_aux/${id}/themes`, {
-		method: 'DELETE',
-		headers: { 'content-type': 'application/json' },
-		body: JSON.stringify({ theme })
-	});
-	if (!res.ok) {
-		throw new Error(`removeStatementAuxTheme ${id} → ${res.status}`);
-	}
-	return (await res.json()) as PolisStatementAux;
+	return api.PolisSyncStatementAux({ workflow_step_id });
 }

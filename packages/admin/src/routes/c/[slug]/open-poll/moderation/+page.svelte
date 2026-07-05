@@ -26,7 +26,7 @@
 		syncing = true;
 		syncMessage = null;
 		try {
-			const res = await syncStatementAux(stepId);
+			const res = await syncStatementAux(data.api, stepId);
 			syncMessage = `Synced ${res.synced} statement${res.synced === 1 ? '' : 's'} from Polis.`;
 			await invalidate('open-poll:aux');
 		} catch (e) {
@@ -85,7 +85,7 @@
 		);
 
 		try {
-			const updated = await moderateStatementAux(row.id, { decision });
+			const updated = await moderateStatementAux(data.api, row.id, { decision });
 			statements = statements.map((s) => (s.id === row.id ? updated : s));
 		} catch (e) {
 			console.error('moderateStatementAux failed', e);
@@ -104,7 +104,7 @@
 			s.id === row.id ? { ...s, themes: [...prev, theme] } : s
 		);
 		try {
-			const updated = await addStatementAuxTheme(row.id, theme);
+			const updated = await addStatementAuxTheme(data.api, row.id, theme);
 			statements = statements.map((s) => (s.id === row.id ? updated : s));
 		} catch (e) {
 			console.error('addStatementAuxTheme failed', e);
@@ -119,7 +119,7 @@
 			s.id === row.id ? { ...s, themes: prev.filter((t) => t !== theme) } : s
 		);
 		try {
-			const updated = await removeStatementAuxTheme(row.id, theme);
+			const updated = await removeStatementAuxTheme(data.api, row.id, theme);
 			statements = statements.map((s) => (s.id === row.id ? updated : s));
 		} catch (e) {
 			console.error('removeStatementAuxTheme failed', e);
