@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { ChevronRight } from '@lucide/svelte';
 	import type { ThemeSummary } from '$lib/types/report';
+	import Meter from '$lib/components/Meter.svelte';
 
 	interface Props {
 		summary: ThemeSummary;
@@ -55,9 +56,7 @@
 		{Math.round(pct)}%
 	</div>
 
-	<div class="border-border bg-muted relative h-2.5 flex-1 overflow-hidden rounded border">
-		<div class="bg-primary absolute inset-y-0 left-0" style:width={`${pct}%`}></div>
-	</div>
+	<Meter class="flex-1" fill={pct} />
 
 	<span
 		class={`shrink-0 rounded-full px-3 py-1.5 text-caption font-medium ${controversyPill.class}`}

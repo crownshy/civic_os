@@ -2,6 +2,7 @@
 	import { Pencil } from '@lucide/svelte';
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import { Button } from '@civicos/shared/ui/button';
+	import Meter from './Meter.svelte';
 
 	interface Row {
 		label: string;
@@ -114,21 +115,13 @@
 			>
 				<div class="truncate font-bold">{row.label}</div>
 
-				<!-- Progress bar -->
-				<div
-					class="relative h-3 w-full overflow-hidden rounded border border-zinc-100 bg-neutral-100"
-				>
-					<div
-						class={`h-full transition-all duration-300 ${barColor}`}
-						style:width={`${fillPct}%`}
-					></div>
-					{#if pctToGoal !== null}
-						<div
-							class="absolute top-0 bottom-0 w-px bg-stone-400"
-							style:left={`${GOAL_ANCHOR}%`}
-						></div>
-					{/if}
-				</div>
+				<!-- Distribution bar -->
+				<Meter
+					class="w-full"
+					fill={fillPct}
+					fillClass={barColor}
+					marker={pctToGoal !== null ? GOAL_ANCHOR : null}
+				/>
 
 				<div class="w-14 text-right font-bold">{row.count}</div>
 				<div class="w-20 text-right font-bold">{Math.round(pctOfTotal)}%</div>
