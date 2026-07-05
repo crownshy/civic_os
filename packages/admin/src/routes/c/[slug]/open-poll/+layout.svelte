@@ -34,12 +34,14 @@
 </script>
 
 <!-- Open Poll sub-tabs strip -->
-<nav class="border-border bg-destructive/5 flex items-center gap-1.5 border-b px-5">
+<nav class="border-border font-ui flex items-center gap-2 border-b px-5">
 	{#each subTabs as tab (tab.href)}
 		<a
 			href={openPollBase + tab.href}
-			class={`px-3.5 py-3.5 text-body font-medium ${
-				activeSubTab === tab.href ? 'text-destructive' : 'text-foreground/70 hover:text-foreground'
+			class={`px-4 py-4 text-body font-medium ${
+				activeSubTab === tab.href
+					? 'text-destructive border-destructive border-b-[3px]'
+					: 'text-foreground/70 hover:text-foreground'
 			}`}
 		>
 			{tab.label}
