@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { page } from '$app/state';
+	import { page, navigating } from '$app/state';
+	import OpenPollSkeleton from '$lib/components/skeletons/OpenPollSkeleton.svelte';
 
 	let { data, children } = $props();
 
@@ -10,14 +11,31 @@
 	];
 
 	const openPollBase = $derived(`/c/${page.params.slug}/open-poll`);
-	const activeSubTab = $derived(
-		subTabs.find((t) => page.url.pathname.startsWith(openPollBase + t.href))?.href ?? ''
+
+	const subTabFor = (pathname: string) =>
+		subTabs.find((t) => pathname.startsWith(openPollBase + t.href))?.href ?? '';
+
+	// The tab that's currently committed (`page.url` only updates once navigation
+	// resolves), vs. the tab we're navigating *to* right now.
+	const committedSubTab = $derived(subTabFor(page.url.pathname));
+	const pendingNav = $derived(navigating.to ? subTabFor(navigating.to.url.pathname) : '');
+
+	// Highlight the in-flight destination the instant it's clicked instead of
+	// waiting for its `load` to resolve — otherwise the highlight lags a whole
+	// fetch behind the click.
+	const activeSubTab = $derived(pendingNav || committedSubTab);
+
+	// While a sub-tab's `load` resolves, SvelteKit keeps the previous page on
+	// screen — so a tab click looks like nothing happened. Show a matching
+	// skeleton for the destination, but only for real tab switches.
+	const pendingSubTab = $derived(
+		pendingNav && pendingNav !== committedSubTab ? pendingNav : null
 	);
 </script>
 
 <!-- Open Poll sub-tabs strip -->
 <nav class="border-border bg-destructive/5 flex items-center gap-1.5 border-b px-5">
-	{#each subTabs as tab}
+	{#each subTabs as tab (tab.href)}
 		<a
 			href={openPollBase + tab.href}
 			class={`px-3.5 py-3.5 text-body font-medium ${
@@ -30,5 +48,9 @@
 </nav>
 
 <div class="flex-1 overflow-y-auto px-5 py-5">
-	{@render children?.()}
+	{#if pendingSubTab}
+		<OpenPollSkeleton tab={pendingSubTab} />
+	{:else}
+		{@render children?.()}
+	{/if}
 </div>
