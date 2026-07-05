@@ -314,10 +314,10 @@
 			<button
 				type="button"
 				onclick={() => (filter = f.key)}
-				class={`text-caption inline-flex cursor-pointer items-center rounded-full px-3 py-1.5 font-medium transition-all duration-150 hover:scale-[1.03] active:scale-[0.97] ${
+				class={`font-ui inline-flex cursor-pointer items-center rounded-[30px] px-3 py-2 text-lg font-medium leading-6 transition-all duration-150 hover:scale-[1.03] active:scale-[0.97] ${
 					filter === f.key
-						? 'bg-foreground text-background shadow-sm'
-						: 'bg-muted text-foreground hover:bg-muted-foreground/15'
+						? 'bg-[#C96442] text-white shadow-sm'
+						: 'bg-[#FCF7F6] text-[#C96442] hover:bg-[#F3E7E2]'
 				}`}
 			>
 				<span>{f.label} · {counts[f.key]}</span>
@@ -331,7 +331,7 @@
 			<div class="flex flex-col">
 				<!-- Column headings -->
 				<div
-					class="text-muted-foreground/60 text-label grid grid-cols-[1.5rem_minmax(0,1fr)_minmax(11rem,16rem)_auto] items-center gap-4 px-4 py-2 font-semibold uppercase"
+					class="font-ui text-muted-foreground/60 text-caption grid grid-cols-[1.5rem_minmax(0,1fr)_minmax(11rem,16rem)_auto] items-center gap-4 px-4 py-2 font-semibold uppercase"
 				>
 					<div>#</div>
 					<div>Statement</div>
@@ -361,13 +361,15 @@
 							></div>
 
 							<!-- # -->
-							<div class="text-muted-foreground pt-0.5 text-center text-caption">
+							<div class="font-ui text-muted-foreground text-label pt-1 text-center tabular-nums">
 								{row.polis_statement_id}
 							</div>
 
 							<!-- Statement text -->
 							<div class="min-w-0">
-								<p class="text-foreground text-body leading-5">{row.statement_text}</p>
+								<p class="font-ui text-foreground text-lg font-medium leading-6">
+									{row.statement_text}
+								</p>
 							</div>
 
 							<!-- Theme picker -->

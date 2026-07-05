@@ -67,6 +67,41 @@ export function totalVotes(c: ReportComment): number {
 	return c.overall_votes.agrees + c.overall_votes.disagrees + c.overall_votes.passes;
 }
 
+/** Fewest votes any single group cast on a comment (a + d + p per group). */
+export function minGroupVotes(c: ReportComment): number {
+	if (c.group_votes.length === 0) return 0;
+	return Math.min(...c.group_votes.map((gv) => gv.agrees + gv.disagrees + gv.passes));
+}
+
+/**
+ * "Low data quality" threshold — a per-group minimum. See CONTEXT.md. A
+ * statement is low quality when ANY group cast fewer than this many votes on
+ * it, because every Insights table compares group agree%s and a barely-voted
+ * group yields a meaningless percentage.
+ */
+export const LOW_QUALITY_MIN_GROUP_VOTES = 10;
+
+/** True when any group has fewer than LOW_QUALITY_MIN_GROUP_VOTES on the comment. */
+export function isLowQuality(c: ReportComment): boolean {
+	return minGroupVotes(c) < LOW_QUALITY_MIN_GROUP_VOTES;
+}
+
+/**
+ * Single classification driving the left color sliver, so the same statement
+ * shows the same stripe in every table. Consensus and difference are mutually
+ * exclusive by their own math (a row can't be all-same-side AND spread > 30).
+ */
+export function classifyStatement(
+	c: ReportComment,
+	groups: ReportGroup[],
+	{ excludePasses = false }: { excludePasses?: boolean } = {}
+): 'consensus' | 'difference' | 'neutral' {
+	if (consensusDirection(c, groups, { excludePasses }) !== null) return 'consensus';
+	const agreed = computeGroupVotePercents(c, groups, { excludePasses }).map((p) => p.agreed);
+	const spread = agreed.length ? Math.max(...agreed) - Math.min(...agreed) : 0;
+	return spread > DIFFERENCE_SPREAD ? 'difference' : 'neutral';
+}
+
 /** Filter helpers shared by the three areas-of-* lists. */
 function withMinVotes(comments: ReportComment[], minVotes: number) {
 	return comments.filter((c) => totalVotes(c) >= minVotes);

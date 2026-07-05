@@ -110,7 +110,7 @@
 <div class="relative inline-flex flex-wrap items-center gap-1" bind:this={containerEl}>
 	{#each themes as t (t)}
 		<span
-			class="bg-muted text-foreground inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-caption font-medium"
+			class="bg-muted text-foreground inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-body font-medium"
 		>
 			{t}
 			{#if !disabled}
@@ -130,7 +130,7 @@
 		<button
 			type="button"
 			onclick={toggleOpen}
-			class="text-destructive bg-destructive/10 hover:bg-destructive/20 inline-flex items-center rounded px-1.5 py-0.5 text-caption font-medium"
+			class="text-destructive bg-destructive/10 hover:bg-destructive/20 inline-flex items-center rounded px-1.5 py-0.5 text-body font-medium"
 		>
 			Add new+
 		</button>
