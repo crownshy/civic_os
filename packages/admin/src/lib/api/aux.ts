@@ -1,6 +1,7 @@
 import type { createApiClient } from '@crownshy/api-client/client';
 import type {
 	PolisStatementAux,
+	CreatePolisStatementAux,
 	UpdatePolisStatementAux,
 	ModerateStatementAuxRequest,
 	SyncStatementAuxResponse
@@ -40,6 +41,26 @@ export function moderateStatementAux(
 	body: ModerateStatementAuxRequest
 ): Promise<PolisStatementAux> {
 	return api.PolisModerateStatementAux(body, { params: { id } });
+}
+
+/**
+ * Insert an aux row for a statement that ALREADY exists in Polis.
+ *
+ * NOT an authoring endpoint: it does not create a comment in Polis, and the DB
+ * has a unique key on `(workflow_step_id, polis_statement_id)`, so the caller
+ * must supply the real Polis-issued id (sending `0` collides). Host seeding
+ * therefore goes via Polis directly (`lib/services/polis.ts` → `is_seed: true`)
+ * followed by `syncStatementAux`, which is why this wrapper is currently unused.
+ *
+ * TODO(comhairle): the clean home for seeding is a server endpoint that posts
+ * the comment to Polis (holding the owner token, no browser CORS) and returns
+ * the real id — then this wrapper records the aux row. Kept for that flow.
+ */
+export function createStatementAux(
+	api: Api,
+	body: CreatePolisStatementAux
+): Promise<PolisStatementAux> {
+	return api.PolisCreateStatementAux(body);
 }
 
 /** Idempotent — adding a theme that is already present is a no-op on the server. */

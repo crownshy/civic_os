@@ -30,6 +30,7 @@
 	let open = $state(false);
 	let newDraft = $state('');
 	let containerEl: HTMLDivElement | undefined = $state();
+	let dropdownEl: HTMLDivElement | undefined = $state();
 	let dropdownPos = $state<{ top: number; left: number } | null>(null);
 
 	const themeSet = $derived(new Set(themes));
@@ -44,11 +45,21 @@
 	 * Dropdown uses `position: fixed` to escape ancestor `overflow: hidden`
 	 * (e.g. the Card wrapping the statements list). So we have to position it
 	 * manually from the trigger's bbox, and re-position on scroll/resize.
+	 *
+	 * When there isn't room below the trigger (statement near the bottom of the
+	 * viewport), flip the menu above it so it never gets clipped off-screen.
 	 */
 	function reposition() {
 		if (!containerEl) return;
 		const rect = containerEl.getBoundingClientRect();
-		dropdownPos = { top: rect.bottom + 4, left: rect.left };
+		const gap = 4;
+		const menuHeight = dropdownEl?.offsetHeight ?? 260;
+		const spaceBelow = window.innerHeight - rect.bottom;
+		const top =
+			spaceBelow < menuHeight + gap && rect.top > spaceBelow
+				? Math.max(gap, rect.top - menuHeight - gap)
+				: rect.bottom + gap;
+		dropdownPos = { top, left: rect.left };
 	}
 
 	function applyToggle(theme: string) {
@@ -70,6 +81,12 @@
 		onAddTheme?.(t);
 		newDraft = '';
 	}
+
+	// Once the menu is in the DOM we know its real height, so re-measure to
+	// decide whether it should flip above the trigger.
+	$effect(() => {
+		if (open && dropdownEl) reposition();
+	});
 
 	// Close on outside click + reposition on scroll/resize while open.
 	$effect(() => {
@@ -121,6 +138,7 @@
 
 	{#if open && dropdownPos}
 		<div
+			bind:this={dropdownEl}
 			style:top="{dropdownPos.top}px"
 			style:left="{dropdownPos.left}px"
 			class="border-border bg-popover text-popover-foreground fixed z-50 w-48 overflow-hidden rounded-md border shadow-lg"
