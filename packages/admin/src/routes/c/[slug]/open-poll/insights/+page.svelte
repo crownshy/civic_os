@@ -39,8 +39,10 @@
 
 	/**
 	 * Overlay aux.themes onto each comment so the existing utils (which read
-	 * `comment.topics`) get aux-sourced themes for free. Falls back to
-	 * `comment.topics` when there's no aux row (e.g. sync hasn't been run).
+	 * `comment.topics`) get aux-sourced themes for free. Themes are human-authored
+	 * today and live only in aux; Polis carries none, so `comment.topics` is empty
+	 * until a future T3C source populates it (see CONTEXT.md → "Theme"). Comments
+	 * with no aux row keep that empty `topics` and simply contribute no themes.
 	 */
 	const reportData = $derived.by<PolisReportData | null>(() => {
 		if (!data.reportData) return null;
@@ -63,6 +65,9 @@
 			: reportData;
 		return getThemeSummaries(source);
 	});
+	// Bars rank against the biggest theme (themes is sorted count-desc), not the
+	// statement total — see ThemeBar.
+	const maxThemeCount = $derived(themes[0]?.statementCount ?? 0);
 	// --- Section filter state (Consensus / Difference / Uncertainty) ---
 	// `is_seed` default matches StatementSection's `excludeHosts = true` default.
 	// "Exclude passes" switches the agree% denominator to agrees/(agrees+disagrees),
@@ -114,7 +119,7 @@
 		return [...set].sort();
 	});
 
-	// --- Theme Explorer state ---
+	// --- All Statements: theme filter state ---
 	// Multi-select theme filter (OR/union). Seeded from ?theme=a,b so the view is
 	// deep-linkable/shareable.
 	let selectedThemes = $state<string[]>(
@@ -284,7 +289,7 @@
 					{#each showAllThemes ? themes : themes.slice(0, COLLAPSED_ROWS) as t (t.theme)}
 						<ThemeBar
 							summary={t}
-							total={stats.totalStatements}
+							barMax={maxThemeCount}
 							onclick={() => focusTheme(t.theme)}
 						/>
 					{/each}

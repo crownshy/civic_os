@@ -15,9 +15,9 @@
 	const clampedFill = $derived(Math.min(100, Math.max(0, fill)));
 </script>
 
-<div class={`bg-meter-track relative h-2.5 overflow-hidden rounded ${className}`}>
+<div class={`bg-meter-track relative h-2.5 overflow-hidden ${className}`}>
 	<div
-		class={`h-full rounded transition-all duration-300 ${fillClass}`}
+		class={`h-full transition-all duration-300 ${fillClass}`}
 		style:width={`${clampedFill}%`}
 	></div>
 	{#if marker !== null}
