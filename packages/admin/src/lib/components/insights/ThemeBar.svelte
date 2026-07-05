@@ -5,16 +5,19 @@
 
 	interface Props {
 		summary: ThemeSummary;
-		total: number;
+		/** Statement count of the largest theme — the bar's full-scale reference. */
+		barMax: number;
 		onclick?: () => void;
 	}
 
-	let { summary, total, onclick }: Props = $props();
+	let { summary, barMax, onclick }: Props = $props();
 
-	// Bar length is the theme's share of all statements — a simple count ranking,
-	// per the "very simple, based on manually added themes" spec. No controversy
-	// signal here (that lives in CONTEXT.md but is intentionally not surfaced).
-	const pct = $derived(total > 0 ? (summary.statementCount / total) * 100 : 0);
+	// Bar length ranks this theme against the largest theme (100% = the top theme),
+	// per the "very simple, based on manually added themes" spec. Theme counts don't
+	// sum to totalStatements (a statement can carry many themes), so share-of-total
+	// would be a meaningless denominator. No controversy signal here (that lives in
+	// CONTEXT.md but is intentionally not surfaced).
+	const pct = $derived(barMax > 0 ? (summary.statementCount / barMax) * 100 : 0);
 </script>
 
 <div

@@ -78,7 +78,7 @@
 	--color-meter-track: #f5f5f5; /* empty track           (neutral-100) */
 	--color-consensus: #16a34a; /* areas of consensus     (green-600)  */
 	--color-difference: #ea580c; /* areas of difference    (orange-600) */
-	--color-theme-bar: #22c55e; /* themes count bar       (green-500)  */
+	--color-theme-bar: #16a34a; /* themes count bar       (green-600)  */
 }
 
 /* Figma redesign: neutral admin surface. Scoped to the admin package only —
