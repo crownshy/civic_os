@@ -1,7 +1,8 @@
 import type {
 	PolisStatementAux,
 	UpdatePolisStatementAux,
-	ModerateStatementAuxRequest
+	ModerateStatementAuxRequest,
+	SyncStatementAuxResponse
 } from '$lib/types/aux';
 
 /**
@@ -23,6 +24,27 @@ export async function listStatementAux(
 	);
 	if (!res.ok) throw new Error(`listStatementAux → ${res.status}`);
 	return (await res.json()) as PolisStatementAux[];
+}
+
+/**
+ * Client-side: POST /api/tools/polis/statement_aux/sync.
+ *
+ * Pulls the latest comments + xid mappings from Polis and upserts an aux row
+ * per statement. New participant submissions only appear in moderation after
+ * this runs; existing rows keep their moderation_status, themes, etc.
+ */
+export async function syncStatementAux(
+	workflow_step_id: string
+): Promise<SyncStatementAuxResponse> {
+	const res = await fetch(`/api/tools/polis/statement_aux/sync`, {
+		method: 'POST',
+		headers: { 'content-type': 'application/json' },
+		body: JSON.stringify({ workflow_step_id })
+	});
+	if (!res.ok) {
+		throw new Error(`syncStatementAux → ${res.status}`);
+	}
+	return (await res.json()) as SyncStatementAuxResponse;
 }
 
 /** Client-side: PUT /api/tools/polis/statement_aux/:id. */
