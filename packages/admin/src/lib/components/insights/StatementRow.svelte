@@ -1,8 +1,7 @@
 <script lang="ts">
 	import type { ReportComment, ReportGroup } from '$lib/types/report';
-	import type { ModerationStatus } from '$lib/types/aux';
 	import { computeGroupVotePercents, totalVotes } from '$lib/utils/report';
-	import { Check, X, User } from '@lucide/svelte';
+	import { User } from '@lucide/svelte';
 	import GroupCircle from './GroupCircle.svelte';
 	import ThemePicker from './ThemePicker.svelte';
 
@@ -16,20 +15,11 @@
 		variant?: Variant;
 		/** Drop passes from the agree% denominator (agrees/(agrees+disagrees)). */
 		excludePasses?: boolean;
-		/** Kept for API compatibility; the metric column replaces the old pill. */
-		showVerdictPill?: boolean;
 		picker?: {
 			availableThemes: string[];
 			onAddTheme: (theme: string) => void | Promise<void>;
 			onRemoveTheme: (theme: string) => void | Promise<void>;
 			disabled?: boolean;
-		};
-		moderation?: {
-			status: ModerationStatus | null;
-			pending?: boolean;
-			disabled?: boolean;
-			onAccept: () => void | Promise<void>;
-			onReject: () => void | Promise<void>;
 		};
 	}
 
@@ -38,8 +28,7 @@
 		groups,
 		variant = 'neutral',
 		excludePasses = false,
-		picker,
-		moderation
+		picker
 	}: Props = $props();
 
 	const groupPcts = $derived(computeGroupVotePercents(comment, groups, { excludePasses }));
@@ -61,9 +50,11 @@
 				: 'bg-transparent'
 	);
 
-	// author == 0 (the host / seed author) renders as "You". Other participants'
-	// ids aren't in the report payload yet — placeholder badge until backfilled.
-	const isYou = $derived(!!comment.is_seed);
+	// Seed/host-authored statements (is_seed) label as "Host". Everyone else is
+	// "Participant" — the report payload has no author pid yet, so we can't show
+	// the real participant id (e.g. "23"). Backfill is blocked on a backend change
+	// (see CONTEXT.md → "Statement author"). Seed author is assumed to be pid 0.
+	const isHostAuthored = $derived(!!comment.is_seed);
 </script>
 
 <div
@@ -72,8 +63,11 @@
 	<!-- Left accent stripe -->
 	<div class={`absolute top-0 bottom-0 left-0 w-1.5 ${stripeClass}`}></div>
 
-	<!-- Polis statement id -->
-	<div class="font-ui text-muted-foreground text-caption pt-1 text-center tabular-nums">
+	<!-- Polis statement id. Sizes here follow the admin token scale, not the raw
+	     Figma px — text-label/body map to the Figma's 12/16px where a token exists;
+	     the 18-20px row text has no token so it stays on the scale (see the type
+	     discussion). -->
+	<div class="font-ui text-muted-foreground text-label pt-1 text-center tabular-nums">
 		{comment.tid}
 	</div>
 
@@ -105,17 +99,17 @@
 
 	<!-- Author -->
 	<div class="pt-1">
-		{#if isYou}
+		{#if isHostAuthored}
 			<span
 				class="text-caption inline-flex items-center gap-1 rounded bg-blue-500 px-1.5 py-0.5 font-medium text-white"
 			>
-				<User class="size-3" />You
+				<User class="size-3" />Host
 			</span>
 		{:else}
 			<span
 				class="bg-muted text-muted-foreground text-caption inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-medium"
 			>
-				<User class="size-3" />
+				<User class="size-3" />Participant
 			</span>
 		{/if}
 	</div>
@@ -131,34 +125,10 @@
 		{/if}
 	</div>
 
-	<!-- Per-group agree rings + hover-revealed moderation -->
+	<!-- Per-group agree rings -->
 	<div class="flex items-center gap-3 self-start pt-0.5">
 		{#each groupPcts as g (g.group_id)}
 			<GroupCircle agreed={g.agreed} disagreed={g.disagreed} passed={g.passed} showLabel={false} />
 		{/each}
-		{#if moderation}
-			<div
-				class="ml-1 flex items-center gap-1 opacity-0 transition-opacity duration-150 group-hover:opacity-100"
-			>
-				<button
-					type="button"
-					disabled={moderation.disabled || moderation.pending || moderation.status === 'accepted'}
-					onclick={() => moderation?.onAccept()}
-					title="Accept"
-					class="text-primary hover:bg-primary/15 inline-flex size-7 cursor-pointer items-center justify-center rounded-full transition-all duration-150 hover:scale-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-transparent"
-				>
-					<Check class="size-4" />
-				</button>
-				<button
-					type="button"
-					disabled={moderation.disabled || moderation.pending || moderation.status === 'rejected'}
-					onclick={() => moderation?.onReject()}
-					title="Reject"
-					class="text-destructive hover:bg-destructive/15 inline-flex size-7 cursor-pointer items-center justify-center rounded-full transition-all duration-150 hover:scale-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-transparent"
-				>
-					<X class="size-4" />
-				</button>
-			</div>
-		{/if}
 	</div>
 </div>

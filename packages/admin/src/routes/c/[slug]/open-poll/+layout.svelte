@@ -38,7 +38,7 @@
 	{#each subTabs as tab (tab.href)}
 		<a
 			href={openPollBase + tab.href}
-			class={`px-4 py-4 text-body font-medium ${
+			class={`px-4 py-2 text-body font-medium ${
 				activeSubTab === tab.href
 					? 'text-destructive border-destructive border-b-[3px]'
 					: 'text-foreground/70 hover:text-foreground'
@@ -49,10 +49,15 @@
 	{/each}
 </nav>
 
-<div class="flex-1 overflow-y-auto px-5 py-5">
-	{#if pendingSubTab}
-		<OpenPollSkeleton tab={pendingSubTab} />
-	{:else}
-		{@render children?.()}
-	{/if}
+<!-- Padding lives on the inner wrapper, NOT the scroll container: a `sticky top-0`
+     header (Insights tables) pins to the scrollport edge, so top padding here would
+     leave a gap that scrolling rows peek through. Same spacing, no sticky gap. -->
+<div class="flex-1 overflow-y-auto">
+	<div class="px-5 py-5">
+		{#if pendingSubTab}
+			<OpenPollSkeleton tab={pendingSubTab} />
+		{:else}
+			{@render children?.()}
+		{/if}
+	</div>
 </div>
