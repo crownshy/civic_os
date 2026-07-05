@@ -7,6 +7,7 @@
 
 export type {
 	PolisStatementAux,
+	CreatePolisStatementAux,
 	UpdatePolisStatementAux,
 	ModerationStatus,
 	ModerateStatementAuxRequest,

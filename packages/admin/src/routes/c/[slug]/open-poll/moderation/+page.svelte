@@ -7,6 +7,7 @@
 		removeStatementAuxTheme,
 		syncStatementAux
 	} from '$lib/api/aux';
+	import { submitSeed } from '$lib/services/polis';
 	import ThemePicker from '$lib/components/insights/ThemePicker.svelte';
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import { Button } from '@civicos/shared/ui/button';
@@ -52,6 +53,76 @@
 		for (const s of statements) for (const t of s.themes) set.add(t);
 		return [...set].sort();
 	});
+
+	// --- Add seed statements (host authoring) ---
+	// We post seeds straight to Polis (is_seed: true) the same way the public
+	// civicos app submits statements, then re-sync so the new comment comes back
+	// with its real Polis-issued ids. See lib/services/polis.ts for the auth/CORS
+	// caveat and the eventual comhairle-endpoint alternative.
+	let showAddForm = $state(false);
+	let draftText = $state('');
+	let addingSeed = $state(false);
+	let addError = $state<string | null>(null);
+
+	let csvImporting = $state(false);
+	let csvError = $state<string | null>(null);
+	let fileInput = $state<HTMLInputElement>();
+
+	const polisId = $derived(data.region?.polisId);
+	const stepId = $derived(data.region?.polis_workflow_step_id);
+	const canSeed = $derived(!!polisId && !!stepId);
+
+	/** Post each seed to Polis, then pull the new comment(s) back into aux. */
+	async function postSeeds(texts: string[]) {
+		if (!polisId || !stepId) return;
+		for (const t of texts) {
+			await submitSeed(polisId, t);
+		}
+		await syncStatementAux(data.api, stepId);
+		await invalidate('open-poll:aux');
+	}
+
+	async function addSeed() {
+		const text = draftText.trim();
+		if (!text || !canSeed || addingSeed) return;
+		addingSeed = true;
+		addError = null;
+		try {
+			await postSeeds([text]);
+			draftText = '';
+			showAddForm = false;
+		} catch (e) {
+			console.error('submitSeed failed', e);
+			addError = e instanceof Error ? e.message : 'Failed to add statement.';
+		} finally {
+			addingSeed = false;
+		}
+	}
+
+	async function importCsv(e: Event) {
+		const input = e.currentTarget as HTMLInputElement;
+		const file = input.files?.[0];
+		if (!file || !canSeed || csvImporting) return;
+		csvImporting = true;
+		csvError = null;
+		try {
+			// One statement per line; strip wrapping quotes and a leading header row.
+			const lines = (await file.text())
+				.split(/\r?\n/)
+				.map((l) => l.replace(/^"(.*)"$/, '$1').trim())
+				.filter(Boolean);
+			if (['statement', 'statements', 'text'].includes(lines[0]?.toLowerCase())) {
+				lines.shift();
+			}
+			if (lines.length) await postSeeds(lines);
+		} catch (err) {
+			console.error('CSV import failed', err);
+			csvError = err instanceof Error ? err.message : 'CSV import failed.';
+		} finally {
+			csvImporting = false;
+			input.value = '';
+		}
+	}
 
 	type Filter = 'all' | 'seeded' | 'accepted' | 'pending' | 'rejected';
 	let filter = $state<Filter>('all');
@@ -174,24 +245,67 @@
 					{syncing ? 'Syncing…' : 'Sync from Polis'}
 				</Button>
 				<Button
-					disabled
+					onclick={() => (showAddForm = !showAddForm)}
 					class="rounded-full px-5 py-2.5"
-					title="Seed statement authoring not yet wired up"
+					title="Add a seed statement as moderator"
 				>
 					<Plus class="size-4" />
 					Add statement
 				</Button>
 				<Button
 					variant="outline"
-					disabled
+					onclick={() => fileInput?.click()}
+					disabled={!canSeed || csvImporting}
 					class="text-primary border-primary rounded-full bg-white px-5 py-2.5"
-					title="CSV import not yet wired up"
+					title="Import seed statements from a CSV (one statement per line)"
 				>
 					<Upload class="size-4" />
-					Import CSV
+					{csvImporting ? 'Importing…' : 'Import CSV'}
 				</Button>
+				<input
+					bind:this={fileInput}
+					type="file"
+					accept=".csv,.txt"
+					class="hidden"
+					onchange={importCsv}
+				/>
 			</div>
 		</div>
+
+		{#if csvError}
+			<div class="text-destructive text-caption border-border border-t px-4 py-2">{csvError}</div>
+		{/if}
+
+		{#if showAddForm}
+			<div class="border-border flex flex-col gap-2 border-t px-4 py-3">
+				<textarea
+					bind:value={draftText}
+					rows="2"
+					placeholder="Write a seed statement…"
+					class="border-border focus:ring-ring/40 text-body w-full rounded-md border px-3 py-2 focus:ring-2 focus:outline-none"
+				></textarea>
+				{#if !canSeed}
+					<p class="text-muted-foreground text-caption">
+						Sync at least one statement from Polis first — a new seed needs the conversation's ids.
+					</p>
+				{/if}
+				{#if addError}
+					<p class="text-destructive text-caption">{addError}</p>
+				{/if}
+				<div class="flex justify-end gap-2">
+					<Button variant="ghost" onclick={() => (showAddForm = false)} class="rounded-full">
+						Cancel
+					</Button>
+					<Button
+						onclick={addSeed}
+						disabled={!canSeed || !draftText.trim() || addingSeed}
+						class="rounded-full"
+					>
+						{addingSeed ? 'Posting…' : 'Post seed'}
+					</Button>
+				</div>
+			</div>
+		{/if}
 	</Card>
 
 	<!-- Status filter chips -->
