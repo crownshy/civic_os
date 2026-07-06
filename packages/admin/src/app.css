@@ -44,8 +44,9 @@
    caption  13px  table cells, helper copy
    body     16px  paragraph body
    section  24px  card / section H2 ("Themes")
-   display  36px  page H1 (conversation title)
-   stat     48px  hero metric numbers */
+   display  36px  page H1 (conversation title), card / section titles
+   stat     48px  hero metric numbers (Insights secondary)
+   hero     72px  primary hero metric numbers (514 / 700 / 167) */
 @theme {
 	--text-label: var(--text-xs);
 	--text-label--line-height: var(--text-xs--line-height);
@@ -59,6 +60,38 @@
 	--text-display--line-height: var(--text-4xl--line-height);
 	--text-stat: var(--text-5xl);
 	--text-stat--line-height: var(--text-5xl--line-height);
+	--text-hero: var(--text-7xl);
+	--text-hero--line-height: var(--text-7xl--line-height);
+
+	/* Inter — UI chrome + numerics (nav, tabs, eyebrow labels, numbers,
+	   statement body). Titles use --font-display (Geom); labels/rows --font-sans. */
+	--font-ui: 'Inter', 'Hanken Grotesk', sans-serif;
+}
+
+/* Data-viz palette — shared encoding colors for meters, theme bars and
+   agree-rings. Named so every chart uses the same hue for the same meaning.
+   These are NOT brand colors; they're data channels. */
+@theme {
+	--color-meter-under: #ea580c; /* < ~50% of goal        (orange-600) */
+	--color-meter-near: #f59e0b; /* 50–99% of goal        (amber-500)  */
+	--color-meter-met: #16a34a; /* at / over goal         (green-600)  */
+	--color-meter-track: #f5f5f5; /* empty track           (neutral-100) */
+	--color-consensus: #16a34a; /* areas of consensus     (green-600)  */
+	--color-difference: #ea580c; /* areas of difference    (orange-600) */
+	--color-theme-bar: #16a34a; /* themes count bar       (green-600)  */
+}
+
+/* Figma redesign: neutral admin surface. Scoped to the admin package only —
+   the public civicos app keeps its warm cream brand (theme.css). Overrides
+   come after the theme.css @import above, so these win for light mode. */
+:root {
+	--background: #ffffff;
+	--card: #ffffff;
+	--card-foreground: #1c1917; /* stone-900 */
+	--foreground: #1c1917; /* stone-900 */
+	--muted: #fafaf9; /* stone-50  */
+	--muted-foreground: #78716c; /* stone-500 */
+	--border: #e5e5e5; /* neutral-200 */
 }
 
 /* Card shadow matching wireframe spec */

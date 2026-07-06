@@ -7,8 +7,10 @@
 
 export type {
 	PolisStatementAux,
+	CreatePolisStatementAux,
 	UpdatePolisStatementAux,
 	ModerationStatus,
 	ModerateStatementAuxRequest,
-	ModerationDecisionRequest
+	ModerationDecisionRequest,
+	SyncStatementAuxResponse
 } from '@crownshy/api-client/api';

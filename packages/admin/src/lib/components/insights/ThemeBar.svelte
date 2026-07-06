@@ -1,76 +1,39 @@
 <script lang="ts">
-	import { ChevronRight } from '@lucide/svelte';
+	import { ArrowRight } from '@lucide/svelte';
 	import type { ThemeSummary } from '$lib/types/report';
+	import Meter from '$lib/components/Meter.svelte';
 
 	interface Props {
 		summary: ThemeSummary;
-		total: number;
+		/** Statement count of the largest theme — the bar's full-scale reference. */
+		barMax: number;
 		onclick?: () => void;
 	}
 
-	let { summary, total, onclick }: Props = $props();
+	let { summary, barMax, onclick }: Props = $props();
 
-	const pct = $derived(total > 0 ? (summary.statementCount / total) * 100 : 0);
-
-	const controversyPill = $derived(
-		summary.controversy === 'high'
-			? { label: 'High controversy', class: 'bg-stone-50 text-destructive' }
-			: summary.controversy === 'moderate'
-				? { label: 'Moderate controversy', class: 'bg-neutral-50 text-muted-foreground' }
-				: { label: 'Low controversy', class: 'bg-primary/20 text-teal-700' }
-	);
-
-	// TODO: how do we calculate unique participant count per theme? per-vote pid
-	// data is not in /tools/polis/report_data today, so we render an X placeholder.
-	const peopleCount = 'X';
+	// Bar length ranks this theme against the largest theme (100% = the top theme),
+	// per the "very simple, based on manually added themes" spec. Theme counts don't
+	// sum to totalStatements (a statement can carry many themes), so share-of-total
+	// would be a meaningless denominator. No controversy signal here (that lives in
+	// CONTEXT.md but is intentionally not surfaced).
+	const pct = $derived(barMax > 0 ? (summary.statementCount / barMax) * 100 : 0);
 </script>
 
 <div
-	class="border-border group hover:bg-muted/40 flex items-center gap-6 rounded-md border-b px-2 py-3 transition-colors duration-150"
+	class="border-border group hover:bg-muted/40 grid grid-cols-[10rem_3rem_1fr_2.5rem] items-center gap-6 border-b px-2 py-4 transition-colors duration-150"
 >
-	<div class="flex w-56 shrink-0 flex-col gap-0.5">
-		<div class="text-foreground truncate text-body font-bold">{summary.theme}</div>
-		<div class="text-muted-foreground text-caption">
-			{summary.statementCount} claims by {peopleCount} people
-		</div>
-	</div>
-
-	{#if summary.subtopics?.length}
-		<div class="flex shrink-0 items-center gap-1.5">
-			{#each summary.subtopics as sub (sub)}
-				<button
-					type="button"
-					class="text-muted-foreground hover:text-foreground cursor-pointer text-body underline underline-offset-2 transition-colors"
-				>
-					{sub}
-				</button>
-			{/each}
-		</div>
-	{/if}
-
-	<div class="text-foreground w-10 shrink-0 text-right text-body font-bold tabular-nums">
+	<div class="text-foreground truncate text-xl font-bold">{summary.theme}</div>
+	<div class="font-ui text-foreground text-right text-xl font-bold tabular-nums">
 		{summary.statementCount}
 	</div>
-	<div class="text-foreground w-12 shrink-0 text-right text-body font-bold tabular-nums">
-		{Math.round(pct)}%
-	</div>
-
-	<div class="border-border bg-muted relative h-2.5 flex-1 overflow-hidden rounded border">
-		<div class="bg-primary absolute inset-y-0 left-0" style:width={`${pct}%`}></div>
-	</div>
-
-	<span
-		class={`shrink-0 rounded-full px-3 py-1.5 text-caption font-medium ${controversyPill.class}`}
-	>
-		{controversyPill.label}
-	</span>
-
+	<Meter class="w-full" fill={pct} fillClass="bg-theme-bar" />
 	<button
 		type="button"
 		{onclick}
 		aria-label={`Open ${summary.theme}`}
-		class="bg-muted text-destructive hover:bg-destructive hover:text-destructive-foreground flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full transition-all duration-150 hover:scale-110 active:scale-95 group-hover:bg-destructive/15"
+		class="bg-muted text-destructive group-hover:bg-destructive/15 flex size-8 shrink-0 cursor-pointer items-center justify-center justify-self-end rounded-full transition-all duration-150 hover:scale-110 active:scale-95"
 	>
-		<ChevronRight class="size-4" />
+		<ArrowRight class="size-4" />
 	</button>
 </div>

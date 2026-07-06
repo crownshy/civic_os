@@ -4,14 +4,39 @@
 	import {
 		addStatementAuxTheme,
 		moderateStatementAux,
-		removeStatementAuxTheme
+		removeStatementAuxTheme,
+		syncStatementAux
 	} from '$lib/api/aux';
+	import { submitSeed } from '$lib/services/polis';
 	import ThemePicker from '$lib/components/insights/ThemePicker.svelte';
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import { Button } from '@civicos/shared/ui/button';
-	import { Check, X, Plus, Upload } from '@lucide/svelte';
+	import { invalidate } from '$app/navigation';
+	import { Check, X, Plus, Upload, RefreshCw } from '@lucide/svelte';
 
 	let { data }: PageProps = $props();
+
+	// Pull latest Polis submissions into the aux table. Submissions don't appear
+	// in moderation until this runs — the aux rows are synced, not created live.
+	let syncing = $state(false);
+	let syncMessage = $state<string | null>(null);
+
+	async function syncFromPolis() {
+		const stepId = data.region?.polis_workflow_step_id;
+		if (!stepId || syncing) return;
+		syncing = true;
+		syncMessage = null;
+		try {
+			const res = await syncStatementAux(data.api, stepId);
+			syncMessage = `Synced ${res.synced} statement${res.synced === 1 ? '' : 's'} from Polis.`;
+			await invalidate('open-poll:aux');
+		} catch (e) {
+			console.error('syncStatementAux failed', e);
+			syncMessage = 'Sync failed — see console for details.';
+		} finally {
+			syncing = false;
+		}
+	}
 
 	// Local mutable copy so optimistic accept/reject re-renders without a refetch.
 	let statements = $state<PolisStatementAux[]>(data.statements);
@@ -28,6 +53,76 @@
 		for (const s of statements) for (const t of s.themes) set.add(t);
 		return [...set].sort();
 	});
+
+	// --- Add seed statements (host authoring) ---
+	// We post seeds straight to Polis (is_seed: true) the same way the public
+	// civicos app submits statements, then re-sync so the new comment comes back
+	// with its real Polis-issued ids. See lib/services/polis.ts for the auth/CORS
+	// caveat and the eventual comhairle-endpoint alternative.
+	let showAddForm = $state(false);
+	let draftText = $state('');
+	let addingSeed = $state(false);
+	let addError = $state<string | null>(null);
+
+	let csvImporting = $state(false);
+	let csvError = $state<string | null>(null);
+	let fileInput = $state<HTMLInputElement>();
+
+	const polisId = $derived(data.region?.polisId);
+	const stepId = $derived(data.region?.polis_workflow_step_id);
+	const canSeed = $derived(!!polisId && !!stepId);
+
+	/** Post each seed to Polis, then pull the new comment(s) back into aux. */
+	async function postSeeds(texts: string[]) {
+		if (!polisId || !stepId) return;
+		for (const t of texts) {
+			await submitSeed(polisId, t);
+		}
+		await syncStatementAux(data.api, stepId);
+		await invalidate('open-poll:aux');
+	}
+
+	async function addSeed() {
+		const text = draftText.trim();
+		if (!text || !canSeed || addingSeed) return;
+		addingSeed = true;
+		addError = null;
+		try {
+			await postSeeds([text]);
+			draftText = '';
+			showAddForm = false;
+		} catch (e) {
+			console.error('submitSeed failed', e);
+			addError = e instanceof Error ? e.message : 'Failed to add statement.';
+		} finally {
+			addingSeed = false;
+		}
+	}
+
+	async function importCsv(e: Event) {
+		const input = e.currentTarget as HTMLInputElement;
+		const file = input.files?.[0];
+		if (!file || !canSeed || csvImporting) return;
+		csvImporting = true;
+		csvError = null;
+		try {
+			// One statement per line; strip wrapping quotes and a leading header row.
+			const lines = (await file.text())
+				.split(/\r?\n/)
+				.map((l) => l.replace(/^"(.*)"$/, '$1').trim())
+				.filter(Boolean);
+			if (['statement', 'statements', 'text'].includes(lines[0]?.toLowerCase())) {
+				lines.shift();
+			}
+			if (lines.length) await postSeeds(lines);
+		} catch (err) {
+			console.error('CSV import failed', err);
+			csvError = err instanceof Error ? err.message : 'CSV import failed.';
+		} finally {
+			csvImporting = false;
+			input.value = '';
+		}
+	}
 
 	type Filter = 'all' | 'seeded' | 'accepted' | 'pending' | 'rejected';
 	let filter = $state<Filter>('all');
@@ -61,7 +156,7 @@
 		);
 
 		try {
-			const updated = await moderateStatementAux(row.id, { decision });
+			const updated = await moderateStatementAux(data.api, row.id, { decision });
 			statements = statements.map((s) => (s.id === row.id ? updated : s));
 		} catch (e) {
 			console.error('moderateStatementAux failed', e);
@@ -80,7 +175,7 @@
 			s.id === row.id ? { ...s, themes: [...prev, theme] } : s
 		);
 		try {
-			const updated = await addStatementAuxTheme(row.id, theme);
+			const updated = await addStatementAuxTheme(data.api, row.id, theme);
 			statements = statements.map((s) => (s.id === row.id ? updated : s));
 		} catch (e) {
 			console.error('addStatementAuxTheme failed', e);
@@ -95,7 +190,7 @@
 			s.id === row.id ? { ...s, themes: prev.filter((t) => t !== theme) } : s
 		);
 		try {
-			const updated = await removeStatementAuxTheme(row.id, theme);
+			const updated = await removeStatementAuxTheme(data.api, row.id, theme);
 			statements = statements.map((s) => (s.id === row.id ? updated : s));
 		} catch (e) {
 			console.error('removeStatementAuxTheme failed', e);
@@ -131,29 +226,86 @@
 			<div class="min-w-0">
 				<div class="text-foreground text-body font-bold">Add a statement</div>
 				<div class="text-muted-foreground text-caption">
-					As moderator, you can seed the discussion.
+					{#if syncMessage}
+						{syncMessage}
+					{:else}
+						As moderator, you can seed the discussion.
+					{/if}
 				</div>
 			</div>
 			<div class="flex shrink-0 items-center gap-2">
 				<Button
-					disabled
+					variant="outline"
+					onclick={syncFromPolis}
+					disabled={syncing || !data.region?.polis_workflow_step_id}
 					class="rounded-full px-5 py-2.5"
-					title="Seed statement authoring not yet wired up"
+					title="Pull the latest submitted statements from Polis"
+				>
+					<RefreshCw class={`size-4 ${syncing ? 'animate-spin' : ''}`} />
+					{syncing ? 'Syncing…' : 'Sync from Polis'}
+				</Button>
+				<Button
+					onclick={() => (showAddForm = !showAddForm)}
+					class="rounded-full px-5 py-2.5"
+					title="Add a seed statement as moderator"
 				>
 					<Plus class="size-4" />
 					Add statement
 				</Button>
 				<Button
 					variant="outline"
-					disabled
+					onclick={() => fileInput?.click()}
+					disabled={!canSeed || csvImporting}
 					class="text-primary border-primary rounded-full bg-white px-5 py-2.5"
-					title="CSV import not yet wired up"
+					title="Import seed statements from a CSV (one statement per line)"
 				>
 					<Upload class="size-4" />
-					Import CSV
+					{csvImporting ? 'Importing…' : 'Import CSV'}
 				</Button>
+				<input
+					bind:this={fileInput}
+					type="file"
+					accept=".csv,.txt"
+					class="hidden"
+					onchange={importCsv}
+				/>
 			</div>
 		</div>
+
+		{#if csvError}
+			<div class="text-destructive text-caption border-border border-t px-4 py-2">{csvError}</div>
+		{/if}
+
+		{#if showAddForm}
+			<div class="border-border flex flex-col gap-2 border-t px-4 py-3">
+				<textarea
+					bind:value={draftText}
+					rows="2"
+					placeholder="Write a seed statement…"
+					class="border-border focus:ring-ring/40 text-body w-full rounded-md border px-3 py-2 focus:ring-2 focus:outline-none"
+				></textarea>
+				{#if !canSeed}
+					<p class="text-muted-foreground text-caption">
+						Sync at least one statement from Polis first — a new seed needs the conversation's ids.
+					</p>
+				{/if}
+				{#if addError}
+					<p class="text-destructive text-caption">{addError}</p>
+				{/if}
+				<div class="flex justify-end gap-2">
+					<Button variant="ghost" onclick={() => (showAddForm = false)} class="rounded-full">
+						Cancel
+					</Button>
+					<Button
+						onclick={addSeed}
+						disabled={!canSeed || !draftText.trim() || addingSeed}
+						class="rounded-full"
+					>
+						{addingSeed ? 'Posting…' : 'Post seed'}
+					</Button>
+				</div>
+			</div>
+		{/if}
 	</Card>
 
 	<!-- Status filter chips -->
@@ -162,10 +314,10 @@
 			<button
 				type="button"
 				onclick={() => (filter = f.key)}
-				class={`text-caption inline-flex cursor-pointer items-center rounded-full px-3 py-1.5 font-medium transition-all duration-150 hover:scale-[1.03] active:scale-[0.97] ${
+				class={`font-ui inline-flex cursor-pointer items-center rounded-[30px] px-3 py-2 text-lg font-medium leading-6 transition-all duration-150 hover:scale-[1.03] active:scale-[0.97] ${
 					filter === f.key
-						? 'bg-foreground text-background shadow-sm'
-						: 'bg-muted text-foreground hover:bg-muted-foreground/15'
+						? 'bg-[#C96442] text-white shadow-sm'
+						: 'bg-[#FCF7F6] text-[#C96442] hover:bg-[#F3E7E2]'
 				}`}
 			>
 				<span>{f.label} · {counts[f.key]}</span>
@@ -179,7 +331,7 @@
 			<div class="flex flex-col">
 				<!-- Column headings -->
 				<div
-					class="text-muted-foreground/60 text-label grid grid-cols-[1.5rem_minmax(0,1fr)_minmax(11rem,16rem)_auto] items-center gap-4 px-4 py-2 font-semibold uppercase"
+					class="font-ui text-muted-foreground/60 text-caption grid grid-cols-[1.5rem_minmax(0,1fr)_minmax(11rem,16rem)_auto] items-center gap-4 px-4 py-2 font-semibold uppercase"
 				>
 					<div>#</div>
 					<div>Statement</div>
@@ -209,13 +361,15 @@
 							></div>
 
 							<!-- # -->
-							<div class="text-muted-foreground pt-0.5 text-center text-caption">
+							<div class="font-ui text-muted-foreground text-label pt-1 text-center tabular-nums">
 								{row.polis_statement_id}
 							</div>
 
 							<!-- Statement text -->
 							<div class="min-w-0">
-								<p class="text-foreground text-body leading-5">{row.statement_text}</p>
+								<p class="font-ui text-foreground text-lg font-medium leading-6">
+									{row.statement_text}
+								</p>
 							</div>
 
 							<!-- Theme picker -->

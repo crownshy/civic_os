@@ -1,5 +1,12 @@
 <script lang="ts">
-	/** A pill-shaped on/off toggle, e.g. "Exclude host statements". */
+	import { Check } from '@lucide/svelte';
+
+	/**
+	 * Spreadsheet-style filter control. Renders as a bordered "dropdown" box with
+	 * the label and a checkmark reflecting state; the whole box is the hitbox
+	 * (per design feedback — not just an arrow). Less discoverable than a visible
+	 * switch, which is an accepted trade-off for the spreadsheet-familiar pattern.
+	 */
 	interface Props {
 		label: string;
 		checked: boolean;
@@ -19,22 +26,14 @@
 	role="switch"
 	aria-checked={checked}
 	onclick={toggle}
-	class={`inline-flex cursor-pointer items-center gap-2 rounded-full px-3 py-1.5 text-body font-medium transition-all duration-150 hover:scale-[1.04] hover:shadow-sm active:scale-[0.97] ${
-		checked
-			? 'bg-destructive/80 text-destructive-foreground hover:bg-destructive'
-			: 'bg-muted text-destructive hover:bg-muted-foreground/15'
-	}`}
+	class="border-border bg-card hover:bg-muted/50 text-caption inline-flex cursor-pointer items-center justify-between gap-3 rounded-[10px] border px-3 py-2 font-medium shadow-sm transition-colors"
 >
-	<span>{label}</span>
+	<span class="text-foreground">{label}</span>
 	<span
-		class={`relative inline-flex h-3.5 w-6 items-center rounded-full transition-colors ${
-			checked ? 'bg-destructive-foreground/40' : 'bg-destructive/30'
+		class={`flex size-4 shrink-0 items-center justify-center rounded border transition-colors ${
+			checked ? 'border-destructive bg-destructive/10 text-destructive' : 'border-border text-transparent'
 		}`}
 	>
-		<span
-			class={`inline-block size-3 rounded-full transition-transform ${
-				checked ? 'translate-x-2.5 bg-destructive-foreground' : 'translate-x-0.5 bg-destructive'
-			}`}
-		></span>
+		<Check class="size-3" />
 	</span>
 </button>

@@ -1,189 +1,134 @@
 <script lang="ts">
 	import type { ReportComment, ReportGroup } from '$lib/types/report';
-	import type { ModerationStatus } from '$lib/types/aux';
-	import {
-		computeGroupVotePercents,
-		totalVotes,
-		CONSENSUS_AGREE,
-		CONSENSUS_DISAGREE
-	} from '$lib/utils/report';
-	import { Check, X } from '@lucide/svelte';
+	import { computeGroupVotePercents, totalVotes } from '$lib/utils/report';
+	import { User } from '@lucide/svelte';
 	import GroupCircle from './GroupCircle.svelte';
 	import ThemePicker from './ThemePicker.svelte';
 
 	type Variant = 'consensus' | 'difference' | 'uncertainty' | 'neutral';
 
 	interface Props {
-		index: number;
+		/** Accepted for call-site convenience; the "#" cell shows the Polis tid. */
+		index?: number;
 		comment: ReportComment;
 		groups: ReportGroup[];
 		variant?: Variant;
 		/** Drop passes from the agree% denominator (agrees/(agrees+disagrees)). */
 		excludePasses?: boolean;
-		/** Show the "consensus" / "difference" pill on the left of the text. */
-		showVerdictPill?: boolean;
-		/**
-		 * When provided, render the inline ThemePicker (Insights' Theme
-		 * Explorer rows). When omitted, render small read-only theme chips
-		 * (Areas of Consensus / Difference / Uncertainty rows).
-		 */
 		picker?: {
 			availableThemes: string[];
 			onAddTheme: (theme: string) => void | Promise<void>;
 			onRemoveTheme: (theme: string) => void | Promise<void>;
-			/** Disable when there's no aux row to write to. */
 			disabled?: boolean;
-		};
-		/**
-		 * When provided, render accept/reject buttons that forward the
-		 * decision to Polis via the moderate endpoint. Omit (or pass
-		 * `disabled: true`) on rows without an aux row to write to.
-		 */
-		moderation?: {
-			status: ModerationStatus | null;
-			pending?: boolean;
-			disabled?: boolean;
-			onAccept: () => void | Promise<void>;
-			onReject: () => void | Promise<void>;
 		};
 	}
 
 	let {
-		index,
 		comment,
 		groups,
 		variant = 'neutral',
 		excludePasses = false,
-		showVerdictPill = false,
-		picker,
-		moderation
+		picker
 	}: Props = $props();
 
 	const groupPcts = $derived(computeGroupVotePercents(comment, groups, { excludePasses }));
 	const count = $derived(totalVotes(comment));
 
-	// Consensus direction: '+' when every group agrees, '−' when every group
-	// disagrees. Mirrors consensusDirection() in utils/report.ts.
-	const consensusSign = $derived(
-		variant === 'consensus' && groupPcts.length > 0
-			? groupPcts.every((p) => p.agreed >= CONSENSUS_AGREE)
-				? '+'
-				: groupPcts.every((p) => p.agreed < CONSENSUS_DISAGREE)
-					? '−'
-					: null
-			: null
+	// Per-variant metric shown in its own column (matches the Figma tables):
+	//   consensus  → lowest group agree% (MIN AGREE)
+	//   difference → max−min group agree% spread (DIFFERENCE, in pp)
+	//   otherwise  → total votes (COUNT)
+	const agreedPcts = $derived(groupPcts.map((g) => g.agreed));
+	const minAgree = $derived(agreedPcts.length ? Math.min(...agreedPcts) : 0);
+	const spread = $derived(agreedPcts.length ? Math.max(...agreedPcts) - Math.min(...agreedPcts) : 0);
+
+	const stripeClass = $derived(
+		variant === 'consensus'
+			? 'bg-consensus'
+			: variant === 'difference'
+				? 'bg-difference'
+				: 'bg-transparent'
 	);
 
-	const accentClass = $derived(
-		variant === 'consensus'
-			? 'bg-primary'
-			: variant === 'difference'
-				? 'bg-destructive'
-				: variant === 'uncertainty'
-					? 'bg-muted-foreground/30'
-					: 'bg-transparent'
-	);
-
-	const verdictPill = $derived(
-		variant === 'consensus'
-			? {
-					label: consensusSign ? `consensus (${consensusSign})` : 'consensus',
-					class: 'bg-primary text-primary-foreground'
-				}
-			: variant === 'difference'
-				? { label: 'difference', class: 'bg-destructive text-destructive-foreground' }
-				: variant === 'uncertainty'
-					? { label: 'uncertainty', class: 'bg-muted-foreground/20 text-muted-foreground' }
-					: null
-	);
+	// Seed/host-authored statements (is_seed) label as "Host". Everyone else is
+	// "Participant" — the report payload has no author pid yet, so we can't show
+	// the real participant id (e.g. "23"). Backfill is blocked on a backend change
+	// (see CONTEXT.md → "Statement author"). Seed author is assumed to be pid 0.
+	const isHostAuthored = $derived(!!comment.is_seed);
 </script>
 
 <div
-	class="border-border group hover:bg-muted/40 relative grid grid-cols-[1.5rem_minmax(0,1fr)_minmax(10rem,14rem)_2.5rem_auto_auto] items-start gap-4 border-b py-4 pl-4 transition-colors duration-150"
+	class="border-border group hover:bg-muted/40 relative grid grid-cols-[2.5rem_minmax(0,1fr)_4rem_5rem_auto] items-start gap-4 border-b py-6 pr-4 pl-5 transition-colors duration-150"
 >
-	<!-- Left accent bar -->
-	<div
-		class={`absolute top-0 bottom-0 left-0 w-1.5 transition-all duration-150 group-hover:w-2 ${accentClass}`}
-	></div>
+	<!-- Left accent stripe -->
+	<div class={`absolute top-0 bottom-0 left-0 w-1.5 ${stripeClass}`}></div>
 
-	<!-- Index -->
-	<div class="text-muted-foreground pt-0.5 text-center text-caption">
-		{index}
+	<!-- Polis statement id. Sizes here follow the admin token scale, not the raw
+	     Figma px — text-label/body map to the Figma's 12/16px where a token exists;
+	     the 18-20px row text has no token so it stays on the scale (see the type
+	     discussion). -->
+	<div class="font-ui text-muted-foreground text-label pt-1 text-center tabular-nums">
+		{comment.tid}
 	</div>
 
-	<!-- Statement text + verdict pill -->
+	<!-- Statement text + theme tags -->
 	<div class="min-w-0">
-		<p class="text-foreground text-body leading-5">{comment.text}</p>
-		{#if showVerdictPill && verdictPill}
+		<p class="font-ui text-foreground text-lg font-medium leading-6">{comment.text}</p>
+		<div class="mt-3">
+			{#if picker}
+				<ThemePicker
+					themes={comment.topics ?? []}
+					availableThemes={picker.availableThemes}
+					disabled={picker.disabled}
+					onAddTheme={picker.onAddTheme}
+					onRemoveTheme={picker.onRemoveTheme}
+				/>
+			{:else}
+				<div class="flex flex-wrap items-center gap-1.5">
+					{#each comment.topics ?? [] as topic (topic)}
+						<span
+							class="bg-muted text-foreground/80 text-caption inline-flex items-center rounded px-1.5 py-0.5 font-medium"
+						>
+							{topic}
+						</span>
+					{/each}
+				</div>
+			{/if}
+		</div>
+	</div>
+
+	<!-- Author -->
+	<div class="pt-1">
+		{#if isHostAuthored}
 			<span
-				class={`mt-2 inline-flex items-center rounded px-1.5 py-0.5 text-caption font-medium ${verdictPill.class}`}
+				class="text-caption inline-flex items-center gap-1 rounded bg-blue-500 px-1.5 py-0.5 font-medium text-white"
 			>
-				{verdictPill.label}
+				<User class="size-3" />Host
+			</span>
+		{:else}
+			<span
+				class="bg-muted text-muted-foreground text-caption inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-medium"
+			>
+				<User class="size-3" />Participant
 			</span>
 		{/if}
 	</div>
 
-	<!-- Theme column: picker for editable rows, read-only chips otherwise -->
-	<div class="min-w-0 pt-0.5">
-		{#if picker}
-			<ThemePicker
-				themes={comment.topics ?? []}
-				availableThemes={picker.availableThemes}
-				disabled={picker.disabled}
-				onAddTheme={picker.onAddTheme}
-				onRemoveTheme={picker.onRemoveTheme}
-			/>
+	<!-- Per-variant metric -->
+	<div class="font-ui pt-1 text-center font-bold">
+		{#if variant === 'consensus'}
+			<span class="text-consensus">{Math.round(minAgree)}%</span>
+		{:else if variant === 'difference'}
+			<span class="text-difference">{Math.round(spread)}pp</span>
 		{:else}
-			<div class="flex flex-wrap items-center gap-1.5">
-				{#each comment.topics ?? [] as topic (topic)}
-					<span
-						class="bg-muted text-foreground/80 inline-flex items-center rounded px-1.5 py-0.5 text-caption font-medium"
-					>
-						{topic}
-					</span>
-				{/each}
-			</div>
+			<span class="text-foreground">{count}</span>
 		{/if}
 	</div>
 
-	<!-- Count -->
-	<div class="text-foreground self-center text-body font-bold tabular-nums">
-		{count}
-	</div>
-
-	<!-- Per-group circles -->
-	<div class="flex items-center gap-3 self-center">
+	<!-- Per-group agree rings -->
+	<div class="flex items-center gap-3 self-start pt-0.5">
 		{#each groupPcts as g (g.group_id)}
-			<GroupCircle
-				label={g.label}
-				agreed={g.agreed}
-				disagreed={g.disagreed}
-				passed={g.passed}
-			/>
+			<GroupCircle agreed={g.agreed} disagreed={g.disagreed} passed={g.passed} showLabel={false} />
 		{/each}
-	</div>
-
-	<!-- Accept / reject (moderation) -->
-	<div class="flex items-center gap-1 self-center pr-4">
-		{#if moderation}
-			<button
-				type="button"
-				disabled={moderation.disabled || moderation.pending || moderation.status === 'accepted'}
-				onclick={() => moderation?.onAccept()}
-				title="Accept"
-				class="text-primary hover:bg-primary/15 inline-flex size-7 cursor-pointer items-center justify-center rounded-full transition-all duration-150 hover:scale-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-transparent"
-			>
-				<Check class="size-4" />
-			</button>
-			<button
-				type="button"
-				disabled={moderation.disabled || moderation.pending || moderation.status === 'rejected'}
-				onclick={() => moderation?.onReject()}
-				title="Reject"
-				class="text-destructive hover:bg-destructive/15 inline-flex size-7 cursor-pointer items-center justify-center rounded-full transition-all duration-150 hover:scale-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-transparent"
-			>
-				<X class="size-4" />
-			</button>
-		{/if}
 	</div>
 </div>
