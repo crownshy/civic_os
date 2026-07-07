@@ -68,7 +68,7 @@
 
 	<!-- Main tabs -->
 	<nav class="border-foreground/30 font-ui flex flex-nowrap items-center overflow-x-auto border-b px-5">
-		{#each tabs as tab}
+		{#each tabs as tab (tab.href)}
 			<a
 				href={`/c/${region.slug}/${tab.href}`}
 				class={`relative h-12 shrink-0 px-3 py-3 text-body font-medium whitespace-nowrap ${

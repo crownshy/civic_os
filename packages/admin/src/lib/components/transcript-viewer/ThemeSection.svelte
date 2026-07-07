@@ -41,7 +41,7 @@
 	<button
 		type="button"
 		onclick={() => (expanded = !expanded)}
-		class="flex h-12 w-full cursor-pointer items-center gap-2.5 px-5 text-left transition-colors hover:bg-primary/10"
+		class="flex min-h-12 w-full cursor-pointer items-center gap-2.5 px-5 py-2 text-left transition-colors hover:bg-primary/10"
 	>
 		{#if expanded}
 			<span class="size-2 shrink-0 rounded-full bg-primary"></span>
