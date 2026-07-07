@@ -215,8 +215,8 @@
 
 	<!-- Page heading -->
 	<div class="flex max-w-3xl flex-col gap-1">
-		<h2 class="text-foreground text-section font-bold">Statements moderation</h2>
-		<p class="text-muted-foreground text-body">Moderate and view all statements.</p>
+		<h2 class="font-display text-foreground text-display font-semibold">Statements moderation</h2>
+		<p class="text-muted-foreground text-section">Moderate and view all statements.</p>
 	</div>
 
 	<!-- Add-a-statement card -->
@@ -225,8 +225,8 @@
 	>
 		<div class="flex items-center justify-between gap-3 px-4 py-3">
 			<div class="min-w-0">
-				<div class="text-foreground text-body font-bold">Add a statement</div>
-				<div class="text-muted-foreground text-caption">
+				<div class="text-foreground text-lg font-bold">Add a statement</div>
+				<div class="text-muted-foreground text-body">
 					{#if syncMessage}
 						{syncMessage}
 					{:else}
@@ -239,7 +239,7 @@
 					variant="outline"
 					onclick={syncFromPolis}
 					disabled={syncing || !data.region?.polis_workflow_step_id}
-					class="rounded-full px-5 py-2.5"
+					class="text-body rounded-full px-5 py-2.5"
 					title="Pull the latest submitted statements from Polis"
 				>
 					<RefreshCw class={`size-4 ${syncing ? 'animate-spin' : ''}`} />
@@ -247,7 +247,7 @@
 				</Button>
 				<Button
 					onclick={() => (showAddForm = !showAddForm)}
-					class="rounded-full px-5 py-2.5"
+					class="text-body rounded-full px-5 py-2.5"
 					title="Add a seed statement as moderator"
 				>
 					<Plus class="size-4" />
@@ -257,7 +257,7 @@
 					variant="outline"
 					onclick={() => fileInput?.click()}
 					disabled={!canSeed || csvImporting}
-					class="text-primary border-primary rounded-full bg-white px-5 py-2.5"
+					class="text-primary border-primary text-body rounded-full bg-white px-5 py-2.5"
 					title="Import seed statements from a CSV (one statement per line)"
 				>
 					<Upload class="size-4" />
