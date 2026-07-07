@@ -7,7 +7,9 @@
 
 	let { data } = $props();
 
-	const recordings = $derived(data.recordings ?? []);
+	const recordings = $derived(
+		Array.isArray(data.recordings) ? data.recordings : [],
+	);
 
 	const api = $derived(data.api);
 	const conversationId = $derived(data.region.conversationId);
