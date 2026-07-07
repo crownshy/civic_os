@@ -70,10 +70,10 @@
 {#if !event}
 	<div class="text-muted-foreground p-8">Event not found.</div>
 {:else}
-	<div class="flex-1 overflow-y-auto px-5 py-5">
+	<div class="flex min-h-0 flex-1 flex-col px-5 py-5">
 		<!-- Event header card -->
 		<div
-			class="bg-card shadow-card mb-4 flex items-center gap-3.5 rounded-lg p-4"
+			class="bg-card shadow-card mb-4 flex shrink-0 items-center gap-3.5 rounded-lg p-4"
 		>
 			<div class="w-14 text-center">
 				<div class="text-muted-foreground text-caption">
@@ -111,6 +111,8 @@
 			</div>
 		</div>
 
-		{@render children?.()}
+		<div class="min-h-0 flex-1 overflow-y-auto">
+			{@render children?.()}
+		</div>
 	</div>
 {/if}
