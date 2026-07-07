@@ -1,47 +1,79 @@
 <script lang="ts">
-	import AudioPlayer from "./AudioPlayer.svelte";
-	import TranscriptViewer, {
+	import TranscriptRail, {
 		type TranscriptEvent,
-	} from "./TranscriptViewer.svelte";
-	import CategoriesPanel, {
-		type Topic,
+	} from "./TranscriptRail.svelte";
+	import ThemeSection, {
+		type Subtopic,
 		type Quote,
-	} from "./CategoriesPanel.svelte";
+	} from "./ThemeSection.svelte";
+	import RecordingSwitcher from "./RecordingSwitcher.svelte";
+	import DownloadMenu from "./DownloadMenu.svelte";
+	import type { AudioRecordingStatus } from "@crownshy/api-client/api";
 
+	interface Topic {
+		id: string;
+		title: string;
+		subtopics?: Subtopic[];
+	}
 	interface Source {
 		id: string;
 	}
-
 	interface ReportData {
 		data?: [unknown, { topics?: Topic[]; sources?: Source[] }];
+	}
+	interface RecordingRef {
+		id: string;
+		name: string;
 	}
 
 	interface Props {
 		recordingId: string;
+		name: string;
+		status: AudioRecordingStatus;
+		conversationTitle: string;
 		audioUrl: string;
 		transcriptionUrl: string;
 		reportUrl: string;
+		recordings: RecordingRef[];
+		basePath: string;
+		recordingsPath: string;
 	}
 
-	let { recordingId, audioUrl, transcriptionUrl, reportUrl }: Props = $props();
+	let {
+		recordingId,
+		name,
+		status,
+		conversationTitle,
+		audioUrl,
+		transcriptionUrl,
+		reportUrl,
+		recordings,
+		basePath,
+		recordingsPath,
+	}: Props = $props();
 
-	// TODO: replace placeholder data with a real fetch keyed on recordingId.
+	const pipelineFailed = $derived(
+		status === "transcription_failed" || status === "categorization_failed",
+	);
+
 	let transcriptData = $state<{ events: TranscriptEvent[] }>({ events: [] });
 	let reportData = $state<ReportData>({ data: [null, { topics: [] }] });
-	let currentTime = $state(0);
-	let audioPlayer = $state<
-		{ seekTo: (t: number) => void; play: () => void } | undefined
-	>();
+	let rail = $state<TranscriptRail | undefined>();
 	let loading = $state(true);
-	let error = $state<string | null>(null);
+	let fetchError = $state(false);
 
 	$effect(() => {
-		// Reset state so navigating between recordings shows the spinner
-		// instead of flashing the previous recording's data or the empty state.
+		// Reset when navigating between recordings so the spinner shows instead of
+		// flashing the previous recording's data.
 		loading = true;
-		error = null;
+		fetchError = false;
 		transcriptData = { events: [] };
 		reportData = { data: [null, { topics: [] }] };
+
+		if (pipelineFailed) {
+			loading = false;
+			return;
+		}
 
 		(async () => {
 			try {
@@ -49,38 +81,29 @@
 					fetch(transcriptionUrl),
 					fetch(reportUrl),
 				]);
-
 				if (!transcriptResponse.ok || !reportResponse.ok) {
 					throw new Error("Failed to load data files");
 				}
-
 				transcriptData = await transcriptResponse.json();
-				let rawReportData = await reportResponse.json();
-				if (typeof rawReportData === "string") {
-					reportData = JSON.parse(rawReportData).result;
+				const raw = await reportResponse.json();
+				if (typeof raw === "string") {
+					reportData = JSON.parse(raw).result;
+				} else {
+					reportData = raw;
 				}
-			} catch (err) {
-				error = err instanceof Error ? err.message : "Failed to load data";
+			} catch {
+				fetchError = true;
 			} finally {
 				loading = false;
 			}
 		})();
 	});
 
-	function onTimeUpdate(time: number) {
-		currentTime = time;
-	}
+	const topics = $derived(reportData?.data?.[1]?.topics ?? []);
+	// Chips = topic titles; theme sections = every subtopic across topics.
+	const subtopics = $derived(topics.flatMap((t) => t.subtopics ?? []));
 
-	function onSeek(time: number) {
-		currentTime = time;
-		if (audioPlayer) {
-			audioPlayer.seekTo(time);
-		}
-	}
-
-	let topics = $derived(reportData?.data?.[1]?.topics ?? []);
-
-	let sourceIdToTime = $derived.by(() => {
+	const sourceIdToTime = $derived.by(() => {
 		const sources = reportData?.data?.[1]?.sources ?? [];
 		const events = transcriptData?.events ?? [];
 		const map = new Map<string, number>();
@@ -94,58 +117,94 @@
 		const sourceId = quote.reference?.sourceId;
 		if (!sourceId) return;
 		const time = sourceIdToTime.get(sourceId);
-		if (time != null && audioPlayer) {
-			audioPlayer.seekTo(time);
-			audioPlayer.play();
-			currentTime = time;
+		if (time != null && rail) {
+			rail.seekTo(time);
+			rail.play();
 		}
 	}
+
+	const showError = $derived(pipelineFailed || fetchError);
 </script>
 
-<div class="mx-auto flex max-w-[1600px] flex-col lg:h-full lg:overflow-hidden">
+<div
+	class="flex overflow-hidden rounded-[30px] bg-white outline outline-1 outline-black/30 max-lg:flex-col lg:h-[600px]"
+>
 	{#if loading}
 		<div
-			class="text-muted-foreground flex flex-col items-center justify-center gap-4 py-24"
+			class="flex flex-1 flex-col items-center justify-center gap-4 py-24 text-muted-foreground"
 		>
 			<div
-				class="border-muted border-t-primary size-10 animate-spin rounded-full border-4"
+				class="size-10 animate-spin rounded-full border-4 border-muted border-t-red-500"
 			></div>
-			<p>Loading data...</p>
-		</div>
-	{:else if error}
-		<div class="flex items-center justify-center py-24">
-			<p class="text-destructive text-lg">Error: {error}</p>
-		</div>
-	{:else if transcriptData.events.length === 0 && topics.length === 0}
-		<div
-			class="border-border text-muted-foreground flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed py-24"
-		>
-			<p class="text-body font-medium">No recording data available yet</p>
-			<p class="text-caption">
-				Recording <code class="bg-muted rounded px-1.5 py-0.5"
-					>{recordingId}</code
-				> will appear here once processing is wired up.
-			</p>
+			<p>Loading recording…</p>
 		</div>
 	{:else}
-		<div
-			class="grid grid-cols-2 gap-5 max-lg:grid-cols-1 lg:min-h-0 lg:flex-1"
-		>
-			<CategoriesPanel {topics} {onQuoteClick} />
-			<div class="flex flex-col lg:min-h-0">
-				<AudioPlayer
-					bind:this={audioPlayer}
-					audioSrc={audioUrl}
-					bind:currentTime
-					{onTimeUpdate}
-					{onSeek}
-				/>
-				<TranscriptViewer
-					events={transcriptData.events}
-					{currentTime}
-					{onSeek}
-				/>
+		<!-- Left: header + themes -->
+		<div class="flex min-w-0 flex-1 flex-col overflow-hidden">
+			<div class="shrink-0 px-10 pt-10 pb-4">
+				<div class="text-sm font-medium uppercase text-zinc-600">
+					From “{conversationTitle}”
+				</div>
+				<div class="mt-1 flex flex-wrap items-center gap-3">
+					<RecordingSwitcher
+						{name}
+						{recordings}
+						currentId={recordingId}
+						{basePath}
+						{recordingsPath}
+					/>
+					{#if !showError}
+						<DownloadMenu
+							{name}
+							transcriptUrl={transcriptionUrl}
+							{reportUrl}
+							recordingUrl={audioUrl}
+						/>
+					{/if}
+				</div>
+
+				{#if !showError && topics.length > 0}
+					<div class="mt-4 flex flex-wrap gap-2">
+						{#each topics as topic (topic.id)}
+							<span
+								class="rounded-[3px] bg-stone-50 px-[5px] py-[3px] text-sm font-medium uppercase text-amber-800"
+							>
+								{topic.title}
+							</span>
+						{/each}
+					</div>
+				{/if}
 			</div>
+
+			{#if showError}
+				<div
+					class="flex flex-1 flex-col items-center justify-center gap-4 px-10 text-center"
+				>
+					<h2 class="text-4xl font-bold text-black">We have a problem.</h2>
+					<p class="max-w-lg text-xl font-medium text-neutral-500">
+						There was an issue in creating the report. If this problem persists,
+						contact <a
+							href="mailto:hello@bloom-project.org"
+							class="text-red-500">hello@bloom-project.org.</a
+						>
+					</p>
+				</div>
+			{:else}
+				<div class="min-h-0 flex-1 overflow-y-auto">
+					{#each subtopics as subtopic, i (subtopic.id)}
+						<ThemeSection {subtopic} open={i === 0} {onQuoteClick} />
+					{/each}
+				</div>
+			{/if}
 		</div>
+
+		<!-- Right: transcript rail -->
+		{#if transcriptData.events.length > 0}
+			<TranscriptRail
+				bind:this={rail}
+				events={transcriptData.events}
+				audioSrc={audioUrl}
+			/>
+		{/if}
 	{/if}
 </div>

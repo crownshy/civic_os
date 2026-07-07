@@ -2,7 +2,6 @@
 	import type { createApiClient } from '@crownshy/api-client/client';
 	import { AudioFormat } from '@crownshy/api-client/api';
 	import * as Dialog from '@civicos/shared/ui/dialog';
-	import { Button } from '@civicos/shared/ui/button';
 	import { Input } from '@civicos/shared/ui/input';
 	import { Label } from '@civicos/shared/ui/label';
 	import { Progress } from '@civicos/shared/ui/progress';
@@ -138,61 +137,84 @@
 </script>
 
 <Dialog.Root bind:open onOpenChange={(v) => !v && close()}>
-	<Dialog.Content class="max-w-lg">
-		<Dialog.Header>
-			<Dialog.Title>Upload New Recording</Dialog.Title>
-			<Dialog.Description>
-				Name the recording and choose an audio file. It will upload directly, then start
-				processing automatically.
-			</Dialog.Description>
-		</Dialog.Header>
+	<Dialog.Content class="max-w-[925px] gap-0 rounded-[30px] border-black/30 p-0">
+		<div class="p-11">
+			<Dialog.Title class="text-4xl font-bold text-yellow-950">
+				Name your recording
+			</Dialog.Title>
 
-		<div class="space-y-4">
-			<div class="space-y-1.5">
-				<Label for="recording-name">Name <span class="text-destructive">*</span></Label>
-				<Input
-					id="recording-name"
-					bind:value={name}
-					placeholder="e.g. Breakout Room #1"
-					required
-					aria-invalid={nameError ? 'true' : undefined}
-					aria-describedby={nameError ? 'recording-name-error' : undefined}
-					oninput={() => (nameError = null)}
-					disabled={submitting}
-				/>
-				{#if nameError}
-					<p id="recording-name-error" class="text-destructive text-caption">{nameError}</p>
+			<!-- Chosen file / picker -->
+			<div class="mt-3.5">
+				{#if selectedFile}
+					<p class="text-2xl font-bold text-yellow-950">{selectedFile.name}</p>
+				{:else}
+					<Label
+						for="recording-file"
+						class="inline-flex cursor-pointer items-center gap-2 text-lg font-medium text-red-500"
+					>
+						Choose an audio file…
+					</Label>
 				{/if}
-			</div>
-
-			<div class="space-y-1.5">
-				<Label for="recording-file">Audio file</Label>
 				<Input
 					id="recording-file"
 					type="file"
 					accept={ACCEPT}
 					bind:files
 					disabled={submitting}
+					class={selectedFile ? 'sr-only' : 'mt-2'}
 				/>
 			</div>
 
+			<!-- Name input -->
+			<div class="mt-6">
+				<input
+					id="recording-name"
+					bind:value={name}
+					placeholder="e.g., Plenary Session"
+					required
+					aria-invalid={nameError ? 'true' : undefined}
+					aria-describedby={nameError ? 'recording-name-error' : undefined}
+					oninput={() => (nameError = null)}
+					disabled={submitting}
+					class="h-16 w-full rounded-[20px] bg-white px-5 text-2xl font-bold text-yellow-950 outline outline-1 outline-stone-500/50 placeholder:text-yellow-950/50 focus:outline-2 focus:outline-red-500 disabled:opacity-50"
+				/>
+				{#if nameError}
+					<p id="recording-name-error" class="mt-1.5 text-caption text-red-500">
+						{nameError}
+					</p>
+				{/if}
+			</div>
+
 			{#if submitting}
-				<div class="space-y-1.5">
+				<div class="mt-4 space-y-1.5">
 					<Progress value={progress} />
 					<p class="text-caption text-muted-foreground">Uploading… {progress}%</p>
 				</div>
 			{/if}
 
 			{#if errorMsg}
-				<p class="text-destructive text-caption">{errorMsg}</p>
+				<p class="mt-3 text-caption text-red-500">{errorMsg}</p>
 			{/if}
-		</div>
 
-		<Dialog.Footer class="gap-2">
-			<Button type="button" variant="secondary" onclick={close} disabled={submitting}>Cancel</Button>
-			<Button type="button" onclick={submitForm} disabled={submitting}>
-				{submitting ? `Uploading… ${progress}%` : 'Upload'}
-			</Button>
-		</Dialog.Footer>
+			<!-- Actions -->
+			<div class="mt-8 flex justify-end gap-3">
+				<button
+					type="button"
+					onclick={close}
+					disabled={submitting}
+					class="cursor-pointer rounded-[45px] bg-red-500/10 px-4 py-3 text-xl font-medium leading-6 text-red-500 disabled:opacity-50"
+				>
+					Cancel
+				</button>
+				<button
+					type="button"
+					onclick={submitForm}
+					disabled={submitting}
+					class="cursor-pointer rounded-[45px] bg-red-500 px-4 py-3 text-xl font-medium leading-6 text-white disabled:opacity-50"
+				>
+					{submitting ? `Uploading… ${progress}%` : 'Submit'}
+				</button>
+			</div>
+		</div>
 	</Dialog.Content>
 </Dialog.Root>

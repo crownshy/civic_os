@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { FileAudio, LoaderCircle, Plus, TriangleAlert } from "@lucide/svelte";
+	import { LoaderCircle, TriangleAlert } from "@lucide/svelte";
 	import type { AudioRecordingStatus } from "@crownshy/api-client/api";
 	import { invalidate } from "$app/navigation";
 	import UploadRecordingModal from "$lib/components/UploadRecordingModal.svelte";
@@ -20,9 +20,7 @@
 
 	// Id of the recording whose detail page is currently being navigated to,
 	// so we can show a loading indicator on the clicked card immediately.
-	const pendingId = $derived(
-		navigating.to?.params?.recordingID ?? null,
-	);
+	const pendingId = $derived(navigating.to?.params?.recordingID ?? null);
 
 	function refreshRecordings() {
 		return invalidate(`recordings:list:${eventId}`);
@@ -40,61 +38,173 @@
 		return () => clearInterval(interval);
 	});
 
-	function statusLabel(status: AudioRecordingStatus): string {
+	type CardTone = "ready" | "processing" | "upload-error" | "pipeline-error";
+
+	function cardTone(status: AudioRecordingStatus): CardTone {
 		switch (status) {
-			case "awaiting_upload":
-				return "awaiting upload";
-			case "transcribing":
-				return "transcribing";
-			case "categorizing":
-				return "categorizing";
 			case "complete":
-				return "complete";
+				return "ready";
+			case "transcribing":
+			case "categorizing":
+				return "processing";
+			case "awaiting_upload":
+				return "upload-error";
 			case "transcription_failed":
-				return "transcript error";
 			case "categorization_failed":
-				return "report error";
+				return "pipeline-error";
 		}
 	}
 
-	function statusTone(
-		status: AudioRecordingStatus,
-	): "done" | "failed" | "progress" {
-		if (status === "complete") return "done";
-		if (status === "transcription_failed" || status === "categorization_failed")
-			return "failed";
-		return "progress";
+	// Outline color per Figma: success/processing red-400, upload error orange-600,
+	// transcript/report error yellow-400.
+	const outlineClass: Record<CardTone, string> = {
+		ready: "outline-red-400",
+		processing: "outline-red-400",
+		"upload-error": "outline-orange-600",
+		"pipeline-error": "outline-yellow-400",
+	};
+
+	function extLabel(ext: string) {
+		return `.${ext.toLowerCase()}`;
 	}
 
-	const toneClass: Record<"done" | "failed" | "progress", string> = {
-		done: "text-success bg-success/10",
-		failed: "text-destructive bg-destructive/10",
-		progress: "text-muted-foreground bg-muted-foreground/10",
-	};
-
-	const toneDot: Record<"done" | "failed" | "progress", string> = {
-		done: "bg-success",
-		failed: "bg-destructive",
-		progress: "bg-muted-foreground/60",
-	};
+	function fmtDate(iso: string) {
+		return new Date(iso).toLocaleDateString("en-US", {
+			month: "short",
+			day: "numeric",
+		});
+	}
 </script>
 
-<div class="space-y-4">
-	<div class="flex items-start justify-between gap-3">
-		<div>
-			<h3 class="text-body font-bold">All Recordings</h3>
-			<p class="text-caption text-muted-foreground">
-				Select a recording below to view its transcript and analysis.
-			</p>
-		</div>
-		<button
-			type="button"
-			onclick={() => (uploadOpen = true)}
-			class="text-caption inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-primary-foreground"
+<div class="space-y-6">
+	{#if data.recordingsFailed}
+		<div
+			class="rounded-[30px] bg-white p-6 text-body text-muted-foreground outline outline-1 outline-black/30"
 		>
-			<Plus class="size-3" /> Upload New Recording
-		</button>
-	</div>
+			Couldn't load recordings. Please try again.
+		</div>
+	{:else if recordings.length === 0}
+		<!-- Empty state -->
+		<h2 class="text-3xl font-bold">
+			{data.event?.name ?? "Recordings"}
+		</h2>
+		<div
+			class="relative flex h-[543px] max-h-[70vh] flex-col items-center justify-center gap-4 rounded-[30px] bg-white px-6 text-center outline outline-1 outline-black/30"
+		>
+			<!-- Upload glyph: circle + notch -->
+			<div
+				class="flex size-36 items-center justify-center rounded-full border-8 border-red-500"
+			>
+				<div class="h-16 w-14 bg-red-500"></div>
+			</div>
+			<h3 class="max-w-2xl text-4xl font-bold text-neutral-900">
+				Upload an audio recording from your event.
+			</h3>
+			<p class="max-w-lg text-2xl font-medium text-neutral-500">
+				One at a time. .mp3, .m4a, .wav all accepted.
+			</p>
+			<button
+				type="button"
+				onclick={() => (uploadOpen = true)}
+				class="mt-2 inline-flex cursor-pointer items-center rounded-[45px] bg-red-500 px-4 py-3 text-2xl font-medium leading-8 text-white"
+			>
+				Upload Recordings
+			</button>
+		</div>
+	{:else}
+		<div class="flex items-end justify-between gap-4">
+			<div>
+				<h2 class="text-4xl font-bold">All Recordings</h2>
+				<p class="mt-1 text-lg font-medium">
+					Select a recording below to view its transcript and analysis.
+				</p>
+			</div>
+			<button
+				type="button"
+				onclick={() => (uploadOpen = true)}
+				class="inline-flex shrink-0 cursor-pointer items-center rounded-[45px] bg-red-500 px-4 py-3 text-xl font-medium leading-6 text-white"
+			>
+				Upload New Recording
+			</button>
+		</div>
+
+		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+			{#each recordings as rec, i (rec.id)}
+				{@const tone = cardTone(rec.status)}
+				{@const pending = pendingId === rec.id}
+				{#snippet cardInner()}
+					<div class="flex items-center gap-3">
+						<!-- Leading marker -->
+						<div class="flex size-6 shrink-0 items-center justify-center">
+							{#if pending}
+								<LoaderCircle
+									class="size-5 animate-spin text-red-500"
+									aria-label="Opening"
+								/>
+							{:else if tone === "processing"}
+								<LoaderCircle
+									class="size-5 animate-spin text-red-500"
+									aria-label="Processing"
+								/>
+							{:else if tone === "upload-error"}
+								<TriangleAlert
+									class="size-5 text-orange-600"
+									aria-label="Upload error"
+								/>
+							{:else if tone === "pipeline-error"}
+								<TriangleAlert
+									class="size-5 text-yellow-500"
+									aria-label="Error"
+								/>
+							{:else}
+								<span class="text-lg font-bold leading-6 text-red-500"
+									>{i + 1}</span
+								>
+							{/if}
+						</div>
+						<div class="min-w-0 flex-1">
+							<div class="truncate text-2xl font-bold text-black">{rec.name}</div>
+							<div class="mt-0.5 text-sm">
+								{#if tone === "upload-error"}
+									<span class="font-bold text-orange-600">Upload Error. Retry?</span>
+								{:else if rec.status === "transcription_failed"}
+									<span class="font-bold text-yellow-700">Transcript Error</span>
+								{:else if rec.status === "categorization_failed"}
+									<span class="font-bold text-yellow-700">Report Error</span>
+								{:else if rec.status === "transcribing"}
+									<span class="text-black">Transcribing…</span>
+								{:else if rec.status === "categorizing"}
+									<span class="text-black">Analyzing…</span>
+								{:else}
+									<span class="text-black"
+										>{extLabel(rec.fileExtension)} · {fmtDate(rec.createdAt)}</span
+									>
+								{/if}
+							</div>
+						</div>
+					</div>
+				{/snippet}
+
+				{#if tone === "upload-error"}
+					<button
+						type="button"
+						onclick={() => (uploadOpen = true)}
+						class={`h-20 w-full cursor-pointer overflow-hidden rounded-[10px] px-5 py-4 text-left outline outline-1 ${outlineClass[tone]}`}
+					>
+						{@render cardInner()}
+					</button>
+				{:else}
+					<a
+						href={`${page.url}/${rec.id}`}
+						class={`block h-20 overflow-hidden rounded-[10px] px-5 py-4 outline outline-1 transition-opacity ${outlineClass[tone]} ${pending ? "pointer-events-none opacity-60" : ""} ${i === 0 ? "bg-stone-50" : ""}`}
+						aria-busy={pending}
+					>
+						{@render cardInner()}
+					</a>
+				{/if}
+			{/each}
+		</div>
+	{/if}
 
 	<UploadRecordingModal
 		bind:open={uploadOpen}
@@ -104,72 +214,4 @@
 		{existingNames}
 		onUploaded={refreshRecordings}
 	/>
-
-	{#if data.recordingsFailed}
-		<div
-			class="text-body rounded-lg bg-card p-6 text-muted-foreground shadow-card"
-		>
-			Couldn't load recordings. Please try again.
-		</div>
-	{:else if recordings.length === 0}
-		<div
-			class="text-body rounded-lg bg-card p-6 text-muted-foreground shadow-card"
-		>
-			No recordings yet. Upload one to get started.
-		</div>
-	{:else}
-		<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-			{#each recordings as rec, i (rec.id)}
-				{@const tone = statusTone(rec.status)}
-				{@const pending = pendingId === rec.id}
-				<a
-					href={`${page.url}/${rec.id}`}
-					class="block transition-opacity"
-					class:pointer-events-none={pending}
-					aria-busy={pending}
-				>
-					<div
-						class={`flex items-start gap-3 rounded-lg bg-card p-4 shadow-card ${pending ? "opacity-60" : ""}`}
-					>
-						<div class="flex w-4 shrink-0 items-center justify-center pt-0.5">
-							{#if pending}
-								<LoaderCircle
-									class="size-4 animate-spin text-primary"
-									aria-label="Opening"
-								/>
-							{:else if tone === "progress"}
-								<LoaderCircle
-									class="size-4 animate-spin text-muted-foreground"
-									aria-label="Processing"
-								/>
-							{:else if tone === "failed"}
-								<TriangleAlert
-									class="size-4 text-destructive"
-									aria-label="Error"
-								/>
-							{:else}
-								<span class="text-caption font-bold text-primary">{i + 1}</span>
-							{/if}
-						</div>
-						<div class="min-w-0 flex-1 space-y-1.5">
-							<div class="flex items-center gap-1.5">
-								<FileAudio class="size-3.5 shrink-0 text-muted-foreground" />
-								<span class="text-body truncate font-bold">{rec.name}</span>
-							</div>
-							<div
-								class="text-caption flex items-center gap-2 text-muted-foreground"
-							>
-								<span
-									class={`inline-flex shrink-0 items-center gap-1 rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl px-2.5 py-0.5 ${toneClass[tone]}`}
-								>
-									<span class={`size-1.5 rounded-full ${toneDot[tone]}`}></span>
-									{statusLabel(rec.status)}
-								</span>
-							</div>
-						</div>
-					</div>
-				</a>
-			{/each}
-		</div>
-	{/if}
 </div>

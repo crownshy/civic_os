@@ -1,15 +1,20 @@
 <script lang="ts">
 	import EventTranscriptViewer from "$lib/components/transcript-viewer/EventTranscriptViewer.svelte";
 
-	const recordingId = "blah";
-	const audioUrl = "/recording.wav";
-	const transcriptionUrl = "/transcript.json";
-	const reportUrl = "/report.json";
+	const recordings = [{ id: "blah", name: "Plenary" }];
 </script>
 
-<EventTranscriptViewer
-	{recordingId}
-	{audioUrl}
-	{transcriptionUrl}
-	{reportUrl}
-/>
+<div class="p-6">
+	<EventTranscriptViewer
+		recordingId="blah"
+		name="Plenary"
+		status="complete"
+		conversationTitle="Demo Conversation"
+		{recordings}
+		basePath="/transcript_test"
+		recordingsPath="/transcript_test"
+		audioUrl="/recording.wav"
+		transcriptionUrl="/transcript.json"
+		reportUrl="/report.json"
+	/>
+</div>
