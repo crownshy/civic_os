@@ -102,7 +102,7 @@
 	}
 </script>
 
-<div class="mx-auto flex max-w-[1600px] flex-col">
+<div class="mx-auto flex max-w-[1600px] flex-col lg:h-full lg:overflow-hidden">
 	{#if loading}
 		<div
 			class="text-muted-foreground flex flex-col items-center justify-center gap-4 py-24"
@@ -129,10 +129,10 @@
 		</div>
 	{:else}
 		<div
-			class="grid grid-cols-2 items-start gap-5 max-lg:grid-cols-1"
+			class="grid grid-cols-2 gap-5 max-lg:grid-cols-1 lg:min-h-0 lg:flex-1"
 		>
 			<CategoriesPanel {topics} {onQuoteClick} />
-			<div class="flex flex-col">
+			<div class="flex flex-col lg:min-h-0">
 				<AudioPlayer
 					bind:this={audioPlayer}
 					audioSrc={audioUrl}
