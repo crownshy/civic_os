@@ -101,11 +101,7 @@
 						Permanently delete this conversation and all its data.
 					</div>
 				</div>
-				<Button
-					size="sm"
-					variant="outline"
-					class="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground rounded-full bg-card transition-all hover:scale-105 active:scale-95"
-				>
+				<Button size="sm" variant="destructive-outline">
 					<Trash2 class="size-3.5" />
 					delete conversation…
 				</Button>

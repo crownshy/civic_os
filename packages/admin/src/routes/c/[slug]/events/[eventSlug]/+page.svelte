@@ -433,7 +433,7 @@
 				>
 					{rsvpLink}
 				</div>
-				<Button variant="outline" size="sm" onclick={copyLink} class="gap-1.5">
+				<Button variant="outline" size="sm" onclick={copyLink}>
 					{#if copied}
 						<Check class="size-3.5" /> copied
 					{:else}
@@ -457,12 +457,7 @@
 					Removes the event, RSVPs, and any uploaded recordings.
 				</div>
 			</div>
-			<Button
-				variant="outline"
-				size="sm"
-				class="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive gap-1.5"
-				onclick={() => (deleteOpen = true)}
-			>
+			<Button variant="destructive-outline" size="sm" onclick={() => (deleteOpen = true)}>
 				<Trash2 class="size-3.5" /> delete event…
 			</Button>
 		</div>

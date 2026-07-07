@@ -103,6 +103,7 @@
 				lines.shift();
 			}
 			if (lines.length) await postSeeds(lines);
+			showAddForm = false;
 		} catch (err) {
 			console.error('CSV import failed', err);
 			csvError = err instanceof Error ? err.message : 'CSV import failed.';
@@ -187,7 +188,6 @@
 				variant="secondary"
 				onclick={syncFromPolis}
 				disabled={syncing || !data.region?.polis_workflow_step_id}
-				class="text-body rounded-full px-5 py-2.5"
 				title="Pull the latest submitted statements from Polis"
 			>
 				<RefreshCw class={`size-4 ${syncing ? 'animate-spin' : ''}`} />
@@ -195,22 +195,42 @@
 			</Button>
 			<Button
 				onclick={() => (showAddForm = !showAddForm)}
-				class="text-body rounded-full px-5 py-2.5"
-				title="Add a seed statement as moderator"
+				title="Add seed statements as moderator"
 			>
 				<Plus class="size-4" />
-				Add statement
+				Add seed statements
 			</Button>
-			<Button
-				variant="secondary"
-				onclick={() => fileInput?.click()}
-				disabled={!canSeed || csvImporting}
-				class="text-body rounded-full px-5 py-2.5"
-				title="Import seed statements from a CSV (one statement per line)"
-			>
-				<Upload class="size-4" />
-				{csvImporting ? 'Importing…' : 'Import CSV'}
-			</Button>
+		</div>
+	</div>
+
+	{#if showAddForm}
+		<div class="border-border flex max-w-3xl flex-col gap-3 rounded-lg border px-4 py-4">
+			<!-- Option 1: type a single seed -->
+			<label class="text-muted-foreground text-caption font-medium" for="seed-text">
+				Write a statement
+			</label>
+			<textarea
+				id="seed-text"
+				bind:value={draftText}
+				rows="2"
+				placeholder="Write a seed statement…"
+				class="border-border focus:ring-ring/40 text-lg w-full rounded-md border px-3 py-2 focus:ring-2 focus:outline-none"
+			></textarea>
+
+			<!-- Option 2: bulk import -->
+			<div class="text-muted-foreground text-caption flex items-center gap-2">
+				<span>or</span>
+				<Button
+					variant="secondary"
+					onclick={() => fileInput?.click()}
+					disabled={!canSeed || csvImporting}
+					title="Import seed statements from a CSV (one statement per line)"
+				>
+					<Upload class="size-4" />
+					{csvImporting ? 'Importing…' : 'Import CSV'}
+				</Button>
+				<span>to add many at once</span>
+			</div>
 			<input
 				bind:this={fileInput}
 				type="file"
@@ -218,21 +238,7 @@
 				class="hidden"
 				onchange={importCsv}
 			/>
-		</div>
-	</div>
 
-	{#if csvError}
-		<div class="text-destructive text-caption">{csvError}</div>
-	{/if}
-
-	{#if showAddForm}
-		<div class="border-border flex max-w-3xl flex-col gap-2 rounded-lg border px-4 py-3">
-			<textarea
-				bind:value={draftText}
-				rows="2"
-				placeholder="Write a seed statement…"
-				class="border-border focus:ring-ring/40 text-body w-full rounded-md border px-3 py-2 focus:ring-2 focus:outline-none"
-			></textarea>
 			{#if !canSeed}
 				<p class="text-muted-foreground text-caption">
 					Sync at least one statement from Polis first — a new seed needs the conversation's ids.
@@ -241,15 +247,15 @@
 			{#if addError}
 				<p class="text-destructive text-caption">{addError}</p>
 			{/if}
+			{#if csvError}
+				<p class="text-destructive text-caption">{csvError}</p>
+			{/if}
+
 			<div class="flex justify-end gap-2">
 				<Button variant="secondary" onclick={() => (showAddForm = false)}>
 					Cancel
 				</Button>
-				<Button
-					onclick={addSeed}
-					disabled={!canSeed || !draftText.trim() || addingSeed}
-					class="rounded-full"
-				>
+				<Button onclick={addSeed} disabled={!canSeed || !draftText.trim() || addingSeed}>
 					{addingSeed ? 'Posting…' : 'Post seed'}
 				</Button>
 			</div>

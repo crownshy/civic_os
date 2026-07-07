@@ -429,7 +429,7 @@
 			bind:excludePasses={explorerExcludePasses}
 		>
 			{#snippet headerAction()}
-				<Button variant="default" size="sm" onclick={handleDownloadCsv}>
+				<Button size="sm" onclick={handleDownloadCsv}>
 					<Download class="size-4" />
 					Download CSV
 				</Button>
