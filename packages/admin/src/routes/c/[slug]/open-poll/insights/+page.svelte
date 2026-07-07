@@ -417,18 +417,24 @@
 			bind:excludePasses={explorerExcludePasses}
 		>
 			{#snippet toolbar()}
-				<div class="flex flex-wrap gap-2">
-					{#each themes as t (t.theme)}
-						<ThemeChip
-							label={t.theme}
-							variant="brand"
-							selected={selectedThemes.includes(t.theme)}
-							onclick={() => toggleTheme(t.theme)}
-						/>
-					{/each}
-					{#if themes.length === 0}
-						<span class="text-muted-foreground text-caption italic">No themes yet.</span>
-					{/if}
+				<div class="flex flex-wrap items-start justify-between gap-4">
+					<div class="flex flex-wrap gap-2">
+						{#each themes as t (t.theme)}
+							<ThemeChip
+								label={t.theme}
+								variant="brand"
+								selected={selectedThemes.includes(t.theme)}
+								onclick={() => toggleTheme(t.theme)}
+							/>
+						{/each}
+						{#if themes.length === 0}
+							<span class="text-muted-foreground text-caption italic">No themes yet.</span>
+						{/if}
+					</div>
+					<Button variant="default" size="sm" onclick={handleDownloadCsv}>
+						<Download class="size-4" />
+						Download CSV
+					</Button>
 				</div>
 			{/snippet}
 
