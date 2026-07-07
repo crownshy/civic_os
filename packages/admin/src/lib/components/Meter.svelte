@@ -21,6 +21,6 @@
 		style:width={`${clampedFill}%`}
 	></div>
 	{#if marker !== null}
-		<div class="absolute top-0 bottom-0 w-px bg-stone-300" style:left={`${marker}%`}></div>
+		<div class="absolute top-0 bottom-0 w-0.5 bg-stone-600" style:left={`${marker}%`}></div>
 	{/if}
 </div>
