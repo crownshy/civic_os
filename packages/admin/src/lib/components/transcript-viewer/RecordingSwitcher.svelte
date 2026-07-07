@@ -24,33 +24,33 @@
 
 <Popover.Root bind:open>
 	<Popover.Trigger
-		class="flex items-center gap-2 text-4xl font-bold text-black outline-none"
+		class="flex items-center gap-2 text-4xl font-bold text-foreground outline-none"
 	>
 		{name}
-		<ChevronDown class="size-6 text-red-500" />
+		<ChevronDown class="size-6 text-primary" />
 	</Popover.Trigger>
 	<Popover.Content
 		align="start"
 		sideOffset={8}
-		class="w-72 overflow-hidden rounded-[30px] border border-black/20 p-0 shadow-[0px_4px_10px_0px_rgba(0,0,0,0.25)]"
+		class="w-72 overflow-hidden rounded-2xl border border-muted-foreground/20 p-0 shadow-lg"
 	>
 		{#each recordings as rec (rec.id)}
 			{@const active = rec.id === currentId}
 			<a
 				href={`${basePath}/${rec.id}`}
 				onclick={() => (open = false)}
-				class={`flex items-center justify-between gap-2 border-b border-black/10 px-5 py-4 text-xl font-bold ${active ? "text-red-500" : "text-black hover:bg-stone-50"}`}
+				class={`flex items-center justify-between gap-2 border-b border-border px-5 py-4 text-xl font-bold ${active ? "text-primary" : "text-foreground hover:bg-muted"}`}
 			>
 				<span class="truncate">{rec.name}</span>
 				{#if active}
-					<Check class="size-4 shrink-0 text-red-400" />
+					<Check class="size-4 shrink-0 text-primary" />
 				{/if}
 			</a>
 		{/each}
 		<a
 			href={recordingsPath}
 			onclick={() => (open = false)}
-			class="flex items-center justify-center gap-1.5 px-5 py-6 text-base font-bold text-red-500 hover:bg-stone-50"
+			class="flex items-center justify-center gap-1.5 px-5 py-6 text-base font-bold text-primary hover:bg-muted"
 		>
 			Go to Recordings <ArrowRight class="size-4" />
 		</a>

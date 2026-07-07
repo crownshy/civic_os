@@ -25,7 +25,7 @@
 	let isPlaying = $state(false);
 
 	// Assign each distinct speaker a stable index (0,1,2…) in order of appearance,
-	// so labels read "SPEAKER 1/2/3…" and colors alternate red/green.
+	// so labels read "SPEAKER 1/2/3…" and colors alternate primary/success.
 	const speakerOrder = $derived.by(() => {
 		const seen = new Map<string, number>();
 		for (const e of events) {
@@ -39,8 +39,8 @@
 	}
 	function speakerColor(id: string) {
 		return (speakerOrder.get(id) ?? 0) % 2 === 0
-			? "text-red-500"
-			: "text-green-600";
+			? "text-primary"
+			: "text-success";
 	}
 
 	const currentIndex = $derived(
@@ -102,7 +102,7 @@
 	}
 </script>
 
-<div class="flex w-80 shrink-0 flex-col border-l border-zinc-400">
+<div class="flex w-80 shrink-0 flex-col border-l border-border">
 	<audio
 		bind:this={audio}
 		src={audioSrc}
@@ -112,21 +112,21 @@
 	></audio>
 
 	<!-- Compact scrubber header -->
-	<div class="shrink-0 border-b border-zinc-200 px-4 pt-3 pb-2">
+	<div class="shrink-0 border-b border-border px-4 pt-3 pb-2">
 		<div class="flex items-center gap-3">
 			<button
 				type="button"
 				onclick={togglePlay}
 				aria-label={isPlaying ? "Pause" : "Play"}
-				class="flex size-6 shrink-0 items-center justify-center text-red-500"
+				class="flex size-6 shrink-0 items-center justify-center text-primary"
 			>
 				{#if isPlaying}
-					<Pause class="size-4 fill-red-500" />
+					<Pause class="size-4 fill-current" />
 				{:else}
-					<Play class="size-4 fill-red-500" />
+					<Play class="size-4 fill-current" />
 				{/if}
 			</button>
-			<span class="text-sm font-medium tabular-nums text-amber-800">
+			<span class="text-sm font-medium tabular-nums text-muted-foreground">
 				{fmt(currentTime)}
 			</span>
 		</div>
@@ -137,13 +137,13 @@
 			aria-label="Seek"
 			class="relative mt-2 flex h-3 w-full cursor-pointer items-center"
 		>
-			<div class="h-0.5 w-full rounded-full bg-stone-300"></div>
+			<div class="h-0.5 w-full rounded-full bg-border"></div>
 			<div
-				class="absolute left-0 h-0.5 rounded-full bg-red-500"
+				class="absolute left-0 h-0.5 rounded-full bg-primary"
 				style={`width:${progress * 100}%`}
 			></div>
 			<div
-				class="absolute size-[7px] -translate-x-1/2 rounded-full bg-red-500"
+				class="absolute size-[7px] -translate-x-1/2 rounded-full bg-primary"
 				style={`left:${progress * 100}%`}
 			></div>
 		</button>
@@ -157,7 +157,7 @@
 				type="button"
 				onclick={() => seekTo(event.start_time)}
 				use:scrollToActive={isActive}
-				class={`flex w-full flex-col items-start gap-[5px] px-5 py-6 text-left transition-colors ${isActive ? "bg-stone-50" : ""}`}
+				class={`flex w-full flex-col items-start gap-[5px] px-5 py-6 text-left transition-colors ${isActive ? "bg-muted" : ""}`}
 			>
 				<span
 					class={`text-sm font-medium uppercase leading-4 ${speakerColor(event.speaker_id)}`}
@@ -165,7 +165,7 @@
 					Speaker {speakerNum(event.speaker_id)}
 				</span>
 				<span
-					class={`text-sm font-medium leading-5 text-stone-900 ${isActive ? "" : "opacity-70"}`}
+					class={`text-sm font-medium leading-5 text-foreground ${isActive ? "" : "opacity-70"}`}
 				>
 					{event.text}
 				</span>

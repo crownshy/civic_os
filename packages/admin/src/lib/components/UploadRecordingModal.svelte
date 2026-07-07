@@ -2,6 +2,7 @@
 	import type { createApiClient } from '@crownshy/api-client/client';
 	import { AudioFormat } from '@crownshy/api-client/api';
 	import * as Dialog from '@civicos/shared/ui/dialog';
+	import { Button } from '@civicos/shared/ui/button';
 	import { Input } from '@civicos/shared/ui/input';
 	import { Label } from '@civicos/shared/ui/label';
 	import { Progress } from '@civicos/shared/ui/progress';
@@ -137,20 +138,20 @@
 </script>
 
 <Dialog.Root bind:open onOpenChange={(v) => !v && close()}>
-	<Dialog.Content class="max-w-[925px] gap-0 rounded-[30px] border-black/30 p-0">
-		<div class="p-11">
-			<Dialog.Title class="text-4xl font-bold text-yellow-950">
+	<Dialog.Content class="min-w-4xl max-w-5xl gap-0 rounded-[30px] p-0">
+		<div class="p-10">
+			<Dialog.Title class="text-4xl font-bold text-foreground">
 				Name your recording
 			</Dialog.Title>
 
 			<!-- Chosen file / picker -->
 			<div class="mt-3.5">
 				{#if selectedFile}
-					<p class="text-2xl font-bold text-yellow-950">{selectedFile.name}</p>
+					<p class="text-2xl font-bold text-foreground">{selectedFile.name}</p>
 				{:else}
 					<Label
 						for="recording-file"
-						class="inline-flex cursor-pointer items-center gap-2 text-lg font-medium text-red-500"
+						class="inline-flex cursor-pointer items-center gap-2 text-2xl font-bold text-primary"
 					>
 						Choose an audio file…
 					</Label>
@@ -161,13 +162,15 @@
 					accept={ACCEPT}
 					bind:files
 					disabled={submitting}
-					class={selectedFile ? 'sr-only' : 'mt-2'}
+					class={selectedFile
+						? 'sr-only'
+						: 'mt-3 flex h-16 items-center rounded-[20px] px-5 text-2xl file:mr-4 file:text-2xl'}
 				/>
 			</div>
 
 			<!-- Name input -->
 			<div class="mt-6">
-				<input
+				<Input
 					id="recording-name"
 					bind:value={name}
 					placeholder="e.g., Plenary Session"
@@ -176,10 +179,10 @@
 					aria-describedby={nameError ? 'recording-name-error' : undefined}
 					oninput={() => (nameError = null)}
 					disabled={submitting}
-					class="h-16 w-full rounded-[20px] bg-white px-5 text-2xl font-bold text-yellow-950 outline outline-1 outline-stone-500/50 placeholder:text-yellow-950/50 focus:outline-2 focus:outline-red-500 disabled:opacity-50"
+					class="h-16 rounded-[20px] px-5 text-2xl font-bold md:text-2xl"
 				/>
 				{#if nameError}
-					<p id="recording-name-error" class="mt-1.5 text-caption text-red-500">
+					<p id="recording-name-error" class="mt-2 text-lg text-destructive">
 						{nameError}
 					</p>
 				{/if}
@@ -193,27 +196,26 @@
 			{/if}
 
 			{#if errorMsg}
-				<p class="mt-3 text-caption text-red-500">{errorMsg}</p>
+				<p class="mt-3 text-lg text-destructive">{errorMsg}</p>
 			{/if}
 
 			<!-- Actions -->
 			<div class="mt-8 flex justify-end gap-3">
-				<button
-					type="button"
+				<Button
+					variant="secondary"
 					onclick={close}
 					disabled={submitting}
-					class="cursor-pointer rounded-[45px] bg-red-500/10 px-4 py-3 text-xl font-medium leading-6 text-red-500 disabled:opacity-50"
+					class="h-auto rounded-[45px] px-4 py-3 text-xl leading-6"
 				>
 					Cancel
-				</button>
-				<button
-					type="button"
+				</Button>
+				<Button
 					onclick={submitForm}
 					disabled={submitting}
-					class="cursor-pointer rounded-[45px] bg-red-500 px-4 py-3 text-xl font-medium leading-6 text-white disabled:opacity-50"
+					class="h-auto rounded-[45px] px-4 py-3 text-xl leading-6"
 				>
 					{submitting ? `Uploading… ${progress}%` : 'Submit'}
-				</button>
+				</Button>
 			</div>
 		</div>
 	</Dialog.Content>

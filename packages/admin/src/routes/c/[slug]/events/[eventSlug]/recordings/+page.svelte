@@ -1,7 +1,9 @@
 <script lang="ts">
-	import { LoaderCircle, TriangleAlert } from "@lucide/svelte";
+	import { LoaderCircle, TriangleAlert, Plus, Upload } from "@lucide/svelte";
 	import type { AudioRecordingStatus } from "@crownshy/api-client/api";
 	import { invalidate } from "$app/navigation";
+	import { Button } from "@civicos/shared/ui/button";
+	import Card from "@civicos/shared/ui/Card.svelte";
 	import UploadRecordingModal from "$lib/components/UploadRecordingModal.svelte";
 	import { page, navigating } from "$app/state";
 
@@ -55,13 +57,13 @@
 		}
 	}
 
-	// Outline color per Figma: success/processing red-400, upload error orange-600,
-	// transcript/report error yellow-400.
+	// Card outline per state: primary accent for ready/processing, warning hues
+	// for upload / pipeline errors (kept distinct from the destructive token).
 	const outlineClass: Record<CardTone, string> = {
-		ready: "outline-red-400",
-		processing: "outline-red-400",
-		"upload-error": "outline-orange-600",
-		"pipeline-error": "outline-yellow-400",
+		ready: "outline-primary/40",
+		processing: "outline-primary/40",
+		"upload-error": "outline-orange-500",
+		"pipeline-error": "outline-yellow-500",
 	};
 
 	function extLabel(ext: string) {
@@ -78,39 +80,35 @@
 
 <div class="space-y-6">
 	{#if data.recordingsFailed}
-		<div
-			class="rounded-[30px] bg-white p-6 text-body text-muted-foreground outline outline-1 outline-black/30"
-		>
+		<Card class="rounded-[30px] p-6 text-body text-muted-foreground">
 			Couldn't load recordings. Please try again.
-		</div>
+		</Card>
 	{:else if recordings.length === 0}
 		<!-- Empty state -->
 		<h2 class="text-3xl font-bold">
 			{data.event?.name ?? "Recordings"}
 		</h2>
-		<div
-			class="relative flex h-[543px] max-h-[70vh] flex-col items-center justify-center gap-4 rounded-[30px] bg-white px-6 text-center outline outline-1 outline-black/30"
+		<Card
+			class="flex h-[543px] max-h-[70vh] flex-col items-center justify-center gap-4 rounded-[30px] px-6 text-center"
 		>
-			<!-- Upload glyph: circle + notch -->
 			<div
-				class="flex size-36 items-center justify-center rounded-full border-8 border-red-500"
+				class="flex size-36 items-center justify-center rounded-full border-8 border-primary text-primary"
 			>
-				<div class="h-16 w-14 bg-red-500"></div>
+				<Upload class="size-14" />
 			</div>
-			<h3 class="max-w-2xl text-4xl font-bold text-neutral-900">
+			<h3 class="max-w-2xl text-4xl font-bold text-foreground">
 				Upload an audio recording from your event.
 			</h3>
-			<p class="max-w-lg text-2xl font-medium text-neutral-500">
+			<p class="max-w-lg text-2xl font-medium text-muted-foreground">
 				One at a time. .mp3, .m4a, .wav all accepted.
 			</p>
-			<button
-				type="button"
+			<Button
+				class="mt-2 h-auto rounded-[45px] px-4 py-3 text-2xl leading-8"
 				onclick={() => (uploadOpen = true)}
-				class="mt-2 inline-flex cursor-pointer items-center rounded-[45px] bg-red-500 px-4 py-3 text-2xl font-medium leading-8 text-white"
 			>
 				Upload Recordings
-			</button>
-		</div>
+			</Button>
+		</Card>
 	{:else}
 		<div class="flex items-end justify-between gap-4">
 			<div>
@@ -119,13 +117,12 @@
 					Select a recording below to view its transcript and analysis.
 				</p>
 			</div>
-			<button
-				type="button"
+			<Button
+				class="h-auto shrink-0 rounded-[45px] px-4 py-3 text-xl leading-6"
 				onclick={() => (uploadOpen = true)}
-				class="inline-flex shrink-0 cursor-pointer items-center rounded-[45px] bg-red-500 px-4 py-3 text-xl font-medium leading-6 text-white"
 			>
-				Upload New Recording
-			</button>
+				<Plus class="size-5" /> Upload New Recording
+			</Button>
 		</div>
 
 		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -138,17 +135,17 @@
 						<div class="flex size-6 shrink-0 items-center justify-center">
 							{#if pending}
 								<LoaderCircle
-									class="size-5 animate-spin text-red-500"
+									class="size-5 animate-spin text-primary"
 									aria-label="Opening"
 								/>
 							{:else if tone === "processing"}
 								<LoaderCircle
-									class="size-5 animate-spin text-red-500"
+									class="size-5 animate-spin text-primary"
 									aria-label="Processing"
 								/>
 							{:else if tone === "upload-error"}
 								<TriangleAlert
-									class="size-5 text-orange-600"
+									class="size-5 text-orange-500"
 									aria-label="Upload error"
 								/>
 							{:else if tone === "pipeline-error"}
@@ -157,13 +154,15 @@
 									aria-label="Error"
 								/>
 							{:else}
-								<span class="text-lg font-bold leading-6 text-red-500"
+								<span class="text-lg font-bold leading-6 text-primary"
 									>{i + 1}</span
 								>
 							{/if}
 						</div>
 						<div class="min-w-0 flex-1">
-							<div class="truncate text-2xl font-bold text-black">{rec.name}</div>
+							<div class="truncate text-2xl font-bold text-foreground">
+								{rec.name}
+							</div>
 							<div class="mt-0.5 text-sm">
 								{#if tone === "upload-error"}
 									<span class="font-bold text-orange-600">Upload Error. Retry?</span>
@@ -172,11 +171,11 @@
 								{:else if rec.status === "categorization_failed"}
 									<span class="font-bold text-yellow-700">Report Error</span>
 								{:else if rec.status === "transcribing"}
-									<span class="text-black">Transcribing…</span>
+									<span class="text-muted-foreground">Transcribing…</span>
 								{:else if rec.status === "categorizing"}
-									<span class="text-black">Analyzing…</span>
+									<span class="text-muted-foreground">Analyzing…</span>
 								{:else}
-									<span class="text-black"
+									<span class="text-muted-foreground"
 										>{extLabel(rec.fileExtension)} · {fmtDate(rec.createdAt)}</span
 									>
 								{/if}
@@ -196,7 +195,7 @@
 				{:else}
 					<a
 						href={`${page.url}/${rec.id}`}
-						class={`block h-20 overflow-hidden rounded-[10px] px-5 py-4 outline outline-1 transition-opacity ${outlineClass[tone]} ${pending ? "pointer-events-none opacity-60" : ""} ${i === 0 ? "bg-stone-50" : ""}`}
+						class={`block h-20 overflow-hidden rounded-[10px] px-5 py-4 outline outline-1 transition-opacity ${outlineClass[tone]} ${pending ? "pointer-events-none opacity-60" : ""} ${i === 0 ? "bg-muted" : ""}`}
 						aria-busy={pending}
 					>
 						{@render cardInner()}

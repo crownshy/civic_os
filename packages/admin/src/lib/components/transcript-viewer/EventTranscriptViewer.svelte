@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Card from "@civicos/shared/ui/Card.svelte";
 	import TranscriptRail, {
 		type TranscriptEvent,
 	} from "./TranscriptRail.svelte";
@@ -126,15 +127,13 @@
 	const showError = $derived(pipelineFailed || fetchError);
 </script>
 
-<div
-	class="flex overflow-hidden rounded-[30px] bg-white outline outline-1 outline-black/30 max-lg:flex-col lg:h-[600px]"
->
+<Card class="flex rounded-[30px] max-lg:flex-col lg:h-[600px]">
 	{#if loading}
 		<div
 			class="flex flex-1 flex-col items-center justify-center gap-4 py-24 text-muted-foreground"
 		>
 			<div
-				class="size-10 animate-spin rounded-full border-4 border-muted border-t-red-500"
+				class="size-10 animate-spin rounded-full border-4 border-muted border-t-primary"
 			></div>
 			<p>Loading recording…</p>
 		</div>
@@ -142,7 +141,7 @@
 		<!-- Left: header + themes -->
 		<div class="flex min-w-0 flex-1 flex-col overflow-hidden">
 			<div class="shrink-0 px-10 pt-10 pb-4">
-				<div class="text-sm font-medium uppercase text-zinc-600">
+				<div class="text-sm font-medium uppercase text-muted-foreground">
 					From “{conversationTitle}”
 				</div>
 				<div class="mt-1 flex flex-wrap items-center gap-3">
@@ -167,7 +166,7 @@
 					<div class="mt-4 flex flex-wrap gap-2">
 						{#each topics as topic (topic.id)}
 							<span
-								class="rounded-[3px] bg-stone-50 px-[5px] py-[3px] text-sm font-medium uppercase text-amber-800"
+								class="rounded-[3px] bg-muted px-[5px] py-[3px] text-sm font-medium uppercase text-amber-800"
 							>
 								{topic.title}
 							</span>
@@ -180,12 +179,12 @@
 				<div
 					class="flex flex-1 flex-col items-center justify-center gap-4 px-10 text-center"
 				>
-					<h2 class="text-4xl font-bold text-black">We have a problem.</h2>
-					<p class="max-w-lg text-xl font-medium text-neutral-500">
+					<h2 class="text-4xl font-bold text-foreground">We have a problem.</h2>
+					<p class="max-w-lg text-xl font-medium text-muted-foreground">
 						There was an issue in creating the report. If this problem persists,
 						contact <a
 							href="mailto:hello@bloom-project.org"
-							class="text-red-500">hello@bloom-project.org.</a
+							class="text-primary underline">hello@bloom-project.org.</a
 						>
 					</p>
 				</div>
@@ -207,4 +206,4 @@
 			/>
 		{/if}
 	{/if}
-</div>
+</Card>
