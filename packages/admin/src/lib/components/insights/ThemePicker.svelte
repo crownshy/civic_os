@@ -130,7 +130,7 @@
 		<button
 			type="button"
 			onclick={toggleOpen}
-			class="font-sans text-brand hover:bg-brand/20 inline-flex items-center rounded-[3px] bg-brand/10 px-[5px] py-0.5 text-base font-medium"
+			class="font-sans text-primary hover:bg-primary/20 inline-flex items-center rounded-[3px] bg-primary/10 px-[5px] py-0.5 text-base font-medium"
 		>
 			Add new+
 		</button>
@@ -152,7 +152,7 @@
 				>
 					<span>#{t}</span>
 					{#if checked}
-						<span class="text-destructive">✓</span>
+						<span class="text-primary">✓</span>
 					{/if}
 				</button>
 			{/each}
@@ -162,13 +162,13 @@
 					bind:value={newDraft}
 					onkeydown={(e) => e.key === 'Enter' && applyAdd()}
 					placeholder="Add new…"
-					class="border-border focus:ring-destructive/40 min-w-0 flex-1 rounded border px-1.5 py-1 text-caption focus:ring-2 focus:outline-none"
+					class="border-border focus:ring-primary/40 min-w-0 flex-1 rounded border px-1.5 py-1 text-caption focus:ring-2 focus:outline-none"
 				/>
 				<button
 					type="button"
 					onclick={applyAdd}
 					disabled={!newDraft.trim()}
-					class="bg-destructive text-destructive-foreground rounded px-1.5 py-1 text-caption font-medium disabled:opacity-40"
+					class="bg-primary text-primary-foreground rounded px-1.5 py-1 text-caption font-medium disabled:opacity-40"
 				>
 					Add
 				</button>

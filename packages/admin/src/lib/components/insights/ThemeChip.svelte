@@ -4,13 +4,12 @@
 		label: string;
 		selected: boolean;
 		/**
-		 * Colour scheme. `default` uses the admin `destructive`/`muted` tokens
-		 * (the coral `#ee503b`); `brand` uses the terracotta brand accent
-		 * (`--color-brand`, `#c96442`): a solid brand fill with white text when
-		 * selected, and the subtle brand surface (`--color-brand-subtle`) with
-		 * brand text when idle. See app.css for the token definitions.
+		 * Colour scheme — both variants use the terracotta primary accent
+		 * (`--color-primary`, `#c96442`; see app.css). `default` renders primary text
+		 * on a neutral muted surface; `primary` uses the solid primary fill when
+		 * selected and the subtle primary surface (`--color-primary-subtle`) when idle.
 		 */
-		variant?: 'default' | 'brand';
+		variant?: 'default' | 'primary';
 		onclick?: () => void;
 	}
 
@@ -18,12 +17,12 @@
 
 	const palette = {
 		default: {
-			on: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-			off: 'bg-muted text-destructive hover:bg-muted-foreground/15'
+			on: 'bg-primary text-primary-foreground hover:bg-primary/90',
+			off: 'bg-muted text-primary hover:bg-muted-foreground/15'
 		},
-		brand: {
-			on: 'bg-brand text-brand-foreground hover:bg-brand/90',
-			off: 'bg-brand-subtle text-brand hover:bg-brand-subtle-hover'
+		primary: {
+			on: 'bg-primary text-primary-foreground hover:bg-primary/90',
+			off: 'bg-primary-subtle text-primary hover:bg-primary-subtle-hover'
 		}
 	};
 </script>

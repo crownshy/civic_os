@@ -40,7 +40,7 @@
 			href={openPollBase + tab.href}
 			class={`px-4 pt-3 pb-2 text-body font-medium ${
 				activeSubTab === tab.href
-					? 'text-destructive border-destructive border-b-[3px]'
+					? 'text-primary border-primary border-b-[3px]'
 					: 'text-foreground/70 hover:text-foreground'
 			}`}
 		>

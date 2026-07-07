@@ -103,7 +103,7 @@
 	<div class="pt-1">
 		{#if isHostAuthored}
 			<span
-				class="text-caption inline-flex items-center gap-1 rounded bg-blue-500 px-1.5 py-0.5 font-medium text-white"
+				class="text-caption bg-host inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-medium text-white"
 			>
 				<User class="size-3" />You
 			</span>

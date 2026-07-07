@@ -57,7 +57,7 @@
 				<div class="px-3 py-3 text-body">
 					<a
 						href={region.hostUrl}
-						class="text-destructive group inline-flex items-center gap-1 underline-offset-2 hover:underline"
+						class="text-primary group inline-flex items-center gap-1 underline-offset-2 hover:underline"
 						target="_blank"
 						rel="noopener"
 					>

@@ -20,6 +20,8 @@
   --color-primary: var(--primary);
   --color-primary-dark: var(--primary-dark);
   --color-primary-foreground: var(--primary-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -75,26 +77,36 @@
   --color-meter-under: #ea580c; /* < ~50% of goal        (orange-600) */
   --color-meter-near: #f59e0b; /* 50–99% of goal        (amber-500)  */
   --color-meter-met: #16a34a; /* at / over goal         (green-600)  */
-  --color-meter-track: #f5f5f5; /* empty track           (neutral-100) */
+  --color-meter-track: #f5f5f5; /* meter bar empty track  (neutral-100) */
+  --color-ring-track: #e5e5e5; /* agree-ring empty track (neutral-200) */
   --color-consensus: #16a34a; /* areas of consensus     (green-600)  */
   --color-difference: #ea580c; /* areas of difference    (orange-600) */
   --color-theme-bar: #16a34a; /* themes count bar       (green-600)  */
 }
 
-/* Brand accent — the terracotta orange from the Figma design. This is
-   the interactive brand accent: selected filter chips, selected theme chips,
-   the theme "Add new+" pill. It is deliberately distinct from two look-alikes,
-   so keep them straight when asked:
-     • --primary      #406b43  civic green  (primary actions, consensus)
-     • --destructive  #ee503b  coral        (reject / danger)
-     • --brand        #c96442  terracotta   (this — brand accent / selection)
-   Every terracotta surface reads from these tokens so the hue lives in one
-   place; retune here and all brand chrome shifts together. */
+/* Admin accent roles. The admin surface is neutral (see :root below), so the
+   accent palette carries all the meaning. Three distinct roles — the whole
+   admin UI reads from exactly these, so keep them straight when asked:
+     • --primary      #c96442  terracotta  interactive / brand: buttons, links,
+                                            active nav & tabs, selected chips
+     • --success      #406b43  green        positive status: LIVE, accept,
+                                            "processed" / "done" / "confirmed"
+     • --destructive  #ee503b  coral        remove / reject / delete / error
+   NOTE: the shared theme.css ships --primary AS the civic green. Admin flips
+   that: --primary becomes terracotta (:root below) and the green is renamed to
+   its honest role, --success. That's why shared components (Button, etc.) can
+   stay theme-agnostic on `bg-primary` — the value differs per app, the role
+   doesn't. The subtle tokens are low-opacity primary tints for idle surfaces. */
 @theme {
-  --color-brand: #c96442; /* terracotta accent fill */
-  --color-brand-foreground: #ffffff; /* text / icon on a brand fill */
-  --color-brand-subtle: #fcf7f6; /* idle brand surface (unselected chip) */
-  --color-brand-subtle-hover: #f3e7e2; /* idle brand surface, hover */
+  --color-primary-subtle: #fcf7f6; /* idle primary surface (unselected chip) */
+  --color-primary-subtle-hover: #f3e7e2; /* idle primary surface, hover */
+}
+
+/* Author identity — the "You" badge marking host-authored statements in the
+   Insights tables. A distinct blue so a host reading the report can spot their
+   own seed statements at a glance; not brand, not a data channel. */
+@theme {
+  --color-host: #3b82f6; /* host / "You" author badge (blue-500) */
 }
 
 /* Figma redesign: neutral admin surface. Scoped to the admin package only —
@@ -108,6 +120,12 @@
   --muted: #fafaf9; /* stone-50  */
   --muted-foreground: #78716c; /* stone-500 */
   --border: #e5e5e5; /* neutral-200 */
+  /* Accent roles (see the comment above). Admin repurposes the shared green
+     --primary as --success and makes terracotta the true --primary. */
+  --primary: #c96442; /* terracotta */
+  --primary-foreground: #ffffff;
+  --success: #406b43; /* civic green (was --primary upstream) */
+  --success-foreground: #ffffff;
 }
 
 /* Card shadow matching wireframe spec */

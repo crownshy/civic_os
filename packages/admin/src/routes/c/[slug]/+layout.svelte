@@ -36,7 +36,7 @@
 		<div class="font-ui flex max-w-full shrink-0 items-center gap-1 overflow-hidden">
 			{#if isLive}
 				<span
-					class="bg-primary shrink-0 px-2 py-0.5 text-body font-semibold leading-6 text-white"
+					class="bg-success shrink-0 px-2 py-0.5 text-body font-semibold leading-6 text-white"
 				>
 					LIVE
 				</span>
@@ -45,7 +45,7 @@
 				href={region.shareUrl}
 				target="_blank"
 				rel="noopener noreferrer"
-				class="bg-destructive/10 text-destructive truncate px-2 py-0.5 text-body font-medium leading-6 underline"
+				class="bg-primary/10 text-primary truncate px-2 py-0.5 text-body font-medium leading-6 underline"
 			>
 				{region.shareUrl.replace(/^https?:\/\//, '')} ↗
 			</a>
@@ -59,7 +59,7 @@
 				href={`/c/${region.slug}/${tab.href}`}
 				class={`relative h-12 shrink-0 px-3 py-3 text-body font-medium whitespace-nowrap ${
 					activeTab === tab.href
-						? 'text-destructive border-destructive border-b-[3px]'
+						? 'text-primary border-primary border-b-[3px]'
 						: 'text-foreground/50 hover:text-foreground/80'
 				}`}
 			>

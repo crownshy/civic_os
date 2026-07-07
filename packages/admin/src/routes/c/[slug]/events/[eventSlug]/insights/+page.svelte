@@ -79,11 +79,11 @@
 					</div>
 					<span
 						class={`inline-flex items-center gap-1 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-2.5 py-1 ${
-							rec.state === 'processed' ? 'text-primary bg-primary/10' : 'text-destructive bg-destructive/10'
+							rec.state === 'processed' ? 'text-success bg-success/10' : 'text-destructive bg-destructive/10'
 						}`}
 					>
 						<span
-							class={`size-1.5 rounded-full ${rec.state === 'processed' ? 'bg-primary' : 'bg-destructive'}`}
+							class={`size-1.5 rounded-full ${rec.state === 'processed' ? 'bg-success' : 'bg-destructive'}`}
 						></span>
 						{rec.state}
 					</span>

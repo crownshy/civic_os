@@ -59,7 +59,7 @@
 <div class="group/circle relative flex flex-col items-center gap-0.5">
 	<div class={`relative ${ringSize}`}>
 		<svg class="size-full -rotate-90" viewBox="0 0 40 40" aria-hidden="true">
-			<circle class="stroke-neutral-200" cx="20" cy="20" r={R} fill="none" stroke-width="5" />
+			<circle class="stroke-ring-track" cx="20" cy="20" r={R} fill="none" stroke-width="5" />
 			<circle
 				class={arcStroke}
 				cx="20"

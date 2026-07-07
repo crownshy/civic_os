@@ -10,7 +10,7 @@
 <div class="bg-background text-foreground flex min-h-screen items-center justify-center p-6">
 	<form method="POST" class="border-border bg-card w-full max-w-sm space-y-4 rounded-lg border p-6 shadow-sm">
 		<div class="flex items-center gap-2.5">
-			<div class="bg-destructive size-8 shrink-0 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl"></div>
+			<div class="bg-primary size-8 shrink-0 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl"></div>
 			<span class="text-body font-bold">CivicOS Admin</span>
 		</div>
 

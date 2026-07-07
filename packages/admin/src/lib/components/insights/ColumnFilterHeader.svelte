@@ -43,7 +43,7 @@
 			class="hover:bg-muted/50 flex h-10 w-full cursor-pointer items-center justify-between border-b border-black/10 px-[9px] text-left transition-colors"
 		>
 			<span class="font-sans text-sm font-medium text-neutral-900">{optionLabel}</span>
-			{#if checked}<Check class="text-destructive size-4 shrink-0" />{/if}
+			{#if checked}<Check class="text-primary size-4 shrink-0" />{/if}
 		</button>
 	</Popover.Content>
 </Popover.Root>

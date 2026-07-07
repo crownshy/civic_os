@@ -235,7 +235,7 @@
 				<span class="text-muted-foreground">saving…</span>
 			{:else if savedTick > 0 && !error}
 				{#key savedTick}
-					<span class="text-primary inline-flex items-center gap-1">
+					<span class="text-success inline-flex items-center gap-1">
 						<Check class="size-3.5" /> saved
 					</span>
 				{/key}
@@ -477,7 +477,7 @@
 				</Dialog.Description>
 			</Dialog.Header>
 			<Dialog.Footer class="gap-2">
-				<Button variant="outline" onclick={() => (deleteOpen = false)} disabled={deleting}>
+				<Button variant="secondary" onclick={() => (deleteOpen = false)} disabled={deleting}>
 					cancel
 				</Button>
 				<Button variant="destructive" onclick={doDelete} disabled={deleting}>
