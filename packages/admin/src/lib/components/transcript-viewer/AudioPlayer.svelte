@@ -111,7 +111,7 @@
 	}
 </script>
 
-<div class="bg-card mb-5 rounded-lg p-4">
+<div class="bg-card sticky top-0 z-20 mb-5 rounded-lg p-4 shadow-card">
 	<audio
 		bind:this={audio}
 		src={audioSrc}

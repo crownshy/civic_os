@@ -3,7 +3,7 @@
 	import type { AudioRecordingStatus } from "@crownshy/api-client/api";
 	import { invalidate } from "$app/navigation";
 	import UploadRecordingModal from "$lib/components/UploadRecordingModal.svelte";
-	import { page } from "$app/state";
+	import { page, navigating } from "$app/state";
 
 	let { data } = $props();
 
@@ -15,6 +15,12 @@
 	const existingNames = $derived(recordings.map((r) => r.name));
 
 	let uploadOpen = $state(false);
+
+	// Id of the recording whose detail page is currently being navigated to,
+	// so we can show a loading indicator on the clicked card immediately.
+	const pendingId = $derived(
+		navigating.to?.params?.recordingID ?? null,
+	);
 
 	function refreshRecordings() {
 		return invalidate(`recordings:list:${eventId}`);
@@ -113,12 +119,23 @@
 		<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
 			{#each recordings as rec, i (rec.id)}
 				{@const tone = statusTone(rec.status)}
-				<a href={`${page.url}/${rec.id}`}>
+				{@const pending = pendingId === rec.id}
+				<a
+					href={`${page.url}/${rec.id}`}
+					class="block transition-opacity"
+					class:pointer-events-none={pending}
+					aria-busy={pending}
+				>
 					<div
-						class="flex items-start gap-3 rounded-lg bg-card p-4 shadow-card"
+						class={`flex items-start gap-3 rounded-lg bg-card p-4 shadow-card ${pending ? "opacity-60" : ""}`}
 					>
 						<div class="flex w-4 shrink-0 items-center justify-center pt-0.5">
-							{#if tone === "progress"}
+							{#if pending}
+								<LoaderCircle
+									class="size-4 animate-spin text-primary"
+									aria-label="Opening"
+								/>
+							{:else if tone === "progress"}
 								<LoaderCircle
 									class="size-4 animate-spin text-muted-foreground"
 									aria-label="Processing"

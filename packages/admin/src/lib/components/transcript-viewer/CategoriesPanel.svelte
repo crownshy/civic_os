@@ -38,12 +38,12 @@
 	let { topics = [], onQuoteClick = () => {} }: Props = $props();
 </script>
 
-<div class="bg-card flex h-full flex-col rounded-lg max-lg:h-[600px]">
+<div class="bg-card flex flex-col rounded-lg">
 	<div class="border-border border-b px-5 py-4">
 		<h2 class="text-foreground text-lg font-semibold">Categories & Themes</h2>
 	</div>
 
-	<div class="min-h-0 flex-1 overflow-y-auto">
+	<div>
 		<div class="p-4">
 			{#each topics as topic (topic.id)}
 				{#if topic.subtopics && topic.subtopics.length > 0}

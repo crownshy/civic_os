@@ -32,10 +32,17 @@
 	let audioPlayer = $state<
 		{ seekTo: (t: number) => void; play: () => void } | undefined
 	>();
-	let loading = $state(false);
+	let loading = $state(true);
 	let error = $state<string | null>(null);
 
 	$effect(() => {
+		// Reset state so navigating between recordings shows the spinner
+		// instead of flashing the previous recording's data or the empty state.
+		loading = true;
+		error = null;
+		transcriptData = { events: [] };
+		reportData = { data: [null, { topics: [] }] };
+
 		(async () => {
 			try {
 				const [transcriptResponse, reportResponse] = await Promise.all([
@@ -49,14 +56,12 @@
 
 				transcriptData = await transcriptResponse.json();
 				let rawReportData = await reportResponse.json();
-				console.log("raw Report Data", typeof rawReportData);
 				if (typeof rawReportData === "string") {
-					console.log("Parsing report data");
 					reportData = JSON.parse(rawReportData).result;
 				}
-				loading = false;
 			} catch (err) {
-				error = err.message;
+				error = err instanceof Error ? err.message : "Failed to load data";
+			} finally {
 				loading = false;
 			}
 		})();
@@ -73,7 +78,6 @@
 		}
 	}
 
-	$inspect(reportData);
 	let topics = $derived(reportData?.data?.[1]?.topics ?? []);
 
 	let sourceIdToTime = $derived.by(() => {
@@ -98,7 +102,7 @@
 	}
 </script>
 
-<div class="mx-auto flex h-full max-w-[1600px] flex-col overflow-hidden">
+<div class="mx-auto flex max-w-[1600px] flex-col">
 	{#if loading}
 		<div
 			class="text-muted-foreground flex flex-col items-center justify-center gap-4 py-24"
@@ -125,7 +129,7 @@
 		</div>
 	{:else}
 		<div
-			class="grid min-h-0 flex-1 grid-cols-2 grid-rows-1 gap-5 max-lg:grid-cols-1 max-lg:grid-rows-[auto_auto] max-lg:overflow-y-auto"
+			class="grid grid-cols-2 items-start gap-5 max-lg:grid-cols-1"
 		>
 			<CategoriesPanel {topics} {onQuoteClick} />
 			<div class="flex flex-col">
