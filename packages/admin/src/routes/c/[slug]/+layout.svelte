@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { page } from '$app/state';
+	import { page, navigating } from '$app/state';
+	import ConversationTabSkeleton from '$lib/components/skeletons/ConversationTabSkeleton.svelte';
 
 	let { data, children } = $props();
 
@@ -18,9 +19,22 @@
 		{ label: 'Events', href: 'events' }
 	];
 
-	const activeTab = $derived(
-		tabs.find((t) => page.url.pathname.startsWith(`/c/${page.params.slug}/${t.href}`))?.href
-	);
+	const tabFor = (pathname: string) =>
+		tabs.find((t) => pathname.startsWith(`/c/${page.params.slug}/${t.href}`))?.href ?? '';
+
+	// The tab currently committed (`page.url` only updates once navigation
+	// resolves), vs. the tab we're navigating *to* right now.
+	const committedTab = $derived(tabFor(page.url.pathname));
+	const pendingNav = $derived(navigating.to ? tabFor(navigating.to.url.pathname) : '');
+
+	// Highlight the in-flight destination the instant it's clicked instead of
+	// waiting for its `load` to resolve.
+	const activeTab = $derived(pendingNav || committedTab);
+
+	// SvelteKit keeps the previous tab on screen while the destination's `load`
+	// resolves, so a click looks like nothing happened. Show a matching skeleton
+	// for the destination, but only for real top-level tab switches.
+	const pendingTab = $derived(pendingNav && pendingNav !== committedTab ? pendingNav : null);
 </script>
 
 {#if !region}
@@ -68,5 +82,9 @@
 		{/each}
 	</nav>
 
-	{@render children?.()}
+	{#if pendingTab}
+		<ConversationTabSkeleton tab={pendingTab} />
+	{:else}
+		{@render children?.()}
+	{/if}
 {/if}

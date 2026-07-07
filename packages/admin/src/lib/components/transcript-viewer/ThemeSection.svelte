@@ -41,7 +41,7 @@
 	<button
 		type="button"
 		onclick={() => (expanded = !expanded)}
-		class="flex h-12 w-full cursor-pointer items-center gap-2.5 px-5 text-left transition-colors hover:bg-muted/50"
+		class="flex h-12 w-full cursor-pointer items-center gap-2.5 px-5 text-left transition-colors hover:bg-primary/10"
 	>
 		{#if expanded}
 			<span class="size-2 shrink-0 rounded-full bg-primary"></span>
@@ -67,7 +67,7 @@
 					onclick={seekable ? () => onQuoteClick(item.quote) : undefined}
 					role={seekable ? "button" : undefined}
 					class={`group relative block w-full overflow-hidden text-left transition-colors ${
-						seekable ? "cursor-pointer hover:bg-muted/50" : ""
+						seekable ? "cursor-pointer hover:bg-primary/10" : ""
 					}`}
 				>
 					<div class="absolute inset-y-0 left-0 w-[5px] bg-primary"></div>

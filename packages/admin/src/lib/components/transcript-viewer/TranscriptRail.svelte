@@ -167,7 +167,7 @@
 				type="button"
 				onclick={() => seekTo(event.start_time)}
 				use:scrollToActive={isActive}
-				class={`flex w-full cursor-pointer flex-col items-start gap-[5px] px-5 py-6 text-left transition-colors ${isActive ? "bg-muted" : "hover:bg-muted/50"}`}
+				class={`flex w-full cursor-pointer flex-col items-start gap-[5px] px-5 py-6 text-left transition-colors hover:bg-primary/10 ${isActive ? "bg-muted" : ""}`}
 			>
 				<span
 					class={`text-sm font-medium uppercase leading-4 ${speakerColor(event.speaker_id)}`}
