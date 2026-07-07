@@ -24,6 +24,9 @@
 
 	let { subtopic, open = false, onQuoteClick = () => {} }: Props = $props();
 
+	// Initial expanded state only — the parent auto-opens the first section, then
+	// the user toggles freely (so this intentionally captures `open` once).
+	// svelte-ignore state_referenced_locally
 	let expanded = $state(open);
 
 	// Flatten claims → quotes, carrying the claim title as each quote's summary line.
@@ -38,7 +41,7 @@
 	<button
 		type="button"
 		onclick={() => (expanded = !expanded)}
-		class="flex h-12 w-full items-center gap-2.5 px-5 text-left"
+		class="flex h-12 w-full cursor-pointer items-center gap-2.5 px-5 text-left transition-colors hover:bg-muted/50"
 	>
 		{#if expanded}
 			<span class="size-2 shrink-0 rounded-full bg-primary"></span>
@@ -57,7 +60,16 @@
 	{#if expanded}
 		<div class="pb-2">
 			{#each quotes as item, i (i)}
-				<div class="relative overflow-hidden">
+				{@const seekable = !!item.quote.reference?.sourceId}
+				<svelte:element
+					this={seekable ? "button" : "div"}
+					type={seekable ? "button" : undefined}
+					onclick={seekable ? () => onQuoteClick(item.quote) : undefined}
+					role={seekable ? "button" : undefined}
+					class={`group relative block w-full overflow-hidden text-left transition-colors ${
+						seekable ? "cursor-pointer hover:bg-muted/50" : ""
+					}`}
+				>
 					<div class="absolute inset-y-0 left-0 w-[5px] bg-primary"></div>
 					<div class="flex flex-col gap-[5px] px-6 py-2.5">
 						{#if item.summary}
@@ -68,17 +80,15 @@
 						<p class="text-lg leading-6 font-normal text-foreground">
 							“{item.quote.text}”
 						</p>
-						{#if item.quote.reference?.sourceId}
-							<button
-								type="button"
-								onclick={() => onQuoteClick(item.quote)}
-								class="w-fit text-xs font-medium leading-4 text-primary"
+						{#if seekable}
+							<span
+								class="w-fit text-xs font-medium leading-4 text-primary transition-all group-hover:underline"
 							>
 								VIEW IN CONTEXT →
-							</button>
+							</span>
 						{/if}
 					</div>
-				</div>
+				</svelte:element>
 			{/each}
 		</div>
 	{/if}
