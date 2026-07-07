@@ -1,19 +1,8 @@
 import type { PageLoad } from './$types';
 
-export const load: PageLoad = async ({ parent, depends }) => {
-	depends('events:list');
-
-	const { api, region } = await parent();
-
-	try {
-		const result = await api.ListEvents({
-			params: { conversation_id: region.conversationId },
-			queries: { start_time: 'asc' }
-		});
-
-		return { events: result?.records ?? [] };
-	} catch (e) {
-		console.error('ListEvents failed', e);
-		return { events: [] };
-	}
+// The events list is loaded by the parent `events` layout (`events:list`); expose
+// it as page data so this page can keep reading `data.events`.
+export const load: PageLoad = async ({ parent }) => {
+	const { events } = await parent();
+	return { events };
 };

@@ -1,21 +1,24 @@
 <script lang="ts">
 	import { page } from "$app/state";
-	import { MapPin, Monitor } from "@lucide/svelte";
+	import * as Popover from "@civicos/shared/ui/popover";
+	import { ChevronDown } from "@lucide/svelte";
 
 	let { data, children } = $props();
 
 	const event = $derived(data.event);
+	const events = $derived(data.events ?? []);
 
 	const subTabs = [
 		{ label: "Setup", href: "" },
-		{ label: "Agenda", href: "/agenda" },
-		{ label: "Registrations", href: "/registrations" },
-		{ label: "Recordings / Insight", href: "/recordings" },
+		{ label: "Participants", href: "/registrations" },
+		{ label: "Recordings & Analysis", href: "/recordings" },
 	];
 
 	const eventBase = $derived(
 		`/c/${page.params.slug}/events/${page.params.eventSlug}`,
 	);
+	const eventsRoot = $derived(`/c/${page.params.slug}/events`);
+
 	const activeSubTab = $derived(
 		subTabs.find((t) =>
 			t.href === ""
@@ -24,39 +27,53 @@
 		)?.href ?? "",
 	);
 
-	function fmtDateLine(iso: string) {
-		return new Date(iso)
-			.toLocaleDateString("en-US", { weekday: "short", month: "short" })
-			.toUpperCase()
-			.replace(",", "");
-	}
-	function fmtDay(iso: string) {
-		return new Date(iso).getDate();
-	}
-	function fmtTime(iso: string) {
-		return new Date(iso).toLocaleTimeString("en-US", {
-			hour: "numeric",
-			minute: "2-digit",
-			hour12: true,
-		});
+	// The sub-page segment currently open (e.g. "/recordings"), so switching events
+	// keeps you on the same tab. Drops any deeper id (e.g. a recording id).
+	const subSuffix = $derived.by(() => {
+		const rest = page.url.pathname.slice(eventBase.length);
+		const seg = rest.split("/")[1];
+		return seg ? `/${seg}` : "";
+	});
+
+	function eventLabel(ev: { name: string; startTime: string }) {
+		const d = new Date(ev.startTime);
+		return `(${d.getMonth() + 1}/${d.getDate()}) ${ev.name}`;
 	}
 
-	const isInPerson = $derived(
-		event ? String(event.format).toLowerCase().includes("person") : false,
-	);
-	const venueName = $derived(
-		event?.location?.name ?? (isInPerson ? "" : "Online"),
-	);
+	let switcherOpen = $state(false);
 </script>
 
-<!-- Event sub-tabs strip -->
-<nav
-	class="border-border bg-primary/5 flex items-center gap-1.5 border-b px-5"
->
-	{#each subTabs as tab}
+<!-- Event switcher + sub-tabs -->
+<nav class="flex items-stretch border-b border-foreground/30">
+	<Popover.Root bind:open={switcherOpen}>
+		<Popover.Trigger
+			class="flex items-center gap-3 bg-primary px-4 py-4 text-body font-medium text-primary-foreground outline-none"
+		>
+			{event ? eventLabel(event) : "Select event"}
+			<ChevronDown class="size-4" />
+		</Popover.Trigger>
+		<Popover.Content
+			align="start"
+			sideOffset={0}
+			class="w-72 overflow-hidden rounded-xl border border-muted-foreground/20 p-1 shadow-lg"
+		>
+			{#each events as ev (ev.id)}
+				{@const active = ev.id === page.params.eventSlug}
+				<a
+					href={`${eventsRoot}/${ev.id}${subSuffix}`}
+					onclick={() => (switcherOpen = false)}
+					class={`block truncate rounded-lg px-3 py-2 text-body font-medium ${active ? "text-primary" : "text-foreground hover:bg-muted"}`}
+				>
+					{eventLabel(ev)}
+				</a>
+			{/each}
+		</Popover.Content>
+	</Popover.Root>
+
+	{#each subTabs as tab (tab.href)}
 		<a
 			href={eventBase + tab.href}
-			class={`px-3.5 py-3.5 text-body font-medium ${
+			class={`px-4 py-4 text-body font-medium ${
 				activeSubTab === tab.href
 					? "text-primary"
 					: "text-foreground/70 hover:text-foreground"
@@ -68,49 +85,9 @@
 </nav>
 
 {#if !event}
-	<div class="text-muted-foreground p-8">Event not found.</div>
+	<div class="p-8 text-muted-foreground">Event not found.</div>
 {:else}
 	<div class="flex min-h-0 flex-1 flex-col px-5 py-5">
-		<!-- Event header card -->
-		<div
-			class="bg-card shadow-card mb-4 flex shrink-0 items-center gap-3.5 rounded-lg p-4"
-		>
-			<div class="w-14 text-center">
-				<div class="text-muted-foreground text-caption">
-					{fmtDateLine(event.startTime)}
-				</div>
-				<div class="text-section font-bold leading-5">
-					{fmtDay(event.startTime)}
-				</div>
-			</div>
-			<div class="border-border h-9 border-l"></div>
-			<div class="flex-1">
-				<div class="text-body font-bold">{event.name}</div>
-				<div class="text-muted-foreground flex items-center gap-2 text-caption">
-					<span>{fmtTime(event.startTime)} – {fmtTime(event.endTime)}</span>
-					<span>·</span>
-					<span>{venueName}</span>
-					<span>·</span>
-					{#if isInPerson}
-						<span
-							class="bg-accent text-foreground inline-flex items-center gap-1 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-2.5 py-1 text-caption"
-						>
-							<MapPin class="size-3" />in-person
-						</span>
-					{:else}
-						<span
-							class="bg-muted-foreground/10 text-muted-foreground inline-flex items-center gap-1 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-2.5 py-1 text-caption"
-						>
-							<Monitor class="size-3" />online
-						</span>
-					{/if}
-				</div>
-			</div>
-			<div class="text-muted-foreground text-caption">
-				{event.currentAttendance ?? 0} / {event.capacity ?? "—"} rsvp'd
-			</div>
-		</div>
-
 		<div class="min-h-0 flex-1 overflow-y-auto">
 			{@render children?.()}
 		</div>
