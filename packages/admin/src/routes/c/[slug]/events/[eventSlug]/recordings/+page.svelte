@@ -160,7 +160,7 @@
 							{/if}
 						</div>
 						<div class="min-w-0 flex-1">
-							<div class="truncate text-2xl font-bold text-foreground">
+							<div class="line-clamp-2 text-2xl leading-tight font-bold text-foreground break-words">
 								{rec.name}
 							</div>
 							<div class="mt-0.5 text-sm">
@@ -188,14 +188,14 @@
 					<button
 						type="button"
 						onclick={() => (uploadOpen = true)}
-						class={`h-20 w-full cursor-pointer overflow-hidden rounded-[10px] px-5 py-4 text-left outline outline-1 ${outlineClass[tone]}`}
+						class={`min-h-20 w-full cursor-pointer rounded-[10px] px-5 py-4 text-left outline outline-1 ${outlineClass[tone]}`}
 					>
 						{@render cardInner()}
 					</button>
 				{:else}
 					<a
 						href={`${page.url}/${rec.id}`}
-						class={`block h-20 overflow-hidden rounded-[10px] px-5 py-4 outline outline-1 transition-opacity ${outlineClass[tone]} ${pending ? "pointer-events-none opacity-60" : ""} ${i === 0 ? "bg-muted" : ""}`}
+						class={`block min-h-20 rounded-[10px] px-5 py-4 outline outline-1 transition-opacity ${outlineClass[tone]} ${pending ? "pointer-events-none opacity-60" : ""} ${i === 0 ? "bg-muted" : ""}`}
 						aria-busy={pending}
 					>
 						{@render cardInner()}
