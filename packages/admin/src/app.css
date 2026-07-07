@@ -1,6 +1,6 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
-@import '@civicos/shared/styles/theme.css';
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@civicos/shared/styles/theme.css";
 
 /* Tailwind 4 only scans this package's src/ by default. The shared
    shadcn-svelte primitives (Dialog, etc.) live in a sibling workspace
@@ -11,29 +11,29 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-	--color-background: var(--background);
-	--color-foreground: var(--foreground);
-	--color-card: var(--card);
-	--color-card-foreground: var(--card-foreground);
-	--color-popover: var(--popover);
-	--color-popover-foreground: var(--popover-foreground);
-	--color-primary: var(--primary);
-	--color-primary-dark: var(--primary-dark);
-	--color-primary-foreground: var(--primary-foreground);
-	--color-secondary: var(--secondary);
-	--color-secondary-foreground: var(--secondary-foreground);
-	--color-muted: var(--muted);
-	--color-muted-foreground: var(--muted-foreground);
-	--color-accent: var(--accent);
-	--color-accent-foreground: var(--accent-foreground);
-	--color-destructive: var(--destructive);
-	--color-destructive-foreground: var(--destructive-foreground);
-	--color-border: var(--border);
-	--color-input: var(--input);
-	--color-ring: var(--ring);
-	--font-sans: var(--font-sans);
-	--font-mono: var(--font-mono);
-	--radius: var(--radius);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --radius: var(--radius);
 }
 
 /* Admin semantic type scale.
@@ -48,53 +48,69 @@
    stat     48px  hero metric numbers (Insights secondary)
    hero     72px  primary hero metric numbers (514 / 700 / 167) */
 @theme {
-	--text-label: var(--text-xs);
-	--text-label--line-height: var(--text-xs--line-height);
-	--text-caption: var(--text-sm);
-	--text-caption--line-height: var(--text-sm--line-height);
-	--text-body: var(--text-base);
-	--text-body--line-height: var(--text-base--line-height);
-	--text-section: var(--text-2xl);
-	--text-section--line-height: var(--text-2xl--line-height);
-	--text-display: var(--text-4xl);
-	--text-display--line-height: var(--text-4xl--line-height);
-	--text-stat: var(--text-5xl);
-	--text-stat--line-height: var(--text-5xl--line-height);
-	--text-hero: var(--text-7xl);
-	--text-hero--line-height: var(--text-7xl--line-height);
+  --text-label: var(--text-xs);
+  --text-label--line-height: var(--text-xs--line-height);
+  --text-caption: var(--text-sm);
+  --text-caption--line-height: var(--text-sm--line-height);
+  --text-body: var(--text-base);
+  --text-body--line-height: var(--text-base--line-height);
+  --text-section: var(--text-2xl);
+  --text-section--line-height: var(--text-2xl--line-height);
+  --text-display: var(--text-4xl);
+  --text-display--line-height: var(--text-4xl--line-height);
+  --text-stat: var(--text-5xl);
+  --text-stat--line-height: var(--text-5xl--line-height);
+  --text-hero: var(--text-7xl);
+  --text-hero--line-height: var(--text-7xl--line-height);
 
-	/* Inter — UI chrome + numerics (nav, tabs, eyebrow labels, numbers,
+  /* Inter — UI chrome + numerics (nav, tabs, eyebrow labels, numbers,
 	   statement body). Titles use --font-display (Geom); labels/rows --font-sans. */
-	--font-ui: 'Inter', 'Hanken Grotesk', sans-serif;
+  --font-ui: "Inter", "Hanken Grotesk", sans-serif;
 }
 
 /* Data-viz palette — shared encoding colors for meters, theme bars and
    agree-rings. Named so every chart uses the same hue for the same meaning.
    These are NOT brand colors; they're data channels. */
 @theme {
-	--color-meter-under: #ea580c; /* < ~50% of goal        (orange-600) */
-	--color-meter-near: #f59e0b; /* 50–99% of goal        (amber-500)  */
-	--color-meter-met: #16a34a; /* at / over goal         (green-600)  */
-	--color-meter-track: #f5f5f5; /* empty track           (neutral-100) */
-	--color-consensus: #16a34a; /* areas of consensus     (green-600)  */
-	--color-difference: #ea580c; /* areas of difference    (orange-600) */
-	--color-theme-bar: #16a34a; /* themes count bar       (green-600)  */
+  --color-meter-under: #ea580c; /* < ~50% of goal        (orange-600) */
+  --color-meter-near: #f59e0b; /* 50–99% of goal        (amber-500)  */
+  --color-meter-met: #16a34a; /* at / over goal         (green-600)  */
+  --color-meter-track: #f5f5f5; /* empty track           (neutral-100) */
+  --color-consensus: #16a34a; /* areas of consensus     (green-600)  */
+  --color-difference: #ea580c; /* areas of difference    (orange-600) */
+  --color-theme-bar: #16a34a; /* themes count bar       (green-600)  */
+}
+
+/* Brand accent — the terracotta orange from the Figma design. This is
+   the interactive brand accent: selected filter chips, selected theme chips,
+   the theme "Add new+" pill. It is deliberately distinct from two look-alikes,
+   so keep them straight when asked:
+     • --primary      #406b43  civic green  (primary actions, consensus)
+     • --destructive  #ee503b  coral        (reject / danger)
+     • --brand        #c96442  terracotta   (this — brand accent / selection)
+   Every terracotta surface reads from these tokens so the hue lives in one
+   place; retune here and all brand chrome shifts together. */
+@theme {
+  --color-brand: #c96442; /* terracotta accent fill */
+  --color-brand-foreground: #ffffff; /* text / icon on a brand fill */
+  --color-brand-subtle: #fcf7f6; /* idle brand surface (unselected chip) */
+  --color-brand-subtle-hover: #f3e7e2; /* idle brand surface, hover */
 }
 
 /* Figma redesign: neutral admin surface. Scoped to the admin package only —
    the public civicos app keeps its warm cream brand (theme.css). Overrides
    come after the theme.css @import above, so these win for light mode. */
 :root {
-	--background: #ffffff;
-	--card: #ffffff;
-	--card-foreground: #1c1917; /* stone-900 */
-	--foreground: #1c1917; /* stone-900 */
-	--muted: #fafaf9; /* stone-50  */
-	--muted-foreground: #78716c; /* stone-500 */
-	--border: #e5e5e5; /* neutral-200 */
+  --background: #ffffff;
+  --card: #ffffff;
+  --card-foreground: #1c1917; /* stone-900 */
+  --foreground: #1c1917; /* stone-900 */
+  --muted: #fafaf9; /* stone-50  */
+  --muted-foreground: #78716c; /* stone-500 */
+  --border: #e5e5e5; /* neutral-200 */
 }
 
 /* Card shadow matching wireframe spec */
 .shadow-card {
-	box-shadow: 0px 5px 15px 0px rgba(12, 34, 95, 0.13);
+  box-shadow: 0px 5px 15px 0px rgba(12, 34, 95, 0.13);
 }

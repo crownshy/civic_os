@@ -5,9 +5,10 @@
 		selected: boolean;
 		/**
 		 * Colour scheme. `default` uses the admin `destructive`/`muted` tokens
-		 * (the coral `#ee503b`); `brand` uses the exact Figma spec — terracotta
-		 * `#C96442` fill with white text when selected, warm off-white `#FCF7F6`
-		 * with `#C96442` text when idle.
+		 * (the coral `#ee503b`); `brand` uses the terracotta brand accent
+		 * (`--color-brand`, `#c96442`): a solid brand fill with white text when
+		 * selected, and the subtle brand surface (`--color-brand-subtle`) with
+		 * brand text when idle. See app.css for the token definitions.
 		 */
 		variant?: 'default' | 'brand';
 		onclick?: () => void;
@@ -21,8 +22,8 @@
 			off: 'bg-muted text-destructive hover:bg-muted-foreground/15'
 		},
 		brand: {
-			on: 'bg-[#C96442] text-white hover:bg-[#C96442]/90',
-			off: 'bg-[#FCF7F6] text-[#C96442] hover:bg-[#F3E7E2]'
+			on: 'bg-brand text-brand-foreground hover:bg-brand/90',
+			off: 'bg-brand-subtle text-brand hover:bg-brand-subtle-hover'
 		}
 	};
 </script>

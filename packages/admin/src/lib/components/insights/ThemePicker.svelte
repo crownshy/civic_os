@@ -107,10 +107,10 @@
 	});
 </script>
 
-<div class="relative inline-flex flex-wrap items-center gap-1" bind:this={containerEl}>
+<div class="relative inline-flex flex-wrap items-center gap-2" bind:this={containerEl}>
 	{#each themes as t (t)}
 		<span
-			class="bg-muted text-foreground inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-body font-medium"
+			class="group/chip font-ui inline-flex items-center gap-1 rounded-[3px] bg-zinc-100 px-[5px] py-[3px] text-base font-medium text-neutral-900"
 		>
 			{t}
 			{#if !disabled}
@@ -118,7 +118,7 @@
 					type="button"
 					onclick={() => applyRemove(t)}
 					aria-label={`Remove theme ${t}`}
-					class="text-muted-foreground hover:text-destructive -mr-0.5 leading-none"
+					class="hover:text-destructive hidden leading-none text-neutral-900/40 group-hover/chip:inline"
 				>
 					×
 				</button>
@@ -130,7 +130,7 @@
 		<button
 			type="button"
 			onclick={toggleOpen}
-			class="text-destructive bg-destructive/10 hover:bg-destructive/20 inline-flex items-center rounded px-1.5 py-0.5 text-body font-medium"
+			class="font-sans text-brand hover:bg-brand/20 inline-flex items-center rounded-[3px] bg-brand/10 px-[5px] py-0.5 text-base font-medium"
 		>
 			Add new+
 		</button>

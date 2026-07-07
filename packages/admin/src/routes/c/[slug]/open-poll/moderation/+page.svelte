@@ -1,14 +1,8 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
 	import type { PolisStatementAux } from '$lib/types/aux';
-	import {
-		addStatementAuxTheme,
-		moderateStatementAux,
-		removeStatementAuxTheme,
-		syncStatementAux
-	} from '$lib/api/aux';
+	import { moderateStatementAux, syncStatementAux } from '$lib/api/aux';
 	import { submitSeed } from '$lib/services/polis';
-	import ThemePicker from '$lib/components/insights/ThemePicker.svelte';
 	import RowAccentStripe from '$lib/components/insights/RowAccentStripe.svelte';
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import { Button } from '@civicos/shared/ui/button';
@@ -46,13 +40,6 @@
 	// or navigating between conversations).
 	$effect(() => {
 		statements = data.statements;
-	});
-
-	// Union of every theme used on any row — drives the picker dropdown.
-	const availableThemes = $derived.by(() => {
-		const set = new Set<string>();
-		for (const s of statements) for (const t of s.themes) set.add(t);
-		return [...set].sort();
 	});
 
 	// --- Add seed statements (host authoring) ---
@@ -166,36 +153,6 @@
 			);
 		} finally {
 			pending = { ...pending, [row.id]: false };
-		}
-	}
-
-	async function addTheme(row: PolisStatementAux, theme: string) {
-		if (row.themes.includes(theme)) return;
-		const prev = row.themes;
-		statements = statements.map((s) =>
-			s.id === row.id ? { ...s, themes: [...prev, theme] } : s
-		);
-		try {
-			const updated = await addStatementAuxTheme(data.api, row.id, theme);
-			statements = statements.map((s) => (s.id === row.id ? updated : s));
-		} catch (e) {
-			console.error('addStatementAuxTheme failed', e);
-			statements = statements.map((s) => (s.id === row.id ? { ...s, themes: prev } : s));
-		}
-	}
-
-	async function removeTheme(row: PolisStatementAux, theme: string) {
-		if (!row.themes.includes(theme)) return;
-		const prev = row.themes;
-		statements = statements.map((s) =>
-			s.id === row.id ? { ...s, themes: prev.filter((t) => t !== theme) } : s
-		);
-		try {
-			const updated = await removeStatementAuxTheme(data.api, row.id, theme);
-			statements = statements.map((s) => (s.id === row.id ? updated : s));
-		} catch (e) {
-			console.error('removeStatementAuxTheme failed', e);
-			statements = statements.map((s) => (s.id === row.id ? { ...s, themes: prev } : s));
 		}
 	}
 
@@ -317,8 +274,8 @@
 				onclick={() => (filter = f.key)}
 				class={`font-ui inline-flex cursor-pointer items-center rounded-[30px] px-3 py-2 text-lg font-medium leading-6 transition-all duration-150 hover:scale-[1.03] active:scale-[0.97] ${
 					filter === f.key
-						? 'bg-[#C96442] text-white shadow-sm'
-						: 'bg-[#FCF7F6] text-[#C96442] hover:bg-[#F3E7E2]'
+						? 'bg-brand text-brand-foreground shadow-sm'
+						: 'bg-brand-subtle text-brand hover:bg-brand-subtle-hover'
 				}`}
 			>
 				<span>{f.label} · {counts[f.key]}</span>
@@ -332,11 +289,10 @@
 			<div class="flex flex-col">
 				<!-- Column headings -->
 				<div
-					class="font-ui text-foreground text-caption grid grid-cols-[1.5rem_minmax(0,1fr)_minmax(11rem,16rem)_auto] items-center gap-4 px-4 py-2 font-semibold uppercase"
+					class="font-ui text-foreground text-caption grid grid-cols-[1.5rem_minmax(0,1fr)_auto] items-center gap-4 px-4 py-2 font-semibold uppercase"
 				>
 					<div>#</div>
 					<div>Statement</div>
-					<div>Theme</div>
 					<div class="pr-4">Action</div>
 				</div>
 
@@ -354,7 +310,7 @@
 									? 'bg-destructive'
 									: 'bg-destructive/60'}
 						<div
-							class="border-border group hover:bg-muted/40 relative grid grid-cols-[1.5rem_minmax(0,1fr)_minmax(11rem,16rem)_auto] items-start gap-4 border-b py-4 pl-4 transition-colors duration-150"
+							class="border-border group hover:bg-muted/40 relative grid grid-cols-[1.5rem_minmax(0,1fr)_auto] items-start gap-4 border-b py-4 pl-4 transition-colors duration-150"
 						>
 							<!-- Left accent bar (status color) -->
 							<RowAccentStripe {accent} />
@@ -371,35 +327,25 @@
 								</p>
 							</div>
 
-							<!-- Theme picker -->
-							<div class="min-w-0 pt-0.5">
-								<ThemePicker
-									themes={row.themes}
-									{availableThemes}
-									onAddTheme={(theme) => addTheme(row, theme)}
-									onRemoveTheme={(theme) => removeTheme(row, theme)}
-								/>
-							</div>
-
 							<!-- Action -->
-							<div class="flex items-center gap-1 self-center pr-4">
+							<div class="flex items-center gap-2 self-center pr-4">
 								<button
 									type="button"
 									disabled={pending[row.id] || row.moderation_status === 'accepted'}
 									onclick={() => setStatus(row, 'accepted')}
 									title="Accept"
-									class="text-primary hover:bg-primary/15 inline-flex size-7 cursor-pointer items-center justify-center rounded-full transition-all duration-150 hover:scale-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-transparent"
+									class="text-primary hover:bg-primary/15 inline-flex size-10 cursor-pointer items-center justify-center rounded-full transition-all duration-150 hover:scale-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-transparent"
 								>
-									<Check class="size-4" />
+									<Check class="size-6" />
 								</button>
 								<button
 									type="button"
 									disabled={pending[row.id] || row.moderation_status === 'rejected'}
 									onclick={() => setStatus(row, 'rejected')}
 									title="Reject"
-									class="text-destructive hover:bg-destructive/15 inline-flex size-7 cursor-pointer items-center justify-center rounded-full transition-all duration-150 hover:scale-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-transparent"
+									class="text-destructive hover:bg-destructive/15 inline-flex size-10 cursor-pointer items-center justify-center rounded-full transition-all duration-150 hover:scale-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-transparent"
 								>
-									<X class="size-4" />
+									<X class="size-6" />
 								</button>
 							</div>
 						</div>
