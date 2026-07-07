@@ -78,7 +78,7 @@
 	// statement total — see ThemeBar.
 	const maxThemeCount = $derived(themes[0]?.statementCount ?? 0);
 	// --- Section filter state (Consensus / Difference / Uncertainty) ---
-	// Every table defaults to "Include all statements" (excludeHosts = false), matching
+	// Every table defaults to "Include host statements" (excludeHosts = false), matching
 	// the Agree% "Include passes" default — all statements shown until the user filters.
 	// "Exclude passes" switches the agree% denominator to agrees/(agrees+disagrees),
 	// which re-runs the consensus/difference selection — not a row filter.

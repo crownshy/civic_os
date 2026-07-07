@@ -119,7 +119,7 @@
 				<div>Statement</div>
 				<ColumnFilterHeader
 					label="Author"
-					optionLabel="Include all statements"
+					optionLabel="Include host statements"
 					checked={!excludeHosts}
 					onchange={(included) => {
 						excludeHosts = !included;
