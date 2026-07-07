@@ -10,9 +10,9 @@
 	};
 
 	const statusClass: Record<'live' | 'idle' | 'draft', string> = {
-		live: 'bg-primary text-primary-foreground',
+		live: 'bg-success text-success-foreground',
 		idle: 'bg-muted text-muted-foreground',
-		draft: 'bg-destructive/10 text-destructive'
+		draft: 'bg-primary/10 text-primary'
 	};
 </script>
 

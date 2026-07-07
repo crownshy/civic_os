@@ -310,7 +310,7 @@
 						>
 							{showAllThemes ? 'Show fewer themes' : `See all ${themes.length} themes`}
 							<ChevronDown
-								class={`text-destructive size-4 transition-transform ${showAllThemes ? 'rotate-180' : ''}`}
+								class={`text-primary size-4 transition-transform ${showAllThemes ? 'rotate-180' : ''}`}
 							/>
 						</button>
 					{/if}
@@ -429,7 +429,7 @@
 			bind:excludePasses={explorerExcludePasses}
 		>
 			{#snippet headerAction()}
-				<Button variant="default" size="sm" onclick={handleDownloadCsv}>
+				<Button size="sm" onclick={handleDownloadCsv}>
 					<Download class="size-4" />
 					Download CSV
 				</Button>
@@ -440,7 +440,7 @@
 					{#each themes as t (t.theme)}
 						<ThemeChip
 							label={t.theme}
-							variant="brand"
+							variant="primary"
 							selected={selectedThemes.includes(t.theme)}
 							onclick={() => toggleTheme(t.theme)}
 						/>

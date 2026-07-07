@@ -87,7 +87,7 @@
 			? 'text-consensus'
 			: countAccent === 'difference'
 				? 'text-difference'
-				: 'text-destructive'
+				: 'text-primary'
 	);
 </script>
 
@@ -149,7 +149,7 @@
 				>
 					{expanded ? 'Show fewer statements' : `See all ${total} statements`}
 					<ChevronDown
-						class={`text-destructive size-4 transition-transform ${expanded ? 'rotate-180' : ''}`}
+						class={`text-primary size-4 transition-transform ${expanded ? 'rotate-180' : ''}`}
 					/>
 				</button>
 			{/if}

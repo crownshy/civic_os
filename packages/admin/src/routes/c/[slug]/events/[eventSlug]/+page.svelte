@@ -235,7 +235,7 @@
 				<span class="text-muted-foreground">saving…</span>
 			{:else if savedTick > 0 && !error}
 				{#key savedTick}
-					<span class="text-primary inline-flex items-center gap-1">
+					<span class="text-success inline-flex items-center gap-1">
 						<Check class="size-3.5" /> saved
 					</span>
 				{/key}
@@ -433,7 +433,7 @@
 				>
 					{rsvpLink}
 				</div>
-				<Button variant="outline" size="sm" onclick={copyLink} class="gap-1.5">
+				<Button variant="outline" size="sm" onclick={copyLink}>
 					{#if copied}
 						<Check class="size-3.5" /> copied
 					{:else}
@@ -457,12 +457,7 @@
 					Removes the event, RSVPs, and any uploaded recordings.
 				</div>
 			</div>
-			<Button
-				variant="outline"
-				size="sm"
-				class="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive gap-1.5"
-				onclick={() => (deleteOpen = true)}
-			>
+			<Button variant="destructive-outline" size="sm" onclick={() => (deleteOpen = true)}>
 				<Trash2 class="size-3.5" /> delete event…
 			</Button>
 		</div>
@@ -477,7 +472,7 @@
 				</Dialog.Description>
 			</Dialog.Header>
 			<Dialog.Footer class="gap-2">
-				<Button variant="outline" onclick={() => (deleteOpen = false)} disabled={deleting}>
+				<Button variant="secondary" onclick={() => (deleteOpen = false)} disabled={deleting}>
 					cancel
 				</Button>
 				<Button variant="destructive" onclick={doDelete} disabled={deleting}>

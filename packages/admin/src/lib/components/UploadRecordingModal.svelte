@@ -189,7 +189,7 @@
 		</div>
 
 		<Dialog.Footer class="gap-2">
-			<Button type="button" variant="outline" onclick={close} disabled={submitting}>Cancel</Button>
+			<Button type="button" variant="secondary" onclick={close} disabled={submitting}>Cancel</Button>
 			<Button type="button" onclick={submitForm} disabled={submitting}>
 				{submitting ? `Uploading… ${progress}%` : 'Upload'}
 			</Button>

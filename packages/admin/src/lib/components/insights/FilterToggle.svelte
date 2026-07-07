@@ -31,7 +31,7 @@
 	<span class="text-foreground">{label}</span>
 	<span
 		class={`flex size-4 shrink-0 items-center justify-center rounded border transition-colors ${
-			checked ? 'border-destructive bg-destructive/10 text-destructive' : 'border-border text-transparent'
+			checked ? 'border-primary bg-primary/10 text-primary' : 'border-border text-transparent'
 		}`}
 	>
 		<Check class="size-3" />

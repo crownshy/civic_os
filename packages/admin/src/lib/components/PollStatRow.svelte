@@ -18,12 +18,12 @@
 				{s.label}{#if s.action}
 					(<button
 						type="button"
-						class="text-destructive cursor-pointer underline"
+						class="text-primary cursor-pointer underline"
 						onclick={s.action.onclick}>{s.action.label}</button
 					>){/if}
 			</div>
 			<div class="text-foreground text-hero font-extrabold leading-none">
-				{s.value}{#if s.accent}<span class="text-primary text-4xl font-extrabold">{s.accent}</span
+				{s.value}{#if s.accent}<span class="text-success text-4xl font-extrabold">{s.accent}</span
 					>{/if}
 			</div>
 		</div>
