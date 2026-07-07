@@ -252,7 +252,7 @@
 					{ label: 'Areas of Consensus', value: consensus.length }
 				]}
 			/>
-			<Button variant="outline" size="sm" onclick={handleDownloadCsv}>
+			<Button onclick={handleDownloadCsv}>
 				<Download class="size-4" />
 				Download CSV
 			</Button>
