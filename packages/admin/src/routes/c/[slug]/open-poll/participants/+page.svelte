@@ -7,7 +7,11 @@
 	import type { GoalMetric } from "$lib/config/representation-goals";
 	import Card from "@civicos/shared/ui/Card.svelte";
 	import { Button } from "@civicos/shared/ui/button";
-	import { Download } from "@lucide/svelte";
+	import { Target, Download } from "@lucide/svelte";
+
+	// Mirrors OTHER_COUNTY_LABEL in @civicos/shared/data/zipcodes. Duplicated as a
+	// plain string so we don't import that module (and its huge dataset) client-side.
+	const OTHER_COUNTY_LABEL = "Other / Unknown";
 
 	let { data } = $props();
 
@@ -64,12 +68,45 @@
 	);
 	const ageRows = $derived(rowsFor(demographics?.ageRanges, goals.ageRanges));
 
-	const geographyRows = $derived(
-		Object.entries(demographics?.zipcodeCounts ?? {})
-			.sort((a, b) => b[1] - a[1])
-			.slice(0, 10)
-			.map(([zip, count]) => ({ label: zip, count })),
-	);
+	// Geography now groups by county (rolled up server-side). Rows = counties with
+	// participants ∪ counties with a goal set, so under-recruited (0-count) counties
+	// still surface. "Other / Unknown" is pinned last; everything else by count desc.
+	const countyCounts = $derived(data.countyCounts ?? {});
+	const regionCounties = $derived(data.regionCounties ?? []);
+	const countyGoals = $derived(goals.county ?? {});
+
+	const geographyRows = $derived.by(() => {
+		const names = new Set([
+			...Object.keys(countyCounts),
+			...Object.keys(countyGoals),
+		]);
+		return [...names]
+			.map((name) => ({
+				label: name,
+				count: countyCounts[name] ?? 0,
+				goal: countyGoals[name],
+			}))
+			.sort((a, b) => {
+				const aOther = a.label === OTHER_COUNTY_LABEL;
+				const bOther = b.label === OTHER_COUNTY_LABEL;
+				if (aOther !== bOther) return aOther ? 1 : -1;
+				return b.count - a.count;
+			});
+	});
+
+	// Buckets offered in the Modify Goals modal. Real regions use their full county
+	// list; the generic region (no prefixes) falls back to counties in play.
+	const countyBuckets = $derived.by(() => {
+		if (regionCounties.length) return regionCounties;
+		return [
+			...new Set([
+				...Object.keys(countyCounts),
+				...Object.keys(countyGoals),
+			]),
+		]
+			.filter((n) => n !== OTHER_COUNTY_LABEL)
+			.sort();
+	});
 
 	const totalEthnicity = $derived(
 		ethnicityRows.reduce((s, r) => s + r.count, 0),
@@ -179,32 +216,57 @@
 								{/if}
 							</p>
 						</div>
+						<button
+							type="button"
+							onclick={() => openModal("county")}
+							class="bg-muted text-destructive text-body inline-flex shrink-0 items-center gap-1.5 rounded-[30px] px-3 py-2 font-semibold transition-all hover:scale-105 active:scale-95"
+						>
+							<Target class="size-4" />
+							Modify Goals
+						</button>
 					</header>
 					<div class="grid grid-cols-1 gap-6 px-8 pb-8 lg:grid-cols-2">
 						<div class="divide-border divide-y">
 							<div
-								class="text-foreground/40 text-label font-ui grid grid-cols-[2fr_auto_auto] items-center gap-4 py-2 font-semibold uppercase"
+								class="text-foreground/40 text-label font-ui grid grid-cols-[1.4fr_auto_auto_auto_auto] items-center gap-3 py-2 font-semibold uppercase"
 							>
-								<div>Zip Code</div>
-								<div class="w-12 text-right">Count</div>
-								<div class="w-20 text-right">% of total</div>
+								<div>County</div>
+								<div class="w-10 text-right">Count</div>
+								<div class="w-14 text-right">% of total</div>
+								<div class="w-10 text-right">Goal</div>
+								<div class="w-14 text-right">To goal</div>
 							</div>
 							{#each geographyRows as row (row.label)}
+								{@const pctOfTotal = totalGeography
+									? (row.count / totalGeography) * 100
+									: 0}
+								{@const pctToGoal =
+									row.goal && row.goal > 0
+										? (row.count / row.goal) * 100
+										: null}
+								{@const goalTextColor =
+									pctToGoal === null
+										? ""
+										: pctToGoal >= 100
+											? "text-meter-met"
+											: "text-meter-under"}
 								<div
-									class="text-caption font-ui hover:bg-muted/40 grid grid-cols-[2fr_auto_auto] items-center gap-4 rounded-md px-1 py-2.5 transition-colors duration-150"
+									class="text-caption font-ui hover:bg-muted/40 grid grid-cols-[1.4fr_auto_auto_auto_auto] items-center gap-3 rounded-md px-1 py-2.5 transition-colors duration-150"
 								>
 									<div class="truncate font-semibold">{row.label}</div>
-									<div class="w-12 text-right font-semibold">{row.count}</div>
-									<div class="w-20 text-right font-semibold">
-										{totalGeography
-											? Math.round((row.count / totalGeography) * 100)
-											: 0}%
+									<div class="w-10 text-right font-semibold">{row.count}</div>
+									<div class="w-14 text-right font-semibold">
+										{Math.round(pctOfTotal)}%
+									</div>
+									<div class="w-10 text-right font-semibold">{row.goal ?? "—"}</div>
+									<div class={`w-14 text-right font-semibold ${goalTextColor}`}>
+										{pctToGoal === null ? "—" : `${Math.round(pctToGoal)}%`}
 									</div>
 								</div>
 							{/each}
 							{#if !geographyRows.length}
 								<div class="text-muted-foreground text-caption py-6">
-									No zipcode data yet.
+									No participation data yet.
 								</div>
 							{/if}
 						</div>
@@ -263,6 +325,7 @@
 		metric={modalMetric}
 		currentGoals={currentGoals as Record<string, number>}
 		totalGoal={participantsGoal}
+		buckets={modalMetric === "county" ? countyBuckets : undefined}
 		{conversationId}
 		{workflowId}
 	/>

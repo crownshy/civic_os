@@ -14,6 +14,8 @@ export interface RegionGoals {
 	politicalParty: Record<string, number>;
 	ageRanges: Record<string, number>;
 	gender: Record<string, number>;
+	/** Geography goals, keyed by county name (buckets are per-region, not static). */
+	county: Record<string, number>;
 }
 
 export type GoalMetric =
@@ -21,7 +23,8 @@ export type GoalMetric =
 	| 'ethnicity'
 	| 'politicalParty'
 	| 'ageRanges'
-	| 'gender';
+	| 'gender'
+	| 'county';
 
 export const TOTAL_PARTICIPANTS_BUCKET = 'total';
 
@@ -42,7 +45,10 @@ export const METRIC_BUCKETS: Record<Exclude<GoalMetric, 'totalParticipants'>, st
 		'Republican / Conservative'
 	],
 	ageRanges: ['Under 18', '18-24', '25-34', '35-44', '45-54', '55-64', '65+'],
-	gender: ['Female', 'Male', 'Other']
+	gender: ['Female', 'Male', 'Other'],
+	// County buckets are derived per-region from zip prefixes at runtime, so there
+	// is no static list here — the editor is fed its buckets dynamically.
+	county: []
 };
 
 export const METRIC_LABELS: Record<GoalMetric, string> = {
@@ -50,7 +56,8 @@ export const METRIC_LABELS: Record<GoalMetric, string> = {
 	ethnicity: 'Race / Ethnicity',
 	gender: 'Gender',
 	politicalParty: 'Political Affiliation',
-	ageRanges: 'Age'
+	ageRanges: 'Age',
+	county: 'Geography'
 };
 
 export function emptyGoals(): RegionGoals {
@@ -59,6 +66,7 @@ export function emptyGoals(): RegionGoals {
 		ethnicity: {},
 		politicalParty: {},
 		ageRanges: {},
-		gender: {}
+		gender: {},
+		county: {}
 	};
 }
