@@ -47,7 +47,7 @@
 <nav class="flex items-stretch border-b border-foreground/30">
 	<Popover.Root bind:open={switcherOpen}>
 		<Popover.Trigger
-			class="flex items-center gap-3 bg-primary px-4 py-4 text-body font-medium text-primary-foreground outline-none"
+			class="flex items-center gap-3 bg-primary px-4 py-4 text-lg font-medium text-primary-foreground outline-none"
 		>
 			{event ? eventLabel(event) : "Select event"}
 			<ChevronDown class="size-4" />
@@ -73,7 +73,7 @@
 	{#each subTabs as tab (tab.href)}
 		<a
 			href={eventBase + tab.href}
-			class={`px-4 py-4 text-body font-medium ${
+			class={`px-4 py-4 text-lg font-medium ${
 				activeSubTab === tab.href
 					? "text-primary"
 					: "text-foreground/70 hover:text-foreground"

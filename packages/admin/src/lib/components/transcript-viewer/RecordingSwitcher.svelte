@@ -24,10 +24,10 @@
 
 <Popover.Root bind:open>
 	<Popover.Trigger
-		class="flex items-center gap-2 text-4xl font-bold text-foreground outline-none"
+		class="flex min-w-0 max-w-full items-center gap-2 text-left text-4xl font-bold text-foreground outline-none"
 	>
-		{name}
-		<ChevronDown class="size-6 text-primary" />
+		<span class="min-w-0 break-words">{name}</span>
+		<ChevronDown class="size-6 shrink-0 text-primary" />
 	</Popover.Trigger>
 	<Popover.Content
 		align="start"
