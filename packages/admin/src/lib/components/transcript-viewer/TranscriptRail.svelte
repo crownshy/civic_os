@@ -20,6 +20,7 @@
 
 	let audio = $state<HTMLAudioElement | undefined>();
 	let track = $state<HTMLElement | undefined>();
+	let listEl = $state<HTMLElement | undefined>();
 	let currentTime = $state(0);
 	let duration = $state(0);
 	let isPlaying = $state(false);
@@ -91,12 +92,21 @@
 		}
 	}
 
+	// Scroll ONLY the rail's own list container (never the page/ancestors, which
+	// `scrollIntoView` would do and yank the sticky player off-screen).
+	function centerInList(node: HTMLElement) {
+		if (!listEl) return;
+		const n = node.getBoundingClientRect();
+		const c = listEl.getBoundingClientRect();
+		const delta = n.top - c.top - (c.height - n.height) / 2;
+		listEl.scrollBy({ top: delta, behavior: "smooth" });
+	}
+
 	function scrollToActive(node: HTMLElement, isActive: boolean) {
-		if (isActive) node.scrollIntoView({ behavior: "smooth", block: "nearest" });
+		if (isActive) centerInList(node);
 		return {
 			update(active: boolean) {
-				if (active)
-					node.scrollIntoView({ behavior: "smooth", block: "nearest" });
+				if (active) centerInList(node);
 			},
 		};
 	}
@@ -150,14 +160,14 @@
 	</div>
 
 	<!-- Speaker turns -->
-	<div class="min-h-0 flex-1 overflow-y-auto">
+	<div bind:this={listEl} class="min-h-0 flex-1 overflow-y-auto">
 		{#each events as event, index (index)}
 			{@const isActive = index === currentIndex}
 			<button
 				type="button"
 				onclick={() => seekTo(event.start_time)}
 				use:scrollToActive={isActive}
-				class={`flex w-full flex-col items-start gap-[5px] px-5 py-6 text-left transition-colors ${isActive ? "bg-muted" : ""}`}
+				class={`flex w-full cursor-pointer flex-col items-start gap-[5px] px-5 py-6 text-left transition-colors hover:bg-primary/10 ${isActive ? "bg-muted" : ""}`}
 			>
 				<span
 					class={`text-sm font-medium uppercase leading-4 ${speakerColor(event.speaker_id)}`}
