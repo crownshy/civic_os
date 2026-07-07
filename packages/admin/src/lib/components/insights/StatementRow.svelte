@@ -3,6 +3,7 @@
 	import { computeGroupVotePercents, totalVotes } from '$lib/utils/report';
 	import { User } from '@lucide/svelte';
 	import GroupCircle from './GroupCircle.svelte';
+	import RowAccentStripe from './RowAccentStripe.svelte';
 	import ThemePicker from './ThemePicker.svelte';
 
 	type Variant = 'consensus' | 'difference' | 'uncertainty' | 'neutral';
@@ -62,8 +63,7 @@
 	class="border-border group hover:bg-muted/40 relative grid items-start gap-4 border-b py-6 pr-4 pl-5 transition-colors duration-150"
 	style="grid-template-columns: var(--insights-cols, 2.5rem minmax(0, 76fr) 14fr 16fr auto)"
 >
-	<!-- Left accent stripe -->
-	<div class={`absolute top-0 bottom-0 left-0 w-1.5 ${stripeClass}`}></div>
+	<RowAccentStripe accent={stripeClass} />
 
 	<!-- Polis statement id. Sizes here follow the admin token scale, not the raw
 	     Figma px — text-label/body map to the Figma's 12/16px where a token exists;

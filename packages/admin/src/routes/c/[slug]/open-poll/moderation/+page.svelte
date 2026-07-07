@@ -9,6 +9,7 @@
 	} from '$lib/api/aux';
 	import { submitSeed } from '$lib/services/polis';
 	import ThemePicker from '$lib/components/insights/ThemePicker.svelte';
+	import RowAccentStripe from '$lib/components/insights/RowAccentStripe.svelte';
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import { Button } from '@civicos/shared/ui/button';
 	import { invalidate } from '$app/navigation';
@@ -356,9 +357,7 @@
 							class="border-border group hover:bg-muted/40 relative grid grid-cols-[1.5rem_minmax(0,1fr)_minmax(11rem,16rem)_auto] items-start gap-4 border-b py-4 pl-4 transition-colors duration-150"
 						>
 							<!-- Left accent bar (status color) -->
-							<div
-								class={`absolute top-0 bottom-0 left-0 w-1.5 transition-all duration-150 group-hover:w-2 ${accent}`}
-							></div>
+							<RowAccentStripe {accent} />
 
 							<!-- # -->
 							<div class="font-ui text-muted-foreground text-label pt-1 text-center tabular-nums">
