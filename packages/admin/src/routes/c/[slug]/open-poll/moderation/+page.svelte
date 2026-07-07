@@ -331,7 +331,7 @@
 			<div class="flex flex-col">
 				<!-- Column headings -->
 				<div
-					class="font-ui text-muted-foreground/60 text-caption grid grid-cols-[1.5rem_minmax(0,1fr)_minmax(11rem,16rem)_auto] items-center gap-4 px-4 py-2 font-semibold uppercase"
+					class="font-ui text-foreground text-caption grid grid-cols-[1.5rem_minmax(0,1fr)_minmax(11rem,16rem)_auto] items-center gap-4 px-4 py-2 font-semibold uppercase"
 				>
 					<div>#</div>
 					<div>Statement</div>

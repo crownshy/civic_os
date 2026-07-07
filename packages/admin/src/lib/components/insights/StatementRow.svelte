@@ -50,7 +50,8 @@
 				: 'bg-transparent'
 	);
 
-	// Seed/host-authored statements (is_seed) label as "Host". Everyone else is
+	// Seed/host-authored statements (is_seed) label as "You" (the host viewing
+	// this admin report authored them). Everyone else is
 	// "Participant" — the report payload has no author pid yet, so we can't show
 	// the real participant id (e.g. "23"). Backfill is blocked on a backend change
 	// (see CONTEXT.md → "Statement author"). Seed author is assumed to be pid 0.
@@ -58,7 +59,8 @@
 </script>
 
 <div
-	class="border-border group hover:bg-muted/40 relative grid grid-cols-[2.5rem_minmax(0,1fr)_4rem_5rem_auto] items-start gap-4 border-b py-6 pr-4 pl-5 transition-colors duration-150"
+	class="border-border group hover:bg-muted/40 relative grid items-start gap-4 border-b py-6 pr-4 pl-5 transition-colors duration-150"
+	style="grid-template-columns: var(--insights-cols, 2.5rem minmax(0, 76fr) 14fr 16fr auto)"
 >
 	<!-- Left accent stripe -->
 	<div class={`absolute top-0 bottom-0 left-0 w-1.5 ${stripeClass}`}></div>
@@ -103,7 +105,7 @@
 			<span
 				class="text-caption inline-flex items-center gap-1 rounded bg-blue-500 px-1.5 py-0.5 font-medium text-white"
 			>
-				<User class="size-3" />Host
+				<User class="size-3" />You
 			</span>
 		{:else}
 			<span
@@ -125,10 +127,19 @@
 		{/if}
 	</div>
 
-	<!-- Per-group agree rings -->
+	<!-- Per-group agree rings. Arc reflects the toggled agree% (g.agreed); the
+	     tooltip uses raw group_votes counts for the honest full breakdown. -->
 	<div class="flex items-center gap-3 self-start pt-0.5">
 		{#each groupPcts as g (g.group_id)}
-			<GroupCircle agreed={g.agreed} disagreed={g.disagreed} passed={g.passed} showLabel={false} />
+			{@const gv = comment.group_votes.find((v) => v.group_id === g.group_id)}
+			<GroupCircle
+				label={g.label}
+				agreePct={g.agreed}
+				agrees={gv?.agrees ?? 0}
+				disagrees={gv?.disagrees ?? 0}
+				passes={gv?.passes ?? 0}
+				showLabel={false}
+			/>
 		{/each}
 	</div>
 </div>

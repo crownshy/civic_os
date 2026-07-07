@@ -16,6 +16,9 @@
 		countAccent?: 'consensus' | 'difference' | 'all';
 		/** Header label for the per-variant metric column, e.g. "Min Agree". */
 		metricLabel: string;
+		/** Number of opinion groups — sizes the trailing agree-rings column so the
+		    header grid and the (separate) row grids share identical column widths. */
+		groupCount?: number;
 		/** Full main-list count. When it exceeds what's rendered, show the expander. */
 		total?: number;
 		/** Rows shown while collapsed (parent does the slicing). */
@@ -31,6 +34,8 @@
 		onExcludePassesChange?: (next: boolean) => void;
 		onExcludeHostsChange?: (next: boolean) => void;
 		children: Snippet;
+		/** Optional action rendered on the title row, right-aligned (e.g. a Download button). */
+		headerAction?: Snippet;
 		/** Optional controls rendered between the description and the table (e.g. theme chips). */
 		toolbar?: Snippet;
 		/** Low-quality rows, rendered below the reveal toggle when expanded. */
@@ -46,19 +51,36 @@
 		metricLabel,
 		total,
 		collapsedCount = 5,
+		groupCount = 0,
 		expanded = $bindable(false),
 		lowQualityCount = 0,
 		showLowQuality = $bindable(false),
 		excludePasses = $bindable(false),
-		excludeHosts = $bindable(true),
+		excludeHosts = $bindable(false),
 		onExcludePassesChange,
 		onExcludeHostsChange,
 		children,
+		headerAction,
 		toolbar,
 		lowQuality
 	}: Props = $props();
 
 	const showExpander = $derived(total !== undefined && total > collapsedCount);
+
+	// Shared grid template for the header and every row, so the header grid and the
+	// rows' separate grids resolve to identical column widths.
+	//
+	// Statement : Author : Min-Agree use proportional fr units taken from the Figma
+	// header pitch (608 : 144 : 166 px ≈ 60 : 14 : 16) so the column ratio holds at
+	// any table width instead of drifting as a fixed-rem column would. `#` is a
+	// fixed narrow column; the trailing agree-rings column is sized from the group
+	// count (each GroupCircle is size-10 = 2.5rem, gap-3 = 0.75rem) so it always
+	// fits the circles rather than scaling.
+	const insightsCols = $derived(
+		groupCount > 0
+			? `2.5rem minmax(0,76fr) 14fr 16fr calc(${groupCount} * 2.5rem + ${groupCount - 1} * 0.75rem)`
+			: '2.5rem minmax(0,76fr) 14fr 16fr auto'
+	);
 
 	const countAccentClass = $derived(
 		countAccent === 'consensus'
@@ -69,8 +91,13 @@
 	);
 </script>
 
-<section {id} class="scroll-mt-4 flex flex-col gap-4">
-	<h2 class="font-display text-foreground text-display font-semibold leading-tight">{title}</h2>
+<section {id} class="scroll-mt-4 flex flex-col gap-4" style={`--insights-cols: ${insightsCols}`}>
+	<div class="flex items-center justify-between gap-4">
+		<h2 class="font-display text-foreground text-display font-semibold leading-tight">{title}</h2>
+		{#if headerAction}
+			<div class="shrink-0">{@render headerAction()}</div>
+		{/if}
+	</div>
 	<p class="font-display text-foreground text-section font-medium whitespace-nowrap">
 		{#if count !== undefined}<span class={countAccentClass}>{count} STATEMENTS</span>&nbsp;{/if}{description}
 	</p>
@@ -86,13 +113,13 @@
 	>
 		<div class="flex flex-col [&>*:last-child]:rounded-b-[20px]">
 			<div
-				class="bg-card font-ui text-muted-foreground/60 text-caption sticky top-0 z-10 grid grid-cols-[2.5rem_minmax(0,1fr)_4rem_5rem_auto] items-center gap-4 rounded-t-[20px] px-5 py-3 font-semibold uppercase"
+				class="bg-card font-ui text-foreground text-caption sticky top-0 z-10 grid [grid-template-columns:var(--insights-cols)] items-center gap-4 rounded-t-[20px] py-3 pr-4 pl-5 font-semibold uppercase"
 			>
 				<div>#</div>
 				<div>Statement</div>
 				<ColumnFilterHeader
 					label="Author"
-					optionLabel="Include host statements"
+					optionLabel="Include all statements"
 					checked={!excludeHosts}
 					onchange={(included) => {
 						excludeHosts = !included;
