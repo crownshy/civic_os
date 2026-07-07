@@ -57,7 +57,7 @@
 			<button
 				type="button"
 				onclick={onModifyGoals}
-				class="bg-muted text-destructive inline-flex shrink-0 items-center gap-1.5 rounded-[30px] px-3 py-2 text-body font-semibold transition-all hover:scale-105 active:scale-95"
+				class="bg-muted text-primary inline-flex shrink-0 items-center gap-1.5 rounded-[30px] px-3 py-2 text-body font-semibold transition-all hover:scale-105 active:scale-95"
 			>
 				<Target class="size-4" />
 				Modify Goals

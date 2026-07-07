@@ -29,9 +29,9 @@
 	);
 
 	const statusDot: Record<'live' | 'idle' | 'draft', string> = {
-		live: 'bg-primary',
+		live: 'bg-success',
 		idle: 'bg-muted-foreground/30',
-		draft: 'bg-destructive'
+		draft: 'bg-primary'
 	};
 
 	const onDashboard = $derived(page.url.pathname === '/');
@@ -76,7 +76,7 @@
 		>
 			<div class="flex min-w-0 items-center gap-2.5">
 				<div
-					class="bg-destructive border-foreground size-9 shrink-0 rounded-tl-2xl rounded-tr-xl rounded-bl-2xl rounded-br-2xl border"
+					class="bg-primary border-foreground size-9 shrink-0 rounded-tl-2xl rounded-tr-xl rounded-bl-2xl rounded-br-2xl border"
 				></div>
 				{#if !collapsed || mobileOpen}
 					<span class="truncate text-body font-bold">CivicOS</span>
@@ -126,7 +126,7 @@
 				title="Dashboard"
 				class={[
 					'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-body font-medium',
-					onDashboard ? 'bg-destructive/5' : 'hover:bg-muted/50',
+					onDashboard ? 'bg-primary/5' : 'hover:bg-muted/50',
 					collapsed && !mobileOpen ? 'justify-center px-0' : ''
 				].join(' ')}
 			>

@@ -5,7 +5,7 @@
 	interface Props {
 		/** Column header label, e.g. "Author". */
 		label: string;
-		/** Popover option label, phrased as the positive action, e.g. "Include host statements". */
+		/** Popover option label, phrased as the positive action, e.g. "Include all statements". */
 		optionLabel: string;
 		/** Controlled — checked = the option is INCLUDED (shown). */
 		checked?: boolean;
@@ -28,27 +28,22 @@
 
 <Popover.Root>
 	<Popover.Trigger
-		class={`text-muted-foreground/60 hover:text-foreground font-ui text-caption flex w-full cursor-pointer items-center gap-1 font-semibold uppercase transition-colors ${justify[align]}`}
+		class={`text-foreground hover:text-foreground/70 font-ui text-caption flex w-full cursor-pointer items-center gap-1 font-semibold whitespace-nowrap uppercase transition-colors ${justify[align]}`}
 	>
 		{label}
-		<ChevronDown class="size-3" />
+		<ChevronDown class="size-3 shrink-0" />
 	</Popover.Trigger>
-	<Popover.Content align="start" class="w-56 p-1">
+	<Popover.Content
+		align="start"
+		class="w-48 overflow-hidden rounded-[10px] border-black/20 p-0 shadow-[0px_4px_10px_0px_rgba(0,0,0,0.10)]"
+	>
 		<button
 			type="button"
 			onclick={toggle}
-			class="hover:bg-muted text-foreground flex w-full cursor-pointer items-center gap-2 rounded px-2 py-2 text-left text-sm font-medium"
+			class="hover:bg-muted/50 flex h-10 w-full cursor-pointer items-center justify-between border-b border-black/10 px-[9px] text-left transition-colors"
 		>
-			<span
-				class={`flex size-4 shrink-0 items-center justify-center rounded border ${
-					checked
-						? 'bg-primary border-primary text-primary-foreground'
-						: 'border-muted-foreground/40'
-				}`}
-			>
-				{#if checked}<Check class="size-3" />{/if}
-			</span>
-			{optionLabel}
+			<span class="font-sans text-sm font-medium text-neutral-900">{optionLabel}</span>
+			{#if checked}<Check class="text-primary size-4 shrink-0" />{/if}
 		</button>
 	</Popover.Content>
 </Popover.Root>

@@ -59,13 +59,13 @@
 	}
 
 	const toneClass: Record<"done" | "failed" | "progress", string> = {
-		done: "text-primary bg-primary/10",
+		done: "text-success bg-success/10",
 		failed: "text-destructive bg-destructive/10",
 		progress: "text-muted-foreground bg-muted-foreground/10",
 	};
 
 	const toneDot: Record<"done" | "failed" | "progress", string> = {
-		done: "bg-primary",
+		done: "bg-success",
 		failed: "bg-destructive",
 		progress: "bg-muted-foreground/60",
 	};

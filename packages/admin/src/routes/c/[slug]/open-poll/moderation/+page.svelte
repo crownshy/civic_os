@@ -1,14 +1,9 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
 	import type { PolisStatementAux } from '$lib/types/aux';
-	import {
-		addStatementAuxTheme,
-		moderateStatementAux,
-		removeStatementAuxTheme,
-		syncStatementAux
-	} from '$lib/api/aux';
+	import { moderateStatementAux, syncStatementAux } from '$lib/api/aux';
 	import { submitSeed } from '$lib/services/polis';
-	import ThemePicker from '$lib/components/insights/ThemePicker.svelte';
+	import RowAccentStripe from '$lib/components/insights/RowAccentStripe.svelte';
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import { Button } from '@civicos/shared/ui/button';
 	import { invalidate } from '$app/navigation';
@@ -45,13 +40,6 @@
 	// or navigating between conversations).
 	$effect(() => {
 		statements = data.statements;
-	});
-
-	// Union of every theme used on any row — drives the picker dropdown.
-	const availableThemes = $derived.by(() => {
-		const set = new Set<string>();
-		for (const s of statements) for (const t of s.themes) set.add(t);
-		return [...set].sort();
 	});
 
 	// --- Add seed statements (host authoring) ---
@@ -115,6 +103,7 @@
 				lines.shift();
 			}
 			if (lines.length) await postSeeds(lines);
+			showAddForm = false;
 		} catch (err) {
 			console.error('CSV import failed', err);
 			csvError = err instanceof Error ? err.message : 'CSV import failed.';
@@ -168,36 +157,6 @@
 		}
 	}
 
-	async function addTheme(row: PolisStatementAux, theme: string) {
-		if (row.themes.includes(theme)) return;
-		const prev = row.themes;
-		statements = statements.map((s) =>
-			s.id === row.id ? { ...s, themes: [...prev, theme] } : s
-		);
-		try {
-			const updated = await addStatementAuxTheme(data.api, row.id, theme);
-			statements = statements.map((s) => (s.id === row.id ? updated : s));
-		} catch (e) {
-			console.error('addStatementAuxTheme failed', e);
-			statements = statements.map((s) => (s.id === row.id ? { ...s, themes: prev } : s));
-		}
-	}
-
-	async function removeTheme(row: PolisStatementAux, theme: string) {
-		if (!row.themes.includes(theme)) return;
-		const prev = row.themes;
-		statements = statements.map((s) =>
-			s.id === row.id ? { ...s, themes: prev.filter((t) => t !== theme) } : s
-		);
-		try {
-			const updated = await removeStatementAuxTheme(data.api, row.id, theme);
-			statements = statements.map((s) => (s.id === row.id ? updated : s));
-		} catch (e) {
-			console.error('removeStatementAuxTheme failed', e);
-			statements = statements.map((s) => (s.id === row.id ? { ...s, themes: prev } : s));
-		}
-	}
-
 	const filters: { key: Filter; label: string }[] = [
 		{ key: 'all', label: 'All' },
 		{ key: 'seeded', label: 'Seeded' },
@@ -212,101 +171,96 @@
 		<div class="text-destructive text-body">Could not load statements: {data.error}</div>
 	{/if}
 
-	<!-- Page heading -->
-	<div class="flex max-w-3xl flex-col gap-1">
-		<h2 class="text-foreground text-section font-bold">Statements moderation</h2>
-		<p class="text-muted-foreground text-body">Moderate and view all statements.</p>
+	<!-- Page heading + actions -->
+	<div class="flex items-start justify-between gap-4">
+		<div class="flex max-w-3xl flex-col gap-1">
+			<h2 class="font-display text-foreground text-display font-semibold">Statements moderation</h2>
+			<p class="text-muted-foreground text-section">
+				{#if syncMessage}
+					{syncMessage}
+				{:else}
+					Moderate and view all statements.
+				{/if}
+			</p>
+		</div>
+		<div class="flex shrink-0 items-center gap-2">
+			<Button
+				variant="secondary"
+				onclick={syncFromPolis}
+				disabled={syncing || !data.region?.polis_workflow_step_id}
+				title="Pull the latest submitted statements from Polis"
+			>
+				<RefreshCw class={`size-4 ${syncing ? 'animate-spin' : ''}`} />
+				{syncing ? 'Syncing…' : 'Sync from Polis'}
+			</Button>
+			<Button
+				onclick={() => (showAddForm = !showAddForm)}
+				title="Add seed statements as moderator"
+			>
+				<Plus class="size-4" />
+				Add seed statements
+			</Button>
+		</div>
 	</div>
 
-	<!-- Add-a-statement card -->
-	<Card
-		class="border-ring/60 bg-muted/40 hover:border-ring hover:bg-muted/60 max-w-3xl transition-colors duration-200"
-	>
-		<div class="flex items-center justify-between gap-3 px-4 py-3">
-			<div class="min-w-0">
-				<div class="text-foreground text-body font-bold">Add a statement</div>
-				<div class="text-muted-foreground text-caption">
-					{#if syncMessage}
-						{syncMessage}
-					{:else}
-						As moderator, you can seed the discussion.
-					{/if}
-				</div>
-			</div>
-			<div class="flex shrink-0 items-center gap-2">
+	{#if showAddForm}
+		<div class="border-border flex max-w-3xl flex-col gap-3 rounded-lg border px-4 py-4">
+			<!-- Option 1: type a single seed -->
+			<label class="text-muted-foreground text-caption font-medium" for="seed-text">
+				Write a statement
+			</label>
+			<textarea
+				id="seed-text"
+				bind:value={draftText}
+				rows="2"
+				placeholder="Write a seed statement…"
+				class="border-border focus:ring-ring/40 text-lg w-full rounded-md border px-3 py-2 focus:ring-2 focus:outline-none"
+			></textarea>
+
+			<!-- Option 2: bulk import -->
+			<div class="text-muted-foreground text-caption flex items-center gap-2">
+				<span>or</span>
 				<Button
-					variant="outline"
-					onclick={syncFromPolis}
-					disabled={syncing || !data.region?.polis_workflow_step_id}
-					class="rounded-full px-5 py-2.5"
-					title="Pull the latest submitted statements from Polis"
-				>
-					<RefreshCw class={`size-4 ${syncing ? 'animate-spin' : ''}`} />
-					{syncing ? 'Syncing…' : 'Sync from Polis'}
-				</Button>
-				<Button
-					onclick={() => (showAddForm = !showAddForm)}
-					class="rounded-full px-5 py-2.5"
-					title="Add a seed statement as moderator"
-				>
-					<Plus class="size-4" />
-					Add statement
-				</Button>
-				<Button
-					variant="outline"
+					variant="secondary"
 					onclick={() => fileInput?.click()}
 					disabled={!canSeed || csvImporting}
-					class="text-primary border-primary rounded-full bg-white px-5 py-2.5"
 					title="Import seed statements from a CSV (one statement per line)"
 				>
 					<Upload class="size-4" />
 					{csvImporting ? 'Importing…' : 'Import CSV'}
 				</Button>
-				<input
-					bind:this={fileInput}
-					type="file"
-					accept=".csv,.txt"
-					class="hidden"
-					onchange={importCsv}
-				/>
+				<span>to add many at once</span>
+			</div>
+			<input
+				bind:this={fileInput}
+				type="file"
+				accept=".csv,.txt"
+				class="hidden"
+				onchange={importCsv}
+			/>
+
+			{#if !canSeed}
+				<p class="text-muted-foreground text-caption">
+					Sync at least one statement from Polis first — a new seed needs the conversation's ids.
+				</p>
+			{/if}
+			{#if addError}
+				<p class="text-destructive text-caption">{addError}</p>
+			{/if}
+			{#if csvError}
+				<p class="text-destructive text-caption">{csvError}</p>
+			{/if}
+
+			<div class="flex justify-end gap-2">
+				<Button variant="secondary" onclick={() => (showAddForm = false)}>
+					Cancel
+				</Button>
+				<Button onclick={addSeed} disabled={!canSeed || !draftText.trim() || addingSeed}>
+					{addingSeed ? 'Posting…' : 'Post seed'}
+				</Button>
 			</div>
 		</div>
-
-		{#if csvError}
-			<div class="text-destructive text-caption border-border border-t px-4 py-2">{csvError}</div>
-		{/if}
-
-		{#if showAddForm}
-			<div class="border-border flex flex-col gap-2 border-t px-4 py-3">
-				<textarea
-					bind:value={draftText}
-					rows="2"
-					placeholder="Write a seed statement…"
-					class="border-border focus:ring-ring/40 text-body w-full rounded-md border px-3 py-2 focus:ring-2 focus:outline-none"
-				></textarea>
-				{#if !canSeed}
-					<p class="text-muted-foreground text-caption">
-						Sync at least one statement from Polis first — a new seed needs the conversation's ids.
-					</p>
-				{/if}
-				{#if addError}
-					<p class="text-destructive text-caption">{addError}</p>
-				{/if}
-				<div class="flex justify-end gap-2">
-					<Button variant="ghost" onclick={() => (showAddForm = false)} class="rounded-full">
-						Cancel
-					</Button>
-					<Button
-						onclick={addSeed}
-						disabled={!canSeed || !draftText.trim() || addingSeed}
-						class="rounded-full"
-					>
-						{addingSeed ? 'Posting…' : 'Post seed'}
-					</Button>
-				</div>
-			</div>
-		{/if}
-	</Card>
+	{/if}
 
 	<!-- Status filter chips -->
 	<div class="flex flex-wrap items-center gap-1.5">
@@ -316,8 +270,8 @@
 				onclick={() => (filter = f.key)}
 				class={`font-ui inline-flex cursor-pointer items-center rounded-[30px] px-3 py-2 text-lg font-medium leading-6 transition-all duration-150 hover:scale-[1.03] active:scale-[0.97] ${
 					filter === f.key
-						? 'bg-[#C96442] text-white shadow-sm'
-						: 'bg-[#FCF7F6] text-[#C96442] hover:bg-[#F3E7E2]'
+						? 'bg-primary text-primary-foreground shadow-sm'
+						: 'bg-primary-subtle text-primary hover:bg-primary-subtle-hover'
 				}`}
 			>
 				<span>{f.label} · {counts[f.key]}</span>
@@ -331,11 +285,10 @@
 			<div class="flex flex-col">
 				<!-- Column headings -->
 				<div
-					class="font-ui text-muted-foreground/60 text-caption grid grid-cols-[1.5rem_minmax(0,1fr)_minmax(11rem,16rem)_auto] items-center gap-4 px-4 py-2 font-semibold uppercase"
+					class="font-ui text-foreground text-caption grid grid-cols-[1.5rem_minmax(0,1fr)_auto] items-center gap-4 px-4 py-2 font-semibold uppercase"
 				>
 					<div>#</div>
 					<div>Statement</div>
-					<div>Theme</div>
 					<div class="pr-4">Action</div>
 				</div>
 
@@ -348,17 +301,15 @@
 						{@const accent = row.is_seed
 							? 'bg-muted-foreground/40'
 							: row.moderation_status === 'accepted'
-								? 'bg-primary'
+								? 'bg-success'
 								: row.moderation_status === 'rejected'
 									? 'bg-destructive'
 									: 'bg-destructive/60'}
 						<div
-							class="border-border group hover:bg-muted/40 relative grid grid-cols-[1.5rem_minmax(0,1fr)_minmax(11rem,16rem)_auto] items-start gap-4 border-b py-4 pl-4 transition-colors duration-150"
+							class="border-border group hover:bg-muted/40 relative grid grid-cols-[1.5rem_minmax(0,1fr)_auto] items-start gap-4 border-b py-4 pl-4 transition-colors duration-150"
 						>
 							<!-- Left accent bar (status color) -->
-							<div
-								class={`absolute top-0 bottom-0 left-0 w-1.5 transition-all duration-150 group-hover:w-2 ${accent}`}
-							></div>
+							<RowAccentStripe {accent} />
 
 							<!-- # -->
 							<div class="font-ui text-muted-foreground text-label pt-1 text-center tabular-nums">
@@ -372,35 +323,25 @@
 								</p>
 							</div>
 
-							<!-- Theme picker -->
-							<div class="min-w-0 pt-0.5">
-								<ThemePicker
-									themes={row.themes}
-									{availableThemes}
-									onAddTheme={(theme) => addTheme(row, theme)}
-									onRemoveTheme={(theme) => removeTheme(row, theme)}
-								/>
-							</div>
-
 							<!-- Action -->
-							<div class="flex items-center gap-1 self-center pr-4">
+							<div class="flex items-center gap-2 self-center pr-4">
 								<button
 									type="button"
 									disabled={pending[row.id] || row.moderation_status === 'accepted'}
 									onclick={() => setStatus(row, 'accepted')}
 									title="Accept"
-									class="text-primary hover:bg-primary/15 inline-flex size-7 cursor-pointer items-center justify-center rounded-full transition-all duration-150 hover:scale-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-transparent"
+									class="text-success hover:bg-success/15 inline-flex size-10 cursor-pointer items-center justify-center rounded-full transition-all duration-150 hover:scale-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-transparent"
 								>
-									<Check class="size-4" />
+									<Check class="size-6" />
 								</button>
 								<button
 									type="button"
 									disabled={pending[row.id] || row.moderation_status === 'rejected'}
 									onclick={() => setStatus(row, 'rejected')}
 									title="Reject"
-									class="text-destructive hover:bg-destructive/15 inline-flex size-7 cursor-pointer items-center justify-center rounded-full transition-all duration-150 hover:scale-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-transparent"
+									class="text-destructive hover:bg-destructive/15 inline-flex size-10 cursor-pointer items-center justify-center rounded-full transition-all duration-150 hover:scale-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-transparent"
 								>
-									<X class="size-4" />
+									<X class="size-6" />
 								</button>
 							</div>
 						</div>

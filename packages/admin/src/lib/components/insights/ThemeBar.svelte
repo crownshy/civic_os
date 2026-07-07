@@ -32,7 +32,7 @@
 		type="button"
 		{onclick}
 		aria-label={`Open ${summary.theme}`}
-		class="bg-muted text-destructive group-hover:bg-destructive/15 flex size-8 shrink-0 cursor-pointer items-center justify-center justify-self-end rounded-full transition-all duration-150 hover:scale-110 active:scale-95"
+		class="bg-muted text-primary group-hover:bg-primary/15 flex size-8 shrink-0 cursor-pointer items-center justify-center justify-self-end rounded-full transition-all duration-150 hover:scale-110 active:scale-95"
 	>
 		<ArrowRight class="size-4" />
 	</button>

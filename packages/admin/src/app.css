@@ -1,6 +1,6 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
-@import '@civicos/shared/styles/theme.css';
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@civicos/shared/styles/theme.css";
 
 /* Tailwind 4 only scans this package's src/ by default. The shared
    shadcn-svelte primitives (Dialog, etc.) live in a sibling workspace
@@ -11,29 +11,31 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-	--color-background: var(--background);
-	--color-foreground: var(--foreground);
-	--color-card: var(--card);
-	--color-card-foreground: var(--card-foreground);
-	--color-popover: var(--popover);
-	--color-popover-foreground: var(--popover-foreground);
-	--color-primary: var(--primary);
-	--color-primary-dark: var(--primary-dark);
-	--color-primary-foreground: var(--primary-foreground);
-	--color-secondary: var(--secondary);
-	--color-secondary-foreground: var(--secondary-foreground);
-	--color-muted: var(--muted);
-	--color-muted-foreground: var(--muted-foreground);
-	--color-accent: var(--accent);
-	--color-accent-foreground: var(--accent-foreground);
-	--color-destructive: var(--destructive);
-	--color-destructive-foreground: var(--destructive-foreground);
-	--color-border: var(--border);
-	--color-input: var(--input);
-	--color-ring: var(--ring);
-	--font-sans: var(--font-sans);
-	--font-mono: var(--font-mono);
-	--radius: var(--radius);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --radius: var(--radius);
 }
 
 /* Admin semantic type scale.
@@ -48,53 +50,85 @@
    stat     48px  hero metric numbers (Insights secondary)
    hero     72px  primary hero metric numbers (514 / 700 / 167) */
 @theme {
-	--text-label: var(--text-xs);
-	--text-label--line-height: var(--text-xs--line-height);
-	--text-caption: var(--text-sm);
-	--text-caption--line-height: var(--text-sm--line-height);
-	--text-body: var(--text-base);
-	--text-body--line-height: var(--text-base--line-height);
-	--text-section: var(--text-2xl);
-	--text-section--line-height: var(--text-2xl--line-height);
-	--text-display: var(--text-4xl);
-	--text-display--line-height: var(--text-4xl--line-height);
-	--text-stat: var(--text-5xl);
-	--text-stat--line-height: var(--text-5xl--line-height);
-	--text-hero: var(--text-7xl);
-	--text-hero--line-height: var(--text-7xl--line-height);
+  --text-label: var(--text-xs);
+  --text-label--line-height: var(--text-xs--line-height);
+  --text-caption: var(--text-sm);
+  --text-caption--line-height: var(--text-sm--line-height);
+  --text-body: var(--text-base);
+  --text-body--line-height: var(--text-base--line-height);
+  --text-section: var(--text-2xl);
+  --text-section--line-height: var(--text-2xl--line-height);
+  --text-display: var(--text-4xl);
+  --text-display--line-height: var(--text-4xl--line-height);
+  --text-stat: var(--text-5xl);
+  --text-stat--line-height: var(--text-5xl--line-height);
+  --text-hero: var(--text-7xl);
+  --text-hero--line-height: var(--text-7xl--line-height);
 
-	/* Inter — UI chrome + numerics (nav, tabs, eyebrow labels, numbers,
+  /* Inter — UI chrome + numerics (nav, tabs, eyebrow labels, numbers,
 	   statement body). Titles use --font-display (Geom); labels/rows --font-sans. */
-	--font-ui: 'Inter', 'Hanken Grotesk', sans-serif;
+  --font-ui: "Inter", "Hanken Grotesk", sans-serif;
 }
 
 /* Data-viz palette — shared encoding colors for meters, theme bars and
    agree-rings. Named so every chart uses the same hue for the same meaning.
    These are NOT brand colors; they're data channels. */
 @theme {
-	--color-meter-under: #ea580c; /* < ~50% of goal        (orange-600) */
-	--color-meter-near: #f59e0b; /* 50–99% of goal        (amber-500)  */
-	--color-meter-met: #16a34a; /* at / over goal         (green-600)  */
-	--color-meter-track: #f5f5f5; /* empty track           (neutral-100) */
-	--color-consensus: #16a34a; /* areas of consensus     (green-600)  */
-	--color-difference: #ea580c; /* areas of difference    (orange-600) */
-	--color-theme-bar: #16a34a; /* themes count bar       (green-600)  */
+  --color-meter-under: #ea580c; /* < ~50% of goal        (orange-600) */
+  --color-meter-near: #f59e0b; /* 50–99% of goal        (amber-500)  */
+  --color-meter-met: #16a34a; /* at / over goal         (green-600)  */
+  --color-meter-track: #f5f5f5; /* meter bar empty track  (neutral-100) */
+  --color-ring-track: #e5e5e5; /* agree-ring empty track (neutral-200) */
+  --color-consensus: #16a34a; /* areas of consensus     (green-600)  */
+  --color-difference: #ea580c; /* areas of difference    (orange-600) */
+  --color-theme-bar: #16a34a; /* themes count bar       (green-600)  */
+}
+
+/* Admin accent roles. The admin surface is neutral (see :root below), so the
+   accent palette carries all the meaning. Three distinct roles — the whole
+   admin UI reads from exactly these, so keep them straight when asked:
+     • --primary      #c96442  terracotta  interactive / brand: buttons, links,
+                                            active nav & tabs, selected chips
+     • --success      #406b43  green        positive status: LIVE, accept,
+                                            "processed" / "done" / "confirmed"
+     • --destructive  #ee503b  coral        remove / reject / delete / error
+   NOTE: the shared theme.css ships --primary AS the civic green. Admin flips
+   that: --primary becomes terracotta (:root below) and the green is renamed to
+   its honest role, --success. That's why shared components (Button, etc.) can
+   stay theme-agnostic on `bg-primary` — the value differs per app, the role
+   doesn't. The subtle tokens are low-opacity primary tints for idle surfaces. */
+@theme {
+  --color-primary-subtle: #fcf7f6; /* idle primary surface (unselected chip) */
+  --color-primary-subtle-hover: #f3e7e2; /* idle primary surface, hover */
+}
+
+/* Author identity — the "You" badge marking host-authored statements in the
+   Insights tables. A distinct blue so a host reading the report can spot their
+   own seed statements at a glance; not brand, not a data channel. */
+@theme {
+  --color-host: #3b82f6; /* host / "You" author badge (blue-500) */
 }
 
 /* Figma redesign: neutral admin surface. Scoped to the admin package only —
    the public civicos app keeps its warm cream brand (theme.css). Overrides
    come after the theme.css @import above, so these win for light mode. */
 :root {
-	--background: #ffffff;
-	--card: #ffffff;
-	--card-foreground: #1c1917; /* stone-900 */
-	--foreground: #1c1917; /* stone-900 */
-	--muted: #fafaf9; /* stone-50  */
-	--muted-foreground: #78716c; /* stone-500 */
-	--border: #e5e5e5; /* neutral-200 */
+  --background: #ffffff;
+  --card: #ffffff;
+  --card-foreground: #1c1917; /* stone-900 */
+  --foreground: #1c1917; /* stone-900 */
+  --muted: #fafaf9; /* stone-50  */
+  --muted-foreground: #78716c; /* stone-500 */
+  --border: #e5e5e5; /* neutral-200 */
+  /* Accent roles (see the comment above). Admin repurposes the shared green
+     --primary as --success and makes terracotta the true --primary. */
+  --primary: #c96442; /* terracotta */
+  --primary-foreground: #ffffff;
+  --success: #406b43; /* civic green (was --primary upstream) */
+  --success-foreground: #ffffff;
 }
 
 /* Card shadow matching wireframe spec */
 .shadow-card {
-	box-shadow: 0px 5px 15px 0px rgba(12, 34, 95, 0.13);
+  box-shadow: 0px 5px 15px 0px rgba(12, 34, 95, 0.13);
 }

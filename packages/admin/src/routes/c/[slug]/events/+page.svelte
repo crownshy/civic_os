@@ -173,7 +173,7 @@
 					onclick={() => (activeFilter = label)}
 					class={`cursor-pointer rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-3 py-1.5 text-caption transition-all duration-150 hover:scale-[1.03] active:scale-[0.97] ${
 						activeFilter === label
-							? 'bg-destructive/10 text-foreground shadow-sm'
+							? 'bg-primary/10 text-foreground shadow-sm'
 							: 'bg-muted-foreground/10 text-foreground hover:bg-muted-foreground/20'
 					}`}
 				>
@@ -188,7 +188,7 @@
 					onclick={() => (viewMode = mode)}
 					class={`cursor-pointer rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-3 py-1.5 text-caption transition-all duration-150 hover:scale-[1.03] active:scale-[0.97] ${
 						viewMode === mode
-							? 'bg-destructive/10 shadow-sm'
+							? 'bg-primary/10 shadow-sm'
 							: 'bg-muted-foreground/10 hover:bg-muted-foreground/20'
 					}`}
 				>
@@ -380,7 +380,7 @@
 									{fmtWeekday(event.startTime)}
 								</div>
 								<div
-									class="text-body leading-5 font-bold transition-colors group-hover:text-destructive"
+									class="text-body leading-5 font-bold transition-colors group-hover:text-primary"
 								>
 									{fmtMonthDay(event.startTime)}
 								</div>
@@ -389,13 +389,13 @@
 							<div class="col-span-2 min-w-0 space-y-1 sm:col-auto sm:flex-1">
 								<div class="flex flex-wrap items-center gap-2">
 									<span
-										class="text-body font-bold transition-colors group-hover:text-destructive"
+										class="text-body font-bold transition-colors group-hover:text-primary"
 									>
 										{event.name}
 									</span>
 									{#if activeFilter === 'past'}
 										<span
-											class="bg-destructive/10 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-3 py-1.5 text-caption"
+											class="bg-primary/10 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-3 py-1.5 text-caption"
 										>
 											past
 										</span>

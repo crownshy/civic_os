@@ -51,14 +51,14 @@
 
 <!-- Event sub-tabs strip -->
 <nav
-	class="border-border bg-destructive/5 flex items-center gap-1.5 border-b px-5"
+	class="border-border bg-primary/5 flex items-center gap-1.5 border-b px-5"
 >
 	{#each subTabs as tab}
 		<a
 			href={eventBase + tab.href}
 			class={`px-3.5 py-3.5 text-body font-medium ${
 				activeSubTab === tab.href
-					? "text-destructive"
+					? "text-primary"
 					: "text-foreground/70 hover:text-foreground"
 			}`}
 		>

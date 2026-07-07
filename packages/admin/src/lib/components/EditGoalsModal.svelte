@@ -120,7 +120,7 @@
 				{/if}
 
 				<Dialog.Footer class="gap-2">
-					<Button type="button" variant="outline" onclick={close} disabled={submitting}>
+					<Button type="button" variant="secondary" onclick={close} disabled={submitting}>
 						Cancel
 					</Button>
 					<Button type="submit" disabled={submitting}>

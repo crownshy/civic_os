@@ -37,7 +37,7 @@
 	);
 
 	const statusClass: Record<string, string> = {
-		confirmed: 'bg-primary/10',
+		confirmed: 'bg-success/10',
 		waitlist: 'bg-muted-foreground/20',
 		'no-show?': 'bg-destructive/20'
 	};
@@ -59,7 +59,7 @@
 					onclick={() => (activeFilter = f)}
 					class={`rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-3 py-1.5 text-caption ${
 						activeFilter === f
-							? 'bg-destructive/10 text-foreground'
+							? 'bg-primary/10 text-foreground'
 							: 'bg-muted-foreground/10 text-foreground'
 					}`}
 				>
@@ -114,7 +114,7 @@
 						class={`inline-flex items-center gap-1 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-2.5 py-1 ${statusClass[row.status]}`}
 					>
 						{#if row.status === 'confirmed'}
-							<span class="bg-primary size-1.5 rounded-full"></span>
+							<span class="bg-success size-1.5 rounded-full"></span>
 						{/if}
 						{row.status}
 					</span>

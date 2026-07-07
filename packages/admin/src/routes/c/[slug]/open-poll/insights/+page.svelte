@@ -1,13 +1,13 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
-	import type { ReportComment, PolisReportData } from '$lib/types/report';
+	import type { ReportComment, PolisReportData, ThemeSummary } from '$lib/types/report';
 	import type { PolisStatementAux } from '$lib/types/aux';
 	import { addStatementAuxTheme, removeStatementAuxTheme } from '$lib/api/aux';
 	import {
 		getEngagementStats,
 		getConsensusStatements,
 		getDifferenceStatements,
-		getThemeSummaries,
+		themeControversy,
 		classifyStatement,
 		isLowQuality,
 		totalVotes
@@ -17,7 +17,6 @@
 	import StatementSection from '$lib/components/insights/StatementSection.svelte';
 	import ThemeBar from '$lib/components/insights/ThemeBar.svelte';
 	import ThemeChip from '$lib/components/insights/ThemeChip.svelte';
-	import FilterToggle from '$lib/components/insights/FilterToggle.svelte';
 	import PollStatRow from '$lib/components/PollStatRow.svelte';
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import { Button } from '@civicos/shared/ui/button';
@@ -55,26 +54,37 @@
 		};
 	});
 
-	let themesExcludeHosts = $state(false);
-
 	const stats = $derived(reportData ? getEngagementStats(reportData) : null);
-	const themes = $derived.by(() => {
-		if (!reportData) return [];
-		const source = themesExcludeHosts
-			? { ...reportData, comments: reportData.comments.filter((c) => !c.is_seed) }
-			: reportData;
-		return getThemeSummaries(source);
+	// Theme roll-up over ALL tagged statements (aux), not just the Polis report
+	// set. Statements outside the report — e.g. pending/rejected ones still shown
+	// in Moderation — carry human-authored themes we want surfaced, so the card
+	// matches what the Moderation table shows. Controversy needs vote data (which
+	// only the report carries), so themes on non-report statements fall back to
+	// 'low' — not surfaced today anyway (see ThemeBar).
+	const themes = $derived.by<ThemeSummary[]>(() => {
+		const counts = new Map<string, number>();
+		for (const row of Object.values(auxByTid)) {
+			for (const t of row.themes) counts.set(t, (counts.get(t) ?? 0) + 1);
+		}
+		return [...counts.entries()]
+			.map(([theme, statementCount]) => ({
+				theme,
+				statementCount,
+				controversy: reportData ? themeControversy(theme, reportData) : ('low' as const)
+			}))
+			.sort((a, b) => b.statementCount - a.statementCount);
 	});
 	// Bars rank against the biggest theme (themes is sorted count-desc), not the
 	// statement total — see ThemeBar.
 	const maxThemeCount = $derived(themes[0]?.statementCount ?? 0);
 	// --- Section filter state (Consensus / Difference / Uncertainty) ---
-	// `is_seed` default matches StatementSection's `excludeHosts = true` default.
+	// Every table defaults to "Include host statements" (excludeHosts = false), matching
+	// the Agree% "Include passes" default — all statements shown until the user filters.
 	// "Exclude passes" switches the agree% denominator to agrees/(agrees+disagrees),
 	// which re-runs the consensus/difference selection — not a row filter.
-	let consensusExcludeHosts = $state(true);
+	let consensusExcludeHosts = $state(false);
 	let consensusExcludePasses = $state(false);
-	let differencesExcludeHosts = $state(true);
+	let differencesExcludeHosts = $state(false);
 	let differencesExcludePasses = $state(false);
 
 	// Collapse long lists to a preview; "See all" expands in place.
@@ -252,7 +262,7 @@
 					{ label: 'Areas of Consensus', value: consensus.length }
 				]}
 			/>
-			<Button variant="outline" size="sm" onclick={handleDownloadCsv}>
+			<Button onclick={handleDownloadCsv}>
 				<Download class="size-4" />
 				Download CSV
 			</Button>
@@ -269,12 +279,11 @@
 						Click a theme to see all of the statements associated with it.
 					</p>
 				</div>
-				<FilterToggle label="Exclude host statements" bind:checked={themesExcludeHosts} />
 			</header>
 
 			<div class="px-8 pt-6 pb-2">
 				<div
-					class="font-ui text-muted-foreground/60 text-label grid grid-cols-[10rem_3rem_1fr_2.5rem] items-center gap-6 px-2 py-2 font-semibold uppercase"
+					class="font-ui text-foreground text-caption grid grid-cols-[10rem_3rem_1fr_2.5rem] items-center gap-6 px-2 py-2 font-semibold uppercase"
 				>
 					<div>Theme</div>
 					<div class="text-right">Count</div>
@@ -301,7 +310,7 @@
 						>
 							{showAllThemes ? 'Show fewer themes' : `See all ${themes.length} themes`}
 							<ChevronDown
-								class={`text-destructive size-4 transition-transform ${showAllThemes ? 'rotate-180' : ''}`}
+								class={`text-primary size-4 transition-transform ${showAllThemes ? 'rotate-180' : ''}`}
 							/>
 						</button>
 					{/if}
@@ -316,6 +325,7 @@
 			countAccent="consensus"
 			description="with greater than 80% agreement across all groups."
 			metricLabel="Min Agree"
+			groupCount={reportData.groups.length}
 			total={consensusMain.length}
 			collapsedCount={COLLAPSED_ROWS}
 			lowQualityCount={consensusLow.length}
@@ -360,6 +370,7 @@
 			countAccent="difference"
 			description="with greater than 30% difference across the groups."
 			metricLabel="Difference"
+			groupCount={reportData.groups.length}
 			total={differencesMain.length}
 			collapsedCount={COLLAPSED_ROWS}
 			lowQualityCount={differencesLow.length}
@@ -408,6 +419,7 @@
 			countAccent="all"
 			description="in total. Use labels below to filter by theme."
 			metricLabel="Count"
+			groupCount={reportData.groups.length}
 			total={explorerMain.length}
 			collapsedCount={COLLAPSED_ROWS}
 			lowQualityCount={explorerLowQuality.length}
@@ -416,12 +428,19 @@
 			bind:excludeHosts={explorerExcludeHosts}
 			bind:excludePasses={explorerExcludePasses}
 		>
+			{#snippet headerAction()}
+				<Button size="sm" onclick={handleDownloadCsv}>
+					<Download class="size-4" />
+					Download CSV
+				</Button>
+			{/snippet}
+
 			{#snippet toolbar()}
 				<div class="flex flex-wrap gap-2">
 					{#each themes as t (t.theme)}
 						<ThemeChip
 							label={t.theme}
-							variant="brand"
+							variant="primary"
 							selected={selectedThemes.includes(t.theme)}
 							onclick={() => toggleTheme(t.theme)}
 						/>
