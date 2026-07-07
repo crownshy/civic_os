@@ -6,6 +6,8 @@
 	import { zipCentroid } from "$lib/utils/zip-centroids";
 	import type { GoalMetric } from "$lib/config/representation-goals";
 	import Card from "@civicos/shared/ui/Card.svelte";
+	import { Button } from "@civicos/shared/ui/button";
+	import { Download } from "@lucide/svelte";
 
 	let { data } = $props();
 
@@ -115,7 +117,7 @@
 {:else}
 	<div class="flex-1 overflow-y-auto px-8 py-8">
 		<!-- Hero metric row -->
-		<div class="pb-8">
+		<div class="flex flex-wrap items-end justify-between gap-4 pb-8">
 			<PollStatRow
 				stats={[
 					{
@@ -134,6 +136,13 @@
 					},
 				]}
 			/>
+			<Button
+				href={`/api/conversation/${conversationId}/demographics/export`}
+				download={`conversation-demographics-${new Date().toISOString().slice(0, 10)}.csv`}
+			>
+				<Download class="size-4" />
+				Download Demographics
+			</Button>
 		</div>
 
 		<!-- Jump-to pills -->
