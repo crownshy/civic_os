@@ -138,61 +138,85 @@
 </script>
 
 <Dialog.Root bind:open onOpenChange={(v) => !v && close()}>
-	<Dialog.Content class="max-w-lg">
-		<Dialog.Header>
-			<Dialog.Title>Upload New Recording</Dialog.Title>
-			<Dialog.Description>
-				Name the recording and choose an audio file. It will upload directly, then start
-				processing automatically.
-			</Dialog.Description>
-		</Dialog.Header>
+	<Dialog.Content class="min-w-4xl max-w-5xl gap-0 rounded-[30px] p-0">
+		<div class="p-10">
+			<Dialog.Title class="text-4xl font-bold text-foreground">
+				Name your recording
+			</Dialog.Title>
 
-		<div class="space-y-4">
-			<div class="space-y-1.5">
-				<Label for="recording-name">Name <span class="text-destructive">*</span></Label>
-				<Input
-					id="recording-name"
-					bind:value={name}
-					placeholder="e.g. Breakout Room #1"
-					required
-					aria-invalid={nameError ? 'true' : undefined}
-					aria-describedby={nameError ? 'recording-name-error' : undefined}
-					oninput={() => (nameError = null)}
-					disabled={submitting}
-				/>
-				{#if nameError}
-					<p id="recording-name-error" class="text-destructive text-caption">{nameError}</p>
+			<!-- Chosen file / picker -->
+			<div class="mt-3.5">
+				{#if selectedFile}
+					<p class="text-2xl font-bold text-foreground">{selectedFile.name}</p>
+				{:else}
+					<Label
+						for="recording-file"
+						class="inline-flex cursor-pointer items-center gap-2 text-2xl font-bold text-primary"
+					>
+						Choose an audio file…
+					</Label>
 				{/if}
-			</div>
-
-			<div class="space-y-1.5">
-				<Label for="recording-file">Audio file</Label>
 				<Input
 					id="recording-file"
 					type="file"
 					accept={ACCEPT}
 					bind:files
 					disabled={submitting}
+					class={selectedFile
+						? 'sr-only'
+						: 'mt-3 flex h-16 items-center rounded-[20px] px-5 text-2xl file:mr-4 file:text-2xl'}
 				/>
 			</div>
 
+			<!-- Name input -->
+			<div class="mt-6">
+				<Input
+					id="recording-name"
+					bind:value={name}
+					placeholder="e.g., Plenary Session"
+					required
+					aria-invalid={nameError ? 'true' : undefined}
+					aria-describedby={nameError ? 'recording-name-error' : undefined}
+					oninput={() => (nameError = null)}
+					disabled={submitting}
+					class="h-16 rounded-[20px] px-5 text-2xl font-bold md:text-2xl"
+				/>
+				{#if nameError}
+					<p id="recording-name-error" class="mt-2 text-lg text-destructive">
+						{nameError}
+					</p>
+				{/if}
+			</div>
+
 			{#if submitting}
-				<div class="space-y-1.5">
+				<div class="mt-4 space-y-1.5">
 					<Progress value={progress} />
 					<p class="text-caption text-muted-foreground">Uploading… {progress}%</p>
 				</div>
 			{/if}
 
 			{#if errorMsg}
-				<p class="text-destructive text-caption">{errorMsg}</p>
+				<p class="mt-3 text-lg text-destructive">{errorMsg}</p>
 			{/if}
-		</div>
 
-		<Dialog.Footer class="gap-2">
-			<Button type="button" variant="secondary" onclick={close} disabled={submitting}>Cancel</Button>
-			<Button type="button" onclick={submitForm} disabled={submitting}>
-				{submitting ? `Uploading… ${progress}%` : 'Upload'}
-			</Button>
-		</Dialog.Footer>
+			<!-- Actions -->
+			<div class="mt-8 flex justify-end gap-3">
+				<Button
+					variant="secondary"
+					onclick={close}
+					disabled={submitting}
+					class="h-auto rounded-[45px] px-4 py-3 text-xl leading-6"
+				>
+					Cancel
+				</Button>
+				<Button
+					onclick={submitForm}
+					disabled={submitting}
+					class="h-auto rounded-[45px] px-4 py-3 text-xl leading-6"
+				>
+					{submitting ? `Uploading… ${progress}%` : 'Submit'}
+				</Button>
+			</div>
+		</div>
 	</Dialog.Content>
 </Dialog.Root>

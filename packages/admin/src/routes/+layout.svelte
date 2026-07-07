@@ -63,9 +63,9 @@
 			'border-foreground bg-background font-ui flex shrink-0 flex-col border-r transition-[width] duration-200',
 			// Mobile: fixed drawer
 			'fixed inset-y-0 left-0 z-40 md:static',
-			mobileOpen ? 'flex w-72 px-3' : 'hidden md:flex',
+			mobileOpen ? 'flex w-64 px-3' : 'hidden md:flex',
 			// md+ width
-			collapsed ? 'md:w-16 md:px-1' : 'md:w-72 md:px-3'
+			collapsed ? 'md:w-16 md:px-1' : 'md:w-64 md:px-3'
 		].join(' ')}
 	>
 		<div
