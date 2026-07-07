@@ -60,12 +60,12 @@
 	}
 </script>
 
-<div class="bg-card flex h-full flex-col rounded-lg max-lg:h-[600px]">
+<div class="bg-card flex flex-col rounded-lg">
 	<div class="border-border border-b px-5 py-4">
 		<h2 class="text-foreground text-lg font-semibold">Transcript</h2>
 	</div>
 
-	<div class="min-h-0 flex-1 overflow-y-auto">
+	<div>
 		<div class="flex flex-col gap-2 p-4">
 			{#each events as event, index (event.start_time)}
 				{@const isActive = index === currentEventIndex}
