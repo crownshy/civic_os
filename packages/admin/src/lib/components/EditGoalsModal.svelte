@@ -17,6 +17,8 @@
 		totalGoal: number;
 		conversationId: string;
 		workflowId: string | null;
+		/** Overrides the static bucket list — used for county, whose buckets are per-region. */
+		buckets?: string[];
 	}
 
 	let {
@@ -25,12 +27,15 @@
 		currentGoals,
 		totalGoal,
 		conversationId,
-		workflowId
+		workflowId,
+		buckets: bucketsOverride
 	}: Props = $props();
 
 	const title = $derived(metric ? `Modify ${METRIC_LABELS[metric]} Goals` : '');
 	const buckets = $derived(
-		metric && metric !== 'totalParticipants' ? METRIC_BUCKETS[metric] : []
+		metric && metric !== 'totalParticipants'
+			? (bucketsOverride ?? METRIC_BUCKETS[metric])
+			: []
 	);
 
 	let submitting = $state(false);

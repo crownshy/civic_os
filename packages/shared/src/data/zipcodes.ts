@@ -168918,3 +168918,50 @@ export const ZIPCODES: ZipEntry[] = [
 ];
 
 export const ZIP_LOOKUP = new Map(ZIPCODES.map((e) => [e.zip, e]));
+
+/** Roll a single zip code up to its county name. `null` if the zip is unknown. */
+export function zipToCounty(zip: string): string | null {
+	const entry = ZIP_LOOKUP.get(zip.trim());
+	return entry ? entry.county : null;
+}
+
+export const OTHER_COUNTY_LABEL = 'Other / Unknown';
+
+/**
+ * Roll a zip→count map up into county→count, scoped to a region's zip prefixes.
+ * Zips outside the prefixes, or absent from the dataset, fold into `otherLabel`.
+ *
+ * The prefix filter is load-bearing, not cosmetic: county names are only unique
+ * *within* a state (there are many "Washington County"s), and `prefixes` pins a
+ * real region to one state. Drop the filter and cross-state counties collide.
+ * A region with no prefixes (generic/all) counts every recognised zip.
+ */
+export function rollUpByCounty(
+	zipCounts: Record<string, number>,
+	prefixes: string[] = [],
+	otherLabel = OTHER_COUNTY_LABEL
+): Record<string, number> {
+	const out: Record<string, number> = {};
+	for (const [zip, count] of Object.entries(zipCounts)) {
+		const inRegion = prefixes.length === 0 || prefixes.some((p) => zip.startsWith(p));
+		const county = inRegion ? zipToCounty(zip) : null;
+		const key = county ?? otherLabel;
+		out[key] = (out[key] ?? 0) + count;
+	}
+	return out;
+}
+
+/**
+ * Every county name in the dataset whose zips match any of `prefixes`, sorted.
+ * Used to populate the county goal-editor. Empty `prefixes` (generic/all) returns
+ * `[]` — callers fall back to counties that actually have participants or goals,
+ * since the full national county list would be unusable in a picker.
+ */
+export function countiesForPrefixes(prefixes: string[]): string[] {
+	if (prefixes.length === 0) return [];
+	const set = new Set<string>();
+	for (const entry of ZIPCODES) {
+		if (prefixes.some((p) => entry.zip.startsWith(p))) set.add(entry.county);
+	}
+	return [...set].sort();
+}

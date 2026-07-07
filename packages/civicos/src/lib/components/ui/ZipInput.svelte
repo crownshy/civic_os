@@ -1,7 +1,7 @@
 <script lang="ts">
 	import CheckIcon from '@lucide/svelte/icons/check';
 	import MapPinIcon from '@lucide/svelte/icons/map-pin';
-	import { ZIPCODES, ZIP_LOOKUP, type ZipEntry } from '$lib/data/zipcodes';
+	import { ZIPCODES, ZIP_LOOKUP, type ZipEntry } from '@civicos/shared/data/zipcodes';
 	import * as Command from '@civicos/shared/ui/command';
 	import * as Popover from '@civicos/shared/ui/popover';
 	import { cn } from '$lib/utils.js';

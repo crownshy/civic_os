@@ -8,6 +8,7 @@ import {
 	type GoalMetric,
 	type RegionGoals
 } from '$lib/config/representation-goals';
+import { countiesForPrefixes, rollUpByCounty } from '@civicos/shared/data/zipcodes';
 
 interface DemographicCategory {
 	category: string;
@@ -46,7 +47,8 @@ const METRIC_NAMES: GoalMetric[] = [
 	'ethnicity',
 	'politicalParty',
 	'ageRanges',
-	'gender'
+	'gender',
+	'county'
 ];
 
 function targetsToGoals(targets: RecruitmentTargetDto[]): RegionGoals {
@@ -88,6 +90,12 @@ export const load: PageServerLoad = async ({ parent, cookies, depends }) => {
 	let workflowId: string | null = null;
 	let error: string | null = null;
 
+	// Zip counts roll up into counties (scoped to this region's zip prefixes so
+	// cross-state county names never collide). Empty for regions with no prefixes.
+	let countyCounts: Record<string, number> = {};
+	// The county universe for goal-setting; empty for the generic/all region.
+	const regionCounties = countiesForPrefixes(region.zipPrefixes);
+
 	try {
 		workflowId = await fetchWorkflowId(conversationId, authToken);
 
@@ -104,6 +112,7 @@ export const load: PageServerLoad = async ({ parent, cookies, depends }) => {
 
 		if (!dRes.ok) throw new Error(`participation_report ${dRes.status}`);
 		demographics = (await dRes.json()) as DemographicReport;
+		countyCounts = rollUpByCounty(demographics.zipcodeCounts ?? {}, region.zipPrefixes);
 
 		if (tRes.ok) {
 			const targets = (await tRes.json()) as RecruitmentTargetDto[];
@@ -113,7 +122,7 @@ export const load: PageServerLoad = async ({ parent, cookies, depends }) => {
 		error = e instanceof Error ? e.message : String(e);
 	}
 
-	return { demographics, goals, workflowId, conversationId, error };
+	return { demographics, goals, countyCounts, regionCounties, workflowId, conversationId, error };
 };
 
 export const actions: Actions = {
@@ -152,7 +161,14 @@ export const actions: Actions = {
 			const err = collect(TOTAL_PARTICIPANTS_BUCKET, form.get('value'));
 			if (err) return fail(400, { error: err });
 		} else {
-			const known = METRIC_BUCKETS[metric as Exclude<GoalMetric, 'totalParticipants'>];
+			// County buckets are per-region, not static — read them from the submitted
+			// `bucket:*` fields. Other metrics validate against their canonical list.
+			const known =
+				metric === 'county'
+					? [...form.keys()]
+							.filter((k) => k.startsWith('bucket:'))
+							.map((k) => k.slice('bucket:'.length))
+					: METRIC_BUCKETS[metric as Exclude<GoalMetric, 'totalParticipants'>];
 			for (const bucket of known) {
 				const err = collect(bucket, form.get(`bucket:${bucket}`));
 				if (err) return fail(400, { error: err });
