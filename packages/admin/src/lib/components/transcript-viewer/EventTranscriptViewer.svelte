@@ -56,6 +56,9 @@
 	const pipelineFailed = $derived(
 		status === "transcription_failed" || status === "categorization_failed",
 	);
+	// Neutral, non-error state: the row exists but its audio hasn't finished
+	// uploading yet, so there's no transcript/report to fetch.
+	const awaitingUpload = $derived(status === "awaiting_upload");
 
 	let transcriptData = $state<{ events: TranscriptEvent[] }>({ events: [] });
 	let reportData = $state<ReportData>({ data: [null, { topics: [] }] });
@@ -71,7 +74,7 @@
 		transcriptData = { events: [] };
 		reportData = { data: [null, { topics: [] }] };
 
-		if (pipelineFailed) {
+		if (pipelineFailed || awaitingUpload) {
 			loading = false;
 			return;
 		}
@@ -152,7 +155,7 @@
 						{basePath}
 						{recordingsPath}
 					/>
-					{#if !showError}
+					{#if !showError && !awaitingUpload}
 						<DownloadMenu
 							{name}
 							transcriptUrl={transcriptionUrl}
@@ -162,7 +165,7 @@
 					{/if}
 				</div>
 
-				{#if !showError && topics.length > 0}
+				{#if !showError && !awaitingUpload && topics.length > 0}
 					<div class="mt-4 flex flex-wrap gap-2">
 						{#each topics as topic (topic.id)}
 							<span
@@ -175,7 +178,22 @@
 				{/if}
 			</div>
 
-			{#if showError}
+			{#if awaitingUpload}
+				<div
+					class="flex flex-1 flex-col items-center justify-center gap-4 px-10 text-center"
+				>
+					<h2 class="text-4xl font-bold text-foreground">
+						Upload in progress.
+					</h2>
+					<p class="max-w-lg text-xl font-medium text-muted-foreground">
+						This recording is still uploading — please check back later. If you
+						need to try again, add a new recording or contact <a
+							href="mailto:hello@bloom-project.org"
+							class="text-primary underline">hello@bloom-project.org.</a
+						>
+					</p>
+				</div>
+			{:else if showError}
 				<div
 					class="flex flex-1 flex-col items-center justify-center gap-4 px-10 text-center"
 				>
