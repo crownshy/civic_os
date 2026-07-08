@@ -1,3 +1,21 @@
+<script lang="ts" module>
+	import { tv } from "tailwind-variants";
+
+	// Single source of truth for the recording-card shell. `tone` maps each
+	// status group to its outline color; the inset offset keeps the 1px outline
+	// from being clipped at the grid's edge.
+	const cardVariants = tv({
+		base: "min-h-20 rounded-[10px] px-5 py-4 outline outline-1 -outline-offset-1",
+		variants: {
+			tone: {
+				ready: "outline-primary/40",
+				processing: "outline-primary/40",
+				"pipeline-error": "outline-yellow-500",
+			},
+		},
+	});
+</script>
+
 <script lang="ts">
 	import { LoaderCircle, TriangleAlert, Plus, Upload } from "@lucide/svelte";
 	import type { AudioRecordingStatus } from "@crownshy/api-client/api";
@@ -40,31 +58,21 @@
 		return () => clearInterval(interval);
 	});
 
-	type CardTone = "ready" | "processing" | "upload-error" | "pipeline-error";
+	type CardTone = "ready" | "processing" | "pipeline-error";
 
 	function cardTone(status: AudioRecordingStatus): CardTone {
 		switch (status) {
 			case "complete":
+			case "awaiting_upload":
 				return "ready";
 			case "transcribing":
 			case "categorizing":
 				return "processing";
-			case "awaiting_upload":
-				return "upload-error";
 			case "transcription_failed":
 			case "categorization_failed":
 				return "pipeline-error";
 		}
 	}
-
-	// Card outline per state: primary accent for ready/processing, warning hues
-	// for upload / pipeline errors (kept distinct from the destructive token).
-	const outlineClass: Record<CardTone, string> = {
-		ready: "outline-primary/40",
-		processing: "outline-primary/40",
-		"upload-error": "outline-orange-500",
-		"pipeline-error": "outline-yellow-500",
-	};
 
 	function extLabel(ext: string) {
 		return `.${ext.toLowerCase()}`;
@@ -143,11 +151,6 @@
 									class="size-5 animate-spin text-primary"
 									aria-label="Processing"
 								/>
-							{:else if tone === "upload-error"}
-								<TriangleAlert
-									class="size-5 text-orange-500"
-									aria-label="Upload error"
-								/>
 							{:else if tone === "pipeline-error"}
 								<TriangleAlert
 									class="size-5 text-yellow-500"
@@ -164,9 +167,7 @@
 								{rec.name}
 							</div>
 							<div class="mt-0.5 text-sm">
-								{#if tone === "upload-error"}
-									<span class="font-bold text-orange-600">Upload Error. Retry?</span>
-								{:else if rec.status === "transcription_failed"}
+								{#if rec.status === "transcription_failed"}
 									<span class="font-bold text-yellow-700">Transcript Error</span>
 								{:else if rec.status === "categorization_failed"}
 									<span class="font-bold text-yellow-700">Report Error</span>
@@ -174,6 +175,8 @@
 									<span class="text-muted-foreground">Transcribing…</span>
 								{:else if rec.status === "categorizing"}
 									<span class="text-muted-foreground">Analyzing…</span>
+								{:else if rec.status === "awaiting_upload"}
+									<span class="text-muted-foreground">Awaiting upload</span>
 								{:else}
 									<span class="text-muted-foreground"
 										>{extLabel(rec.fileExtension)} · {fmtDate(rec.createdAt)}</span
@@ -184,23 +187,16 @@
 					</div>
 				{/snippet}
 
-				{#if tone === "upload-error"}
-					<button
-						type="button"
-						onclick={() => (uploadOpen = true)}
-						class={`min-h-20 w-full cursor-pointer rounded-[10px] px-5 py-4 text-left outline outline-1 ${outlineClass[tone]}`}
-					>
-						{@render cardInner()}
-					</button>
-				{:else}
-					<a
-						href={`${page.url}/${rec.id}`}
-						class={`block min-h-20 rounded-[10px] px-5 py-4 outline outline-1 transition-opacity ${outlineClass[tone]} ${pending ? "pointer-events-none opacity-60" : ""} ${i === 0 ? "bg-muted" : ""}`}
-						aria-busy={pending}
-					>
-						{@render cardInner()}
-					</a>
-				{/if}
+				<a
+					href={`${page.url}/${rec.id}`}
+					class={cardVariants({
+						tone,
+						class: `block transition-opacity ${pending ? "pointer-events-none opacity-60" : ""} ${i === 0 ? "bg-muted" : ""}`,
+					})}
+					aria-busy={pending}
+				>
+					{@render cardInner()}
+				</a>
 			{/each}
 		</div>
 	{/if}
