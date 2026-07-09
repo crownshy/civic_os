@@ -18,7 +18,8 @@
 		"@lucide/svelte": "^1.16.0",
 		"layercake": "^10.0.2",
 		"maplibre-gl": "^5.24.0",
-		"svelte-dnd-action": "^0.9.70"
+		"svelte-dnd-action": "^0.9.70",
+		"tailwind-variants": "^3.2.2"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-node": "^5.5.2",
