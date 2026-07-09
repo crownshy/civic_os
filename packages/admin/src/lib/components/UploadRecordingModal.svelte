@@ -6,6 +6,8 @@
 	import { Input } from '@civicos/shared/ui/input';
 	import { Label } from '@civicos/shared/ui/label';
 	import { Progress } from '@civicos/shared/ui/progress';
+    import { uploadToSignedUrl } from "@civicos/shared/utils";
+
 
 	type Api = ReturnType<typeof createApiClient>;
 
@@ -49,30 +51,6 @@
 		let ext = filename.slice(dot + 1).toLowerCase();
 		if (ext === 'oga') ext = 'ogg';
 		return (SUPPORTED as readonly string[]).includes(ext) ? (ext as AudioFormat) : null;
-	}
-
-	function uploadToSignedUrl(
-		file: File,
-		url: string,
-		onProgress: (pct: number) => void
-	): Promise<void> {
-		return new Promise((resolve, reject) => {
-			const xhr = new XMLHttpRequest();
-			xhr.open('PUT', url, true);
-			xhr.upload.onprogress = (e) => {
-				if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100));
-			};
-			xhr.onload = () => {
-				if (xhr.status >= 200 && xhr.status < 300) {
-					onProgress(100);
-					resolve();
-				} else {
-					reject(new Error(`Upload failed (${xhr.status})`));
-				}
-			};
-			xhr.onerror = () => reject(new Error('Network error during upload'));
-			xhr.send(file);
-		});
 	}
 
 	function reset() {
