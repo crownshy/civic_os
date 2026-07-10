@@ -1,4 +1,6 @@
 <script lang="ts">
+	import * as HoverCard from '@civicos/shared/ui/hover-card';
+
 	/**
 	 * Compact agree% visualization for one group on a single statement (Insights
 	 * "Option 1"). A colored arc whose length is the group's agree% and whose
@@ -56,37 +58,46 @@
 	const pct = (n: number) => (total > 0 ? Math.round((n / total) * 100) : 0);
 </script>
 
-<div class="group/circle relative flex flex-col items-center gap-0.5">
-	<div class={`relative ${ringSize}`}>
-		<svg class="size-full -rotate-90" viewBox="0 0 40 40" aria-hidden="true">
-			<circle class="stroke-ring-track" cx="20" cy="20" r={R} fill="none" stroke-width="5" />
-			<circle
-				class={arcStroke}
-				cx="20"
-				cy="20"
-				r={R}
-				fill="none"
-				stroke-width="5"
-				stroke-linecap="round"
-				stroke-dasharray={`${dash} ${CIRC - dash}`}
-			/>
-		</svg>
-		<span
-			class="font-ui text-foreground text-caption absolute inset-0 flex items-center justify-center font-bold leading-none"
-		>
-			{Math.round(clamped)}
-		</span>
-	</div>
+<!-- Vote-breakdown on hover. HoverCard (bits-ui LinkPreview) portals the panel to
+     the body and uses Floating UI collision handling, so it flips/shifts to stay
+     on-screen instead of running off the right edge on the last agree column like
+     the old CSS-only absolute tooltip did. -->
+<HoverCard.Root openDelay={80} closeDelay={80}>
+	<HoverCard.Trigger
+		class="flex cursor-default flex-col items-center gap-0.5 outline-none"
+		aria-label={`Group ${label} vote breakdown`}
+	>
+		<div class={`relative ${ringSize}`}>
+			<svg class="size-full -rotate-90" viewBox="0 0 40 40" aria-hidden="true">
+				<circle class="stroke-ring-track" cx="20" cy="20" r={R} fill="none" stroke-width="5" />
+				<circle
+					class={arcStroke}
+					cx="20"
+					cy="20"
+					r={R}
+					fill="none"
+					stroke-width="5"
+					stroke-linecap="round"
+					stroke-dasharray={`${dash} ${CIRC - dash}`}
+				/>
+			</svg>
+			<span
+				class="font-ui text-foreground text-caption absolute inset-0 flex items-center justify-center font-bold leading-none"
+			>
+				{Math.round(clamped)}
+			</span>
+		</div>
 
-	{#if showLabel && label}
-		<span class="text-muted-foreground text-caption font-semibold uppercase">{label}</span>
-	{/if}
+		{#if showLabel && label}
+			<span class="text-muted-foreground text-caption font-semibold uppercase">{label}</span>
+		{/if}
+	</HoverCard.Trigger>
 
-	<!-- Vote-breakdown tooltip. Positioned above the ring; escapes the card because
-	     the section Card renders overflow-visible. -->
-	<div
-		role="tooltip"
-		class="bg-slate-900 pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 w-44 -translate-x-1/2 rounded-xl px-3.5 py-3 opacity-0 shadow-lg transition-opacity duration-150 group-hover/circle:opacity-100"
+	<HoverCard.Content
+		side="top"
+		align="end"
+		sideOffset={8}
+		class="w-44 rounded-xl border-0 bg-slate-900 px-3.5 py-3 shadow-lg"
 	>
 		<div class="text-caption font-bold uppercase text-white">
 			Group {label} <span class="text-white/60">(N={total})</span>
@@ -105,5 +116,5 @@
 				<dd class="tabular-nums">{pct(passes)}%</dd>
 			</div>
 		</dl>
-	</div>
-</div>
+	</HoverCard.Content>
+</HoverCard.Root>

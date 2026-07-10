@@ -12,6 +12,7 @@
 		"./styles/theme.css": "./src/styles/theme.css",
 		"./ui/button": "./src/ui/button/index.ts",
 		"./ui/dialog": "./src/ui/dialog/index.ts",
+		"./ui/hover-card": "./src/ui/hover-card/index.ts",
 		"./ui/input": "./src/ui/input/index.ts",
 		"./ui/label": "./src/ui/label/index.ts",
 		"./ui/popover": "./src/ui/popover/index.ts",
