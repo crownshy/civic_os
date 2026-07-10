@@ -335,7 +335,9 @@
 			bind:excludePasses={consensusExcludePasses}
 		>
 			{#if consensusMain.length === 0}
-				<p class="text-muted-foreground text-caption px-4 py-6 italic">No consensus statements yet.</p>
+				<p class="text-muted-foreground text-caption col-span-full px-4 py-6 italic">
+					No consensus statements yet.
+				</p>
 			{:else}
 				{#each (consensusExpanded ? consensusMain : consensusMain.slice(0, COLLAPSED_ROWS)) as c, i (c.tid)}
 					<StatementRow
@@ -380,7 +382,9 @@
 			bind:excludePasses={differencesExcludePasses}
 		>
 			{#if differencesMain.length === 0}
-				<p class="text-muted-foreground text-caption px-4 py-6 italic">No clear differences yet.</p>
+				<p class="text-muted-foreground text-caption col-span-full px-4 py-6 italic">
+					No clear differences yet.
+				</p>
 			{:else}
 				{#each (differencesExpanded ? differencesMain : differencesMain.slice(0, COLLAPSED_ROWS)) as c, i (c.tid)}
 					<StatementRow
@@ -452,7 +456,7 @@
 			{/snippet}
 
 			{#if explorerMain.length === 0}
-				<p class="text-muted-foreground text-caption px-4 py-6 italic">
+				<p class="text-muted-foreground text-caption col-span-full px-4 py-6 italic">
 					No statements match the current filters.
 				</p>
 			{:else}

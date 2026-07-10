@@ -67,20 +67,19 @@
 
 	const showExpander = $derived(total !== undefined && total > collapsedCount);
 
-	// Shared grid template for the header and every row, so the header grid and the
-	// rows' separate grids resolve to identical column widths.
+	// One real grid, defined here on the table wrapper; the header and every row are
+	// `subgrid`s that adopt these exact tracks (see StatementRow). That's why columns
+	// line up without any hand-tuned fr ratios: there's a single source of truth.
 	//
-	// Statement : Author : Min-Agree use proportional fr units taken from the Figma
-	// header pitch (608 : 144 : 166 px ≈ 60 : 14 : 16) so the column ratio holds at
-	// any table width instead of drifting as a fixed-rem column would. `#` is a
-	// fixed narrow column; the trailing agree-rings column is sized from the group
-	// count (each GroupCircle is size-10 = 2.5rem, gap-3 = 0.75rem) so it always
-	// fits the circles rather than scaling.
-	const insightsCols = $derived(
-		groupCount > 0
-			? `2.5rem minmax(0,76fr) 14fr 16fr calc(${groupCount} * 2.5rem + ${groupCount - 1} * 0.75rem)`
-			: '2.5rem minmax(0,76fr) 14fr 16fr auto'
-	);
+	//   #        → auto: hugs the tid/"#" width
+	//   Statement→ minmax(12rem,1fr): eats all leftover space (min 12rem so it never
+	//              collapses; below that the wrapper scrolls horizontally on mobile)
+	//   Author / metric / Agree%|rings → auto: each takes exactly the width its own
+	//              content needs, no more. Even column-gap comes from `gap-x-*`.
+	//
+	// groupCount is no longer needed to size the rings column — `auto` fits the
+	// circles for free — but stays in Props for call-site compatibility.
+	const insightsCols = 'auto minmax(12rem,1fr) auto auto auto';
 
 	const countAccentClass = $derived(
 		countAccent === 'consensus'
@@ -111,9 +110,17 @@
 	<Card
 		class="hover:border-muted-foreground/40 shadow-card overflow-visible rounded-[20px] transition-colors duration-200"
 	>
-		<div class="flex flex-col [&>*:last-child]:rounded-b-[20px]">
+		<!-- The single owning grid: its columns are defined once here and every direct
+		     child (header, each row, the empty-state + reveal buttons) spans all of them.
+		     Rows adopt these exact tracks via `subgrid`, so columns align with zero fr
+		     juggling. overflow-x-auto lets the table scroll sideways on a narrow panel
+		     instead of crushing columns; md:overflow-visible keeps the sticky header
+		     pinning vertically on desktop. -->
+		<div
+			class="grid [grid-template-columns:var(--insights-cols)] gap-x-4 overflow-x-auto md:overflow-visible [&>*:last-child]:rounded-b-[20px]"
+		>
 			<div
-				class="bg-card font-ui text-foreground text-caption sticky top-0 z-10 grid [grid-template-columns:var(--insights-cols)] items-center gap-4 rounded-t-[20px] py-3 pr-4 pl-5 font-semibold uppercase"
+				class="bg-card font-ui text-foreground text-caption sticky top-0 z-10 col-span-full grid grid-cols-subgrid items-center rounded-t-[20px] py-3 pr-4 pl-5 font-semibold uppercase"
 			>
 				<div>#</div>
 				<div>Statement</div>
@@ -126,7 +133,7 @@
 						onExcludeHostsChange?.(excludeHosts);
 					}}
 				/>
-				<div class="text-center">{metricLabel}</div>
+				<div class="text-center whitespace-nowrap">{metricLabel}</div>
 				<ColumnFilterHeader
 					label="Agree %"
 					optionLabel="Include passes"
@@ -145,7 +152,7 @@
 				<button
 					type="button"
 					onclick={() => (expanded = !expanded)}
-					class="bg-muted/40 hover:bg-muted/70 text-foreground/70 text-section flex items-center justify-center gap-2 py-5 font-normal transition-colors"
+					class="bg-muted/40 hover:bg-muted/70 text-foreground/70 text-section col-span-full flex items-center justify-center gap-2 py-5 font-normal transition-colors"
 				>
 					{expanded ? 'Show fewer statements' : `See all ${total} statements`}
 					<ChevronDown
@@ -158,7 +165,7 @@
 				<button
 					type="button"
 					onclick={() => (showLowQuality = !showLowQuality)}
-					class="text-section flex items-center justify-center gap-2 bg-yellow-400/5 py-5 text-yellow-600 transition-colors hover:bg-yellow-400/10"
+					class="text-section col-span-full flex items-center justify-center gap-2 bg-yellow-400/5 py-5 text-yellow-600 transition-colors hover:bg-yellow-400/10"
 				>
 					{showLowQuality
 						? 'Hide low data quality statements'

@@ -31,7 +31,9 @@ export interface DemographicReport {
 	zipcodeCounts: Record<string, number>;
 }
 
-export const load: PageServerLoad = async ({ locals, fetch, url }) => {
+export const load: PageServerLoad = async ({ locals, fetch, url, depends }) => {
+	depends('report:data');
+
 	const region = locals.region;
 	const conversationId = region.conversationId;
 

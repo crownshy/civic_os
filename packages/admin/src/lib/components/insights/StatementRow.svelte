@@ -59,9 +59,12 @@
 	const isHostAuthored = $derived(!!comment.is_seed);
 </script>
 
+<!-- col-span-full + grid-cols-subgrid: the row spans every column of the owning
+     grid in StatementSection and adopts its exact tracks, so cells line up with the
+     header without this component knowing the column widths. The column-gap is
+     inherited from the parent grid's gap-x-4. -->
 <div
-	class="border-border group hover:bg-muted/40 relative grid items-start gap-4 border-b py-6 pr-4 pl-5 transition-colors duration-150"
-	style="grid-template-columns: var(--insights-cols, 2.5rem minmax(0, 76fr) 14fr 16fr auto)"
+	class="border-border group hover:bg-muted/40 relative col-span-full grid grid-cols-subgrid items-start border-b py-6 pr-4 pl-5 transition-colors duration-150"
 >
 	<RowAccentStripe accent={stripeClass} />
 
