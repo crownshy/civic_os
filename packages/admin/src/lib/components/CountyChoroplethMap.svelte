@@ -142,14 +142,13 @@
 			const count = Number(p._count ?? 0);
 			const goal = p._goal == null ? null : Number(p._goal);
 			const pct = goal && goal > 0 ? Math.round((count / goal) * 100) : null;
+			const countLine = `${count} participant${count === 1 ? '' : 's'}`;
 			const goalLine =
-				goal == null
-					? 'No goal set'
-					: `${count} / ${goal} goal${pct == null ? '' : ` (${pct}%)`}`;
+				goal == null ? 'No goal set' : `Goal: ${goal}${pct == null ? '' : ` (${pct}%)`}`;
 			popup
 				.setLngLat(e.lngLat)
 				.setHTML(
-					`<div style="font-size:12px;line-height:1.3"><strong>${p._name}</strong><br>${goalLine}</div>`
+					`<div style="font-size:12px;line-height:1.3"><strong>${p._name}</strong><br>${countLine}<br>${goalLine}</div>`
 				)
 				.addTo(map);
 		});
