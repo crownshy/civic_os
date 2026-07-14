@@ -9,6 +9,7 @@ import {
 	type RegionGoals
 } from '$lib/config/representation-goals';
 import { countiesForPrefixes, rollUpByCounty } from '@civicos/shared/data/zipcodes';
+import { statesForZipCounts } from '@civicos/shared/data/zip-states';
 
 interface DemographicCategory {
 	category: string;
@@ -95,6 +96,9 @@ export const load: PageServerLoad = async ({ parent, cookies, depends }) => {
 	let countyCounts: Record<string, number> = {};
 	// The county universe for goal-setting; empty for the generic/all region.
 	const regionCounties = countiesForPrefixes(region.zipPrefixes);
+	// USPS state codes the choropleth needs, derived from where participants
+	// actually live (scoped like the county rollup). Empty ⇒ no map to draw.
+	let mapStates: string[] = [];
 
 	try {
 		workflowId = await fetchWorkflowId(conversationId, authToken);
@@ -113,6 +117,7 @@ export const load: PageServerLoad = async ({ parent, cookies, depends }) => {
 		if (!dRes.ok) throw new Error(`participation_report ${dRes.status}`);
 		demographics = (await dRes.json()) as DemographicReport;
 		countyCounts = rollUpByCounty(demographics.zipcodeCounts ?? {}, region.zipPrefixes);
+		mapStates = statesForZipCounts(demographics.zipcodeCounts ?? {}, region.zipPrefixes);
 
 		if (tRes.ok) {
 			const targets = (await tRes.json()) as RecruitmentTargetDto[];
@@ -122,7 +127,16 @@ export const load: PageServerLoad = async ({ parent, cookies, depends }) => {
 		error = e instanceof Error ? e.message : String(e);
 	}
 
-	return { demographics, goals, countyCounts, regionCounties, workflowId, conversationId, error };
+	return {
+		demographics,
+		goals,
+		countyCounts,
+		regionCounties,
+		mapStates,
+		workflowId,
+		conversationId,
+		error
+	};
 };
 
 export const actions: Actions = {

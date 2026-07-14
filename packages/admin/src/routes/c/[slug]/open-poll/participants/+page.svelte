@@ -1,9 +1,8 @@
 <script lang="ts">
 	import DemographicTable from "$lib/components/DemographicTable.svelte";
-	import RegionMap from "$lib/components/RegionMap.svelte";
+	import CountyChoroplethMap from "$lib/components/CountyChoroplethMap.svelte";
 	import PollStatRow from "$lib/components/PollStatRow.svelte";
 	import EditGoalsModal from "$lib/components/EditGoalsModal.svelte";
-	import { zipCentroid } from "$lib/utils/zip-centroids";
 	import type { GoalMetric } from "$lib/config/representation-goals";
 	import Card from "@civicos/shared/ui/Card.svelte";
 	import { Button } from "@civicos/shared/ui/button";
@@ -30,15 +29,6 @@
 		modalMetric = metric;
 		modalOpen = true;
 	}
-
-	const mapCenter = $derived<[number, number]>(
-		region.slug === "utah"
-			? [-111.66, 40.23]
-			: region.slug === "oregon"
-				? [-121.0, 44.0]
-				: [-98.5, 39.8],
-	);
-	const mapZoom = 3;
 
 	const totalParticipants = $derived(demographics?.totalParticipants ?? 0);
 	const participantsGoal = $derived(goals.totalParticipants);
@@ -120,13 +110,18 @@
 		geographyRows.reduce((s, r) => s + r.count, 0),
 	);
 
-	const mapPoints = $derived(
-		Object.entries(demographics?.zipcodeCounts ?? {}).map(([zip, count]) => ({
-			coord: zipCentroid(zip),
-			count,
-			label: zip,
-		})),
-	);
+	// Feed the county choropleth: which states to draw (derived server-side from
+	// where participants live) and per-county count+goal keyed by county name.
+	// "Other / Unknown" has no polygon, so it's dropped here.
+	const mapStates = $derived(data.mapStates ?? []);
+	const countyData = $derived.by(() => {
+		const out: Record<string, { count: number; goal?: number }> = {};
+		for (const row of geographyRows) {
+			if (row.label === OTHER_COUNTY_LABEL) continue;
+			out[row.label] = { count: row.count, goal: row.goal };
+		}
+		return out;
+	});
 
 	const jumpLinks = [
 		{ href: "#geography", label: "Geography" },
@@ -272,7 +267,7 @@
 						</div>
 
 						<div class="bg-muted h-80 overflow-hidden rounded-xl">
-							<RegionMap center={mapCenter} zoom={mapZoom} points={mapPoints} />
+							<CountyChoroplethMap states={mapStates} {countyData} />
 						</div>
 					</div>
 				</Card>
