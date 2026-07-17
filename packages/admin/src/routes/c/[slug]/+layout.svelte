@@ -9,7 +9,7 @@
 
 	const title = $derived(conversation?.title ?? region.heroHeader);
 	const isLive = $derived(
-		conversation ? conversation.is_live : region.conversationsActive !== false
+		conversation ? conversation.isLive : region.conversationsActive !== false
 	);
 
 	// Main conversation tabs
