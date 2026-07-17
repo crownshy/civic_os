@@ -3,6 +3,7 @@
 	import type { ReportComment, PolisReportData, ThemeSummary } from '$lib/types/report';
 	import type { PolisStatementAux } from '$lib/types/aux';
 	import { addStatementAuxTheme, removeStatementAuxTheme } from '$lib/api/aux';
+	import { toThemeDefinitions, parseMetadata } from '$lib/types/metadata';
 	import {
 		getEngagementStats,
 		getConsensusStatements,
@@ -34,6 +35,13 @@
 	let auxByTid = $state<Record<number, PolisStatementAux>>(data.auxByTid);
 	$effect(() => {
 		auxByTid = data.auxByTid;
+	});
+
+	// Canonical theme dictionary from the conversation's metadata, kept mutable so
+	// modal-created themes appear in every picker without a refetch. Re-seeded on load.
+	let themeDictionary = $state<Record<string, { description: string }>>(data.themeDictionary ?? {});
+	$effect(() => {
+		themeDictionary = data.themeDictionary ?? {};
 	});
 
 	/**
@@ -120,14 +128,12 @@
 	const differencesMain = $derived(differencesFiltered.filter((c) => !isLowQuality(c)));
 	const differencesLow = $derived(differencesFiltered.filter((c) => isLowQuality(c)));
 
-	/** All themes used anywhere on this conversation — powers the picker dropdown. */
-	const availableThemes = $derived.by(() => {
-		const set = new Set<string>();
-		for (const row of Object.values(auxByTid)) {
-			for (const t of row.themes) set.add(t);
-		}
-		return [...set].sort();
-	});
+	/**
+	 * The conversation's canonical theme dictionary (name + description), sorted by
+	 * name — powers the picker dropdown. Unlike before, this is the curated set from
+	 * metadata, not the union of themes ever typed onto statements.
+	 */
+	const availableThemes = $derived(toThemeDefinitions(themeDictionary));
 
 	// --- All Statements: theme filter state ---
 	// Multi-select theme filter (OR/union). Seeded from ?theme=a,b so the view is
@@ -198,8 +204,37 @@
 			availableThemes,
 			disabled: !auxByTid[tid],
 			onAddTheme: (theme: string) => addThemeFor(tid, theme),
-			onRemoveTheme: (theme: string) => removeThemeFor(tid, theme)
+			onRemoveTheme: (theme: string) => removeThemeFor(tid, theme),
+			onCreateTheme
 		};
+	}
+
+	/**
+	 * Add a theme to the conversation's dictionary via a metadata PATCH. Optimistic
+	 * with rollback; the merged `themes` map is sent in full because the PATCH
+	 * shallow-merges at the top level (sending only the delta would drop siblings).
+	 * Throws on failure so the modal can surface it.
+	 */
+	async function onCreateTheme(name: string, description: string) {
+		const key = name.trim();
+		if (!key) return;
+		if (!data.conversationId) {
+			throw new Error('No conversation loaded — cannot save theme.');
+		}
+		const prev = themeDictionary;
+		const merged = { ...prev, [key]: { description: description.trim() } };
+		themeDictionary = merged;
+		try {
+			const updated = await data.api.PatchConversationMetadata(
+				{ themes: merged },
+				{ params: { conversation_id: data.conversationId } }
+			);
+			themeDictionary = parseMetadata(updated?.metadata).themes;
+		} catch (e) {
+			console.error('PatchConversationMetadata failed', e);
+			themeDictionary = prev;
+			throw e;
+		}
 	}
 
 	/**

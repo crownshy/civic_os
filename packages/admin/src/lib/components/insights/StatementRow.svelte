@@ -5,6 +5,7 @@
 	import GroupCircle from './GroupCircle.svelte';
 	import RowAccentStripe from './RowAccentStripe.svelte';
 	import ThemePicker from './ThemePicker.svelte';
+	import type { ThemeDefinition } from '$lib/types/metadata';
 
 	type Variant = 'consensus' | 'difference' | 'uncertainty' | 'neutral';
 
@@ -25,9 +26,10 @@
 		/** Drop passes from the agree% denominator (agrees/(agrees+disagrees)). */
 		excludePasses?: boolean;
 		picker?: {
-			availableThemes: string[];
+			availableThemes: ThemeDefinition[];
 			onAddTheme: (theme: string) => void | Promise<void>;
 			onRemoveTheme: (theme: string) => void | Promise<void>;
+			onCreateTheme?: (name: string, description: string) => Promise<void>;
 			disabled?: boolean;
 		};
 	}
@@ -96,6 +98,7 @@
 					disabled={picker.disabled}
 					onAddTheme={picker.onAddTheme}
 					onRemoveTheme={picker.onRemoveTheme}
+					onCreateTheme={picker.onCreateTheme}
 				/>
 			{:else}
 				<div class="flex flex-wrap items-center gap-1.5">
