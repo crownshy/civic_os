@@ -221,9 +221,9 @@
 						</button>
 					</header>
 					<div class="grid grid-cols-1 gap-6 px-8 pb-8 lg:grid-cols-2">
-						<div class="divide-border divide-y">
+						<div class="divide-border max-h-80 divide-y overflow-y-auto">
 							<div
-								class="text-foreground/40 text-label font-ui grid grid-cols-[1.4fr_auto_auto_auto_auto] items-center gap-3 py-2 font-semibold uppercase"
+								class="text-foreground/40 text-label font-ui bg-card sticky top-0 z-10 grid grid-cols-[1.4fr_auto_auto_auto_auto] items-center gap-3 py-2 font-semibold uppercase"
 							>
 								<div>County</div>
 								<div class="w-10 text-right">Count</div>

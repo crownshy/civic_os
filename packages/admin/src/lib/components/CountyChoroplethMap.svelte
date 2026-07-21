@@ -19,12 +19,11 @@
 
 	let { states, countyData, class: className = '' }: Props = $props();
 
-	// Fill palette. Under-goal counties run deep→light red the further they are
-	// from goal; at/over goal is a flat green; a county with no goal set is gray.
-	const MET = '#16a34a'; // meter-met green-600
-	const DEEP_RED = '#7f1d1d'; // red-900 — furthest from goal
-	const LIGHT_RED = '#fecaca'; // red-200 — just short of goal
-	const NO_GOAL = '#d4d4d4'; // neutral-300
+	// Sequential choropleth ramp, light→dark as count runs 0 → max county count.
+	const RAMP = ['#fbe6c5', '#f5ba98', '#ee8a82', '#dc7176', '#c8586c', '#9c3f5d', '#70284a'];
+
+	// Largest county count — the top of the colour scale. 0 when there's no data.
+	const maxCount = $derived(Math.max(0, ...Object.values(countyData).map((d) => d.count)));
 
 	function hexToRgb(hex: string): [number, number, number] {
 		const n = parseInt(hex.slice(1), 16);
@@ -37,11 +36,13 @@
 		return `#${c.map((v) => v.toString(16).padStart(2, '0')).join('')}`;
 	}
 
-	function colorFor(datum: CountyDatum | undefined): string {
-		if (!datum || datum.goal == null || datum.goal <= 0) return NO_GOAL;
-		if (datum.count >= datum.goal) return MET;
-		const ratio = Math.max(0, Math.min(1, datum.count / datum.goal));
-		return lerpHex(DEEP_RED, LIGHT_RED, ratio);
+	// Interpolate the count across the ramp. count 0 → lightest, max → darkest.
+	function colorFor(count: number, max: number): string {
+		if (max <= 0) return RAMP[0];
+		const t = Math.max(0, Math.min(1, count / max));
+		const pos = t * (RAMP.length - 1);
+		const i = Math.min(RAMP.length - 2, Math.floor(pos));
+		return lerpHex(RAMP[i], RAMP[i + 1], pos - i);
 	}
 
 	type Coords = number[] | Coords[];
@@ -92,7 +93,7 @@
 					_name: name,
 					_count: datum?.count ?? 0,
 					_goal: datum?.goal ?? null,
-					_fill: colorFor(datum)
+					_fill: colorFor(datum?.count ?? 0, maxCount)
 				};
 				features.push(f);
 			}
@@ -229,15 +230,15 @@
 	<div
 		class="bg-background/90 text-foreground/80 absolute bottom-2 left-2 rounded-md px-2.5 py-2 text-[11px] leading-tight shadow-sm"
 	>
-		<div class="mb-1 font-semibold">Participation vs. goal</div>
+		<div class="mb-1 font-semibold">Participants</div>
 		<div class="flex items-center gap-1.5">
-			<span class="inline-block h-3 w-3 rounded-sm" style="background:{DEEP_RED}"></span>
-			<span class="inline-block h-3 w-3 rounded-sm" style="background:{LIGHT_RED}"></span>
-			<span>Under goal</span>
-			<span class="ml-2 inline-block h-3 w-3 rounded-sm" style="background:{MET}"></span>
-			<span>Met</span>
-			<span class="ml-2 inline-block h-3 w-3 rounded-sm" style="background:{NO_GOAL}"></span>
-			<span>No goal</span>
+			<span>0</span>
+			<span class="inline-flex overflow-hidden rounded-sm">
+				{#each RAMP as c (c)}
+					<span class="inline-block h-3 w-4" style="background:{c}"></span>
+				{/each}
+			</span>
+			<span>{maxCount}</span>
 		</div>
 	</div>
 </div>
