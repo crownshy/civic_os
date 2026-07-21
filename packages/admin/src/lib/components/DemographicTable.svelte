@@ -33,13 +33,15 @@
 	);
 
 	/**
-	 * Fraction of the track where the goal line sits. The fill reaches this point
-	 * exactly when a category hits 100% of its goal; exceeding the goal extends
-	 * the fill past the marker into the remaining headroom (fill caps at the track
-	 * end, i.e. once a category reaches ~133% of goal). Categories with no goal
-	 * fall back to plain share-of-total and render no marker.
+	 * One shared scale for every bar in the section: the track runs 0 → the largest
+	 * value in play (any category's count or goal). Every count fill and goal marker
+	 * is positioned against this same max, so bar lengths are directly comparable
+	 * across rows. Goals are included so a goal above every count still lands on the
+	 * track instead of overflowing.
 	 */
-	const GOAL_ANCHOR = 75;
+	const scaleMax = $derived(
+		Math.max(1, ...rows.map((r) => r.count), ...rows.map((r) => r.goal ?? 0))
+	);
 </script>
 
 <Card class="hover:border-muted-foreground/40 shadow-card rounded-[20px] transition-colors duration-200">
@@ -102,12 +104,10 @@
 						: pctToGoal >= 50
 							? 'text-meter-near'
 							: 'text-meter-under'}
-			<!-- Goal-relative fill: hitting the goal reaches the marker (GOAL_ANCHOR%),
-			     overshoot extends past it. No goal → plain share-of-total. -->
-			{@const fillPct =
-				pctToGoal === null
-					? Math.min(100, pctOfTotal)
-					: Math.min(100, (pctToGoal / 100) * GOAL_ANCHOR)}
+			<!-- Shared-scale fill: count as a fraction of the section max. The goal
+			     marker sits at the goal's position on that same scale. -->
+			{@const fillPct = (row.count / scaleMax) * 100}
+			{@const markerPct = row.goal && row.goal > 0 ? (row.goal / scaleMax) * 100 : null}
 			<div
 				class="text-section font-ui hover:bg-muted/40 grid grid-cols-[2fr_3fr_auto_auto_auto_auto] items-center gap-6 px-8 py-4 transition-colors duration-150"
 			>
@@ -118,7 +118,7 @@
 					class="w-full"
 					fill={fillPct}
 					fillClass={barColor}
-					marker={pctToGoal !== null ? GOAL_ANCHOR : null}
+					marker={markerPct}
 				/>
 
 				<div class="w-14 text-right font-bold">{row.count}</div>
