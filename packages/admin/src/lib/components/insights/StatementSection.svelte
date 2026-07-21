@@ -161,7 +161,7 @@
 				</button>
 			{/if}
 
-			{#if lowQualityCount > 0}
+			{#if lowQualityCount > 0 && (expanded || !showExpander)}
 				<button
 					type="button"
 					onclick={() => (showLowQuality = !showLowQuality)}
