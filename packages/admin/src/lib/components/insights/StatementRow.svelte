@@ -14,6 +14,14 @@
 		comment: ReportComment;
 		groups: ReportGroup[];
 		variant?: Variant;
+		/**
+		 * Which unit the metric column shows. 'auto' derives it from `variant`
+		 * (consensus → agree %, difference → pp, else count). 'count' always shows
+		 * the raw vote count regardless of variant — used by the All Statements
+		 * table, whose "Count" header must hold for every row while `variant` still
+		 * drives the accent stripe colour.
+		 */
+		metric?: 'auto' | 'count';
 		/** Drop passes from the agree% denominator (agrees/(agrees+disagrees)). */
 		excludePasses?: boolean;
 		picker?: {
@@ -28,6 +36,7 @@
 		comment,
 		groups,
 		variant = 'neutral',
+		metric = 'auto',
 		excludePasses = false,
 		picker
 	}: Props = $props();
@@ -119,9 +128,12 @@
 		{/if}
 	</div>
 
-	<!-- Per-variant metric -->
+	<!-- Metric column. 'count' mode always shows the vote count (e.g. All
+	     Statements); 'auto' derives the unit from the variant. -->
 	<div class="font-ui pt-1 text-center font-bold">
-		{#if variant === 'consensus'}
+		{#if metric === 'count'}
+			<span class="text-foreground">{count}</span>
+		{:else if variant === 'consensus'}
 			<span class="text-consensus">{Math.round(minAgree)}%</span>
 		{:else if variant === 'difference'}
 			<span class="text-difference">{Math.round(spread)}pp</span>
