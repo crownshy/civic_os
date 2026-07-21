@@ -462,6 +462,7 @@
 						comment={c}
 						groups={reportData.groups}
 						variant={classifyStatement(c, reportData.groups, { excludePasses: explorerExcludePasses })}
+						metric="count"
 						excludePasses={explorerExcludePasses}
 						picker={pickerFor(c.tid)}
 					/>
@@ -475,6 +476,7 @@
 						comment={c}
 						groups={reportData.groups}
 						variant={classifyStatement(c, reportData.groups, { excludePasses: explorerExcludePasses })}
+						metric="count"
 						excludePasses={explorerExcludePasses}
 						picker={pickerFor(c.tid)}
 					/>
