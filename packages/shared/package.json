@@ -9,6 +9,7 @@
 		"./utils": "./src/utils.ts",
 		"./data/regions": "./src/data/regions.ts",
 		"./data/zipcodes": "./src/data/zipcodes.ts",
+		"./data/zip-states": "./src/data/zip-states.ts",
 		"./styles/theme.css": "./src/styles/theme.css",
 		"./ui/button": "./src/ui/button/index.ts",
 		"./ui/dialog": "./src/ui/dialog/index.ts",
