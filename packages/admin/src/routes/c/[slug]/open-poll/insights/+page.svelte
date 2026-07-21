@@ -152,10 +152,9 @@
 		return list.sort((a, b) => totalVotes(b) - totalVotes(a));
 	});
 
-	// "All Statements" shows everything by default (it's last, so length doesn't
-	// disrupt) but the reveal is still reversible. Low-quality rows split out as
-	// in the other tables. See CONTEXT.md → "Low data quality".
-	let explorerExpanded = $state(true);
+	// "All Statements" shows everything (no expander — it's the last table so its
+	// length doesn't disrupt). Low-quality rows split out behind a reveal as in the
+	// other tables. See CONTEXT.md → "Low data quality".
 	let showLowQuality = $state(false);
 	const explorerMain = $derived(explorerStatements.filter((c) => !isLowQuality(c)));
 	const explorerLowQuality = $derived(explorerStatements.filter((c) => isLowQuality(c)));
@@ -424,10 +423,7 @@
 			description="in total. Use labels below to filter by theme."
 			metricLabel="Count"
 			groupCount={reportData.groups.length}
-			total={explorerMain.length}
-			collapsedCount={COLLAPSED_ROWS}
 			lowQualityCount={explorerLowQuality.length}
-			bind:expanded={explorerExpanded}
 			bind:showLowQuality
 			bind:excludeHosts={explorerExcludeHosts}
 			bind:excludePasses={explorerExcludePasses}
@@ -460,7 +456,7 @@
 					No statements match the current filters.
 				</p>
 			{:else}
-				{#each (explorerExpanded ? explorerMain : explorerMain.slice(0, COLLAPSED_ROWS)) as c, i (c.tid)}
+				{#each explorerMain as c, i (c.tid)}
 					<StatementRow
 						index={i + 1}
 						comment={c}
