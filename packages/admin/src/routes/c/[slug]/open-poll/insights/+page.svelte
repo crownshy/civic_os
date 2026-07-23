@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
-	import type { ReportComment, PolisReportData, ThemeSummary } from '$lib/types/report';
+	import type { ReportComment, PolisReportData } from '$lib/types/report';
 	import type { PolisStatementAux } from '$lib/types/aux';
 	import { addStatementAuxTheme, removeStatementAuxTheme } from '$lib/api/aux';
 	import { toThemeDefinitions, parseMetadata } from '$lib/types/metadata';
@@ -8,20 +8,21 @@
 		getEngagementStats,
 		getConsensusStatements,
 		getDifferenceStatements,
-		themeControversy,
 		classifyStatement,
 		isLowQuality,
 		totalVotes
 	} from '$lib/utils/report';
+	import { buildThemeSummaries } from '$lib/utils/themes';
 	import { buildStatementsCsv, downloadCsv } from '$lib/utils/report-csv';
 	import StatementRow from '$lib/components/insights/StatementRow.svelte';
 	import StatementSection from '$lib/components/insights/StatementSection.svelte';
 	import ThemeBar from '$lib/components/insights/ThemeBar.svelte';
 	import ThemeChip from '$lib/components/insights/ThemeChip.svelte';
+	import AddThemeModal from '$lib/components/AddThemeModal.svelte';
 	import PollStatRow from '$lib/components/PollStatRow.svelte';
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import { Button } from '@civicos/shared/ui/button';
-	import { Download, ChevronDown } from '@lucide/svelte';
+	import { Download, ChevronDown, Plus } from '@lucide/svelte';
 	import { onMount, tick } from 'svelte';
 	import { page } from '$app/state';
 	import { replaceState } from '$app/navigation';
@@ -63,25 +64,9 @@
 	});
 
 	const stats = $derived(reportData ? getEngagementStats(reportData) : null);
-	// Theme roll-up over ALL tagged statements (aux), not just the Polis report
-	// set. Statements outside the report — e.g. pending/rejected ones still shown
-	// in Moderation — carry human-authored themes we want surfaced, so the card
-	// matches what the Moderation table shows. Controversy needs vote data (which
-	// only the report carries), so themes on non-report statements fall back to
-	// 'low' — not surfaced today anyway (see ThemeBar).
-	const themes = $derived.by<ThemeSummary[]>(() => {
-		const counts = new Map<string, number>();
-		for (const row of Object.values(auxByTid)) {
-			for (const t of row.themes) counts.set(t, (counts.get(t) ?? 0) + 1);
-		}
-		return [...counts.entries()]
-			.map(([theme, statementCount]) => ({
-				theme,
-				statementCount,
-				controversy: reportData ? themeControversy(theme, reportData) : ('low' as const)
-			}))
-			.sort((a, b) => b.statementCount - a.statementCount);
-	});
+	// Union of the dictionary and the themes actually applied to statements, so a
+	// newly created theme shows at count 0 instead of vanishing. See buildThemeSummaries.
+	const themes = $derived(buildThemeSummaries(themeDictionary, auxByTid, reportData));
 	// Bars rank against the biggest theme (themes is sorted count-desc), not the
 	// statement total — see ThemeBar.
 	const maxThemeCount = $derived(themes[0]?.statementCount ?? 0);
@@ -198,6 +183,11 @@
 		}
 	});
 
+	// "Add theme" on the Themes card: curates the dictionary only — unlike the
+	// picker's create flow, it deliberately does not tag any statement.
+	let addThemeOpen = $state(false);
+	const dictionaryNames = $derived(Object.keys(themeDictionary));
+
 	/** Shared theme-picker wiring for a row (disabled until the aux row exists). */
 	function pickerFor(tid: number) {
 		return {
@@ -313,6 +303,10 @@
 						Click a theme to see all of the statements associated with it.
 					</p>
 				</div>
+				<Button size="sm" onclick={() => (addThemeOpen = true)}>
+					<Plus class="size-4" />
+					Add theme
+				</Button>
 			</header>
 
 			<div class="px-8 pt-6 pb-2">
@@ -518,5 +512,12 @@
 				{/each}
 			{/snippet}
 		</StatementSection>
+
+		<!-- Dictionary-only theme creation (no statement is tagged). -->
+		<AddThemeModal
+			bind:open={addThemeOpen}
+			existingNames={dictionaryNames}
+			onSubmit={({ name, description }) => onCreateTheme(name, description)}
+		/>
 	</div>
 {/if}
