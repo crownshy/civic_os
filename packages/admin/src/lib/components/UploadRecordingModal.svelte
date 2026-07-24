@@ -121,18 +121,25 @@
 			<Dialog.Title class="text-4xl font-bold text-foreground">
 				Name your recording
 			</Dialog.Title>
+			<!-- Visually hidden: the design shows no description, but the dialog still needs an
+			     accessible one for aria-describedby. -->
+			<Dialog.Description class="sr-only">
+				Name the recording and choose an audio file. It will upload directly, then start
+				processing automatically.
+			</Dialog.Description>
 
 			<!-- Chosen file / picker -->
 			<div class="mt-3.5">
+				<Label
+					for="recording-file"
+					class={selectedFile
+						? 'sr-only'
+						: 'inline-flex cursor-pointer items-center gap-2 text-2xl font-bold text-primary'}
+				>
+					Choose an audio file…
+				</Label>
 				{#if selectedFile}
 					<p class="text-2xl font-bold text-foreground">{selectedFile.name}</p>
-				{:else}
-					<Label
-						for="recording-file"
-						class="inline-flex cursor-pointer items-center gap-2 text-2xl font-bold text-primary"
-					>
-						Choose an audio file…
-					</Label>
 				{/if}
 				<Input
 					id="recording-file"
@@ -148,6 +155,7 @@
 
 			<!-- Name input -->
 			<div class="mt-6">
+				<Label for="recording-name" class="sr-only">Recording name</Label>
 				<Input
 					id="recording-name"
 					bind:value={name}
