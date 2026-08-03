@@ -54,8 +54,8 @@ function renderModal(
 }
 
 const nameField = () => page.getByRole('textbox', { name: /name/i });
-const fileField = () => page.getByLabelText('Audio file');
-const uploadButton = () => page.getByRole('button', { name: 'Upload' });
+const fileField = () => page.getByLabelText(/choose an audio file/i);
+const uploadButton = () => page.getByRole('button', { name: 'Submit' });
 
 afterEach(() => {
 	vi.unstubAllGlobals();
@@ -92,6 +92,14 @@ describe('UploadRecordingModal.svelte', () => {
 			.element(page.getByText('A recording with that name already exists.'))
 			.toBeInTheDocument();
 		expect(api.CreateAudioRecording).not.toHaveBeenCalled();
+	});
+
+	it('keeps the file input reachable by its label after a file is chosen', async () => {
+		renderModal();
+
+		await userEvent.upload(fileField(), new File(['x'], 'clip.mp3', { type: 'audio/mpeg' }));
+
+		await expect.element(fileField()).toBeInTheDocument();
 	});
 
 	it('rejects an unsupported file type', async () => {

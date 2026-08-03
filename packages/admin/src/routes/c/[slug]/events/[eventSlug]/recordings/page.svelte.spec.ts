@@ -53,35 +53,34 @@ describe('recordings /+page.svelte', () => {
 	it('shows the empty state when there are no recordings', async () => {
 		render(Page, { props: { data: makeData([], false) } });
 
-		await expect.element(page.getByText('No recordings yet', { exact: false })).toBeInTheDocument();
+		await expect
+			.element(page.getByText('Upload an audio recording from your event.', { exact: false }))
+			.toBeInTheDocument();
 	});
 
-	it('renders a card with name and status pill for each recording', async () => {
+	it('renders a card per recording, subtitled according to its status', async () => {
 		const recordings = [
 			makeRecording('Plenary', 'complete'),
 			makeRecording('Breakout 1', 'transcribing')
 		];
 		render(Page, { props: { data: makeData(recordings, false) } });
 
-		await expect.element(page.getByText('Plenary')).toBeInTheDocument();
-		await expect.element(page.getByText('Breakout 1')).toBeInTheDocument();
-		// Status-pill labels come from statusLabel()/statusTone() — the component's real logic.
-		await expect.element(page.getByText('complete')).toBeInTheDocument();
-		await expect.element(page.getByText('transcribing')).toBeInTheDocument();
+		await expect.element(page.getByRole('link', { name: /Plenary/ })).toHaveTextContent('.mp3');
+		await expect
+			.element(page.getByRole('link', { name: /Breakout 1/ }))
+			.toHaveTextContent('Transcribing');
 	});
 
 	it('opens the upload modal when the Upload New Recording button is clicked', async () => {
-		render(Page, { props: { data: makeData([], false) } });
-
-		// Modal is closed initially — its description is not rendered.
-		await expect
-			.element(page.getByText('Name the recording and choose an audio file', { exact: false }))
-			.not.toBeInTheDocument();
-
+		render(Page, { props: { data: makeData([makeRecording('Plenary', 'complete')], false) } });
+		await expect.element(page.getByText('Name your recording')).not.toBeInTheDocument();
 		await userEvent.click(page.getByRole('button', { name: /upload new recording/i }));
+		await expect.element(page.getByText('Name your recording')).toBeInTheDocument();
+	});
 
-		await expect
-			.element(page.getByText('Name the recording and choose an audio file', { exact: false }))
-			.toBeInTheDocument();
+	it('opens the upload modal from the empty state', async () => {
+		render(Page, { props: { data: makeData([], false) } });
+		await userEvent.click(page.getByRole('button', { name: /upload recordings/i }));
+		await expect.element(page.getByText('Name your recording')).toBeInTheDocument();
 	});
 });
