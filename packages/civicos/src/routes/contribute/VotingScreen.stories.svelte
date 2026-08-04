@@ -1,6 +1,7 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import VotingScreen from './VotingScreen.svelte';
+	import { REGIONS } from '$lib/config/regions';
 
 	const { Story } = defineMeta({
 		title: 'Screens/VotingScreen',
@@ -23,7 +24,13 @@
 	}}
 >
 	{#snippet template(args)}
-		<VotingScreen {...args} onVote={() => {}} onEnd={() => {}} onCompose={() => {}} />
+		<VotingScreen
+			{...args}
+			region={REGIONS.utah}
+			onVote={() => {}}
+			onEnd={() => {}}
+			onCompose={() => {}}
+		/>
 	{/snippet}
 </Story>
 
@@ -38,7 +45,13 @@
 	}}
 >
 	{#snippet template(args)}
-		<VotingScreen {...args} onVote={() => {}} onEnd={() => {}} onCompose={() => {}} />
+		<VotingScreen
+			{...args}
+			region={REGIONS.utah}
+			onVote={() => {}}
+			onEnd={() => {}}
+			onCompose={() => {}}
+		/>
 	{/snippet}
 </Story>
 
@@ -54,6 +67,12 @@
 	}}
 >
 	{#snippet template(args)}
-		<VotingScreen {...args} onVote={() => {}} onEnd={() => {}} onCompose={() => {}} />
+		<VotingScreen
+			{...args}
+			region={REGIONS.utah}
+			onVote={() => {}}
+			onEnd={() => {}}
+			onCompose={() => {}}
+		/>
 	{/snippet}
 </Story>
