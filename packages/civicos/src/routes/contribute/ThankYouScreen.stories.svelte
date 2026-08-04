@@ -20,28 +20,28 @@
 </script>
 
 <Story name="Default — Utah, nothing done" args={{ countyName: 'UTAH COUNTY' }}>
-	{#snippet children(args)}
+	{#snippet template(args)}
 		{setState(false, false, false)}
 		<ThankYouScreen {...args} region={REGIONS.utah} />
 	{/snippet}
 </Story>
 
 <Story name="Email already provided" args={{ countyName: 'UTAH COUNTY' }}>
-	{#snippet children(args)}
+	{#snippet template(args)}
 		{setState(true, false, false)}
 		<ThankYouScreen {...args} region={REGIONS.utah} />
 	{/snippet}
 </Story>
 
 <Story name="All CTAs completed" args={{ countyName: 'UTAH COUNTY' }}>
-	{#snippet children(args)}
+	{#snippet template(args)}
 		{setState(true, true, true)}
 		<ThankYouScreen {...args} region={REGIONS.utah} />
 	{/snippet}
 </Story>
 
 <Story name="Oregon — nothing done" args={{ countyName: 'DESCHUTES COUNTY' }}>
-	{#snippet children(args)}
+	{#snippet template(args)}
 		{setState(false, false, false)}
 		<ThankYouScreen {...args} region={REGIONS.oregon} />
 	{/snippet}

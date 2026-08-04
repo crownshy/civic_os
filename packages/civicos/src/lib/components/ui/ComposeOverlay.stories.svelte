@@ -23,7 +23,7 @@
 		countyName: 'UTAH COUNTY'
 	}}
 >
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<ComposeOverlay {...args} />
 	{/snippet}
 </Story>

@@ -10,7 +10,7 @@
 </script>
 
 <Story name="Default" args={{}}>
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<div class="p-6">
 			<MapPlaceholder {...args} />
 		</div>

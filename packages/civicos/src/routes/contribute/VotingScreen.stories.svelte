@@ -22,7 +22,7 @@
 		total: 10
 	}}
 >
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<VotingScreen {...args} onVote={() => {}} onEnd={() => {}} onCompose={() => {}} />
 	{/snippet}
 </Story>
@@ -37,7 +37,7 @@
 		total: 10
 	}}
 >
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<VotingScreen {...args} onVote={() => {}} onEnd={() => {}} onCompose={() => {}} />
 	{/snippet}
 </Story>
@@ -53,7 +53,7 @@
 		total: 10
 	}}
 >
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<VotingScreen {...args} onVote={() => {}} onEnd={() => {}} onCompose={() => {}} />
 	{/snippet}
 </Story>

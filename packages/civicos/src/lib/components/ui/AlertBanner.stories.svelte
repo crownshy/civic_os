@@ -18,7 +18,7 @@
 		message: 'Your email has not been verified yet. Check your inbox for the verification link.'
 	}}
 >
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<div class="p-6">
 			<AlertBanner {...args} />
 		</div>
@@ -26,7 +26,7 @@
 </Story>
 
 <Story name="Short Message" args={{ message: 'Something went wrong. Please try again.' }}>
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<div class="p-6">
 			<AlertBanner {...args} />
 		</div>

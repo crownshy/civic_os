@@ -32,7 +32,7 @@
 </script>
 
 <Story name="Age Question" args={{ countyName: 'UTAH COUNTY', questions }}>
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<AboutYouScreen {...args} onDone={() => {}} />
 	{/snippet}
 </Story>

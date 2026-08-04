@@ -21,7 +21,7 @@
 		}
 	}}
 >
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<div class="p-6">
 			<ConversationCard {...args} />
 		</div>
@@ -29,7 +29,7 @@
 </Story>
 
 <Story name="List" args={{}}>
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<div class="flex flex-col gap-2 p-6">
 			<ConversationCard
 				conversation={{

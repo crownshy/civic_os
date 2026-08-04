@@ -19,7 +19,7 @@
 		countyName: 'UTAH COUNTY'
 	}}
 >
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<ComposeScreen {...args} onSubmit={() => {}} onBack={() => {}} />
 	{/snippet}
 </Story>

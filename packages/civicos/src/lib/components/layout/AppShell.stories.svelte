@@ -13,7 +13,7 @@
 </script>
 
 <Story name="Default" args={{}}>
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<AppShell {...args}>
 			<div class="bg-primary px-8 py-6">
 				<span class="font-mono text-sm text-white/80">UTAH COUNTY</span>
@@ -29,7 +29,7 @@
 </Story>
 
 <Story name="With Background" args={{}}>
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<AppShell class="bg-primary" {...args}>
 			<div class="flex min-h-dvh flex-col items-center justify-center px-8">
 				<h1 class="font-sans text-5xl font-bold text-white">Welcome!</h1>
