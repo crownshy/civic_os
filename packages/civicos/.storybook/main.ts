@@ -1,4 +1,6 @@
 import type { StorybookConfig } from '@storybook/sveltekit';
+import { mergeConfig } from 'vite';
+import { browserTestAliases } from '../env-alias';
 
 const config: StorybookConfig = {
 	stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|ts|svelte)'],
@@ -9,6 +11,7 @@ const config: StorybookConfig = {
 		'@storybook/addon-a11y',
 		'@storybook/addon-docs'
 	],
-	framework: '@storybook/sveltekit'
+	framework: '@storybook/sveltekit',
+	viteFinal: async (viteConfig) => mergeConfig(viteConfig, { resolve: { alias: browserTestAliases } })
 };
 export default config;
