@@ -1,6 +1,7 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import AboutYouScreen from './AboutYouScreen.svelte';
+	import { REGIONS } from '$lib/config/regions';
 
 	const { Story } = defineMeta({
 		title: 'Screens/AboutYouScreen',
@@ -32,7 +33,7 @@
 </script>
 
 <Story name="Age Question" args={{ countyName: 'UTAH COUNTY', questions }}>
-	{#snippet children(args)}
-		<AboutYouScreen {...args} onDone={() => {}} />
+	{#snippet template(args)}
+		<AboutYouScreen {...args} region={REGIONS.utah} onDone={() => {}} />
 	{/snippet}
 </Story>

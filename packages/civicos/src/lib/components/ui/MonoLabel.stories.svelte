@@ -14,13 +14,13 @@
 </script>
 
 <Story name="Primary" args={{ size: 'sm', variant: 'primary' }}>
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<MonoLabel {...args}>UTAH COUNTY</MonoLabel>
 	{/snippet}
 </Story>
 
 <Story name="White" args={{ variant: 'white' }}>
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<div class="rounded-xl bg-primary p-6">
 			<MonoLabel {...args}>YOU</MonoLabel>
 		</div>
@@ -28,13 +28,13 @@
 </Story>
 
 <Story name="Muted" args={{ variant: 'muted' }}>
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<MonoLabel {...args}>Jan 02 2026</MonoLabel>
 	{/snippet}
 </Story>
 
 <Story name="All Sizes" args={{}}>
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<div class="flex flex-col gap-3">
 			<MonoLabel size="xs">EXTRA SMALL — DID YOU KNOW...</MonoLabel>
 			<MonoLabel size="sm">SMALL — POP QUIZ</MonoLabel>

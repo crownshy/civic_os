@@ -14,7 +14,7 @@
 </script>
 
 <Story name="Start" args={{ remaining: 10, total: 10 }}>
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<div class="bg-card">
 			<VoteBar {...args} />
 		</div>
@@ -22,7 +22,7 @@
 </Story>
 
 <Story name="Midway" args={{ remaining: 5, total: 10 }}>
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<div class="bg-card">
 			<VoteBar {...args} />
 		</div>
@@ -30,7 +30,7 @@
 </Story>
 
 <Story name="Almost Done" args={{ remaining: 1, total: 10 }}>
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<div class="bg-card">
 			<VoteBar {...args} />
 		</div>
@@ -38,7 +38,7 @@
 </Story>
 
 <Story name="Complete" args={{ remaining: 0, total: 10 }}>
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<div class="bg-card">
 			<VoteBar {...args} />
 		</div>

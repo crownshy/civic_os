@@ -26,7 +26,7 @@
 </script>
 
 <Story name="Default" args={{ count: 3 }}>
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<div class="rounded-xl bg-primary p-8">
 			<SwipeCarousel count={slides.length}>
 				{#snippet children(index)}
@@ -41,7 +41,7 @@
 </Story>
 
 <Story name="Auto Scroll" args={{ count: 3, autoScrollMs: 3000 }}>
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<div class="rounded-xl bg-primary p-8">
 			<SwipeCarousel count={slides.length} autoScrollMs={3000}>
 				{#snippet children(index)}

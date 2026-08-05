@@ -21,25 +21,25 @@
 </script>
 
 <Story name="Contribute (vote 10)" args={{ ...baseArgs, variant: 'contribute' }}>
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<CheckpointScreen {...args} />
 	{/snippet}
 </Story>
 
 <Story name="Email (vote 20)" args={{ ...baseArgs, variant: 'email' }}>
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<CheckpointScreen {...args} />
 	{/snippet}
 </Story>
 
 <Story name="Feedback (vote 30)" args={{ ...baseArgs, variant: 'feedback' }}>
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<CheckpointScreen {...args} />
 	{/snippet}
 </Story>
 
 <Story name="Share (vote 40)" args={{ ...baseArgs, variant: 'share' }}>
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<CheckpointScreen {...args} />
 	{/snippet}
 </Story>

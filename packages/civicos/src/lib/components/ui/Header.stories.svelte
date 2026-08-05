@@ -13,7 +13,7 @@
 </script>
 
 <Story name="Default" args={{ countyName: 'UTAH COUNTY' }}>
-	{#snippet children(args)}
+	{#snippet template(args)}
 		<div class="rounded-xl bg-primary">
 			<Header {...args} />
 		</div>
