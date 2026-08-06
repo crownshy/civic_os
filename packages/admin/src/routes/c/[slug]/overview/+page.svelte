@@ -27,9 +27,14 @@
 	const places = $derived(region.stateName ? [region.stateName] : []);
 
 	// Read-only co-hosts from static region data (lead host + coalition partners).
+	// The lead org is conventionally also listed as a partner (Oregon/Utah repeat
+	// the host verbatim in partners[0]), so drop the partner that duplicates the
+	// lead to avoid listing it twice and, worse, colliding the CoHostsCard row key.
 	const cohosts = $derived([
 		{ name: region.hostName, website: region.hostUrl, isAdmin: true },
-		...region.partners.map((p) => ({ name: p.name, website: p.url }))
+		...region.partners
+			.filter((p) => !(p.name === region.hostName && p.url === region.hostUrl))
+			.map((p) => ({ name: p.name, website: p.url }))
 	]);
 
 	// --- Editable fields (Title + Basic Description) ---------------------------
