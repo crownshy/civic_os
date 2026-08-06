@@ -14,7 +14,7 @@
 
 	// Main conversation tabs
 	const tabs = [
-		{ label: 'Overview', href: 'overview' },
+		{ label: 'Setup', href: 'overview' },
 		{ label: 'Open Poll', href: 'open-poll' },
 		{ label: 'Events', href: 'events' }
 	];
