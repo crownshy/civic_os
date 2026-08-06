@@ -1,8 +1,9 @@
 <script lang="ts">
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import { Button } from '@civicos/shared/ui/button';
-	import { Trash2, ExternalLink } from '@lucide/svelte';
+	import { Trash2 } from '@lucide/svelte';
 	import IdentityCard from './IdentityCard.svelte';
+	import CoHostsCard from './CoHostsCard.svelte';
 	import SetupCard from './SetupCard.svelte';
 	import SetupField from './SetupField.svelte';
 
@@ -17,6 +18,14 @@
 	// Host portion of the public URL (strip protocol + any path).
 	const baseUrl = $derived(region.shareUrl.replace(/^https?:\/\//, '').replace(/\/.*$/, ''));
 	const places = $derived(region.stateName ? [region.stateName] : []);
+
+	// Read-only co-hosts from static region data (lead host + coalition partners).
+	// Emails aren't in the static config yet, so they show "Not listed" until the
+	// real Host model lands (#362, blocked-by #350).
+	const cohosts = $derived([
+		{ name: region.hostName, website: region.hostUrl, isAdmin: true },
+		...region.partners.map((p) => ({ name: p.name, website: p.url }))
+	]);
 </script>
 
 {#if region}
@@ -26,39 +35,9 @@
 			<IdentityCard {title} {baseUrl} {slug} keyQuestion={region.question} {places} />
 
 			<!-- ===== Co-Hosts ===== -->
-			<!-- Read-only from static region data (no Add flow). PR4 rebuilds this as
-			     the full name/website/email table matching the Figma; the add flow is
+			<!-- Read-only from static region data (no Add flow). The add flow is
 			     deferred to #362 (blocked-by #350, the Host object). -->
-			<SetupCard
-				title="Co-Hosts"
-				subtitle="The organizations who are stewarding this conversation in your community."
-			>
-				<div class="flex flex-col divide-y divide-border">
-					<div class="flex items-center justify-between gap-4 py-4">
-						<a
-							href={region.hostUrl}
-							target="_blank"
-							rel="noopener"
-							class="text-primary group inline-flex items-center gap-1 text-body font-bold underline-offset-2 hover:underline"
-						>
-							{region.hostName}
-							<ExternalLink class="size-3 opacity-0 transition-opacity group-hover:opacity-100" />
-						</a>
-					</div>
-					{#each region.partners as p (p.url)}
-						<div class="flex items-center justify-between gap-4 py-4">
-							<a
-								href={p.url}
-								target="_blank"
-								rel="noopener"
-								class="text-body font-bold underline-offset-2 hover:underline"
-							>
-								{p.name}
-							</a>
-						</div>
-					{/each}
-				</div>
-			</SetupCard>
+			<CoHostsCard {cohosts} />
 
 			<!-- ===== Context for Participants ===== -->
 			<!-- PR6 refines copy/labels; FAQ is intentionally skipped per #352. -->
