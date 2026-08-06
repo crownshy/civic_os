@@ -5,8 +5,7 @@
 	import IdentityCard from './IdentityCard.svelte';
 	import CoHostsCard from './CoHostsCard.svelte';
 	import DemographicsCard from './DemographicsCard.svelte';
-	import SetupCard from './SetupCard.svelte';
-	import SetupField from './SetupField.svelte';
+	import ContextCard from './ContextCard.svelte';
 
 	let { data } = $props();
 
@@ -46,15 +45,7 @@
 			<DemographicsCard />
 
 			<!-- ===== Context for Participants ===== -->
-			<!-- PR6 refines copy/labels; FAQ is intentionally skipped per #352. -->
-			<SetupCard
-				title="Context for Participants"
-				subtitle="This will appear on the homepage for this conversation."
-			>
-				<SetupField label="Basic Description">
-					<div class="text-body leading-relaxed whitespace-pre-line">{description}</div>
-				</SetupField>
-			</SetupCard>
+			<ContextCard {description} />
 
 			<!-- Danger zone: not in the Figma refresh and currently non-functional.
 			     Kept to avoid dropping an affordance; open question whether to wire
