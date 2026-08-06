@@ -4,6 +4,7 @@
 	import { Trash2 } from '@lucide/svelte';
 	import IdentityCard from './IdentityCard.svelte';
 	import CoHostsCard from './CoHostsCard.svelte';
+	import DemographicsCard from './DemographicsCard.svelte';
 	import SetupCard from './SetupCard.svelte';
 	import SetupField from './SetupField.svelte';
 
@@ -38,6 +39,11 @@
 			<!-- Read-only from static region data (no Add flow). The add flow is
 			     deferred to #362 (blocked-by #350, the Host object). -->
 			<CoHostsCard {cohosts} />
+
+			<!-- ===== Demographics ===== -->
+			<!-- Presentational: toggles/Add-New don't persist yet. Config storage is
+			     #363/#364 (metadata vs table, pending the team decision). -->
+			<DemographicsCard />
 
 			<!-- ===== Context for Participants ===== -->
 			<!-- PR6 refines copy/labels; FAQ is intentionally skipped per #352. -->
