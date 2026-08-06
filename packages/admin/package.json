@@ -18,10 +18,13 @@
 		"@civicos/shared": "workspace:*",
 		"@crownshy/api-client": "^0.0.13",
 		"@lucide/svelte": "^1.16.0",
+		"formsnap": "^2.0.1",
 		"layercake": "^10.0.2",
 		"maplibre-gl": "^5.24.0",
 		"svelte-dnd-action": "^0.9.70",
-		"tailwind-variants": "^3.2.2"
+		"sveltekit-superforms": "2.30.1",
+		"tailwind-variants": "^3.2.2",
+		"zod": "^4.4.3"
 	},
 	"devDependencies": {
 		"@chromatic-com/storybook": "^5.0.1",

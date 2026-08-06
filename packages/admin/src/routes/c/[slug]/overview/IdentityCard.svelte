@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import SetupField from './SetupField.svelte';
 
@@ -10,9 +11,11 @@
 		keyQuestion: string;
 		/** Place names shown as chips, e.g. ["Oregon"]. Provisioned by BLOOM (#351). */
 		places: string[];
+		/** When provided, replaces the read-only title with an editable field. */
+		titleField?: Snippet;
 	}
 
-	let { title, baseUrl, slug, keyQuestion, places }: Props = $props();
+	let { title, baseUrl, slug, keyQuestion, places, titleField }: Props = $props();
 
 	// Presentational shell only. Real theming (persisted, applied across the
 	// participant surfaces) is #365; this just previews the picker affordance.
@@ -25,7 +28,11 @@
 >
 	<div class="flex flex-col gap-6 px-8 py-8">
 		<SetupField label="Title">
-			<div class="font-display text-display font-semibold">{title}</div>
+			{#if titleField}
+				{@render titleField()}
+			{:else}
+				<div class="font-display text-display font-semibold">{title}</div>
+			{/if}
 		</SetupField>
 
 		<div class="flex flex-wrap gap-x-12 gap-y-6">
