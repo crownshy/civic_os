@@ -1,10 +1,10 @@
 # Quickstart
 
-This will use the staging backend at https://bloom.comhairle.scot and the actual Polis ids for those regions (confim)
+This will use the staging backend at https://bloom.comhairle.scot and the actual Polis ids for those regions (confim).
 
 ```sh
-# 1. Node 22.12 + pnpm 9.15 (skip if you have them)
-nvm install 22.12 && nvm use 22.12
+# 1. Node (version from .nvmrc) + pnpm 9.15 (skip if you have them)
+nvm install && nvm use
 corepack enable && corepack prepare pnpm@9.15.0 --activate
 
 # 2. Install + config
