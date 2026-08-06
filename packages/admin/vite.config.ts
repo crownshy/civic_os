@@ -31,6 +31,16 @@ function fixApiClientPlugin() {
 
 export default defineConfig({
 	plugins: [fixApiClientPlugin(), tailwindcss(), sveltekit()],
+	resolve: {
+		alias: [
+			// sveltekit-superforms' adapter barrel eagerly evaluates every adapter,
+			// and adapters/typebox.js does a top-level `class extends Type.Base`.
+			// We use the zod4 adapter and don't install TypeBox, so this bare import
+			// resolves to `undefined` in dev SSR and 500s any page using superforms.
+			// Point it at a tiny stub. See src/lib/stubs/typebox.js for the details.
+			{ find: /^typebox$/, replacement: path.join(dirname, 'src/lib/stubs/typebox.js') }
+		]
+	},
 	server: {
 		port: 5173,
 		allowedHosts: ['.localhost'],
