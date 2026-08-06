@@ -34,7 +34,7 @@
 		</div>
 
 		<div class="divide-border divide-y">
-			{#each cohosts as host (host.name + (host.website ?? ''))}
+			{#each cohosts as host, i (host.name + (host.website ?? '') + i)}
 				<div
 					class="text-body grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)] items-center gap-4 px-2 py-4"
 				>
