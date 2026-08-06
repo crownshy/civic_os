@@ -2,6 +2,7 @@
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import { Button } from '@civicos/shared/ui/button';
 	import { Trash2, ExternalLink } from '@lucide/svelte';
+	import IdentityCard from './IdentityCard.svelte';
 	import SetupCard from './SetupCard.svelte';
 	import SetupField from './SetupField.svelte';
 
@@ -13,35 +14,16 @@
 	const title = $derived(conversation?.title ?? region.heroHeader);
 	const description = $derived(conversation?.description ?? region.contextParagraphs.join('\n\n'));
 	const slug = $derived(conversation?.slug ?? region.slug);
+	// Host portion of the public URL (strip protocol + any path).
+	const baseUrl = $derived(region.shareUrl.replace(/^https?:\/\//, '').replace(/\/.*$/, ''));
+	const places = $derived(region.stateName ? [region.stateName] : []);
 </script>
 
 {#if region}
 	<div class="flex-1 overflow-y-auto">
 		<div class="flex flex-col gap-6 px-8 py-8">
 			<!-- ===== Identity ===== -->
-			<!-- Bare Card (no section header): the campaign's own identity fields.
-			     PR3 deepens this with Place(s) + the Color Scheme picker shell. -->
-			<Card
-				class="hover:border-muted-foreground/40 shadow-card rounded-[20px] transition-colors duration-200"
-			>
-				<div class="flex flex-col gap-6 px-8 py-8">
-					<SetupField label="Title">
-						<div class="font-display text-display font-semibold">{title}</div>
-					</SetupField>
-
-					<SetupField label="Slug">
-						<div class="text-section font-semibold">
-							<span class="text-muted-foreground"
-								>{region.shareUrl.replace(/^https?:\/\//, '').replace(/\/.*$/, '')}/</span
-							>{slug}
-						</div>
-					</SetupField>
-
-					<SetupField label="Key Question">
-						<div class="text-section font-medium">{region.question}</div>
-					</SetupField>
-				</div>
-			</Card>
+			<IdentityCard {title} {baseUrl} {slug} keyQuestion={region.question} {places} />
 
 			<!-- ===== Co-Hosts ===== -->
 			<!-- Read-only from static region data (no Add flow). PR4 rebuilds this as
