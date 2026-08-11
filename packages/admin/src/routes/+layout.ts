@@ -13,5 +13,8 @@ export const load: LayoutLoad = async ({ url, data, depends }) => {
 	const authToken = browser ? undefined : data?.authToken;
 	const api = createApiClient(url.origin + '/api', authToken, browser ? 'client' : 'server');
 
-	return { api };
+	// Surface the create-host capability (resolved server-side) so the nav can hide
+	// the /sysadmin entry for users who can't create Hosts. Routes still guard
+	// server-side.
+	return { api, canCreateHost: data?.canCreateHost ?? false };
 };

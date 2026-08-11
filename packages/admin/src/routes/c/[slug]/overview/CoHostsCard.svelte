@@ -1,7 +1,11 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
+	import { Trash2 } from '@lucide/svelte';
 	import SetupCard from './SetupCard.svelte';
 
 	export interface CoHost {
+		/** Organization id (used to revoke the co-host grant). */
+		id?: string;
 		name: string;
 		/** Full URL; displayed with the protocol stripped. */
 		website?: string;
@@ -12,11 +16,20 @@
 
 	interface Props {
 		cohosts: CoHost[];
+		/** When provided, renders an "Add New…" action that opens the picker. */
+		onAddNew?: () => void;
+		/** Conversation id; when set, co-host rows (not the owning host) get a Remove action. */
+		convId?: string;
 	}
 
-	let { cohosts }: Props = $props();
+	let { cohosts, onAddNew, convId }: Props = $props();
 
 	const stripProtocol = (url: string) => url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+
+	// 3 content columns + a trailing action column (kept in the header too so rows
+	// stay aligned whether or not a Remove button is present).
+	const grid =
+		'grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_2rem] items-center gap-4';
 </script>
 
 <SetupCard
@@ -25,19 +38,16 @@
 >
 	<div class="font-ui">
 		<!-- Column header -->
-		<div
-			class="text-muted-foreground text-caption grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)] gap-4 px-2 pb-2 font-semibold uppercase"
-		>
+		<div class="text-muted-foreground text-caption {grid} px-2 pb-2 font-semibold uppercase">
 			<div>Name</div>
 			<div>Website</div>
 			<div>Contact Email</div>
+			<div></div>
 		</div>
 
 		<div class="divide-border divide-y">
-			{#each cohosts as host, i (host.name + (host.website ?? '') + i)}
-				<div
-					class="text-body grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)] items-center gap-4 px-2 py-4"
-				>
+			{#each cohosts as host, i (host.id ?? host.name + (host.website ?? '') + i)}
+				<div class="text-body {grid} px-2 py-4">
 					<div class="flex min-w-0 items-center gap-2">
 						<span class="truncate font-bold">{host.name}</span>
 						{#if host.isAdmin}
@@ -71,8 +81,37 @@
 							<span class="text-muted-foreground">Not listed</span>
 						{/if}
 					</div>
+
+					<div class="flex justify-end">
+						{#if convId && host.id && !host.isAdmin}
+							<form method="POST" action="?/removeCohost" use:enhance>
+								<input type="hidden" name="convId" value={convId} />
+								<input type="hidden" name="orgId" value={host.id} />
+								<button
+									type="submit"
+									title="Remove co-host"
+									aria-label={`Remove ${host.name}`}
+									class="text-muted-foreground hover:text-destructive rounded-md p-1"
+								>
+									<Trash2 class="size-4" />
+								</button>
+							</form>
+						{/if}
+					</div>
 				</div>
 			{/each}
 		</div>
+
+		{#if onAddNew}
+			<div class="border-border border-t">
+				<button
+					type="button"
+					onclick={onAddNew}
+					class="text-primary px-2 py-4 text-body font-bold hover:underline"
+				>
+					Add New…
+				</button>
+			</div>
+		{/if}
 	</div>
 </SetupCard>

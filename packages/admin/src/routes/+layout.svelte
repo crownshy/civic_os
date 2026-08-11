@@ -1,12 +1,14 @@
 <script lang="ts">
 	import '../app.css';
-	import { LayoutDashboard, Plus, Menu, PanelLeftClose, PanelLeftOpen, X, LogOut } from '@lucide/svelte';
+	import { LayoutDashboard, Plus, Menu, PanelLeftClose, PanelLeftOpen, X, LogOut, Building2 } from '@lucide/svelte';
 	import { page } from '$app/state';
 	import { REGIONS } from '$lib/config/regions';
 
-	let { children } = $props();
+	let { children, data } = $props();
 
 	const isLogin = $derived(page.url.pathname === '/login');
+	const canCreateHost = $derived(data?.canCreateHost ?? false);
+	const onHosts = $derived(page.url.pathname.startsWith('/sysadmin/hosts'));
 
 	// Sidebar UI state.
 	// `collapsed` toggles icon-rail vs full sidebar on md+.
@@ -135,6 +137,23 @@
 					<span>Dashboard</span>
 				{/if}
 			</a>
+
+			{#if canCreateHost}
+				<a
+					href="/sysadmin/hosts"
+					title="Hosts"
+					class={[
+						'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-body font-medium',
+						onHosts ? 'bg-primary/5' : 'hover:bg-muted/50',
+						collapsed && !mobileOpen ? 'justify-center px-0' : ''
+					].join(' ')}
+				>
+					<Building2 class="size-4 shrink-0" />
+					{#if !collapsed || mobileOpen}
+						<span>Hosts</span>
+					{/if}
+				</a>
+			{/if}
 		</nav>
 
 		{#if !collapsed || mobileOpen}
