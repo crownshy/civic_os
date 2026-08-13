@@ -10,6 +10,7 @@
 	import { Trash2 } from '@lucide/svelte';
 	import IdentityCard from './IdentityCard.svelte';
 	import CoHostsCard from './CoHostsCard.svelte';
+	import AddCoHostsDialog from './AddCoHostsDialog.svelte';
 	import DemographicsCard from './DemographicsCard.svelte';
 	import ContextCard from './ContextCard.svelte';
 	import { setupSchema } from './setup-schema';
@@ -26,16 +27,12 @@
 	const baseUrl = $derived(region.shareUrl.replace(/^https?:\/\//, '').replace(/\/.*$/, ''));
 	const places = $derived(region.stateName ? [region.stateName] : []);
 
-	// Read-only co-hosts from static region data (lead host + coalition partners).
-	// The lead org is conventionally also listed as a partner (Oregon/Utah repeat
-	// the host verbatim in partners[0]), so drop the partner that duplicates the
-	// lead to avoid listing it twice and, worse, colliding the CoHostsCard row key.
-	const cohosts = $derived([
-		{ name: region.hostName, website: region.hostUrl, isAdmin: true },
-		...region.partners
-			.filter((p) => !(p.name === region.hostName && p.url === region.hostUrl))
-			.map((p) => ({ name: p.name, website: p.url }))
-	]);
+	// Live co-hosts: the owning host (Admin badge) plus organizations granted the
+	// co-host role on this Conversation. Resolved server-side in +page.server.ts
+	// (ListResourcePermissions -> GetOrganization). Replaces the old static
+	// region.partners list. Added via the AddCoHostsDialog below (#362).
+	const cohosts = $derived(data.cohosts);
+	let addCohostsOpen = $state(false);
 
 	// --- Editable fields (Title + Basic Description) ---------------------------
 	// Conversation.title/description are TextContentId (UUID) references, not text
@@ -172,9 +169,15 @@
 			<IdentityCard {title} {baseUrl} {slug} keyQuestion={region.question} {places} {titleField} />
 
 			<!-- ===== Co-Hosts ===== -->
-			<!-- Read-only from static region data (no Add flow). The add flow is
-			     deferred to #362 (blocked-by #350, the Host object). -->
-			<CoHostsCard {cohosts} />
+			<!-- Live co-hosts; "Add New…" opens the org picker and grants the
+			     co-host role on this Conversation (#362). -->
+			<CoHostsCard {cohosts} convId={data.convId} onAddNew={() => (addCohostsOpen = true)} />
+			<AddCoHostsDialog
+				bind:open={addCohostsOpen}
+				convId={data.convId}
+				pickerOrgs={data.pickerOrgs}
+				excludeIds={data.excludeIds}
+			/>
 
 			<!-- ===== Demographics ===== -->
 			<!-- Presentational: toggles/Add-New don't persist yet. Config storage is
