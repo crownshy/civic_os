@@ -138,6 +138,11 @@ CONV_RESPONSE=$(curl -s -X POST "$BACKEND_URL/conversation" \
 CONVERSATION_ID=$(echo "$CONV_RESPONSE" | jq -r '.id // empty')
 if [ -z "$CONVERSATION_ID" ]; then
   fail "conversation creation failed: $CONV_RESPONSE"
+  echo ""
+  echo "  Hint: this usually means $ADMIN_EMAIL isn't an admin on the backend."
+  echo "  Run 'just seed' in the comhairle repo to create the default admin,"
+  echo "  or add $ADMIN_EMAIL to ADMIN_USERS in comhairle's .env and restart 'just api-dev'."
+  exit 1
 fi
 ok "conversation: $CONVERSATION_ID"
 
@@ -207,10 +212,6 @@ REGION_RESPONSE=$(curl -s -X POST "$BACKEND_URL/regions" \
 REGION_ID=$(echo "$REGION_RESPONSE" | jq -r '.id // empty')
 if [ -z "$REGION_ID" ]; then
   fail "region creation failed: $REGION_RESPONSE"
-  echo ""
-  echo "  Hint: this usually means $ADMIN_EMAIL isn't an admin on the backend."
-  echo "  Run 'just seed' in the comhairle repo to create the default admin,"
-  echo "  or add $ADMIN_EMAIL to ADMIN_USERS in comhairle's .env and restart 'just api-dev'."
   exit 1
 fi
 ok "region: $REGION_ID"
