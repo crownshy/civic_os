@@ -17,7 +17,7 @@
 	let syncMessage = $state<string | null>(null);
 
 	async function syncFromPolis() {
-		const stepId = data.region?.polis_workflow_step_id;
+		const stepId = data.campaign?.polis?.stepId;
 		if (!stepId || syncing) return;
 		syncing = true;
 		syncMessage = null;
@@ -56,8 +56,8 @@
 	let csvError = $state<string | null>(null);
 	let fileInput = $state<HTMLInputElement>();
 
-	const polisId = $derived(data.region?.polisId);
-	const stepId = $derived(data.region?.polis_workflow_step_id);
+	const polisId = $derived(data.campaign?.polis?.pollId);
+	const stepId = $derived(data.campaign?.polis?.stepId);
 	const canSeed = $derived(!!polisId && !!stepId);
 
 	/** Post each seed to Polis, then pull the new comment(s) back into aux. */
@@ -187,7 +187,7 @@
 			<Button
 				variant="secondary"
 				onclick={syncFromPolis}
-				disabled={syncing || !data.region?.polis_workflow_step_id}
+						disabled={syncing || !data.campaign?.polis?.stepId}
 				title="Pull the latest submitted statements from Polis"
 			>
 				<RefreshCw class={`size-4 ${syncing ? 'animate-spin' : ''}`} />

@@ -16,25 +16,25 @@
 
 	let { data } = $props();
 
-	const region = $derived(data.region);
+	const campaign = $derived(data.campaign);
 	const conversation = $derived(data.conversation);
 
-	const title = $derived(conversation?.title ?? region.heroHeader);
-	const description = $derived(conversation?.description ?? region.contextParagraphs.join('\n\n'));
-	const slug = $derived(conversation?.slug ?? region.slug);
+	const title = $derived(conversation?.title ?? campaign?.copy.heroHeader ?? '');
+	const description = $derived(
+		conversation?.description ?? campaign?.copy.contextParagraphs.join('\n\n') ?? ''
+	);
+	const slug = $derived(conversation?.slug ?? campaign?.officialId ?? '');
 	// Host portion of the public URL (strip protocol + any path).
-	const baseUrl = $derived(region.shareUrl.replace(/^https?:\/\//, '').replace(/\/.*$/, ''));
-	const places = $derived(region.stateName ? [region.stateName] : []);
+	const baseUrl = $derived(
+		(campaign?.shareUrl ?? '').replace(/^https?:\/\//, '').replace(/\/.*$/, '')
+	);
+	const places = $derived(campaign?.name ? [campaign.name] : []);
 
-	// Read-only co-hosts from static region data (lead host + coalition partners).
-	// The lead org is conventionally also listed as a partner (Oregon/Utah repeat
-	// the host verbatim in partners[0]), so drop the partner that duplicates the
-	// lead to avoid listing it twice and, worse, colliding the CoHostsCard row key.
 	const cohosts = $derived([
-		{ name: region.hostName, website: region.hostUrl, isAdmin: true },
-		...region.partners
-			.filter((p) => !(p.name === region.hostName && p.url === region.hostUrl))
-			.map((p) => ({ name: p.name, website: p.url }))
+		...(campaign?.host
+			? [{ name: campaign.host.name, website: campaign.host.url ?? '', isAdmin: true }]
+			: []),
+		...(campaign?.coHosts ?? []).map((o) => ({ name: o.name, website: o.url ?? '' }))
 	]);
 
 	// --- Editable fields (Title + Basic Description) ---------------------------
@@ -56,8 +56,11 @@
 	// working copy, so `untrack` makes that intent explicit). `saved` tracks the
 	// last-persisted value per field so we only re-write what changed.
 	const initialFields = untrack(() => ({
-		title: data.conversation?.title ?? data.region.heroHeader,
-		description: data.conversation?.description ?? data.region.contextParagraphs.join('\n\n')
+		title: data.conversation?.title ?? data.campaign?.copy.heroHeader ?? '',
+		description:
+			data.conversation?.description ??
+			data.campaign?.copy.contextParagraphs.join('\n\n') ??
+			''
 	}));
 	const saved: Record<Field, string> = { ...initialFields };
 
@@ -111,7 +114,7 @@
 			);
 			for (const e of edits) saved[e.key] = e.content;
 			saveStatus = edits.length === changed.length ? 'saved' : 'error';
-			await invalidate(`region:conversation:${page.params.slug}`);
+			await invalidate(`campaign:${page.params.slug}`);
 		} catch (e) {
 			console.error('Failed to save translations', e);
 			saveStatus = 'error';
@@ -125,7 +128,7 @@
 	};
 </script>
 
-{#if region}
+{#if campaign}
 	{#snippet titleField()}
 		<Form.Field {form} name="title">
 			<Form.Control>
@@ -169,11 +172,17 @@
 			</div>
 
 			<!-- ===== Identity ===== -->
-			<IdentityCard {title} {baseUrl} {slug} keyQuestion={region.question} {places} {titleField} />
+			<IdentityCard
+				{title}
+				{baseUrl}
+				{slug}
+				keyQuestion={campaign?.copy.question ?? ''}
+				{places}
+				{titleField}
+			/>
 
 			<!-- ===== Co-Hosts ===== -->
-			<!-- Read-only from static region data (no Add flow). The add flow is
-			     deferred to #362 (blocked-by #350, the Host object). -->
+			<!-- Read-only until the co-hosts relationship ships; the add flow is #362. -->
 			<CoHostsCard {cohosts} />
 
 			<!-- ===== Demographics ===== -->

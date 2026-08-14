@@ -6,7 +6,7 @@
 
 	let { data }: { data: PageData } = $props();
 
-	const region = $derived(data.region);
+	const campaign = $derived(data.campaign);
 	const api = $derived(data.api);
 
 	let showForm = $state(false);
@@ -105,7 +105,7 @@
 		creating = true;
 		try {
 			await api.CreateEvent(body, {
-				params: { conversation_id: region.conversationId }
+				params: { conversation_id: campaign!.conversationId }
 			});
 			await invalidate('events:list');
 			showForm = false;
@@ -366,7 +366,7 @@
 		<div class="space-y-2.5">
 			{#each visible as event (event.id)}
 				<a
-					href={`/c/${region.slug}/events/${event.id}`}
+					href={`/c/${campaign!.officialId}/events/${event.id}`}
 					class="group block"
 				>
 					<Card

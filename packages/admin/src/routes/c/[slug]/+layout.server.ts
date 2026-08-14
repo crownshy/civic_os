@@ -1,31 +1,35 @@
 import { error } from '@sveltejs/kit';
 import { createApiClient } from '@crownshy/api-client/client';
-import { REGIONS } from '$lib/config/regions';
+import { getCampaign } from '$lib/api/campaigns';
+import type { Campaign } from '$lib/types/campaign';
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async ({ params, cookies, url, depends }) => {
-	depends(`region:conversation:${params.slug}`);
+	depends(`campaign:${params.slug}`);
 
-	const region = REGIONS[params.slug];
-	if (!region) {
+	const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
+
+	// getCampaign fetches the Conversation withTranslations, which (admin only)
+	// returns the resolved display strings *and* each text field's TextContent id +
+	// locale. Those ids are what edits are written against: Conversation
+	// title/description are TextContentId (UUID) references, not text columns, so
+	// they can only be edited via the translations endpoints. See #391.
+	let campaign: Campaign | null = null;
+	let campaignError: string | null = null;
+	try {
+		campaign = await getCampaign(api, params.slug);
+	} catch (e) {
+		campaignError = e instanceof Error ? e.message : String(e);
+		console.warn('getCampaign failed', campaignError);
+	}
+
+	// No region carries this official_id and the API answered — a bad URL, not a
+	// failure. Everything else renders an error state rather than a 404.
+	if (!campaign && !campaignError) {
 		error(404, `Unknown conversation: ${params.slug}`);
 	}
 
-	const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
-	let conversation = null;
-	try {
-		// withTranslations (admin only) returns the resolved display strings *and*
-		// each text field's TextContent id + locale. Those ids are what edits are
-		// written against: Conversation.title/description are TextContentId (UUID)
-		// references, not text columns, so they can only be edited via the
-		// translations endpoints, never UpdateConversation. See #391.
-		conversation = await api.GetConversation({
-			params: { conversation_id: region.conversationId },
-			queries: { withTranslations: true }
-		});
-	} catch (e) {
-		console.warn('GetConversation failed', e);
-	}
+	const conversation = campaign?.conversation ?? null;
 
 	// Pull out the { id, locale } we POST title/description edits against. Null
 	// when the backend didn't return translation detail (non-admin, or the
@@ -44,7 +48,7 @@ export const load: LayoutServerLoad = async ({ params, cookies, url, depends }) 
 		description: fieldTarget(tx?.description)
 	};
 
-	return { region, conversation, textContent };
+	return { campaign, campaignError, conversation, textContent };
 };
 
 type TxField = { textContent?: { id: string; primaryLocale: string } | null } | null;

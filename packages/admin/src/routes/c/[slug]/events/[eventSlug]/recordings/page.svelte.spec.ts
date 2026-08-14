@@ -16,7 +16,7 @@ function makeData(recordings: AudioRecordingDto[], recordingsFailed: boolean): P
 		recordings,
 		recordingsFailed,
 		eventId: 'event-1',
-		region: { conversationId: 'conv-1' },
+		campaign: { conversationId: 'conv-1' },
 		api: {
 			CreateAudioRecording: vi.fn(),
 			ProcessAudioRecording: vi.fn()

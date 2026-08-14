@@ -2,9 +2,8 @@
 	import '../app.css';
 	import { LayoutDashboard, Plus, Menu, PanelLeftClose, PanelLeftOpen, X, LogOut } from '@lucide/svelte';
 	import { page } from '$app/state';
-	import { REGIONS } from '$lib/config/regions';
 
-	let { children } = $props();
+	let { children, data } = $props();
 
 	const isLogin = $derived(page.url.pathname === '/login');
 
@@ -14,18 +13,8 @@
 	let collapsed = $state(false);
 	let mobileOpen = $state(false);
 
-	// Build sidebar list from real region data. Status dot: green if active
-	// conversation, red if explicitly closed, gray for testing/dev.
 	const conversations = $derived(
-		Object.values(REGIONS).map((r) => {
-			const status: 'live' | 'idle' | 'draft' =
-				r.slug === 'testing' || r.slug === 'dev'
-					? 'idle'
-					: r.conversationsActive === false
-						? 'draft'
-						: 'live';
-			return { slug: r.slug, title: r.heroHeader, status };
-		})
+		data.campaigns.map((c) => ({ slug: c.officialId, title: c.title, status: c.status }))
 	);
 
 	const statusDot: Record<'live' | 'idle' | 'draft', string> = {

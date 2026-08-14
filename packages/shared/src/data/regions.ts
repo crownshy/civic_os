@@ -14,6 +14,392 @@
 // dev region (from PUBLIC_DEV_* env) at its own boundary.
 import type { ConversationEvent } from '../types/conversation-event';
 
+/** # MIGRATION_DESCRIPTION:
+ *
+ * ## Regions:
+ * Most of the region-specific content is now in the regions table in the database. e.g.
+ * GET https://comhairle.bloomproject.us/api/regions, or apiClient.ListRegions, returns:
+ *
+ * {
+ * 	"total":4,
+ * 	"records":[
+ * 		{
+ * 			"id":"ce8c550a-61ac-4ce8-b907-b7be2113ae6a",
+ * 			"name":"Central Oregon",
+ * 			"description":"",
+ * 			"region_type":"official",
+ * 			"official_id":"oregon",
+ * 			"metadata":{
+ * 				"conversation_id":"8a55fb75-5442-4654-886c-339c693b8ac5",
+ * 				"demonym":"Central Oregonians"
+ * 			},
+ * 			"created_at":"2026-08-12T14:17:42.649060Z"
+ * 		},
+ * 		{
+ * 			"id":"646fe728-b867-4205-b26e-7400256bc974",
+ * 			"name":"Testing",
+ * 			"description":"A test region",
+ * 			"region_type":"custom",
+ * 			"official_id":"testing",
+ * 			"metadata":{
+ * 				"conversation_id":"e00cfd87-5f22-4332-83bc-bc8401802e3d",
+ * 				"demonym":"Test Subjects"
+ * 			},
+ * 			"created_at":"2026-08-12T14:16:09.569958Z"
+ * 		},
+ * 		{
+ * 			"id":"c0cc4509-7980-401d-9200-702d3a54aea7",
+ * 			"name":"Utah",
+ * 			"description":"",
+ * 			"region_type":"official",
+ * 			"official_id":"utah",
+ * 			"metadata":{
+ * 				"conversation_id":"0a580270-f46b-4b8c-b97a-9a28def51336",
+ * 				"demonym":"Utahns"
+ * 			},
+ * 			"created_at":"2026-08-12T14:17:12.370815Z"
+ * 		},
+ * 		{
+ * 			"id":"3b4e3580-393d-4fd7-bca3-a257bfbe76aa",
+ * 			"name":"USA",
+ * 			"description":"",
+ * 			"region_type":"official",
+ * 			"official_id":"all",
+ * 			"metadata":{
+ * 				"conversation_id":"30f5c285-a538-4ed7-9565-61f8e4b9d998",
+ * 				"demonym":"Americans"
+ * 			},
+ * 			"created_at":"2026-08-13T11:41:22.483048Z"
+ * 		}
+ * 	]
+ * }
+ *
+ * ## Conversations:
+ * Most of the campaign / conversation specific content is now in conversation metadata. e.g.
+ * GET https://comhairle.bloomproject.us/api/conversation/0a580270-f46b-4b8c-b97a-9a28def51336?withTranslations=true, or apiClient.GetConversation, returns:
+ *
+ * {
+ * 	"id":"0a580270-f46b-4b8c-b97a-9a28def51336",
+ * 	"title":"Utah bloom poll",
+ * 	"shortDescription":"A poll for utah's bloom implementation",
+ * 	"description":"This should be a longer description about the conversation. It should introduce people to what is being discussed and outline-solid the actions that might be taken as a result of the conversation",
+ * 	"videoUrl":null,
+ * 	"image":null,
+ * 	"tags":[],
+ * 	"isPublic":false,
+ * 	"isLive":true,
+ * 	"isComplete":false,
+ * 	"ownerId":"620d29a2-c6b7-4767-bded-596cb2544a59",
+ * 	"organizationId":"957d9fb8-7403-4d5b-acc7-6f6557c054fd",
+ * 	"isInviteOnly":false,
+ * 	"slug":"utah-bloom-poll",
+ * 	"defaultWorkflowId":"73795156-f717-4703-912d-bf0806f482d6",
+ * 	"primaryLocale":"en",
+ * 	"knowledgeBaseId":"4a715ca6293511f18905e612ccf94f0e",
+ * 	"chatBotId":"4a8c23ec293511f1a130e612ccf94f0e",
+ * 	"enableQaChatBot":false,
+ * 	"supportedLanguages":["en"],
+ * 	"privacyPolicy":null,
+ * 	"shortPrivacyPolicy":null,
+ * 	"faqs":[
+ * 		{
+ * 			"answer":"Anyone who lives in the region can vote on statements and contribute their own thoughts. There are no qualifications beyond residency.",
+ * 			"question":"Who can participate in this poll?"
+ * 		},
+ * 		{
+ * 			"answer":"Yes. Your votes and any statements you submit are anonymous. If you share an email, that is kept separate from your contributions.",
+ * 			"question":"Are my responses anonymous?"
+ * 		},
+ * 		{
+ * 			"answer":"Results are published publicly when the conversation closes, and feed into live conversations and the Solutions Forum later in the campaign.",
+ * 			"question":"What happens to the results?"
+ * 		},
+ * 		{
+ * 			"answer":"Most people spend 3—5 minutes. You can come back anytime to add more votes or new statements.",
+ * 			"question":"How long does this take?"
+ * 		}
+ * 	],
+ * 	"thankYouMessage":null,
+ * 	"callToAction":null,
+ * 	"enableSignupPrompts":true,
+ * 	"showThankYouPageAnnonInstructions":true,
+ * 	"metadata":{
+ * 		"about":[
+ * 			"This conversation is about how Utah can prepare for the growing impact of AI in so many aspects of our lives (work and the economy, education, wellbeing, information quality, government services, etc).",
+ * 			"            It is hosted by Utah Common Ground, a collaboration of diverse nonpartisan organizations across Utah. You can find out more about them at utahcommonground.org."
+ * 		],
+ * 		"context_paragraphs":[
+ * 			"AI is reshaping work, school, government services, and daily life across Utah — and Utahns have a choice in how we respond. This is a place for us to weigh in."
+ * 		],
+ * 		"end_cta_join_description":[
+ * 			"Conversations with neighbors in Utah are taking place in-person and online."
+ * 		],
+ * 		"end_cta_share_description":[
+ * 			"Anyone in Utah is welcome to participate."
+ * 		],
+ * 		"go_deeper":"The ultimate goal of this campaign is to surface common ground that lets Utahns take action from the local to state levels and beyond. If you are interested in getting involved in a deeper way, let us know at <Link href=\"mailto:hello@bloom-project.org\" external class=\"font-bold\">hello@bloom-project.org</Link>.",
+ * 		"hero_blurb":"Share your thoughts with 400+ Utah residents who are shaping the impact of artificial intelligence together. <a href=\"#context\" class=\"text-destructive\">Learn more →</a>",
+ * 		"hero_header":"AI and the Future of Our Communities",
+ * 		"host_message":[
+ * 			"This space is hosted by <a href=\"https://www.utahcommonground.org/home\" class=\"text-destructive underline\" target=\"_blank\" rel=\"noopener noreferrer\">Utah Common Ground</a>, a coalition of nonprofit organizations from around the state, including Utah State University Center for Anticipatory Intelligence, the AI Ethics and Governance Institute, Engage Forum, Braver Angels and Mormon Women for Ethical Government. We came together to help citizens come together across political differences to identify issues of local concern, consider possible solutions, and take the necessary steps to achieve meaningful, measurable change.",
+ * 			"We invite all Utahns to share what matters most to them about the future of AI and its impact on communities across the state. Over several weeks, this process will surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding.",
+ * 			"After this period of broad public input, a representative group of approximately 30 to 50 residents from three counties (Cache, Salt Lake, and Utah Counties) will be invited to convene in person in August and September 2026 for a Solutions Forum."
+ * 		],
+ * 		"hosts_blurb":"This conversation is hosted by <a href=\"https://www.utahcommonground.org/home\" class=\"text-destructive underline\">Utah Common Ground</a>, and supported by many other committed organizations, individuals, and partners across Utah.",
+ * 		"phase_labels":{
+ * 			"phase_1":"APRIL 2026",
+ * 			"phase_2":"MAY 2026",
+ * 			"phase_3":"SEPTEMBER 2026"
+ * 		},
+ * 		"polis_workflow_step_id":"9d1041f9-fda6-4597-b4b0-c1260e4b7268",
+ * 		"question":"How can Utahns ensure the benefits of AI are widely shared and risks are responsibly managed?",
+ * 		"share_url":"https://utah.bloomproject.us",
+ * 		"whats_next":"<a href=\"https://www.utahcommonground.org/get-involved\" class=\"font-bold underline\">Sign up↗</a> for live conversations about this topic, taking place both online and in-person across Salt Lake, Utah, and Cache counties. These conversations will be an opportunity to connect with your neighbors and develop shared values around AI's influence on the people we care about."
+ * 	},
+ * 	"createdAt":"2026-03-26T17:00:28.687051Z",
+ * 	"updatedAt":"2026-08-13T11:20:30.365595Z",
+ * 	"translations":{
+ * 		"title":{
+ * 			"textContent":{
+ * 				"id":"b825514c-cd90-404c-9b14-9fd3277ac4a7",
+ * 				"primaryLocale":"en",
+ * 				"format":"plain"
+ * 			},
+ * 			"textTranslations":[
+ * 				{
+ * 					"id":"b8a0e591-8693-45c7-8373-7923610dcf20",
+ * 					"contentId":"b825514c-cd90-404c-9b14-9fd3277ac4a7",
+ * 					"locale":"en",
+ * 					"content":"Utah bloom poll",
+ * 					"aiGenerated":false,
+ * 					"requiresValidation":false
+ * 				}
+ * 			]
+ * 		},
+ * 		"shortDescription":{
+ * 			"textContent":{
+ * 				"id":"22a38050-36c9-4ce9-8c82-6c11eec3bfb8",
+ * 				"primaryLocale":"en",
+ * 				"format":"rich"
+ * 			},
+ * 			"textTranslations":[
+ * 				{
+ * 					"id":"d1c2cc92-cb07-4d26-be64-2063ea66ff61",
+ * 					"contentId":"22a38050-36c9-4ce9-8c82-6c11eec3bfb8",
+ * 					"locale":"en",
+ * 					"content":"A poll for utah's bloom implementation",
+ * 					"aiGenerated":false,
+ * 					"requiresValidation":false
+ * 				}
+ * 			]
+ * 		},
+ * 		"description":{
+ * 			"textContent":{
+ * 				"id":"83c1d895-e3c2-4fcf-96e4-4cccf655fb70",
+ * 				"primaryLocale":"en",
+ * 				"format":"rich"
+ * 			},
+ * 			"textTranslations":[
+ * 				{
+ * 					"id":"14a7891f-cf0a-4d3c-85ac-f576a35ca757",
+ * 					"contentId":"83c1d895-e3c2-4fcf-96e4-4cccf655fb70",
+ * 					"locale":"en",
+ * 					"content":"This should be a longer description about the conversation. It should introduce people to what is being discussed and outline-solid the actions that might be taken as a result of the conversation",
+ * 					"aiGenerated":false,
+ * 					"requiresValidation":false
+ * 				}
+ * 			]
+ * 		},
+ * 		"privacyPolicy":null,
+ * 		"shortPrivacyPolicy":null,
+ * 		"faqs":null,
+ * 		"thankYouMessage":null,
+ * 		"callToAction":null
+ * 	}
+ * }
+ * 
+ * ## Events:
+ * The events data now live in the events table in the database. e.g.
+ * GET https://comhairle.bloomproject.us/api/conversation/0a580270-f46b-4b8c-b97a-9a28def51336/events, or apiClient.ListEvents, returns:
+ * 
+ * {
+ * 	"total":7,
+ * 	"records":[
+ * 		{
+ * 			"id":"7fdbf92c-f49b-416d-bb8d-fb7870e40a8c",
+ * 			"name":"AI & Springville",
+ * 			"description":"Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.",
+ * 			"capacity":20,
+ * 			"conversationId":"0a580270-f46b-4b8c-b97a-9a28def51336",
+ * 			"startTime":"2026-05-02T19:30:00Z",
+ * 			"endTime":"2026-05-02T21:00:00Z",
+ * 			"signupMode":"invite",
+ * 			"currentAttendance":0,
+ * 			"videoMeetingId":"f8eb2024-d6b0-49e6-bc1a-fd122eb9757c",
+ * 			"agenda":[],
+ * 			"location":{
+ * 				"venue_name":"Springville Library",
+ * 				"city":"Springville",
+ * 				"state_province":"UT",
+ * 				"postal_code":"84663",
+ * 				"country_code":"US",
+ * 				"address_line_1":"45 S Main St",
+ * 				"address_line_2":null,
+ * 				"address_line_3":null
+ * 			},
+ * 			"metadata":{
+ * 				"slug":"may-02-springville"
+ * 			},
+ * 			"format":"in_person",
+ * 			"createdAt":"2026-07-01T18:40:11.953501Z"},
+ * 		{
+ * 			"id":"9edbede4-e020-4b12-be3a-bffb8676b502",
+ * 			"name":"AI & Our Communities",
+ * 			"description":"Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.",
+ * 			"capacity":10,
+ * 			"conversationId":"0a580270-f46b-4b8c-b97a-9a28def51336",
+ * 			"startTime":"2026-05-05T18:00:00Z",
+ * 			"endTime":"2026-05-05T19:00:00Z",
+ * 			"signupMode":"invite",
+ * 			"currentAttendance":0,
+ * 			"videoMeetingId":"bb0d8e3a-9223-4e60-9fae-a5ff1c13dac0",
+ * 			"agenda":[],
+ * 			"location":null,
+ * 			"metadata":{
+ * 				"slug":"may-05-online"
+ * 			},
+ * 			"format":"online",
+ * 			"createdAt":"2026-08-13T13:30:28.866404Z"},
+ * 		{
+ * 			"id":"d531a4d2-1b36-43a9-b08b-16807827b4c2",
+ * 			"name":"AI & Our Communities",
+ * 			"description":"Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.",
+ * 			"capacity":10,
+ * 			"conversationId":"0a580270-f46b-4b8c-b97a-9a28def51336",
+ * 			"startTime":"2026-05-07T18:00:00Z",
+ * 			"endTime":"2026-05-07T19:00:00Z",
+ * 			"signupMode":"invite",
+ * 			"currentAttendance":0,
+ * 			"videoMeetingId":"1ff048f9-70f9-40a3-b0d4-05e717975e2e",
+ * 			"agenda":[],
+ * 			"location":null,
+ * 			"metadata":{
+ * 				"slug":"may-07-online"
+ * 			},
+ * 			"format":"online",
+ * 			"createdAt":"2026-08-13T13:32:43.159007Z"},
+ * 		{
+ * 			"id":"6a54c281-d87d-448d-8070-161f796936fc",
+ * 			"name":"AI & Kearns",
+ * 			"description":"Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.",
+ * 			"capacity":10,
+ * 			"conversationId":"0a580270-f46b-4b8c-b97a-9a28def51336",
+ * 			"startTime":"2026-05-09T18:00:00Z",
+ * 			"endTime":"2026-05-09T19:30:00Z",
+ * 			"signupMode":"invite",
+ * 			"currentAttendance":0,
+ * 			"videoMeetingId":"15fce9cd-4883-4897-a59f-17642793c583",
+ * 			"agenda":[],
+ * 			"location":{
+ * 				"venue_name":"KearnsLibrary",
+ * 				"city":"Kearns",
+ * 				"state_province":"UT",
+ * 				"postal_code":"84118",
+ * 				"country_code":"US",
+ * 				"address_line_1":"4015 S 4400 W",
+ * 				"address_line_2":null,
+ * 				"address_line_3":null
+ * 			},
+ * 			"metadata":{
+ * 				"slug":"may-09-kearns"
+ * 			},
+ * 			"format":"in_person",
+ * 			"createdAt":"2026-08-13T13:34:06.243743Z"},
+ * 		{
+ * 			"id":"5284fb38-7f34-4638-b93a-dfe9be530c80",
+ * 			"name":"AI & Our Communities",
+ * 			"description":"Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.",
+ * 			"capacity":10,
+ * 			"conversationId":"0a580270-f46b-4b8c-b97a-9a28def51336",
+ * 			"startTime":"2026-05-12T18:00:00Z",
+ * 			"endTime":"2026-05-12T19:00:00Z",
+ * 			"signupMode":"invite",
+ * 			"currentAttendance":0,
+ * 			"videoMeetingId":"7efd5f87-369e-4e08-b09c-680fa49c4247",
+ * 			"agenda":[],
+ * 			"location":null,
+ * 			"metadata":{
+ * 				"slug":"may-12-online"
+ * 			},
+ * 			"format":"online",
+ * 			"createdAt":"2026-08-13T13:36:04.499511Z"},
+ * 		{
+ * 			"id":"c94cc296-61b5-4aa3-91e2-3d11a88f93b7",
+ * 			"name":"AI & Our Communities",
+ * 			"description":"Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.",
+ * 			"capacity":10,
+ * 			"conversationId":"0a580270-f46b-4b8c-b97a-9a28def51336",
+ * 			"startTime":"2026-05-15T01:00:00Z",
+ * 			"endTime":"2026-05-15T02:00:00Z",
+ * 			"signupMode":"invite",
+ * 			"currentAttendance":0,
+ * 			"videoMeetingId":"55e1f576-ee7f-488d-843a-bc71d77291f1",
+ * 			"agenda":[],
+ * 			"location":null,
+ * 			"metadata":{
+ * 				"slug":"may-14-online"
+ * 			},
+ * 			"format":"online",
+ * 			"createdAt":"2026-08-13T13:36:42.955620Z"},
+ * 		{
+ * 			"id":"510a9460-b3f8-4423-adcb-3832be0aeb1d",
+ * 			"name":"AI & Logan",
+ * 			"description":"Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.",
+ * 			"capacity":10,
+ * 			"conversationId":"0a580270-f46b-4b8c-b97a-9a28def51336",
+ * 			"startTime":"2026-05-16T21:30:00Z",
+ * 			"endTime":"2026-05-16T23:00:00Z",
+ * 			"signupMode":"invite",
+ * 			"currentAttendance":0,
+ * 			"videoMeetingId":"8f5fd03b-25f8-4ca4-bd67-d147a71b379b",
+ * 			"agenda":[],
+ * 			"location":{
+ * 				"venue_name":"Logan Library",
+ * 				"city":"Logan",
+ * 				"state_province":"UT",
+ * 				"postal_code":"84321",
+ * 				"country_code":"US",
+ * 				"address_line_1":"255 N Main St",
+ * 				"address_line_2":null,
+ * 				"address_line_3":null
+ * 			},
+ * 			"metadata":{
+ * 				"slug":"may-16-logan"
+ * 			},
+ * 			"format":"in_person",
+ * 			"createdAt":"2026-08-13T13:37:10.120274Z"
+ * 		}
+ * 	]
+ * }
+ * 
+ * ## Organizations:
+ * The organizarion data now live in the organizations table in the database. e.g.
+ * GET https://comhairle.bloomproject.us/api/organizations/957d9fb8-7403-4d5b-acc7-6f6557c054fd, or apiClient.GetOrganization, returns:
+ * 
+ * {
+ * 	"id":"957d9fb8-7403-4d5b-acc7-6f6557c054fd",
+ * 	"name":"Utah Common Ground",
+ * 	"description":"PLACEHOLDER",
+ * 	"mission":"PLACEHOLDER",
+ * 	"orgType":"other",
+ * 	"contactEmail":"info@utahcommonground.org",
+ * 	"externalUrl":"https://www.utahcommonground.org/home",
+ * 	"regions":["c0cc4509-7980-401d-9200-702d3a54aea7"],
+ * 	"metadata":null,
+ * 	"createdAt":"2026-08-12T15:14:39.385323Z"
+ * }
+ */
+
 /** A coalition partner / host organization shown on the landing page. */
 export interface Partner {
 	name: string;

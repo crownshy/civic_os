@@ -4,13 +4,11 @@
 
 	let { data, children } = $props();
 
-	const region = $derived(data.region);
+	const campaign = $derived(data.campaign);
 	const conversation = $derived(data.conversation);
 
-	const title = $derived(conversation?.title ?? region.heroHeader);
-	const isLive = $derived(
-		conversation ? conversation.isLive : region.conversationsActive !== false
-	);
+	const title = $derived(conversation?.title ?? campaign?.copy.heroHeader ?? campaign?.name ?? '');
+	const isLive = $derived(conversation?.isLive ?? false);
 
 	// Main conversation tabs
 	const tabs = [
@@ -37,8 +35,10 @@
 	const pendingTab = $derived(pendingNav && pendingNav !== committedTab ? pendingNav : null);
 </script>
 
-{#if !region}
-	<div class="text-muted-foreground p-8">Unknown conversation: {page.params.slug}</div>
+{#if !campaign}
+	<div class="text-muted-foreground p-8">
+		{data.campaignError ?? `Unknown conversation: ${page.params.slug}`}
+	</div>
 {:else}
 	<!-- Top bar -->
 	<header
@@ -55,14 +55,16 @@
 					LIVE
 				</span>
 			{/if}
-			<a
-				href={region.shareUrl}
-				target="_blank"
-				rel="noopener noreferrer"
-				class="bg-primary/10 text-primary truncate px-2 py-0.5 text-body font-medium leading-6 underline"
-			>
-				{region.shareUrl.replace(/^https?:\/\//, '')} ↗
-			</a>
+			{#if campaign.shareUrl}
+				<a
+					href={campaign.shareUrl}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="bg-primary/10 text-primary truncate px-2 py-0.5 text-body font-medium leading-6 underline"
+				>
+					{campaign.shareUrl.replace(/^https?:\/\//, '')} ↗
+				</a>
+			{/if}
 		</div>
 	</header>
 
@@ -70,7 +72,7 @@
 	<nav class="border-foreground/30 font-ui flex flex-nowrap items-center overflow-x-auto border-b px-5">
 		{#each tabs as tab (tab.href)}
 			<a
-				href={`/c/${region.slug}/${tab.href}`}
+				href={`/c/${campaign.officialId}/${tab.href}`}
 				class={`relative h-12 shrink-0 px-3 py-3 text-body font-medium whitespace-nowrap ${
 					activeTab === tab.href
 						? 'text-primary border-primary border-b-[3px]'

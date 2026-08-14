@@ -5,13 +5,13 @@ import type { LayoutLoad } from './$types';
 export const load: LayoutLoad = async ({ parent, depends }) => {
 	depends('open-poll:aux');
 
-	const { region, api } = await parent();
+	const { campaign, api } = await parent();
 
-	const stepId = region.polis_workflow_step_id;
+	const stepId = campaign?.polis?.stepId;
 	if (!stepId) {
 		return {
 			aux: [] as PolisStatementAux[],
-			auxError: 'Region has no polis_workflow_step_id configured.'
+			auxError: 'This conversation has no Polis workflow step.'
 		};
 	}
 

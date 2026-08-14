@@ -5,14 +5,14 @@ import type { PolisStatementAux } from '$lib/types/aux';
 export const load: PageLoad = async ({ parent, depends, fetch }) => {
 	depends('open-poll:report');
 
-	const { region, aux, auxError } = await parent();
+	const { campaign, aux, auxError } = await parent();
 
-	const stepId = region.polis_workflow_step_id;
+	const stepId = campaign?.polis?.stepId;
 	if (!stepId) {
 		return {
 			reportData: null,
 			auxByTid: {} as Record<number, PolisStatementAux>,
-			error: 'Region has no polis_workflow_step_id configured.'
+			error: 'This conversation has no Polis workflow step.'
 		};
 	}
 

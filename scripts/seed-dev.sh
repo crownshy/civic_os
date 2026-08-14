@@ -138,16 +138,97 @@ CONV_RESPONSE=$(curl -s -X POST "$BACKEND_URL/conversation" \
 CONVERSATION_ID=$(echo "$CONV_RESPONSE" | jq -r '.id // empty')
 if [ -z "$CONVERSATION_ID" ]; then
   fail "conversation creation failed: $CONV_RESPONSE"
+fi
+ok "conversation: $CONVERSATION_ID"
+
+info "Step 2.5: Updating conversation metadata..."
+curl -s -X PATCH "$BACKEND_URL/conversation/$CONVERSATION_ID/metadata" \
+  -H "Content-Type: application/json" \
+  -H "$AUTH_HEADER" \
+  -d "$(jq -nc \
+    --arg slug "$SEED_SLUG" \
+    '{
+    "about": [
+        "This conversation is about how Utah can prepare for the growing impact of AI in so many aspects of our lives (work and the economy, education, wellbeing, information quality, government services, etc).",
+        "It is hosted by Utah Common Ground, a collaboration of diverse nonpartisan organizations across Utah. You can find out more about them at utahcommonground.org."
+    ],
+    "context_paragraphs": [
+        "This is a testing environment for the landing page redesign \u2014 placeholder copy.",
+        "Use this region to validate UI changes without affecting any real conversation."
+    ],
+    "end_cta_join_description": "Conversations with neighbors are taking place in-person and online.",
+    "end_cta_share_description": "Anyone in your community is welcome to participate.",
+    "faq": [
+        {
+            "question": "Who can participate in this poll?",
+            "answer": "Anyone who lives in the region can vote on statements and contribute their own thoughts. There are no qualifications beyond residency."
+        },
+        {
+            "question": "Are my responses anonymous?",
+            "answer": "Yes. Your votes and any statements you submit are anonymous. If you share an email, that is kept separate from your contributions."
+        },
+        {
+            "question": "What happens to the results?",
+            "answer": "Results are published publicly when the conversation closes, and feed into live conversations and the Solutions Forum later in the campaign."
+        },
+        {
+            "question": "How long does this take?",
+            "answer": "Most people spend 3\u20145 minutes. You can come back anytime to add more votes or new statements."
+        }
+    ],
+    "go_deeper": "Nothing",
+    "hero_blurb": "Share your thoughts with other test subjects making sense of this topic together. <a href=\"#context\" class=\"text-destructive\">Learn more \\u2192</a>",
+    "hero_header": "AI and the Future of Our Communities",
+    "host_message": [
+        "This is a testing version of the site to check things are working and to play with new features with play",
+        "This is mostly just to see if things work",
+        "This is not a live conversation"
+    ],
+    "hosts_blurb": "This conversation is hosted by Bloom Testing.",
+    "question": "How can we all ensure the benefits of AI are widely shared and risks are responsibly managed?",
+    "share_url": "https://testing.bloomproject.us",
+    "whats_next": "Nothing"
+}')"
+
+info "Step 3: Creating region..."
+REGION_RESPONSE=$(curl -s -X POST "$BACKEND_URL/regions" \
+  -H "Content-Type: application/json" \
+  -H "$AUTH_HEADER" \
+  -d "$(jq -nc \
+    --arg title "$SEED_TITLE" \
+    --arg slug "$SEED_SLUG" \
+    '{
+      name: "Test Region for Local Development",
+      official_id: "test",
+      region_type: "custom",
+      description: "Local development region for testing Civic OS features. All data is stored in your local Postgres database.",
+    }')")
+
+REGION_ID=$(echo "$REGION_RESPONSE" | jq -r '.id // empty')
+if [ -z "$REGION_ID" ]; then
+  fail "region creation failed: $REGION_RESPONSE"
   echo ""
   echo "  Hint: this usually means $ADMIN_EMAIL isn't an admin on the backend."
   echo "  Run 'just seed' in the comhairle repo to create the default admin,"
   echo "  or add $ADMIN_EMAIL to ADMIN_USERS in comhairle's .env and restart 'just api-dev'."
   exit 1
 fi
-ok "conversation: $CONVERSATION_ID"
+ok "region: $REGION_ID"
+
+info "Step 3.5: Updating region metadata..."
+curl -s -X PATCH "$BACKEND_URL/regions/$REGION_ID/metadata" \
+  -H "Content-Type: application/json" \
+  -H "$AUTH_HEADER" \
+  -d "$(jq -nc \
+    --arg slug "$SEED_SLUG" \
+    '{
+      "conversation_id": "'"$CONVERSATION_ID"'",
+      "demonym": "Local Devs",
+    }')"
+
 
 # --- Workflow ----------------------------------------------------------------
-info "Step 3: Creating workflow..."
+info "Step 4: Creating workflow..."
 WORKFLOW_RESPONSE=$(curl -s -X POST "$BACKEND_URL/conversation/$CONVERSATION_ID/workflow" \
   -H "Content-Type: application/json" \
   -H "$AUTH_HEADER" \
@@ -169,7 +250,7 @@ ok "workflow: $WORKFLOW_ID"
 # --- Polis workflow step (this is what creates the Polis poll for us) --------
 # The backend hits its configured polis_url (default polis.comhairle.scot) and
 # creates a poll on our behalf. The poll_id comes back in previewToolConfig.
-info "Step 4: Creating Polis workflow step (this creates the Polis poll for you)..."
+info "Step 5: Creating Polis workflow step (this creates the Polis poll for you)..."
 WORKFLOW_STEP_RESPONSE=$(curl -s -X POST \
   "$BACKEND_URL/conversation/$CONVERSATION_ID/workflow/$WORKFLOW_ID/workflow_step" \
   -H "Content-Type: application/json" \
@@ -215,7 +296,7 @@ SEED_STATEMENTS=(
   "(dev) Small models deployed locally beat large remote ones for privacy"
 )
 
-info "Step 4.5: Seeding Polis statements ($POLIS_URL)..."
+info "Step 5.5: Seeding Polis statements ($POLIS_URL)..."
 for stmt in "${SEED_STATEMENTS[@]}"; do
   RESP=$(curl -s -X POST "$POLIS_URL/api/v3/comments" \
     -H "Content-Type: application/json" \
@@ -233,7 +314,7 @@ for stmt in "${SEED_STATEMENTS[@]}"; do
 done
 
 # --- Open invite -------------------------------------------------------------
-info "Step 5: Creating open invite..."
+info "Step 6: Creating open invite..."
 INVITE_RESPONSE=$(curl -s -X POST "$BACKEND_URL/conversation/$CONVERSATION_ID/invite" \
   -H "Content-Type: application/json" \
   -H "$AUTH_HEADER" \
@@ -248,7 +329,7 @@ ok "invite: $INVITE_ID"
 
 # --- Launch (make conversation live) -----------------------------------------
 # Invites only work against live conversations.
-info "Step 6: Launching conversation (making it live)..."
+info "Step 7: Launching conversation (making it live)..."
 LAUNCH_RESPONSE=$(curl -s -w '\n%{http_code}' -X PUT \
   "$BACKEND_URL/conversation/$CONVERSATION_ID/launch" \
   -H "$AUTH_HEADER")
@@ -267,7 +348,7 @@ ok "conversation is live"
 # aux table starts empty after every re-seed even though polis has statements.
 # Endpoint is from comhairle PR #467 — skipped (with a warning) on older
 # backends that don't have it.
-info "Step 7: Syncing polis statements into aux table..."
+info "Step 8: Syncing polis statements into aux table..."
 SYNC_RESPONSE=$(curl -s -w '\n%{http_code}' -X POST \
   "$BACKEND_URL/tools/polis/statement_aux/sync" \
   -H "Content-Type: application/json" \
