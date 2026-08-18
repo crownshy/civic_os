@@ -1,5 +1,6 @@
 import { createApiClient } from '@crownshy/api-client/client';
 import { browser } from '$app/environment';
+import type { ConversationSummary } from '$lib/conversations';
 import type { LayoutLoad } from './$types';
 
 export const load: LayoutLoad = async ({ url, data, depends }) => {
@@ -13,8 +14,12 @@ export const load: LayoutLoad = async ({ url, data, depends }) => {
 	const authToken = browser ? undefined : data?.authToken;
 	const api = createApiClient(url.origin + '/api', authToken, browser ? 'client' : 'server');
 
-	// Surface the create-host capability (resolved server-side) so the nav can hide
-	// the /sysadmin entry for users who can't create Hosts. Routes still guard
-	// server-side.
-	return { api, canCreateHost: data?.canCreateHost ?? false };
+	// A universal load replaces the server load's data for this route level, so
+	// anything the pages need has to be forwarded explicitly. `authToken` is
+	// deliberately not among them: it stays server-side.
+	return {
+		api,
+		canCreateHost: data?.canCreateHost ?? false,
+		conversations: (data?.conversations ?? []) as ConversationSummary[]
+	};
 };

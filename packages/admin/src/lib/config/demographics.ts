@@ -74,3 +74,68 @@ export function readDemographicToggles(metadata: unknown): DemographicToggles {
 		return acc;
 	}, {} as DemographicToggles);
 }
+
+/**
+ * A Host-authored category (#364).
+ *
+ * Kept in a separate `customDemographics` array rather than folded into the
+ * `demographics` booleans, because the two are different kinds of thing today:
+ * the four defaults map onto comhairle's `DemographicReport` buckets and have
+ * fixed options, while these map onto nothing at all and carry their own.
+ *
+ * ⚠️ Nothing asks these of a participant yet. civicos's `AboutYouScreen`
+ * collects the four fixed fields against hardcoded question ids, so a custom
+ * category is stored and shown back to the Host but never reaches the poll
+ * until civicos reads its config from the API (#398) and its collection UI is
+ * made dynamic.
+ */
+export interface CustomDemographicCategory {
+	/** Slug derived from the name at creation; stable across renames. */
+	key: string;
+	name: string;
+	options: string[];
+	enabled: boolean;
+}
+
+/** Slugify a category name into a metadata key. */
+export function toDemographicKey(name: string): string {
+	return name
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, '-')
+		.replace(/^-+|-+$/g, '');
+}
+
+function isCustomCategory(v: unknown): v is CustomDemographicCategory {
+	if (!v || typeof v !== 'object') return false;
+	const c = v as Record<string, unknown>;
+	return (
+		typeof c.key === 'string' &&
+		typeof c.name === 'string' &&
+		Array.isArray(c.options) &&
+		c.options.every((o) => typeof o === 'string')
+	);
+}
+
+/** Read Host-authored categories out of the untyped `metadata` jsonb. */
+export function readCustomDemographics(metadata: unknown): CustomDemographicCategory[] {
+	const bag =
+		metadata && typeof metadata === 'object'
+			? (metadata as Record<string, unknown>).customDemographics
+			: null;
+	if (!Array.isArray(bag)) return [];
+
+	return bag.filter(isCustomCategory).map((c) => ({
+		key: c.key,
+		name: c.name,
+		options: c.options,
+		enabled: typeof c.enabled === 'boolean' ? c.enabled : true
+	}));
+}
+
+/** Reserved keys a new category cannot collide with. */
+export function isKeyTaken(key: string, existing: CustomDemographicCategory[]): boolean {
+	return (
+		(DEMOGRAPHIC_KEYS as readonly string[]).includes(key) ||
+		existing.some((c) => c.key === key)
+	);
+}

@@ -6,6 +6,7 @@
 	import SetupCard from '$lib/components/setup/SetupCard.svelte';
 	import DemographicsCard from '$lib/components/setup/DemographicsCard.svelte';
 	import {
+		readCustomDemographics,
 		readDemographicToggles,
 		type DemographicKey
 	} from '$lib/config/demographics';
@@ -14,14 +15,17 @@
 
 	let { data } = $props();
 
-	const region = $derived(data.region);
+	const campaign = $derived(data.campaign);
 	const conversation = $derived(data.conversation);
 
 	// Same fallback the header badge uses when the conversation didn't resolve.
-	const isLive = $derived(conversation ? conversation.isLive : region.conversationsActive !== false);
+	const isLive = $derived(conversation ? conversation.isLive : campaign.status === 'live');
 
+	// Empty for Campaigns with no legacy region entry: they have no public URL yet.
 	const pollUrl = $derived(
-		`${region.shareUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}/poll`
+		campaign.shareUrl
+			? `${campaign.shareUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}/poll`
+			: ''
 	);
 
 	/**
@@ -33,12 +37,12 @@
 	async function setLive(next: boolean) {
 		await data.api.UpdateConversation(
 			{ is_live: next },
-			{ params: { conversation_id: region.conversationId } }
+			{ params: { conversation_id: campaign.id } }
 		);
-		await invalidate(`region:conversation:${page.params.slug}`);
+		await invalidate(`campaign:${page.params.slug}`);
 	}
 
-	const stepId = $derived(region.polis_workflow_step_id);
+	const stepId = $derived(campaign.polisWorkflowStepId);
 
 	/**
 	 * Comhairle posts the seed to Polis server-side (owner session, no browser
@@ -58,6 +62,7 @@
 	}
 
 	const demographics = $derived(readDemographicToggles(conversation?.metadata));
+	const customDemographics = $derived(readCustomDemographics(conversation?.metadata));
 
 	/**
 	 * One shared setting, not a poll-specific one: #363 moves demographics up to
@@ -68,13 +73,22 @@
 	 * the top level only and replaces nested objects wholesale, so sending a
 	 * single key would drop the other three.
 	 */
-	async function setDemographic(key: DemographicKey, next: boolean) {
-		await data.api.PatchConversationMetadata(
-			{ demographics: { ...demographics, [key]: next } },
-			{ params: { conversation_id: region.conversationId } }
-		);
-		await invalidate(`region:conversation:${page.params.slug}`);
+	async function patchMetadata(patch: Record<string, unknown>) {
+		await data.api.PatchConversationMetadata(patch, {
+			params: { conversation_id: campaign.id }
+		});
+		await invalidate(`campaign:${page.params.slug}`);
 	}
+
+	const setDemographic = (key: DemographicKey, next: boolean) =>
+		patchMetadata({ demographics: { ...demographics, [key]: next } });
+
+	const toggleCustomDemographic = (key: string, next: boolean) =>
+		patchMetadata({
+			customDemographics: customDemographics.map((c) =>
+				c.key === key ? { ...c, enabled: next } : c
+			)
+		});
 </script>
 
 <div class="mx-auto flex max-w-6xl flex-col gap-6 px-8 py-8">
@@ -103,5 +117,7 @@
 		subtitle="Select from your active demographic categories. To add or edit categories, use the Campaign Setup tab."
 		toggles={demographics}
 		onToggle={setDemographic}
+		custom={customDemographics}
+		onToggleCustom={toggleCustomDemographic}
 	/>
 </div>

@@ -4,11 +4,11 @@ import type { LayoutLoad } from './$types';
 export const load: LayoutLoad = async ({ parent, params, depends }) => {
 	depends(`recordings:list:${params.eventSlug}`);
 
-	const { api, region } = await parent();
+	const { api, campaign } = await parent();
 
 	try {
 		const result = await api.ListAudioRecordings({
-			params: { conversation_id: region.conversationId, event_id: params.eventSlug }
+			params: { conversation_id: campaign.id, event_id: params.eventSlug }
 		});
 		// On SSR the api client is unauthenticated, so the /api proxy redirects to
 		// the login page and this can resolve to HTML/an error object instead of an

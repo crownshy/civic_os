@@ -16,7 +16,7 @@
 	let syncMessage = $state<string | null>(null);
 
 	async function syncFromPolis() {
-		const stepId = data.region?.polis_workflow_step_id;
+		const stepId = data.campaign.polisWorkflowStepId;
 		if (!stepId || syncing) return;
 		syncing = true;
 		syncMessage = null;
@@ -49,7 +49,7 @@
 	let csvError = $state<string | null>(null);
 	let fileInput = $state<HTMLInputElement>();
 
-	const stepId = $derived(data.region?.polis_workflow_step_id);
+	const stepId = $derived(data.campaign.polisWorkflowStepId);
 	const canSeed = $derived(!!stepId);
 
 	/** Post each seed, then pull the new comment(s) back into aux. */
@@ -161,7 +161,7 @@
 			<Button
 				variant="secondary"
 				onclick={syncFromPolis}
-				disabled={syncing || !data.region?.polis_workflow_step_id}
+				disabled={syncing || !data.campaign.polisWorkflowStepId}
 				title="Pull the latest submitted statements from Polis"
 			>
 				<RefreshCw class={`size-4 ${syncing ? 'animate-spin' : ''}`} />
@@ -188,7 +188,7 @@
 
 	{#if !canSeed}
 		<p class="text-muted-foreground text-caption">
-			This region has no polis_workflow_step_id, so statements cannot be imported.
+			This conversation has no Polis workflow step, so statements cannot be imported.
 		</p>
 	{/if}
 	{#if csvError}

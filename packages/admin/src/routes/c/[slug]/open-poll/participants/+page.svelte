@@ -14,7 +14,6 @@
 
 	let { data } = $props();
 
-	const region = $derived(data.region);
 	const demographics = $derived(data.demographics);
 	const goals = $derived(data.goals);
 	const workflowId = $derived(data.workflowId);

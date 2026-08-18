@@ -32,7 +32,7 @@
 	);
 
 	const api = $derived(data.api);
-	const conversationId = $derived(data.region.conversationId);
+	const conversationId = $derived(data.campaign.id);
 	const eventId = $derived(data.eventId);
 	const existingNames = $derived(recordings.map((r) => r.name));
 

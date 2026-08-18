@@ -9,7 +9,7 @@
 		`/c/${page.params.slug}/events/${page.params.eventSlug}/recordings`,
 	);
 	const conversationTitle = $derived(
-		data.conversation?.title ?? data.region?.heroHeader ?? "",
+		data.conversation?.title ?? data.campaign.title,
 	);
 	const recordingRefs = $derived(
 		(Array.isArray(data.recordings) ? data.recordings : []).map((r) => ({

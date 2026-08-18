@@ -3,7 +3,7 @@ import type { PageLoad } from './$types';
 export const load: PageLoad = async ({ parent, params, depends }) => {
 	depends(`recording:view:${params.recordingID}`);
 
-	const { api, region, event } = await parent();
+	const { api, campaign, event } = await parent();
 
 	if (!event) {
 		return { recording: null, error: 'Failed to find recording' };
@@ -11,7 +11,7 @@ export const load: PageLoad = async ({ parent, params, depends }) => {
 
 	try {
 		const result = await api.GetAudioRecording({
-			params: { conversation_id: region.conversationId, event_id: event.id, recording_id: params.recordingID },
+			params: { conversation_id: campaign.id, event_id: event.id, recording_id: params.recordingID },
 		});
 
 		return { recording: result, error: null };

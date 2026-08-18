@@ -82,9 +82,9 @@ export const load: PageServerLoad = async ({ parent, cookies, depends }) => {
 	depends('open-poll:demographics');
 	depends('open-poll:goals');
 
-	const { region } = await parent();
+	const { campaign } = await parent();
 	const authToken = cookies.get('auth-token');
-	const conversationId = region.conversationId;
+	const conversationId = campaign.id;
 
 	let demographics: DemographicReport | null = null;
 	let goals: RegionGoals = emptyGoals();
@@ -95,7 +95,7 @@ export const load: PageServerLoad = async ({ parent, cookies, depends }) => {
 	// cross-state county names never collide). Empty for regions with no prefixes.
 	let countyCounts: Record<string, number> = {};
 	// The county universe for goal-setting; empty for the generic/all region.
-	const regionCounties = countiesForPrefixes(region.zipPrefixes);
+	const regionCounties = countiesForPrefixes(campaign.zipPrefixes);
 	// USPS state codes the choropleth needs, derived from where participants
 	// actually live (scoped like the county rollup). Empty ⇒ no map to draw.
 	let mapStates: string[] = [];
@@ -116,8 +116,8 @@ export const load: PageServerLoad = async ({ parent, cookies, depends }) => {
 
 		if (!dRes.ok) throw new Error(`participation_report ${dRes.status}`);
 		demographics = (await dRes.json()) as DemographicReport;
-		countyCounts = rollUpByCounty(demographics.zipcodeCounts ?? {}, region.zipPrefixes);
-		mapStates = statesForZipCounts(demographics.zipcodeCounts ?? {}, region.zipPrefixes);
+		countyCounts = rollUpByCounty(demographics.zipcodeCounts ?? {}, campaign.zipPrefixes);
+		mapStates = statesForZipCounts(demographics.zipcodeCounts ?? {}, campaign.zipPrefixes);
 
 		if (tRes.ok) {
 			const targets = (await tRes.json()) as RecruitmentTargetDto[];

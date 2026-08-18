@@ -8,7 +8,7 @@
 
 	const event = $derived(data.event);
 	const api = $derived(data.api);
-	const region = $derived(data.region);
+	const campaign = $derived(data.campaign);
 
 	type BasicRow = {
 		id: string;
@@ -121,7 +121,7 @@
 				{ agenda: toAgenda(next) },
 				{
 					params: {
-						conversation_id: region.conversationId,
+						conversation_id: campaign.id,
 						event_id: event.id
 					}
 				}

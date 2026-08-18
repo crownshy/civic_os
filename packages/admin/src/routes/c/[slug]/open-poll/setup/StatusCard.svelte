@@ -6,6 +6,7 @@
 		/** Conversation-level live flag, the same source as the header badge. */
 		isLive: boolean;
 		/** Public poll URL, protocol stripped, e.g. "oregon.bloomproject.us/ai/poll". */
+		/** Public poll URL. Empty when this Campaign has no public URL yet. */
 		pollUrl: string;
 		participants: number;
 		statements: number;
@@ -44,16 +45,18 @@
 					>{isLive ? 'LIVE.' : 'OFF.'}</span
 				>
 			</h2>
-			<p class="text-foreground/70 text-body mt-2">
-				at
-				<a
-					href={`https://${pollUrl}`}
-					target="_blank"
-					rel="noopener noreferrer"
-					class="hover:text-foreground underline">{pollUrl}</a
-				>
-				<span aria-hidden="true">→</span>
-			</p>
+			{#if pollUrl}
+				<p class="text-foreground/70 text-body mt-2">
+					at
+					<a
+						href={`https://${pollUrl}`}
+						target="_blank"
+						rel="noopener noreferrer"
+						class="hover:text-foreground underline">{pollUrl}</a
+					>
+					<span aria-hidden="true">→</span>
+				</p>
+			{/if}
 		</div>
 
 		<PollStatRow

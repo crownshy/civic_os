@@ -11,7 +11,7 @@
 	let { data } = $props();
 
 	const event = $derived(data.event);
-	const region = $derived(data.region);
+	const campaign = $derived(data.campaign);
 	const api = $derived(data.api);
 
 	const BROWSER_TZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -158,7 +158,7 @@
 		error = null;
 		try {
 			await api.UpdateEvent(patch, {
-				params: { conversation_id: region.conversationId, event_id: event.id }
+				params: { conversation_id: campaign.id, event_id: event.id }
 			});
 			await invalidate(`events:detail:${event.id}`);
 			savedTick++;
@@ -207,10 +207,10 @@
 		deleting = true;
 		try {
 			await api.DeleteEvent(undefined, {
-				params: { conversation_id: region.conversationId, event_id: event.id }
+				params: { conversation_id: campaign.id, event_id: event.id }
 			});
 			deleteOpen = false;
-			await goto(`/c/${region.slug}/events`, { invalidateAll: true });
+			await goto(`/c/${campaign.slug}/events`, { invalidateAll: true });
 		} catch (e) {
 			console.error('DeleteEvent failed', e);
 			error = 'Delete failed.';
@@ -420,7 +420,7 @@
 				<div
 					class="bg-card shadow-card flex h-10 items-center rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-3 text-body"
 				>
-					{region.hostName}
+					{campaign.hostName}
 				</div>
 			</div>
 		</div>

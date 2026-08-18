@@ -11,7 +11,7 @@
 	}
 </script>
 
-<div class="p-6 sm:p-8">
+<div class="min-h-0 flex-1 overflow-y-auto p-6 sm:p-8">
 	<div class="mb-8 flex items-start justify-between gap-4">
 		<div>
 			<h1 class="mb-1 text-section font-bold">Hosts</h1>

@@ -1,18 +1,19 @@
 <script lang="ts">
 	import { ArrowRight, CalendarDays } from '@lucide/svelte';
+	import type { ConversationStatus } from '$lib/conversations';
 
 	let { data } = $props();
 
-	const statusLabel: Record<'live' | 'idle' | 'draft', string> = {
+	const statusLabel: Record<ConversationStatus, string> = {
 		live: 'Live',
-		idle: 'Dev',
-		draft: 'Offline'
+		draft: 'Draft',
+		complete: 'Closed'
 	};
 
-	const statusClass: Record<'live' | 'idle' | 'draft', string> = {
+	const statusClass: Record<ConversationStatus, string> = {
 		live: 'bg-success text-success-foreground',
-		idle: 'bg-muted text-muted-foreground',
-		draft: 'bg-primary/10 text-primary'
+		draft: 'bg-primary/10 text-primary',
+		complete: 'bg-muted text-muted-foreground'
 	};
 </script>
 
@@ -21,10 +22,12 @@
 	<p class="text-muted-foreground mb-8 text-body">Select a conversation to manage.</p>
 
 	{#if data.conversations.length === 0}
-		<p class="text-muted-foreground text-body">No conversations configured.</p>
+		<p class="text-muted-foreground text-body">
+			No conversations yet. Ones your organization owns or co-hosts will show up here.
+		</p>
 	{:else}
 		<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-			{#each data.conversations as conv (conv.slug)}
+			{#each data.conversations as conv (conv.id)}
 				<a
 					href={`/c/${conv.slug}/overview`}
 					class="border-border hover:border-foreground/20 hover:bg-muted/30 group flex flex-col gap-4 rounded-xl border p-5 transition-colors"
@@ -42,7 +45,9 @@
 
 					<div class="min-w-0 flex-1">
 						<p class="truncate text-body font-semibold leading-snug">{conv.title}</p>
-						<p class="text-muted-foreground mt-0.5 text-body">{conv.stateName}</p>
+						{#if conv.placeName}
+							<p class="text-muted-foreground mt-0.5 text-body">{conv.placeName}</p>
+						{/if}
 					</div>
 
 					{#if conv.eventCount > 0}

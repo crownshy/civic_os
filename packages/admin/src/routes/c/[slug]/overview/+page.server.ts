@@ -16,8 +16,8 @@ const RESOURCE_TYPE = 'Conversation';
 type PickerOrg = { id: string; name: string; website?: string | null; email?: string | null };
 
 export const load: PageServerLoad = async ({ parent, cookies, url, depends }) => {
-	const { region, conversation } = await parent();
-	const convId = region.conversationId;
+	const { campaign, conversation } = await parent();
+	const convId = campaign.id;
 	depends(`cohosts:${convId}`);
 
 	const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');

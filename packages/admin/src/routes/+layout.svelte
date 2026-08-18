@@ -2,7 +2,7 @@
 	import '../app.css';
 	import { LayoutDashboard, Plus, Menu, PanelLeftClose, PanelLeftOpen, X, LogOut, Building2 } from '@lucide/svelte';
 	import { page } from '$app/state';
-	import { REGIONS } from '$lib/config/regions';
+	import type { ConversationStatus } from '$lib/conversations';
 
 	let { children, data } = $props();
 
@@ -16,24 +16,14 @@
 	let collapsed = $state(false);
 	let mobileOpen = $state(false);
 
-	// Build sidebar list from real region data. Status dot: green if active
-	// conversation, red if explicitly closed, gray for testing/dev.
-	const conversations = $derived(
-		Object.values(REGIONS).map((r) => {
-			const status: 'live' | 'idle' | 'draft' =
-				r.slug === 'testing' || r.slug === 'dev'
-					? 'idle'
-					: r.conversationsActive === false
-						? 'draft'
-						: 'live';
-			return { slug: r.slug, title: r.heroHeader, status };
-		})
-	);
+	// The Campaigns this user may see, resolved from comhairle in the root
+	// +layout.server.ts. A Host member sees their org's; a super-admin sees all.
+	const conversations = $derived(data?.conversations ?? []);
 
-	const statusDot: Record<'live' | 'idle' | 'draft', string> = {
+	const statusDot: Record<ConversationStatus, string> = {
 		live: 'bg-success',
-		idle: 'bg-muted-foreground/30',
-		draft: 'bg-primary'
+		draft: 'bg-primary',
+		complete: 'bg-muted-foreground/30'
 	};
 
 	const onDashboard = $derived(page.url.pathname === '/');
@@ -163,21 +153,25 @@
 		{/if}
 
 		<div class="border-border flex flex-col gap-0.5 border-b pb-2.5">
-			{#each conversations as conv}
+			{#each conversations as conversation (conversation.id)}
 				<a
-					href={`/c/${conv.slug}/overview`}
-					title={conv.title}
+					href={`/c/${conversation.slug}/overview`}
+					title={conversation.title}
 					class={[
 						'flex items-center gap-2 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-2.5 py-2 text-caption font-medium',
-						currentSlug === conv.slug ? 'bg-muted-foreground/20' : 'hover:bg-muted/50',
+						currentSlug === conversation.slug ? 'bg-muted-foreground/20' : 'hover:bg-muted/50',
 						collapsed && !mobileOpen ? 'justify-center px-0' : ''
 					].join(' ')}
 				>
-					<span class={`size-1.5 shrink-0 rounded-full ${statusDot[conv.status]}`}></span>
+					<span class={`size-1.5 shrink-0 rounded-full ${statusDot[conversation.status]}`}></span>
 					{#if !collapsed || mobileOpen}
-						<span class="flex-1 truncate">{conv.title}</span>
+						<span class="flex-1 truncate">{conversation.title}</span>
 					{/if}
 				</a>
+			{:else}
+				{#if !collapsed || mobileOpen}
+					<p class="text-muted-foreground px-2.5 py-2 text-caption">None yet.</p>
+				{/if}
 			{/each}
 		</div>
 

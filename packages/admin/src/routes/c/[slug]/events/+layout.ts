@@ -6,11 +6,11 @@ import type { LayoutLoad } from './$types';
 export const load: LayoutLoad = async ({ parent, depends }) => {
 	depends('events:list');
 
-	const { api, region } = await parent();
+	const { api, campaign } = await parent();
 
 	try {
 		const result = await api.ListEvents({
-			params: { conversation_id: region.conversationId },
+			params: { conversation_id: campaign.id },
 			queries: { start_time: 'asc' }
 		});
 		return { events: result?.records ?? [] };
