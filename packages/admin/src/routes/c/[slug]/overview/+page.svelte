@@ -155,7 +155,7 @@
 	{/snippet}
 
 	<div class="flex-1 overflow-y-auto">
-		<div class="flex flex-col gap-6 px-8 py-8">
+		<div class="flex flex-col gap-6 px-8 pb-8">
 			<!-- Auto-save status -->
 			<div class="text-caption text-muted-foreground h-4 self-end" aria-live="polite">
 				{#if saveStatus !== 'idle'}
