@@ -87,7 +87,7 @@
 
 	<!-- Statement text + theme tags -->
 	<div class="min-w-0">
-		<p class="font-ui text-foreground text-lg font-medium leading-6">{comment.text}</p>
+		<p class="font-ui text-foreground text-body-lg font-medium">{comment.text}</p>
 		<div class="mt-3">
 			{#if picker}
 				<ThemePicker

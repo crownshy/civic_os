@@ -24,7 +24,7 @@
 
 <Popover.Root bind:open>
 	<Popover.Trigger
-		class="flex min-w-0 max-w-full items-center gap-2 text-left text-4xl font-bold text-foreground outline-none"
+		class="flex min-w-0 max-w-full items-center gap-2 text-left text-h3 md:text-h2 font-bold text-foreground outline-none"
 	>
 		<span class="min-w-0 break-words">{name}</span>
 		<ChevronDown class="size-6 shrink-0 text-primary" />
@@ -39,7 +39,7 @@
 			<a
 				href={`${basePath}/${rec.id}`}
 				onclick={() => (open = false)}
-				class={`flex items-center justify-between gap-2 border-b border-border px-5 py-4 text-xl font-bold ${active ? "text-primary" : "text-foreground hover:bg-muted"}`}
+				class={`flex items-center justify-between gap-2 border-b border-border px-5 py-4 text-h4 font-bold ${active ? "text-primary" : "text-foreground hover:bg-muted"}`}
 			>
 				<span class="truncate">{rec.name}</span>
 				{#if active}
@@ -50,7 +50,7 @@
 		<a
 			href={recordingsPath}
 			onclick={() => (open = false)}
-			class="flex items-center justify-center gap-1.5 px-5 py-6 text-base font-bold text-primary hover:bg-muted"
+			class="flex items-center justify-center gap-1.5 px-5 py-6 text-body font-bold text-primary hover:bg-muted"
 		>
 			Go to Recordings <ArrowRight class="size-4" />
 		</a>

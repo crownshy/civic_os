@@ -31,13 +31,13 @@
 			{#if titleField}
 				{@render titleField()}
 			{:else}
-				<div class="font-display text-display font-semibold">{title}</div>
+				<div class="font-display text-body-lg font-semibold">{title}</div>
 			{/if}
 		</SetupField>
 
 		<div class="flex flex-wrap gap-x-12 gap-y-6">
 			<SetupField label="Slug">
-				<div class="text-section font-semibold">
+				<div class="text-body font-semibold">
 					<span class="text-muted-foreground">{baseUrl}/</span>{slug}
 				</div>
 			</SetupField>
@@ -47,7 +47,7 @@
 					<div class="flex flex-wrap items-center gap-2">
 						{#each places as place (place)}
 							<span
-								class="bg-primary/5 text-primary text-section rounded-[10px] px-2.5 py-1.5 font-semibold"
+								class="bg-primary/5 text-primary text-caption rounded-[10px] px-2.5 py-1.5 font-medium"
 							>
 								{place}
 							</span>
@@ -58,7 +58,7 @@
 		</div>
 
 		<SetupField label="Key Question">
-			<div class="text-section font-medium">{keyQuestion}</div>
+			<div class="text-body">{keyQuestion}</div>
 		</SetupField>
 
 		<SetupField label="Color Scheme">

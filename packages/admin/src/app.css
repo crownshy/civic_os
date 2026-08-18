@@ -38,35 +38,71 @@
   --radius: var(--radius);
 }
 
-/* Admin semantic type scale.
-   Use these on admin pages instead of raw text-sm/2xl/4xl utilities so
-   role-and-size live in one named token. Retune the var, whole app shifts.
+/* Admin type scale (design system, sizes only).
 
-   label    12px  small caps eyebrow labels ("TOTAL STATEMENTS")
-   caption  13px  table cells, helper copy
-   body     16px  paragraph body
-   section  24px  card / section H2 ("Themes")
-   display  36px  page H1 (conversation title), card / section titles
-   stat     48px  hero metric numbers (Insights secondary)
-   hero     72px  primary hero metric numbers (514 / 700 / 167) */
+   Sizes and line heights come from the design system spec; weight stays an
+   explicit utility so a heading can borrow the rung below it on mobile without
+   dragging that rung's weight along. Prefer these over raw text-sm/2xl/4xl.
+
+   Headings step down one rung on mobile. Pair them:
+     H1  text-h2 md:text-h1     48/48 bold      banner / marketing hero
+     H2  text-h3 md:text-h2     36/40 bold      page titles (conversation title,
+                                                "All Recordings"), empty states
+     H3  text-h4 md:text-h3     24/32 semibold  card titles, subsection headings
+     H4  text-lg md:text-h4     20/32 medium    component headings, list-item titles
+
+   Admin has no banner surface yet, so --text-h1 is defined but unused. The
+   conversation title is a page title, which is H2.
+
+   Body and label roles do not step:
+     body-lg    18/24  regular  first paragraph under a conversation title
+     paragraph  16/28  regular  long-form reading inside conversation steps
+     body       16/24  regular  general UI body copy
+     caption    14/20           body small (table cells, breadcrumbs, sidebar nav)
+                                and label small (status badges, at font-medium)
+     label      12/16  medium   divider labels, timestamps, user email
+
+   18/28 (button large, footer link, H4 on mobile) is Tailwind's text-lg
+   unchanged, so it has no token of its own.
+
+   Numerals sit outside the spec and keep their own names:
+     stat  48px  hero metric numbers (Insights secondary)
+     hero  72px  primary hero metric numbers (514 / 700 / 167) */
 @theme {
-  --text-label: var(--text-xs);
-  --text-label--line-height: var(--text-xs--line-height);
-  --text-caption: var(--text-sm);
-  --text-caption--line-height: var(--text-sm--line-height);
-  --text-body: var(--text-base);
-  --text-body--line-height: var(--text-base--line-height);
-  --text-section: var(--text-2xl);
-  --text-section--line-height: var(--text-2xl--line-height);
-  --text-display: var(--text-4xl);
-  --text-display--line-height: var(--text-4xl--line-height);
+  --text-h1: 3rem;
+  --text-h1--line-height: 1;
+  --text-h2: 2.25rem;
+  --text-h2--line-height: 2.5rem;
+  --text-h3: 1.5rem;
+  --text-h3--line-height: 2rem;
+  --text-h4: 1.25rem;
+  --text-h4--line-height: 2rem;
+
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 1.5rem;
+  --text-paragraph: 1rem;
+  --text-paragraph--line-height: 1.75rem;
+  --text-body: 1rem;
+  --text-body--line-height: 1.5rem;
+  --text-caption: 0.875rem;
+  --text-caption--line-height: 1.25rem;
+  --text-label: 0.75rem;
+  --text-label--line-height: 1rem;
+
   --text-stat: var(--text-5xl);
   --text-stat--line-height: var(--text-5xl--line-height);
   --text-hero: var(--text-7xl);
   --text-hero--line-height: var(--text-7xl--line-height);
 
-  /* Inter — UI chrome + numerics (nav, tabs, eyebrow labels, numbers,
-	   statement body). Titles use --font-display (Geom); labels/rows --font-sans. */
+  /* Deprecated: --text-section is H3 and --text-display is H2. Kept so the
+     existing call sites keep working; rename them and delete these. */
+  --text-section: var(--text-h3);
+  --text-section--line-height: var(--text-h3--line-height);
+  --text-display: var(--text-h2);
+  --text-display--line-height: var(--text-h2--line-height);
+
+  /* Inter: UI chrome + numerics (nav, tabs, eyebrow labels, numbers, statement
+     body). Titles use --font-display; labels and rows use --font-sans. */
   --font-ui: "Inter", "Hanken Grotesk", sans-serif;
 }
 

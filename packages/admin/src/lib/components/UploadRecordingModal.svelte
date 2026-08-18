@@ -118,7 +118,7 @@
 <Dialog.Root bind:open onOpenChange={(v) => !v && close()}>
 	<Dialog.Content class="min-w-4xl max-w-5xl gap-0 rounded-[30px] p-0">
 		<div class="p-10">
-			<Dialog.Title class="text-4xl font-bold text-foreground">
+			<Dialog.Title class="text-h4 md:text-h3 font-bold text-foreground">
 				Name your recording
 			</Dialog.Title>
 			<!-- Visually hidden: the design shows no description, but the dialog still needs an
@@ -134,12 +134,12 @@
 					for="recording-file"
 					class={selectedFile
 						? 'sr-only'
-						: 'inline-flex cursor-pointer items-center gap-2 text-2xl font-bold text-primary'}
+						: 'inline-flex cursor-pointer items-center gap-2 text-body md:text-lg font-bold text-primary'}
 				>
 					Choose an audio file…
 				</Label>
 				{#if selectedFile}
-					<p class="text-2xl font-bold text-foreground">{selectedFile.name}</p>
+					<p class="text-body-lg font-bold text-foreground">{selectedFile.name}</p>
 				{/if}
 				<Input
 					id="recording-file"
@@ -149,7 +149,7 @@
 					disabled={submitting}
 					class={selectedFile
 						? 'sr-only'
-						: 'mt-3 flex h-16 items-center rounded-[20px] px-5 text-2xl file:mr-4 file:text-2xl'}
+						: 'mt-3 flex h-16 items-center rounded-[20px] px-5 text-body file:mr-4 file:text-body'}
 				/>
 			</div>
 
@@ -165,10 +165,10 @@
 					aria-describedby={nameError ? 'recording-name-error' : undefined}
 					oninput={() => (nameError = null)}
 					disabled={submitting}
-					class="h-16 rounded-[20px] px-5 text-2xl font-bold md:text-2xl"
+					class="h-16 rounded-[20px] px-5 text-body md:text-lg font-bold"
 				/>
 				{#if nameError}
-					<p id="recording-name-error" class="mt-2 text-lg text-destructive">
+					<p id="recording-name-error" class="mt-2 text-body text-destructive">
 						{nameError}
 					</p>
 				{/if}
@@ -182,7 +182,7 @@
 			{/if}
 
 			{#if errorMsg}
-				<p class="mt-3 text-lg text-destructive">{errorMsg}</p>
+				<p class="mt-3 text-body text-destructive">{errorMsg}</p>
 			{/if}
 
 			<!-- Actions -->
@@ -191,14 +191,14 @@
 					variant="secondary"
 					onclick={close}
 					disabled={submitting}
-					class="h-auto rounded-[45px] px-4 py-3 text-xl leading-6"
+					class="h-auto rounded-[45px] px-4 py-3 text-body md:text-lg"
 				>
 					Cancel
 				</Button>
 				<Button
 					onclick={submitForm}
 					disabled={submitting}
-					class="h-auto rounded-[45px] px-4 py-3 text-xl leading-6"
+					class="h-auto rounded-[45px] px-4 py-3 text-body md:text-lg"
 				>
 					{submitting ? `Uploading… ${progress}%` : 'Submit'}
 				</Button>

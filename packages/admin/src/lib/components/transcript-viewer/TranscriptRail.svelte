@@ -136,7 +136,7 @@
 					<Play class="size-4 fill-current" />
 				{/if}
 			</button>
-			<span class="text-sm font-medium tabular-nums text-muted-foreground">
+			<span class="text-caption font-medium tabular-nums text-muted-foreground">
 				{fmt(currentTime)}
 			</span>
 		</div>
@@ -170,12 +170,12 @@
 				class={`flex w-full cursor-pointer flex-col items-start gap-[5px] px-5 py-6 text-left transition-colors hover:bg-primary/10 ${isActive ? "bg-muted" : ""}`}
 			>
 				<span
-					class={`text-sm font-medium uppercase leading-4 ${speakerColor(event.speaker_id)}`}
+					class={`text-caption font-medium uppercase leading-4 ${speakerColor(event.speaker_id)}`}
 				>
 					Speaker {speakerNum(event.speaker_id)}
 				</span>
 				<span
-					class={`text-sm font-medium leading-5 text-foreground ${isActive ? "" : "opacity-70"}`}
+					class={`text-caption font-medium leading-5 text-foreground ${isActive ? "" : "opacity-70"}`}
 				>
 					{event.text}
 				</span>

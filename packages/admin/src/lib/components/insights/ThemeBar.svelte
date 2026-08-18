@@ -23,8 +23,8 @@
 <div
 	class="border-border group hover:bg-muted/40 grid grid-cols-[10rem_3rem_1fr_2.5rem] items-center gap-6 border-b px-2 py-4 transition-colors duration-150"
 >
-	<div class="text-foreground truncate text-xl font-bold">{summary.theme}</div>
-	<div class="font-ui text-foreground text-right text-xl font-bold tabular-nums">
+	<div class="text-foreground truncate text-h4 font-bold">{summary.theme}</div>
+	<div class="font-ui text-foreground text-right text-h4 font-bold tabular-nums">
 		{summary.statementCount}
 	</div>
 	<Meter class="w-full" fill={pct} fillClass="bg-theme-bar" />

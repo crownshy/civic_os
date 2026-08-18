@@ -130,7 +130,7 @@
 					<input
 						{...props}
 						bind:value={$formData.title}
-						class="font-display text-display focus:border-primary w-full rounded-[10px] border border-stone-300 bg-transparent px-3 py-2 font-semibold focus:outline-none"
+						class="font-display text-body-lg focus:border-primary w-full rounded-[10px] border border-stone-300 bg-transparent px-3 py-2 font-semibold focus:outline-none"
 					/>
 				{/snippet}
 			</Form.Control>
@@ -146,7 +146,7 @@
 						{...props}
 						bind:value={$formData.description}
 						rows="4"
-						class="text-body focus:border-primary w-full rounded-[10px] border border-stone-300 bg-transparent px-3 py-2 leading-relaxed focus:outline-none"
+						class="text-paragraph focus:border-primary w-full rounded-[10px] border border-stone-300 bg-transparent px-3 py-2 focus:outline-none"
 					></textarea>
 				{/snippet}
 			</Form.Control>

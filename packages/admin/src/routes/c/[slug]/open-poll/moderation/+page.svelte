@@ -214,7 +214,7 @@
 				bind:value={draftText}
 				rows="2"
 				placeholder="Write a seed statement…"
-				class="border-border focus:ring-ring/40 text-lg w-full rounded-md border px-3 py-2 focus:ring-2 focus:outline-none"
+				class="border-border focus:ring-ring/40 text-body w-full rounded-md border px-3 py-2 focus:ring-2 focus:outline-none"
 			></textarea>
 
 			<!-- Option 2: bulk import -->
@@ -268,7 +268,7 @@
 			<button
 				type="button"
 				onclick={() => (filter = f.key)}
-				class={`font-ui inline-flex cursor-pointer items-center rounded-[30px] px-3 py-2 text-lg font-medium leading-6 transition-all duration-150 hover:scale-[1.03] active:scale-[0.97] ${
+				class={`font-ui inline-flex cursor-pointer items-center rounded-[30px] px-3 py-2 text-body-lg font-medium transition-all duration-150 hover:scale-[1.03] active:scale-[0.97] ${
 					filter === f.key
 						? 'bg-primary text-primary-foreground shadow-sm'
 						: 'bg-primary-subtle text-primary hover:bg-primary-subtle-hover'
@@ -318,7 +318,7 @@
 
 							<!-- Statement text -->
 							<div class="min-w-0">
-								<p class="font-ui text-foreground text-lg font-medium leading-6">
+								<p class="font-ui text-foreground text-body-lg font-medium">
 									{row.statement_text}
 								</p>
 							</div>

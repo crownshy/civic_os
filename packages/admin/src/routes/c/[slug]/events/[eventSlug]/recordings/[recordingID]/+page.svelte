@@ -20,7 +20,7 @@
 </script>
 
 {#if error}
-	<h1 class="text-2xl font-bold">{error}</h1>
+	<h1 class="text-h3 md:text-h2 font-bold">{error}</h1>
 {/if}
 
 {#if recording}
