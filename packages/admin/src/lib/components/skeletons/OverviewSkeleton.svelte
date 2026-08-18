@@ -6,7 +6,7 @@
 	// label + card read-only setting rows, ending with the danger-zone card.
 </script>
 
-<div class="flex-1 space-y-5 overflow-y-auto px-5 py-5" aria-hidden="true">
+<div class="flex-1 space-y-5 overflow-y-auto px-8 py-8" aria-hidden="true">
 	<Skeleton class="h-4 w-20" />
 
 	{#each Array(5) as _, i (i)}

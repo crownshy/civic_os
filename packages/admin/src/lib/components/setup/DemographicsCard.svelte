@@ -99,7 +99,7 @@
 							aria-label={`Toggle ${category.name}`}
 							disabled={!editable || pending[category.key]}
 							onclick={() => toggle(category.key, on)}
-							class="relative h-5 w-9 shrink-0 rounded-full transition-colors disabled:cursor-not-allowed {on
+							class="relative h-5 w-9 shrink-0 cursor-pointer rounded-full transition-colors disabled:cursor-not-allowed {on
 								? 'bg-primary'
 								: 'bg-muted-foreground/30'}"
 						>
@@ -143,7 +143,7 @@
 							aria-label={`Toggle ${category.name}`}
 							disabled={!onToggleCustom || pending[category.key]}
 							onclick={() => run(category.key, () => onToggleCustom!(category.key, !on))}
-							class="relative h-5 w-9 shrink-0 rounded-full transition-colors disabled:cursor-not-allowed {on
+							class="relative h-5 w-9 shrink-0 cursor-pointer rounded-full transition-colors disabled:cursor-not-allowed {on
 								? 'bg-primary'
 								: 'bg-muted-foreground/30'}"
 						>

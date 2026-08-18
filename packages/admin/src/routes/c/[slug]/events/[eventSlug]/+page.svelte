@@ -229,7 +229,7 @@
 </script>
 
 {#if event}
-	<div class="max-w-6xl space-y-5">
+	<div class="space-y-5">
 		<div class="flex items-center justify-end gap-3 text-caption">
 			{#if saving}
 				<span class="text-muted-foreground">saving…</span>

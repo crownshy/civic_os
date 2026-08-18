@@ -19,9 +19,7 @@
 		{/each}
 	</nav>
 	<div class="flex-1 overflow-y-auto">
-		<div class="px-5 py-5">
-			<OpenPollSkeleton tab="/participants" />
-		</div>
+		<OpenPollSkeleton tab="/participants" />
 	</div>
 {:else if tab === 'events'}
 	<EventsSkeleton />

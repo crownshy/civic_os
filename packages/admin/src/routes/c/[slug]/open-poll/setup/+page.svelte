@@ -91,7 +91,7 @@
 		});
 </script>
 
-<div class="mx-auto flex max-w-6xl flex-col gap-6 px-8 py-8">
+<div class="flex flex-col gap-6 px-8 py-8">
 	<StatusCard
 		{isLive}
 		{pollUrl}

@@ -213,7 +213,7 @@
 	</div>
 
 	<!-- Statements list (matches Insights StatementSection card style) -->
-	<div class="max-w-6xl">
+	<div>
 		<Card class="hover:border-muted-foreground/40 shadow-card transition-colors duration-200">
 			<div class="flex flex-col">
 				<!-- Column headings -->

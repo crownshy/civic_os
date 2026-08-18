@@ -121,8 +121,10 @@
 </script>
 
 <Dialog.Root bind:open {onOpenChange}>
-	<Dialog.Content class="font-ui max-h-[85vh] w-[min(92vw,720px)] overflow-y-auto sm:max-w-[720px]">
-		<Dialog.Header>
+	<Dialog.Content
+		class="font-ui flex max-h-[85vh] w-[min(92vw,720px)] flex-col overflow-hidden sm:max-w-[720px]"
+	>
+		<Dialog.Header class="shrink-0">
 			<Dialog.Title class="font-display md:text-h3 text-h4 font-semibold">
 				Add New Demographic Category
 			</Dialog.Title>
@@ -131,102 +133,137 @@
 			</Dialog.Description>
 		</Dialog.Header>
 
-		<div class="flex flex-col gap-8 py-2">
-			<SetupField label="Category name">
-				<input
-					bind:value={name}
-					placeholder="e.g. Education Level"
-					class="border-input bg-background text-body-lg focus:ring-ring w-full rounded-[10px] border px-4 py-4 font-semibold focus:ring-2 focus:outline-none"
-				/>
-			</SetupField>
+		<div class="-mx-6 min-h-0 flex-1 overflow-y-auto px-6">
+			<div class="flex flex-col gap-8 py-2">
+				<SetupField label="Category name">
+					<!-- svelte-ignore a11y_autofocus -->
+					<input
+						bind:value={name}
+						autofocus
+						placeholder="e.g. Education Level"
+						onkeydown={(e) => {
+							if (e.key === 'Enter' && editing < 0) {
+								e.preventDefault();
+								startAdd();
+							}
+						}}
+						class="border-input bg-background text-body-lg focus:ring-ring w-full rounded-[10px] border px-4 py-4 font-semibold focus:ring-2 focus:outline-none"
+					/>
+				</SetupField>
 
-			<div>
-				<h3 class="font-display md:text-h4 text-foreground text-lg font-medium">Options</h3>
-				<p class="text-foreground/70 text-body mt-1">
-					These are the options that participants will be able to choose from within the category.
-				</p>
+				<div>
+					<h3 class="font-display md:text-h4 text-foreground text-lg font-medium">Options</h3>
+					<p class="text-foreground/70 text-body mt-1">
+						These are the options that participants will be able to choose from within the category.
+					</p>
 
-				<div class="divide-border mt-4 divide-y border-t">
-					{#each options as option, i (i)}
-						<div class="flex items-center gap-4 py-4">
-							{#if editing === i}
-								<!-- svelte-ignore a11y_autofocus -->
-								<input
-									bind:value={draft}
-									autofocus
-									aria-label={`Option ${i + 1}`}
-									onkeydown={(e) => {
-										if (e.key === 'Enter') commit();
-										if (e.key === 'Escape') cancelEdit();
-									}}
-									onblur={commit}
-									class="border-input bg-background text-body focus:ring-ring min-w-0 flex-1 rounded-[10px] border px-3 py-2 font-semibold focus:ring-2 focus:outline-none"
-								/>
-							{:else}
-								<span class="text-body min-w-0 flex-1 font-semibold">{option}</span>
-								<div class="flex shrink-0 items-center gap-3">
-									<button
-										type="button"
-										onclick={() => move(i, -1)}
-										disabled={i === 0}
-										aria-label={`Move ${option} up`}
-										class="text-foreground hover:text-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-25"
-									>
-										<ArrowUp class="size-4" />
-									</button>
-									<button
-										type="button"
-										onclick={() => move(i, 1)}
-										disabled={i === options.length - 1}
-										aria-label={`Move ${option} down`}
-										class="text-foreground hover:text-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-25"
-									>
-										<ArrowDown class="size-4" />
-									</button>
-									<button
-										type="button"
-										onclick={() => startEdit(i)}
-										aria-label={`Edit ${option}`}
-										class="text-primary cursor-pointer"
-									>
-										<Pencil class="size-4" />
-									</button>
-									<button
-										type="button"
-										onclick={() => remove(i)}
-										aria-label={`Remove ${option}`}
-										class="text-primary cursor-pointer"
-									>
-										<X class="size-4" />
-									</button>
-								</div>
-							{/if}
-						</div>
-					{/each}
+					<div class="divide-border mt-4 divide-y border-t">
+						{#each options as option, i (i)}
+							<div class="flex items-center gap-4 py-4">
+								{#if editing === i}
+									<div class="min-w-0 flex-1">
+										<!-- svelte-ignore a11y_autofocus -->
+										<input
+											bind:value={draft}
+											autofocus
+											aria-label={`Option ${i + 1}`}
+											aria-describedby="option-editor-hint"
+											onkeydown={(e) => {
+												if (e.key === 'Enter') {
+													e.preventDefault();
+													commitAndContinue();
+												}
+												if (e.key === 'Escape') {
+													// Otherwise the dialog itself swallows Escape and the whole form is lost.
+													e.stopPropagation();
+													cancelEdit();
+												}
+											}}
+											onblur={() => {
+												// Only for this row: chaining to the next one blurs this input after
+												// `editing` has already moved on.
+												if (editing === i) commit();
+											}}
+											class="border-input bg-background text-body focus:ring-ring w-full rounded-[10px] border px-3 py-2 font-semibold focus:ring-2 focus:outline-none"
+										/>
+										<p id="option-editor-hint" class="text-foreground/60 text-caption mt-1.5">
+											Press <kbd class="font-ui font-semibold">Enter</kbd> to save and start the next option,
+											<kbd class="font-ui font-semibold">Esc</kbd> to discard. Enter on an empty row finishes.
+										</p>
+									</div>
+								{:else}
+									<span class="text-body min-w-0 flex-1 font-semibold">{option}</span>
+									<div class="flex shrink-0 items-center gap-3">
+										<button
+											type="button"
+											onclick={() => move(i, -1)}
+											disabled={i === 0}
+											aria-label={`Move ${option} up`}
+											class="text-foreground hover:text-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-25"
+										>
+											<ArrowUp class="size-4" />
+										</button>
+										<button
+											type="button"
+											onclick={() => move(i, 1)}
+											disabled={i === options.length - 1}
+											aria-label={`Move ${option} down`}
+											class="text-foreground hover:text-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-25"
+										>
+											<ArrowDown class="size-4" />
+										</button>
+										<button
+											type="button"
+											onclick={() => startEdit(i)}
+											aria-label={`Edit ${option}`}
+											class="text-primary cursor-pointer"
+										>
+											<Pencil class="size-4" />
+										</button>
+										<button
+											type="button"
+											onclick={() => remove(i)}
+											aria-label={`Remove ${option}`}
+											class="text-primary cursor-pointer"
+										>
+											<X class="size-4" />
+										</button>
+									</div>
+								{/if}
+							</div>
+						{/each}
 
-					<button
-						type="button"
-						onclick={startAdd}
-						disabled={editing >= 0}
-						class="text-primary text-body w-full cursor-pointer py-4 text-left font-semibold disabled:cursor-not-allowed disabled:opacity-50"
-					>
-						Add New…
-					</button>
+						<button
+							type="button"
+							onclick={startAdd}
+							disabled={editing >= 0}
+							class="text-primary text-body w-full cursor-pointer py-4 text-left font-semibold disabled:cursor-not-allowed disabled:opacity-50"
+						>
+							Add New…
+						</button>
+					</div>
 				</div>
-			</div>
 
-			{#if error}
-				<p class="text-destructive text-body">{error}</p>
-			{/if}
+				{#if error}
+					<p class="text-destructive text-body">{error}</p>
+				{/if}
+			</div>
 		</div>
 
-		<Dialog.Footer>
-			<Button variant="secondary" onclick={() => (open = false)} disabled={submitting}>
-				Cancel
-			</Button>
-			<Button onclick={save} disabled={!!problem || submitting} title={problem ?? undefined}>
-				{submitting ? 'Saving…' : 'Save category'}
-			</Button>
+		<Dialog.Footer
+			class="border-border shrink-0 items-stretch gap-3 border-t pt-4 sm:items-center sm:justify-between"
+		>
+			{#if started && problem}
+				<p class="text-foreground/70 text-body min-w-0">{problem}</p>
+			{/if}
+			<div class="flex shrink-0 gap-2 sm:ml-auto">
+				<Button variant="secondary" onclick={() => (open = false)} disabled={submitting}>
+					Cancel
+				</Button>
+				<Button onclick={save} disabled={!!problem || submitting}>
+					{submitting ? 'Saving…' : 'Save category'}
+				</Button>
+			</div>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

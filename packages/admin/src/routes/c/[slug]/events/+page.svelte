@@ -166,7 +166,7 @@
 	}
 </script>
 
-<div class="flex-1 space-y-3.5 overflow-y-auto px-4 py-5 sm:px-5">
+<div class="flex-1 space-y-3.5 overflow-y-auto px-8 py-8">
 	<div class="flex flex-col items-stretch justify-between gap-2 sm:flex-row sm:items-center">
 		<div class="flex flex-wrap items-center gap-1.5">
 			{#each [['upcoming', counts.upcoming], ['drafts', counts.drafts], ['past', counts.past]] as const as [label, n] (label)}

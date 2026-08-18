@@ -187,7 +187,7 @@
 	}
 </script>
 
-<div class="max-w-6xl space-y-4">
+<div class="space-y-4">
 	<div class="flex items-end justify-between">
 		<div>
 			<h3 class="text-body font-bold">Agenda</h3>

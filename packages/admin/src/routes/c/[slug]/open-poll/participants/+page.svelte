@@ -146,7 +146,7 @@
 		Loading participants…
 	</div>
 {:else}
-	<div class="flex-1 overflow-y-auto px-8 py-8">
+	<div class="px-8 py-8">
 		<!-- Hero metric row -->
 		<div class="flex flex-wrap items-end justify-between gap-4 pb-8">
 			<PollStatRow

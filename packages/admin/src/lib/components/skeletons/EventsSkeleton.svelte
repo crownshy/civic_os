@@ -6,7 +6,7 @@
 	// event cards (date block, title/time, RSVP count, open pill).
 </script>
 
-<div class="flex-1 space-y-3.5 overflow-y-auto px-4 py-5 sm:px-5" aria-hidden="true">
+<div class="flex-1 space-y-3.5 overflow-y-auto px-8 py-8" aria-hidden="true">
 	<!-- Toolbar: filter pills (left) + view toggles / new-event (right) -->
 	<div class="flex flex-col items-stretch justify-between gap-2 sm:flex-row sm:items-center">
 		<div class="flex flex-wrap items-center gap-1.5">

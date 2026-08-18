@@ -6,7 +6,7 @@
 	// plus a subtitle line over a body block.
 </script>
 
-<div class="mx-auto flex max-w-6xl flex-col gap-6 px-8 py-8" aria-hidden="true">
+<div class="flex flex-col gap-6 px-8 py-8" aria-hidden="true">
 	{#each Array(4) as _, i (i)}
 		<Card class="shadow-card rounded-[20px]">
 			<div class="flex flex-col gap-6 px-8 py-8">
