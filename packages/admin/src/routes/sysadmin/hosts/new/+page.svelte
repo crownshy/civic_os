@@ -4,7 +4,7 @@
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import * as Form from '@civicos/shared/ui/form';
 	import { Button } from '@civicos/shared/ui/button';
-	import { ArrowLeft, CheckCircle2, AlertCircle } from '@lucide/svelte';
+	import { ArrowLeft, AlertCircle } from '@lucide/svelte';
 	import { createHostSchema, type CreateHostMessage } from './create-host-schema';
 
 	let { data } = $props();
@@ -47,7 +47,7 @@
 
 	<h1 class="mb-1 text-section font-bold">Create Host</h1>
 	<p class="text-muted-foreground mb-8 text-body">
-		Create a new Host organization and invite its initial admins.
+		Create a new Host organization. Members are added from the Host's page afterwards.
 	</p>
 
 	{#if msg?.kind === 'error'}
@@ -56,38 +56,6 @@
 		>
 			<AlertCircle class="size-4 shrink-0" />
 			<span>{msg.text}</span>
-		</div>
-	{/if}
-
-	{#if msg?.kind === 'partial'}
-		<div
-			class="border-border mb-6 rounded-xl border px-4 py-4"
-		>
-			<div class="text-body font-semibold">
-				<span class="text-success">{msg.orgName}</span> was created, but some members could not be added:
-			</div>
-			<ul class="mt-3 flex flex-col gap-1.5">
-				{#each msg.members ?? [] as m (m.email)}
-					<li class="flex items-center gap-2 text-body">
-						{#if m.error}
-							<AlertCircle class="text-destructive size-4 shrink-0" />
-							<span>{m.email}</span>
-							<span class="text-muted-foreground">{m.error}</span>
-						{:else}
-							<CheckCircle2 class="text-success size-4 shrink-0" />
-							<span>{m.email}</span>
-							<span class="text-muted-foreground">
-								{m.createdAccount ? 'account created' : 'existing account'}{m.emailed
-									? ', emailed'
-									: ''}
-							</span>
-						{/if}
-					</li>
-				{/each}
-			</ul>
-			<div class="mt-4">
-				<Button href="/sysadmin/hosts" variant="outline" size="sm">View all Hosts</Button>
-			</div>
 		</div>
 	{/if}
 
@@ -212,28 +180,6 @@
 						This appears on the homepage for this Host.
 					</p>
 					<textarea {...props} bind:value={$formData.description} rows="4" class={inputClass}
-					></textarea>
-				{/snippet}
-			</Form.Control>
-			<Form.FieldErrors class="text-caption text-destructive mt-1" />
-		</Form.Field>
-
-		<!-- Member emails -->
-		<Form.Field {form} name="memberEmailsRaw">
-			<Form.Control>
-				{#snippet children({ props })}
-					<Form.Label class="text-label text-muted-foreground font-semibold tracking-wider uppercase"
-						>Invite admins</Form.Label
-					>
-					<p class="text-caption text-muted-foreground mb-1">
-						One email per line. Each person gets an admin account and a set-password email.
-					</p>
-					<textarea
-						{...props}
-						bind:value={$formData.memberEmailsRaw}
-						rows="3"
-						placeholder="alex@example.org&#10;sam@example.org"
-						class={inputClass}
 					></textarea>
 				{/snippet}
 			</Form.Control>
