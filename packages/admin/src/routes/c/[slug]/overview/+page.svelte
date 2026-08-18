@@ -11,7 +11,8 @@
 	import IdentityCard from './IdentityCard.svelte';
 	import CoHostsCard from './CoHostsCard.svelte';
 	import AddCoHostsDialog from './AddCoHostsDialog.svelte';
-	import DemographicsCard from './DemographicsCard.svelte';
+	import DemographicsCard from '$lib/components/setup/DemographicsCard.svelte';
+	import { readDemographicToggles } from '$lib/config/demographics';
 	import ContextCard from './ContextCard.svelte';
 	import { setupSchema } from './setup-schema';
 
@@ -179,10 +180,16 @@
 				excludeIds={data.excludeIds}
 			/>
 
-			<!-- ===== Demographics ===== -->
-			<!-- Presentational: toggles/Add-New don't persist yet. Config storage is
-			     #363/#364 (metadata vs table, pending the team decision). -->
-			<DemographicsCard />
+			<!-- ===== Demographics =====
+			     Reads the same conversation.metadata.demographics the Open Poll Setup
+			     card writes, so the two views cannot disagree. Read-only here: the
+			     Campaign-side write path plus Add New are #363/#364. -->
+			<DemographicsCard
+				title="Demographics"
+				subtitle="Participants will be shown these questions at the end of the Open Poll. You can turn on/off any questions, or add your own."
+				toggles={readDemographicToggles(conversation?.metadata)}
+				canAdd
+			/>
 
 			<!-- ===== Context for Participants ===== -->
 			<ContextCard {description} {descriptionField} />

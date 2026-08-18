@@ -4,6 +4,11 @@
 	import { moderateStatementAux, postSeed, syncStatementAux } from '$lib/api/aux';
 	import type { PolisStatementAux } from '$lib/types/aux';
 	import SetupCard from '$lib/components/setup/SetupCard.svelte';
+	import DemographicsCard from '$lib/components/setup/DemographicsCard.svelte';
+	import {
+		readDemographicToggles,
+		type DemographicKey
+	} from '$lib/config/demographics';
 	import StatusCard from './StatusCard.svelte';
 	import SeedStatementsCard from './SeedStatementsCard.svelte';
 
@@ -51,6 +56,25 @@
 		await moderateStatementAux(data.api, row.id, { decision });
 		await invalidate('open-poll:aux');
 	}
+
+	const demographics = $derived(readDemographicToggles(conversation?.metadata));
+
+	/**
+	 * One shared setting, not a poll-specific one: #363 moves demographics up to
+	 * the Campaign so they are collected consistently across every Engagement, so
+	 * this writes the same key the Campaign Setup card reads.
+	 *
+	 * The whole object goes on every write. PatchConversationMetadata merges at
+	 * the top level only and replaces nested objects wholesale, so sending a
+	 * single key would drop the other three.
+	 */
+	async function setDemographic(key: DemographicKey, next: boolean) {
+		await data.api.PatchConversationMetadata(
+			{ demographics: { ...demographics, [key]: next } },
+			{ params: { conversation_id: region.conversationId } }
+		);
+		await invalidate(`region:conversation:${page.params.slug}`);
+	}
 </script>
 
 <div class="mx-auto flex max-w-6xl flex-col gap-6 px-8 py-8">
@@ -74,7 +98,10 @@
 		canEdit={!!stepId}
 	/>
 
-	<SetupCard title="Demographics Questions" subtitle="Select from your active demographic categories.">
-		<p class="text-muted-foreground text-body">Coming next.</p>
-	</SetupCard>
+	<DemographicsCard
+		title="Demographics Questions"
+		subtitle="Select from your active demographic categories. To add or edit categories, use the Campaign Setup tab."
+		toggles={demographics}
+		onToggle={setDemographic}
+	/>
 </div>
