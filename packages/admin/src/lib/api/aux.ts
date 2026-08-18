@@ -4,7 +4,8 @@ import type {
 	CreatePolisStatementAux,
 	UpdatePolisStatementAux,
 	ModerateStatementAuxRequest,
-	SyncStatementAuxResponse
+	SyncStatementAuxResponse,
+	PostSeedResponse
 } from '$lib/types/aux';
 
 /**
@@ -48,13 +49,8 @@ export function moderateStatementAux(
  *
  * NOT an authoring endpoint: it does not create a comment in Polis, and the DB
  * has a unique key on `(workflow_step_id, polis_statement_id)`, so the caller
- * must supply the real Polis-issued id (sending `0` collides). Host seeding
- * therefore goes via Polis directly (`lib/services/polis.ts` → `is_seed: true`)
- * followed by `syncStatementAux`, which is why this wrapper is currently unused.
- *
- * TODO(comhairle): the clean home for seeding is a server endpoint that posts
- * the comment to Polis (holding the owner token, no browser CORS) and returns
- * the real id — then this wrapper records the aux row. Kept for that flow.
+ * must supply the real Polis-issued id (sending `0` collides). To author a
+ * seed, use `postSeed` below.
  */
 export function createStatementAux(
 	api: Api,
@@ -91,4 +87,20 @@ export function syncStatementAux(
 	workflow_step_id: string
 ): Promise<SyncStatementAuxResponse> {
 	return api.PolisSyncStatementAux({ workflow_step_id });
+}
+
+/**
+ * Author a moderator seed statement. Comhairle posts it to Polis with
+ * `is_seed` using the server-side admin session, so this needs no Polis
+ * credentials in the browser and is not subject to Polis CORS.
+ *
+ * The new comment only appears in the local aux table after a sync, so callers
+ * should follow with `syncStatementAux` before re-reading the list.
+ */
+export function postSeed(
+	api: Api,
+	workflow_step_id: string,
+	statement_text: string
+): Promise<PostSeedResponse> {
+	return api.PolisPostSeed({ workflow_step_id, statement_text });
 }

@@ -1,13 +1,12 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
 	import type { PolisStatementAux } from '$lib/types/aux';
-	import { moderateStatementAux, syncStatementAux } from '$lib/api/aux';
-	import { submitSeed } from '$lib/services/polis';
+	import { moderateStatementAux, postSeed, syncStatementAux } from '$lib/api/aux';
 	import RowAccentStripe from '$lib/components/insights/RowAccentStripe.svelte';
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import { Button } from '@civicos/shared/ui/button';
 	import { invalidate } from '$app/navigation';
-	import { Check, X, Plus, Upload, RefreshCw } from '@lucide/svelte';
+	import { Check, X, Upload, RefreshCw } from '@lucide/svelte';
 
 	let { data }: PageProps = $props();
 
@@ -42,49 +41,25 @@
 		statements = data.statements;
 	});
 
-	// --- Add seed statements (host authoring) ---
-	// We post seeds straight to Polis (is_seed: true) the same way the public
-	// civicos app submits statements, then re-sync so the new comment comes back
-	// with its real Polis-issued ids. See lib/services/polis.ts for the auth/CORS
-	// caveat and the eventual comhairle-endpoint alternative.
-	let showAddForm = $state(false);
-	let draftText = $state('');
-	let addingSeed = $state(false);
-	let addError = $state<string | null>(null);
-
+	// --- Bulk seed import ---
+	// Writing one statement at a time lives on the Setup tab; this page keeps the
+	// CSV path because that is a moderator-scale job with nowhere else to sit.
+	// Comhairle posts to Polis server-side, so no Polis credentials in the browser.
 	let csvImporting = $state(false);
 	let csvError = $state<string | null>(null);
 	let fileInput = $state<HTMLInputElement>();
 
-	const polisId = $derived(data.region?.polisId);
 	const stepId = $derived(data.region?.polis_workflow_step_id);
-	const canSeed = $derived(!!polisId && !!stepId);
+	const canSeed = $derived(!!stepId);
 
-	/** Post each seed to Polis, then pull the new comment(s) back into aux. */
+	/** Post each seed, then pull the new comment(s) back into aux. */
 	async function postSeeds(texts: string[]) {
-		if (!polisId || !stepId) return;
+		if (!stepId) return;
 		for (const t of texts) {
-			await submitSeed(polisId, t);
+			await postSeed(data.api, stepId, t);
 		}
 		await syncStatementAux(data.api, stepId);
 		await invalidate('open-poll:aux');
-	}
-
-	async function addSeed() {
-		const text = draftText.trim();
-		if (!text || !canSeed || addingSeed) return;
-		addingSeed = true;
-		addError = null;
-		try {
-			await postSeeds([text]);
-			draftText = '';
-			showAddForm = false;
-		} catch (e) {
-			console.error('submitSeed failed', e);
-			addError = e instanceof Error ? e.message : 'Failed to add statement.';
-		} finally {
-			addingSeed = false;
-		}
 	}
 
 	async function importCsv(e: Event) {
@@ -103,7 +78,6 @@
 				lines.shift();
 			}
 			if (lines.length) await postSeeds(lines);
-			showAddForm = false;
 		} catch (err) {
 			console.error('CSV import failed', err);
 			csvError = err instanceof Error ? err.message : 'CSV import failed.';
@@ -194,72 +168,31 @@
 				{syncing ? 'Syncing…' : 'Sync from Polis'}
 			</Button>
 			<Button
-				onclick={() => (showAddForm = !showAddForm)}
-				title="Add seed statements as moderator"
+				onclick={() => fileInput?.click()}
+				disabled={!canSeed || csvImporting}
+				title="Import seed statements from a CSV (one statement per line)"
 			>
-				<Plus class="size-4" />
-				Add seed statements
+				<Upload class="size-4" />
+				{csvImporting ? 'Importing…' : 'Import CSV'}
 			</Button>
 		</div>
 	</div>
 
-	{#if showAddForm}
-		<div class="border-border flex max-w-3xl flex-col gap-3 rounded-lg border px-4 py-4">
-			<!-- Option 1: type a single seed -->
-			<label class="text-muted-foreground text-caption font-medium" for="seed-text">
-				Write a statement
-			</label>
-			<textarea
-				id="seed-text"
-				bind:value={draftText}
-				rows="2"
-				placeholder="Write a seed statement…"
-				class="border-border focus:ring-ring/40 text-body w-full rounded-md border px-3 py-2 focus:ring-2 focus:outline-none"
-			></textarea>
+	<input
+		bind:this={fileInput}
+		type="file"
+		accept=".csv,.txt"
+		class="hidden"
+		onchange={importCsv}
+	/>
 
-			<!-- Option 2: bulk import -->
-			<div class="text-muted-foreground text-caption flex items-center gap-2">
-				<span>or</span>
-				<Button
-					variant="secondary"
-					onclick={() => fileInput?.click()}
-					disabled={!canSeed || csvImporting}
-					title="Import seed statements from a CSV (one statement per line)"
-				>
-					<Upload class="size-4" />
-					{csvImporting ? 'Importing…' : 'Import CSV'}
-				</Button>
-				<span>to add many at once</span>
-			</div>
-			<input
-				bind:this={fileInput}
-				type="file"
-				accept=".csv,.txt"
-				class="hidden"
-				onchange={importCsv}
-			/>
-
-			{#if !canSeed}
-				<p class="text-muted-foreground text-caption">
-					Sync at least one statement from Polis first — a new seed needs the conversation's ids.
-				</p>
-			{/if}
-			{#if addError}
-				<p class="text-destructive text-caption">{addError}</p>
-			{/if}
-			{#if csvError}
-				<p class="text-destructive text-caption">{csvError}</p>
-			{/if}
-
-			<div class="flex justify-end gap-2">
-				<Button variant="secondary" onclick={() => (showAddForm = false)}>
-					Cancel
-				</Button>
-				<Button onclick={addSeed} disabled={!canSeed || !draftText.trim() || addingSeed}>
-					{addingSeed ? 'Posting…' : 'Post seed'}
-				</Button>
-			</div>
-		</div>
+	{#if !canSeed}
+		<p class="text-muted-foreground text-caption">
+			This region has no polis_workflow_step_id, so statements cannot be imported.
+		</p>
+	{/if}
+	{#if csvError}
+		<p class="text-destructive text-caption">{csvError}</p>
 	{/if}
 
 	<!-- Status filter chips -->

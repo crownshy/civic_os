@@ -12,5 +12,6 @@ export type {
 	ModerationStatus,
 	ModerateStatementAuxRequest,
 	ModerationDecisionRequest,
-	SyncStatementAuxResponse
+	SyncStatementAuxResponse,
+	PostSeedResponse
 } from '@crownshy/api-client/api';

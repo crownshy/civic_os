@@ -1,8 +1,11 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/state';
+	import { moderateStatementAux, postSeed, syncStatementAux } from '$lib/api/aux';
+	import type { PolisStatementAux } from '$lib/types/aux';
 	import SetupCard from '$lib/components/setup/SetupCard.svelte';
 	import StatusCard from './StatusCard.svelte';
+	import SeedStatementsCard from './SeedStatementsCard.svelte';
 
 	let { data } = $props();
 
@@ -29,6 +32,25 @@
 		);
 		await invalidate(`region:conversation:${page.params.slug}`);
 	}
+
+	const stepId = $derived(region.polis_workflow_step_id);
+
+	/**
+	 * Comhairle posts the seed to Polis server-side (owner session, no browser
+	 * CORS), but the aux table only learns about it on the next sync, so the
+	 * write is post -> sync -> invalidate rather than a single call.
+	 */
+	async function addSeed(text: string) {
+		if (!stepId) return;
+		await postSeed(data.api, stepId, text);
+		await syncStatementAux(data.api, stepId);
+		await invalidate('open-poll:aux');
+	}
+
+	async function setSeedStatus(row: PolisStatementAux, decision: 'accept' | 'reject') {
+		await moderateStatementAux(data.api, row.id, { decision });
+		await invalidate('open-poll:aux');
+	}
 </script>
 
 <div class="mx-auto flex max-w-6xl flex-col gap-6 px-8 py-8">
@@ -45,12 +67,12 @@
 		<p class="text-muted-foreground text-body">Coming next.</p>
 	</SetupCard>
 
-	<SetupCard
-		title="Seed Statements"
-		subtitle="These statements will be shown to most participants for review. As your community adds statements, old statements will show up less often."
-	>
-		<p class="text-muted-foreground text-body">Coming next.</p>
-	</SetupCard>
+	<SeedStatementsCard
+		statements={data.aux}
+		onAdd={addSeed}
+		onSetStatus={setSeedStatus}
+		canEdit={!!stepId}
+	/>
 
 	<SetupCard title="Demographics Questions" subtitle="Select from your active demographic categories.">
 		<p class="text-muted-foreground text-body">Coming next.</p>
