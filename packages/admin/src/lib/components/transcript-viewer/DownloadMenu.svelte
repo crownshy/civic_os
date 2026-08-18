@@ -56,7 +56,7 @@
 	<Popover.Trigger
 		class={cn(
 			buttonVariants({ variant: "secondary" }),
-			"h-auto rounded-[30px] px-3 py-2 text-lg leading-6",
+			"h-auto rounded-[30px] px-3 py-2 text-lg",
 		)}
 	>
 		Download
@@ -71,7 +71,7 @@
 			type="button"
 			onclick={downloadTranscript}
 			disabled={busy !== null}
-			class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-base font-medium text-foreground hover:bg-muted disabled:opacity-50"
+			class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-body font-medium text-foreground hover:bg-muted disabled:opacity-50"
 		>
 			<FileText class="size-4 text-primary" />
 			{busy === "transcript" ? "Preparing…" : "Transcript"}
@@ -80,7 +80,7 @@
 			type="button"
 			onclick={downloadReport}
 			disabled={busy !== null}
-			class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-base font-medium text-foreground hover:bg-muted disabled:opacity-50"
+			class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-body font-medium text-foreground hover:bg-muted disabled:opacity-50"
 		>
 			<FileBarChart2 class="size-4 text-primary" />
 			{busy === "report" ? "Preparing…" : "Report"}
@@ -89,7 +89,7 @@
 			href={recordingUrl}
 			download={`${name} — Audio`}
 			onclick={() => (open = false)}
-			class="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-base font-medium text-foreground hover:bg-muted"
+			class="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-body font-medium text-foreground hover:bg-muted"
 		>
 			<FileAudio class="size-4 text-primary" />
 			Audio

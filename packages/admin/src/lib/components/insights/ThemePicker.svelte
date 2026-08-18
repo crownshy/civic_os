@@ -110,7 +110,7 @@
 <div class="relative inline-flex flex-wrap items-center gap-2" bind:this={containerEl}>
 	{#each themes as t (t)}
 		<span
-			class="group/chip font-ui inline-flex items-center gap-1 rounded-[3px] bg-zinc-100 px-[5px] py-[3px] text-base font-medium text-neutral-900"
+			class="group/chip font-ui inline-flex items-center gap-1 rounded-[3px] bg-zinc-100 px-[5px] py-[3px] text-body font-medium text-neutral-900"
 		>
 			{t}
 			{#if !disabled}
@@ -130,7 +130,7 @@
 		<button
 			type="button"
 			onclick={toggleOpen}
-			class="font-sans text-primary hover:bg-primary/20 inline-flex items-center rounded-[3px] bg-primary/10 px-[5px] py-0.5 text-base font-medium"
+			class="font-sans text-primary hover:bg-primary/20 inline-flex items-center rounded-[3px] bg-primary/10 px-[5px] py-0.5 text-body font-medium"
 		>
 			Add new+
 		</button>

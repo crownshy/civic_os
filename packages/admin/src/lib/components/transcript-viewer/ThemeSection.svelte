@@ -45,12 +45,12 @@
 	>
 		{#if expanded}
 			<span class="size-2 shrink-0 rounded-full bg-primary"></span>
-			<span class="text-2xl font-medium text-foreground">{subtopic.title}</span>
+			<span class="text-h4 md:text-h3 font-medium text-foreground">{subtopic.title}</span>
 		{:else}
-			<span class="text-lg font-medium text-foreground">{subtopic.title}</span>
+			<span class="text-body-lg font-medium text-foreground">{subtopic.title}</span>
 		{/if}
 		{#if quotes.length > 0}
-			<span class="text-sm font-medium text-primary">
+			<span class="text-caption font-medium text-primary">
 				{quotes.length}
 				{quotes.length === 1 ? "QUOTE" : "QUOTES"}
 			</span>
@@ -73,16 +73,16 @@
 					<div class="absolute inset-y-0 left-0 w-[5px] bg-primary"></div>
 					<div class="flex flex-col gap-[5px] px-6 py-2.5">
 						{#if item.summary}
-							<p class="text-xs font-medium leading-4 text-primary">
+							<p class="text-label font-medium leading-4 text-primary">
 								{item.summary}
 							</p>
 						{/if}
-						<p class="text-lg leading-6 font-normal text-foreground">
+						<p class="text-body-lg font-normal text-foreground">
 							“{item.quote.text}”
 						</p>
 						{#if seekable}
 							<span
-								class="w-fit text-xs font-medium leading-4 text-primary transition-all group-hover:underline"
+								class="w-fit text-label font-medium leading-4 text-primary transition-all group-hover:underline"
 							>
 								VIEW IN CONTEXT →
 							</span>

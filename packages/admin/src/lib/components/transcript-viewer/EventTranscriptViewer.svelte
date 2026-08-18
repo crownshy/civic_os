@@ -144,7 +144,7 @@
 		<!-- Left: header + themes -->
 		<div class="flex min-w-0 flex-1 flex-col overflow-hidden">
 			<div class="shrink-0 px-10 pt-10 pb-4">
-				<div class="text-sm font-medium uppercase text-muted-foreground">
+				<div class="text-caption font-medium uppercase text-muted-foreground">
 					From “{conversationTitle}”
 				</div>
 				<div class="mt-1 flex flex-wrap items-center gap-3">
@@ -169,7 +169,7 @@
 					<div class="mt-4 flex flex-wrap gap-2">
 						{#each topics as topic (topic.id)}
 							<span
-								class="rounded-[3px] bg-muted px-[5px] py-[3px] text-sm font-medium uppercase text-amber-800"
+								class="rounded-[3px] bg-muted px-[5px] py-[3px] text-caption font-medium uppercase text-amber-800"
 							>
 								{topic.title}
 							</span>
@@ -182,10 +182,10 @@
 				<div
 					class="flex flex-1 flex-col items-center justify-center gap-4 px-10 text-center"
 				>
-					<h2 class="text-4xl font-bold text-foreground">
+					<h2 class="text-h3 md:text-h2 font-bold text-foreground">
 						Upload in progress.
 					</h2>
-					<p class="max-w-lg text-xl font-medium text-muted-foreground">
+					<p class="max-w-lg text-body-lg font-medium text-muted-foreground">
 						This recording is still uploading — please check back later. If you
 						need to try again, add a new recording or contact <a
 							href="mailto:hello@bloom-project.org"
@@ -197,8 +197,8 @@
 				<div
 					class="flex flex-1 flex-col items-center justify-center gap-4 px-10 text-center"
 				>
-					<h2 class="text-4xl font-bold text-foreground">We have a problem.</h2>
-					<p class="max-w-lg text-xl font-medium text-muted-foreground">
+					<h2 class="text-h3 md:text-h2 font-bold text-foreground">We have a problem.</h2>
+					<p class="max-w-lg text-body-lg font-medium text-muted-foreground">
 						There was an issue in creating the report. If this problem persists,
 						contact <a
 							href="mailto:hello@bloom-project.org"

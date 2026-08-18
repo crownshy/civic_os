@@ -127,7 +127,7 @@
 				href="/"
 				title="Dashboard"
 				class={[
-					'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-body font-medium',
+					'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-caption font-medium',
 					onDashboard ? 'bg-primary/5' : 'hover:bg-muted/50',
 					collapsed && !mobileOpen ? 'justify-center px-0' : ''
 				].join(' ')}
@@ -143,7 +143,7 @@
 					href="/sysadmin/hosts"
 					title="Hosts"
 					class={[
-						'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-body font-medium',
+						'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-caption font-medium',
 						onHosts ? 'bg-primary/5' : 'hover:bg-muted/50',
 						collapsed && !mobileOpen ? 'justify-center px-0' : ''
 					].join(' ')}
@@ -157,7 +157,7 @@
 		</nav>
 
 		{#if !collapsed || mobileOpen}
-			<div class="text-muted-foreground/70 px-2.5 py-2 text-label font-semibold tracking-wider">
+			<div class="text-muted-foreground/70 px-2.5 py-2 text-label font-medium tracking-wider">
 				CONVERSATIONS
 			</div>
 		{/if}
@@ -168,7 +168,7 @@
 					href={`/c/${conv.slug}/overview`}
 					title={conv.title}
 					class={[
-						'flex items-center gap-2 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-2.5 py-2 text-body font-medium',
+						'flex items-center gap-2 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-2.5 py-2 text-caption font-medium',
 						currentSlug === conv.slug ? 'bg-muted-foreground/20' : 'hover:bg-muted/50',
 						collapsed && !mobileOpen ? 'justify-center px-0' : ''
 					].join(' ')}
@@ -186,7 +186,7 @@
 				type="button"
 				title="New Conversation"
 				class={[
-					'text-muted-foreground inline-flex items-center gap-1 rounded-xl outline outline-1 outline-stone-400 text-body font-medium',
+					'text-muted-foreground inline-flex items-center gap-1 rounded-xl outline outline-1 outline-stone-400 text-caption font-medium',
 					collapsed && !mobileOpen ? 'size-9 justify-center p-0' : 'p-2.5'
 				].join(' ')}
 			>
@@ -209,7 +209,7 @@
 				class="bg-foreground size-7 shrink-0 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl"
 			></div>
 			{#if !collapsed || mobileOpen}
-				<span class="flex-1 text-body font-medium">Admin</span>
+				<span class="flex-1 text-caption font-medium">Admin</span>
 				<form method="POST" action="/logout">
 					<button
 						type="submit"

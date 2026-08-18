@@ -93,7 +93,7 @@
 		</Card>
 	{:else if recordings.length === 0}
 		<!-- Empty state -->
-		<h2 class="text-3xl font-bold">
+		<h2 class="text-h3 md:text-h2 font-bold">
 			{data.event?.name ?? "Recordings"}
 		</h2>
 		<Card
@@ -104,14 +104,14 @@
 			>
 				<Upload class="size-14" />
 			</div>
-			<h3 class="max-w-2xl text-4xl font-bold text-foreground">
+			<h3 class="max-w-2xl text-h3 md:text-h2 font-bold text-foreground">
 				Upload an audio recording from your event.
 			</h3>
-			<p class="max-w-lg text-2xl font-medium text-muted-foreground">
+			<p class="max-w-lg text-body-lg font-medium text-muted-foreground">
 				One at a time. .mp3, .m4a, .wav all accepted.
 			</p>
 			<Button
-				class="mt-2 h-auto rounded-[45px] px-4 py-3 text-2xl leading-8"
+				class="mt-2 h-auto rounded-[45px] px-4 py-3 text-body md:text-lg"
 				onclick={() => (uploadOpen = true)}
 			>
 				Upload Recordings
@@ -120,13 +120,13 @@
 	{:else}
 		<div class="flex items-end justify-between gap-4">
 			<div>
-				<h2 class="text-4xl font-bold">All Recordings</h2>
-				<p class="mt-1 text-lg font-medium">
+				<h2 class="text-h3 md:text-h2 font-bold">All Recordings</h2>
+				<p class="mt-1 text-body-lg font-medium">
 					Select a recording below to view its transcript and analysis.
 				</p>
 			</div>
 			<Button
-				class="h-auto shrink-0 rounded-[45px] px-4 py-3 text-xl leading-6"
+				class="h-auto shrink-0 rounded-[45px] px-4 py-3 text-body md:text-lg"
 				onclick={() => (uploadOpen = true)}
 			>
 				<Plus class="size-5" /> Upload New Recording
@@ -157,16 +157,16 @@
 									aria-label="Error"
 								/>
 							{:else}
-								<span class="text-lg font-bold leading-6 text-primary"
+								<span class="text-body-lg font-bold text-primary"
 									>{i + 1}</span
 								>
 							{/if}
 						</div>
 						<div class="min-w-0 flex-1">
-							<div class="line-clamp-2 text-2xl leading-tight font-bold text-foreground break-words">
+							<div class="line-clamp-2 text-h4 font-bold text-foreground break-words">
 								{rec.name}
 							</div>
-							<div class="mt-0.5 text-sm">
+							<div class="mt-0.5 text-caption">
 								{#if rec.status === "transcription_failed"}
 									<span class="font-bold text-yellow-700">Transcript Error</span>
 								{:else if rec.status === "categorization_failed"}
