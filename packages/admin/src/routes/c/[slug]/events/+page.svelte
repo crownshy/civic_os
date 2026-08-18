@@ -91,16 +91,18 @@
 		const startISO = zonedToISO(start_date, start_time, time_zone);
 		const endISO = zonedToISO(start_date, end_time, time_zone);
 
-		const body: Record<string, unknown> = {
+		// The generated request type is deep-readonly, so capacity has to go in the
+		// literal rather than being assigned after the fact.
+		const cap = Number(capacity);
+		const body: Parameters<typeof api.CreateEvent>[0] = {
 			name: name.trim(),
 			description: description.trim(),
 			start_time: startISO,
 			end_time: endISO,
 			signup_mode,
-			default_time_zone: time_zone
+			default_time_zone: time_zone,
+			...(Number.isFinite(cap) && cap > 0 ? { capacity: Math.floor(cap) } : {})
 		};
-		const cap = Number(capacity);
-		if (Number.isFinite(cap) && cap > 0) body.capacity = Math.floor(cap);
 
 		creating = true;
 		try {
@@ -356,7 +358,7 @@
 
 	{#if viewMode === 'calendar'}
 		<div class="text-muted-foreground py-10 text-center text-body italic">
-			Calendar view — coming soon
+			Calendar view, coming soon
 		</div>
 	{:else if visible.length === 0}
 		<div class="text-muted-foreground py-10 text-center text-body italic">

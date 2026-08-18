@@ -1,6 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import SetupCard from './SetupCard.svelte';
+	import SetupCard from '$lib/components/setup/SetupCard.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Setup/SetupCard',

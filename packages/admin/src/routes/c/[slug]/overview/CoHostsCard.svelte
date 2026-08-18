@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { Trash2 } from '@lucide/svelte';
-	import SetupCard from './SetupCard.svelte';
+	import SetupCard from '$lib/components/setup/SetupCard.svelte';
 
 	export interface CoHost {
 		/** Organization id (used to revoke the co-host grant). */

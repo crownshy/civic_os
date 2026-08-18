@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Plus } from '@lucide/svelte';
-	import SetupCard from './SetupCard.svelte';
+	import SetupCard from '$lib/components/setup/SetupCard.svelte';
 
 	export interface DemographicCategory {
 		name: string;

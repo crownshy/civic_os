@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import SetupCard from './SetupCard.svelte';
-	import SetupField from './SetupField.svelte';
+	import SetupCard from '$lib/components/setup/SetupCard.svelte';
+	import SetupField from '$lib/components/setup/SetupField.svelte';
 
 	interface Props {
 		/** Basic description shown on the campaign homepage (Conversation.description). */

@@ -5,6 +5,7 @@
 	let { data, children } = $props();
 
 	const subTabs = [
+		{ label: 'Setup', href: '/setup' },
 		{ label: 'Participants', href: '/participants' },
 		{ label: 'Moderation', href: '/moderation' },
 		{ label: 'Insights', href: '/insights' }

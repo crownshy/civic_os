@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import Card from '@civicos/shared/ui/Card.svelte';
-	import SetupField from './SetupField.svelte';
+	import SetupField from '$lib/components/setup/SetupField.svelte';
 
 	interface Props {
 		title: string;
