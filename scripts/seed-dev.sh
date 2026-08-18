@@ -297,6 +297,135 @@ else
   info "  ! aux sync failed (HTTP $SYNC_STATUS): $SYNC_BODY"
 fi
 
+# --- Org scoping fixture -----------------------------------------------------
+# Everything above gives you one conversation owned by nobody, which is enough to
+# develop against but useless for testing per-org visibility (#397): with a single
+# unowned conversation, "filtered correctly" and "not filtered at all" look the same.
+#
+# This step builds the smallest fixture that can tell them apart:
+#   - a Host org that owns the seeded conversation
+#   - a member user in that org, with a password you can actually log in with
+#   - a second org owning a second conversation, which the member must NOT see
+#
+# Every call here is non-fatal. If your backend predates any of it you still get a
+# working dev seed, just without the fixture. Skip entirely with SEED_SCOPING=0.
+SEED_SCOPING="${SEED_SCOPING:-1}"
+
+if [ "$SEED_SCOPING" = "1" ]; then
+  MEMBER_EMAIL="${SEED_MEMBER_EMAIL:-host-member@example.com}"
+  MEMBER_PASSWORD="${SEED_MEMBER_PASSWORD:-memberPassword123!}"
+
+  create_org() {
+    curl -s -X POST "$BACKEND_URL/organizations" \
+      -H "Content-Type: application/json" \
+      -H "$AUTH_HEADER" \
+      -d "$(jq -nc --arg n "$1" '{
+        name: $n,
+        description: "Seeded by scripts/seed-dev.sh",
+        mission: "Local development fixture",
+        org_type: "non_profit"
+      }')" \
+      | jq -r '.id // empty'
+  }
+
+  info "Step 8: Creating Host org and attaching the conversation..."
+  ORG_ID=$(create_org "${SEED_ORG_NAME:-Local Dev Host ($SEED_TS)}")
+
+  if [ -z "$ORG_ID" ]; then
+    info "  ! org creation failed — skipping the scoping fixture"
+  else
+    ok "host org: $ORG_ID"
+
+    # CreateConversation silently drops organization_id, so ownership has to be set
+    # in a follow-up PUT. The field is also missing from PartialConversation in the
+    # generated client, but the schema is passthrough and the backend honours it.
+    OWN_STATUS=$(curl -s -o /dev/null -w '%{http_code}' -X PUT \
+      "$BACKEND_URL/conversation/$CONVERSATION_ID" \
+      -H "Content-Type: application/json" \
+      -H "$AUTH_HEADER" \
+      -d "$(jq -nc --arg o "$ORG_ID" '{organization_id:$o}')")
+    if echo "$OWN_STATUS" | grep -qE '^2[0-9][0-9]$'; then
+      ok "conversation owned by $ORG_ID"
+    else
+      info "  ! setting organization_id failed (HTTP $OWN_STATUS) — conversation stays unowned"
+    fi
+
+    # Member with a real password. AddOrganizationMember can bootstrap an account,
+    # but a bootstrapped user has no password, so sign up first and add second.
+    info "Step 8.1: Creating member $MEMBER_EMAIL..."
+    SIGNUP_STATUS=$(curl -s -o /dev/null -w '%{http_code}' -X POST "$BACKEND_URL/auth/signup" \
+      -H "Content-Type: application/json" \
+      --data "$(jq -nc \
+        --arg e "$MEMBER_EMAIL" \
+        --arg p "$MEMBER_PASSWORD" \
+        --arg u "${MEMBER_EMAIL%@*}" \
+        '{email:$e,password:$p,username:$u}')")
+    if echo "$SIGNUP_STATUS" | grep -qE '^2[0-9][0-9]$'; then
+      ok "signed up $MEMBER_EMAIL"
+    else
+      info "  ! signup returned HTTP $SIGNUP_STATUS — assuming the user already exists"
+      info "    (if the password differs, override with SEED_MEMBER_PASSWORD)"
+    fi
+
+    MEMBER_STATUS=$(curl -s -o /dev/null -w '%{http_code}' -X POST \
+      "$BACKEND_URL/organizations/$ORG_ID/members" \
+      -H "Content-Type: application/json" \
+      -H "$AUTH_HEADER" \
+      -d "$(jq -nc --arg e "$MEMBER_EMAIL" '{email:$e, role:"member", allow_create_user:true}')")
+    if echo "$MEMBER_STATUS" | grep -qE '^2[0-9][0-9]$'; then
+      ok "$MEMBER_EMAIL is a member of $ORG_ID"
+    else
+      info "  ! adding member failed (HTTP $MEMBER_STATUS)"
+    fi
+
+    # The negative case. A bare conversation, no workflow or polis, existing only so
+    # there is something on the dashboard the member has no claim to.
+    info "Step 8.2: Creating a second org + conversation the member should not see..."
+    OTHER_ORG_ID=$(create_org "${SEED_OTHER_ORG_NAME:-Other Local Host ($SEED_TS)}")
+    OTHER_CONV_ID=$(curl -s -X POST "$BACKEND_URL/conversation" \
+      -H "Content-Type: application/json" \
+      -H "$AUTH_HEADER" \
+      -d "$(jq -nc --arg s "other-local-dev-$SEED_TS" '{
+        title: "Other Host'"'"'s Conversation",
+        short_description: "Belongs to a different org",
+        description: "Seeded so per-org visibility has a negative case to fail against.",
+        image_url: "https://fakeimg.pl/1000x600",
+        tags: ["dev", "local", "negative-case"],
+        is_public: true,
+        is_live: false,
+        is_invite_only: false,
+        slug: $s,
+        primary_locale: "en",
+        supported_languages: ["en"]
+      }')" | jq -r '.id // empty')
+
+    if [ -n "$OTHER_ORG_ID" ] && [ -n "$OTHER_CONV_ID" ]; then
+      curl -s -o /dev/null -X PUT "$BACKEND_URL/conversation/$OTHER_CONV_ID" \
+        -H "Content-Type: application/json" \
+        -H "$AUTH_HEADER" \
+        -d "$(jq -nc --arg o "$OTHER_ORG_ID" '{organization_id:$o}')"
+      ok "other org: $OTHER_ORG_ID"
+      ok "other conversation: $OTHER_CONV_ID"
+    else
+      info "  ! second org/conversation failed — no negative case seeded"
+    fi
+
+    echo ""
+    info "Host org fixture:"
+    echo "    org:            $ORG_ID"
+    echo "    member login:   $MEMBER_EMAIL / $MEMBER_PASSWORD"
+    echo "    should see:     $CONVERSATION_ID"
+    echo "    should not see: ${OTHER_CONV_ID:-<not created>}"
+    echo ""
+    echo "  ⚠️  On the backend build this was written against, that member cannot"
+    echo "     reach the admin app at all: /regions, /user/organizations and"
+    echo "     /user/permitted_conversations all return 401 'Requires Auth User'"
+    echo "     for a non-admin, whether their org role is member or admin. The"
+    echo "     admin app's hooks.server.ts probes /regions, so the login bounces"
+    echo "     to /login?denied=1. See #397."
+  fi
+fi
+
 # --- Done --------------------------------------------------------------------
 echo ""
 printf "${GREEN}═══════════════════════════════════════════════════════════════${NC}\n"
