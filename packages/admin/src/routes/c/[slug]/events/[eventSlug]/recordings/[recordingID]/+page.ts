@@ -5,6 +5,10 @@ export const load: PageLoad = async ({ parent, params, depends }) => {
 
 	const { api, region, event } = await parent();
 
+	if (!event) {
+		return { recording: null, error: 'Failed to find recording' };
+	}
+
 	try {
 		const result = await api.GetAudioRecording({
 			params: { conversation_id: region.conversationId, event_id: event.id, recording_id: params.recordingID },
