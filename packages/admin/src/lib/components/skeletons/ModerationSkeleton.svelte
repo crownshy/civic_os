@@ -35,7 +35,7 @@
 	</div>
 
 	<!-- Statements list -->
-	<div class="max-w-6xl">
+	<div>
 		<Card class="shadow-card">
 			<div class="flex flex-col gap-4 px-4 py-4">
 				{#each Array(6) as _, i (i)}

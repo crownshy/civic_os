@@ -51,6 +51,15 @@
 		}
 	}
 
+	/** Focus on mount, so an opened editor is ready to type into. */
+	function takeFocus(node: HTMLInputElement) {
+		node.focus({ preventScroll: true });
+		node.select();
+		// The wrapper, not the input: otherwise a row opened near the fold leaves its
+		// keyboard hint scrolled out of sight.
+		node.parentElement?.scrollIntoView({ block: 'nearest' });
+	}
+
 	function startAdd() {
 		options = [...options, ''];
 		editing = options.length - 1;
@@ -136,10 +145,9 @@
 		<div class="-mx-6 min-h-0 flex-1 overflow-y-auto px-6">
 			<div class="flex flex-col gap-8 py-2">
 				<SetupField label="Category name">
-					<!-- svelte-ignore a11y_autofocus -->
 					<input
 						bind:value={name}
-						autofocus
+						{@attach takeFocus}
 						placeholder="e.g. Education Level"
 						onkeydown={(e) => {
 							if (e.key === 'Enter' && editing < 0) {
@@ -162,10 +170,9 @@
 							<div class="flex items-center gap-4 py-4">
 								{#if editing === i}
 									<div class="min-w-0 flex-1">
-										<!-- svelte-ignore a11y_autofocus -->
 										<input
 											bind:value={draft}
-											autofocus
+											{@attach takeFocus}
 											aria-label={`Option ${i + 1}`}
 											aria-describedby="option-editor-hint"
 											onkeydown={(e) => {
@@ -187,8 +194,8 @@
 											class="border-input bg-background text-body focus:ring-ring w-full rounded-[10px] border px-3 py-2 font-semibold focus:ring-2 focus:outline-none"
 										/>
 										<p id="option-editor-hint" class="text-foreground/60 text-caption mt-1.5">
-											Press <kbd class="font-ui font-semibold">Enter</kbd> to save and start the next option,
-											<kbd class="font-ui font-semibold">Esc</kbd> to discard. Enter on an empty row finishes.
+											<kbd class="font-ui font-semibold">Enter</kbd> saves and opens the next option.
+											<kbd class="font-ui font-semibold">Esc</kbd> discards it.
 										</p>
 									</div>
 								{:else}
