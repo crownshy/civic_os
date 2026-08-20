@@ -20,6 +20,7 @@ export const load: LayoutLoad = async ({ url, data, depends }) => {
 	return {
 		api,
 		canCreateHost: data?.canCreateHost ?? false,
-		conversations: (data?.conversations ?? []) as ConversationSummary[]
+		conversations: (data?.conversations ?? []) as ConversationSummary[],
+		conversationsFailed: data?.conversationsFailed ?? false
 	};
 };

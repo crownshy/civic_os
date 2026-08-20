@@ -42,9 +42,19 @@ export const load: LayoutServerLoad = async ({ cookies, url, depends }) => {
 	depends('app:conversations');
 
 	const authToken = cookies.get('auth-token');
-	if (!authToken) return { authToken, canCreateHost: false, conversations: [] };
+	if (!authToken)
+		return { authToken, canCreateHost: false, conversations: [], conversationsFailed: false };
 
 	const api = createApiClient(`${url.origin}/api`, authToken, 'server');
+
+	/**
+	 * An empty list and a failed call are different problems with the same shape,
+	 * and swallowing the error made them indistinguishable in the UI: a 401 from
+	 * the backend rendered as "no conversations yet", which reads as "you have
+	 * access to nothing" on a deployed instance where nobody can see the server
+	 * log. Track the failure so the surfaces can say which one happened.
+	 */
+	let conversationsFailed = false;
 
 	const [canCreateHost, conversations] = await Promise.all([
 		api
@@ -59,9 +69,10 @@ export const load: LayoutServerLoad = async ({ cookies, url, depends }) => {
 			.then((res) => res.records.map(toSummary).sort(bySidebarOrder))
 			.catch((e) => {
 				console.warn('GetPermittedConversations failed', e);
+				conversationsFailed = true;
 				return [] as ConversationSummary[];
 			})
 	]);
 
-	return { authToken, canCreateHost, conversations };
+	return { authToken, canCreateHost, conversations, conversationsFailed };
 };

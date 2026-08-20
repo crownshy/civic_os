@@ -170,7 +170,9 @@
 				</a>
 			{:else}
 				{#if !collapsed || mobileOpen}
-					<p class="text-muted-foreground px-2.5 py-2 text-caption">None yet.</p>
+					<p class="text-muted-foreground px-2.5 py-2 text-caption">
+						{data.conversationsFailed ? 'Could not load.' : 'None yet.'}
+					</p>
 				{/if}
 			{/each}
 		</div>
