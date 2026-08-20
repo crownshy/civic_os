@@ -52,9 +52,13 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 		};
 	};
 
+	// The owning Host also holds a `content_editor` grant, because ownership alone
+	// does not make a Campaign visible to its own team, so it comes back in
+	// `cohostOrgIds` too. Drop it there and let the owner row win, otherwise the
+	// Host is listed twice and the keyed each block collides (#393).
 	const cohosts = [
 		...(owningOrgId ? [toCoHost(owningOrgId, true)] : []),
-		...cohostOrgIds.map((id) => toCoHost(id, false))
+		...cohostOrgIds.filter((id) => id !== owningOrgId).map((id) => toCoHost(id, false))
 	].filter((c): c is NonNullable<typeof c> => c != null);
 
 	// Orgs already attached (owning + co-hosts) are excluded from the picker.

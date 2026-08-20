@@ -170,8 +170,20 @@ export const actions: Actions = {
 	/**
 	 * Give an unowned Campaign to this Host.
 	 *
-	 * `POST /conversation` silently drops `organization_id`, so a Campaign is born
-	 * unowned and a follow-up PUT is the only thing that sets ownership at all.
+	 * Two writes, both required. `POST /conversation` silently drops
+	 * `organization_id`, so a Campaign is born unowned and the PUT is the only
+	 * thing that records an owner at all.
+	 *
+	 * The PUT alone does not let the Host's members see it. Comhairle's
+	 * `list_for_permitted_user` admits a Campaign when `conversation.owner_id` is
+	 * the caller or a `resource_permissions` row matches them or their
+	 * organization. `conversation.organization_id` is not in that condition, so
+	 * ownership without a grant is invisible to everyone in the owning Host.
+	 * Verified against a local backend: adding the grant took a Host member's
+	 * dashboard from empty to showing the Campaign.
+	 *
+	 * `content_editor` is the role because the owning Host should be able to edit
+	 * its own Campaign; `conversation_co_host` carries read only.
 	 */
 	assignCampaign: async ({ request, params, cookies, url }) => {
 		const fd = await request.formData();
@@ -179,16 +191,34 @@ export const actions: Actions = {
 		if (!conversationId) return fail(400, { error: 'Select a Campaign to assign.' });
 
 		const api = client(url, cookies);
+
 		try {
 			await api.UpdateConversation(
 				{ organization_id: params.id },
 				{ params: { conversation_id: conversationId } }
 			);
-			return { ok: true };
 		} catch (e) {
 			console.error('UpdateConversation (assign owner) failed', e);
 			return fail(400, { error: 'Could not assign that Campaign.' });
 		}
+
+		try {
+			await api.GrantPermission(
+				{
+					organization_id: params.id,
+					role_name: COHOST_ROLE,
+					grant_reason: 'Owning Host assigned via sysadmin'
+				},
+				{ params: { resource_type: CONVERSATION_RESOURCE, resource_id: conversationId } }
+			);
+		} catch (e) {
+			console.error('GrantPermission (owning host) failed', e);
+			return fail(400, {
+				error: 'Campaign assigned, but its team cannot see it yet. Re-run the assignment.'
+			});
+		}
+
+		return { ok: true };
 	},
 
 	/**
