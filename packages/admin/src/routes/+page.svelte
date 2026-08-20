@@ -21,11 +21,9 @@
 	<h1 class="mb-1 text-section font-bold">Dashboard</h1>
 	<p class="text-muted-foreground mb-8 text-body">Select a conversation to manage.</p>
 
-	{#if data.conversationsFailed}
+	{#if data.conversationsError}
 		<p class="text-destructive text-body">
-			We could not load your Campaigns. This is a problem reaching the server, not an empty
-			account. Try again, and if it persists check the admin server log for
-			<code>GetPermittedConversations failed</code>.
+			We could not load your Campaigns: {data.conversationsError} This is not an empty account.
 		</p>
 	{:else if data.conversations.length === 0}
 		<p class="text-muted-foreground text-body">

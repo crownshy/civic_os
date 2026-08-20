@@ -1,5 +1,6 @@
 import { createApiClient } from '$lib/api/client';
 import { toSummary, type ConversationSummary } from '$lib/conversations';
+import { describeApiFailure } from '$lib/api/describe-failure';
 import type { LayoutServerLoad } from './$types';
 
 /** Every Campaign the caller may see, unfiltered. */
@@ -43,18 +44,18 @@ export const load: LayoutServerLoad = async ({ cookies, url, depends }) => {
 
 	const authToken = cookies.get('auth-token');
 	if (!authToken)
-		return { authToken, canCreateHost: false, conversations: [], conversationsFailed: false };
+		return { authToken, canCreateHost: false, conversations: [], conversationsError: null };
 
 	const api = createApiClient(`${url.origin}/api`, authToken, 'server');
 
 	/**
 	 * An empty list and a failed call are different problems with the same shape,
-	 * and swallowing the error made them indistinguishable in the UI: a 401 from
-	 * the backend rendered as "no conversations yet", which reads as "you have
-	 * access to nothing" on a deployed instance where nobody can see the server
-	 * log. Track the failure so the surfaces can say which one happened.
+	 * and swallowing the error made them indistinguishable in the UI: a failed
+	 * call rendered as "no conversations yet", which reads as "you have access to
+	 * nothing" on a deployed instance where nobody can read the server log.
+	 * Capture why it failed so the dashboard can say it out loud.
 	 */
-	let conversationsFailed = false;
+	let conversationsError: string | null = null;
 
 	const [canCreateHost, conversations] = await Promise.all([
 		api
@@ -69,10 +70,10 @@ export const load: LayoutServerLoad = async ({ cookies, url, depends }) => {
 			.then((res) => res.records.map(toSummary).sort(bySidebarOrder))
 			.catch((e) => {
 				console.warn('GetPermittedConversations failed', e);
-				conversationsFailed = true;
+				conversationsError = describeApiFailure(e);
 				return [] as ConversationSummary[];
 			})
 	]);
 
-	return { authToken, canCreateHost, conversations, conversationsFailed };
+	return { authToken, canCreateHost, conversations, conversationsError };
 };

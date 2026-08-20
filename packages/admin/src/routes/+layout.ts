@@ -21,6 +21,6 @@ export const load: LayoutLoad = async ({ url, data, depends }) => {
 		api,
 		canCreateHost: data?.canCreateHost ?? false,
 		conversations: (data?.conversations ?? []) as ConversationSummary[],
-		conversationsFailed: data?.conversationsFailed ?? false
+		conversationsError: data?.conversationsError ?? null
 	};
 };
