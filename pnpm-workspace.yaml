@@ -1,12 +1,7 @@
 allowBuilds:
   esbuild: true
 minimumReleaseAgeExclude:
-  - '@crownshy/api-client@0.0.8'
-  - '@crownshy/api-client@0.0.10'
-  - '@crownshy/api-client@0.0.11'
-  - '@crownshy/api-client@0.0.12'
-  - '@crownshy/api-client@0.0.13'
-  - '@crownshy/api-client@0.0.14'
+  - '@crownshy/api-client@0.0.8 || 0.0.10 || 0.0.11 || 0.0.12 || 0.0.13 || 0.0.14 || 0.0.43'
 onlyBuiltDependencies:
   - esbuild
 packages:
