@@ -40,7 +40,7 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 
 	const owningOrgId = (conversation as { organizationId?: string | null } | null)?.organizationId ?? null;
 
-	const toCoHost = (id: string, isAdmin: boolean) => {
+	const toCoHost = (id: string, isOwner: boolean) => {
 		const o = orgById.get(id);
 		if (!o) return null;
 		return {
@@ -48,7 +48,7 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 			name: o.name,
 			website: o.externalUrl ?? undefined,
 			email: o.contactEmail ?? undefined,
-			isAdmin
+			isOwner
 		};
 	};
 

@@ -11,5 +11,19 @@
  */
 export const COHOST_ROLE = 'content_editor';
 
-/** `resource_type` segment for Conversation grants. */
-export const CONVERSATION_RESOURCE = 'Conversation';
+/**
+ * `resource_type` segment for Conversation grants. MUST stay lowercase.
+ *
+ * The grant endpoint persists this path segment verbatim into
+ * `resource_permissions.resource_type`, with no normalisation. Comhairle's own
+ * reads compare against `ResourceType::Conversation.as_ref()`, and that enum is
+ * `#[strum(serialize_all = "snake_case")]`, so it looks for `conversation`.
+ *
+ * We used to send `Conversation`. Grants written that way are invisible to
+ * `list_for_permitted_user`, so a co-host organization's members got an empty
+ * dashboard while this app, which read the rows back using the same wrong
+ * casing, showed the co-host as correctly attached. Verified against a local
+ * comhairle: the same visibility query returns 1 row for `Conversation` and 0
+ * for `conversation`.
+ */
+export const CONVERSATION_RESOURCE = 'conversation';

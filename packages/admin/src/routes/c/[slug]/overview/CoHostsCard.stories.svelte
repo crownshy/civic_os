@@ -14,7 +14,7 @@
 	name="From static region (no emails)"
 	args={{
 		cohosts: [
-			{ name: 'Central Oregon Civic Action Project', website: 'https://cocap.us', isAdmin: true },
+			{ name: 'Central Oregon Civic Action Project', website: 'https://cocap.us', isOwner: true },
 			{ name: 'Citizens 4 Community', website: 'https://citizens4community.com' }
 		]
 	}}
@@ -29,7 +29,7 @@
 				name: 'Central Oregon Civic Action Project',
 				website: 'https://cocap.us',
 				email: 'info@cocap.us',
-				isAdmin: true
+				isOwner: true
 			},
 			{
 				name: 'Citizens 4 Community',
@@ -40,4 +40,4 @@
 	}}
 />
 
-<Story name="Single host" args={{ cohosts: [{ name: 'The Bloom Project', isAdmin: true }] }} />
+<Story name="Single host" args={{ cohosts: [{ name: 'The Bloom Project', isOwner: true }] }} />

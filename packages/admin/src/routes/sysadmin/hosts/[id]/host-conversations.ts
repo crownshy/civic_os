@@ -10,3 +10,9 @@ export type HostConversation = {
 	/** How the Host is attached: it owns the Campaign, or co-hosts it. */
 	access: 'owner' | 'cohost';
 };
+
+/** A Campaign with no owning Host, offered for assignment on the Host page. */
+export type AssignableConversation = {
+	id: string;
+	title: string;
+};

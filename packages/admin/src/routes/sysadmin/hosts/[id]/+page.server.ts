@@ -5,7 +5,7 @@ import { zod4 } from 'sveltekit-superforms/adapters';
 import { addMemberSchema } from './member-schema';
 import { COHOST_ROLE, CONVERSATION_RESOURCE } from '$lib/permissions';
 import { routeSlugFor, statusFor } from '$lib/conversations';
-import type { HostConversation } from './host-conversations';
+import type { AssignableConversation, HostConversation } from './host-conversations';
 import type { Actions, PageServerLoad } from './$types';
 
 function client(url: URL, cookies: { get: (n: string) => string | undefined }) {
@@ -15,22 +15,29 @@ function client(url: URL, cookies: { get: (n: string) => string | undefined }) {
 /**
  * The Campaigns this Host is attached to, split by how it is attached: the ones
  * it owns (`Conversation.organizationId`) and the ones it was granted co-host
- * access to (a `content_editor` grant on the Conversation resource).
+ * access to (a `content_editor` grant on the Conversation resource). Also returns
+ * the Campaigns that belong to nobody yet, which are the ones assignable here.
  *
- * Built from the full conversation list rather than per-id `GetConversation`
- * calls because only the list endpoint returns display strings: on the single
- * `ConversationDto`, `title` and `description` are TextContentId UUIDs, not text.
+ * Built from `GetPermittedConversations`, not `ListConverastions`: verified
+ * against a local comhairle, `GET /conversation` returns only Campaigns with
+ * `is_live: true` and ignores the `is_live` query param, so it hides every draft
+ * and completed Campaign. Using it here would drop a Host's drafts from the list
+ * and, worse, hide exactly the unowned drafts that most need assigning.
+ *
+ * It is also a list endpoint rather than per-id `GetConversation` calls because
+ * only the list endpoints return display strings: on the single `ConversationDto`,
+ * `title` and `description` are TextContentId UUIDs, not text.
  */
 async function loadHostConversations(
 	api: ReturnType<typeof client>,
 	orgId: string
-): Promise<HostConversation[]> {
+): Promise<{ attached: HostConversation[]; assignable: AssignableConversation[] }> {
 	const [conversations, grants] = await Promise.all([
 		api
-			.ListConverastions({ queries: { limit: 200 } })
+			.GetPermittedConversations({ queries: { limit: 200 } })
 			.then((r) => r.records)
 			.catch((e) => {
-				console.warn('ListConverastions failed', e);
+				console.warn('GetPermittedConversations failed', e);
 				return [];
 			}),
 		api
@@ -48,7 +55,7 @@ async function loadHostConversations(
 		grants.filter((p) => p.resource_type === CONVERSATION_RESOURCE).map((p) => p.resource_id)
 	);
 
-	return conversations
+	const attached = conversations
 		.filter((c) => c.organizationId === orgId || cohostedIds.has(c.id))
 		.map((c) => ({
 			id: c.id,
@@ -60,6 +67,22 @@ async function loadHostConversations(
 			access: c.organizationId === orgId ? ('owner' as const) : ('cohost' as const)
 		}))
 		.sort((a, b) => a.title.localeCompare(b.title));
+
+	// Only unowned Campaigns are offered. Transferring one that already has a Host
+	// is possible on the wire (a PUT with a different `organization_id` returns
+	// 200) but it is deliberately not a two-click action: it takes a Campaign away
+	// from another Host with no consent step and no audit trail.
+	//
+	// Assignment has NO UNDO. `{"organization_id": null}` comes back 422 ("Update
+	// request contained no valid parameters") because the backend drops null
+	// fields from an update, so a Campaign can never be returned to unowned. Only
+	// offer Campaigns the Host really should get.
+	const assignable = conversations
+		.filter((c) => !c.organizationId)
+		.map((c) => ({ id: c.id, title: c.title }))
+		.sort((a, b) => a.title.localeCompare(b.title));
+
+	return { attached, assignable };
 }
 
 export const load: PageServerLoad = async ({ params, cookies, url, depends }) => {
@@ -102,7 +125,8 @@ export const load: PageServerLoad = async ({ params, cookies, url, depends }) =>
 			places
 		},
 		team,
-		conversations,
+		conversations: conversations.attached,
+		assignableConversations: conversations.assignable,
 		currentUserId: me?.id ?? null,
 		form: await superValidate(zod4(addMemberSchema))
 	};
@@ -140,6 +164,30 @@ export const actions: Actions = {
 				{ kind: 'error', text: `Could not add ${form.data.email}.` },
 				{ status: 400 }
 			);
+		}
+	},
+
+	/**
+	 * Give an unowned Campaign to this Host.
+	 *
+	 * `POST /conversation` silently drops `organization_id`, so a Campaign is born
+	 * unowned and a follow-up PUT is the only thing that sets ownership at all.
+	 */
+	assignCampaign: async ({ request, params, cookies, url }) => {
+		const fd = await request.formData();
+		const conversationId = String(fd.get('conversationId') ?? '');
+		if (!conversationId) return fail(400, { error: 'Select a Campaign to assign.' });
+
+		const api = client(url, cookies);
+		try {
+			await api.UpdateConversation(
+				{ organization_id: params.id },
+				{ params: { conversation_id: conversationId } }
+			);
+			return { ok: true };
+		} catch (e) {
+			console.error('UpdateConversation (assign owner) failed', e);
+			return fail(400, { error: 'Could not assign that Campaign.' });
 		}
 	},
 

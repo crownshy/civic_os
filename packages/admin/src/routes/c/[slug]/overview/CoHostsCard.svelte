@@ -10,8 +10,12 @@
 		/** Full URL; displayed with the protocol stripped. */
 		website?: string;
 		email?: string;
-		/** Marks the lead host (green "Admin" badge). */
-		isAdmin?: boolean;
+		/**
+		 * Marks the Host that owns the Campaign (`Conversation.organizationId`),
+		 * as opposed to an organization granted co-host access. Not a role: every
+		 * member of a co-host org gets the same access regardless of their org role.
+		 */
+		isOwner?: boolean;
 	}
 
 	interface Props {
@@ -50,9 +54,9 @@
 				<div class="text-body {grid} px-2 py-4">
 					<div class="flex min-w-0 items-center gap-2">
 						<span class="truncate font-bold">{host.name}</span>
-						{#if host.isAdmin}
+						{#if host.isOwner}
 							<span class="bg-success text-caption shrink-0 rounded-[3px] px-1.5 py-0.5 text-white">
-								Admin
+								Owner
 							</span>
 						{/if}
 					</div>
@@ -83,7 +87,7 @@
 					</div>
 
 					<div class="flex justify-end">
-						{#if convId && host.id && !host.isAdmin}
+						{#if convId && host.id && !host.isOwner}
 							<form method="POST" action="?/removeCohost" use:enhance>
 								<input type="hidden" name="convId" value={convId} />
 								<input type="hidden" name="orgId" value={host.id} />

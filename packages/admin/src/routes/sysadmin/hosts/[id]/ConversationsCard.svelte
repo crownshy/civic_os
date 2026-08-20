@@ -2,14 +2,18 @@
 	import { enhance } from '$app/forms';
 	import { Button } from '@civicos/shared/ui/button';
 	import { ArrowUpRight, MessagesSquare } from '@lucide/svelte';
-	import type { HostConversation } from './host-conversations';
+	import type { AssignableConversation, HostConversation } from './host-conversations';
 	import type { ConversationStatus } from '$lib/conversations';
 
 	interface Props {
 		conversations: HostConversation[];
+		/** Campaigns with no owning Host, offered in the assign control. */
+		assignable?: AssignableConversation[];
 	}
 
-	let { conversations }: Props = $props();
+	let { conversations, assignable = [] }: Props = $props();
+
+	let selected = $state('');
 
 	const STATUS_STYLE: Record<ConversationStatus, string> = {
 		live: 'bg-success/15 text-success',
@@ -68,5 +72,26 @@
 				</li>
 			{/each}
 		</ul>
+	{/if}
+
+	{#if assignable.length}
+		<form
+			method="POST"
+			action="?/assignCampaign"
+			use:enhance
+			class="border-border flex flex-wrap items-center gap-2 border-t px-5 py-4"
+		>
+			<select
+				name="conversationId"
+				bind:value={selected}
+				class="focus:border-primary min-w-0 flex-1 rounded-[10px] border border-stone-300 bg-transparent px-3 py-2 text-body focus:outline-none"
+			>
+				<option value="">Assign an unowned Campaign…</option>
+				{#each assignable as campaign (campaign.id)}
+					<option value={campaign.id}>{campaign.title}</option>
+				{/each}
+			</select>
+			<Button type="submit" disabled={!selected}>Assign</Button>
+		</form>
 	{/if}
 </section>

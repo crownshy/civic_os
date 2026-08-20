@@ -61,7 +61,10 @@
 
 	<!-- ===== Campaigns ===== -->
 	<div class="mb-6">
-		<ConversationsCard conversations={data.conversations} />
+		<ConversationsCard
+			conversations={data.conversations}
+			assignable={data.assignableConversations}
+		/>
 	</div>
 
 	<!-- ===== Team ===== -->

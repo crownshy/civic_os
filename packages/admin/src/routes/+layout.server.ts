@@ -2,13 +2,8 @@ import { createApiClient } from '@crownshy/api-client/client';
 import { toSummary, type ConversationSummary } from '$lib/conversations';
 import type { LayoutServerLoad } from './$types';
 
-/**
- * We want every Campaign the caller may see, unfiltered by role. `role_name` is
- * an optional filter on the wire (the route answers without it) but the
- * generated schema types it as required, so it is asserted away here rather
- * than sending a role we do not mean to filter on.
- */
-const PERMITTED_QUERIES = { limit: 200 } as { limit: number; role_name: string };
+/** Every Campaign the caller may see, unfiltered. */
+const PERMITTED_QUERIES = { limit: 200 };
 
 const STATUS_ORDER: Record<ConversationSummary['status'], number> = {
 	live: 0,
