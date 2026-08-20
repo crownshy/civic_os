@@ -1,5 +1,5 @@
 import { error, fail } from '@sveltejs/kit';
-import { createApiClient } from '@crownshy/api-client/client';
+import { createApiClient } from '$lib/api/client';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { addMemberSchema } from './member-schema';

@@ -1,4 +1,4 @@
-import { createApiClient } from '@crownshy/api-client/client';
+import { createApiClient } from '$lib/api/client';
 import { toSummary, type ConversationSummary } from '$lib/conversations';
 import type { LayoutServerLoad } from './$types';
 

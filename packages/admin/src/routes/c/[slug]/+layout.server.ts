@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { createApiClient } from '@crownshy/api-client/client';
+import { createApiClient } from '$lib/api/client';
 import type { createApiClient as ApiClientFactory } from '@crownshy/api-client/client';
 import { findByRouteSlug, regionFor } from '$lib/conversations';
 import type { LayoutServerLoad } from './$types';

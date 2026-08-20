@@ -1,8 +1,7 @@
 import { fail } from '@sveltejs/kit';
-import { createApiClient } from '@crownshy/api-client/client';
+import { createApiClient } from '$lib/api/client';
 import { COHOST_ROLE, CONVERSATION_RESOURCE } from '$lib/permissions';
 import type { Actions, PageServerLoad } from './$types';
-
 
 type PickerOrg = { id: string; name: string; website?: string | null; email?: string | null };
 
@@ -38,7 +37,8 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 			return [] as string[];
 		});
 
-	const owningOrgId = (conversation as { organizationId?: string | null } | null)?.organizationId ?? null;
+	const owningOrgId =
+		(conversation as { organizationId?: string | null } | null)?.organizationId ?? null;
 
 	const toCoHost = (id: string, isOwner: boolean) => {
 		const o = orgById.get(id);
