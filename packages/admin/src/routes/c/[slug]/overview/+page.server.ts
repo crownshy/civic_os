@@ -1,17 +1,8 @@
 import { fail } from '@sveltejs/kit';
 import { createApiClient } from '@crownshy/api-client/client';
+import { COHOST_ROLE, CONVERSATION_RESOURCE } from '$lib/permissions';
 import type { Actions, PageServerLoad } from './$types';
 
-/**
- * The role granted to a co-host organization on a Campaign's Conversation.
- * `content_editor` (ConversationContentEditor) is currently the ONLY
- * Conversation-level role in comhairle, so it is what we grant. PROVISIONAL:
- * whether this role also propagates Campaign visibility to the co-host's members
- * (the #362 dashboard/homepage requirement) is unconfirmed with the backend. If a
- * dedicated co-host/steward role lands, change it here only.
- */
-const COHOST_ROLE = 'content_editor';
-const RESOURCE_TYPE = 'Conversation';
 
 type PickerOrg = { id: string; name: string; website?: string | null; email?: string | null };
 
@@ -34,7 +25,7 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 	// Co-host org ids = organizations granted the co-host role on this Conversation.
 	const cohostOrgIds = await api
 		.ListResourcePermissions({
-			params: { resource_type: RESOURCE_TYPE, resource_id: convId },
+			params: { resource_type: CONVERSATION_RESOURCE, resource_id: convId },
 			queries: { limit: 200 }
 		})
 		.then((r) =>
@@ -93,7 +84,7 @@ export const actions: Actions = {
 			try {
 				await api.GrantPermission(
 					{ organization_id, role_name: COHOST_ROLE, grant_reason: 'Co-host added via admin' },
-					{ params: { resource_type: RESOURCE_TYPE, resource_id: convId } }
+					{ params: { resource_type: CONVERSATION_RESOURCE, resource_id: convId } }
 				);
 			} catch (e) {
 				console.error(`GrantPermission failed for ${organization_id}`, e);
@@ -114,7 +105,7 @@ export const actions: Actions = {
 		const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
 		try {
 			await api.RevokePermission(undefined, {
-				params: { resource_type: RESOURCE_TYPE, resource_id: convId },
+				params: { resource_type: CONVERSATION_RESOURCE, resource_id: convId },
 				queries: { organization_id: orgId, role_name: COHOST_ROLE }
 			});
 			return { removed: true };

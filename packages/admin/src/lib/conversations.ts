@@ -70,7 +70,9 @@ export function findByRouteSlug<T extends RoutableConversation>(
 	);
 }
 
-export function statusFor(conversation: Pick<LocalizedConversationDto, 'isLive' | 'isComplete'>) {
+export function statusFor(
+	conversation: Pick<LocalizedConversationDto, 'isLive' | 'isComplete'>
+): ConversationStatus {
 	if (conversation.isComplete) return 'complete';
 	if (conversation.isLive) return 'live';
 	return 'draft';

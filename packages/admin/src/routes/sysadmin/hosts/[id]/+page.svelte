@@ -8,6 +8,7 @@
 	import { Button } from '@civicos/shared/ui/button';
 	import { ArrowLeft, CheckCircle2, AlertCircle, ShieldCheck } from '@lucide/svelte';
 	import { addMemberSchema, type AddMemberMessage } from './member-schema';
+	import ConversationsCard from './ConversationsCard.svelte';
 
 	let { data } = $props();
 
@@ -56,6 +57,11 @@
 		{#if org.places.length}
 			<span>{org.places.join(', ')}</span>
 		{/if}
+	</div>
+
+	<!-- ===== Campaigns ===== -->
+	<div class="mb-6">
+		<ConversationsCard conversations={data.conversations} />
 	</div>
 
 	<!-- ===== Team ===== -->
