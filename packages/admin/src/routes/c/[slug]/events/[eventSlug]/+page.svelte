@@ -41,6 +41,7 @@
 		signup_mode: 'open' | 'invite';
 		time_zone: string;
 		location: LocationForm;
+		custom_event_link: string;
 	};
 
 	const emptyLocation = (): LocationForm => ({
@@ -104,7 +105,8 @@
 				capacity: '',
 				signup_mode: 'open',
 				time_zone: BROWSER_TZ,
-				location: emptyLocation()
+				location: emptyLocation(),
+				custom_event_name: ''
 			};
 		}
 		const tz = BROWSER_TZ;
@@ -129,7 +131,8 @@
 				state_province: loc?.state_province ?? '',
 				postal_code: loc?.postal_code ?? '',
 				country_code: loc?.country_code ?? ''
-			}
+			},
+			custom_event_link: e.customEventLink ?? ''
 		};
 	}
 
@@ -221,7 +224,7 @@
 	let copied = $state(false);
 	let copyTimer: ReturnType<typeof setTimeout> | null = null;
 	function copyLink() {
-		navigator.clipboard?.writeText(rsvpLink);
+		navigator.clipboard?.writeText(event?.customEventLink ?? rsvpLink);
 		copied = true;
 		if (copyTimer) clearTimeout(copyTimer);
 		copyTimer = setTimeout(() => (copied = false), 1500);
@@ -428,11 +431,13 @@
 		<div class="space-y-1.5">
 			<Label class="text-muted-foreground text-caption tracking-tight">RSVP LINK</Label>
 			<div class="flex items-center gap-2">
-				<div
-					class="bg-card shadow-card flex-1 truncate rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-3 py-2.5 text-caption"
-				>
-					{rsvpLink}
-				</div>
+				<Input
+				        id="ev-link"
+				        bind:value={form.custom_event_link}
+				        onblur={() => form.custom_event_link.trim() !== event.customEventLink && save({ custom_event_link: form.custom_event_link.trim() })}
+					placeholder={rsvpLink}
+					class="h-10"
+			        />
 				<Button variant="outline" size="sm" onclick={copyLink}>
 					{#if copied}
 						<Check class="size-3.5" /> copied
