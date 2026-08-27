@@ -211,7 +211,9 @@
 				params: { conversation_id: campaign.id, event_id: event.id }
 			});
 			deleteOpen = false;
-			await goto(resolve(`/c/${campaign.slug}/events`), { invalidateAll: true });
+			// The events layout declares `events:list` and is a shared ancestor of this
+			// route, so it survives the navigation and would still list the deleted event.
+			await goto(resolve(`/c/${campaign.slug}/events`), { invalidate: ['events:list'] });
 		} catch (e) {
 			console.error('DeleteEvent failed', e);
 			error = 'Delete failed.';

@@ -2,6 +2,7 @@
 	import EventTranscriptViewer from '$lib/components/transcript-viewer/EventTranscriptViewer.svelte';
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
+	import { invalidate } from '$app/navigation';
 
 	let { data } = $props();
 	let { error, recording } = $derived(data);
@@ -16,6 +17,20 @@
 			name: r.name
 		}))
 	);
+
+	// Transcription finishes server-side with nothing to push the result here. The
+	// recordings list already polls its own key while a job runs; without the same
+	// poll, a recording opened mid-transcription sits on "processing" until reload.
+	const inFlight = $derived(
+		recording?.recording.status === 'transcribing' || recording?.recording.status === 'categorizing'
+	);
+
+	$effect(() => {
+		if (!inFlight) return;
+		const id = page.params.recordingID;
+		const interval = setInterval(() => invalidate(`recording:view:${id}`), 10000);
+		return () => clearInterval(interval);
+	});
 </script>
 
 {#if error}
