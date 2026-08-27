@@ -90,15 +90,16 @@
 	);
 </script>
 
-<section {id} class="scroll-mt-4 flex flex-col gap-4" style={`--insights-cols: ${insightsCols}`}>
+<section {id} class="flex scroll-mt-4 flex-col gap-4" style={`--insights-cols: ${insightsCols}`}>
 	<div class="flex items-center justify-between gap-4">
-		<h2 class="font-display text-foreground text-display font-semibold leading-tight">{title}</h2>
+		<h2 class="font-display text-display leading-tight font-semibold text-foreground">{title}</h2>
 		{#if headerAction}
 			<div class="shrink-0">{@render headerAction()}</div>
 		{/if}
 	</div>
-	<p class="font-display text-foreground text-section font-medium whitespace-nowrap">
-		{#if count !== undefined}<span class={countAccentClass}>{count} STATEMENTS</span>&nbsp;{/if}{description}
+	<p class="font-display text-section font-medium whitespace-nowrap text-foreground">
+		{#if count !== undefined}<span class={countAccentClass}>{count} STATEMENTS</span
+			>&nbsp;{/if}{description}
 	</p>
 
 	{#if toolbar}
@@ -108,7 +109,7 @@
 	<!-- overflow-visible (overrides Card's default overflow-hidden) so the sticky
 	     header can pin to the layout scroll container instead of being clipped. -->
 	<Card
-		class="hover:border-muted-foreground/40 shadow-card overflow-visible rounded-[20px] transition-colors duration-200"
+		class="overflow-visible rounded-[20px] shadow-card transition-colors duration-200 hover:border-muted-foreground/40"
 	>
 		<!-- The single owning grid: its columns are defined once here and every direct
 		     child (header, each row, the empty-state + reveal buttons) spans all of them.
@@ -120,7 +121,7 @@
 			class="grid [grid-template-columns:var(--insights-cols)] gap-x-4 overflow-x-auto md:overflow-visible [&>*:last-child]:rounded-b-[20px]"
 		>
 			<div
-				class="bg-card font-ui text-foreground text-caption sticky top-0 z-10 col-span-full grid grid-cols-subgrid items-center rounded-t-[20px] py-3 pr-4 pl-5 font-semibold uppercase"
+				class="sticky top-0 z-10 col-span-full grid grid-cols-subgrid items-center rounded-t-[20px] bg-card py-3 pr-4 pl-5 font-ui text-caption font-semibold text-foreground uppercase"
 			>
 				<div>#</div>
 				<div>Statement</div>
@@ -152,11 +153,11 @@
 				<button
 					type="button"
 					onclick={() => (expanded = !expanded)}
-					class="bg-muted/40 hover:bg-muted text-foreground/70 hover:text-foreground text-body col-span-full flex cursor-pointer items-center justify-center gap-2 py-5 font-normal transition-colors"
+					class="col-span-full flex cursor-pointer items-center justify-center gap-2 bg-muted/40 py-5 text-body font-normal text-foreground/70 transition-colors hover:bg-muted hover:text-foreground"
 				>
 					{expanded ? 'Show fewer statements' : `See all ${total} statements`}
 					<ChevronDown
-						class={`text-primary size-4 transition-transform ${expanded ? 'rotate-180' : ''}`}
+						class={`size-4 text-primary transition-transform ${expanded ? 'rotate-180' : ''}`}
 					/>
 				</button>
 			{/if}
@@ -165,7 +166,7 @@
 				<button
 					type="button"
 					onclick={() => (showLowQuality = !showLowQuality)}
-					class="text-body col-span-full flex cursor-pointer items-center justify-center gap-2 bg-yellow-400/5 py-5 text-yellow-600 transition-colors hover:bg-yellow-400/10"
+					class="col-span-full flex cursor-pointer items-center justify-center gap-2 bg-yellow-400/5 py-5 text-body text-yellow-600 transition-colors hover:bg-yellow-400/10"
 				>
 					{showLowQuality
 						? 'Hide low data quality statements'

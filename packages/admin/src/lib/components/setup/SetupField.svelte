@@ -12,7 +12,7 @@
 </script>
 
 <div class="min-w-0 space-y-1.5 {className ?? ''}">
-	<div class="text-muted-foreground font-ui text-caption font-semibold tracking-tight uppercase">
+	<div class="font-ui text-caption font-semibold tracking-tight text-muted-foreground uppercase">
 		{label}
 	</div>
 	{@render children()}

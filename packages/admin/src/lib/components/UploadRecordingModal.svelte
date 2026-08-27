@@ -6,8 +6,7 @@
 	import { Input } from '@civicos/shared/ui/input';
 	import { Label } from '@civicos/shared/ui/label';
 	import { Progress } from '@civicos/shared/ui/progress';
-    import { uploadToSignedUrl } from "@civicos/shared/utils";
-
+	import { uploadToSignedUrl } from '@civicos/shared/utils';
 
 	type Api = ReturnType<typeof createApiClient>;
 
@@ -116,16 +115,16 @@
 </script>
 
 <Dialog.Root bind:open onOpenChange={(v) => !v && close()}>
-	<Dialog.Content class="min-w-4xl max-w-5xl gap-0 rounded-[30px] p-0">
+	<Dialog.Content class="max-w-5xl min-w-4xl gap-0 rounded-[30px] p-0">
 		<div class="p-10">
-			<Dialog.Title class="text-h4 md:text-h3 font-bold text-foreground">
+			<Dialog.Title class="text-h4 font-bold text-foreground md:text-h3">
 				Name your recording
 			</Dialog.Title>
 			<!-- Visually hidden: the design shows no description, but the dialog still needs an
 			     accessible one for aria-describedby. -->
 			<Dialog.Description class="sr-only">
-				Name the recording and choose an audio file. It will upload directly, then start
-				processing automatically.
+				Name the recording and choose an audio file. It will upload directly, then start processing
+				automatically.
 			</Dialog.Description>
 
 			<!-- Chosen file / picker -->
@@ -134,7 +133,7 @@
 					for="recording-file"
 					class={selectedFile
 						? 'sr-only'
-						: 'inline-flex cursor-pointer items-center gap-2 text-body md:text-lg font-bold text-primary'}
+						: 'inline-flex cursor-pointer items-center gap-2 text-body font-bold text-primary md:text-lg'}
 				>
 					Choose an audio file…
 				</Label>
@@ -165,7 +164,7 @@
 					aria-describedby={nameError ? 'recording-name-error' : undefined}
 					oninput={() => (nameError = null)}
 					disabled={submitting}
-					class="h-16 rounded-[20px] px-5 text-body md:text-lg font-bold"
+					class="h-16 rounded-[20px] px-5 text-body font-bold md:text-lg"
 				/>
 				{#if nameError}
 					<p id="recording-name-error" class="mt-2 text-body text-destructive">

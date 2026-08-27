@@ -110,9 +110,7 @@
 		pending = { ...pending, [row.id]: true };
 
 		const prevStatus = row.moderation_status;
-		statements = statements.map((s) =>
-			s.id === row.id ? { ...s, moderation_status: status } : s
-		);
+		statements = statements.map((s) => (s.id === row.id ? { ...s, moderation_status: status } : s));
 
 		try {
 			const updated = await moderateStatementAux(data.api, row.id, { decision });
@@ -138,14 +136,14 @@
 
 <div class="flex flex-col gap-6 px-8 py-8">
 	{#if data.error}
-		<div class="text-destructive text-body">Could not load statements: {data.error}</div>
+		<div class="text-body text-destructive">Could not load statements: {data.error}</div>
 	{/if}
 
 	<!-- Page heading + actions -->
 	<div class="flex items-start justify-between gap-4">
 		<div class="flex max-w-3xl flex-col gap-1">
-			<h2 class="font-display text-foreground text-display font-semibold">Statements moderation</h2>
-			<p class="text-muted-foreground text-section">
+			<h2 class="font-display text-display font-semibold text-foreground">Statements moderation</h2>
+			<p class="text-section text-muted-foreground">
 				{#if syncMessage}
 					{syncMessage}
 				{:else}
@@ -174,21 +172,15 @@
 		</div>
 	</div>
 
-	<input
-		bind:this={fileInput}
-		type="file"
-		accept=".csv,.txt"
-		class="hidden"
-		onchange={importCsv}
-	/>
+	<input bind:this={fileInput} type="file" accept=".csv,.txt" class="hidden" onchange={importCsv} />
 
 	{#if !canSeed}
-		<p class="text-muted-foreground text-caption">
+		<p class="text-caption text-muted-foreground">
 			This conversation has no Polis workflow step, so statements cannot be imported.
 		</p>
 	{/if}
 	{#if csvError}
-		<p class="text-destructive text-caption">{csvError}</p>
+		<p class="text-caption text-destructive">{csvError}</p>
 	{/if}
 
 	<!-- Status filter chips -->
@@ -197,7 +189,7 @@
 			<button
 				type="button"
 				onclick={() => (filter = f.key)}
-				class={`font-ui inline-flex cursor-pointer items-center rounded-[30px] px-3 py-2 text-body-lg font-medium transition-all duration-150 hover:scale-[1.03] active:scale-[0.97] ${
+				class={`inline-flex cursor-pointer items-center rounded-[30px] px-3 py-2 font-ui text-body-lg font-medium transition-all duration-150 hover:scale-[1.03] active:scale-[0.97] ${
 					filter === f.key
 						? 'bg-primary text-primary-foreground shadow-sm'
 						: 'bg-primary-subtle text-primary hover:bg-primary-subtle-hover'
@@ -210,11 +202,11 @@
 
 	<!-- Statements list (matches Insights StatementSection card style) -->
 	<div>
-		<Card class="hover:border-muted-foreground/40 shadow-card transition-colors duration-200">
+		<Card class="shadow-card transition-colors duration-200 hover:border-muted-foreground/40">
 			<div class="flex flex-col">
 				<!-- Column headings -->
 				<div
-					class="font-ui text-foreground text-caption grid grid-cols-[1.5rem_minmax(0,1fr)_auto] items-center gap-4 px-4 py-2 font-semibold uppercase"
+					class="grid grid-cols-[1.5rem_minmax(0,1fr)_auto] items-center gap-4 px-4 py-2 font-ui text-caption font-semibold text-foreground uppercase"
 				>
 					<div>#</div>
 					<div>Statement</div>
@@ -222,7 +214,7 @@
 				</div>
 
 				{#if visible.length === 0}
-					<p class="text-muted-foreground text-caption px-4 py-6 italic">
+					<p class="px-4 py-6 text-caption text-muted-foreground italic">
 						No statements match this filter.
 					</p>
 				{:else}
@@ -235,19 +227,19 @@
 									? 'bg-destructive'
 									: 'bg-destructive/60'}
 						<div
-							class="border-border group hover:bg-muted/40 relative grid grid-cols-[1.5rem_minmax(0,1fr)_auto] items-start gap-4 border-b py-4 pl-4 transition-colors duration-150"
+							class="group relative grid grid-cols-[1.5rem_minmax(0,1fr)_auto] items-start gap-4 border-b border-border py-4 pl-4 transition-colors duration-150 hover:bg-muted/40"
 						>
 							<!-- Left accent bar (status color) -->
 							<RowAccentStripe {accent} />
 
 							<!-- # -->
-							<div class="font-ui text-muted-foreground text-label pt-1 text-center tabular-nums">
+							<div class="pt-1 text-center font-ui text-label text-muted-foreground tabular-nums">
 								{row.polis_statement_id}
 							</div>
 
 							<!-- Statement text -->
 							<div class="min-w-0">
-								<p class="font-ui text-foreground text-body-lg font-medium">
+								<p class="font-ui text-body-lg font-medium text-foreground">
 									{row.statement_text}
 								</p>
 							</div>
@@ -259,7 +251,7 @@
 									disabled={pending[row.id] || row.moderation_status === 'accepted'}
 									onclick={() => setStatus(row, 'accepted')}
 									title="Accept"
-									class="text-success hover:bg-success/15 inline-flex size-10 cursor-pointer items-center justify-center rounded-full transition-all duration-150 hover:scale-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-transparent"
+									class="inline-flex size-10 cursor-pointer items-center justify-center rounded-full text-success transition-all duration-150 hover:scale-110 hover:bg-success/15 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-transparent"
 								>
 									<Check class="size-6" />
 								</button>
@@ -268,7 +260,7 @@
 									disabled={pending[row.id] || row.moderation_status === 'rejected'}
 									onclick={() => setStatus(row, 'rejected')}
 									title="Reject"
-									class="text-destructive hover:bg-destructive/15 inline-flex size-10 cursor-pointer items-center justify-center rounded-full transition-all duration-150 hover:scale-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-transparent"
+									class="inline-flex size-10 cursor-pointer items-center justify-center rounded-full text-destructive transition-all duration-150 hover:scale-110 hover:bg-destructive/15 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-transparent"
 								>
 									<X class="size-6" />
 								</button>

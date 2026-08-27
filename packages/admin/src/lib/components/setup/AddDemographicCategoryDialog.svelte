@@ -131,13 +131,13 @@
 
 <Dialog.Root bind:open {onOpenChange}>
 	<Dialog.Content
-		class="font-ui flex max-h-[85vh] w-[min(92vw,720px)] flex-col overflow-hidden sm:max-w-[720px]"
+		class="flex max-h-[85vh] w-[min(92vw,720px)] flex-col overflow-hidden font-ui sm:max-w-[720px]"
 	>
 		<Dialog.Header class="shrink-0">
-			<Dialog.Title class="font-display md:text-h3 text-h4 font-semibold">
+			<Dialog.Title class="font-display text-h4 font-semibold md:text-h3">
 				Add New Demographic Category
 			</Dialog.Title>
-			<Dialog.Description class="text-foreground/70 text-body">
+			<Dialog.Description class="text-body text-foreground/70">
 				Participants pick one option. Categories added here apply across the whole Campaign.
 			</Dialog.Description>
 		</Dialog.Header>
@@ -155,17 +155,17 @@
 								startAdd();
 							}
 						}}
-						class="border-input bg-background text-body-lg focus:ring-ring w-full rounded-[10px] border px-4 py-4 font-semibold focus:ring-2 focus:outline-none"
+						class="w-full rounded-[10px] border border-input bg-background px-4 py-4 text-body-lg font-semibold focus:ring-2 focus:ring-ring focus:outline-none"
 					/>
 				</SetupField>
 
 				<div>
-					<h3 class="font-display md:text-h4 text-foreground text-lg font-medium">Options</h3>
-					<p class="text-foreground/70 text-body mt-1">
+					<h3 class="font-display text-lg font-medium text-foreground md:text-h4">Options</h3>
+					<p class="mt-1 text-body text-foreground/70">
 						These are the options that participants will be able to choose from within the category.
 					</p>
 
-					<div class="divide-border mt-4 divide-y border-t">
+					<div class="mt-4 divide-y divide-border border-t">
 						{#each options as option, i (i)}
 							<div class="flex items-center gap-4 py-4">
 								{#if editing === i}
@@ -191,22 +191,23 @@
 												// `editing` has already moved on.
 												if (editing === i) commit();
 											}}
-											class="border-input bg-background text-body focus:ring-ring w-full rounded-[10px] border px-3 py-2 font-semibold focus:ring-2 focus:outline-none"
+											class="w-full rounded-[10px] border border-input bg-background px-3 py-2 text-body font-semibold focus:ring-2 focus:ring-ring focus:outline-none"
 										/>
-										<p id="option-editor-hint" class="text-foreground/60 text-caption mt-1.5">
-											<kbd class="font-ui font-semibold">Enter</kbd> saves and opens the next option.
+										<p id="option-editor-hint" class="mt-1.5 text-caption text-foreground/60">
+											<kbd class="font-ui font-semibold">Enter</kbd> saves and opens the next
+											option.
 											<kbd class="font-ui font-semibold">Esc</kbd> discards it.
 										</p>
 									</div>
 								{:else}
-									<span class="text-body min-w-0 flex-1 font-semibold">{option}</span>
+									<span class="min-w-0 flex-1 text-body font-semibold">{option}</span>
 									<div class="flex shrink-0 items-center gap-3">
 										<button
 											type="button"
 											onclick={() => move(i, -1)}
 											disabled={i === 0}
 											aria-label={`Move ${option} up`}
-											class="text-foreground hover:text-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-25"
+											class="cursor-pointer text-foreground hover:text-primary disabled:cursor-not-allowed disabled:opacity-25"
 										>
 											<ArrowUp class="size-4" />
 										</button>
@@ -215,7 +216,7 @@
 											onclick={() => move(i, 1)}
 											disabled={i === options.length - 1}
 											aria-label={`Move ${option} down`}
-											class="text-foreground hover:text-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-25"
+											class="cursor-pointer text-foreground hover:text-primary disabled:cursor-not-allowed disabled:opacity-25"
 										>
 											<ArrowDown class="size-4" />
 										</button>
@@ -223,7 +224,7 @@
 											type="button"
 											onclick={() => startEdit(i)}
 											aria-label={`Edit ${option}`}
-											class="text-primary cursor-pointer"
+											class="cursor-pointer text-primary"
 										>
 											<Pencil class="size-4" />
 										</button>
@@ -231,7 +232,7 @@
 											type="button"
 											onclick={() => remove(i)}
 											aria-label={`Remove ${option}`}
-											class="text-primary cursor-pointer"
+											class="cursor-pointer text-primary"
 										>
 											<X class="size-4" />
 										</button>
@@ -244,7 +245,7 @@
 							type="button"
 							onclick={startAdd}
 							disabled={editing >= 0}
-							class="text-primary text-body w-full cursor-pointer py-4 text-left font-semibold disabled:cursor-not-allowed disabled:opacity-50"
+							class="w-full cursor-pointer py-4 text-left text-body font-semibold text-primary disabled:cursor-not-allowed disabled:opacity-50"
 						>
 							Add New…
 						</button>
@@ -252,16 +253,16 @@
 				</div>
 
 				{#if error}
-					<p class="text-destructive text-body">{error}</p>
+					<p class="text-body text-destructive">{error}</p>
 				{/if}
 			</div>
 		</div>
 
 		<Dialog.Footer
-			class="border-border shrink-0 items-stretch gap-3 border-t pt-4 sm:items-center sm:justify-between"
+			class="shrink-0 items-stretch gap-3 border-t border-border pt-4 sm:items-center sm:justify-between"
 		>
 			{#if started && problem}
-				<p class="text-foreground/70 text-body min-w-0">{problem}</p>
+				<p class="min-w-0 text-body text-foreground/70">{problem}</p>
 			{/if}
 			<div class="flex shrink-0 gap-2 sm:ml-auto">
 				<Button variant="secondary" onclick={() => (open = false)} disabled={submitting}>

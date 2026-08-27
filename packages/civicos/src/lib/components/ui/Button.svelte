@@ -4,14 +4,7 @@
 	import type { HTMLButtonAttributes, HTMLAnchorAttributes } from 'svelte/elements';
 
 	type Variant =
-		| 'primary'
-		| 'secondary'
-		| 'destructive'
-		| 'outline'
-		| 'pill'
-		| 'soft'
-		| 'ghost'
-		| 'gradient';
+		'primary' | 'secondary' | 'destructive' | 'outline' | 'pill' | 'soft' | 'ghost' | 'gradient';
 	type Size = 'xs' | 'sm' | 'md' | 'lg';
 
 	interface Props extends Omit<HTMLButtonAttributes, 'class' | 'onclick' | 'disabled' | 'type'> {

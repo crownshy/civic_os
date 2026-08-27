@@ -22,32 +22,32 @@
 	};
 </script>
 
-<section class="border-border rounded-xl border">
-	<div class="border-border border-b px-5 py-4">
+<section class="rounded-xl border border-border">
+	<div class="border-b border-border px-5 py-4">
 		<h2 class="text-body font-bold">Campaigns</h2>
-		<p class="text-muted-foreground text-caption">
+		<p class="text-caption text-muted-foreground">
 			Campaigns this Host owns, plus the ones it was added to as a co-host.
 		</p>
 	</div>
 
 	{#if conversations.length === 0}
-		<div class="text-muted-foreground flex flex-col items-center gap-2 px-5 py-10 text-body">
+		<div class="flex flex-col items-center gap-2 px-5 py-10 text-body text-muted-foreground">
 			<MessagesSquare class="size-5" />
 			<p>This Host has no Campaigns yet.</p>
 		</div>
 	{:else}
 		<ul>
 			{#each conversations as conversation (conversation.id)}
-				<li class="border-border flex items-center gap-3 border-b px-5 py-3 last:border-b-0">
+				<li class="flex items-center gap-3 border-b border-border px-5 py-3 last:border-b-0">
 					<div class="min-w-0 flex-1">
 						<a
 							href={`/c/${conversation.slug}/overview`}
-							class="hover:text-primary inline-flex items-center gap-1 text-body font-semibold underline-offset-2 hover:underline"
+							class="inline-flex items-center gap-1 text-body font-semibold underline-offset-2 hover:text-primary hover:underline"
 						>
 							{conversation.title}
 							<ArrowUpRight class="size-3.5 shrink-0" />
 						</a>
-						<p class="text-muted-foreground truncate text-caption">/c/{conversation.slug}</p>
+						<p class="truncate text-caption text-muted-foreground">/c/{conversation.slug}</p>
 					</div>
 
 					<span
@@ -59,7 +59,7 @@
 						{conversation.status}
 					</span>
 
-					<span class="text-muted-foreground text-caption">
+					<span class="text-caption text-muted-foreground">
 						{conversation.access === 'owner' ? 'Owner' : 'Co-host'}
 					</span>
 
@@ -79,12 +79,12 @@
 			method="POST"
 			action="?/assignCampaign"
 			use:enhance
-			class="border-border flex flex-wrap items-center gap-2 border-t px-5 py-4"
+			class="flex flex-wrap items-center gap-2 border-t border-border px-5 py-4"
 		>
 			<select
 				name="conversationId"
 				bind:value={selected}
-				class="focus:border-primary min-w-0 flex-1 rounded-[10px] border border-stone-300 bg-transparent px-3 py-2 text-body focus:outline-none"
+				class="min-w-0 flex-1 rounded-[10px] border border-stone-300 bg-transparent px-3 py-2 text-body focus:border-primary focus:outline-none"
 			>
 				<option value="">Assign an unowned Campaign…</option>
 				{#each assignable as campaign (campaign.id)}

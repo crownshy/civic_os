@@ -15,10 +15,13 @@
 	const org = $derived(data.org);
 	const team = $derived(data.team);
 
-	const form = superForm(untrack(() => data.form), {
-		validators: zod4Client(addMemberSchema),
-		resetForm: true
-	});
+	const form = superForm(
+		untrack(() => data.form),
+		{
+			validators: zod4Client(addMemberSchema),
+			resetForm: true
+		}
+	);
 	const { form: formData, enhance: addEnhance, submitting, message } = form;
 	const msg = $derived($message as AddMemberMessage | undefined);
 
@@ -36,21 +39,29 @@
 <div class="mx-auto max-w-3xl p-6 sm:p-8">
 	<a
 		href="/sysadmin/hosts"
-		class="text-muted-foreground hover:text-foreground mb-4 inline-flex items-center gap-1.5 text-body"
+		class="mb-4 inline-flex items-center gap-1.5 text-body text-muted-foreground hover:text-foreground"
 	>
 		<ArrowLeft class="size-4" />
 		Hosts
 	</a>
 
 	<h1 class="mb-1 text-section font-bold">{org.name}</h1>
-	<div class="text-muted-foreground mb-8 flex flex-wrap gap-x-4 gap-y-1 text-body">
+	<div class="mb-8 flex flex-wrap gap-x-4 gap-y-1 text-body text-muted-foreground">
 		{#if org.externalUrl}
-			<a href={org.externalUrl} target="_blank" rel="noreferrer" class="hover:text-foreground underline-offset-2 hover:underline">
+			<a
+				href={org.externalUrl}
+				target="_blank"
+				rel="noreferrer"
+				class="underline-offset-2 hover:text-foreground hover:underline"
+			>
 				{displayUrl(org.externalUrl)}
 			</a>
 		{/if}
 		{#if org.contactEmail}
-			<a href={`mailto:${org.contactEmail}`} class="hover:text-foreground underline-offset-2 hover:underline">
+			<a
+				href={`mailto:${org.contactEmail}`}
+				class="underline-offset-2 hover:text-foreground hover:underline"
+			>
 				{org.contactEmail}
 			</a>
 		{/if}
@@ -68,33 +79,37 @@
 	</div>
 
 	<!-- ===== Team ===== -->
-	<section class="border-border rounded-xl border">
-		<div class="border-border border-b px-5 py-4">
+	<section class="rounded-xl border border-border">
+		<div class="border-b border-border px-5 py-4">
 			<h2 class="text-body font-bold">Team</h2>
-			<p class="text-muted-foreground text-caption">Admins can manage this Host. Members can view it.</p>
+			<p class="text-caption text-muted-foreground">
+				Admins can manage this Host. Members can view it.
+			</p>
 		</div>
 
 		{#if actionError}
-			<div class="border-destructive/30 bg-destructive/5 text-destructive flex items-center gap-2 border-b px-5 py-2.5 text-caption">
+			<div
+				class="flex items-center gap-2 border-b border-destructive/30 bg-destructive/5 px-5 py-2.5 text-caption text-destructive"
+			>
 				<AlertCircle class="size-4 shrink-0" />
 				<span>{actionError}</span>
 			</div>
 		{/if}
 
 		{#if team.length === 0}
-			<p class="text-muted-foreground px-5 py-6 text-body">No team members yet.</p>
+			<p class="px-5 py-6 text-body text-muted-foreground">No team members yet.</p>
 		{:else}
 			<ul>
 				{#each team as m (m.id)}
 					{@const isSelf = m.id === data.currentUserId}
-					<li class="border-border flex items-center gap-3 border-b px-5 py-3 last:border-b-0">
+					<li class="flex items-center gap-3 border-b border-border px-5 py-3 last:border-b-0">
 						<div class="min-w-0 flex-1">
 							<span class="text-body font-semibold">{label(m)}</span>
 							{#if m.username && m.email}
-								<span class="text-muted-foreground text-caption"> · {m.email}</span>
+								<span class="text-caption text-muted-foreground"> · {m.email}</span>
 							{/if}
 							{#if isSelf}
-								<span class="text-muted-foreground text-caption"> · you</span>
+								<span class="text-caption text-muted-foreground"> · you</span>
 							{/if}
 						</div>
 
@@ -127,7 +142,12 @@
 		{/if}
 
 		<!-- Add member -->
-		<form method="POST" action="?/addMember" use:addEnhance class="border-border border-t px-5 py-4">
+		<form
+			method="POST"
+			action="?/addMember"
+			use:addEnhance
+			class="border-t border-border px-5 py-4"
+		>
 			{#if msg}
 				<div
 					class={[
@@ -151,16 +171,16 @@
 								type="email"
 								bind:value={$formData.email}
 								placeholder="person@example.org"
-								class="focus:border-primary w-full rounded-[10px] border border-stone-300 bg-transparent px-3 py-2 text-body focus:outline-none"
+								class="w-full rounded-[10px] border border-stone-300 bg-transparent px-3 py-2 text-body focus:border-primary focus:outline-none"
 							/>
 						{/snippet}
 					</Form.Control>
-					<Form.FieldErrors class="text-caption text-destructive mt-1" />
+					<Form.FieldErrors class="mt-1 text-caption text-destructive" />
 				</Form.Field>
 
 				<select
 					bind:value={$formData.role}
-					class="focus:border-primary rounded-[10px] border border-stone-300 bg-transparent px-3 py-2 text-body focus:outline-none"
+					class="rounded-[10px] border border-stone-300 bg-transparent px-3 py-2 text-body focus:border-primary focus:outline-none"
 				>
 					<option value="admin">Admin</option>
 					<option value="member">Member</option>
@@ -170,7 +190,7 @@
 					{$submitting ? 'Adding…' : 'Add'}
 				</Button>
 			</div>
-			<p class="text-muted-foreground mt-2 text-caption">
+			<p class="mt-2 text-caption text-muted-foreground">
 				New emails get an account and a set-password email.
 			</p>
 		</form>

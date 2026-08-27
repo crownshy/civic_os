@@ -134,10 +134,7 @@ export function getConsensusStatements(
 ): ReportComment[] {
 	return withMinVotes(data.comments, minVotes)
 		.filter((c) => consensusDirection(c, data.groups, { excludePasses }) !== null)
-		.sort(
-			(a, b) =>
-				(b.group_informed_consensus ?? 0) - (a.group_informed_consensus ?? 0)
-		);
+		.sort((a, b) => (b.group_informed_consensus ?? 0) - (a.group_informed_consensus ?? 0));
 }
 
 /**
@@ -147,7 +144,11 @@ export function getConsensusStatements(
  */
 export function getDifferenceStatements(
 	data: PolisReportData,
-	{ threshold = DIFFERENCE_SPREAD, minVotes = 5, excludePasses = false }: {
+	{
+		threshold = DIFFERENCE_SPREAD,
+		minVotes = 5,
+		excludePasses = false
+	}: {
 		threshold?: number;
 		minVotes?: number;
 		excludePasses?: boolean;

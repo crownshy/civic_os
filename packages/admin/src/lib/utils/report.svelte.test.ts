@@ -38,7 +38,14 @@ const groups = (n: number): ReportGroup[] =>
 
 describe('minGroupVotes', () => {
 	it('is the fewest votes any single group cast', () => {
-		expect(minGroupVotes(comment([[5, 2, 1], [10, 0, 0]]))).toBe(8);
+		expect(
+			minGroupVotes(
+				comment([
+					[5, 2, 1],
+					[10, 0, 0]
+				])
+			)
+		).toBe(8);
 	});
 	it('is 0 when a comment has no group votes', () => {
 		expect(minGroupVotes(comment([]))).toBe(0);
@@ -47,24 +54,62 @@ describe('minGroupVotes', () => {
 
 describe('isLowQuality (any group < 10 votes)', () => {
 	it('is low quality when the thinnest group is under 10', () => {
-		expect(isLowQuality(comment([[9, 0, 0], [50, 0, 0]]))).toBe(true);
+		expect(
+			isLowQuality(
+				comment([
+					[9, 0, 0],
+					[50, 0, 0]
+				])
+			)
+		).toBe(true);
 	});
 	it('is not low quality when every group has 10+', () => {
-		expect(isLowQuality(comment([[10, 0, 0], [4, 4, 2]]))).toBe(false);
+		expect(
+			isLowQuality(
+				comment([
+					[10, 0, 0],
+					[4, 4, 2]
+				])
+			)
+		).toBe(false);
 	});
 });
 
 describe('classifyStatement', () => {
 	it('flags consensus when every group agrees ≥ 80%', () => {
 		// group0 = 9/10 = 90%, group1 = 16/20 = 80%
-		expect(classifyStatement(comment([[9, 0, 1], [16, 0, 4]]), groups(2))).toBe('consensus');
+		expect(
+			classifyStatement(
+				comment([
+					[9, 0, 1],
+					[16, 0, 4]
+				]),
+				groups(2)
+			)
+		).toBe('consensus');
 	});
 	it('flags difference when the group agree% spread exceeds 30', () => {
 		// group0 = 18/20 = 90%, group1 = 2/20 = 10% → spread 80
-		expect(classifyStatement(comment([[18, 0, 2], [2, 16, 2]]), groups(2))).toBe('difference');
+		expect(
+			classifyStatement(
+				comment([
+					[18, 0, 2],
+					[2, 16, 2]
+				]),
+				groups(2)
+			)
+		).toBe('difference');
 	});
 	it('is neutral when neither consensus nor difference', () => {
 		// group0 = 60%, group1 = 50% → spread 10, not all ≥80
-		expect(classifyStatement(comment([[12, 6, 2], [10, 8, 2]]), groups(2))).toBe('neutral');
+		expect(
+			classifyStatement(
+				comment([
+					[12, 6, 2],
+					[10, 8, 2]
+				]),
+				groups(2)
+			)
+		).toBe('neutral');
 	});
 });

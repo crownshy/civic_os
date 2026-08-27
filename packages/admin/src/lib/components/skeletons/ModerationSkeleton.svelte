@@ -14,7 +14,7 @@
 	</div>
 
 	<!-- Add-a-statement card -->
-	<Card class="bg-muted/40 max-w-3xl">
+	<Card class="max-w-3xl bg-muted/40">
 		<div class="flex items-center justify-between gap-3 px-4 py-3">
 			<div class="flex flex-col gap-2">
 				<Skeleton class="h-4 w-32" />

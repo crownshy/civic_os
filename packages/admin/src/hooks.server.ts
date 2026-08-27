@@ -24,8 +24,7 @@ async function probeAdmin(authToken: string): Promise<'admin' | 'unauthorized' |
 export const handle: Handle = async ({ event, resolve }) => {
 	const path = event.url.pathname;
 
-	const isPublic =
-		PUBLIC_PATHS.includes(path) || PUBLIC_PREFIXES.some((p) => path.startsWith(p));
+	const isPublic = PUBLIC_PATHS.includes(path) || PUBLIC_PREFIXES.some((p) => path.startsWith(p));
 	if (isPublic) return resolve(event);
 
 	const authToken = event.cookies.get('auth-token');

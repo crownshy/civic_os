@@ -12,9 +12,7 @@ export const createHostSchema = z.object({
 	description: z.string().trim().min(1, 'A basic description is required'),
 	// Bare website (no protocol); the action prefixes https:// -> external_url.
 	website: z.string().trim().default(''),
-	contactEmail: z
-		.union([z.literal(''), z.email('Enter a valid contact email')])
-		.default(''),
+	contactEmail: z.union([z.literal(''), z.email('Enter a valid contact email')]).default(''),
 	orgType: z.enum(['non_profit', 'governmental', 'other']).default('other'),
 	regionIds: z.array(z.string().uuid()).default([])
 });

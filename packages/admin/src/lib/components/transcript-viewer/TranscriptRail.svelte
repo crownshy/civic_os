@@ -8,15 +8,15 @@
 </script>
 
 <script lang="ts">
-	import Play from "@lucide/svelte/icons/play";
-	import Pause from "@lucide/svelte/icons/pause";
+	import Play from '@lucide/svelte/icons/play';
+	import Pause from '@lucide/svelte/icons/pause';
 
 	interface Props {
 		events?: TranscriptEvent[];
 		audioSrc?: string;
 	}
 
-	let { events = [], audioSrc = "" }: Props = $props();
+	let { events = [], audioSrc = '' }: Props = $props();
 
 	let audio = $state<HTMLAudioElement | undefined>();
 	let track = $state<HTMLElement | undefined>();
@@ -39,19 +39,14 @@
 		return (speakerOrder.get(id) ?? 0) + 1;
 	}
 	function speakerColor(id: string) {
-		return (speakerOrder.get(id) ?? 0) % 2 === 0
-			? "text-primary"
-			: "text-success";
+		return (speakerOrder.get(id) ?? 0) % 2 === 0 ? 'text-primary' : 'text-success';
 	}
 
 	const currentIndex = $derived(
 		events.findIndex((event, index) => {
 			const next = events[index + 1];
-			return (
-				currentTime >= event.start_time &&
-				(!next || currentTime < next.start_time)
-			);
-		}),
+			return currentTime >= event.start_time && (!next || currentTime < next.start_time);
+		})
 	);
 
 	const progress = $derived(duration > 0 ? currentTime / duration : 0);
@@ -64,11 +59,11 @@
 	}
 
 	function fmt(seconds: number) {
-		if (!seconds || isNaN(seconds)) return "00:00:00";
+		if (!seconds || isNaN(seconds)) return '00:00:00';
 		const h = Math.floor(seconds / 3600);
 		const m = Math.floor((seconds % 3600) / 60);
 		const s = Math.floor(seconds % 60);
-		return [h, m, s].map((x) => String(x).padStart(2, "0")).join(":");
+		return [h, m, s].map((x) => String(x).padStart(2, '0')).join(':');
 	}
 
 	function seekFromPointer(e: PointerEvent) {
@@ -99,7 +94,7 @@
 		const n = node.getBoundingClientRect();
 		const c = listEl.getBoundingClientRect();
 		const delta = n.top - c.top - (c.height - n.height) / 2;
-		listEl.scrollBy({ top: delta, behavior: "smooth" });
+		listEl.scrollBy({ top: delta, behavior: 'smooth' });
 	}
 
 	function scrollToActive(node: HTMLElement, isActive: boolean) {
@@ -107,7 +102,7 @@
 		return {
 			update(active: boolean) {
 				if (active) centerInList(node);
-			},
+			}
 		};
 	}
 </script>
@@ -127,7 +122,7 @@
 			<button
 				type="button"
 				onclick={togglePlay}
-				aria-label={isPlaying ? "Pause" : "Play"}
+				aria-label={isPlaying ? 'Pause' : 'Play'}
 				class="flex size-6 shrink-0 items-center justify-center text-primary"
 			>
 				{#if isPlaying}
@@ -136,7 +131,7 @@
 					<Play class="size-4 fill-current" />
 				{/if}
 			</button>
-			<span class="text-caption font-medium tabular-nums text-muted-foreground">
+			<span class="text-caption font-medium text-muted-foreground tabular-nums">
 				{fmt(currentTime)}
 			</span>
 		</div>
@@ -167,15 +162,15 @@
 				type="button"
 				onclick={() => seekTo(event.start_time)}
 				use:scrollToActive={isActive}
-				class={`flex w-full cursor-pointer flex-col items-start gap-[5px] px-5 py-6 text-left transition-colors hover:bg-primary/10 ${isActive ? "bg-muted" : ""}`}
+				class={`flex w-full cursor-pointer flex-col items-start gap-[5px] px-5 py-6 text-left transition-colors hover:bg-primary/10 ${isActive ? 'bg-muted' : ''}`}
 			>
 				<span
-					class={`text-caption font-medium uppercase leading-4 ${speakerColor(event.speaker_id)}`}
+					class={`text-caption leading-4 font-medium uppercase ${speakerColor(event.speaker_id)}`}
 				>
 					Speaker {speakerNum(event.speaker_id)}
 				</span>
 				<span
-					class={`text-caption font-medium leading-5 text-foreground ${isActive ? "" : "opacity-70"}`}
+					class={`text-caption leading-5 font-medium text-foreground ${isActive ? '' : 'opacity-70'}`}
 				>
 					{event.text}
 				</span>

@@ -32,7 +32,13 @@
 	const newId = () => `row-${++nextId}`;
 
 	const DEFAULT_ITEMS: () => Row[] = () => [
-		{ id: newId(), kind: 'basic', title: 'Welcome & context (host)', description: '', estimated_time: 15 },
+		{
+			id: newId(),
+			kind: 'basic',
+			title: 'Welcome & context (host)',
+			description: '',
+			estimated_time: 15
+		},
 		{
 			id: newId(),
 			kind: 'breakout',
@@ -42,7 +48,13 @@
 			time_limit: null,
 			max_per_room: null
 		},
-		{ id: newId(), kind: 'basic', title: 'Share-out & themes', description: '', estimated_time: 25 },
+		{
+			id: newId(),
+			kind: 'basic',
+			title: 'Share-out & themes',
+			description: '',
+			estimated_time: 25
+		},
 		{ id: newId(), kind: 'basic', title: 'Closing reflection', description: '', estimated_time: 10 }
 	];
 
@@ -180,8 +192,7 @@
 
 	function handleFinalize(e: CustomEvent<DndEvent<Row>>) {
 		const next = e.detail.items;
-		const orderChanged =
-			next.length !== items.length || next.some((r, i) => r.id !== items[i]?.id);
+		const orderChanged = next.length !== items.length || next.some((r, i) => r.id !== items[i]?.id);
 		items = next;
 		if (orderChanged) persist(next);
 	}
@@ -191,35 +202,35 @@
 	<div class="flex items-end justify-between">
 		<div>
 			<h3 class="text-body font-bold">Agenda</h3>
-			<p class="text-muted-foreground text-caption">
+			<p class="text-caption text-muted-foreground">
 				Inherited from the conversation's default agenda. Drag to reorder.
 			</p>
 		</div>
 		<div class="flex items-center gap-2">
 			{#if saving}
-				<span class="text-muted-foreground text-caption">saving…</span>
+				<span class="text-caption text-muted-foreground">saving…</span>
 			{/if}
 			{#if error}
-				<span class="text-destructive text-caption">{error}</span>
+				<span class="text-caption text-destructive">{error}</span>
 			{/if}
 			<button
 				type="button"
 				onclick={resetToDefault}
-				class="text-destructive/50 hover:text-destructive rounded-full px-3 py-1.5 text-caption"
+				class="rounded-full px-3 py-1.5 text-caption text-destructive/50 hover:text-destructive"
 			>
 				reset to default
 			</button>
 			<button
 				type="button"
 				onclick={addBreakout}
-				class="border-foreground/20 text-foreground inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-caption"
+				class="inline-flex items-center gap-1 rounded-full border border-foreground/20 px-3 py-1.5 text-caption text-foreground"
 			>
 				<Users class="size-3" /> add breakout
 			</button>
 			<button
 				type="button"
 				onclick={addBasic}
-				class="bg-primary text-primary-foreground inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-caption"
+				class="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-caption text-primary-foreground"
 			>
 				<Plus class="size-3" /> add item
 			</button>
@@ -228,7 +239,7 @@
 
 	{#if items.length === 0}
 		<div
-			class="text-muted-foreground rounded-lg border border-dashed py-10 text-center text-body italic"
+			class="rounded-lg border border-dashed py-10 text-center text-body text-muted-foreground italic"
 		>
 			No agenda items yet. Click <span class="font-bold">add item</span> or
 			<span class="font-bold">reset to default</span>.
@@ -251,29 +262,28 @@
 			{#each items as item, i (item.id)}
 				<div
 					animate:flip={{ duration: FLIP_MS }}
-					class="bg-muted/30 border-foreground/20 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl border px-3 py-2.5"
+					class="rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl border border-foreground/20 bg-muted/30 px-3 py-2.5"
 				>
 					<div class="flex items-center gap-2.5">
 						<button
 							type="button"
-							class="text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing"
+							class="cursor-grab text-muted-foreground hover:text-foreground active:cursor-grabbing"
 							aria-label="Drag to reorder"
 						>
 							<GripVertical class="size-4" />
 						</button>
 						{#if item.kind === 'breakout'}
-							<Users class="text-muted-foreground size-4 shrink-0" />
+							<Users class="size-4 shrink-0 text-muted-foreground" />
 							<label class="group/title relative flex flex-1 items-center">
 								<input
 									type="text"
 									value={item.prompt}
-									onblur={(e) =>
-										commitEdit(i, { prompt: e.currentTarget.value } as Partial<Row>)}
+									onblur={(e) => commitEdit(i, { prompt: e.currentTarget.value } as Partial<Row>)}
 									placeholder="Breakout prompt"
-									class="border-foreground/0 focus:border-foreground/20 hover:border-foreground/15 w-full rounded-md border bg-transparent px-1.5 py-1 pr-6 text-caption font-bold outline-none transition-colors"
+									class="w-full rounded-md border border-foreground/0 bg-transparent px-1.5 py-1 pr-6 text-caption font-bold transition-colors outline-none hover:border-foreground/15 focus:border-foreground/20"
 								/>
 								<Pencil
-									class="text-muted-foreground/0 group-hover/title:text-muted-foreground/60 pointer-events-none absolute right-1.5 size-3 transition-colors"
+									class="pointer-events-none absolute right-1.5 size-3 text-muted-foreground/0 transition-colors group-hover/title:text-muted-foreground/60"
 								/>
 							</label>
 						{:else}
@@ -281,12 +291,11 @@
 								<input
 									type="text"
 									value={item.title}
-									onblur={(e) =>
-										commitEdit(i, { title: e.currentTarget.value } as Partial<Row>)}
-									class="border-foreground/0 focus:border-foreground/20 hover:border-foreground/15 w-full rounded-md border bg-transparent px-1.5 py-1 pr-6 text-caption font-bold outline-none transition-colors"
+									onblur={(e) => commitEdit(i, { title: e.currentTarget.value } as Partial<Row>)}
+									class="w-full rounded-md border border-foreground/0 bg-transparent px-1.5 py-1 pr-6 text-caption font-bold transition-colors outline-none hover:border-foreground/15 focus:border-foreground/20"
 								/>
 								<Pencil
-									class="text-muted-foreground/0 group-hover/title:text-muted-foreground/60 pointer-events-none absolute right-1.5 size-3 transition-colors"
+									class="pointer-events-none absolute right-1.5 size-3 text-muted-foreground/0 transition-colors group-hover/title:text-muted-foreground/60"
 								/>
 							</label>
 						{/if}
@@ -299,7 +308,7 @@
 									commitEdit(i, {
 										estimated_time: Number(e.currentTarget.value) || 0
 									} as Partial<Row>)}
-								class="bg-foreground/10 border-foreground/20 w-14 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl border px-2 py-1 text-right outline-none"
+								class="w-14 rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl border border-foreground/20 bg-foreground/10 px-2 py-1 text-right outline-none"
 							/>
 							<span class="text-muted-foreground">min</span>
 						</div>
@@ -321,9 +330,9 @@
 									commitEdit(i, { instructions: e.currentTarget.value } as Partial<Row>)}
 								placeholder="Instructions for participants"
 								rows="2"
-								class="bg-foreground/5 border-foreground/15 w-full rounded-lg border px-2 py-1.5 text-caption outline-none"
+								class="w-full rounded-lg border border-foreground/15 bg-foreground/5 px-2 py-1.5 text-caption outline-none"
 							></textarea>
-							<div class="text-muted-foreground flex items-center gap-4 text-caption">
+							<div class="flex items-center gap-4 text-caption text-muted-foreground">
 								<label class="flex items-center gap-1.5">
 									<span>time limit</span>
 									<input
@@ -337,7 +346,7 @@
 											} as Partial<Row>);
 										}}
 										placeholder="—"
-										class="bg-foreground/10 border-foreground/20 w-14 rounded-md border px-2 py-1 text-right outline-none"
+										class="w-14 rounded-md border border-foreground/20 bg-foreground/10 px-2 py-1 text-right outline-none"
 									/>
 									<span>min</span>
 								</label>
@@ -354,7 +363,7 @@
 											} as Partial<Row>);
 										}}
 										placeholder="—"
-										class="bg-foreground/10 border-foreground/20 w-14 rounded-md border px-2 py-1 text-right outline-none"
+										class="w-14 rounded-md border border-foreground/20 bg-foreground/10 px-2 py-1 text-right outline-none"
 									/>
 								</label>
 							</div>

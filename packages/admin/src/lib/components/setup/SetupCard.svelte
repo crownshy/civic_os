@@ -20,14 +20,14 @@
 <!-- Matches the Analysis/Insights card idiom: rounded-[20px] + shadow-card, an
      H3 heading with an optional body-copy subtitle. -->
 <Card
-	class="hover:border-muted-foreground/40 shadow-card rounded-[20px] transition-colors duration-200 {className ??
+	class="rounded-[20px] shadow-card transition-colors duration-200 hover:border-muted-foreground/40 {className ??
 		''}"
 >
 	<header class="flex items-start justify-between gap-4 px-8 pt-8">
 		<div class="min-w-0">
-			<h2 class="font-display text-foreground md:text-h3 text-h4 font-semibold">{title}</h2>
+			<h2 class="font-display text-h4 font-semibold text-foreground md:text-h3">{title}</h2>
 			{#if subtitle}
-				<p class="text-foreground/70 text-body mt-2">{subtitle}</p>
+				<p class="mt-2 text-body text-foreground/70">{subtitle}</p>
 			{/if}
 		</div>
 		{#if action}

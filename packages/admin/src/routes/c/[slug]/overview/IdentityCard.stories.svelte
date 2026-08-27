@@ -18,6 +18,9 @@
 
 <Story name="Default" />
 
-<Story name="Multiple places" args={{ places: ['Prineville', 'Deschutes County', 'Jefferson County'] }} />
+<Story
+	name="Multiple places"
+	args={{ places: ['Prineville', 'Deschutes County', 'Jefferson County'] }}
+/>
 
 <Story name="No places" args={{ places: [] }} />

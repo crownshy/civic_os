@@ -29,19 +29,17 @@
 	// While a sub-tab's `load` resolves, SvelteKit keeps the previous page on
 	// screen — so a tab click looks like nothing happened. Show a matching
 	// skeleton for the destination, but only for real tab switches.
-	const pendingSubTab = $derived(
-		pendingNav && pendingNav !== committedSubTab ? pendingNav : null
-	);
+	const pendingSubTab = $derived(pendingNav && pendingNav !== committedSubTab ? pendingNav : null);
 </script>
 
 <!-- Open Poll sub-tabs strip -->
-<nav class="border-border font-ui flex items-center gap-2 border-b px-5">
+<nav class="flex items-center gap-2 border-b border-border px-5 font-ui">
 	{#each subTabs as tab (tab.href)}
 		<a
 			href={openPollBase + tab.href}
 			class={`px-4 pt-3 pb-2 text-body font-medium ${
 				activeSubTab === tab.href
-					? 'text-primary border-primary border-b-[3px]'
+					? 'border-b-[3px] border-primary text-primary'
 					: 'text-foreground/70 hover:text-foreground'
 			}`}
 		>

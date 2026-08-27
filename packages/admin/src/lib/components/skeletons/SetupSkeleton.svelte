@@ -8,7 +8,7 @@
 
 <div class="flex flex-col gap-6 px-8 py-8" aria-hidden="true">
 	{#each Array(4) as _, i (i)}
-		<Card class="shadow-card rounded-[20px]">
+		<Card class="rounded-[20px] shadow-card">
 			<div class="flex flex-col gap-6 px-8 py-8">
 				<div class="flex flex-col gap-2">
 					<Skeleton class="h-7 w-64" />

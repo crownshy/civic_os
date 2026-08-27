@@ -20,7 +20,7 @@
 		</div>
 	{/each}
 
-	<div class="border-border my-4 border-t"></div>
+	<div class="my-4 border-t border-border"></div>
 
 	<Card class="border-destructive/30">
 		<div class="flex items-center justify-between gap-3 px-4 py-3.5">

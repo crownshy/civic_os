@@ -19,14 +19,7 @@
 		onModifyGoals?: () => void;
 	}
 
-	let {
-		title,
-		rows,
-		total,
-		participantCount,
-		showGoals = true,
-		onModifyGoals
-	}: Props = $props();
+	let { title, rows, total, participantCount, showGoals = true, onModifyGoals }: Props = $props();
 
 	const respondentPct = $derived(
 		participantCount ? Math.round((total / participantCount) * 100) : null
@@ -44,14 +37,16 @@
 	);
 </script>
 
-<Card class="hover:border-muted-foreground/40 shadow-card rounded-[20px] transition-colors duration-200">
+<Card
+	class="rounded-[20px] shadow-card transition-colors duration-200 hover:border-muted-foreground/40"
+>
 	<header class="flex items-start justify-between gap-4 px-8 pt-8 pb-2">
 		<div>
 			<h2 class="font-display text-display font-semibold">{title}</h2>
-			<p class="text-section mt-1">
+			<p class="mt-1 text-section">
 				<span class="font-medium">n = {total}</span>
 				{#if respondentPct !== null}
-					<span class="text-foreground/50 font-medium">({respondentPct}% of respondents)</span>
+					<span class="font-medium text-foreground/50">({respondentPct}% of respondents)</span>
 				{/if}
 			</p>
 		</div>
@@ -59,7 +54,7 @@
 			<button
 				type="button"
 				onclick={onModifyGoals}
-				class="bg-muted text-primary inline-flex shrink-0 items-center gap-1.5 rounded-[30px] px-3 py-2 text-body font-semibold transition-all hover:scale-105 active:scale-95"
+				class="inline-flex shrink-0 items-center gap-1.5 rounded-[30px] bg-muted px-3 py-2 text-body font-semibold text-primary transition-all hover:scale-105 active:scale-95"
 			>
 				<Target class="size-4" />
 				Modify Goals
@@ -69,7 +64,7 @@
 
 	<!-- Column headings -->
 	<div
-		class="text-foreground/40 text-caption font-ui grid grid-cols-[2fr_3fr_auto_auto_auto_auto] items-center gap-6 px-8 pt-4 pb-2 font-semibold uppercase"
+		class="grid grid-cols-[2fr_3fr_auto_auto_auto_auto] items-center gap-6 px-8 pt-4 pb-2 font-ui text-caption font-semibold text-foreground/40 uppercase"
 	>
 		<div>Category</div>
 		<div>Progress</div>
@@ -84,7 +79,7 @@
 		{/if}
 	</div>
 
-	<div class="divide-border divide-y">
+	<div class="divide-y divide-border">
 		{#each rows as row (row.label)}
 			{@const pctOfTotal = total > 0 ? (row.count / total) * 100 : 0}
 			{@const pctToGoal = row.goal && row.goal > 0 ? (row.count / row.goal) * 100 : null}
@@ -109,17 +104,12 @@
 			{@const fillPct = (row.count / scaleMax) * 100}
 			{@const markerPct = row.goal && row.goal > 0 ? (row.goal / scaleMax) * 100 : null}
 			<div
-				class="text-section font-ui hover:bg-muted/40 grid grid-cols-[2fr_3fr_auto_auto_auto_auto] items-center gap-6 px-8 py-4 transition-colors duration-150"
+				class="grid grid-cols-[2fr_3fr_auto_auto_auto_auto] items-center gap-6 px-8 py-4 font-ui text-section transition-colors duration-150 hover:bg-muted/40"
 			>
-				<div class="font-sans truncate font-bold">{row.label}</div>
+				<div class="truncate font-sans font-bold">{row.label}</div>
 
 				<!-- Distribution bar -->
-				<Meter
-					class="w-full"
-					fill={fillPct}
-					fillClass={barColor}
-					marker={markerPct}
-				/>
+				<Meter class="w-full" fill={fillPct} fillClass={barColor} marker={markerPct} />
 
 				<div class="w-14 text-right font-bold">{row.count}</div>
 				<div class="w-20 text-right font-bold">{Math.round(pctOfTotal)}%</div>

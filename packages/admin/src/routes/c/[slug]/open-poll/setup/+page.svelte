@@ -101,8 +101,11 @@
 		onToggle={setLive}
 	/>
 
-	<SetupCard title="Context for Participants" subtitle="Shown on the homepage for this conversation.">
-		<p class="text-muted-foreground text-body">Coming next.</p>
+	<SetupCard
+		title="Context for Participants"
+		subtitle="Shown on the homepage for this conversation."
+	>
+		<p class="text-body text-muted-foreground">Coming next.</p>
 	</SetupCard>
 
 	<SeedStatementsCard

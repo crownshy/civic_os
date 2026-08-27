@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { page } from "$app/state";
-	import * as Popover from "@civicos/shared/ui/popover";
-	import { ChevronDown } from "@lucide/svelte";
+	import { page } from '$app/state';
+	import * as Popover from '@civicos/shared/ui/popover';
+	import { ChevronDown } from '@lucide/svelte';
 
 	let { data, children } = $props();
 
@@ -9,30 +9,28 @@
 	const events = $derived(data.events ?? []);
 
 	const subTabs = [
-		{ label: "Setup", href: "" },
-		{ label: "Participants", href: "/registrations" },
-		{ label: "Recordings & Analysis", href: "/recordings" },
+		{ label: 'Setup', href: '' },
+		{ label: 'Participants', href: '/registrations' },
+		{ label: 'Recordings & Analysis', href: '/recordings' }
 	];
 
-	const eventBase = $derived(
-		`/c/${page.params.slug}/events/${page.params.eventSlug}`,
-	);
+	const eventBase = $derived(`/c/${page.params.slug}/events/${page.params.eventSlug}`);
 	const eventsRoot = $derived(`/c/${page.params.slug}/events`);
 
 	const activeSubTab = $derived(
 		subTabs.find((t) =>
-			t.href === ""
+			t.href === ''
 				? page.url.pathname === eventBase
-				: page.url.pathname.startsWith(eventBase + t.href),
-		)?.href ?? "",
+				: page.url.pathname.startsWith(eventBase + t.href)
+		)?.href ?? ''
 	);
 
 	// The sub-page segment currently open (e.g. "/recordings"), so switching events
 	// keeps you on the same tab. Drops any deeper id (e.g. a recording id).
 	const subSuffix = $derived.by(() => {
 		const rest = page.url.pathname.slice(eventBase.length);
-		const seg = rest.split("/")[1];
-		return seg ? `/${seg}` : "";
+		const seg = rest.split('/')[1];
+		return seg ? `/${seg}` : '';
 	});
 
 	function eventLabel(ev: { name: string; startTime: string }) {
@@ -49,7 +47,7 @@
 		<Popover.Trigger
 			class="flex cursor-pointer items-center gap-3 bg-primary px-4 py-2.5 text-body font-medium text-primary-foreground outline-none"
 		>
-			{event ? eventLabel(event) : "Select event"}
+			{event ? eventLabel(event) : 'Select event'}
 			<ChevronDown class="size-4" />
 		</Popover.Trigger>
 		<Popover.Content
@@ -62,7 +60,7 @@
 				<a
 					href={`${eventsRoot}/${ev.id}${subSuffix}`}
 					onclick={() => (switcherOpen = false)}
-					class={`block truncate rounded-lg px-3 py-2 text-body font-medium ${active ? "text-primary" : "text-foreground hover:bg-muted"}`}
+					class={`block truncate rounded-lg px-3 py-2 text-body font-medium ${active ? 'text-primary' : 'text-foreground hover:bg-muted'}`}
 				>
 					{eventLabel(ev)}
 				</a>
@@ -74,9 +72,7 @@
 		<a
 			href={eventBase + tab.href}
 			class={`cursor-pointer px-4 py-2.5 text-body font-medium ${
-				activeSubTab === tab.href
-					? "text-primary"
-					: "text-foreground/70 hover:text-foreground"
+				activeSubTab === tab.href ? 'text-primary' : 'text-foreground/70 hover:text-foreground'
 			}`}
 		>
 			{tab.label}

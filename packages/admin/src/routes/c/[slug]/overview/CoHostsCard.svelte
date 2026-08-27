@@ -32,8 +32,7 @@
 
 	// 3 content columns + a trailing action column (kept in the header too so rows
 	// stay aligned whether or not a Remove button is present).
-	const grid =
-		'grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_2rem] items-center gap-4';
+	const grid = 'grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_2rem] items-center gap-4';
 </script>
 
 <SetupCard
@@ -42,20 +41,20 @@
 >
 	<div class="font-ui">
 		<!-- Column header -->
-		<div class="text-muted-foreground text-caption {grid} px-2 pb-2 font-semibold uppercase">
+		<div class="text-caption text-muted-foreground {grid} px-2 pb-2 font-semibold uppercase">
 			<div>Name</div>
 			<div>Website</div>
 			<div>Contact Email</div>
 			<div></div>
 		</div>
 
-		<div class="divide-border divide-y">
+		<div class="divide-y divide-border">
 			{#each cohosts as host, i (host.id ?? host.name + (host.website ?? '') + i)}
 				<div class="text-body {grid} px-2 py-4">
 					<div class="flex min-w-0 items-center gap-2">
 						<span class="truncate font-bold">{host.name}</span>
 						{#if host.isOwner}
-							<span class="bg-success text-caption shrink-0 rounded-[3px] px-1.5 py-0.5 text-white">
+							<span class="shrink-0 rounded-[3px] bg-success px-1.5 py-0.5 text-caption text-white">
 								Owner
 							</span>
 						{/if}
@@ -95,7 +94,7 @@
 									type="submit"
 									title="Remove co-host"
 									aria-label={`Remove ${host.name}`}
-									class="text-muted-foreground hover:text-destructive rounded-md p-1"
+									class="rounded-md p-1 text-muted-foreground hover:text-destructive"
 								>
 									<Trash2 class="size-4" />
 								</button>
@@ -107,11 +106,11 @@
 		</div>
 
 		{#if onAddNew}
-			<div class="border-border border-t">
+			<div class="border-t border-border">
 				<button
 					type="button"
 					onclick={onAddNew}
-					class="text-primary px-2 py-4 text-body font-bold hover:underline"
+					class="px-2 py-4 text-body font-bold text-primary hover:underline"
 				>
 					Add New…
 				</button>

@@ -19,12 +19,7 @@ export interface RegionGoals {
 }
 
 export type GoalMetric =
-	| 'totalParticipants'
-	| 'ethnicity'
-	| 'politicalParty'
-	| 'ageRanges'
-	| 'gender'
-	| 'county';
+	'totalParticipants' | 'ethnicity' | 'politicalParty' | 'ageRanges' | 'gender' | 'county';
 
 export const TOTAL_PARTICIPANTS_BUCKET = 'total';
 

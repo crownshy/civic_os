@@ -4,11 +4,7 @@
 	import { Button } from '@civicos/shared/ui/button';
 	import { Input } from '@civicos/shared/ui/input';
 	import { Label } from '@civicos/shared/ui/label';
-	import {
-		METRIC_BUCKETS,
-		METRIC_LABELS,
-		type GoalMetric
-	} from '$lib/config/representation-goals';
+	import { METRIC_BUCKETS, METRIC_LABELS, type GoalMetric } from '$lib/config/representation-goals';
 
 	interface Props {
 		open: boolean;
@@ -33,9 +29,7 @@
 
 	const title = $derived(metric ? `Modify ${METRIC_LABELS[metric]} Goals` : '');
 	const buckets = $derived(
-		metric && metric !== 'totalParticipants'
-			? (bucketsOverride ?? METRIC_BUCKETS[metric])
-			: []
+		metric && metric !== 'totalParticipants' ? (bucketsOverride ?? METRIC_BUCKETS[metric]) : []
 	);
 
 	let submitting = $state(false);
@@ -52,8 +46,7 @@
 		<Dialog.Header>
 			<Dialog.Title>{title}</Dialog.Title>
 			<Dialog.Description>
-				Set the target number of participants per category. Leave a field blank to clear that
-				goal.
+				Set the target number of participants per category. Leave a field blank to clear that goal.
 			</Dialog.Description>
 		</Dialog.Header>
 
@@ -67,8 +60,7 @@
 					return async ({ result, update }) => {
 						submitting = false;
 						if (result.type === 'failure') {
-							errorMsg =
-								(result.data as { error?: string } | undefined)?.error ?? 'Save failed.';
+							errorMsg = (result.data as { error?: string } | undefined)?.error ?? 'Save failed.';
 							await update({ reset: false });
 							return;
 						}
@@ -116,7 +108,7 @@
 				{/if}
 
 				{#if errorMsg}
-					<p class="text-destructive text-caption">{errorMsg}</p>
+					<p class="text-caption text-destructive">{errorMsg}</p>
 				{/if}
 
 				<Dialog.Footer class="gap-2">
@@ -129,7 +121,7 @@
 				</Dialog.Footer>
 			</form>
 		{:else if !workflowId}
-			<p class="text-destructive text-caption">No workflow loaded — cannot save goals.</p>
+			<p class="text-caption text-destructive">No workflow loaded — cannot save goals.</p>
 			<Dialog.Footer>
 				<Button onclick={close}>Close</Button>
 			</Dialog.Footer>

@@ -4,4 +4,4 @@
 	let { class: className = '' }: { class?: string } = $props();
 </script>
 
-<div class={`bg-muted-foreground/15 animate-pulse rounded-md ${className}`}></div>
+<div class={`animate-pulse rounded-md bg-muted-foreground/15 ${className}`}></div>

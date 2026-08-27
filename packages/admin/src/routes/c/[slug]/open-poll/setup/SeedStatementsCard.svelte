@@ -81,11 +81,11 @@
 >
 	<div class="font-ui">
 		{#if error}
-			<p class="text-destructive text-body mb-3">{error}</p>
+			<p class="mb-3 text-body text-destructive">{error}</p>
 		{/if}
 
 		<div
-			class="text-muted-foreground text-caption grid grid-cols-[minmax(0,1fr)_8rem_4rem] gap-4 px-3.5 pb-2 font-semibold uppercase"
+			class="grid grid-cols-[minmax(0,1fr)_8rem_4rem] gap-4 px-3.5 pb-2 text-caption font-semibold text-muted-foreground uppercase"
 		>
 			<div>Statements ({active.length})</div>
 			<div>Date added</div>
@@ -94,9 +94,9 @@
 
 		{#each active as row (row.id)}
 			<div
-				class="border-border grid grid-cols-[minmax(0,1fr)_8rem_4rem] items-center gap-4 border-t px-3.5 py-4"
+				class="grid grid-cols-[minmax(0,1fr)_8rem_4rem] items-center gap-4 border-t border-border px-3.5 py-4"
 			>
-				<div class="text-body text-foreground font-semibold">{row.statement_text}</div>
+				<div class="text-body font-semibold text-foreground">{row.statement_text}</div>
 				<div class="text-body text-foreground/70">{addedLabel(row.created_at)}</div>
 				<div class="text-right">
 					<button
@@ -105,7 +105,7 @@
 						disabled={!canEdit || pending[row.id]}
 						title="Remove this statement from rotation"
 						aria-label={`Remove statement: ${row.statement_text}`}
-						class="text-primary cursor-pointer p-1 disabled:cursor-not-allowed disabled:opacity-40"
+						class="cursor-pointer p-1 text-primary disabled:cursor-not-allowed disabled:opacity-40"
 					>
 						<X class="size-4" />
 					</button>
@@ -117,7 +117,7 @@
 			</p>
 		{/each}
 
-		<div class="border-border border-t px-3.5 py-4">
+		<div class="border-t border-border px-3.5 py-4">
 			{#if showAddForm}
 				<div class="flex flex-col gap-2">
 					<!-- svelte-ignore a11y_autofocus -->
@@ -126,7 +126,7 @@
 						autofocus
 						rows="2"
 						placeholder="Write a seed statement…"
-						class="border-input bg-background text-body focus:ring-ring w-full rounded-[10px] border px-3 py-2 focus:ring-2 focus:outline-none"
+						class="w-full rounded-[10px] border border-input bg-background px-3 py-2 text-body focus:ring-2 focus:ring-ring focus:outline-none"
 					></textarea>
 					<div class="flex items-center gap-2">
 						<Button onclick={submit} disabled={busy || !draft.trim()}>
@@ -149,7 +149,7 @@
 					type="button"
 					onclick={() => (showAddForm = true)}
 					disabled={!canEdit}
-					class="text-primary text-body inline-flex cursor-pointer items-center gap-1 font-semibold disabled:cursor-not-allowed disabled:opacity-40"
+					class="inline-flex cursor-pointer items-center gap-1 text-body font-semibold text-primary disabled:cursor-not-allowed disabled:opacity-40"
 				>
 					<Plus class="size-4" />
 					Add New…
@@ -158,12 +158,12 @@
 		</div>
 
 		{#if removed.length}
-			<div class="border-border border-t pt-4">
+			<div class="border-t border-border pt-4">
 				<button
 					type="button"
 					onclick={() => (showRemoved = !showRemoved)}
 					aria-expanded={showRemoved}
-					class="text-muted-foreground text-caption hover:text-foreground w-full cursor-pointer text-left font-semibold uppercase"
+					class="w-full cursor-pointer text-left text-caption font-semibold text-muted-foreground uppercase hover:text-foreground"
 				>
 					{showRemoved ? 'Hide' : 'Show'} removed statements ({removed.length})
 				</button>
@@ -171,9 +171,9 @@
 				{#if showRemoved}
 					{#each removed as row (row.id)}
 						<div
-							class="border-border grid grid-cols-[minmax(0,1fr)_8rem_4rem] items-center gap-4 border-t px-3.5 py-4"
+							class="grid grid-cols-[minmax(0,1fr)_8rem_4rem] items-center gap-4 border-t border-border px-3.5 py-4"
 						>
-							<div class="text-body text-foreground/50 font-semibold line-through">
+							<div class="text-body font-semibold text-foreground/50 line-through">
 								{row.statement_text}
 							</div>
 							<div class="text-body text-foreground/50">{addedLabel(row.created_at)}</div>
@@ -182,7 +182,7 @@
 									type="button"
 									onclick={() => setStatus(row, 'accept')}
 									disabled={!canEdit || pending[row.id]}
-									class="text-primary text-body cursor-pointer underline disabled:cursor-not-allowed disabled:opacity-40"
+									class="cursor-pointer text-body text-primary underline disabled:cursor-not-allowed disabled:opacity-40"
 								>
 									Reinstate
 								</button>

@@ -82,14 +82,14 @@
 				/>
 			</svg>
 			<span
-				class="font-ui text-foreground text-caption absolute inset-0 flex items-center justify-center font-bold leading-none"
+				class="absolute inset-0 flex items-center justify-center font-ui text-caption leading-none font-bold text-foreground"
 			>
 				{Math.round(clamped)}
 			</span>
 		</div>
 
 		{#if showLabel && label}
-			<span class="text-muted-foreground text-caption font-semibold uppercase">{label}</span>
+			<span class="text-caption font-semibold text-muted-foreground uppercase">{label}</span>
 		{/if}
 	</HoverCard.Trigger>
 
@@ -99,19 +99,19 @@
 		sideOffset={8}
 		class="w-44 rounded-xl border-0 bg-slate-900 px-3.5 py-3 shadow-lg"
 	>
-		<div class="text-caption font-bold uppercase text-white">
+		<div class="text-caption font-bold text-white uppercase">
 			Group {label} <span class="text-white/60">(N={total})</span>
 		</div>
 		<dl class="mt-2 space-y-1 text-white/80">
-			<div class="text-caption flex items-center justify-between font-semibold">
+			<div class="flex items-center justify-between text-caption font-semibold">
 				<dt>Agree</dt>
 				<dd class="tabular-nums">{pct(agrees)}%</dd>
 			</div>
-			<div class="text-caption flex items-center justify-between font-semibold">
+			<div class="flex items-center justify-between text-caption font-semibold">
 				<dt>Disagree</dt>
 				<dd class="tabular-nums">{pct(disagrees)}%</dd>
 			</div>
-			<div class="text-caption flex items-center justify-between font-semibold">
+			<div class="flex items-center justify-between text-caption font-semibold">
 				<dt>Pass</dt>
 				<dd class="tabular-nums">{pct(passes)}%</dd>
 			</div>

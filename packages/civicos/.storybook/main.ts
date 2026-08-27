@@ -12,6 +12,7 @@ const config: StorybookConfig = {
 		'@storybook/addon-docs'
 	],
 	framework: '@storybook/sveltekit',
-	viteFinal: async (viteConfig) => mergeConfig(viteConfig, { resolve: { alias: browserTestAliases } })
+	viteFinal: async (viteConfig) =>
+		mergeConfig(viteConfig, { resolve: { alias: browserTestAliases } })
 };
 export default config;

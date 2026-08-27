@@ -1,7 +1,7 @@
 <script lang="ts">
-	import EventTranscriptViewer from "$lib/components/transcript-viewer/EventTranscriptViewer.svelte";
+	import EventTranscriptViewer from '$lib/components/transcript-viewer/EventTranscriptViewer.svelte';
 
-	const recordings = [{ id: "blah", name: "Plenary" }];
+	const recordings = [{ id: 'blah', name: 'Plenary' }];
 </script>
 
 <div class="p-6">

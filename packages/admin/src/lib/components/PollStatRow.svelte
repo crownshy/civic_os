@@ -11,19 +11,19 @@
 	let { stats }: { stats: Stat[] } = $props();
 </script>
 
-<section class="font-ui flex flex-wrap items-end gap-x-16 gap-y-4">
+<section class="flex flex-wrap items-end gap-x-16 gap-y-4 font-ui">
 	{#each stats as s (s.label)}
 		<div>
-			<div class="text-foreground text-body font-medium uppercase">
+			<div class="text-body font-medium text-foreground uppercase">
 				{s.label}{#if s.action}
 					(<button
 						type="button"
-						class="text-primary cursor-pointer underline"
+						class="cursor-pointer text-primary underline"
 						onclick={s.action.onclick}>{s.action.label}</button
 					>){/if}
 			</div>
-			<div class="text-foreground text-hero font-extrabold leading-none">
-				{s.value}{#if s.accent}<span class="text-success text-4xl font-extrabold">{s.accent}</span
+			<div class="text-hero leading-none font-extrabold text-foreground">
+				{s.value}{#if s.accent}<span class="text-4xl font-extrabold text-success">{s.accent}</span
 					>{/if}
 			</div>
 		</div>

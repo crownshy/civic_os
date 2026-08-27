@@ -50,7 +50,9 @@
 	//   otherwise  → total votes (COUNT)
 	const agreedPcts = $derived(groupPcts.map((g) => g.agreed));
 	const minAgree = $derived(agreedPcts.length ? Math.min(...agreedPcts) : 0);
-	const spread = $derived(agreedPcts.length ? Math.max(...agreedPcts) - Math.min(...agreedPcts) : 0);
+	const spread = $derived(
+		agreedPcts.length ? Math.max(...agreedPcts) - Math.min(...agreedPcts) : 0
+	);
 
 	const stripeClass = $derived(
 		variant === 'consensus'
@@ -73,7 +75,7 @@
      header without this component knowing the column widths. The column-gap is
      inherited from the parent grid's gap-x-4. -->
 <div
-	class="border-border group hover:bg-muted/40 relative col-span-full grid grid-cols-subgrid items-start border-b py-6 pr-4 pl-5 transition-colors duration-150"
+	class="group relative col-span-full grid grid-cols-subgrid items-start border-b border-border py-6 pr-4 pl-5 transition-colors duration-150 hover:bg-muted/40"
 >
 	<RowAccentStripe accent={stripeClass} />
 
@@ -81,13 +83,13 @@
 	     Figma px — text-label/body map to the Figma's 12/16px where a token exists;
 	     the 18-20px row text has no token so it stays on the scale (see the type
 	     discussion). -->
-	<div class="font-ui text-muted-foreground text-label pt-1 text-center tabular-nums">
+	<div class="pt-1 text-center font-ui text-label text-muted-foreground tabular-nums">
 		{comment.tid}
 	</div>
 
 	<!-- Statement text + theme tags -->
 	<div class="min-w-0">
-		<p class="font-ui text-foreground text-body-lg font-medium">{comment.text}</p>
+		<p class="font-ui text-body-lg font-medium text-foreground">{comment.text}</p>
 		<div class="mt-3">
 			{#if picker}
 				<ThemePicker
@@ -101,7 +103,7 @@
 				<div class="flex flex-wrap items-center gap-1.5">
 					{#each comment.topics ?? [] as topic (topic)}
 						<span
-							class="bg-muted text-foreground/80 text-caption inline-flex items-center rounded px-1.5 py-0.5 font-medium"
+							class="inline-flex items-center rounded bg-muted px-1.5 py-0.5 text-caption font-medium text-foreground/80"
 						>
 							{topic}
 						</span>
@@ -115,13 +117,13 @@
 	<div class="pt-1">
 		{#if isHostAuthored}
 			<span
-				class="text-caption bg-host inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-medium text-white"
+				class="inline-flex items-center gap-1 rounded bg-host px-1.5 py-0.5 text-caption font-medium text-white"
 			>
 				<User class="size-3" />You
 			</span>
 		{:else}
 			<span
-				class="bg-muted text-muted-foreground text-caption inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-medium"
+				class="inline-flex items-center gap-1 rounded bg-muted px-1.5 py-0.5 text-caption font-medium text-muted-foreground"
 			>
 				<User class="size-3" />Participant
 			</span>
@@ -130,7 +132,7 @@
 
 	<!-- Metric column. 'count' mode always shows the vote count (e.g. All
 	     Statements); 'auto' derives the unit from the variant. -->
-	<div class="font-ui pt-1 text-center font-bold">
+	<div class="pt-1 text-center font-ui font-bold">
 		{#if metric === 'count'}
 			<span class="text-foreground">{count}</span>
 		{:else if variant === 'consensus'}

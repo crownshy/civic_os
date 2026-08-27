@@ -11,12 +11,12 @@
 	<div class="flex flex-col items-stretch justify-between gap-2 sm:flex-row sm:items-center">
 		<div class="flex flex-wrap items-center gap-1.5">
 			{#each Array(3) as _, i (i)}
-				<Skeleton class="h-8 w-24 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl" />
+				<Skeleton class="h-8 w-24 rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl" />
 			{/each}
 		</div>
 		<div class="flex flex-wrap items-center gap-2">
-			<Skeleton class="h-8 w-14 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl" />
-			<Skeleton class="h-8 w-20 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl" />
+			<Skeleton class="h-8 w-14 rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl" />
+			<Skeleton class="h-8 w-20 rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl" />
 			<Skeleton class="h-8 w-28 rounded-full" />
 		</div>
 	</div>
@@ -30,7 +30,7 @@
 						<Skeleton class="mx-auto h-3 w-10" />
 						<Skeleton class="mx-auto h-4 w-12" />
 					</div>
-					<div class="border-border hidden h-9 self-center border-l sm:block"></div>
+					<div class="hidden h-9 self-center border-l border-border sm:block"></div>
 					<div class="min-w-0 flex-1 space-y-2">
 						<Skeleton class="h-4 w-48" />
 						<Skeleton class="h-3 w-28" />

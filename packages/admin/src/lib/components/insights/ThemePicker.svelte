@@ -19,13 +19,7 @@
 		onRemoveTheme?: (theme: string) => void | Promise<void>;
 	}
 
-	let {
-		themes,
-		availableThemes,
-		disabled = false,
-		onAddTheme,
-		onRemoveTheme
-	}: Props = $props();
+	let { themes, availableThemes, disabled = false, onAddTheme, onRemoveTheme }: Props = $props();
 
 	let open = $state(false);
 	let newDraft = $state('');
@@ -110,7 +104,7 @@
 <div class="relative inline-flex flex-wrap items-center gap-2" bind:this={containerEl}>
 	{#each themes as t (t)}
 		<span
-			class="group/chip font-ui inline-flex items-center gap-1 rounded-[3px] bg-zinc-100 px-[5px] py-[3px] text-body font-medium text-neutral-900"
+			class="group/chip inline-flex items-center gap-1 rounded-[3px] bg-zinc-100 px-[5px] py-[3px] font-ui text-body font-medium text-neutral-900"
 		>
 			{t}
 			{#if !disabled}
@@ -118,7 +112,7 @@
 					type="button"
 					onclick={() => applyRemove(t)}
 					aria-label={`Remove theme ${t}`}
-					class="hover:text-destructive hidden leading-none text-neutral-900/40 group-hover/chip:inline"
+					class="hidden leading-none text-neutral-900/40 group-hover/chip:inline hover:text-destructive"
 				>
 					×
 				</button>
@@ -130,7 +124,7 @@
 		<button
 			type="button"
 			onclick={toggleOpen}
-			class="font-sans text-primary hover:bg-primary/20 inline-flex items-center rounded-[3px] bg-primary/10 px-[5px] py-0.5 text-body font-medium"
+			class="inline-flex items-center rounded-[3px] bg-primary/10 px-[5px] py-0.5 font-sans text-body font-medium text-primary hover:bg-primary/20"
 		>
 			Add new+
 		</button>
@@ -141,14 +135,14 @@
 			bind:this={dropdownEl}
 			style:top="{dropdownPos.top}px"
 			style:left="{dropdownPos.left}px"
-			class="border-border bg-popover text-popover-foreground fixed z-50 w-48 overflow-hidden rounded-md border shadow-lg"
+			class="fixed z-50 w-48 overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-lg"
 		>
 			{#each availableThemes as t (t)}
 				{@const checked = themeSet.has(t)}
 				<button
 					type="button"
 					onclick={() => applyToggle(t)}
-					class="hover:bg-muted/60 flex w-full items-center justify-between border-b border-black/10 px-2.5 py-1.5 text-left text-caption last:border-b-0"
+					class="flex w-full items-center justify-between border-b border-black/10 px-2.5 py-1.5 text-left text-caption last:border-b-0 hover:bg-muted/60"
 				>
 					<span>#{t}</span>
 					{#if checked}
@@ -162,13 +156,13 @@
 					bind:value={newDraft}
 					onkeydown={(e) => e.key === 'Enter' && applyAdd()}
 					placeholder="Add new…"
-					class="border-border focus:ring-primary/40 min-w-0 flex-1 rounded border px-1.5 py-1 text-caption focus:ring-2 focus:outline-none"
+					class="min-w-0 flex-1 rounded border border-border px-1.5 py-1 text-caption focus:ring-2 focus:ring-primary/40 focus:outline-none"
 				/>
 				<button
 					type="button"
 					onclick={applyAdd}
 					disabled={!newDraft.trim()}
-					class="bg-primary text-primary-foreground rounded px-1.5 py-1 text-caption font-medium disabled:opacity-40"
+					class="rounded bg-primary px-1.5 py-1 text-caption font-medium text-primary-foreground disabled:opacity-40"
 				>
 					Add
 				</button>

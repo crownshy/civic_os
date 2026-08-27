@@ -40,7 +40,7 @@
 <DialogPrimitive.Root bind:open onOpenChange={handleBitsOpenChange}>
 	<DialogPrimitive.Portal>
 		<DialogPrimitive.Overlay
-			class="fixed inset-0 z-50 bg-gradient-primary/80 backdrop-blur-sm duration-300 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0"
+			class="bg-gradient-primary/80 fixed inset-0 z-50 backdrop-blur-sm duration-300 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0"
 		/>
 		<DialogPrimitive.Content
 			class="fixed inset-x-0 bottom-0 z-50 mx-auto flex max-w-[800px] flex-col duration-300 data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=open]:animate-in data-[state=open]:slide-in-from-bottom md:inset-0 md:items-center md:justify-center md:data-[state=closed]:slide-out-to-bottom-0 md:data-[state=closed]:zoom-out-95 md:data-[state=open]:slide-in-from-bottom-0 md:data-[state=open]:zoom-in-95"

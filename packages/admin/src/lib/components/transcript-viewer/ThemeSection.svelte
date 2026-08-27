@@ -32,8 +32,8 @@
 	// Flatten claims → quotes, carrying the claim title as each quote's summary line.
 	const quotes = $derived(
 		(subtopic.claims ?? []).flatMap((claim) =>
-			(claim.quotes ?? []).map((q) => ({ summary: claim.title, quote: q })),
-		),
+			(claim.quotes ?? []).map((q) => ({ summary: claim.title, quote: q }))
+		)
 	);
 </script>
 
@@ -45,14 +45,14 @@
 	>
 		{#if expanded}
 			<span class="size-2 shrink-0 rounded-full bg-primary"></span>
-			<span class="text-h4 md:text-h3 font-medium text-foreground">{subtopic.title}</span>
+			<span class="text-h4 font-medium text-foreground md:text-h3">{subtopic.title}</span>
 		{:else}
 			<span class="text-body-lg font-medium text-foreground">{subtopic.title}</span>
 		{/if}
 		{#if quotes.length > 0}
 			<span class="text-caption font-medium text-primary">
 				{quotes.length}
-				{quotes.length === 1 ? "QUOTE" : "QUOTES"}
+				{quotes.length === 1 ? 'QUOTE' : 'QUOTES'}
 			</span>
 		{/if}
 	</button>
@@ -62,18 +62,18 @@
 			{#each quotes as item, i (i)}
 				{@const seekable = !!item.quote.reference?.sourceId}
 				<svelte:element
-					this={seekable ? "button" : "div"}
-					type={seekable ? "button" : undefined}
+					this={seekable ? 'button' : 'div'}
+					type={seekable ? 'button' : undefined}
 					onclick={seekable ? () => onQuoteClick(item.quote) : undefined}
-					role={seekable ? "button" : undefined}
+					role={seekable ? 'button' : undefined}
 					class={`group relative block w-full overflow-hidden text-left transition-colors ${
-						seekable ? "cursor-pointer hover:bg-primary/10" : ""
+						seekable ? 'cursor-pointer hover:bg-primary/10' : ''
 					}`}
 				>
 					<div class="absolute inset-y-0 left-0 w-[5px] bg-primary"></div>
 					<div class="flex flex-col gap-[5px] px-6 py-2.5">
 						{#if item.summary}
-							<p class="text-label font-medium leading-4 text-primary">
+							<p class="text-label leading-4 font-medium text-primary">
 								{item.summary}
 							</p>
 						{/if}
@@ -82,7 +82,7 @@
 						</p>
 						{#if seekable}
 							<span
-								class="w-fit text-label font-medium leading-4 text-primary transition-all group-hover:underline"
+								class="w-fit text-label leading-4 font-medium text-primary transition-all group-hover:underline"
 							>
 								VIEW IN CONTEXT →
 							</span>

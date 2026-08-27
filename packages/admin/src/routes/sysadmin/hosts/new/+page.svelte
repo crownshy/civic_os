@@ -11,11 +11,14 @@
 
 	// superForm is seeded once from the initial load data; untrack makes that
 	// intentional one-time read explicit (same pattern as the Setup overview page).
-	const form = superForm(untrack(() => data.form), {
-		dataType: 'json',
-		validators: zod4Client(createHostSchema),
-		resetForm: false
-	});
+	const form = superForm(
+		untrack(() => data.form),
+		{
+			dataType: 'json',
+			validators: zod4Client(createHostSchema),
+			resetForm: false
+		}
+	);
 	const { form: formData, enhance, submitting, message } = form;
 
 	const msg = $derived($message as CreateHostMessage | undefined);
@@ -40,20 +43,20 @@
 	<div class="mx-auto max-w-3xl p-6 sm:p-8">
 		<a
 			href="/sysadmin/hosts"
-			class="text-muted-foreground hover:text-foreground mb-4 inline-flex items-center gap-1.5 text-body"
+			class="mb-4 inline-flex items-center gap-1.5 text-body text-muted-foreground hover:text-foreground"
 		>
 			<ArrowLeft class="size-4" />
 			Hosts
 		</a>
 
 		<h1 class="mb-1 text-section font-bold">Create Host</h1>
-		<p class="text-muted-foreground mb-8 text-body">
+		<p class="mb-8 text-body text-muted-foreground">
 			Create a new Host organization. Members are added from the Host's page afterwards.
 		</p>
 
 		{#if msg?.kind === 'error'}
 			<div
-				class="border-destructive/30 bg-destructive/5 text-destructive mb-6 flex items-center gap-2 rounded-xl border px-4 py-3 text-body"
+				class="mb-6 flex items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-body text-destructive"
 			>
 				<AlertCircle class="size-4 shrink-0" />
 				<span>{msg.text}</span>
@@ -65,13 +68,14 @@
 			<Form.Field {form} name="name">
 				<Form.Control>
 					{#snippet children({ props })}
-						<Form.Label class="text-label text-muted-foreground font-semibold tracking-wider uppercase"
+						<Form.Label
+							class="text-label font-semibold tracking-wider text-muted-foreground uppercase"
 							>Organization name</Form.Label
 						>
 						<input {...props} bind:value={$formData.name} class={inputClass} />
 					{/snippet}
 				</Form.Control>
-				<Form.FieldErrors class="text-caption text-destructive mt-1" />
+				<Form.FieldErrors class="mt-1 text-caption text-destructive" />
 			</Form.Field>
 
 			<!-- Website + contact email -->
@@ -80,13 +84,13 @@
 					<Form.Control>
 						{#snippet children({ props })}
 							<Form.Label
-								class="text-label text-muted-foreground font-semibold tracking-wider uppercase"
+								class="text-label font-semibold tracking-wider text-muted-foreground uppercase"
 								>Website</Form.Label
 							>
 							<div
-								class="focus-within:border-primary flex items-center rounded-[10px] border border-stone-300 px-3"
+								class="flex items-center rounded-[10px] border border-stone-300 px-3 focus-within:border-primary"
 							>
-								<span class="text-muted-foreground text-body">https://</span>
+								<span class="text-body text-muted-foreground">https://</span>
 								<input
 									{...props}
 									bind:value={$formData.website}
@@ -96,14 +100,14 @@
 							</div>
 						{/snippet}
 					</Form.Control>
-					<Form.FieldErrors class="text-caption text-destructive mt-1" />
+					<Form.FieldErrors class="mt-1 text-caption text-destructive" />
 				</Form.Field>
 
 				<Form.Field {form} name="contactEmail">
 					<Form.Control>
 						{#snippet children({ props })}
 							<Form.Label
-								class="text-label text-muted-foreground font-semibold tracking-wider uppercase"
+								class="text-label font-semibold tracking-wider text-muted-foreground uppercase"
 								>Contact email</Form.Label
 							>
 							<input
@@ -115,7 +119,7 @@
 							/>
 						{/snippet}
 					</Form.Control>
-					<Form.FieldErrors class="text-caption text-destructive mt-1" />
+					<Form.FieldErrors class="mt-1 text-caption text-destructive" />
 				</Form.Field>
 			</div>
 
@@ -123,7 +127,8 @@
 			<Form.Field {form} name="orgType">
 				<Form.Control>
 					{#snippet children({ props })}
-						<Form.Label class="text-label text-muted-foreground font-semibold tracking-wider uppercase"
+						<Form.Label
+							class="text-label font-semibold tracking-wider text-muted-foreground uppercase"
 							>Organization type</Form.Label
 						>
 						<select {...props} bind:value={$formData.orgType} class={inputClass}>
@@ -133,16 +138,17 @@
 						</select>
 					{/snippet}
 				</Form.Control>
-				<Form.FieldErrors class="text-caption text-destructive mt-1" />
+				<Form.FieldErrors class="mt-1 text-caption text-destructive" />
 			</Form.Field>
 
 			<!-- Places -->
 			<Form.Field {form} name="regionIds">
-				<span class="text-label text-muted-foreground mb-2 block font-semibold tracking-wider uppercase"
+				<span
+					class="mb-2 block text-label font-semibold tracking-wider text-muted-foreground uppercase"
 					>Place(s)</span
 				>
 				{#if data.regions.length === 0}
-					<p class="text-muted-foreground text-body">No places available.</p>
+					<p class="text-body text-muted-foreground">No places available.</p>
 				{:else}
 					<div class="flex flex-wrap gap-2">
 						{#each data.regions as region (region.id)}
@@ -167,30 +173,31 @@
 						{/each}
 					</div>
 				{/if}
-				<Form.FieldErrors class="text-caption text-destructive mt-1" />
+				<Form.FieldErrors class="mt-1 text-caption text-destructive" />
 			</Form.Field>
 
 			<!-- Basic description -->
 			<Form.Field {form} name="description">
 				<Form.Control>
 					{#snippet children({ props })}
-						<Form.Label class="text-label text-muted-foreground font-semibold tracking-wider uppercase"
+						<Form.Label
+							class="text-label font-semibold tracking-wider text-muted-foreground uppercase"
 							>Basic description</Form.Label
 						>
-						<p class="text-caption text-muted-foreground mb-1">
+						<p class="mb-1 text-caption text-muted-foreground">
 							This appears on the homepage for this Host.
 						</p>
 						<textarea {...props} bind:value={$formData.description} rows="4" class={inputClass}
 						></textarea>
 					{/snippet}
 				</Form.Control>
-				<Form.FieldErrors class="text-caption text-destructive mt-1" />
+				<Form.FieldErrors class="mt-1 text-caption text-destructive" />
 			</Form.Field>
 
 			<!-- Action row stays pinned to the bottom of the scroll region.
 			     Negative margins cancel the column padding so it spans edge to edge. -->
 			<div
-				class="bg-background border-border sticky bottom-0 -mx-6 -mb-6 flex items-center gap-3 border-t px-6 py-4 sm:-mx-8 sm:-mb-8 sm:px-8"
+				class="sticky bottom-0 -mx-6 -mb-6 flex items-center gap-3 border-t border-border bg-background px-6 py-4 sm:-mx-8 sm:-mb-8 sm:px-8"
 			>
 				<Button type="submit" disabled={$submitting}>
 					{$submitting ? 'Creating…' : 'Create Host'}

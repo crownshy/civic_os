@@ -30,7 +30,9 @@
 			.filter((o) => o.name.toLowerCase().includes(query.trim().toLowerCase()))
 	);
 
-	const selectedOrgs = $derived(selected.map((id) => byId.get(id)).filter((o): o is PickerOrg => !!o));
+	const selectedOrgs = $derived(
+		selected.map((id) => byId.get(id)).filter((o): o is PickerOrg => !!o)
+	);
 
 	function toggle(id: string) {
 		selected = selected.includes(id) ? selected.filter((s) => s !== id) : [...selected, id];
@@ -50,7 +52,7 @@
 
 <Dialog.Root bind:open {onOpenChange}>
 	<Dialog.Content
-		class="font-ui flex max-h-[85vh] w-[min(92vw,1000px)] flex-col overflow-hidden sm:max-w-[1000px]"
+		class="flex max-h-[85vh] w-[min(92vw,1000px)] flex-col overflow-hidden font-ui sm:max-w-[1000px]"
 	>
 		<Dialog.Header class="shrink-0">
 			<Dialog.Title class="text-section font-bold">Add New Co-Hosts</Dialog.Title>
@@ -64,24 +66,24 @@
 			<!-- SELECTED -->
 			<div>
 				<div
-					class="text-muted-foreground text-caption grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)] gap-4 px-2 pb-1 font-semibold uppercase"
+					class="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)] gap-4 px-2 pb-1 text-caption font-semibold text-muted-foreground uppercase"
 				>
 					<div>Selected ({selected.length})</div>
 					<div>Website</div>
 					<div>Contact Email</div>
 				</div>
 				{#if selectedOrgs.length === 0}
-					<p class="text-muted-foreground px-2 py-3 text-body">No hosts selected yet.</p>
+					<p class="px-2 py-3 text-body text-muted-foreground">No hosts selected yet.</p>
 				{:else}
-					<div class="divide-border divide-y">
+					<div class="divide-y divide-border">
 						{#each selectedOrgs as o (o.id)}
 							<div
-								class="text-body grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)] items-center gap-4 px-2 py-3"
+								class="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)] items-center gap-4 px-2 py-3 text-body"
 							>
 								<button
 									type="button"
 									onclick={() => toggle(o.id)}
-									class="text-primary flex min-w-0 items-center gap-2 text-left font-bold hover:underline"
+									class="flex min-w-0 items-center gap-2 text-left font-bold text-primary hover:underline"
 								>
 									<X class="size-4 shrink-0" />
 									<span class="truncate">{o.name}</span>
@@ -96,11 +98,11 @@
 
 			<!-- Search -->
 			<div class="mt-4 flex items-center gap-3">
-				<span class="text-muted-foreground text-caption font-semibold uppercase">All hosts</span>
+				<span class="text-caption font-semibold text-muted-foreground uppercase">All hosts</span>
 				<div
-					class="focus-within:border-primary flex flex-1 items-center gap-2 rounded-[10px] border border-stone-300 px-3"
+					class="flex flex-1 items-center gap-2 rounded-[10px] border border-stone-300 px-3 focus-within:border-primary"
 				>
-					<Search class="text-muted-foreground size-4 shrink-0" />
+					<Search class="size-4 shrink-0 text-muted-foreground" />
 					<input
 						bind:value={query}
 						placeholder="Search hosts…"
@@ -112,17 +114,17 @@
 			<!-- Results -->
 			<div class="mt-2 min-h-24">
 				{#if results.length === 0}
-					<p class="text-muted-foreground px-2 py-4 text-body">
+					<p class="px-2 py-4 text-body text-muted-foreground">
 						No matching hosts. {query ? 'Try a different search.' : ''}
 					</p>
 				{:else}
-					<div class="divide-border divide-y">
+					<div class="divide-y divide-border">
 						{#each results as o (o.id)}
 							{@const isSel = selected.includes(o.id)}
 							<button
 								type="button"
 								onclick={() => toggle(o.id)}
-								class="text-body hover:bg-muted/40 grid w-full grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)] items-center gap-4 px-2 py-3 text-left"
+								class="grid w-full grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)] items-center gap-4 px-2 py-3 text-left text-body hover:bg-muted/40"
 							>
 								<span class="flex min-w-0 items-center gap-2 font-bold">
 									<span
@@ -144,7 +146,7 @@
 			</div>
 		</div>
 
-		<Dialog.Footer class="border-border shrink-0 border-t pt-4">
+		<Dialog.Footer class="shrink-0 border-t border-border pt-4">
 			<form
 				method="POST"
 				action="?/grantCohosts"
@@ -162,7 +164,9 @@
 					<input type="hidden" name="orgIds" value={id} />
 				{/each}
 				<Button type="submit" disabled={selected.length === 0 || submitting}>
-					{submitting ? 'Adding…' : `Add ${selected.length || ''} co-host${selected.length === 1 ? '' : 's'}`}
+					{submitting
+						? 'Adding…'
+						: `Add ${selected.length || ''} co-host${selected.length === 1 ? '' : 's'}`}
 				</Button>
 			</form>
 		</Dialog.Footer>

@@ -179,7 +179,9 @@
 	async function focusTheme(theme: string) {
 		setThemes([theme]);
 		await tick();
-		document.getElementById(ALL_STATEMENTS_ID)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		document
+			.getElementById(ALL_STATEMENTS_ID)
+			?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 	}
 
 	// Arriving via a ?theme= deep-link: jump to the (already filtered) table.
@@ -244,9 +246,9 @@
 </script>
 
 {#if data.error}
-	<div class="text-destructive text-body p-8">Could not load report: {data.error}</div>
+	<div class="p-8 text-body text-destructive">Could not load report: {data.error}</div>
 {:else if !reportData || !stats}
-	<div class="text-muted-foreground text-body p-8">Loading report…</div>
+	<div class="p-8 text-body text-muted-foreground">Loading report…</div>
 {:else}
 	<div class="flex flex-col gap-10 px-8 py-8">
 		<!-- ===== Top stats ===== -->
@@ -266,12 +268,12 @@
 
 		<!-- ===== Themes card ===== -->
 		<Card
-			class="hover:border-muted-foreground/40 shadow-card rounded-[20px] transition-colors duration-200"
+			class="rounded-[20px] shadow-card transition-colors duration-200 hover:border-muted-foreground/40"
 		>
 			<header class="flex items-start justify-between gap-4 px-8 pt-8">
 				<div>
-					<h2 class="font-display text-foreground text-display font-semibold">Themes</h2>
-					<p class="text-foreground/70 text-section mt-2 font-medium">
+					<h2 class="font-display text-display font-semibold text-foreground">Themes</h2>
+					<p class="mt-2 text-section font-medium text-foreground/70">
 						Click a theme to see all of the statements associated with it.
 					</p>
 				</div>
@@ -279,7 +281,7 @@
 
 			<div class="px-8 pt-6 pb-2">
 				<div
-					class="font-ui text-foreground text-caption grid grid-cols-[10rem_3rem_1fr_2.5rem] items-center gap-6 px-2 py-2 font-semibold uppercase"
+					class="grid grid-cols-[10rem_3rem_1fr_2.5rem] items-center gap-6 px-2 py-2 font-ui text-caption font-semibold text-foreground uppercase"
 				>
 					<div>Theme</div>
 					<div class="text-right">Count</div>
@@ -287,26 +289,22 @@
 					<div></div>
 				</div>
 				{#if themes.length === 0}
-					<p class="text-muted-foreground text-caption py-6 italic">
+					<p class="py-6 text-caption text-muted-foreground italic">
 						No themes have been generated yet for this conversation.
 					</p>
 				{:else}
 					{#each showAllThemes ? themes : themes.slice(0, COLLAPSED_ROWS) as t (t.theme)}
-						<ThemeBar
-							summary={t}
-							barMax={maxThemeCount}
-							onclick={() => focusTheme(t.theme)}
-						/>
+						<ThemeBar summary={t} barMax={maxThemeCount} onclick={() => focusTheme(t.theme)} />
 					{/each}
 					{#if themes.length > COLLAPSED_ROWS}
 						<button
 							type="button"
 							onclick={() => (showAllThemes = !showAllThemes)}
-							class="text-foreground/70 hover:text-foreground text-section flex w-full items-center justify-center gap-2 py-4 transition-colors"
+							class="flex w-full items-center justify-center gap-2 py-4 text-section text-foreground/70 transition-colors hover:text-foreground"
 						>
 							{showAllThemes ? 'Show fewer themes' : `See all ${themes.length} themes`}
 							<ChevronDown
-								class={`text-primary size-4 transition-transform ${showAllThemes ? 'rotate-180' : ''}`}
+								class={`size-4 text-primary transition-transform ${showAllThemes ? 'rotate-180' : ''}`}
 							/>
 						</button>
 					{/if}
@@ -331,11 +329,11 @@
 			bind:excludePasses={consensusExcludePasses}
 		>
 			{#if consensusMain.length === 0}
-				<p class="text-muted-foreground text-caption col-span-full px-4 py-6 italic">
+				<p class="col-span-full px-4 py-6 text-caption text-muted-foreground italic">
 					No consensus statements yet.
 				</p>
 			{:else}
-				{#each (consensusExpanded ? consensusMain : consensusMain.slice(0, COLLAPSED_ROWS)) as c, i (c.tid)}
+				{#each consensusExpanded ? consensusMain : consensusMain.slice(0, COLLAPSED_ROWS) as c, i (c.tid)}
 					<StatementRow
 						index={i + 1}
 						comment={c}
@@ -378,11 +376,11 @@
 			bind:excludePasses={differencesExcludePasses}
 		>
 			{#if differencesMain.length === 0}
-				<p class="text-muted-foreground text-caption col-span-full px-4 py-6 italic">
+				<p class="col-span-full px-4 py-6 text-caption text-muted-foreground italic">
 					No clear differences yet.
 				</p>
 			{:else}
-				{#each (differencesExpanded ? differencesMain : differencesMain.slice(0, COLLAPSED_ROWS)) as c, i (c.tid)}
+				{#each differencesExpanded ? differencesMain : differencesMain.slice(0, COLLAPSED_ROWS) as c, i (c.tid)}
 					<StatementRow
 						index={i + 1}
 						comment={c}
@@ -443,13 +441,13 @@
 						/>
 					{/each}
 					{#if themes.length === 0}
-						<span class="text-muted-foreground text-caption italic">No themes yet.</span>
+						<span class="text-caption text-muted-foreground italic">No themes yet.</span>
 					{/if}
 				</div>
 			{/snippet}
 
 			{#if explorerMain.length === 0}
-				<p class="text-muted-foreground text-caption col-span-full px-4 py-6 italic">
+				<p class="col-span-full px-4 py-6 text-caption text-muted-foreground italic">
 					No statements match the current filters.
 				</p>
 			{:else}
@@ -458,7 +456,9 @@
 						index={i + 1}
 						comment={c}
 						groups={reportData.groups}
-						variant={classifyStatement(c, reportData.groups, { excludePasses: explorerExcludePasses })}
+						variant={classifyStatement(c, reportData.groups, {
+							excludePasses: explorerExcludePasses
+						})}
 						metric="count"
 						excludePasses={explorerExcludePasses}
 						picker={pickerFor(c.tid)}
@@ -472,7 +472,9 @@
 						index={i + 1}
 						comment={c}
 						groups={reportData.groups}
-						variant={classifyStatement(c, reportData.groups, { excludePasses: explorerExcludePasses })}
+						variant={classifyStatement(c, reportData.groups, {
+							excludePasses: explorerExcludePasses
+						})}
 						metric="count"
 						excludePasses={explorerExcludePasses}
 						picker={pickerFor(c.tid)}

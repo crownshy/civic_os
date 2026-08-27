@@ -70,18 +70,18 @@
 <SetupCard {title} {subtitle}>
 	<div class="font-ui">
 		{#if error}
-			<p class="text-destructive text-body mb-3">{error}</p>
+			<p class="mb-3 text-body text-destructive">{error}</p>
 		{/if}
 
 		<div
-			class="text-muted-foreground text-caption grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)_auto] gap-4 px-2 pb-2 font-semibold uppercase"
+			class="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)_auto] gap-4 px-2 pb-2 text-caption font-semibold text-muted-foreground uppercase"
 		>
 			<div>Name</div>
 			<div>Options</div>
 			<div class="text-right">Status</div>
 		</div>
 
-		<div class="divide-border divide-y">
+		<div class="divide-y divide-border">
 			{#each DEMOGRAPHIC_CATEGORIES as category (category.key)}
 				{@const on = toggles[category.key]}
 				<div
@@ -109,7 +109,7 @@
 									: 'left-1'}"
 							></span>
 						</button>
-						<span class="text-body w-7 font-bold">{on ? 'On' : 'Off'}</span>
+						<span class="w-7 text-body font-bold">{on ? 'On' : 'Off'}</span>
 					</div>
 				</div>
 			{/each}
@@ -131,7 +131,7 @@
 								disabled={pending[category.key]}
 								aria-label={`Delete ${category.name}`}
 								title="Delete this category"
-								class="text-muted-foreground hover:text-destructive cursor-pointer p-1 disabled:cursor-not-allowed disabled:opacity-40"
+								class="cursor-pointer p-1 text-muted-foreground hover:text-destructive disabled:cursor-not-allowed disabled:opacity-40"
 							>
 								<Trash2 class="size-4" />
 							</button>
@@ -153,7 +153,7 @@
 									: 'left-1'}"
 							></span>
 						</button>
-						<span class="text-body w-7 font-bold">{on ? 'On' : 'Off'}</span>
+						<span class="w-7 text-body font-bold">{on ? 'On' : 'Off'}</span>
 					</div>
 				</div>
 			{/each}
@@ -163,7 +163,7 @@
 			<button
 				type="button"
 				onclick={() => (addOpen = true)}
-				class="text-primary text-body border-border flex w-full cursor-pointer items-center gap-1 border-t px-2 py-4 font-bold"
+				class="flex w-full cursor-pointer items-center gap-1 border-t border-border px-2 py-4 text-body font-bold text-primary"
 			>
 				Add New…
 			</button>

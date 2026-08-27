@@ -1,35 +1,33 @@
 <script lang="ts" module>
-	import { tv } from "tailwind-variants";
+	import { tv } from 'tailwind-variants';
 
 	// Single source of truth for the recording-card shell. `tone` maps each
 	// status group to its outline color; the inset offset keeps the 1px outline
 	// from being clipped at the grid's edge.
 	const cardVariants = tv({
-		base: "min-h-20 rounded-[10px] px-5 py-4 outline outline-1 -outline-offset-1",
+		base: 'min-h-20 rounded-[10px] px-5 py-4 outline outline-1 -outline-offset-1',
 		variants: {
 			tone: {
-				ready: "outline-primary/40",
-				processing: "outline-primary/40",
-				"pipeline-error": "outline-yellow-500",
-			},
-		},
+				ready: 'outline-primary/40',
+				processing: 'outline-primary/40',
+				'pipeline-error': 'outline-yellow-500'
+			}
+		}
 	});
 </script>
 
 <script lang="ts">
-	import { LoaderCircle, TriangleAlert, Plus, Upload } from "@lucide/svelte";
-	import type { AudioRecordingStatus } from "@crownshy/api-client/api";
-	import { invalidate } from "$app/navigation";
-	import { Button } from "@civicos/shared/ui/button";
-	import Card from "@civicos/shared/ui/Card.svelte";
-	import UploadRecordingModal from "$lib/components/UploadRecordingModal.svelte";
-	import { page, navigating } from "$app/state";
+	import { LoaderCircle, TriangleAlert, Plus, Upload } from '@lucide/svelte';
+	import type { AudioRecordingStatus } from '@crownshy/api-client/api';
+	import { invalidate } from '$app/navigation';
+	import { Button } from '@civicos/shared/ui/button';
+	import Card from '@civicos/shared/ui/Card.svelte';
+	import UploadRecordingModal from '$lib/components/UploadRecordingModal.svelte';
+	import { page, navigating } from '$app/state';
 
 	let { data } = $props();
 
-	const recordings = $derived(
-		Array.isArray(data.recordings) ? data.recordings : [],
-	);
+	const recordings = $derived(Array.isArray(data.recordings) ? data.recordings : []);
 
 	const api = $derived(data.api);
 	const conversationId = $derived(data.campaign.id);
@@ -47,9 +45,7 @@
 	}
 
 	const hasInFlight = $derived(
-		recordings.some(
-			(r) => r.status === "transcribing" || r.status === "categorizing",
-		),
+		recordings.some((r) => r.status === 'transcribing' || r.status === 'categorizing')
 	);
 
 	$effect(() => {
@@ -58,19 +54,19 @@
 		return () => clearInterval(interval);
 	});
 
-	type CardTone = "ready" | "processing" | "pipeline-error";
+	type CardTone = 'ready' | 'processing' | 'pipeline-error';
 
 	function cardTone(status: AudioRecordingStatus): CardTone {
 		switch (status) {
-			case "complete":
-			case "awaiting_upload":
-				return "ready";
-			case "transcribing":
-			case "categorizing":
-				return "processing";
-			case "transcription_failed":
-			case "categorization_failed":
-				return "pipeline-error";
+			case 'complete':
+			case 'awaiting_upload':
+				return 'ready';
+			case 'transcribing':
+			case 'categorizing':
+				return 'processing';
+			case 'transcription_failed':
+			case 'categorization_failed':
+				return 'pipeline-error';
 		}
 	}
 
@@ -79,9 +75,9 @@
 	}
 
 	function fmtDate(iso: string) {
-		return new Date(iso).toLocaleDateString("en-US", {
-			month: "short",
-			day: "numeric",
+		return new Date(iso).toLocaleDateString('en-US', {
+			month: 'short',
+			day: 'numeric'
 		});
 	}
 </script>
@@ -93,8 +89,8 @@
 		</Card>
 	{:else if recordings.length === 0}
 		<!-- Empty state -->
-		<h2 class="text-h3 md:text-h2 font-bold">
-			{data.event?.name ?? "Recordings"}
+		<h2 class="text-h3 font-bold md:text-h2">
+			{data.event?.name ?? 'Recordings'}
 		</h2>
 		<Card
 			class="flex h-[543px] max-h-[70vh] flex-col items-center justify-center gap-4 rounded-[30px] px-6 text-center"
@@ -104,7 +100,7 @@
 			>
 				<Upload class="size-14" />
 			</div>
-			<h3 class="max-w-2xl text-h3 md:text-h2 font-bold text-foreground">
+			<h3 class="max-w-2xl text-h3 font-bold text-foreground md:text-h2">
 				Upload an audio recording from your event.
 			</h3>
 			<p class="max-w-lg text-body-lg font-medium text-muted-foreground">
@@ -120,7 +116,7 @@
 	{:else}
 		<div class="flex items-end justify-between gap-4">
 			<div>
-				<h2 class="text-h3 md:text-h2 font-bold">All Recordings</h2>
+				<h2 class="text-h3 font-bold md:text-h2">All Recordings</h2>
 				<p class="mt-1 text-body-lg font-medium">
 					Select a recording below to view its transcript and analysis.
 				</p>
@@ -142,40 +138,29 @@
 						<!-- Leading marker -->
 						<div class="flex size-6 shrink-0 items-center justify-center">
 							{#if pending}
-								<LoaderCircle
-									class="size-5 animate-spin text-primary"
-									aria-label="Opening"
-								/>
-							{:else if tone === "processing"}
-								<LoaderCircle
-									class="size-5 animate-spin text-primary"
-									aria-label="Processing"
-								/>
-							{:else if tone === "pipeline-error"}
-								<TriangleAlert
-									class="size-5 text-yellow-500"
-									aria-label="Error"
-								/>
+								<LoaderCircle class="size-5 animate-spin text-primary" aria-label="Opening" />
+							{:else if tone === 'processing'}
+								<LoaderCircle class="size-5 animate-spin text-primary" aria-label="Processing" />
+							{:else if tone === 'pipeline-error'}
+								<TriangleAlert class="size-5 text-yellow-500" aria-label="Error" />
 							{:else}
-								<span class="text-body-lg font-bold text-primary"
-									>{i + 1}</span
-								>
+								<span class="text-body-lg font-bold text-primary">{i + 1}</span>
 							{/if}
 						</div>
 						<div class="min-w-0 flex-1">
-							<div class="line-clamp-2 text-h4 font-bold text-foreground break-words">
+							<div class="line-clamp-2 text-h4 font-bold break-words text-foreground">
 								{rec.name}
 							</div>
 							<div class="mt-0.5 text-caption">
-								{#if rec.status === "transcription_failed"}
+								{#if rec.status === 'transcription_failed'}
 									<span class="font-bold text-yellow-700">Transcript Error</span>
-								{:else if rec.status === "categorization_failed"}
+								{:else if rec.status === 'categorization_failed'}
 									<span class="font-bold text-yellow-700">Report Error</span>
-								{:else if rec.status === "transcribing"}
+								{:else if rec.status === 'transcribing'}
 									<span class="text-muted-foreground">Transcribing…</span>
-								{:else if rec.status === "categorizing"}
+								{:else if rec.status === 'categorizing'}
 									<span class="text-muted-foreground">Analyzing…</span>
-								{:else if rec.status === "awaiting_upload"}
+								{:else if rec.status === 'awaiting_upload'}
 									<span class="text-muted-foreground">Awaiting upload</span>
 								{:else}
 									<span class="text-muted-foreground"
@@ -191,7 +176,7 @@
 					href={`${page.url}/${rec.id}`}
 					class={cardVariants({
 						tone,
-						class: `block transition-opacity ${pending ? "pointer-events-none opacity-60" : ""} ${i === 0 ? "bg-muted" : ""}`,
+						class: `block transition-opacity ${pending ? 'pointer-events-none opacity-60' : ''} ${i === 0 ? 'bg-muted' : ''}`
 					})}
 					aria-busy={pending}
 				>

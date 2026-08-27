@@ -1,15 +1,10 @@
 <script lang="ts">
-	import Card from "@civicos/shared/ui/Card.svelte";
-	import TranscriptRail, {
-		type TranscriptEvent,
-	} from "./TranscriptRail.svelte";
-	import ThemeSection, {
-		type Subtopic,
-		type Quote,
-	} from "./ThemeSection.svelte";
-	import RecordingSwitcher from "./RecordingSwitcher.svelte";
-	import DownloadMenu from "./DownloadMenu.svelte";
-	import type { AudioRecordingStatus } from "@crownshy/api-client/api";
+	import Card from '@civicos/shared/ui/Card.svelte';
+	import TranscriptRail, { type TranscriptEvent } from './TranscriptRail.svelte';
+	import ThemeSection, { type Subtopic, type Quote } from './ThemeSection.svelte';
+	import RecordingSwitcher from './RecordingSwitcher.svelte';
+	import DownloadMenu from './DownloadMenu.svelte';
+	import type { AudioRecordingStatus } from '@crownshy/api-client/api';
 
 	interface Topic {
 		id: string;
@@ -50,15 +45,15 @@
 		reportUrl,
 		recordings,
 		basePath,
-		recordingsPath,
+		recordingsPath
 	}: Props = $props();
 
 	const pipelineFailed = $derived(
-		status === "transcription_failed" || status === "categorization_failed",
+		status === 'transcription_failed' || status === 'categorization_failed'
 	);
 	// Neutral, non-error state: the row exists but its audio hasn't finished
 	// uploading yet, so there's no transcript/report to fetch.
-	const awaitingUpload = $derived(status === "awaiting_upload");
+	const awaitingUpload = $derived(status === 'awaiting_upload');
 
 	let transcriptData = $state<{ events: TranscriptEvent[] }>({ events: [] });
 	let reportData = $state<ReportData>({ data: [null, { topics: [] }] });
@@ -83,14 +78,14 @@
 			try {
 				const [transcriptResponse, reportResponse] = await Promise.all([
 					fetch(transcriptionUrl),
-					fetch(reportUrl),
+					fetch(reportUrl)
 				]);
 				if (!transcriptResponse.ok || !reportResponse.ok) {
-					throw new Error("Failed to load data files");
+					throw new Error('Failed to load data files');
 				}
 				transcriptData = await transcriptResponse.json();
 				const raw = await reportResponse.json();
-				if (typeof raw === "string") {
+				if (typeof raw === 'string') {
 					reportData = JSON.parse(raw).result;
 				} else {
 					reportData = raw;
@@ -132,19 +127,15 @@
 
 <Card class="flex rounded-[30px] max-lg:flex-col lg:h-[600px]">
 	{#if loading}
-		<div
-			class="flex flex-1 flex-col items-center justify-center gap-4 py-24 text-muted-foreground"
-		>
-			<div
-				class="size-10 animate-spin rounded-full border-4 border-muted border-t-primary"
-			></div>
+		<div class="flex flex-1 flex-col items-center justify-center gap-4 py-24 text-muted-foreground">
+			<div class="size-10 animate-spin rounded-full border-4 border-muted border-t-primary"></div>
 			<p>Loading recording…</p>
 		</div>
 	{:else}
 		<!-- Left: header + themes -->
 		<div class="flex min-w-0 flex-1 flex-col overflow-hidden">
 			<div class="shrink-0 px-10 pt-10 pb-4">
-				<div class="text-caption font-medium uppercase text-muted-foreground">
+				<div class="text-caption font-medium text-muted-foreground uppercase">
 					From “{conversationTitle}”
 				</div>
 				<div class="mt-1 flex flex-wrap items-center gap-3">
@@ -169,7 +160,7 @@
 					<div class="mt-4 flex flex-wrap gap-2">
 						{#each topics as topic (topic.id)}
 							<span
-								class="rounded-[3px] bg-muted px-[5px] py-[3px] text-caption font-medium uppercase text-amber-800"
+								class="rounded-[3px] bg-muted px-[5px] py-[3px] text-caption font-medium text-amber-800 uppercase"
 							>
 								{topic.title}
 							</span>
@@ -179,28 +170,21 @@
 			</div>
 
 			{#if awaitingUpload}
-				<div
-					class="flex flex-1 flex-col items-center justify-center gap-4 px-10 text-center"
-				>
-					<h2 class="text-h3 md:text-h2 font-bold text-foreground">
-						Upload in progress.
-					</h2>
+				<div class="flex flex-1 flex-col items-center justify-center gap-4 px-10 text-center">
+					<h2 class="text-h3 font-bold text-foreground md:text-h2">Upload in progress.</h2>
 					<p class="max-w-lg text-body-lg font-medium text-muted-foreground">
-						This recording is still uploading — please check back later. If you
-						need to try again, add a new recording or contact <a
+						This recording is still uploading — please check back later. If you need to try again,
+						add a new recording or contact <a
 							href="mailto:hello@bloom-project.org"
 							class="text-primary underline">hello@bloom-project.org.</a
 						>
 					</p>
 				</div>
 			{:else if showError}
-				<div
-					class="flex flex-1 flex-col items-center justify-center gap-4 px-10 text-center"
-				>
-					<h2 class="text-h3 md:text-h2 font-bold text-foreground">We have a problem.</h2>
+				<div class="flex flex-1 flex-col items-center justify-center gap-4 px-10 text-center">
+					<h2 class="text-h3 font-bold text-foreground md:text-h2">We have a problem.</h2>
 					<p class="max-w-lg text-body-lg font-medium text-muted-foreground">
-						There was an issue in creating the report. If this problem persists,
-						contact <a
+						There was an issue in creating the report. If this problem persists, contact <a
 							href="mailto:hello@bloom-project.org"
 							class="text-primary underline">hello@bloom-project.org.</a
 						>
@@ -217,11 +201,7 @@
 
 		<!-- Right: transcript rail -->
 		{#if transcriptData.events.length > 0}
-			<TranscriptRail
-				bind:this={rail}
-				events={transcriptData.events}
-				audioSrc={audioUrl}
-			/>
+			<TranscriptRail bind:this={rail} events={transcriptData.events} audioSrc={audioUrl} />
 		{/if}
 	{/if}
 </Card>

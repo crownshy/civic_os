@@ -214,13 +214,13 @@
 
 	{#if states.length === 0}
 		<div
-			class="text-muted-foreground bg-muted/60 absolute inset-0 flex items-center justify-center text-center text-caption"
+			class="absolute inset-0 flex items-center justify-center bg-muted/60 text-center text-caption text-muted-foreground"
 		>
 			No geographic participation data yet.
 		</div>
 	{:else if loadError}
 		<div
-			class="text-destructive bg-muted/60 absolute inset-0 flex items-center justify-center text-center text-caption"
+			class="absolute inset-0 flex items-center justify-center bg-muted/60 text-center text-caption text-destructive"
 		>
 			Couldn’t load county map: {loadError}
 		</div>
@@ -228,7 +228,7 @@
 
 	<!-- Legend -->
 	<div
-		class="bg-background/90 text-foreground/80 absolute bottom-2 left-2 rounded-md px-2.5 py-2 text-[11px] leading-tight shadow-sm"
+		class="absolute bottom-2 left-2 rounded-md bg-background/90 px-2.5 py-2 text-[11px] leading-tight text-foreground/80 shadow-sm"
 	>
 		<div class="mb-1 font-semibold">Participants</div>
 		<div class="flex items-center gap-1.5">

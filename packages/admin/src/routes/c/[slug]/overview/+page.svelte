@@ -172,11 +172,11 @@
 				<input
 					{...props}
 					bind:value={$formData.title}
-					class="font-display text-body-lg focus:border-primary w-full rounded-[10px] border border-stone-300 bg-transparent px-3 py-2 font-semibold focus:outline-none"
+					class="font-display w-full rounded-[10px] border border-stone-300 bg-transparent px-3 py-2 text-body-lg font-semibold focus:border-primary focus:outline-none"
 				/>
 			{/snippet}
 		</Form.Control>
-		<Form.FieldErrors class="text-caption mt-1" />
+		<Form.FieldErrors class="mt-1 text-caption" />
 	</Form.Field>
 {/snippet}
 
@@ -188,18 +188,18 @@
 					{...props}
 					bind:value={$formData.description}
 					rows="4"
-					class="text-paragraph focus:border-primary w-full rounded-[10px] border border-stone-300 bg-transparent px-3 py-2 focus:outline-none"
+					class="w-full rounded-[10px] border border-stone-300 bg-transparent px-3 py-2 text-paragraph focus:border-primary focus:outline-none"
 				></textarea>
 			{/snippet}
 		</Form.Control>
-		<Form.FieldErrors class="text-caption mt-1" />
+		<Form.FieldErrors class="mt-1 text-caption" />
 	</Form.Field>
 {/snippet}
 
 <div class="flex-1 overflow-y-auto">
 	<div class="flex flex-col gap-6 px-8 pb-8">
 		<!-- Auto-save status -->
-		<div class="text-caption text-muted-foreground h-4 self-end" aria-live="polite">
+		<div class="h-4 self-end text-caption text-muted-foreground" aria-live="polite">
 			{#if saveStatus !== 'idle'}
 				<span class={saveStatus === 'error' ? 'text-destructive' : ''}>
 					{statusLabel[saveStatus]}
@@ -208,7 +208,14 @@
 		</div>
 
 		<!-- ===== Identity ===== -->
-		<IdentityCard {title} {baseUrl} {slug} keyQuestion={campaign.keyQuestion} {places} {titleField} />
+		<IdentityCard
+			{title}
+			{baseUrl}
+			{slug}
+			keyQuestion={campaign.keyQuestion}
+			{places}
+			{titleField}
+		/>
 
 		<!-- ===== Co-Hosts ===== -->
 		<!-- Live co-hosts; "Add New…" opens the org picker and grants the
@@ -243,12 +250,12 @@
 		     Kept to avoid dropping an affordance; open question whether to wire
 		     (DeleteConversation) or remove. -->
 		<Card
-			class="bg-destructive/5 border-destructive/30 hover:border-destructive/60 hover:bg-destructive/10 rounded-[20px] transition-colors duration-200"
+			class="rounded-[20px] border-destructive/30 bg-destructive/5 transition-colors duration-200 hover:border-destructive/60 hover:bg-destructive/10"
 		>
 			<div class="flex items-center justify-between gap-3 px-8 py-5">
 				<div>
-					<div class="text-destructive text-caption font-bold tracking-tight">DANGER ZONE</div>
-					<div class="text-muted-foreground text-caption">
+					<div class="text-caption font-bold tracking-tight text-destructive">DANGER ZONE</div>
+					<div class="text-caption text-muted-foreground">
 						Permanently delete this conversation and all its data.
 					</div>
 				</div>

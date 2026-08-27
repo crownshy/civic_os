@@ -27,27 +27,27 @@
 	<div class="space-y-4">
 		<div>
 			<h3 class="text-body font-bold">Reports</h3>
-			<p class="text-muted-foreground text-caption">appear once recordings are processed</p>
+			<p class="text-caption text-muted-foreground">appear once recordings are processed</p>
 		</div>
 		<div class="space-y-2">
 			{#each reports as r}
 				<div
-					class={`bg-card shadow-card flex items-center gap-3 rounded-lg p-4 ${
+					class={`flex items-center gap-3 rounded-lg bg-card p-4 shadow-card ${
 						r.state === 'pending' ? 'opacity-70' : ''
 					}`}
 				>
 					<div
-						class={`flex size-12 items-center justify-center rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl text-caption font-medium ${kindClass[r.kind] ?? 'bg-muted-foreground/20'}`}
+						class={`flex size-12 items-center justify-center rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl text-caption font-medium ${kindClass[r.kind] ?? 'bg-muted-foreground/20'}`}
 					>
 						{r.kind}
 					</div>
 					<div class="flex-1">
 						<div class="text-body font-bold">{r.title}</div>
-						<div class="text-muted-foreground text-caption">{r.ts}</div>
+						<div class="text-caption text-muted-foreground">{r.ts}</div>
 					</div>
 					<button
 						type="button"
-						class="border-foreground/20 size-8 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl border text-caption"
+						class="size-8 rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl border border-foreground/20 text-caption"
 						aria-label="open report"
 					>
 						⛓
@@ -61,25 +61,27 @@
 	<div class="space-y-3">
 		<h3 class="text-body font-bold">Add recordings</h3>
 		<div
-			class="bg-muted/30 border-foreground/20 flex flex-col items-center gap-1.5 rounded-lg border px-3 py-5"
+			class="flex flex-col items-center gap-1.5 rounded-lg border border-foreground/20 bg-muted/30 px-3 py-5"
 		>
-			<Upload class="text-muted-foreground size-7" />
+			<Upload class="size-7 text-muted-foreground" />
 			<div class="text-caption font-bold">drop .mp3 / .wav / .m4a</div>
-			<div class="text-muted-foreground text-caption">
+			<div class="text-caption text-muted-foreground">
 				or <span class="underline">browse files</span>
 			</div>
 		</div>
 		<div class="space-y-1.5">
 			{#each recordings as rec}
-				<div class="bg-card shadow-card flex items-center gap-2 rounded-lg p-3 text-caption">
-					<Music class="text-muted-foreground size-4" />
+				<div class="flex items-center gap-2 rounded-lg bg-card p-3 text-caption shadow-card">
+					<Music class="size-4 text-muted-foreground" />
 					<div class="flex-1">
 						<div class="font-bold">{rec.name}</div>
 						<div class="text-muted-foreground">{rec.duration}</div>
 					</div>
 					<span
-						class={`inline-flex items-center gap-1 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-2.5 py-1 ${
-							rec.state === 'processed' ? 'text-success bg-success/10' : 'text-destructive bg-destructive/10'
+						class={`inline-flex items-center gap-1 rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl px-2.5 py-1 ${
+							rec.state === 'processed'
+								? 'bg-success/10 text-success'
+								: 'bg-destructive/10 text-destructive'
 						}`}
 					>
 						<span
@@ -90,15 +92,17 @@
 				</div>
 			{/each}
 		</div>
-		<div class="bg-card shadow-card space-y-1 rounded-lg p-3">
+		<div class="space-y-1 rounded-lg bg-card p-3 shadow-card">
 			<div class="text-caption font-bold">Phone recording</div>
-			<div class="text-muted-foreground text-caption">Dial in & we'll transcribe.</div>
-			<div class="bg-muted-foreground/10 mt-1.5 flex items-center gap-2 rounded-lg px-2.5 py-2">
+			<div class="text-caption text-muted-foreground">Dial in & we'll transcribe.</div>
+			<div class="mt-1.5 flex items-center gap-2 rounded-lg bg-muted-foreground/10 px-2.5 py-2">
 				<span class="flex-1 text-body">+1 (415) 555-0142</span>
-				<span class="bg-foreground text-background rounded-full px-2.5 py-1 text-caption">pin 8417</span>
+				<span class="rounded-full bg-foreground px-2.5 py-1 text-caption text-background"
+					>pin 8417</span
+				>
 			</div>
 		</div>
-		<div class="bg-card shadow-card rounded-lg p-3 text-caption">
+		<div class="rounded-lg bg-card p-3 text-caption shadow-card">
 			<span class="font-bold">Online events:</span> the Jitsi link auto-records. No upload needed.
 		</div>
 	</div>

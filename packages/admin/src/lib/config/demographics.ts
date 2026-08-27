@@ -135,7 +135,6 @@ export function readCustomDemographics(metadata: unknown): CustomDemographicCate
 /** Reserved keys a new category cannot collide with. */
 export function isKeyTaken(key: string, existing: CustomDemographicCategory[]): boolean {
 	return (
-		(DEMOGRAPHIC_KEYS as readonly string[]).includes(key) ||
-		existing.some((c) => c.key === key)
+		(DEMOGRAPHIC_KEYS as readonly string[]).includes(key) || existing.some((c) => c.key === key)
 	);
 }

@@ -15,7 +15,7 @@
 	const clampedFill = $derived(Math.min(100, Math.max(0, fill)));
 </script>
 
-<div class={`bg-meter-track relative h-2.5 overflow-hidden ${className}`}>
+<div class={`relative h-2.5 overflow-hidden bg-meter-track ${className}`}>
 	<div
 		class={`h-full transition-all duration-300 ${fillClass}`}
 		style:width={`${clampedFill}%`}

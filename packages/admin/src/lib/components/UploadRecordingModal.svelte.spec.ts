@@ -8,8 +8,9 @@ import UploadRecordingModal from './UploadRecordingModal.svelte';
 // svelte compiler doesn't flag a nested class in this `.svelte.spec` file.
 class FakeXHR {
 	static lastSent: { method?: string; url?: string } = {};
-	upload: { onprogress?: (e: { lengthComputable: boolean; loaded: number; total: number }) => void } =
-		{};
+	upload: {
+		onprogress?: (e: { lengthComputable: boolean; loaded: number; total: number }) => void;
+	} = {};
 	status = 200;
 	onload: (() => void) | null = null;
 	onerror: (() => void) | null = null;
@@ -34,9 +35,7 @@ function makeApi(overrides: Record<string, unknown> = {}) {
 	};
 }
 
-function renderModal(
-	props: { existingNames?: string[]; api?: ReturnType<typeof makeApi> } = {}
-) {
+function renderModal(props: { existingNames?: string[]; api?: ReturnType<typeof makeApi> } = {}) {
 	const api = props.api ?? makeApi();
 	const onUploaded = vi.fn();
 	render(UploadRecordingModal, {
@@ -109,7 +108,9 @@ describe('UploadRecordingModal.svelte', () => {
 		await userEvent.upload(fileField(), new File(['x'], 'notes.txt', { type: 'text/plain' }));
 		await userEvent.click(uploadButton());
 
-		await expect.element(page.getByText('Unsupported file type', { exact: false })).toBeInTheDocument();
+		await expect
+			.element(page.getByText('Unsupported file type', { exact: false }))
+			.toBeInTheDocument();
 		expect(api.CreateAudioRecording).not.toHaveBeenCalled();
 	});
 

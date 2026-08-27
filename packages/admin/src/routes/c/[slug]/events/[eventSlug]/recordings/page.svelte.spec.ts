@@ -11,7 +11,7 @@ vi.mock('$app/navigation', () => ({ invalidate: vi.fn(() => Promise.resolve()) }
 
 function makeData(recordings: AudioRecordingDto[], recordingsFailed: boolean): PageData {
 	// we only create the pieces of data that are relevant to the view, but have to cast it to keep the compiler happy.
-    // i'd love to find a better way to do this!
+	// i'd love to find a better way to do this!
 	return {
 		recordings,
 		recordingsFailed,

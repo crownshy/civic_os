@@ -36,23 +36,23 @@
 </script>
 
 <Card
-	class="hover:border-muted-foreground/40 shadow-card rounded-[20px] transition-colors duration-200"
+	class="rounded-[20px] shadow-card transition-colors duration-200 hover:border-muted-foreground/40"
 >
 	<div class="flex flex-col gap-6 px-8 py-8">
 		<div>
-			<h2 class="font-display text-foreground md:text-h3 text-h4 font-semibold">
+			<h2 class="font-display text-h4 font-semibold text-foreground md:text-h3">
 				Your Open Poll is <span class={isLive ? 'text-success' : 'text-muted-foreground'}
 					>{isLive ? 'LIVE.' : 'OFF.'}</span
 				>
 			</h2>
 			{#if pollUrl}
-				<p class="text-foreground/70 text-body mt-2">
+				<p class="mt-2 text-body text-foreground/70">
 					at
 					<a
 						href={`https://${pollUrl}`}
 						target="_blank"
 						rel="noopener noreferrer"
-						class="hover:text-foreground underline">{pollUrl}</a
+						class="underline hover:text-foreground">{pollUrl}</a
 					>
 					<span aria-hidden="true">→</span>
 				</p>
@@ -67,18 +67,18 @@
 			]}
 		/>
 
-		<div class="font-ui flex flex-wrap items-center justify-end gap-2">
+		<div class="flex flex-wrap items-center justify-end gap-2 font-ui">
 			{#if error}
-				<span class="text-destructive text-body mr-auto">{error}</span>
+				<span class="mr-auto text-body text-destructive">{error}</span>
 			{/if}
-			<span class="text-foreground text-body">
+			<span class="text-body text-foreground">
 				{isLive ? 'Done collecting responses?' : 'Ready to collect responses again?'}
 			</span>
 			<button
 				type="button"
 				onclick={toggle}
 				disabled={busy}
-				class="text-primary text-body cursor-pointer underline disabled:cursor-not-allowed disabled:opacity-60"
+				class="cursor-pointer text-body text-primary underline disabled:cursor-not-allowed disabled:opacity-60"
 			>
 				{#if busy}
 					Saving…

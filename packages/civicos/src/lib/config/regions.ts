@@ -22,7 +22,13 @@ import {
 import type { RegionConfig, Partner, FaqEntry } from '@civicos/shared/data/regions';
 
 export type { RegionConfig, Partner, FaqEntry };
-export { GENERIC_REGION, extractSubdomain, getRegionUrl, getEventFullDescription, formatDurationLabel };
+export {
+	GENERIC_REGION,
+	extractSubdomain,
+	getRegionUrl,
+	getEventFullDescription,
+	formatDurationLabel
+};
 
 const DEFAULT_FAQ: FaqEntry[] = [
 	{

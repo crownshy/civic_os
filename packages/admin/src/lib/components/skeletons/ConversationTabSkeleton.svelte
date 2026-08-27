@@ -13,7 +13,7 @@
 {#if tab === 'open-poll'}
 	<!-- Open Poll redirects to /participants and mounts its own sub-tab layout;
 	     sketch the sub-tab strip + participants content it lands on. -->
-	<nav class="border-border font-ui flex items-center gap-6 border-b px-5 py-3" aria-hidden="true">
+	<nav class="flex items-center gap-6 border-b border-border px-5 py-3 font-ui" aria-hidden="true">
 		{#each Array(3) as _, i (i)}
 			<Skeleton class="h-4 w-24" />
 		{/each}

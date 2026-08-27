@@ -1,26 +1,22 @@
 <script lang="ts">
-	import EventTranscriptViewer from "$lib/components/transcript-viewer/EventTranscriptViewer.svelte";
-	import { page } from "$app/state";
+	import EventTranscriptViewer from '$lib/components/transcript-viewer/EventTranscriptViewer.svelte';
+	import { page } from '$app/state';
 
 	let { data } = $props();
 	let { error, recording } = $derived(data);
 
-	const basePath = $derived(
-		`/c/${page.params.slug}/events/${page.params.eventSlug}/recordings`,
-	);
-	const conversationTitle = $derived(
-		data.conversation?.title ?? data.campaign.title,
-	);
+	const basePath = $derived(`/c/${page.params.slug}/events/${page.params.eventSlug}/recordings`);
+	const conversationTitle = $derived(data.conversation?.title ?? data.campaign.title);
 	const recordingRefs = $derived(
 		(Array.isArray(data.recordings) ? data.recordings : []).map((r) => ({
 			id: r.id,
-			name: r.name,
-		})),
+			name: r.name
+		}))
 	);
 </script>
 
 {#if error}
-	<h1 class="text-h3 md:text-h2 font-bold">{error}</h1>
+	<h1 class="text-h3 font-bold md:text-h2">{error}</h1>
 {/if}
 
 {#if recording}

@@ -235,7 +235,7 @@
 				<span class="text-muted-foreground">saving…</span>
 			{:else if savedTick > 0 && !error}
 				{#key savedTick}
-					<span class="text-success inline-flex items-center gap-1">
+					<span class="inline-flex items-center gap-1 text-success">
 						<Check class="size-3.5" /> saved
 					</span>
 				{/key}
@@ -246,7 +246,7 @@
 		</div>
 
 		<div class="space-y-1.5">
-			<Label class="text-muted-foreground text-caption tracking-tight">MODE</Label>
+			<Label class="text-caption tracking-tight text-muted-foreground">MODE</Label>
 			<ToggleGroup.Root
 				type="single"
 				value={form.format}
@@ -269,7 +269,7 @@
 		</div>
 
 		<div class="space-y-1.5">
-			<Label for="ev-name" class="text-muted-foreground text-caption tracking-tight">NAME</Label>
+			<Label for="ev-name" class="text-caption tracking-tight text-muted-foreground">NAME</Label>
 			<Input
 				id="ev-name"
 				bind:value={form.name}
@@ -280,7 +280,7 @@
 
 		<div class="grid grid-cols-1 gap-3.5 md:grid-cols-3">
 			<div class="space-y-1.5">
-				<Label for="ev-date" class="text-muted-foreground text-caption tracking-tight">DATE</Label>
+				<Label for="ev-date" class="text-caption tracking-tight text-muted-foreground">DATE</Label>
 				<Input
 					id="ev-date"
 					type="date"
@@ -290,7 +290,8 @@
 				/>
 			</div>
 			<div class="space-y-1.5">
-				<Label for="ev-start" class="text-muted-foreground text-caption tracking-tight">START</Label>
+				<Label for="ev-start" class="text-caption tracking-tight text-muted-foreground">START</Label
+				>
 				<Input
 					id="ev-start"
 					type="time"
@@ -300,24 +301,18 @@
 				/>
 			</div>
 			<div class="space-y-1.5">
-				<Label for="ev-end" class="text-muted-foreground text-caption tracking-tight">END</Label>
-				<Input
-					id="ev-end"
-					type="time"
-					bind:value={form.end_time}
-					onblur={saveTimes}
-					class="h-10"
-				/>
+				<Label for="ev-end" class="text-caption tracking-tight text-muted-foreground">END</Label>
+				<Input id="ev-end" type="time" bind:value={form.end_time} onblur={saveTimes} class="h-10" />
 			</div>
 		</div>
 
 		<div class="space-y-1.5">
-			<Label for="ev-tz" class="text-muted-foreground text-caption tracking-tight">TIME ZONE</Label>
+			<Label for="ev-tz" class="text-caption tracking-tight text-muted-foreground">TIME ZONE</Label>
 			<select
 				id="ev-tz"
 				bind:value={form.time_zone}
 				onchange={saveTimes}
-				class="bg-muted/30 border-input focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-lg border px-3 text-body transition-colors outline-none focus-visible:ring-[3px]"
+				class="h-10 w-full rounded-lg border border-input bg-muted/30 px-3 text-body transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
 			>
 				{#each TIMEZONES as tz (tz)}
 					<option value={tz}>{tz}</option>
@@ -327,7 +322,7 @@
 
 		{#if isInPerson}
 			<div class="space-y-3">
-				<Label class="text-muted-foreground text-caption tracking-tight">LOCATION</Label>
+				<Label class="text-caption tracking-tight text-muted-foreground">LOCATION</Label>
 				<div class="grid grid-cols-1 gap-3 md:grid-cols-2">
 					<Input
 						bind:value={form.location.venue_name}
@@ -372,14 +367,16 @@
 						class="h-10"
 					/>
 				</div>
-				<p class="text-muted-foreground text-label">
+				<p class="text-label text-muted-foreground">
 					All required address fields must be filled before location saves.
 				</p>
 			</div>
 		{/if}
 
 		<div class="space-y-1.5">
-			<Label for="ev-desc" class="text-muted-foreground text-caption tracking-tight">DESCRIPTION</Label>
+			<Label for="ev-desc" class="text-caption tracking-tight text-muted-foreground"
+				>DESCRIPTION</Label
+			>
 			<textarea
 				id="ev-desc"
 				bind:value={form.description}
@@ -387,13 +384,15 @@
 					form.description.trim() !== event.description &&
 					save({ description: form.description.trim() })}
 				rows="4"
-				class="bg-muted/30 border-input focus-visible:border-ring focus-visible:ring-ring/50 w-full rounded-lg border px-3 py-2.5 text-body leading-relaxed transition-colors outline-none focus-visible:ring-[3px]"
+				class="w-full rounded-lg border border-input bg-muted/30 px-3 py-2.5 text-body leading-relaxed transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
 			></textarea>
 		</div>
 
 		<div class="grid grid-cols-1 gap-3.5 md:grid-cols-3">
 			<div class="space-y-1.5">
-				<Label for="ev-cap" class="text-muted-foreground text-caption tracking-tight">CAPACITY</Label>
+				<Label for="ev-cap" class="text-caption tracking-tight text-muted-foreground"
+					>CAPACITY</Label
+				>
 				<Input
 					id="ev-cap"
 					type="number"
@@ -404,21 +403,23 @@
 				/>
 			</div>
 			<div class="space-y-1.5">
-				<Label for="ev-sign" class="text-muted-foreground text-caption tracking-tight">SIGNUP MODE</Label>
+				<Label for="ev-sign" class="text-caption tracking-tight text-muted-foreground"
+					>SIGNUP MODE</Label
+				>
 				<select
 					id="ev-sign"
 					bind:value={form.signup_mode}
 					onchange={() => save({ signup_mode: form.signup_mode })}
-					class="bg-muted/30 border-input focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-lg border px-3 text-body transition-colors outline-none focus-visible:ring-[3px]"
+					class="h-10 w-full rounded-lg border border-input bg-muted/30 px-3 text-body transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
 				>
 					<option value="open">open</option>
 					<option value="invite">invite only</option>
 				</select>
 			</div>
 			<div class="space-y-1.5">
-				<Label class="text-muted-foreground text-caption tracking-tight">CONTACT / HOST</Label>
+				<Label class="text-caption tracking-tight text-muted-foreground">CONTACT / HOST</Label>
 				<div
-					class="bg-card shadow-card flex h-10 items-center rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-3 text-body"
+					class="flex h-10 items-center rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl bg-card px-3 text-body shadow-card"
 				>
 					{campaign.hostName}
 				</div>
@@ -426,10 +427,10 @@
 		</div>
 
 		<div class="space-y-1.5">
-			<Label class="text-muted-foreground text-caption tracking-tight">RSVP LINK</Label>
+			<Label class="text-caption tracking-tight text-muted-foreground">RSVP LINK</Label>
 			<div class="flex items-center gap-2">
 				<div
-					class="bg-card shadow-card flex-1 truncate rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-3 py-2.5 text-caption"
+					class="flex-1 truncate rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl bg-card px-3 py-2.5 text-caption shadow-card"
 				>
 					{rsvpLink}
 				</div>
@@ -441,19 +442,19 @@
 					{/if}
 				</Button>
 			</div>
-			<p class="text-muted-foreground text-label">
+			<p class="text-label text-muted-foreground">
 				Autofilled. Replace with a Zoom or other link if you're hosting online.
 			</p>
 		</div>
 
-		<div class="border-border my-4 border-t"></div>
+		<div class="my-4 border-t border-border"></div>
 
 		<div
-			class="bg-destructive/5 border-destructive/30 flex items-center justify-between rounded-lg border px-4 py-3.5"
+			class="flex items-center justify-between rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3.5"
 		>
 			<div>
-				<div class="text-destructive text-caption font-bold tracking-tight">DELETE EVENT</div>
-				<div class="text-muted-foreground text-caption">
+				<div class="text-caption font-bold tracking-tight text-destructive">DELETE EVENT</div>
+				<div class="text-caption text-muted-foreground">
 					Removes the event, RSVPs, and any uploaded recordings.
 				</div>
 			</div>
@@ -468,7 +469,8 @@
 			<Dialog.Header>
 				<Dialog.Title>Delete "{event.name}"?</Dialog.Title>
 				<Dialog.Description>
-					This permanently removes the event, all RSVPs, and any uploaded recordings. This cannot be undone.
+					This permanently removes the event, all RSVPs, and any uploaded recordings. This cannot be
+					undone.
 				</Dialog.Description>
 			</Dialog.Header>
 			<Dialog.Footer class="gap-2">

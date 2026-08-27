@@ -24,7 +24,7 @@
 </script>
 
 <Card
-	class="hover:border-muted-foreground/40 shadow-card rounded-[20px] transition-colors duration-200"
+	class="rounded-[20px] shadow-card transition-colors duration-200 hover:border-muted-foreground/40"
 >
 	<div class="flex flex-col gap-6 px-8 py-8">
 		<SetupField label="Title">
@@ -47,7 +47,7 @@
 					<div class="flex flex-wrap items-center gap-2">
 						{#each places as place (place)}
 							<span
-								class="bg-primary/5 text-primary text-caption rounded-[10px] px-2.5 py-1.5 font-medium"
+								class="rounded-[10px] bg-primary/5 px-2.5 py-1.5 text-caption font-medium text-primary"
 							>
 								{place}
 							</span>
@@ -72,7 +72,7 @@
 						style={`background-color: ${color}`}
 						class="size-12 rounded-[10px] border border-stone-300 transition-transform hover:scale-105 {selectedColor ===
 						i
-							? 'ring-primary ring-offset-background ring-2 ring-offset-2'
+							? 'ring-2 ring-primary ring-offset-2 ring-offset-background'
 							: ''}"
 					></button>
 				{/each}

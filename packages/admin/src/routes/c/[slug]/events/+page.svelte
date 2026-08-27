@@ -78,7 +78,16 @@
 		if (creating) return;
 		formError = null;
 
-		const { name, description, start_date, start_time, end_time, capacity, signup_mode, time_zone } = form;
+		const {
+			name,
+			description,
+			start_date,
+			start_time,
+			end_time,
+			capacity,
+			signup_mode,
+			time_zone
+		} = form;
 		if (!name.trim() || !description.trim() || !start_date || !start_time || !end_time) {
 			formError = 'Fill all required fields.';
 			return;
@@ -173,7 +182,7 @@
 				<button
 					type="button"
 					onclick={() => (activeFilter = label)}
-					class={`cursor-pointer rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-3 py-1.5 text-caption transition-all duration-150 hover:scale-[1.03] active:scale-[0.97] ${
+					class={`cursor-pointer rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl px-3 py-1.5 text-caption transition-all duration-150 hover:scale-[1.03] active:scale-[0.97] ${
 						activeFilter === label
 							? 'bg-primary/10 text-foreground shadow-sm'
 							: 'bg-muted-foreground/10 text-foreground hover:bg-muted-foreground/20'
@@ -188,7 +197,7 @@
 				<button
 					type="button"
 					onclick={() => (viewMode = mode)}
-					class={`cursor-pointer rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-3 py-1.5 text-caption transition-all duration-150 hover:scale-[1.03] active:scale-[0.97] ${
+					class={`cursor-pointer rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl px-3 py-1.5 text-caption transition-all duration-150 hover:scale-[1.03] active:scale-[0.97] ${
 						viewMode === mode
 							? 'bg-primary/10 shadow-sm'
 							: 'bg-muted-foreground/10 hover:bg-muted-foreground/20'
@@ -200,7 +209,7 @@
 			<button
 				type="button"
 				onclick={() => (showForm = !showForm)}
-				class="bg-primary text-primary-foreground inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-caption"
+				class="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-caption text-primary-foreground"
 			>
 				<Plus class="size-3" /> new event
 			</button>
@@ -210,12 +219,12 @@
 	{#if showForm}
 		<form
 			onsubmit={submitForm}
-			class="bg-card border-border space-y-3.5 rounded-lg border p-4 shadow-sm"
+			class="space-y-3.5 rounded-lg border border-border bg-card p-4 shadow-sm"
 		>
 			<div class="flex items-start justify-between">
 				<div>
 					<h3 class="text-body font-bold">New event</h3>
-					<p class="text-muted-foreground text-caption">
+					<p class="text-caption text-muted-foreground">
 						Creates a draft event in this conversation.
 					</p>
 				</div>
@@ -233,80 +242,89 @@
 			</div>
 
 			<div class="space-y-1">
-				<label class="text-muted-foreground text-caption tracking-tight" for="ev-name">NAME</label>
+				<label class="text-caption tracking-tight text-muted-foreground" for="ev-name">NAME</label>
 				<input
 					id="ev-name"
 					type="text"
 					bind:value={form.name}
 					required
-					class="bg-muted/30 border-foreground/20 w-full rounded-lg border px-3 py-2 text-body outline-none"
+					class="w-full rounded-lg border border-foreground/20 bg-muted/30 px-3 py-2 text-body outline-none"
 					placeholder="Community listening session"
 				/>
 			</div>
 
 			<div class="space-y-1">
-				<label class="text-muted-foreground text-caption tracking-tight" for="ev-desc">DESCRIPTION</label>
+				<label class="text-caption tracking-tight text-muted-foreground" for="ev-desc"
+					>DESCRIPTION</label
+				>
 				<textarea
 					id="ev-desc"
 					bind:value={form.description}
 					required
 					rows="3"
-					class="bg-muted/30 border-foreground/20 w-full rounded-lg border px-3 py-2 text-body outline-none"
+					class="w-full rounded-lg border border-foreground/20 bg-muted/30 px-3 py-2 text-body outline-none"
 					placeholder="What's this gathering about?"
 				></textarea>
 			</div>
 
 			<div class="flex flex-wrap gap-3">
 				<div class="min-w-[160px] flex-1 space-y-1">
-					<label class="text-muted-foreground text-caption tracking-tight" for="ev-date">DATE</label>
+					<label class="text-caption tracking-tight text-muted-foreground" for="ev-date">DATE</label
+					>
 					<input
 						id="ev-date"
 						type="date"
 						bind:value={form.start_date}
 						required
-						class="bg-muted/30 border-foreground/20 w-full rounded-lg border px-3 py-2 text-body outline-none"
+						class="w-full rounded-lg border border-foreground/20 bg-muted/30 px-3 py-2 text-body outline-none"
 					/>
 				</div>
 				<div class="min-w-[120px] flex-1 space-y-1">
-					<label class="text-muted-foreground text-caption tracking-tight" for="ev-start">START</label>
+					<label class="text-caption tracking-tight text-muted-foreground" for="ev-start"
+						>START</label
+					>
 					<input
 						id="ev-start"
 						type="time"
 						bind:value={form.start_time}
 						required
-						class="bg-muted/30 border-foreground/20 w-full rounded-lg border px-3 py-2 text-body outline-none"
+						class="w-full rounded-lg border border-foreground/20 bg-muted/30 px-3 py-2 text-body outline-none"
 					/>
 				</div>
 				<div class="min-w-[120px] flex-1 space-y-1">
-					<label class="text-muted-foreground text-caption tracking-tight" for="ev-end">END</label>
+					<label class="text-caption tracking-tight text-muted-foreground" for="ev-end">END</label>
 					<input
 						id="ev-end"
 						type="time"
 						bind:value={form.end_time}
 						required
-						class="bg-muted/30 border-foreground/20 w-full rounded-lg border px-3 py-2 text-body outline-none"
+						class="w-full rounded-lg border border-foreground/20 bg-muted/30 px-3 py-2 text-body outline-none"
 					/>
 				</div>
 			</div>
 
 			<div class="flex flex-wrap gap-3">
 				<div class="min-w-[140px] flex-1 space-y-1">
-					<label class="text-muted-foreground text-caption tracking-tight" for="ev-cap">CAPACITY</label>
+					<label class="text-caption tracking-tight text-muted-foreground" for="ev-cap"
+						>CAPACITY</label
+					>
 					<input
 						id="ev-cap"
 						type="number"
 						min="2"
 						bind:value={form.capacity}
-						class="bg-muted/30 border-foreground/20 w-full rounded-lg border px-3 py-2 text-body outline-none"
+						class="w-full rounded-lg border border-foreground/20 bg-muted/30 px-3 py-2 text-body outline-none"
 						placeholder="(optional)"
 					/>
 				</div>
 				<div class="min-w-[160px] flex-1 space-y-1">
-					<label class="text-muted-foreground text-caption tracking-tight" for="ev-sign">SIGNUP MODE</label>
+					<label class="text-caption tracking-tight text-muted-foreground" for="ev-sign"
+						>SIGNUP MODE</label
+					>
 					<select
 						id="ev-sign"
 						bind:value={form.signup_mode}
-						class="bg-muted/30 border-foreground/20 w-full rounded-lg border px-3 py-2 text-body outline-none"
+						class="w-full rounded-lg border border-foreground/20 bg-muted/30 px-3 py-2 text-body outline-none"
 					>
 						<option value="open">open</option>
 						<option value="invite">invite only</option>
@@ -315,23 +333,25 @@
 			</div>
 
 			<div class="space-y-1">
-				<label class="text-muted-foreground text-caption tracking-tight" for="ev-tz">TIME ZONE</label>
+				<label class="text-caption tracking-tight text-muted-foreground" for="ev-tz"
+					>TIME ZONE</label
+				>
 				<select
 					id="ev-tz"
 					bind:value={form.time_zone}
-					class="bg-muted/30 border-foreground/20 w-full rounded-lg border px-3 py-2 text-body outline-none"
+					class="w-full rounded-lg border border-foreground/20 bg-muted/30 px-3 py-2 text-body outline-none"
 				>
 					{#each TIMEZONES as tz (tz)}
 						<option value={tz}>{tz}</option>
 					{/each}
 				</select>
-				<p class="text-muted-foreground text-caption">
+				<p class="text-caption text-muted-foreground">
 					Start/end times are interpreted in this zone. Defaults to your browser ({BROWSER_TZ}).
 				</p>
 			</div>
 
 			{#if formError}
-				<p class="text-destructive text-caption">{formError}</p>
+				<p class="text-caption text-destructive">{formError}</p>
 			{/if}
 
 			<div class="flex justify-end gap-2 pt-1">
@@ -341,14 +361,14 @@
 						showForm = false;
 						resetForm();
 					}}
-					class="text-muted-foreground hover:text-foreground rounded-full px-3 py-1.5 text-caption"
+					class="rounded-full px-3 py-1.5 text-caption text-muted-foreground hover:text-foreground"
 				>
 					cancel
 				</button>
 				<button
 					type="submit"
 					disabled={creating}
-					class="bg-primary text-primary-foreground rounded-full px-3 py-1.5 text-caption disabled:opacity-50"
+					class="rounded-full bg-primary px-3 py-1.5 text-caption text-primary-foreground disabled:opacity-50"
 				>
 					{creating ? 'creating…' : 'create event'}
 				</button>
@@ -357,28 +377,25 @@
 	{/if}
 
 	{#if viewMode === 'calendar'}
-		<div class="text-muted-foreground py-10 text-center text-body italic">
+		<div class="py-10 text-center text-body text-muted-foreground italic">
 			Calendar view, coming soon
 		</div>
 	{:else if visible.length === 0}
-		<div class="text-muted-foreground py-10 text-center text-body italic">
+		<div class="py-10 text-center text-body text-muted-foreground italic">
 			No {activeFilter} events.
 		</div>
 	{:else}
 		<div class="space-y-2.5">
 			{#each visible as event (event.id)}
-				<a
-					href={`/c/${campaign.slug}/events/${event.id}`}
-					class="group block"
-				>
+				<a href={`/c/${campaign.slug}/events/${event.id}`} class="group block">
 					<Card
-						class="hover:border-primary/40 group-hover:bg-card group-hover:shadow-md group-hover:-translate-y-0.5 transition-all duration-200"
+						class="transition-all duration-200 group-hover:-translate-y-0.5 group-hover:bg-card group-hover:shadow-md hover:border-primary/40"
 					>
 						<div
 							class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2 bg-card p-4 sm:flex sm:items-center sm:gap-4"
 						>
 							<div class="flex items-baseline gap-1.5 sm:block sm:w-16 sm:shrink-0 sm:text-center">
-								<div class="text-muted-foreground text-caption tracking-wide">
+								<div class="text-caption tracking-wide text-muted-foreground">
 									{fmtWeekday(event.startTime)}
 								</div>
 								<div
@@ -387,24 +404,22 @@
 									{fmtMonthDay(event.startTime)}
 								</div>
 							</div>
-							<div class="border-border hidden h-9 self-center border-l sm:block"></div>
+							<div class="hidden h-9 self-center border-l border-border sm:block"></div>
 							<div class="col-span-2 min-w-0 space-y-1 sm:col-auto sm:flex-1">
 								<div class="flex flex-wrap items-center gap-2">
-									<span
-										class="text-body font-bold transition-colors group-hover:text-primary"
-									>
+									<span class="text-body font-bold transition-colors group-hover:text-primary">
 										{event.name}
 									</span>
 									{#if activeFilter === 'past'}
 										<span
-											class="bg-primary/10 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-3 py-1.5 text-caption"
+											class="rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl bg-primary/10 px-3 py-1.5 text-caption"
 										>
 											past
 										</span>
 									{/if}
 								</div>
 								<div
-									class="text-muted-foreground flex flex-wrap items-center gap-x-2.5 gap-y-1 text-caption"
+									class="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-caption text-muted-foreground"
 								>
 									<span
 										>{fmtTime(event.startTime)}{event.endTime
@@ -417,21 +432,21 @@
 								class="col-span-2 flex items-center justify-between gap-3 sm:col-auto sm:block sm:w-24 sm:text-right"
 							>
 								<div class="flex items-baseline gap-1.5 sm:block">
-									<div class="text-muted-foreground text-caption tracking-wide">RSVP'D</div>
+									<div class="text-caption tracking-wide text-muted-foreground">RSVP'D</div>
 									<div class="text-body font-bold">
-										{event.currentAttendance ?? 0}{event.capacity
-											? ` / ${event.capacity}`
-											: ''}
+										{event.currentAttendance ?? 0}{event.capacity ? ` / ${event.capacity}` : ''}
 									</div>
 								</div>
 								<span
-									class="bg-primary text-primary-foreground inline-flex items-center gap-0.5 rounded-full px-3 py-1.5 text-caption transition-all group-hover:gap-1.5 sm:hidden"
+									class="inline-flex items-center gap-0.5 rounded-full bg-primary px-3 py-1.5 text-caption text-primary-foreground transition-all group-hover:gap-1.5 sm:hidden"
 								>
-									open <ChevronRight class="size-3 transition-transform group-hover:translate-x-0.5" />
+									open <ChevronRight
+										class="size-3 transition-transform group-hover:translate-x-0.5"
+									/>
 								</span>
 							</div>
 							<span
-								class="bg-primary text-primary-foreground group-hover:bg-primary/90 hidden items-center gap-0.5 rounded-full px-3 py-1.5 text-caption transition-all group-hover:gap-1.5 sm:inline-flex"
+								class="hidden items-center gap-0.5 rounded-full bg-primary px-3 py-1.5 text-caption text-primary-foreground transition-all group-hover:gap-1.5 group-hover:bg-primary/90 sm:inline-flex"
 							>
 								open
 								<ChevronRight class="size-3 transition-transform group-hover:translate-x-0.5" />

@@ -1,6 +1,15 @@
 <script lang="ts">
 	import '../app.css';
-	import { LayoutDashboard, Plus, Menu, PanelLeftClose, PanelLeftOpen, X, LogOut, Building2 } from '@lucide/svelte';
+	import {
+		LayoutDashboard,
+		Plus,
+		Menu,
+		PanelLeftClose,
+		PanelLeftOpen,
+		X,
+		LogOut,
+		Building2
+	} from '@lucide/svelte';
 	import { page } from '$app/state';
 	import type { ConversationStatus } from '$lib/conversations';
 
@@ -39,202 +48,202 @@
 {#if isLogin}
 	{@render children?.()}
 {:else}
-<div class="bg-background text-foreground flex h-screen w-screen overflow-hidden font-sans">
-	<!-- Mobile drawer backdrop -->
-	{#if mobileOpen}
-		<button
-			type="button"
-			aria-label="Close sidebar"
-			class="fixed inset-0 z-30 bg-black/40 md:hidden"
-			onclick={() => (mobileOpen = false)}
-		></button>
-	{/if}
-
-	<aside
-		class={[
-			'border-foreground bg-background font-ui flex shrink-0 flex-col border-r transition-[width] duration-200',
-			// Mobile: fixed drawer
-			'fixed inset-y-0 left-0 z-40 md:static',
-			mobileOpen ? 'flex w-64 px-3' : 'hidden md:flex',
-			// md+ width
-			collapsed ? 'md:w-16 md:px-1' : 'md:w-64 md:px-3'
-		].join(' ')}
-	>
-		<div
-			class={[
-				'border-foreground flex items-center border-b py-4',
-				collapsed && !mobileOpen ? 'justify-center px-0' : 'justify-between gap-2.5 px-1'
-			].join(' ')}
-		>
-			<div class="flex min-w-0 items-center gap-2.5">
-				<div
-					class="bg-primary border-foreground size-9 shrink-0 rounded-tl-2xl rounded-tr-xl rounded-bl-2xl rounded-br-2xl border"
-				></div>
-				{#if !collapsed || mobileOpen}
-					<span class="truncate text-body font-bold">CivicOS</span>
-				{/if}
-			</div>
-
-			<!-- Collapse toggle (md+) -->
-			{#if !collapsed || mobileOpen}
-				<button
-					type="button"
-					aria-label="Collapse sidebar"
-					class="hover:bg-muted/50 hidden rounded-md p-1.5 md:inline-flex"
-					onclick={() => (collapsed = true)}
-				>
-					<PanelLeftClose class="size-4" />
-				</button>
-			{/if}
-
-			<!-- Close drawer (mobile) -->
-			{#if mobileOpen}
-				<button
-					type="button"
-					aria-label="Close sidebar"
-					class="hover:bg-muted/50 rounded-md p-1.5 md:hidden"
-					onclick={() => (mobileOpen = false)}
-				>
-					<X class="size-4" />
-				</button>
-			{/if}
-		</div>
-
-		<!-- Expand button shown only when collapsed on md+ -->
-		{#if collapsed && !mobileOpen}
+	<div class="flex h-screen w-screen overflow-hidden bg-background font-sans text-foreground">
+		<!-- Mobile drawer backdrop -->
+		{#if mobileOpen}
 			<button
 				type="button"
-				aria-label="Expand sidebar"
-				class="hover:bg-muted/50 mx-auto mt-2 hidden rounded-md p-1.5 md:inline-flex"
-				onclick={() => (collapsed = false)}
-			>
-				<PanelLeftOpen class="size-4" />
-			</button>
+				aria-label="Close sidebar"
+				class="fixed inset-0 z-30 bg-black/40 md:hidden"
+				onclick={() => (mobileOpen = false)}
+			></button>
 		{/if}
 
-		<nav class="py-2.5">
-			<a
-				href="/"
-				title="Dashboard"
-				class={[
-					'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-caption font-medium',
-					onDashboard ? 'bg-primary/5' : 'hover:bg-muted/50',
-					collapsed && !mobileOpen ? 'justify-center px-0' : ''
-				].join(' ')}
-			>
-				<LayoutDashboard class="size-4 shrink-0" />
-				{#if !collapsed || mobileOpen}
-					<span>Dashboard</span>
-				{/if}
-			</a>
-
-			{#if canCreateHost}
-				<a
-					href="/sysadmin/hosts"
-					title="Hosts"
-					class={[
-						'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-caption font-medium',
-						onHosts ? 'bg-primary/5' : 'hover:bg-muted/50',
-						collapsed && !mobileOpen ? 'justify-center px-0' : ''
-					].join(' ')}
-				>
-					<Building2 class="size-4 shrink-0" />
-					{#if !collapsed || mobileOpen}
-						<span>Hosts</span>
-					{/if}
-				</a>
-			{/if}
-		</nav>
-
-		{#if !collapsed || mobileOpen}
-			<div class="text-muted-foreground/70 px-2.5 py-2 text-label font-medium tracking-wider">
-				CONVERSATIONS
-			</div>
-		{/if}
-
-		<div class="border-border flex flex-col gap-0.5 border-b pb-2.5">
-			{#each conversations as conversation (conversation.id)}
-				<a
-					href={`/c/${conversation.slug}/overview`}
-					title={conversation.title}
-					class={[
-						'flex items-center gap-2 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl px-2.5 py-2 text-caption font-medium',
-						currentSlug === conversation.slug ? 'bg-muted-foreground/20' : 'hover:bg-muted/50',
-						collapsed && !mobileOpen ? 'justify-center px-0' : ''
-					].join(' ')}
-				>
-					<span class={`size-1.5 shrink-0 rounded-full ${statusDot[conversation.status]}`}></span>
-					{#if !collapsed || mobileOpen}
-						<span class="flex-1 truncate">{conversation.title}</span>
-					{/if}
-				</a>
-			{:else}
-				{#if !collapsed || mobileOpen}
-					<p class="text-muted-foreground px-2.5 py-2 text-caption">
-						{data.conversationsError ? 'Could not load.' : 'None yet.'}
-					</p>
-				{/if}
-			{/each}
-		</div>
-
-		<div class="p-2.5">
-			<button
-				type="button"
-				title="New Conversation"
-				class={[
-					'text-muted-foreground inline-flex items-center gap-1 rounded-xl outline outline-1 outline-stone-400 text-caption font-medium',
-					collapsed && !mobileOpen ? 'size-9 justify-center p-0' : 'p-2.5'
-				].join(' ')}
-			>
-				<Plus class="size-4 shrink-0" />
-				{#if !collapsed || mobileOpen}
-					<span>New Conversation</span>
-				{/if}
-			</button>
-		</div>
-
-		<div class="flex-1"></div>
-
-		<div
+		<aside
 			class={[
-				'border-border flex items-center border-t py-2.5',
-				collapsed && !mobileOpen ? 'justify-center px-0' : 'gap-4 px-3.5'
+				'flex shrink-0 flex-col border-r border-foreground bg-background font-ui transition-[width] duration-200',
+				// Mobile: fixed drawer
+				'fixed inset-y-0 left-0 z-40 md:static',
+				mobileOpen ? 'flex w-64 px-3' : 'hidden md:flex',
+				// md+ width
+				collapsed ? 'md:w-16 md:px-1' : 'md:w-64 md:px-3'
 			].join(' ')}
 		>
 			<div
-				class="bg-foreground size-7 shrink-0 rounded-tl-xl rounded-tr-xl rounded-bl-2xl rounded-br-xl"
-			></div>
-			{#if !collapsed || mobileOpen}
-				<span class="flex-1 text-caption font-medium">Admin</span>
-				<form method="POST" action="/logout">
-					<button
-						type="submit"
-						title="Sign out"
-						aria-label="Sign out"
-						class="hover:bg-muted/50 rounded-md p-1.5"
-					>
-						<LogOut class="size-4" />
-					</button>
-				</form>
-			{/if}
-		</div>
-	</aside>
-
-	<main class="flex min-w-0 flex-1 flex-col overflow-hidden">
-		<!-- Mobile top bar with hamburger -->
-		<div class="border-border flex h-12 items-center gap-2 border-b px-3 md:hidden">
-			<button
-				type="button"
-				aria-label="Open sidebar"
-				class="hover:bg-muted/50 rounded-md p-1.5"
-				onclick={() => (mobileOpen = true)}
+				class={[
+					'flex items-center border-b border-foreground py-4',
+					collapsed && !mobileOpen ? 'justify-center px-0' : 'justify-between gap-2.5 px-1'
+				].join(' ')}
 			>
-				<Menu class="size-5" />
-			</button>
-			<span class="text-body font-bold">CivicOS</span>
-		</div>
+				<div class="flex min-w-0 items-center gap-2.5">
+					<div
+						class="size-9 shrink-0 rounded-tl-2xl rounded-tr-xl rounded-br-2xl rounded-bl-2xl border border-foreground bg-primary"
+					></div>
+					{#if !collapsed || mobileOpen}
+						<span class="truncate text-body font-bold">CivicOS</span>
+					{/if}
+				</div>
 
-		{@render children?.()}
-	</main>
-</div>
+				<!-- Collapse toggle (md+) -->
+				{#if !collapsed || mobileOpen}
+					<button
+						type="button"
+						aria-label="Collapse sidebar"
+						class="hidden rounded-md p-1.5 hover:bg-muted/50 md:inline-flex"
+						onclick={() => (collapsed = true)}
+					>
+						<PanelLeftClose class="size-4" />
+					</button>
+				{/if}
+
+				<!-- Close drawer (mobile) -->
+				{#if mobileOpen}
+					<button
+						type="button"
+						aria-label="Close sidebar"
+						class="rounded-md p-1.5 hover:bg-muted/50 md:hidden"
+						onclick={() => (mobileOpen = false)}
+					>
+						<X class="size-4" />
+					</button>
+				{/if}
+			</div>
+
+			<!-- Expand button shown only when collapsed on md+ -->
+			{#if collapsed && !mobileOpen}
+				<button
+					type="button"
+					aria-label="Expand sidebar"
+					class="mx-auto mt-2 hidden rounded-md p-1.5 hover:bg-muted/50 md:inline-flex"
+					onclick={() => (collapsed = false)}
+				>
+					<PanelLeftOpen class="size-4" />
+				</button>
+			{/if}
+
+			<nav class="py-2.5">
+				<a
+					href="/"
+					title="Dashboard"
+					class={[
+						'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-caption font-medium',
+						onDashboard ? 'bg-primary/5' : 'hover:bg-muted/50',
+						collapsed && !mobileOpen ? 'justify-center px-0' : ''
+					].join(' ')}
+				>
+					<LayoutDashboard class="size-4 shrink-0" />
+					{#if !collapsed || mobileOpen}
+						<span>Dashboard</span>
+					{/if}
+				</a>
+
+				{#if canCreateHost}
+					<a
+						href="/sysadmin/hosts"
+						title="Hosts"
+						class={[
+							'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-caption font-medium',
+							onHosts ? 'bg-primary/5' : 'hover:bg-muted/50',
+							collapsed && !mobileOpen ? 'justify-center px-0' : ''
+						].join(' ')}
+					>
+						<Building2 class="size-4 shrink-0" />
+						{#if !collapsed || mobileOpen}
+							<span>Hosts</span>
+						{/if}
+					</a>
+				{/if}
+			</nav>
+
+			{#if !collapsed || mobileOpen}
+				<div class="px-2.5 py-2 text-label font-medium tracking-wider text-muted-foreground/70">
+					CONVERSATIONS
+				</div>
+			{/if}
+
+			<div class="flex flex-col gap-0.5 border-b border-border pb-2.5">
+				{#each conversations as conversation (conversation.id)}
+					<a
+						href={`/c/${conversation.slug}/overview`}
+						title={conversation.title}
+						class={[
+							'flex items-center gap-2 rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl px-2.5 py-2 text-caption font-medium',
+							currentSlug === conversation.slug ? 'bg-muted-foreground/20' : 'hover:bg-muted/50',
+							collapsed && !mobileOpen ? 'justify-center px-0' : ''
+						].join(' ')}
+					>
+						<span class={`size-1.5 shrink-0 rounded-full ${statusDot[conversation.status]}`}></span>
+						{#if !collapsed || mobileOpen}
+							<span class="flex-1 truncate">{conversation.title}</span>
+						{/if}
+					</a>
+				{:else}
+					{#if !collapsed || mobileOpen}
+						<p class="text-muted-foreground px-2.5 py-2 text-caption">
+							{data.conversationsError ? 'Could not load.' : 'None yet.'}
+						</p>
+					{/if}
+				{/each}
+			</div>
+
+			<div class="p-2.5">
+				<button
+					type="button"
+					title="New Conversation"
+					class={[
+						'inline-flex items-center gap-1 rounded-xl text-caption font-medium text-muted-foreground outline outline-1 outline-stone-400',
+						collapsed && !mobileOpen ? 'size-9 justify-center p-0' : 'p-2.5'
+					].join(' ')}
+				>
+					<Plus class="size-4 shrink-0" />
+					{#if !collapsed || mobileOpen}
+						<span>New Conversation</span>
+					{/if}
+				</button>
+			</div>
+
+			<div class="flex-1"></div>
+
+			<div
+				class={[
+					'flex items-center border-t border-border py-2.5',
+					collapsed && !mobileOpen ? 'justify-center px-0' : 'gap-4 px-3.5'
+				].join(' ')}
+			>
+				<div
+					class="size-7 shrink-0 rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl bg-foreground"
+				></div>
+				{#if !collapsed || mobileOpen}
+					<span class="flex-1 text-caption font-medium">Admin</span>
+					<form method="POST" action="/logout">
+						<button
+							type="submit"
+							title="Sign out"
+							aria-label="Sign out"
+							class="rounded-md p-1.5 hover:bg-muted/50"
+						>
+							<LogOut class="size-4" />
+						</button>
+					</form>
+				{/if}
+			</div>
+		</aside>
+
+		<main class="flex min-w-0 flex-1 flex-col overflow-hidden">
+			<!-- Mobile top bar with hamburger -->
+			<div class="flex h-12 items-center gap-2 border-b border-border px-3 md:hidden">
+				<button
+					type="button"
+					aria-label="Open sidebar"
+					class="rounded-md p-1.5 hover:bg-muted/50"
+					onclick={() => (mobileOpen = true)}
+				>
+					<Menu class="size-5" />
+				</button>
+				<span class="text-body font-bold">CivicOS</span>
+			</div>
+
+			{@render children?.()}
+		</main>
+	</div>
 {/if}

@@ -5,5 +5,14 @@ yarn.lock
 bun.lock
 bun.lockb
 
+# Build output
+.svelte-kit/
+build/
+storybook-static/
+
+# Generated
+src/lib/paraglide/
+project.inlang/
+
 # Miscellaneous
 /static/
