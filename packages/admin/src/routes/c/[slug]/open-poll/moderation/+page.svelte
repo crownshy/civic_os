@@ -32,14 +32,10 @@
 		}
 	}
 
-	// Local mutable copy so optimistic accept/reject re-renders without a refetch.
-	let statements = $state<PolisStatementAux[]>(data.statements);
-
-	// Reset local state when the load function re-runs (e.g. after invalidation
-	// or navigating between conversations).
-	$effect(() => {
-		statements = data.statements;
-	});
+	// Tracks the load data, but stays writable so accept/reject can render
+	// optimistically. Any re-run of the load (invalidation, navigating between
+	// conversations) discards the local override.
+	let statements = $derived(data.statements);
 
 	// --- Bulk seed import ---
 	// Writing one statement at a time lives on the Setup tab; this page keeps the

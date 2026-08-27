@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
 	import type { ReportComment, PolisReportData, ThemeSummary } from '$lib/types/report';
-	import type { PolisStatementAux } from '$lib/types/aux';
 	import { addStatementAuxTheme, removeStatementAuxTheme } from '$lib/api/aux';
 	import {
 		getEngagementStats,
@@ -29,12 +28,10 @@
 
 	let { data }: PageProps = $props();
 
-	// Local mutable aux map so picker edits re-render without a refetch.
-	// Re-seeded on every load (e.g. when slug changes).
-	let auxByTid = $state<Record<number, PolisStatementAux>>(data.auxByTid);
-	$effect(() => {
-		auxByTid = data.auxByTid;
-	});
+	// Tracks the load data, but stays writable so picker edits render
+	// optimistically. Any re-run of the load (slug change, invalidation)
+	// discards the local override.
+	let auxByTid = $derived(data.auxByTid);
 
 	/**
 	 * Overlay aux.themes onto each comment so the existing utils (which read
