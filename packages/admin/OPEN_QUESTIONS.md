@@ -5,28 +5,27 @@ Working doc of everything that needs an answer before the Insights surface (and 
 
 ### What we do today
 
-The admin app does **not** ask comhairle "what conversations exist". It reads from a static TypeScript map at `packages/shared/src/data/regions.ts` plus an env overlay in `packages/admin/src/lib/config/regions.ts` for the synthetic `dev` region (driven by `PUBLIC_DEV_*` env vars).
+The admin app asks comhairle what Campaigns the caller may see:
+`GetPermittedConversations` (`GET /user/permitted_conversations`), loaded once in the root `+layout.server.ts`. The sidebar, the dashboard, and the `/c/[slug]` access check all read that one list. See `docs/adr/0004-admin-resolves-conversations-from-the-backend.md`.
 
-Each `RegionConfig` carries, among other things:
+`packages/shared/src/data/regions.ts` (plus the `PUBLIC_DEV_*` env overlay in `packages/admin/src/lib/config/regions.ts`) is now an overlay, not the list. `packages/admin/src/lib/conversations.ts` maps a Conversation to its route slug and to its region entry, if it has one. A legacy region's slug wins, so `/c/utah` and `/c/oregon` keep resolving; everything else routes under the backend `slug`.
 
-- `slug`: the URL segment (`/c/dev`, `/c/oregon`, ...)
-- `conversationId`: comhairle's `Conversation` UUID
-- `polisId`: the Polis conversation id
-- `polis_workflow_step_id`: the workflow step that wraps the Polis tool
+Three fields still come from the overlay, and are empty for Campaigns with no region entry: `shareUrl`, `keyQuestion`, and `zipPrefixes`. `conversationId` is now the Conversation's own id, `hostName` is resolved from the owning organization, and `polis_workflow_step_id` is resolved from the Campaign's active workflow when there is no region entry.
 
-From the URL `/c/:slug` we look up the region, and from the region we pull `conversationId` / `polis_workflow_step_id` to drive every downstream call:
+Downstream calls key off the resolved `campaign` object returned by `routes/c/[slug]/+layout.server.ts`:
 
-- Events list: `api.ListEvents({ params: { conversation_id } })`
-- Insights: `api.axios.get('/tools/polis/report_data', { params: { workflow_step_id } })`
+- Events list: `api.ListEvents({ params: { conversation_id: campaign.id } })`
+- Insights: `/tools/polis/report_data?workflow_step_id=${campaign.polisWorkflowStepId}`
 
-This is captured as "Open problem #1" in `CONTEXT.md`.
+"Open problem #1" in `CONTEXT.md` is narrowed to the civicos side and the three overlay fields.
 
 ### Questions
 
-- **Q1.1** Should the admin sidebar's conversation list eventually come from comhairle (`GET /conversation` or similar) instead of `regions.ts`? If yes, what happens to the dev region overlay: keep it client-side, or have comhairle seed a dev conversation?
-- **Q1.2** Does a Host (Organization) own one Conversation or many? `regions.ts` assumes 1:1; the design implies many. This decides whether a "Region" sits above or beside Conversation in the sidebar.
-- **Q1.3** Are `polisId` and `polis_workflow_step_id` ever going to live on comhairle's `Conversation` model (or a `polis_conversations` join), or permanently in `regions.ts`?
+- **Q1.1** ~~Should the admin sidebar's conversation list come from comhairle instead of `regions.ts`?~~ **Answered:** yes, via `GetPermittedConversations` (#397). The dev overlay stays client-side and keys off `PUBLIC_DEV_CONVERSATION_ID`, so whichever backend Conversation that names is the one routing at `/c/dev`.
+- **Q1.2** Does a Host (Organization) own one Conversation or many? `regions.ts` assumes 1:1; the design implies many. This decides whether a "Region" sits above or beside Conversation in the sidebar. Still open, but no longer blocking: the sidebar is a flat list of whatever the backend returns, so a Host with several Campaigns already renders correctly.
+- **Q1.3** ~~Are `polisId` and `polis_workflow_step_id` ever going to live on comhairle's `Conversation` model, or permanently in `regions.ts`?~~ **Answered:** neither. `/conversation/:id/workflow/:workflow_id/workflow_step` returns the Polis step, whose `id` is `polis_workflow_step_id` and whose `toolConfig.poll_id` is `polisId`. Verified against a local comhairle. Legacy regions still use their configured value until the two are confirmed to match.
 - **Q1.4** When we ship a new region, who owns the migration off `regions.ts`? Same person who creates the comhairle conversation? Different team?
+- **Q1.5** Is `Conversation.slug` unique and stable? A rename that changes the slug changes the URL for any Campaign without a region entry. Carried over from #401 and overlapping #349.
 
 ---
 

@@ -46,13 +46,15 @@ Run per-package from `packages/<name>`, or use the root scripts:
 - `pnpm dev` civicos dev server. `pnpm dev:admin` admin dev server.
 - `pnpm -r build` / `pnpm run build` build every package.
 - `pnpm -r check` / `pnpm run check` svelte-check (types) across packages.
-- `pnpm --filter civic-os lint` prettier check + eslint. **Only `civicos` has a lint
-  script today** (see Follow-ups below).
+- `pnpm --filter civic-os lint` / `pnpm --filter @civicos/admin lint` prettier check +
+  eslint. `pnpm run lint` runs both. Both packages are currently red against a backlog of
+  pre-existing violations (see Follow-ups below), so read the diff, not just the exit code.
 - `pnpm --filter civic-os test:unit` / `pnpm --filter @civicos/admin test:unit` Vitest.
-- `pnpm --filter civic-os storybook` run Storybook (port 6006).
-- Format only files you touched: `pnpm --filter civic-os exec prettier --write <files>`.
-  **Do not** run the repo-wide `pnpm format`; it reformats unrelated files and buries
-  your diff.
+- `pnpm --filter civic-os storybook` (port 6006) / `pnpm --filter @civicos/admin storybook`
+  (port 6007) run Storybook.
+- Format only files you touched:
+  `pnpm --filter <pkg> exec prettier --write <files>`. **Do not** run the repo-wide
+  `pnpm format`; it reformats unrelated files and buries your diff.
 
 ## Non-negotiables
 
@@ -109,8 +111,9 @@ focused PR; do not let them silently grow:
 - `sveltekit-superforms` + `formsnap` are installed and the shared `ui/form` primitives
   exist, but app forms do not use them yet. Migrate forms onto superforms as you touch
   them.
-- `admin` has no `lint`/`format` script and no eslint/prettier config; only `civicos`
-  does. Linting the admin package is manual until that is added.
-- Storybook is set up in `civicos` only. `admin` has no stories.
+- Both packages have lint configured but neither passes yet: `admin` has 73 files failing
+  `prettier --check` and 52 eslint errors, `civicos` has 77 eslint errors. The civicos
+  ones were invisible until the config's `.gitignore` path was fixed, so they are old, not
+  new. Pay them down in focused PRs rather than mixing fixes into feature work.
 - `load` functions do not call `depends()` for explicit invalidation keys. Add them when
   you touch a `load` that needs targeted invalidation.

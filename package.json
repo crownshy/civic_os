@@ -8,8 +8,8 @@
 		"dev:admin": "pnpm --filter @civicos/admin dev",
 		"build": "pnpm -r build",
 		"check": "pnpm -r check",
-		"lint": "pnpm --filter civic-os lint",
-		"format": "pnpm --filter civic-os format",
-        "test": "pnpm --filter civic-os --filter @civicos/admin exec vitest run"
+		"lint": "pnpm --filter civic-os --filter @civicos/admin lint",
+		"format": "pnpm --filter civic-os --filter @civicos/admin format",
+		"test": "pnpm --filter civic-os --filter @civicos/admin exec vitest run"
 	}
 }
