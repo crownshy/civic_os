@@ -1,6 +1,8 @@
 import { fail, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { comhairleFetch } from '$lib/server/comhairle';
+import { createApiClient } from '$lib/api/client';
+import { describeApiFailure } from '$lib/api/describe-failure';
+import type { DemographicReport, RecruitmentTargetDto } from '@crownshy/api-client/api';
 import {
 	emptyGoals,
 	METRIC_BUCKETS,
@@ -11,38 +13,6 @@ import {
 import { countiesForPrefixes, rollUpByCounty } from '@civicos/shared/data/zipcodes';
 import { statesForZipCounts } from '@civicos/shared/data/zip-states';
 
-interface DemographicCategory {
-	category: string;
-	count: number;
-	value?: string | null;
-}
-
-export interface DemographicReport {
-	ageRanges: DemographicCategory[];
-	ethnicity: DemographicCategory[];
-	gender: DemographicCategory[];
-	politicalParty: DemographicCategory[];
-	totalParticipants: number;
-	zipcodeCounts: Record<string, number>;
-}
-
-interface WorkflowDto {
-	id: string;
-	name: string;
-	conversationId?: string | null;
-	isActive: boolean;
-}
-
-interface RecruitmentTargetDto {
-	id: string;
-	workflowId: string;
-	metric: string;
-	bucket: string;
-	targetCount: number;
-	createdAt: string;
-	updatedAt: string;
-}
-
 const METRIC_NAMES: GoalMetric[] = [
 	'totalParticipants',
 	'ethnicity',
@@ -51,6 +21,22 @@ const METRIC_NAMES: GoalMetric[] = [
 	'gender',
 	'county'
 ];
+
+/** HTTP status of a failed api-client call, absent when it never reached the server. */
+function statusOf(e: unknown): number | undefined {
+	return (e as { response?: { status?: number } })?.response?.status;
+}
+
+/**
+ * `DemographicReport.zipcodeCounts` is generated as `z.record(z.number().int())`,
+ * but zod 4 wants `z.record(key, value)`, so the single-argument call loses the
+ * key type and TS infers `Record<number, unknown>`. The runtime shape is zip
+ * code to participant count, which is what both rollups take. Drop this once
+ * the api-client regenerates against zod 4.
+ */
+function zipCounts(report: DemographicReport): Record<string, number> {
+	return (report.zipcodeCounts ?? {}) as Record<string, number>;
+}
 
 function targetsToGoals(targets: RecruitmentTargetDto[]): RegionGoals {
 	const goals = emptyGoals();
@@ -67,23 +53,12 @@ function targetsToGoals(targets: RecruitmentTargetDto[]): RegionGoals {
 	return goals;
 }
 
-async function fetchWorkflowId(
-	conversationId: string,
-	authToken: string | undefined
-): Promise<string> {
-	const wfRes = await comhairleFetch(`/conversation/${conversationId}/workflow`, authToken);
-	if (!wfRes.ok) throw new Error(`workflows ${wfRes.status}`);
-	const workflows = (await wfRes.json()) as WorkflowDto[];
-	if (!workflows.length) throw new Error('no workflows for conversation');
-	return workflows[0].id;
-}
-
-export const load: PageServerLoad = async ({ parent, cookies, depends }) => {
+export const load: PageServerLoad = async ({ parent, cookies, url, depends }) => {
 	depends('open-poll:demographics');
 	depends('open-poll:goals');
 
 	const { campaign } = await parent();
-	const authToken = cookies.get('auth-token');
+	const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
 	const conversationId = campaign.id;
 
 	let demographics: DemographicReport | null = null;
@@ -101,30 +76,37 @@ export const load: PageServerLoad = async ({ parent, cookies, depends }) => {
 	let mapStates: string[] = [];
 
 	try {
-		workflowId = await fetchWorkflowId(conversationId, authToken);
+		const workflows = await api.ListConversationWorkflows({
+			params: { conversation_id: conversationId }
+		});
+		workflowId = workflows[0]?.id ?? null;
 
-		const [dRes, tRes] = await Promise.all([
-			comhairleFetch(
-				`/conversation/${conversationId}/workflow/${workflowId}/participation_report`,
-				authToken
-			),
-			comhairleFetch(
-				`/conversation/${conversationId}/workflow/${workflowId}/recruitment_targets`,
-				authToken
-			)
-		]);
+		if (!workflowId) {
+			error = 'this Campaign has no workflow yet.';
+		} else {
+			const params = { conversation_id: conversationId, workflow_id: workflowId };
 
-		if (!dRes.ok) throw new Error(`participation_report ${dRes.status}`);
-		demographics = (await dRes.json()) as DemographicReport;
-		countyCounts = rollUpByCounty(demographics.zipcodeCounts ?? {}, campaign.zipPrefixes);
-		mapStates = statesForZipCounts(demographics.zipcodeCounts ?? {}, campaign.zipPrefixes);
+			// Goals are optional furniture on this page, so a failure there leaves
+			// the empty set rather than blanking the demographics the page exists
+			// to show.
+			const [report, targets] = await Promise.all([
+				api.GetConversationWorkflowParticipationReport({ params }),
+				api.ListRecruitmentTargets({ params }).catch((e) => {
+					console.warn('ListRecruitmentTargets failed', e);
+					return null;
+				})
+			]);
 
-		if (tRes.ok) {
-			const targets = (await tRes.json()) as RecruitmentTargetDto[];
-			goals = targetsToGoals(targets);
+			demographics = report;
+			const zips = zipCounts(report);
+			countyCounts = rollUpByCounty(zips, campaign.zipPrefixes);
+			mapStates = statesForZipCounts(zips, campaign.zipPrefixes);
+
+			if (targets) goals = targetsToGoals(targets);
 		}
 	} catch (e) {
-		error = e instanceof Error ? e.message : String(e);
+		console.warn('Loading participants failed', e);
+		error = describeApiFailure(e);
 	}
 
 	return {
@@ -140,9 +122,9 @@ export const load: PageServerLoad = async ({ parent, cookies, depends }) => {
 };
 
 export const actions: Actions = {
-	saveGoals: async ({ request, cookies, params }) => {
+	saveGoals: async ({ request, cookies, params, url }) => {
 		const form = await request.formData();
-		const authToken = cookies.get('auth-token');
+		const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
 		const metric = String(form.get('metric') ?? '');
 		const conversationId = String(form.get('conversationId') ?? '');
 		const workflowId = String(form.get('workflowId') ?? '');
@@ -189,42 +171,42 @@ export const actions: Actions = {
 			}
 		}
 
+		const targetParams = { conversation_id: conversationId, workflow_id: workflowId };
 		const errors: string[] = [];
 
-		// Upserts via POST (the API upserts on workflow_id+metric+bucket).
+		// CreateRecruitmentTarget upserts on (workflow_id, metric, bucket).
 		for (const { bucket, targetCount } of toUpsert) {
-			const res = await comhairleFetch(
-				`/conversation/${conversationId}/workflow/${workflowId}/recruitment_targets`,
-				authToken,
-				{
-					method: 'POST',
-					headers: { 'content-type': 'application/json' },
-					body: JSON.stringify({ metric, bucket, target_count: targetCount })
-				}
-			);
-			if (!res.ok) errors.push(`${bucket}: ${res.status}`);
+			try {
+				await api.CreateRecruitmentTarget(
+					{ metric, bucket, target_count: targetCount },
+					{ params: targetParams }
+				);
+			} catch (e) {
+				errors.push(`${bucket}: ${statusOf(e) ?? 'request failed'}`);
+			}
 		}
 
 		// Deletions: blanked-out fields. We list once and DELETE matches.
 		if (toClear.length) {
-			const listRes = await comhairleFetch(
-				`/conversation/${conversationId}/workflow/${workflowId}/recruitment_targets`,
-				authToken
-			);
-			if (listRes.ok) {
-				const existing = (await listRes.json()) as RecruitmentTargetDto[];
-				const cleared = new Set(toClear);
-				for (const t of existing) {
-					if (t.metric !== metric || !cleared.has(t.bucket)) continue;
-					const dRes = await comhairleFetch(
-						`/conversation/${conversationId}/workflow/${workflowId}/recruitment_targets/${t.id}`,
-						authToken,
-						{ method: 'DELETE' }
-					);
-					if (!dRes.ok && dRes.status !== 404) errors.push(`${t.bucket}: ${dRes.status}`);
+			let existing: RecruitmentTargetDto[] | null = null;
+			try {
+				existing = await api.ListRecruitmentTargets({ params: targetParams });
+			} catch (e) {
+				errors.push(`list ${statusOf(e) ?? 'request failed'}`);
+			}
+
+			const cleared = new Set(toClear);
+			for (const t of existing ?? []) {
+				if (t.metric !== metric || !cleared.has(t.bucket)) continue;
+				try {
+					await api.DeleteRecruitmentTarget(undefined, {
+						params: { ...targetParams, recruitment_target_id: t.id }
+					});
+				} catch (e) {
+					// Already gone is the outcome we wanted.
+					const status = statusOf(e);
+					if (status !== 404) errors.push(`${t.bucket}: ${status ?? 'request failed'}`);
 				}
-			} else {
-				errors.push(`list ${listRes.status}`);
 			}
 		}
 
