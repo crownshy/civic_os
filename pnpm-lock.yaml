@@ -150,8 +150,8 @@ importers:
         specifier: workspace:*
         version: link:../shared
       '@crownshy/api-client':
-        specifier: ^0.0.14
-        version: 0.0.14(axios@1.18.1)(zod@3.25.76)
+        specifier: ^0.0.43
+        version: 0.0.43(axios@1.18.1)(zod@4.4.3)
       '@lukulent/svelte-umami':
         specifier: ^0.0.4
         version: 0.0.4(svelte@5.56.4(@typescript-eslint/types@8.62.1))
@@ -189,8 +189,8 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0
       zod:
-        specifier: 3.25.76
-        version: 3.25.76
+        specifier: ^4.4.3
+        version: 4.4.3
     devDependencies:
       '@chromatic-com/storybook':
         specifier: ^5.0.1
@@ -406,9 +406,6 @@ packages:
     engines: {node: '>=20.0.0', yarn: '>=1.22.18'}
     peerDependencies:
       storybook: ^0.0.0-0 || ^10.1.0 || ^10.1.0-0 || ^10.2.0-0 || ^10.3.0-0 || ^10.4.0-0 || ^10.5.0-0 || ^10.6.0-0
-
-  '@crownshy/api-client@0.0.14':
-    resolution: {integrity: sha512-ai9ph979STGy9dEytpJ72MwXFkmZmZSDb5gxBUiutDx8JHU+P7/UtT1F7h1Uiln01q0Jgs45ZZKL0xXi30Iwsg==}
 
   '@crownshy/api-client@0.0.43':
     resolution: {integrity: sha512-XWJNPfmn9lUs5tixMqqZ32l+GsEhafEoCCjC9Pb91VvEn/XOlGVwStJgRghTJhaRo+a/U3zdKzP69bKYHTDbcA==}
@@ -3400,9 +3397,6 @@ packages:
     peerDependencies:
       zod: ^3.25 || ^4.0.14
 
-  zod@3.25.76:
-    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
-
   zod@4.4.3:
     resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
 
@@ -3454,14 +3448,6 @@ snapshots:
       - '@chromatic-com/cypress'
       - '@chromatic-com/playwright'
       - '@chromatic-com/vitest'
-
-  '@crownshy/api-client@0.0.14(axios@1.18.1)(zod@3.25.76)':
-    dependencies:
-      '@zodios/core': 10.9.6(axios@1.18.1)(zod@3.25.76)
-      typescript: 5.9.3
-    transitivePeerDependencies:
-      - axios
-      - zod
 
   '@crownshy/api-client@0.0.43(axios@1.18.1)(zod@4.4.3)':
     dependencies:
@@ -4655,11 +4641,6 @@ snapshots:
       tinyrainbow: 3.1.0
 
   '@webcontainer/env@1.1.1': {}
-
-  '@zodios/core@10.9.6(axios@1.18.1)(zod@3.25.76)':
-    dependencies:
-      axios: 1.18.1
-      zod: 3.25.76
 
   '@zodios/core@10.9.6(axios@1.18.1)(zod@4.4.3)':
     dependencies:
@@ -6212,7 +6193,5 @@ snapshots:
     dependencies:
       zod: 4.4.3
     optional: true
-
-  zod@3.25.76: {}
 
   zod@4.4.3: {}

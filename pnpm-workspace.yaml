@@ -2,6 +2,15 @@ allowBuilds:
   esbuild: true
 minimumReleaseAgeExclude:
   - '@crownshy/api-client@0.0.8 || 0.0.10 || 0.0.11 || 0.0.12 || 0.0.13 || 0.0.14 || 0.0.43'
+# @crownshy/api-client's `exports` point at its TypeScript source, and that
+# source does `import { z } from "zod"` while the package lists zod only under
+# devDependencies. Under pnpm's strict layout the package has no zod to resolve,
+# which breaks both `vite build` and svelte-check (every zodios request body
+# degrades to `undefined` at the call sites). It only ever worked because pnpm
+# happened to hoist a zod into .pnpm/node_modules. Hoist it deliberately until
+# the package declares zod as a peer dependency.
+publicHoistPattern:
+  - zod
 onlyBuiltDependencies:
   - esbuild
 packages:

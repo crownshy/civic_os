@@ -5,28 +5,28 @@
 	import { Button } from '$lib/components/ui';
 	import { format } from 'date-fns';
 	import * as Form from '@civicos/shared/ui/form';
-	import { api } from '$lib/services/api';
 	import { Spinner } from '@civicos/shared/ui/spinner';
 	import ThankYouMessage from './ThankYouMessage.svelte';
 	import EventCalendarInviteButton from './EventCalendarInviteButton.svelte';
 	import type { RegionConfig } from '$lib/config/regions';
 	import { defaults, superForm } from 'sveltekit-superforms';
-	import { zod, zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4, zod4Client } from 'sveltekit-superforms/adapters';
 	import otpUserSignupSchema from './OtpUserSignupSchema';
-	import type { LocalizedEventDto } from '@crownshy/api-client/api';
+	import type { ApiClient, LocalizedEventDto } from '@crownshy/api-client/api';
 
 	type Props = {
 		open: boolean;
 		event: LocalizedEventDto;
 		region: RegionConfig;
+		api: ApiClient;
 	};
 
-	let { open, event, region }: Props = $props();
+	let { open, event, region, api }: Props = $props();
 
 	const formattedDate = $derived(event ? format(new Date(event.startTime), 'EEEE, MMMM d') : '');
 
-	const form = superForm(defaults(zod(otpUserSignupSchema)), {
-		validators: zodClient(otpUserSignupSchema),
+	const form = superForm(defaults(zod4(otpUserSignupSchema)), {
+		validators: zod4Client(otpUserSignupSchema),
 		taintedMessage: false,
 		onSubmit: handleSubmit
 	});

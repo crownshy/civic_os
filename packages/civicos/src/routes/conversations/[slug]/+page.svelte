@@ -320,7 +320,7 @@
 			</div>
 		</div>
 
-		<EventRegistrationModal open={showForm} {event} {region} />
+		<EventRegistrationModal open={showForm} {event} {region} api={data.api} />
 	</AppShell>
 {:else}
 	<AppShell>

@@ -1,4 +1,5 @@
-import { api, config } from './api';
+import type { ApiClient } from '@crownshy/api-client/api';
+import { config } from './api';
 import { GENERIC_REGION, REGIONS } from '$lib/config/regions';
 
 export interface UserProfile {
@@ -77,6 +78,22 @@ class Session {
 	_inviteId = $state('');
 	endCtaShareCompleted = $state(false);
 	endCtaReviewCompleted = $state(false);
+
+	#api: ApiClient | null = null;
+
+	/**
+	 * Wired once from the root layout with the client built in `load`, so the
+	 * session does not construct its own. Browser only: this is a module
+	 * singleton and a per-request client must not leak across SSR requests.
+	 */
+	setApi(api: ApiClient) {
+		this.#api = api;
+	}
+
+	private get api(): ApiClient {
+		if (!this.#api) throw new Error('Session.setApi() was never called; see routes/+layout.svelte');
+		return this.#api;
+	}
 
 	constructor() {
 		const saved = loadPersistedSession();
@@ -199,13 +216,13 @@ class Session {
 
 		try {
 			// 1. Create anonymous user (sets auth-token cookie)
-			const user = await api.SignupAnnonUser(undefined, {});
+			const user = await this.api.SignupAnnonUser(undefined, {});
 			this.user = user;
 			this.persist();
 
 			// 2. Accept the invite (registers user for the workflow)
 			if (this.conversationId && this.inviteId) {
-				await api.AcceptInvite(undefined, {
+				await this.api.AcceptInvite(undefined, {
 					params: {
 						conversation_id: this.conversationId,
 						invite_id: this.inviteId
@@ -243,7 +260,7 @@ class Session {
 		}
 
 		try {
-			const result = await api.RegisterEmailForUpdates(
+			const result = await this.api.RegisterEmailForUpdates(
 				{
 					email,
 					receive_updates_by_email: true,
@@ -277,7 +294,7 @@ class Session {
 			politicalParty: data.politicalParty ?? null
 		};
 		try {
-			const res = await api.UpsertUserProfile(body);
+			const res = await this.api.UpsertUserProfile(body);
 			this.profile = res;
 			return true;
 		} catch (e) {
@@ -294,13 +311,18 @@ class Session {
 		if (!this.conversationId || !workflowId) return false;
 
 		try {
-			await api.SetUserProgress(status, {
-				params: {
-					conversation_id: this.conversationId,
-					workflow_id: workflowId,
-					workflow_step_id: workflowStepId
+			// UpdateUserProgress is an object body, not a bare status string. The
+			// client's types could not catch this while zod was unresolvable.
+			await this.api.SetUserProgress(
+				{ status },
+				{
+					params: {
+						conversation_id: this.conversationId,
+						workflow_id: workflowId,
+						workflow_step_id: workflowStepId
+					}
 				}
-			});
+			);
 			return true;
 		} catch (e) {
 			console.error('[Session] Failed to set progress:', e);

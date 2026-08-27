@@ -1,7 +1,4 @@
-import { createApiClient } from '@crownshy/api-client/client';
 import { env } from '$env/dynamic/public';
-
-export const api = createApiClient('/api', undefined, 'client');
 
 export const config = {
 	conversationId: env.PUBLIC_CONVERSATION_ID || '',
