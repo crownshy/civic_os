@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { invalidate } from '$app/navigation';
+	import type { SubmitFunction } from '@sveltejs/kit';
 	import { Trash2 } from '@lucide/svelte';
 	import SetupCard from '$lib/components/setup/SetupCard.svelte';
 
@@ -29,6 +31,15 @@
 	let { cohosts, onAddNew, convId }: Props = $props();
 
 	const stripProtocol = (url: string) => url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+
+	// The overview load declares `cohosts:${convId}`; refresh that key rather than
+	// taking enhance's default, which invalidates every load on the page.
+	const removeCohost: SubmitFunction =
+		() =>
+		async ({ update }) => {
+			await update({ invalidateAll: false });
+			await invalidate(`cohosts:${convId}`);
+		};
 
 	// 3 content columns + a trailing action column (kept in the header too so rows
 	// stay aligned whether or not a Remove button is present).
@@ -90,7 +101,7 @@
 
 					<div class="flex justify-end">
 						{#if convId && host.id && !host.isOwner}
-							<form method="POST" action="?/removeCohost" use:enhance>
+							<form method="POST" action="?/removeCohost" use:enhance={removeCohost}>
 								<input type="hidden" name="convId" value={convId} />
 								<input type="hidden" name="orgId" value={host.id} />
 								<button

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { invalidate } from '$app/navigation';
 	import * as Dialog from '@civicos/shared/ui/dialog';
 	import { Button } from '@civicos/shared/ui/button';
 	import { Search, X, Check } from '@lucide/svelte';
@@ -153,9 +154,14 @@
 				use:enhance={() => {
 					submitting = true;
 					return async ({ update, result }) => {
-						await update();
+						// The overview load declares `cohosts:${convId}`; refresh that rather
+						// than letting update() invalidate every load on the page.
+						await update({ invalidateAll: false });
+						if (result.type === 'success') {
+							await invalidate(`cohosts:${convId}`);
+							open = false;
+						}
 						submitting = false;
-						if (result.type === 'success') open = false;
 					};
 				}}
 			>
