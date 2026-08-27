@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { invalidate } from '$app/navigation';
 	import * as Dialog from '@civicos/shared/ui/dialog';
 	import { Button } from '@civicos/shared/ui/button';
 	import { Input } from '@civicos/shared/ui/input';
@@ -64,7 +65,10 @@
 							await update({ reset: false });
 							return;
 						}
-						await update();
+						// The participants load declares `open-poll:goals`; refresh that
+						// rather than letting update() invalidate every load on the page.
+						await update({ invalidateAll: false });
+						await invalidate('open-poll:goals');
 						close();
 					};
 				}}

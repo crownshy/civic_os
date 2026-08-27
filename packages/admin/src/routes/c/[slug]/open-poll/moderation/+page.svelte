@@ -115,6 +115,8 @@
 		try {
 			const updated = await moderateStatementAux(data.api, row.id, { decision });
 			statements = statements.map((s) => (s.id === row.id ? updated : s));
+		
+			await invalidate('open-poll:aux');
 		} catch (e) {
 			console.error('moderateStatementAux failed', e);
 			statements = statements.map((s) =>
