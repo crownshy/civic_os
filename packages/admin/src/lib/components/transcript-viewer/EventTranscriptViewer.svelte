@@ -76,6 +76,8 @@
 
 		(async () => {
 			try {
+				// Object-storage URLs from `recording.downloads`, not comhairle
+				// endpoints, so the api client does not cover them.
 				const [transcriptResponse, reportResponse] = await Promise.all([
 					fetch(transcriptionUrl),
 					fetch(reportUrl)

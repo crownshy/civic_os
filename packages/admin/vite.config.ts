@@ -68,6 +68,15 @@ export default defineConfig({
 				}
 			},
 			{
+				extends: './vite.config.ts',
+				test: {
+					name: 'server',
+					environment: 'node',
+					include: ['src/**/*.{test,spec}.{js,ts}'],
+					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}']
+				}
+			},
+			{
 				extends: true,
 				plugins: [
 					// The plugin will run tests for the stories defined in your Storybook config.

@@ -78,6 +78,7 @@
 	async function buildCollection(codes: string[]): Promise<FeatureCollection> {
 		const collections = await Promise.all(
 			codes.map(async (code) => {
+				// Static asset served by this app, not a comhairle call.
 				const res = await fetch(`${base}/counties/counties_${code}.geojson`);
 				if (!res.ok) throw new Error(`counties_${code} ${res.status}`);
 				return (await res.json()) as FeatureCollection;

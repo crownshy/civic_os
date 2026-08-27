@@ -13,6 +13,9 @@ export type PolisStatement = {
  * 1. Fetch first statement via nextComment (no pid needed)
  * 2. Vote using xid — server auto-creates participant, returns currentPid
  * 3. Use currentPid for subsequent nextComment calls (not_voted_by_pid filter)
+ *
+ * Polis is a third-party service with its own API, so every call in here is a
+ * raw fetch on purpose: the generated comhairle client does not cover it.
  */
 export default class PolisApi {
 	_currentStatement = $state<PolisStatement | undefined>();

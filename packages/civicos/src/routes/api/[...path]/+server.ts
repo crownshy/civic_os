@@ -30,6 +30,8 @@ const handler: RequestHandler = async ({ request, params, cookies }) => {
 		headers.set('cookie', `auth-token=${authToken}`);
 	}
 
+	// Raw fetch by definition: this route is the proxy the api client calls
+	// through, so it cannot call the client itself.
 	const res = await fetch(fullTarget, {
 		method: request.method,
 		headers,

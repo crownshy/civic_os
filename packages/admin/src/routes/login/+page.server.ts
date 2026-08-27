@@ -1,11 +1,9 @@
 import { fail, redirect, type Actions } from '@sveltejs/kit';
-import { env } from '$env/dynamic/private';
-
-const BACKEND_URL = env.API_URL || 'http://localhost:3000';
-const API_PREFIX = env.API_PREFIX || '';
+import { createBackendClient } from '$lib/server/backend-client';
+import { forwardAuthCookie, setCookiesOf } from '$lib/server/auth-cookie';
 
 export const actions: Actions = {
-	default: async ({ request, cookies, fetch }) => {
+	default: async ({ request, cookies }) => {
 		const data = await request.formData();
 		const email = String(data.get('email') ?? '').trim();
 		const password = String(data.get('password') ?? '');
@@ -14,33 +12,30 @@ export const actions: Actions = {
 			return fail(400, { email, error: 'Email and password are required.' });
 		}
 
-		const loginRes = await fetch(`${BACKEND_URL}${API_PREFIX}/auth/login`, {
-			method: 'POST',
-			headers: { 'content-type': 'application/json' },
-			body: JSON.stringify({ email, password })
+		const api = createBackendClient();
+
+		// The session arrives as a `Set-Cookie` header, and the client hands back
+		// the parsed body rather than the response, so catch the headers on the
+		// way through.
+		let setCookies: string[] = [];
+		api.axios.interceptors.response.use((res) => {
+			setCookies = setCookiesOf(res.headers);
+			return res;
 		});
 
-		if (!loginRes.ok) {
-			return fail(401, { email, error: 'Invalid email or password.' });
+		try {
+			await api.LoginUser({ email, password });
+		} catch {
+			// A reply that arrived but failed to validate still signed us in, and
+			// the interceptor above already holds the cookie. Only a rejected login,
+			// or a request that never landed, is a real failure.
+			if (!setCookies.length) {
+				return fail(401, { email, error: 'Invalid email or password.' });
+			}
 		}
 
-		// Forward auth-token cookie set by comhairle to the browser (same-origin).
-		for (const cookieHeader of loginRes.headers.getSetCookie?.() ?? []) {
-			const [nameValue, ...attrs] = cookieHeader.split(';').map((s) => s.trim());
-			const [name, value] = nameValue.split('=');
-			if (name !== 'auth-token') continue;
-
-			let maxAge: number | undefined;
-			let secure = false;
-			let httpOnly = false;
-			for (const a of attrs) {
-				const [k, v] = a.split('=').map((s) => s.trim());
-				const lk = k.toLowerCase();
-				if (lk === 'max-age' && v) maxAge = parseInt(v);
-				else if (lk === 'secure') secure = true;
-				else if (lk === 'httponly') httpOnly = true;
-			}
-			cookies.set(name, value, { path: '/', maxAge, secure, httpOnly, sameSite: 'lax' });
+		for (const setCookie of setCookies) {
+			forwardAuthCookie(setCookie, cookies);
 		}
 
 		throw redirect(303, '/');

@@ -18,6 +18,9 @@
 
 	let { name, transcriptUrl, reportUrl, recordingUrl }: Props = $props();
 
+	// These are object-storage URLs handed down from `recording.downloads`, not
+	// comhairle endpoints, so they are fetched directly rather than via the client.
+
 	let open = $state(false);
 	let busy = $state<'transcript' | 'report' | null>(null);
 
