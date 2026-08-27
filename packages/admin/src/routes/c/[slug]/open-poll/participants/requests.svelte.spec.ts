@@ -8,9 +8,9 @@ import { createApiClient } from '$lib/api/client';
  * than as an empty Participants tab.
  */
 
-const CONV = '11111111-1111-1111-1111-111111111111';
-const WF = '22222222-2222-2222-2222-222222222222';
-const TARGET = '33333333-3333-3333-3333-333333333333';
+const CONV = '0f9b1c2d-3e4f-4a5b-8c6d-7e8f9a0b1c2d';
+const WF = '1a2b3c4d-5e6f-4a7b-9c8d-0e1f2a3b4c5d';
+const TARGET = '2b3c4d5e-6f7a-4b8c-ad9e-0f1a2b3c4d5e';
 
 /** Record what the client would put on the wire, without sending it. */
 async function capture(call: (api: ReturnType<typeof createApiClient>) => Promise<unknown>) {
