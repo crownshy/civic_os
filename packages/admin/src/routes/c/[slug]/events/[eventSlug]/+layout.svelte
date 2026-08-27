@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import * as Popover from '@civicos/shared/ui/popover';
 	import { ChevronDown } from '@lucide/svelte';
+	import { resolve } from '$app/paths';
 
 	let { data, children } = $props();
 
@@ -9,13 +10,22 @@
 	const events = $derived(data.events ?? []);
 
 	const subTabs = [
-		{ label: 'Setup', href: '' },
-		{ label: 'Participants', href: '/registrations' },
-		{ label: 'Recordings & Analysis', href: '/recordings' }
-	];
+		{ label: 'Setup', href: '', route: '/c/[slug]/events/[eventSlug]' },
+		{
+			label: 'Participants',
+			href: '/registrations',
+			route: '/c/[slug]/events/[eventSlug]/registrations'
+		},
+		{
+			label: 'Recordings & Analysis',
+			href: '/recordings',
+			route: '/c/[slug]/events/[eventSlug]/recordings'
+		}
+	] as const;
 
-	const eventBase = $derived(`/c/${page.params.slug}/events/${page.params.eventSlug}`);
-	const eventsRoot = $derived(`/c/${page.params.slug}/events`);
+	const campaignSlug = $derived(data.campaign.slug);
+	const eventId = $derived(page.params.eventSlug ?? '');
+	const eventBase = $derived(`/c/${campaignSlug}/events/${eventId}`);
 
 	const activeSubTab = $derived(
 		subTabs.find((t) =>
@@ -57,20 +67,25 @@
 		>
 			{#each events as ev (ev.id)}
 				{@const active = ev.id === page.params.eventSlug}
+				<!-- The base is resolved; `subSuffix` is the sub-path carried over from the
+				     current route so switching events keeps you on the same tab. -->
+				<!-- eslint-disable svelte/no-navigation-without-resolve -->
 				<a
-					href={`${eventsRoot}/${ev.id}${subSuffix}`}
+					href={resolve('/c/[slug]/events/[eventSlug]', { slug: campaignSlug, eventSlug: ev.id }) +
+						subSuffix}
 					onclick={() => (switcherOpen = false)}
 					class={`block truncate rounded-lg px-3 py-2 text-body font-medium ${active ? 'text-primary' : 'text-foreground hover:bg-muted'}`}
 				>
 					{eventLabel(ev)}
 				</a>
+				<!-- eslint-enable svelte/no-navigation-without-resolve -->
 			{/each}
 		</Popover.Content>
 	</Popover.Root>
 
 	{#each subTabs as tab (tab.href)}
 		<a
-			href={eventBase + tab.href}
+			href={resolve(tab.route, { slug: campaignSlug, eventSlug: eventId })}
 			class={`cursor-pointer px-4 py-2.5 text-body font-medium ${
 				activeSubTab === tab.href ? 'text-primary' : 'text-foreground/70 hover:text-foreground'
 			}`}

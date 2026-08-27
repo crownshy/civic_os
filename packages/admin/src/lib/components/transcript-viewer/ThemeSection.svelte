@@ -22,6 +22,9 @@
 		onQuoteClick?: (quote: Quote) => void;
 	}
 
+	// `Subtopic` mirrors the transcript API payload and is re-exported for other
+	// consumers; this component only renders `title` and `claims`.
+	// eslint-disable-next-line svelte/no-unused-props
 	let { subtopic, open = false, onQuoteClick = () => {} }: Props = $props();
 
 	// Initial expanded state only — the parent auto-opens the first section, then

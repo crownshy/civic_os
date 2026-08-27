@@ -105,6 +105,10 @@
 	const sourceIdToTime = $derived.by(() => {
 		const sources = reportData?.data?.[1]?.sources ?? [];
 		const events = transcriptData?.events ?? [];
+		// Local accumulator inside a `$derived` — rebuilt from scratch on every
+		// recompute and never mutated after. A reactive collection would add
+		// tracking overhead for no behavioural gain.
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const map = new Map<string, number>();
 		sources.forEach((src, i) => {
 			if (events[i]) map.set(src.id, events[i].start_time);

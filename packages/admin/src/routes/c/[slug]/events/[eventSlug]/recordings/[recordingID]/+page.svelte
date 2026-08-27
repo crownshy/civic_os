@@ -1,11 +1,14 @@
 <script lang="ts">
 	import EventTranscriptViewer from '$lib/components/transcript-viewer/EventTranscriptViewer.svelte';
 	import { page } from '$app/state';
+	import { resolve } from '$app/paths';
 
 	let { data } = $props();
 	let { error, recording } = $derived(data);
 
-	const basePath = $derived(`/c/${page.params.slug}/events/${page.params.eventSlug}/recordings`);
+	const basePath = $derived(
+		resolve(`/c/${page.params.slug}/events/${page.params.eventSlug}/recordings`)
+	);
 	const conversationTitle = $derived(data.conversation?.title ?? data.campaign.title);
 	const recordingRefs = $derived(
 		(Array.isArray(data.recordings) ? data.recordings : []).map((r) => ({

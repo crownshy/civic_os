@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page, navigating } from '$app/state';
 	import ConversationTabSkeleton from '$lib/components/skeletons/ConversationTabSkeleton.svelte';
+	import { resolve } from '$app/paths';
 
 	let { data, children } = $props();
 
@@ -65,7 +66,7 @@
 >
 	{#each tabs as tab (tab.href)}
 		<a
-			href={`/c/${campaign.slug}/${tab.href}`}
+			href={resolve(`/c/${campaign.slug}/${tab.href}`)}
 			class={`relative h-12 shrink-0 px-3 py-3 text-body font-medium whitespace-nowrap ${
 				activeTab === tab.href
 					? 'border-b-[3px] border-primary text-primary'

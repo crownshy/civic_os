@@ -10,7 +10,7 @@
 	<!-- Top stats + download button -->
 	<div class="flex flex-wrap items-end justify-between gap-4">
 		<div class="flex gap-10">
-			{#each Array(3) as _, i (i)}
+			{#each Array(3), i (i)}
 				<div class="flex flex-col gap-2">
 					<Skeleton class="h-8 w-16" />
 					<Skeleton class="h-3 w-24" />
@@ -30,7 +30,7 @@
 			<Skeleton class="h-6 w-40" />
 		</div>
 		<div class="flex flex-col gap-3 px-6 pt-6 pb-6">
-			{#each Array(5) as _, i (i)}
+			{#each Array(5), i (i)}
 				<div class="grid grid-cols-[10rem_1fr] items-center gap-6">
 					<Skeleton class="h-4 w-32" />
 					<Skeleton class="h-4 w-full" />
@@ -40,7 +40,7 @@
 	</Card>
 
 	<!-- Statement sections -->
-	{#each Array(3) as _, i (i)}
+	{#each Array(3), i (i)}
 		<div class="flex flex-col gap-4">
 			<div class="flex flex-col gap-2">
 				<Skeleton class="h-5 w-52" />
@@ -48,7 +48,7 @@
 			</div>
 			<Card class="shadow-card">
 				<div class="flex flex-col gap-4 px-4 py-4">
-					{#each Array(3) as _, j (j)}
+					{#each Array(3), j (j)}
 						<div class="grid grid-cols-[1.5rem_1fr_10rem] items-center gap-4">
 							<Skeleton class="h-4 w-4" />
 							<Skeleton class="h-4 w-full" />

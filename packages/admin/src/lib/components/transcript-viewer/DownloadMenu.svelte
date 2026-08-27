@@ -82,6 +82,8 @@
 			<FileBarChart2 class="size-4 text-primary" />
 			{busy === 'report' ? 'Preparing…' : 'Report'}
 		</button>
+		<!-- Points at the recording's storage URL, not an app route -->
+		<!-- eslint-disable svelte/no-navigation-without-resolve -->
 		<a
 			href={recordingUrl}
 			download={`${name} — Audio`}
@@ -91,5 +93,6 @@
 			<FileAudio class="size-4 text-primary" />
 			Audio
 		</a>
+		<!-- eslint-enable svelte/no-navigation-without-resolve -->
 	</Popover.Content>
 </Popover.Root>

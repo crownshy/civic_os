@@ -10,7 +10,7 @@
 	<!-- Toolbar: filter pills (left) + view toggles / new-event (right) -->
 	<div class="flex flex-col items-stretch justify-between gap-2 sm:flex-row sm:items-center">
 		<div class="flex flex-wrap items-center gap-1.5">
-			{#each Array(3) as _, i (i)}
+			{#each Array(3), i (i)}
 				<Skeleton class="h-8 w-24 rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl" />
 			{/each}
 		</div>
@@ -23,7 +23,7 @@
 
 	<!-- Event cards -->
 	<div class="space-y-2.5">
-		{#each Array(5) as _, i (i)}
+		{#each Array(5), i (i)}
 			<Card>
 				<div class="flex items-center gap-4 p-4">
 					<div class="w-16 shrink-0 space-y-1.5 text-center">

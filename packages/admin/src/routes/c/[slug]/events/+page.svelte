@@ -3,6 +3,7 @@
 	import { ChevronRight, Plus, X } from '@lucide/svelte';
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import type { PageData } from './$types';
+	import { resolve } from '$app/paths';
 
 	let { data }: { data: PageData } = $props();
 
@@ -387,7 +388,13 @@
 	{:else}
 		<div class="space-y-2.5">
 			{#each visible as event (event.id)}
-				<a href={`/c/${campaign.slug}/events/${event.id}`} class="group block">
+				<a
+					href={resolve('/c/[slug]/events/[eventSlug]', {
+						slug: campaign.slug,
+						eventSlug: event.id
+					})}
+					class="group block"
+				>
 					<Card
 						class="transition-all duration-200 group-hover:-translate-y-0.5 group-hover:bg-card group-hover:shadow-md hover:border-primary/40"
 					>

@@ -9,6 +9,7 @@
 	import { ArrowLeft, CheckCircle2, AlertCircle, ShieldCheck } from '@lucide/svelte';
 	import { addMemberSchema, type AddMemberMessage } from './member-schema';
 	import ConversationsCard from './ConversationsCard.svelte';
+	import { resolve } from '$app/paths';
 
 	let { data } = $props();
 
@@ -38,7 +39,7 @@
 
 <div class="mx-auto max-w-3xl p-6 sm:p-8">
 	<a
-		href="/sysadmin/hosts"
+		href={resolve('/sysadmin/hosts')}
 		class="mb-4 inline-flex items-center gap-1.5 text-body text-muted-foreground hover:text-foreground"
 	>
 		<ArrowLeft class="size-4" />

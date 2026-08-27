@@ -9,7 +9,7 @@
 <div class="flex-1 space-y-5 overflow-y-auto px-8 py-8" aria-hidden="true">
 	<Skeleton class="h-4 w-20" />
 
-	{#each Array(5) as _, i (i)}
+	{#each Array(5), i (i)}
 		<div class="space-y-1">
 			<Skeleton class="h-3 w-24" />
 			<Card>

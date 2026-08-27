@@ -11,7 +11,9 @@
 		Building2
 	} from '@lucide/svelte';
 	import { page } from '$app/state';
+	import { afterNavigate } from '$app/navigation';
 	import type { ConversationStatus } from '$lib/conversations';
+	import { resolve } from '$app/paths';
 
 	let { children, data } = $props();
 
@@ -39,8 +41,7 @@
 	const currentSlug = $derived(page.params.slug);
 
 	// Close drawer when route changes
-	$effect(() => {
-		page.url.pathname;
+	afterNavigate(() => {
 		mobileOpen = false;
 	});
 </script>
@@ -123,7 +124,7 @@
 
 			<nav class="py-2.5">
 				<a
-					href="/"
+					href={resolve('/')}
 					title="Dashboard"
 					class={[
 						'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-caption font-medium',
@@ -139,7 +140,7 @@
 
 				{#if canCreateHost}
 					<a
-						href="/sysadmin/hosts"
+						href={resolve('/sysadmin/hosts')}
 						title="Hosts"
 						class={[
 							'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-caption font-medium',
@@ -164,7 +165,7 @@
 			<div class="flex flex-col gap-0.5 border-b border-border pb-2.5">
 				{#each conversations as conversation (conversation.id)}
 					<a
-						href={`/c/${conversation.slug}/overview`}
+						href={resolve('/c/[slug]/overview', { slug: conversation.slug })}
 						title={conversation.title}
 						class={[
 							'flex items-center gap-2 rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl px-2.5 py-2 text-caption font-medium',

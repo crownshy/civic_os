@@ -157,12 +157,15 @@
 		>
 			<span class="pr-2 text-body font-medium text-foreground/70">Jump to:</span>
 			{#each jumpLinks as link (link.href)}
+				<!-- Jump links are in-page fragments (#geography, …), not routes -->
+				<!-- eslint-disable svelte/no-navigation-without-resolve -->
 				<a
 					href={link.href}
 					class="inline-flex cursor-pointer items-center rounded-[30px] bg-muted px-3 py-2 text-body font-medium transition-all duration-150 hover:scale-[1.04] hover:shadow-sm active:scale-[0.97]"
 				>
 					{link.label}
 				</a>
+				<!-- eslint-enable svelte/no-navigation-without-resolve -->
 			{/each}
 		</div>
 

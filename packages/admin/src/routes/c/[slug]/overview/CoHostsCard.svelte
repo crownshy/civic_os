@@ -62,6 +62,8 @@
 
 					<div class="min-w-0 truncate">
 						{#if host.website}
+							<!-- Host-supplied external site, not an app route -->
+							<!-- eslint-disable svelte/no-navigation-without-resolve -->
 							<a
 								href={host.website}
 								target="_blank"
@@ -70,6 +72,7 @@
 							>
 								{stripProtocol(host.website)}
 							</a>
+							<!-- eslint-enable svelte/no-navigation-without-resolve -->
 						{:else}
 							<span class="text-muted-foreground">Not listed</span>
 						{/if}

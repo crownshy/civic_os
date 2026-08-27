@@ -11,12 +11,14 @@
 		name: string;
 		recordings: RecordingRef[];
 		currentId: string;
-		/** Path prefix for a recording detail page; `${basePath}/${id}` is the link. */
+		/** Resolved path prefix for a recording detail page; `${basePath}/${id}` is the link. */
 		basePath: string;
-		/** Path to the recordings list ("Go to Recordings →"). */
+		/** Resolved path to the recordings list ("Go to Recordings →"). */
 		recordingsPath: string;
 	}
 
+	// `basePath` and `recordingsPath` arrive already resolved from the caller, so the
+	// links below intentionally do not call `resolve()` a second time.
 	let { name, recordings, currentId, basePath, recordingsPath }: Props = $props();
 
 	let open = $state(false);
@@ -36,6 +38,7 @@
 	>
 		{#each recordings as rec (rec.id)}
 			{@const active = rec.id === currentId}
+			<!-- eslint-disable svelte/no-navigation-without-resolve -->
 			<a
 				href={`${basePath}/${rec.id}`}
 				onclick={() => (open = false)}
@@ -46,7 +49,10 @@
 					<Check class="size-4 shrink-0 text-primary" />
 				{/if}
 			</a>
+			<!-- eslint-enable svelte/no-navigation-without-resolve -->
+			<!-- eslint-enable svelte/no-navigation-without-resolve -->
 		{/each}
+		<!-- eslint-disable svelte/no-navigation-without-resolve -->
 		<a
 			href={recordingsPath}
 			onclick={() => (open = false)}

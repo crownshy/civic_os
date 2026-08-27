@@ -1,15 +1,16 @@
 <script lang="ts">
 	import { page, navigating } from '$app/state';
 	import OpenPollSkeleton from '$lib/components/skeletons/OpenPollSkeleton.svelte';
+	import { resolve } from '$app/paths';
 
 	let { data, children } = $props();
 
 	const subTabs = [
-		{ label: 'Setup', href: '/setup' },
-		{ label: 'Participants', href: '/participants' },
-		{ label: 'Moderation', href: '/moderation' },
-		{ label: 'Insights', href: '/insights' }
-	];
+		{ label: 'Setup', href: '/setup', route: '/c/[slug]/open-poll/setup' },
+		{ label: 'Participants', href: '/participants', route: '/c/[slug]/open-poll/participants' },
+		{ label: 'Moderation', href: '/moderation', route: '/c/[slug]/open-poll/moderation' },
+		{ label: 'Insights', href: '/insights', route: '/c/[slug]/open-poll/insights' }
+	] as const;
 
 	const openPollBase = $derived(`/c/${page.params.slug}/open-poll`);
 
@@ -36,7 +37,7 @@
 <nav class="flex items-center gap-2 border-b border-border px-5 font-ui">
 	{#each subTabs as tab (tab.href)}
 		<a
-			href={openPollBase + tab.href}
+			href={resolve(tab.route, { slug: data.campaign.slug })}
 			class={`px-4 pt-3 pb-2 text-body font-medium ${
 				activeSubTab === tab.href
 					? 'border-b-[3px] border-primary text-primary'

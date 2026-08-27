@@ -30,7 +30,7 @@
 			<p class="text-caption text-muted-foreground">appear once recordings are processed</p>
 		</div>
 		<div class="space-y-2">
-			{#each reports as r}
+			{#each reports as r (r.title)}
 				<div
 					class={`flex items-center gap-3 rounded-lg bg-card p-4 shadow-card ${
 						r.state === 'pending' ? 'opacity-70' : ''
@@ -70,7 +70,7 @@
 			</div>
 		</div>
 		<div class="space-y-1.5">
-			{#each recordings as rec}
+			{#each recordings as rec (rec.name)}
 				<div class="flex items-center gap-2 rounded-lg bg-card p-3 text-caption shadow-card">
 					<Music class="size-4 text-muted-foreground" />
 					<div class="flex-1">

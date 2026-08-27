@@ -16,9 +16,6 @@
 		countAccent?: 'consensus' | 'difference' | 'all';
 		/** Header label for the per-variant metric column, e.g. "Min Agree". */
 		metricLabel: string;
-		/** Number of opinion groups — sizes the trailing agree-rings column so the
-		    header grid and the (separate) row grids share identical column widths. */
-		groupCount?: number;
 		/** Full main-list count. When it exceeds what's rendered, show the expander. */
 		total?: number;
 		/** Rows shown while collapsed (parent does the slicing). */
@@ -51,7 +48,6 @@
 		metricLabel,
 		total,
 		collapsedCount = 5,
-		groupCount = 0,
 		expanded = $bindable(false),
 		lowQualityCount = 0,
 		showLowQuality = $bindable(false),
@@ -77,8 +73,7 @@
 	//   Author / metric / Agree%|rings → auto: each takes exactly the width its own
 	//              content needs, no more. Even column-gap comes from `gap-x-*`.
 	//
-	// groupCount is no longer needed to size the rings column — `auto` fits the
-	// circles for free — but stays in Props for call-site compatibility.
+	// The rings column needs no explicit group count: `auto` fits the circles for free.
 	const insightsCols = 'auto minmax(12rem,1fr) auto auto auto';
 
 	const countAccentClass = $derived(

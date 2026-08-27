@@ -4,6 +4,7 @@
 	import { ArrowUpRight, MessagesSquare } from '@lucide/svelte';
 	import type { AssignableConversation, HostConversation } from './host-conversations';
 	import type { ConversationStatus } from '$lib/conversations';
+	import { resolve } from '$app/paths';
 
 	interface Props {
 		conversations: HostConversation[];
@@ -41,7 +42,7 @@
 				<li class="flex items-center gap-3 border-b border-border px-5 py-3 last:border-b-0">
 					<div class="min-w-0 flex-1">
 						<a
-							href={`/c/${conversation.slug}/overview`}
+							href={resolve('/c/[slug]/overview', { slug: conversation.slug })}
 							class="inline-flex items-center gap-1 text-body font-semibold underline-offset-2 hover:text-primary hover:underline"
 						>
 							{conversation.title}

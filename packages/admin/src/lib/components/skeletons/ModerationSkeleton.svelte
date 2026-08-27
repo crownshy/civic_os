@@ -29,7 +29,7 @@
 
 	<!-- Filter chips -->
 	<div class="flex flex-wrap gap-1.5">
-		{#each Array(5) as _, i (i)}
+		{#each Array(5), i (i)}
 			<Skeleton class="h-7 w-20 rounded-full" />
 		{/each}
 	</div>
@@ -38,7 +38,7 @@
 	<div>
 		<Card class="shadow-card">
 			<div class="flex flex-col gap-4 px-4 py-4">
-				{#each Array(6) as _, i (i)}
+				{#each Array(6), i (i)}
 					<div class="grid grid-cols-[1.5rem_minmax(0,1fr)_11rem_auto] items-center gap-4">
 						<Skeleton class="h-4 w-4" />
 						<Skeleton class="h-4 w-full" />

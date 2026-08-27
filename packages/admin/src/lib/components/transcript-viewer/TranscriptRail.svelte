@@ -28,6 +28,10 @@
 	// Assign each distinct speaker a stable index (0,1,2…) in order of appearance,
 	// so labels read "SPEAKER 1/2/3…" and colors alternate primary/success.
 	const speakerOrder = $derived.by(() => {
+		// Local accumulator inside a `$derived` — rebuilt from scratch on every
+		// recompute and never mutated after. A reactive collection would add
+		// tracking overhead for no behavioural gain.
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const seen = new Map<string, number>();
 		for (const e of events) {
 			if (!seen.has(e.speaker_id)) seen.set(e.speaker_id, seen.size);

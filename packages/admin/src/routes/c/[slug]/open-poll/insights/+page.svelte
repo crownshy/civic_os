@@ -59,6 +59,10 @@
 	// only the report carries), so themes on non-report statements fall back to
 	// 'low' — not surfaced today anyway (see ThemeBar).
 	const themes = $derived.by<ThemeSummary[]>(() => {
+		// Local accumulator inside a `$derived` — rebuilt from scratch on every
+		// recompute and never mutated after. A reactive collection would add
+		// tracking overhead for no behavioural gain.
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const counts = new Map<string, number>();
 		for (const row of Object.values(auxByTid)) {
 			for (const t of row.themes) counts.set(t, (counts.get(t) ?? 0) + 1);
@@ -119,6 +123,10 @@
 
 	/** All themes used anywhere on this conversation — powers the picker dropdown. */
 	const availableThemes = $derived.by(() => {
+		// Local accumulator inside a `$derived` — rebuilt from scratch on every
+		// recompute and never mutated after. A reactive collection would add
+		// tracking overhead for no behavioural gain.
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const set = new Set<string>();
 		for (const row of Object.values(auxByTid)) {
 			for (const t of row.themes) set.add(t);
@@ -163,6 +171,8 @@
 		const url = new URL(page.url);
 		if (next.length) url.searchParams.set('theme', next.join(','));
 		else url.searchParams.delete('theme');
+		// `url` is cloned from `page.url`, so it already carries the base path.
+		// eslint-disable-next-line svelte/no-navigation-without-resolve
 		replaceState(url, {});
 	}
 
@@ -319,7 +329,6 @@
 			countAccent="consensus"
 			description="with greater than 80% agreement across all groups."
 			metricLabel="Min Agree"
-			groupCount={reportData.groups.length}
 			total={consensusMain.length}
 			collapsedCount={COLLAPSED_ROWS}
 			lowQualityCount={consensusLow.length}
@@ -333,9 +342,8 @@
 					No consensus statements yet.
 				</p>
 			{:else}
-				{#each consensusExpanded ? consensusMain : consensusMain.slice(0, COLLAPSED_ROWS) as c, i (c.tid)}
+				{#each consensusExpanded ? consensusMain : consensusMain.slice(0, COLLAPSED_ROWS) as c (c.tid)}
 					<StatementRow
-						index={i + 1}
 						comment={c}
 						groups={reportData.groups}
 						variant="consensus"
@@ -346,9 +354,8 @@
 			{/if}
 
 			{#snippet lowQuality()}
-				{#each consensusLow as c, i (c.tid)}
+				{#each consensusLow as c (c.tid)}
 					<StatementRow
-						index={i + 1}
 						comment={c}
 						groups={reportData.groups}
 						variant="consensus"
@@ -366,7 +373,6 @@
 			countAccent="difference"
 			description="with greater than 30% difference across the groups."
 			metricLabel="Difference"
-			groupCount={reportData.groups.length}
 			total={differencesMain.length}
 			collapsedCount={COLLAPSED_ROWS}
 			lowQualityCount={differencesLow.length}
@@ -380,9 +386,8 @@
 					No clear differences yet.
 				</p>
 			{:else}
-				{#each differencesExpanded ? differencesMain : differencesMain.slice(0, COLLAPSED_ROWS) as c, i (c.tid)}
+				{#each differencesExpanded ? differencesMain : differencesMain.slice(0, COLLAPSED_ROWS) as c (c.tid)}
 					<StatementRow
-						index={i + 1}
 						comment={c}
 						groups={reportData.groups}
 						variant="difference"
@@ -393,9 +398,8 @@
 			{/if}
 
 			{#snippet lowQuality()}
-				{#each differencesLow as c, i (c.tid)}
+				{#each differencesLow as c (c.tid)}
 					<StatementRow
-						index={i + 1}
 						comment={c}
 						groups={reportData.groups}
 						variant="difference"
@@ -417,7 +421,6 @@
 			countAccent="all"
 			description="in total. Use labels below to filter by theme."
 			metricLabel="Count"
-			groupCount={reportData.groups.length}
 			lowQualityCount={explorerLowQuality.length}
 			bind:showLowQuality
 			bind:excludeHosts={explorerExcludeHosts}
@@ -451,9 +454,8 @@
 					No statements match the current filters.
 				</p>
 			{:else}
-				{#each explorerMain as c, i (c.tid)}
+				{#each explorerMain as c (c.tid)}
 					<StatementRow
-						index={i + 1}
 						comment={c}
 						groups={reportData.groups}
 						variant={classifyStatement(c, reportData.groups, {
@@ -467,9 +469,8 @@
 			{/if}
 
 			{#snippet lowQuality()}
-				{#each explorerLowQuality as c, i (c.tid)}
+				{#each explorerLowQuality as c (c.tid)}
 					<StatementRow
-						index={i + 1}
 						comment={c}
 						groups={reportData.groups}
 						variant={classifyStatement(c, reportData.groups, {

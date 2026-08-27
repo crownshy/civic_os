@@ -77,7 +77,7 @@
 
 	<div class="flex items-center justify-between">
 		<div class="flex items-center gap-1.5">
-			{#each ['all', 'confirmed', 'waitlist'] as const as f}
+			{#each ['all', 'confirmed', 'waitlist'] as const as f (f)}
 				<button
 					type="button"
 					onclick={() => (activeFilter = f)}
@@ -124,7 +124,7 @@
 			<div>STATUS</div>
 			<div></div>
 		</div>
-		{#each visible as row}
+		{#each visible as row (row.email)}
 			<div
 				class="grid grid-cols-[24px_1fr_1fr_140px_100px_120px_24px] items-center gap-2 border-b border-border px-3.5 py-2.5 text-caption last:border-b-0"
 			>

@@ -2,6 +2,7 @@
 	import { invalidate } from '$app/navigation';
 	import { GripVertical, Pencil, Plus, Trash2, Users } from '@lucide/svelte';
 	import { dndzone, type DndEvent } from 'svelte-dnd-action';
+	import type { EventAgendaItem } from '@crownshy/api-client/api';
 	import { flip } from 'svelte/animate';
 
 	let { data } = $props();
@@ -58,7 +59,7 @@
 		{ id: newId(), kind: 'basic', title: 'Closing reflection', description: '', estimated_time: 10 }
 	];
 
-	function fromAgenda(agenda: any[] | undefined): Row[] {
+	function fromAgenda(agenda: EventAgendaItem[] | null | undefined): Row[] {
 		if (!agenda?.length) return [];
 		const out: Row[] = [];
 		for (const item of agenda) {

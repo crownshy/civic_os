@@ -6,6 +6,7 @@
 	import { Button } from '@civicos/shared/ui/button';
 	import { ArrowLeft, AlertCircle } from '@lucide/svelte';
 	import { createHostSchema, type CreateHostMessage } from './create-host-schema';
+	import { resolve } from '$app/paths';
 
 	let { data } = $props();
 
@@ -42,7 +43,7 @@
 <div class="min-h-0 flex-1 overflow-y-auto">
 	<div class="mx-auto max-w-3xl p-6 sm:p-8">
 		<a
-			href="/sysadmin/hosts"
+			href={resolve('/sysadmin/hosts')}
 			class="mb-4 inline-flex items-center gap-1.5 text-body text-muted-foreground hover:text-foreground"
 		>
 			<ArrowLeft class="size-4" />
@@ -202,7 +203,7 @@
 				<Button type="submit" disabled={$submitting}>
 					{$submitting ? 'Creating…' : 'Create Host'}
 				</Button>
-				<Button href="/sysadmin/hosts" variant="outline" type="button">Cancel</Button>
+				<Button href={resolve('/sysadmin/hosts')} variant="outline" type="button">Cancel</Button>
 			</div>
 		</form>
 	</div>

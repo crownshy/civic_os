@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { ArrowRight, CalendarDays } from '@lucide/svelte';
 	import type { ConversationStatus } from '$lib/conversations';
+	import { resolve } from '$app/paths';
 
 	let { data } = $props();
 
@@ -33,7 +34,7 @@
 		<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
 			{#each data.conversations as conv (conv.id)}
 				<a
-					href={`/c/${conv.slug}/overview`}
+					href={resolve('/c/[slug]/overview', { slug: conv.slug })}
 					class="group flex flex-col gap-4 rounded-xl border border-border p-5 transition-colors hover:border-foreground/20 hover:bg-muted/30"
 				>
 					<div class="flex items-start justify-between gap-2">

@@ -23,7 +23,8 @@
 	import { Button } from '@civicos/shared/ui/button';
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import UploadRecordingModal from '$lib/components/UploadRecordingModal.svelte';
-	import { page, navigating } from '$app/state';
+	import { navigating } from '$app/state';
+	import { resolve } from '$app/paths';
 
 	let { data } = $props();
 
@@ -173,7 +174,11 @@
 				{/snippet}
 
 				<a
-					href={`${page.url}/${rec.id}`}
+					href={resolve('/c/[slug]/events/[eventSlug]/recordings/[recordingID]', {
+						slug: data.campaign.slug,
+						eventSlug: eventId,
+						recordingID: rec.id
+					})}
 					class={cardVariants({
 						tone,
 						class: `block transition-opacity ${pending ? 'pointer-events-none opacity-60' : ''} ${i === 0 ? 'bg-muted' : ''}`

@@ -9,8 +9,6 @@
 	type Variant = 'consensus' | 'difference' | 'uncertainty' | 'neutral';
 
 	interface Props {
-		/** Accepted for call-site convenience; the "#" cell shows the Polis tid. */
-		index?: number;
 		comment: ReportComment;
 		groups: ReportGroup[];
 		variant?: Variant;

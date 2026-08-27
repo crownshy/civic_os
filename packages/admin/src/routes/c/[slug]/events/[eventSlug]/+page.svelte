@@ -7,6 +7,7 @@
 	import { Label } from '@civicos/shared/ui/label';
 	import * as ToggleGroup from '@civicos/shared/ui/toggle-group';
 	import { Check, Copy, MapPin, Monitor, Trash2 } from '@lucide/svelte';
+	import { resolve } from '$app/paths';
 
 	let { data } = $props();
 
@@ -210,7 +211,7 @@
 				params: { conversation_id: campaign.id, event_id: event.id }
 			});
 			deleteOpen = false;
-			await goto(`/c/${campaign.slug}/events`, { invalidateAll: true });
+			await goto(resolve(`/c/${campaign.slug}/events`), { invalidateAll: true });
 		} catch (e) {
 			console.error('DeleteEvent failed', e);
 			error = 'Delete failed.';

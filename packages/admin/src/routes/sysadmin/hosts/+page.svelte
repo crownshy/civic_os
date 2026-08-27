@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Building2, Plus, CheckCircle2 } from '@lucide/svelte';
 	import { Button } from '@civicos/shared/ui/button';
+	import { resolve } from '$app/paths';
 
 	let { data } = $props();
 
@@ -58,7 +59,7 @@
 						<tr class="border-b border-border last:border-b-0 hover:bg-muted/30">
 							<td class="px-4 py-3 text-body font-semibold">
 								<a
-									href={`/sysadmin/hosts/${org.id}`}
+									href={resolve('/sysadmin/hosts/[id]', { id: org.id })}
 									class="underline-offset-2 hover:text-primary hover:underline"
 								>
 									{org.name}
