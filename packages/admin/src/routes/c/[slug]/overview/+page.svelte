@@ -12,13 +12,16 @@
 	import CoHostsCard from './CoHostsCard.svelte';
 	import AddCoHostsDialog from './AddCoHostsDialog.svelte';
 	import DemographicsCard from '$lib/components/setup/DemographicsCard.svelte';
+	import CheckpointsCard from '$lib/components/setup/CheckpointsCard.svelte';
 	import {
 		readCustomDemographics,
 		readDemographicToggles,
 		type CustomDemographicCategory,
 		type DemographicKey
 	} from '$lib/config/demographics';
+	import { readCheckpointToggles, type CheckpointKey } from '$lib/config/checkpoints';
 	import ContextCard from './ContextCard.svelte';
+	import RichTextEditor from '$lib/components/RichTextEditor.svelte';
 	import { setupSchema } from './setup-schema';
 
 	let { data } = $props();
@@ -163,6 +166,12 @@
 
 	const removeCustomDemographic = (key: string) =>
 		patchMetadata({ customDemographics: customDemographics.filter((c) => c.key !== key) });
+
+	// Same interim metadata storage as demographics, same whole-key write.
+	const checkpoints = $derived(readCheckpointToggles(conversation?.metadata));
+
+	const setCheckpoint = (key: CheckpointKey, next: boolean) =>
+		patchMetadata({ checkpoints: { ...checkpoints, [key]: next } });
 </script>
 
 {#snippet titleField()}
@@ -184,12 +193,18 @@
 	<Form.Field {form} name="description">
 		<Form.Control>
 			{#snippet children({ props })}
-				<textarea
-					{...props}
-					bind:value={$formData.description}
-					rows="4"
-					class="w-full rounded-[10px] border border-stone-300 bg-transparent px-3 py-2 text-paragraph focus:border-primary focus:outline-none"
-				></textarea>
+				<!-- Tiptap owns a contenteditable, not an <input>, so formsnap's control
+				     attributes are forwarded onto that element rather than spread here. -->
+				<RichTextEditor
+					value={$formData.description}
+					onChange={(html) => ($formData.description = html)}
+					attributes={{
+						id: props.id,
+						'aria-describedby': props['aria-describedby'],
+						'aria-invalid': props['aria-invalid'],
+						'aria-required': props['aria-required']
+					}}
+				/>
 			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors class="mt-1 text-caption" />
@@ -241,6 +256,18 @@
 			onToggleCustom={toggleCustomDemographic}
 			onAddCustom={addCustomDemographic}
 			onRemoveCustom={removeCustomDemographic}
+		/>
+
+		<!-- ===== Checkpoint CTAs =====
+		     The four prompts civicos interleaves into the swipe flow every 10
+		     votes. Stored alongside demographics in conversation.metadata; civicos
+		     still hardcodes its own list, so this does not change the poll yet
+		     (#398). -->
+		<CheckpointsCard
+			title="Checkpoint Prompts"
+			subtitle="Participants are shown one of these between rounds of voting. Turn off any you don't want to ask for."
+			toggles={checkpoints}
+			onToggle={setCheckpoint}
 		/>
 
 		<!-- ===== Context for Participants ===== -->

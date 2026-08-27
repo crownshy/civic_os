@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Trash2 } from '@lucide/svelte';
 	import SetupCard from './SetupCard.svelte';
+	import ToggleRow from './ToggleRow.svelte';
 	import AddDemographicCategoryDialog from './AddDemographicCategoryDialog.svelte';
 	import {
 		DEMOGRAPHIC_CATEGORIES,
@@ -62,9 +62,6 @@
 			pending = { ...pending, [key]: false };
 		}
 	}
-
-	const toggle = (key: DemographicKey, current: boolean) =>
-		run(key, () => onToggle!(key, !current));
 </script>
 
 <SetupCard {title} {subtitle}>
@@ -84,78 +81,27 @@
 		<div class="divide-y divide-border">
 			{#each DEMOGRAPHIC_CATEGORIES as category (category.key)}
 				{@const on = toggles[category.key]}
-				<div
-					class="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)_auto] items-center gap-4 px-2 py-5 {on
-						? ''
-						: 'opacity-50'}"
-				>
-					<div class="text-body font-bold">{category.name}</div>
-					<div class="text-body font-medium">{category.options.join(', ')}</div>
-					<div class="flex items-center justify-end gap-3">
-						<button
-							type="button"
-							role="switch"
-							aria-checked={on}
-							aria-label={`Toggle ${category.name}`}
-							disabled={!editable || pending[category.key]}
-							onclick={() => toggle(category.key, on)}
-							class="relative h-5 w-9 shrink-0 cursor-pointer rounded-full transition-colors disabled:cursor-not-allowed {on
-								? 'bg-primary'
-								: 'bg-muted-foreground/30'}"
-						>
-							<span
-								class="absolute top-1 size-3 rounded-full bg-white transition-all {on
-									? 'left-5'
-									: 'left-1'}"
-							></span>
-						</button>
-						<span class="w-7 text-body font-bold">{on ? 'On' : 'Off'}</span>
-					</div>
-				</div>
+				<ToggleRow
+					name={category.name}
+					detail={category.options.join(', ')}
+					{on}
+					disabled={!editable || pending[category.key]}
+					onToggle={() => run(category.key, () => onToggle!(category.key, !on))}
+				/>
 			{/each}
 
 			{#each custom as category (category.key)}
 				{@const on = category.enabled}
-				<div
-					class="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)_auto] items-center gap-4 px-2 py-5 {on
-						? ''
-						: 'opacity-50'}"
-				>
-					<div class="text-body font-bold">{category.name}</div>
-					<div class="text-body font-medium">{category.options.join(', ')}</div>
-					<div class="flex items-center justify-end gap-3">
-						{#if onRemoveCustom}
-							<button
-								type="button"
-								onclick={() => run(category.key, () => onRemoveCustom!(category.key))}
-								disabled={pending[category.key]}
-								aria-label={`Delete ${category.name}`}
-								title="Delete this category"
-								class="cursor-pointer p-1 text-muted-foreground hover:text-destructive disabled:cursor-not-allowed disabled:opacity-40"
-							>
-								<Trash2 class="size-4" />
-							</button>
-						{/if}
-						<button
-							type="button"
-							role="switch"
-							aria-checked={on}
-							aria-label={`Toggle ${category.name}`}
-							disabled={!onToggleCustom || pending[category.key]}
-							onclick={() => run(category.key, () => onToggleCustom!(category.key, !on))}
-							class="relative h-5 w-9 shrink-0 cursor-pointer rounded-full transition-colors disabled:cursor-not-allowed {on
-								? 'bg-primary'
-								: 'bg-muted-foreground/30'}"
-						>
-							<span
-								class="absolute top-1 size-3 rounded-full bg-white transition-all {on
-									? 'left-5'
-									: 'left-1'}"
-							></span>
-						</button>
-						<span class="w-7 text-body font-bold">{on ? 'On' : 'Off'}</span>
-					</div>
-				</div>
+				<ToggleRow
+					name={category.name}
+					detail={category.options.join(', ')}
+					{on}
+					disabled={!onToggleCustom || pending[category.key]}
+					onToggle={() => run(category.key, () => onToggleCustom!(category.key, !on))}
+					onRemove={onRemoveCustom
+						? () => run(category.key, () => onRemoveCustom(category.key))
+						: undefined}
+				/>
 			{/each}
 		</div>
 
