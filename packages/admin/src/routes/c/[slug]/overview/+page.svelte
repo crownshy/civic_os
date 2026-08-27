@@ -12,14 +12,14 @@
 	import CoHostsCard from './CoHostsCard.svelte';
 	import AddCoHostsDialog from './AddCoHostsDialog.svelte';
 	import DemographicsCard from '$lib/components/setup/DemographicsCard.svelte';
-	import CheckpointsCard from '$lib/components/setup/CheckpointsCard.svelte';
+	import ParticipantAsksCard from '$lib/components/setup/ParticipantAsksCard.svelte';
 	import {
 		readCustomDemographics,
 		readDemographicToggles,
 		type CustomDemographicCategory,
 		type DemographicKey
 	} from '$lib/config/demographics';
-	import { readCheckpointToggles, type CheckpointKey } from '$lib/config/checkpoints';
+	import { readAskToggles, type AskKey } from '$lib/config/participant-asks';
 	import ContextCard from './ContextCard.svelte';
 	import RichTextEditor from '$lib/components/RichTextEditor.svelte';
 	import { setupSchema } from './setup-schema';
@@ -168,10 +168,10 @@
 		patchMetadata({ customDemographics: customDemographics.filter((c) => c.key !== key) });
 
 	// Same interim metadata storage as demographics, same whole-key write.
-	const checkpoints = $derived(readCheckpointToggles(conversation?.metadata));
+	const asks = $derived(readAskToggles(conversation?.metadata));
 
-	const setCheckpoint = (key: CheckpointKey, next: boolean) =>
-		patchMetadata({ checkpoints: { ...checkpoints, [key]: next } });
+	const setAsk = (key: AskKey, next: boolean) =>
+		patchMetadata({ participantAsks: { ...asks, [key]: next } });
 </script>
 
 {#snippet titleField()}
@@ -258,16 +258,17 @@
 			onRemoveCustom={removeCustomDemographic}
 		/>
 
-		<!-- ===== Checkpoint CTAs =====
-		     The four prompts civicos interleaves into the swipe flow every 10
-		     votes. Stored alongside demographics in conversation.metadata; civicos
-		     still hardcodes its own list, so this does not change the poll yet
-		     (#398). -->
-		<CheckpointsCard
-			title="Checkpoint Prompts"
-			subtitle="Participants are shown one of these between rounds of voting. Turn off any you don't want to ask for."
-			toggles={checkpoints}
-			onToggle={setCheckpoint}
+		<!-- ===== Participant Asks =====
+		     One switch per ask, governing both surfaces civicos shows it on: the
+		     mid-poll checkpoint screen and the end-page CTA card. They already
+		     share a completion flag per ask, so they are one ask shown twice.
+		     Stored alongside demographics in conversation.metadata; civicos still
+		     hardcodes both lists, so this does not change the poll yet (#398). -->
+		<ParticipantAsksCard
+			title="Participant Asks"
+			subtitle="What we ask participants for besides their votes. Each one shows up while they vote and again on the thank-you page. Turn off any you don't want to ask for."
+			toggles={asks}
+			onToggle={setAsk}
 		/>
 
 		<!-- ===== Context for Participants ===== -->

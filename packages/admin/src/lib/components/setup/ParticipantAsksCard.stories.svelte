@@ -1,17 +1,17 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import CheckpointsCard from '$lib/components/setup/CheckpointsCard.svelte';
-	import { DEFAULT_CHECKPOINT_TOGGLES } from '$lib/config/checkpoints';
+	import ParticipantAsksCard from '$lib/components/setup/ParticipantAsksCard.svelte';
+	import { DEFAULT_ASK_TOGGLES } from '$lib/config/participant-asks';
 
 	const { Story } = defineMeta({
-		title: 'Setup/CheckpointsCard',
-		component: CheckpointsCard,
+		title: 'Setup/ParticipantAsksCard',
+		component: ParticipantAsksCard,
 		tags: ['autodocs'],
 		args: {
-			title: 'Checkpoint Prompts',
+			title: 'Participant Asks',
 			subtitle:
-				"Participants are shown one of these between rounds of voting. Turn off any you don't want to ask for.",
-			toggles: DEFAULT_CHECKPOINT_TOGGLES,
+				'What we ask participants for besides their votes. Each one shows up while they vote and again on the thank-you page.',
+			toggles: DEFAULT_ASK_TOGGLES,
 			onToggle: async () => {}
 		}
 	});

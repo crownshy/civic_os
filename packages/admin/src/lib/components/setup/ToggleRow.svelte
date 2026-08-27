@@ -6,6 +6,8 @@
 		name: string;
 		/** Middle column: whatever the card lists, options or a description. */
 		detail: string;
+		/** Dimmer second line under `detail`, for where the thing shows up. */
+		note?: string;
 		on: boolean;
 		/** Read-only cards, and rows with a write in flight, pass true. */
 		disabled?: boolean;
@@ -14,7 +16,7 @@
 		onRemove?: () => void;
 	}
 
-	let { name, detail, on, disabled = false, onToggle, onRemove }: Props = $props();
+	let { name, detail, note, on, disabled = false, onToggle, onRemove }: Props = $props();
 </script>
 
 <div
@@ -23,7 +25,12 @@
 		: 'opacity-50'}"
 >
 	<div class="text-body font-bold">{name}</div>
-	<div class="text-body font-medium">{detail}</div>
+	<div>
+		<div class="text-body font-medium">{detail}</div>
+		{#if note}
+			<div class="mt-1 text-body text-muted-foreground">{note}</div>
+		{/if}
+	</div>
 	<div class="flex items-center justify-end gap-3">
 		{#if onRemove}
 			<button

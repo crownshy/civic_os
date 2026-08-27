@@ -1,19 +1,15 @@
 <script lang="ts">
 	import SetupCard from './SetupCard.svelte';
 	import ToggleRow from './ToggleRow.svelte';
-	import {
-		CHECKPOINT_CTAS,
-		type CheckpointKey,
-		type CheckpointToggles
-	} from '$lib/config/checkpoints';
+	import { PARTICIPANT_ASKS, type AskKey, type AskToggles } from '$lib/config/participant-asks';
 
 	interface Props {
 		title: string;
 		subtitle: string;
-		/** Current on/off state, read from conversation.metadata.checkpoints. */
-		toggles: CheckpointToggles;
+		/** Current on/off state, read from conversation.metadata.participantAsks. */
+		toggles: AskToggles;
 		/** Persist a single change. Omit to render read-only. */
-		onToggle?: (key: CheckpointKey, next: boolean) => Promise<void>;
+		onToggle?: (key: AskKey, next: boolean) => Promise<void>;
 	}
 
 	let { title, subtitle, toggles, onToggle }: Props = $props();
@@ -48,20 +44,21 @@
 		<div
 			class="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)_auto] gap-4 px-2 pb-2 text-caption font-semibold text-muted-foreground uppercase"
 		>
-			<div>Prompt</div>
+			<div>Ask</div>
 			<div>What participants see</div>
 			<div class="text-right">Status</div>
 		</div>
 
 		<div class="divide-y divide-border">
-			{#each CHECKPOINT_CTAS as cta (cta.key)}
-				{@const on = toggles[cta.key]}
+			{#each PARTICIPANT_ASKS as ask (ask.key)}
+				{@const on = toggles[ask.key]}
 				<ToggleRow
-					name={cta.name}
-					detail={cta.description}
+					name={ask.name}
+					detail={ask.description}
+					note={ask.surfaces}
 					{on}
-					disabled={!editable || pending[cta.key]}
-					onToggle={() => run(cta.key, () => onToggle!(cta.key, !on))}
+					disabled={!editable || pending[ask.key]}
+					onToggle={() => run(ask.key, () => onToggle!(ask.key, !on))}
 				/>
 			{/each}
 		</div>
