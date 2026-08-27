@@ -110,8 +110,16 @@
 	{/each}
 </nav>
 
+<!-- SvelteKit reuses page components across a param change, so switching
+     Conversations left the previous one's init-once state on screen: superForm's
+     working copy on Setup, filters and dialogs on the Open Poll tabs. Keying on
+     the Conversation remounts the tab so all of it re-seeds from the new `data`.
+     Keyed on the id, not the slug, because renaming a slug navigates too and
+     must not tear the editor down mid-edit. -->
 {#if pendingTab}
 	<ConversationTabSkeleton tab={pendingTab} />
 {:else}
-	{@render children?.()}
+	{#key campaign.id}
+		{@render children?.()}
+	{/key}
 {/if}

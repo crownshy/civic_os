@@ -36,6 +36,7 @@
 		/>
 		<Input
 			type="search"
+			data-search-field
 			bind:value={search}
 			placeholder="Search by name"
 			aria-label="Search Campaigns by name"
@@ -80,3 +81,11 @@
 		</ToggleGroupItem>
 	</ToggleGroup>
 </div>
+
+<style>
+	/* WebKit draws its own clear affordance on type="search" and we render one
+	   that matches the kit. :global because the input is inside <Input>. */
+	:global(input[data-search-field]::-webkit-search-cancel-button) {
+		display: none;
+	}
+</style>
