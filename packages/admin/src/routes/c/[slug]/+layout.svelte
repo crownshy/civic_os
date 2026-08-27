@@ -1,13 +1,34 @@
 <script lang="ts">
 	import { page, navigating } from '$app/state';
+	import { invalidate } from '$app/navigation';
 	import ConversationTabSkeleton from '$lib/components/skeletons/ConversationTabSkeleton.svelte';
+	import LiveToggle from './LiveToggle.svelte';
 	import { resolve } from '$app/paths';
 
 	let { data, children } = $props();
 
 	const campaign = $derived(data.campaign);
+	const conversation = $derived(data.conversation);
 	const title = $derived(campaign.title);
-	const isLive = $derived(campaign.status === 'live');
+	// Prefer the Conversation's own flag; `status` is the summary's stale-by-a-load
+	// copy of it, and only stands in when the conversation did not resolve.
+	const isLive = $derived(conversation ? conversation.isLive : campaign.status === 'live');
+
+	// Where participants actually land. civicos resolves a Campaign from the
+	// SUBDOMAIN, not from a path segment: there is no `/<slug>` route, so the
+	// region root IS the Campaign's site. Empty for Campaigns with no legacy
+	// region entry, which have no participant site at all yet.
+	const publicUrl = $derived(campaign.shareUrl?.replace(/\/$/, '') ?? '');
+
+	/** Same write the Open Poll Status card makes, so the two cannot disagree. */
+	async function setLive(next: boolean) {
+		await data.api.UpdateConversation(
+			{ is_live: next },
+			{ params: { conversation_id: campaign.id } }
+		);
+		await invalidate(`campaign:${page.params.slug}`);
+		await invalidate('app:conversations');
+	}
 
 	// Main conversation tabs
 	const tabs = [
@@ -42,20 +63,31 @@
 		{title}
 	</h1>
 	<div class="flex max-w-full shrink-0 items-center gap-1 overflow-hidden font-ui">
-		{#if isLive}
-			<span class="shrink-0 bg-success px-2 py-0.5 text-caption font-medium text-white">
-				LIVE
-			</span>
-		{/if}
-		{#if campaign.shareUrl}
+		<LiveToggle {isLive} onToggle={setLive} />
+		{#if publicUrl}
+			<!-- Absolute participant-app URL on another host, so there is no SvelteKit
+			     route for resolve() to check it against. -->
+			<!-- eslint-disable svelte/no-navigation-without-resolve -->
 			<a
-				href={campaign.shareUrl}
+				href={publicUrl}
 				target="_blank"
 				rel="noopener noreferrer"
+				title="Open the participant site in a new tab"
 				class="truncate bg-primary/10 px-2 py-0.5 text-caption font-medium text-primary underline"
 			>
-				{campaign.shareUrl.replace(/^https?:\/\//, '')} ↗
+				{publicUrl.replace(/^https?:\/\//, '')} ↗
 			</a>
+			<!-- eslint-enable svelte/no-navigation-without-resolve -->
+		{:else}
+			<!-- Rendering nothing here made a backend-created Campaign look like it
+			     had a site we just weren't linking. It has none until it gets a
+			     regions.ts entry. -->
+			<span
+				class="shrink-0 px-2 py-0.5 text-caption font-medium text-muted-foreground"
+				title="civicos resolves Campaigns by subdomain, so this one needs a regions.ts entry before participants can reach it."
+			>
+				No participant site yet
+			</span>
 		{/if}
 	</div>
 </header>

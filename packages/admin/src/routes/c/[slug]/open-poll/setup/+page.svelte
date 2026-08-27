@@ -21,10 +21,12 @@
 	// Same fallback the header badge uses when the conversation didn't resolve.
 	const isLive = $derived(conversation ? conversation.isLive : campaign.status === 'live');
 
-	// Empty for Campaigns with no legacy region entry: they have no public URL yet.
+	// The poll lives at /contribute, not /poll: civicos has no `/poll` route, so
+	// the old link 404'd. Empty for Campaigns with no legacy region entry, which
+	// have no participant site at all yet.
 	const pollUrl = $derived(
 		campaign.shareUrl
-			? `${campaign.shareUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}/poll`
+			? `${campaign.shareUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}/contribute`
 			: ''
 	);
 
@@ -40,6 +42,8 @@
 			{ params: { conversation_id: campaign.id } }
 		);
 		await invalidate(`campaign:${page.params.slug}`);
+		// The sidebar's status dot reads the permitted list, not this page's data.
+		await invalidate('app:conversations');
 	}
 
 	const stepId = $derived(campaign.polisWorkflowStepId);
