@@ -36,15 +36,14 @@ export const load: LayoutServerLoad = async ({ params, parent, cookies, url, dep
 			return null;
 		});
 
-	// `regions.ts` hardcodes the Polis step per region; comhairle exposes it on
-	// the Campaign's active workflow. Legacy regions keep using their configured
-	// value so existing deployments are untouched, and everything else resolves
-	// it from the backend. Once the configured ids are confirmed to match what
-	// the workflow reports, the region branch can go (#401, Q1.3).
+	// The Polis step carries both the id every Polis surface keys off and the
+	// `topic`, which is the Key Question on Setup. `regions.ts` hardcodes the id
+	// per region, so legacy regions keep using their configured value and only
+	// fall back to the workflow's answer, leaving existing deployments untouched
+	// (#401, Q1.3). The step is now resolved either way, because the topic is
+	// only readable from its tool config.
 	const region = regionFor(summary);
-	const polisStepPromise = region
-		? Promise.resolve(region.polis_workflow_step_id)
-		: resolvePolisWorkflowStepId(api, summary.id);
+	const polisStepPromise = resolvePolisStep(api, summary.id, region?.polis_workflow_step_id);
 
 	// The owning Host's name, shown as the contact on an Event. `regions.ts`
 	// duplicates it as `hostName`; the Conversation's organization is the real
@@ -56,7 +55,7 @@ export const load: LayoutServerLoad = async ({ params, parent, cookies, url, dep
 				.catch(() => null)
 		: Promise.resolve(null);
 
-	const [conversation, polisWorkflowStepId, hostName] = await Promise.all([
+	const [conversation, polisStep, hostName] = await Promise.all([
 		conversationPromise,
 		polisStepPromise,
 		hostNamePromise
@@ -87,23 +86,31 @@ export const load: LayoutServerLoad = async ({ params, parent, cookies, url, dep
 		placeName: summary.placeName,
 		shareUrl: summary.shareUrl,
 		hostName: hostName ?? region?.hostName ?? '',
-		polisWorkflowStepId,
+		polisWorkflowStepId: region?.polis_workflow_step_id ?? polisStep?.id ?? null,
+		// The Key Question is the Polis conversation's `topic`, edited on Setup
+		// through PolisUpdateConfig. A legacy region's hardcoded `question` is
+		// only the fallback now, for Campaigns whose Polis step did not resolve.
+		keyQuestion: polisStep?.topic ?? region?.question ?? '',
 		// Still sourced from `regions.ts`, because the Conversation model has
-		// nowhere to put them yet: the public participant URL, the key question
-		// shown on Setup, and the zip prefixes that scope the participants county
-		// rollup. Campaigns without a region entry render without them (#401).
-		zipPrefixes: region?.zipPrefixes ?? [],
-		keyQuestion: region?.question ?? ''
+		// nowhere to put them yet: the public participant URL and the zip
+		// prefixes that scope the participants county rollup. Campaigns without a
+		// region entry render without them (#401).
+		zipPrefixes: region?.zipPrefixes ?? []
 	};
 
 	return { campaign, conversation, textContent };
 };
 
 /**
- * The workflow step wrapping this Campaign's Polis poll. Insights and the Open
- * Poll surfaces key everything off this id.
+ * The workflow step wrapping this Campaign's Polis poll: the id Insights and the
+ * Open Poll surfaces key everything off, plus the `topic` Setup renders as the
+ * Key Question.
+ *
+ * `pinnedStepId` is a legacy region's configured id. Preferring that step keeps
+ * the id and the topic pointing at the same step, rather than reading the topic
+ * off one step and writing edits against another.
  */
-async function resolvePolisWorkflowStepId(api: Api, conversationId: string) {
+async function resolvePolisStep(api: Api, conversationId: string, pinnedStepId?: string) {
 	try {
 		const workflows = await api.ListConversationWorkflows({
 			params: { conversation_id: conversationId }
@@ -114,7 +121,14 @@ async function resolvePolisWorkflowStepId(api: Api, conversationId: string) {
 		const steps = await api.ListConversationWorkflowSteps({
 			params: { conversation_id: conversationId, workflow_id: workflow.id }
 		});
-		return steps.find((step) => step.toolConfig?.type === 'polis')?.id ?? null;
+		const isPolis = (step: (typeof steps)[number]) => step.toolConfig?.type === 'polis';
+		const step = steps.find((s) => s.id === pinnedStepId && isPolis(s)) ?? steps.find(isPolis);
+		if (!step) return null;
+
+		return {
+			id: step.id,
+			topic: step.toolConfig?.type === 'polis' ? (step.toolConfig.topic ?? null) : null
+		};
 	} catch (e) {
 		console.warn('Resolving the Polis workflow step failed', e);
 		return null;

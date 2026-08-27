@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import { invalidate } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import { page } from '$app/state';
+	import { resolve } from '$app/paths';
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4, zod4Client } from 'sveltekit-superforms/adapters';
 	import * as Form from '@civicos/shared/ui/form';
@@ -20,9 +21,11 @@
 		type DemographicKey
 	} from '$lib/config/demographics';
 	import { readAskToggles, type AskKey } from '$lib/config/participant-asks';
+	import { routeSlugFor } from '$lib/conversations';
 	import ContextCard from './ContextCard.svelte';
 	import RichTextEditor from '$lib/components/RichTextEditor.svelte';
 	import { setupSchema } from './setup-schema';
+	import { describeApiFailure } from '$lib/api/describe-failure';
 
 	let { data } = $props();
 
@@ -46,16 +49,25 @@
 	const cohosts = $derived(data.cohosts);
 	let addCohostsOpen = $state(false);
 
-	// --- Editable fields (Title + Basic Description) ---------------------------
-	// Conversation.title/description are TextContentId (UUID) references, not text
-	// columns, so edits go through the translations subsystem, not
-	// UpdateConversation (which 422s on plain strings). Each field is written with
-	// CreateOrUpdateTextTranslation against its text_content_id in the
-	// conversation's primary_locale (resolved in +layout.server.ts as
-	// data.textContent). SPA superforms with debounced auto-save; only the field
-	// that actually changed is written, then a scoped invalidate refreshes the
-	// public-facing strings. See #391.
-	type Field = 'title' | 'description';
+	// --- Editable fields -------------------------------------------------------
+	// One SPA superform, three destinations, because no two of these fields live
+	// in the same place on the backend:
+	//
+	//   title, description  TextContentId (UUID) references, not text columns, so
+	//                       edits go through CreateOrUpdateTextTranslation against
+	//                       each field's text_content_id in the conversation's
+	//                       primary_locale (resolved in +layout.server.ts as
+	//                       data.textContent). UpdateConversation 422s on plain
+	//                       strings here. See #391.
+	//   keyQuestion         the `topic` of the Polis conversation behind this
+	//                       Campaign's Polis workflow step, via PolisUpdateConfig.
+	//   slug                a real Conversation column, via UpdateConversation.
+	//
+	// The first three auto-save on a debounce and only write the fields that
+	// actually changed, then a scoped invalidate refreshes the public-facing
+	// strings. Slug is the exception and commits on blur; see `saveSlug`.
+	type DebouncedField = 'title' | 'description' | 'keyQuestion';
+	const DEBOUNCED_FIELDS = ['title', 'description', 'keyQuestion'] as const;
 	type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 	let saveStatus = $state<SaveStatus>('idle');
 	let debounce: ReturnType<typeof setTimeout> | undefined;
@@ -66,20 +78,27 @@
 	// last-persisted value per field so we only re-write what changed.
 	const initialFields = untrack(() => ({
 		title: data.conversation?.title ?? data.campaign.title,
-		description: data.conversation?.description ?? ''
+		description: data.conversation?.description ?? '',
+		slug: data.conversation?.slug ?? data.campaign.slug,
+		keyQuestion: data.campaign.keyQuestion
 	}));
-	const saved: Record<Field, string> = { ...initialFields };
+	const saved: Record<DebouncedField | 'slug', string> = { ...initialFields };
 
 	const form = superForm(defaults(initialFields, zod4(setupSchema)), {
 		SPA: true,
 		validators: zod4Client(setupSchema),
-		onChange() {
+		onChange(event) {
+			// The slug is the public URL and the `/c/<slug>` route segment, so it
+			// commits on blur (see `saveSlug`) instead of mid-typing: auto-saving it
+			// would publish every half-typed value and bounce the admin route along
+			// with it.
+			if (event.paths.length === 1 && event.paths[0] === 'slug') return;
 			clearTimeout(debounce);
 			saveStatus = 'idle';
 			debounce = setTimeout(save, 700);
 		}
 	});
-	const { form: formData, validateForm } = form;
+	const { form: formData, errors, validateForm } = form;
 
 	async function save() {
 		const result = await validateForm({ update: true });
@@ -89,41 +108,107 @@
 		}
 
 		// Only the fields whose value actually changed since the last save.
-		const changed = (['title', 'description'] as const).filter(
-			(key) => result.data[key] !== saved[key]
-		);
+		const changed = DEBOUNCED_FIELDS.filter((key) => result.data[key] !== saved[key]);
 		if (changed.length === 0) return;
 
-		// Each changed field needs a text_content_id to write against. If one is
-		// missing (non-admin, or the conversation didn't resolve on this backend)
-		// there's nothing to persist to, so surface that rather than silently drop.
-		const edits = changed
-			.map((key) => ({ key, target: data.textContent[key], content: result.data[key] }))
-			.filter((e): e is { key: Field; target: { id: string; locale: string }; content: string } => {
-				if (!e.target) console.error(`No text_content_id for "${e.key}"; edit not persisted.`);
-				return e.target != null;
-			});
-		if (edits.length === 0) {
+		// A field with nowhere to write to is dropped rather than written to the
+		// wrong place. Say so on the field itself: a bare "Couldn't save" cannot
+		// distinguish a Campaign that has no Polis poll from one whose save the
+		// backend refused.
+		const attempts = changed.map((key) => ({ key, to: writerFor(key, result.data[key]) }));
+		for (const a of attempts) if (typeof a.to === 'string') $errors[a.key] = [a.to];
+
+		const writes = attempts.filter(
+			(a): a is { key: DebouncedField; to: () => Promise<unknown> } => typeof a.to === 'function'
+		);
+		if (writes.length === 0) {
 			saveStatus = 'error';
 			return;
 		}
 
 		saveStatus = 'saving';
 		try {
-			await Promise.all(
-				edits.map((e) =>
-					data.api.CreateOrUpdateTextTranslation(
-						{ content: e.content },
-						{ params: { text_content_id: e.target.id, locale: e.target.locale } }
-					)
-				)
-			);
-			for (const e of edits) saved[e.key] = e.content;
-			saveStatus = edits.length === changed.length ? 'saved' : 'error';
+			await Promise.all(writes.map((w) => w.to()));
+			for (const w of writes) {
+				saved[w.key] = result.data[w.key];
+				$errors[w.key] = undefined;
+			}
+			saveStatus = writes.length === changed.length ? 'saved' : 'error';
 			await invalidate(`campaign:${page.params.slug}`);
 		} catch (e) {
-			console.error('Failed to save translations', e);
+			console.error('Failed to save setup fields', e);
+			const reason = describeApiFailure(e);
+			for (const w of writes) $errors[w.key] = [`Could not save: ${reason}`];
 			saveStatus = 'error';
+		}
+	}
+
+	/**
+	 * How one field gets written, or a sentence explaining why it cannot be. The
+	 * string case is a configuration gap, not a failed request, so it is worth
+	 * saying out loud rather than logging and rendering a generic error.
+	 */
+	function writerFor(key: DebouncedField, content: string): (() => Promise<unknown>) | string {
+		if (key === 'keyQuestion') {
+			const stepId = campaign.polisWorkflowStepId;
+			if (!stepId) return 'This Campaign has no Polis poll to write the question to.';
+			return () => data.api.PolisUpdateConfig({ workflow_step_id: stepId, topic: content });
+		}
+
+		// Missing on a non-admin session, or when the conversation didn't resolve
+		// against this backend.
+		const target = data.textContent[key];
+		if (!target) return `No translation record for "${key}" on this Campaign.`;
+		return () =>
+			data.api.CreateOrUpdateTextTranslation(
+				{ content },
+				{ params: { text_content_id: target.id, locale: target.locale } }
+			);
+	}
+
+	/**
+	 * The slug is a plain Conversation column, so unlike title/description it is
+	 * written with UpdateConversation. Renaming it moves the Campaign: the public
+	 * URL changes, and so does the `/c/<slug>` segment this page is open at,
+	 * unless a legacy `regions.ts` entry pins the route slug. Navigate to wherever
+	 * the Campaign now lives so a refresh does not 404 on the old segment.
+	 */
+	async function saveSlug() {
+		const next = $formData.slug.trim();
+		if (next === saved.slug) return;
+
+		const result = await validateForm({ update: true });
+		if (!result.valid) {
+			saveStatus = 'error';
+			return;
+		}
+
+		saveStatus = 'saving';
+		try {
+			await data.api.UpdateConversation(
+				{ slug: next },
+				{ params: { conversation_id: campaign.id } }
+			);
+		} catch (e) {
+			console.error('Failed to save slug', e);
+			$errors.slug = [`Could not save the slug: ${describeApiFailure(e)}`];
+			saveStatus = 'error';
+			return;
+		}
+
+		saved.slug = next;
+		saveStatus = 'saved';
+
+		const from = page.params.slug;
+		const to = routeSlugFor({ id: campaign.id, slug: next });
+		if (to !== from) {
+			await goto(resolve('/c/[slug]/overview', { slug: to }), {
+				replaceState: true,
+				invalidateAll: true
+			});
+		} else {
+			await invalidate(`campaign:${from}`);
+			await invalidate('app:conversations');
 		}
 	}
 
@@ -189,6 +274,49 @@
 	</Form.Field>
 {/snippet}
 
+{#snippet slugField()}
+	<Form.Field {form} name="slug">
+		<Form.Control>
+			{#snippet children({ props })}
+				<div class="flex items-center gap-1.5 text-body font-semibold">
+					{#if baseUrl}
+						<span class="shrink-0">{baseUrl}/</span>
+					{/if}
+					<!-- field-sizing-content keeps the box hugging the slug, so the row
+					     still reads as one URL rather than as a form spanning the card. -->
+					<input
+						{...props}
+						bind:value={$formData.slug}
+						onblur={saveSlug}
+						onkeydown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
+						spellcheck="false"
+						autocapitalize="off"
+						autocorrect="off"
+						class="field-sizing-content min-w-24 rounded-[10px] border border-stone-300 bg-muted px-3 py-1.5 focus:border-primary focus:outline-none"
+					/>
+				</div>
+			{/snippet}
+		</Form.Control>
+		<Form.FieldErrors class="mt-1 text-caption" />
+	</Form.Field>
+{/snippet}
+
+{#snippet keyQuestionField()}
+	<Form.Field {form} name="keyQuestion">
+		<Form.Control>
+			{#snippet children({ props })}
+				<textarea
+					{...props}
+					bind:value={$formData.keyQuestion}
+					rows="2"
+					class="field-sizing-content w-full resize-none rounded-[10px] border border-stone-300 bg-transparent px-3 py-2 text-body focus:border-primary focus:outline-none"
+				></textarea>
+			{/snippet}
+		</Form.Control>
+		<Form.FieldErrors class="mt-1 text-caption" />
+	</Form.Field>
+{/snippet}
+
 {#snippet descriptionField()}
 	<Form.Field {form} name="description">
 		<Form.Control>
@@ -230,6 +358,8 @@
 			keyQuestion={campaign.keyQuestion}
 			{places}
 			{titleField}
+			{slugField}
+			{keyQuestionField}
 		/>
 
 		<!-- ===== Co-Hosts ===== -->

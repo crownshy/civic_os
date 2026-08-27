@@ -18,6 +18,13 @@
 import type { LocalizedConversationDto } from '@crownshy/api-client/api';
 import { REGIONS, type RegionConfig } from '$lib/config/regions';
 
+/**
+ * Slugs the `/c/**` routes already use for something else. A Campaign carrying
+ * one would be shadowed by the static route and unreachable, so both the create
+ * form and the Setup rename reject them.
+ */
+export const RESERVED_ROUTE_SLUGS = ['new'] as const;
+
 /** Anything with an id and an optional backend slug can be routed. */
 type RoutableConversation = Pick<LocalizedConversationDto, 'id'> & { slug?: string | null };
 

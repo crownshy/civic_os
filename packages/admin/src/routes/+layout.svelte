@@ -188,11 +188,11 @@
 			</div>
 
 			<div class="p-2.5">
-				<button
-					type="button"
+				<a
+					href={resolve('/c/new')}
 					title="New Conversation"
 					class={[
-						'inline-flex items-center gap-1 rounded-xl text-caption font-medium text-muted-foreground outline outline-1 outline-stone-400',
+						'inline-flex items-center gap-1 rounded-xl text-caption font-medium text-muted-foreground outline outline-1 outline-stone-400 hover:text-foreground',
 						collapsed && !mobileOpen ? 'size-9 justify-center p-0' : 'p-2.5'
 					].join(' ')}
 				>
@@ -200,7 +200,7 @@
 					{#if !collapsed || mobileOpen}
 						<span>New Conversation</span>
 					{/if}
-				</button>
+				</a>
 			</div>
 
 			<div class="flex-1"></div>

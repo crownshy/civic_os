@@ -59,6 +59,31 @@ regardless of profile consent. Sourced from comhairle
 `GET /conversation/{id}/demographics/export`, which is **owner-only**
 (`conversation.owner_id == caller`) and **not** workflow-scoped.
 
+### Participant Ask
+One of the four things civicos asks an Open Poll participant for besides their
+votes: **Add a Statement**, **Collect Email**, **Ask for Feedback**, **Share with
+Friends**. Each Ask surfaces on two screens, and the Host has one switch that
+governs both:
+
+1. Mid-poll, as a `CheckpointScreen` variant, shown at every tenth vote
+   (`packages/civicos/src/routes/contribute/+page.svelte`).
+2. On the end page, as a `ThankYouScreen` CTA card.
+
+The two surfaces already share one completion flag per Ask
+(`session.emailProvided`, `endCtaShareCompleted`, `endCtaReviewCompleted`), so
+they are the same Ask shown twice, not two features. The mid-poll checkpoint
+skips an Ask whose flag is set; the end-page card does not, it dims and shows a
+checkmark. `Add a Statement` has no end-page card (composing lives in the vote
+bar), and the end page's "Join a Conversation." card is not an Ask and has no
+switch.
+
+_Avoid_: "checkpoint" for the Ask itself. A **Checkpoint** is the mid-poll screen,
+one of the two places an Ask appears. Host-facing UI says Ask.
+
+Toggles live in `conversation.metadata.participantAsks` (interim storage, same as
+demographics) and are read by `packages/admin/src/lib/config/participant-asks.ts`.
+civicos does not read them yet (#398).
+
 ### Conversation
 A single Polis-style deliberation. Owned by comhairle (`Conversation` model:
 `id`, `title`, `description`, `slug`, `faqs`, `is_live`, `organization_id`, …).
@@ -73,6 +98,20 @@ Product-facing name for a **Conversation** (the word participants and hosts see;
 "Campaign" in host/admin-facing copy, "Conversation" when talking about the
 comhairle model. `Campaign ↔ Conversation` mirrors `Host ↔ Organization` and
 `Place ↔ Region`.
+
+**A Campaign has exactly one Polis step.** comhairle's model is more general: a
+Conversation runs a workflow of many steps (`polis`, `learn`, `heyform`,
+`stories`, `elicitationbot`), and its own frontend offers "+ Add step". Civic OS
+deliberately narrows that to the single-Polis case, so "the Campaign's poll" and
+"the Campaign's Polis step" are the same thing. Anything needing that step
+resolves it as *the polis-typed step of the active workflow*, and a second one
+is out of scope rather than handled.
+
+This is a Civic OS constraint, not a comhairle guarantee. Nothing stops a Host
+adding a second Polis step from the comhairle frontend, and comhairle is already
+tracking the consequences of two (their issue 799, on vote-progress gating keyed
+by poll id rather than step). If that becomes real, the assumption breaks here
+first.
 
 ### Host
 An **Organization** that stewards Campaigns in its community. Modeled in comhairle
@@ -144,6 +183,15 @@ user removing or demoting **themselves**. Distinct from a Campaign **participant
 ### Polis conversation
 The external Polis-side artifact identified by `polisId`. The `polis_workflow_step_id`
 links a comhairle workflow step to a Polis conversation.
+
+### Key Question
+The question a Campaign puts to its participants, shown on admin Setup. It is
+**the same value as the Polis conversation's Topic**, not a separate field:
+read from the Polis workflow step's `toolConfig.topic`, written with
+`PolisUpdateConfig({ workflow_step_id, topic })`. Comhairle's own admin edits
+it under the name **Topic**, so the two surfaces are two editors of one value.
+A legacy region's hardcoded `question` in `regions.ts` is only a fallback, for
+Campaigns whose Polis step does not resolve.
 
 ### Dev region
 A synthetic Region built at runtime from `PUBLIC_DEV_*` env vars, so a local
