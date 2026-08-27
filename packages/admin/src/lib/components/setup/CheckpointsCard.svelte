@@ -1,7 +1,11 @@
 <script lang="ts">
 	import SetupCard from './SetupCard.svelte';
 	import ToggleRow from './ToggleRow.svelte';
-	import { CHECKPOINT_CTAS, type CheckpointKey, type CheckpointToggles } from '$lib/config/checkpoints';
+	import {
+		CHECKPOINT_CTAS,
+		type CheckpointKey,
+		type CheckpointToggles
+	} from '$lib/config/checkpoints';
 
 	interface Props {
 		title: string;

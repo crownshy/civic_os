@@ -49,7 +49,9 @@
 				: 'bg-muted-foreground/30'}"
 		>
 			<span
-				class="absolute top-1 size-3 rounded-full bg-white transition-all {on ? 'left-5' : 'left-1'}"
+				class="absolute top-1 size-3 rounded-full bg-white transition-all {on
+					? 'left-5'
+					: 'left-1'}"
 			></span>
 		</button>
 		<span class="w-7 text-body font-bold">{on ? 'On' : 'Off'}</span>
