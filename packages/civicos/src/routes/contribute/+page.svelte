@@ -341,6 +341,7 @@
 			countyName={session.county}
 			onBackToVoting={handleBackToVoting}
 			region={subdomainRegion}
+			whatsNext={page.data.hostCopy.whatsNext}
 		/>
 
 		<!-- Preserved screens (unused in conference flow) -->

@@ -8,6 +8,8 @@
 	import { session } from '$lib/services/session.svelte';
 	import { Mail, MessageSquare } from 'lucide-svelte';
 	import { fade } from 'svelte/transition';
+	import { safeHref, sanitizeHostHtml } from '@civicos/shared/sanitize';
+	import { listSeparator } from '$lib/utils/list';
 
 	const region: RegionConfig = page.data.region;
 
@@ -27,16 +29,6 @@
 	function isValidEmail(value: string): boolean {
 		return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 	}
-
-	// Build a comma-separated linked list of partners, ending with "and" — replaces the old
-	// `region.fullHosts` HTML string. Order follows whatever the region config lists.
-	const partnersHtml = (() => {
-		const links = region.partners.map((p) => `<a href='${p.url}'>${p.name}</a>`);
-		if (links.length === 0) return '';
-		if (links.length === 1) return `${links[0]}.`;
-		if (links.length === 2) return `${links[0]} and ${links[1]}.`;
-		return `${links.slice(0, -1).join(', ')}, and ${links[links.length - 1]}.`;
-	})();
 
 	const emailHref = `mailto:?subject=${encodeURIComponent('Make your voice heard on the impact of AI. I did!')}&body=${encodeURIComponent(`Hi ___, I just filled out this short poll about managing AI impact in ${region.stateName} — it was fast, and it actually made me think. Since this stuff is going to affect all of us, I figured you might want to share your perspective too. Here's the link: ${region.shareUrl}`)}`;
 	const smsHref = `sms:?body=${encodeURIComponent(`I just did this quick poll about managing AI in ${region.stateName}. It only took a couple of minutes — thought you might want to weigh in too. ${region.shareUrl}`)}`;
@@ -138,11 +130,18 @@
 				>
 					Your Hosts
 				</h2>
-				<p class="text-md mb-6 font-sans leading-5 font-medium text-muted-foreground">
+				<p
+					class="text-md mb-6 font-sans leading-5 font-medium text-muted-foreground [&_a]:font-bold [&_a]:underline"
+				>
+					<!-- The linked partner list replaces the old `region.fullHosts` HTML
+						string. Order follows the region config, and the anchors are markup
+						so a Partner's name and url are never interpolated. -->
 					{#if region.campaignPageHosts}
-						{@html region.campaignPageHosts}
+						{@html sanitizeHostHtml(region.campaignPageHosts)}
 					{:else}
-						Hosted by {@html partnersHtml}
+						Hosted by {#each region.partners as partner, i (partner.url)}<a
+								href={safeHref(partner.url)}>{partner.name}</a
+							>{listSeparator(i, region.partners.length)}{/each}.
 					{/if}
 				</p>
 				<a href={region.hostUrl} target="_blank" rel="noopener noreferrer">

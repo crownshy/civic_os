@@ -1,32 +1,6 @@
-/**
- * Conversation.description was a plain-text field before Setup grew a rich-text
- * editor, and existing rows are still plain text with newlines. Anything that
- * edits or renders the field normalizes through here first: HTML passes
- * straight through, plain text gets escaped and given paragraph structure so a
- * legacy value does not collapse onto one line.
- */
-
-const HTML_TAG = /<[a-z][a-z0-9]*\b[^>]*>/i;
-
-export function isHtml(value: string): boolean {
-	return HTML_TAG.test(value);
-}
-
-function escapeHtml(value: string): string {
-	return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
-/** Editor- and render-ready HTML for a value that may still be plain text. */
-export function toRichTextHtml(value: string): string {
-	const text = value.trim();
-	if (text === '') return '';
-	if (isHtml(text)) return text;
-
-	return text
-		.split(/\n{2,}/)
-		.map((block) => `<p>${escapeHtml(block).replace(/\n/g, '<br>')}</p>`)
-		.join('');
-}
+// The shape helpers moved to @civicos/shared so civicos can render the same
+// field. Re-exported here for the existing `$lib/utils/rich-text` imports.
+export { isHtml, toRichTextHtml } from '@civicos/shared/rich-text';
 
 /**
  * Prose styling for rich-text output. The editor's contenteditable is owned by

@@ -12,8 +12,12 @@
 	import type { RegionConfig } from '$lib/config/regions';
 	import { OPEN_POLL_EXPLAINER, FOOTER_LINKS } from '$lib/config/landing-copy';
 	import { trackEvent } from '@lukulent/svelte-umami';
+	import { safeHref, sanitizeHostHtml } from '@civicos/shared/sanitize';
+	import { HOST_COPY_PROSE_CLASS, renderHostCopy } from '$lib/config/host-copy';
+	import { listSeparator } from '$lib/utils/list';
 
 	const region: RegionConfig = page.data.region;
+	const hostCopy = page.data.hostCopy;
 	const isReturning = session.hasSession;
 
 	// --- Join (zip → /contribute) state ---
@@ -116,19 +120,6 @@
 		emailSubmitting = false;
 		emailSuccess = true;
 	}
-
-	// Comma-separated list of partner names with "and" before the last — fallback
-	// rendering for the Your Hosts section while logo carousel is deferred.
-	const partnersText = (() => {
-		const links = region.partners.map(
-			(p) =>
-				`<a href='${p.url}' target='_blank' rel='noopener noreferrer' class='underline'>${p.name}</a>`
-		);
-		if (links.length === 0) return '';
-		if (links.length === 1) return links[0];
-		if (links.length === 2) return `${links[0]} and ${links[1]}`;
-		return `${links.slice(0, -1).join(', ')}, and ${links[links.length - 1]}`;
-	})();
 </script>
 
 <svelte:head>
@@ -184,9 +175,9 @@
 					{region.heroHeader}
 				</h1>
 				<p
-					class="mt-6 text-center font-sans text-base leading-5 font-medium md:text-lg md:leading-6"
+					class="mt-6 text-center font-sans text-base leading-5 font-medium md:text-lg md:leading-6 [&_a]:text-destructive"
 				>
-					{@html region.heroBlurb}
+					{@html sanitizeHostHtml(region.heroBlurb)}
 				</p>
 
 				<div class="mt-10 flex flex-col items-center">
@@ -257,12 +248,8 @@
 	<!-- Context -->
 	<section id="context" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
 		<h2 class="font-display text-2xl font-medium md:text-3xl">Context</h2>
-		<div class="mt-6 flex flex-col gap-7">
-			{#each region.contextParagraphs as paragraph, i (i)}
-				<p class="font-sans text-base leading-6 font-medium opacity-80 md:text-lg md:leading-7">
-					{@html paragraph}
-				</p>
-			{/each}
+		<div class="mt-6 opacity-80 {HOST_COPY_PROSE_CLASS}">
+			{@html renderHostCopy(hostCopy.context)}
 		</div>
 	</section>
 
@@ -281,12 +268,22 @@
 	<!-- Your Hosts -->
 	<section id="your-host" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
 		<h2 class="font-display text-2xl font-medium md:text-3xl">Your Hosts</h2>
-		<p class="mt-6 font-sans text-base leading-6 font-medium opacity-80">
-			{@html region.hostsBlurb}
+		<p
+			class="mt-6 font-sans text-base leading-6 font-medium opacity-80 [&_a]:text-destructive [&_a]:underline"
+		>
+			{@html sanitizeHostHtml(region.hostsBlurb)}
 		</p>
-		{#if partnersText}
+		<!-- Linked partner names; fallback for the Your Hosts section while the
+			logo carousel is deferred. The anchors are markup rather than an HTML
+			string so a Partner's name and url are never interpolated. -->
+		{#if region.partners.length > 0}
 			<p class="mt-4 font-sans text-sm leading-6 font-medium opacity-70 md:text-base">
-				Your local hosts: {@html partnersText}.
+				Your local hosts: {#each region.partners as partner, i (partner.url)}<a
+						href={safeHref(partner.url)}
+						target="_blank"
+						rel="noopener noreferrer"
+						class="underline">{partner.name}</a
+					>{listSeparator(i, region.partners.length)}{/each}.
 			</p>
 		{/if}
 	</section>
@@ -294,9 +291,9 @@
 	<!-- What's Next? -->
 	<section id="whats-next" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
 		<h2 class="font-display text-2xl font-medium md:text-3xl">What's Next?</h2>
-		<p class="mt-6 font-sans text-base leading-6 font-medium opacity-80">
-			{@html region.whatsNext}
-		</p>
+		<div class="mt-6 opacity-80 [&_a]:font-bold {HOST_COPY_PROSE_CLASS}">
+			{@html renderHostCopy(hostCopy.whatsNext)}
+		</div>
 	</section>
 
 	<!-- FAQ — hide when empty -->
@@ -399,8 +396,10 @@
 <Dialog bind:open={showHostMessage} title="A Message from Your Hosts" buttonText="GO BACK">
 	<div class="px-7 pt-6">
 		{#each region.hostMessage as paragraph, i (i)}
-			<p class="mt-4 font-sans text-lg leading-7 font-medium first:mt-0">
-				{@html paragraph}
+			<p
+				class="mt-4 font-sans text-lg leading-7 font-medium first:mt-0 [&_a]:text-destructive [&_a]:underline [&_ul]:list-inside [&_ul]:list-disc"
+			>
+				{@html sanitizeHostHtml(paragraph)}
 			</p>
 		{/each}
 	</div>
@@ -409,8 +408,10 @@
 <Dialog bind:open={showAboutMessage} title="About This Conversation" buttonText="GOT IT">
 	<div class="px-7 pt-6">
 		{#each region.aboutConversation as paragraph, i (i)}
-			<p class="mt-4 font-sans text-lg leading-7 font-medium first:mt-0">
-				{@html paragraph}
+			<p
+				class="mt-4 font-sans text-lg leading-7 font-medium first:mt-0 [&_a]:text-destructive [&_a]:underline"
+			>
+				{@html sanitizeHostHtml(paragraph)}
 			</p>
 		{/each}
 	</div>

@@ -2,6 +2,7 @@
 	import Dialog from './Dialog.svelte';
 	import Button from './Button.svelte';
 	import { cn } from '$lib/utils';
+	import { sanitizeHostHtml } from '@civicos/shared/sanitize';
 	import type { RegionConfig } from '$lib/config/regions';
 
 	interface Props {
@@ -89,12 +90,14 @@
 	<div class="px-7 pt-6">
 		{#each region.aboutConversation as para, index}
 			{#if index == 0}
-				<p class="font-sans text-lg leading-7 font-medium">
-					{@html para}
+				<p class="font-sans text-lg leading-7 font-medium [&_a]:text-destructive [&_a]:underline">
+					{@html sanitizeHostHtml(para)}
 				</p>
 			{:else}
-				<p class="mt-4 font-sans text-lg leading-7 font-medium">
-					{@html para}
+				<p
+					class="mt-4 font-sans text-lg leading-7 font-medium [&_a]:text-destructive [&_a]:underline"
+				>
+					{@html sanitizeHostHtml(para)}
 				</p>
 			{/if}
 		{/each}
