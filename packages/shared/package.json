@@ -7,6 +7,8 @@
 		".": "./src/index.ts",
 		"./types": "./src/types/index.ts",
 		"./utils": "./src/utils.ts",
+		"./sanitize": "./src/sanitize.ts",
+		"./rich-text": "./src/rich-text.ts",
 		"./data/regions": "./src/data/regions.ts",
 		"./data/zipcodes": "./src/data/zipcodes.ts",
 		"./data/zip-states": "./src/data/zip-states.ts",
@@ -38,6 +40,7 @@
 		"clsx": "^2.1.1",
 		"embla-carousel-svelte": "^8.6.0",
 		"formsnap": "^2.0.1",
+		"isomorphic-dompurify": "~3.19.0",
 		"sveltekit-superforms": "2.30.1",
 		"tailwind-merge": "^3.0.0",
 		"tailwind-variants": "^3.2.2"

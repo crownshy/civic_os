@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Accordion as AccordionPrimitive } from 'bits-ui';
+	import { sanitizeHostHtml } from '@civicos/shared/sanitize';
 	import type { FaqEntry } from '$lib/config/regions';
 
 	interface Props {
@@ -39,7 +40,9 @@
 			<AccordionPrimitive.Content
 				class="overflow-hidden font-sans text-base leading-6 font-medium text-foreground/80 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down md:text-lg md:leading-7"
 			>
-				<div class="pb-4">{@html item.answer}</div>
+				<div class="pb-4 [&_a]:text-destructive [&_a]:underline">
+					{@html sanitizeHostHtml(item.answer)}
+				</div>
 			</AccordionPrimitive.Content>
 		</AccordionPrimitive.Item>
 	{/each}

@@ -138,7 +138,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 		zipPrefixes: [],
 		heroHeader: 'AI and the Future of Our Communities',
 		heroBlurb:
-			'Share your thoughts with other test subjects making sense of this topic together. <a href="#context" class="text-destructive">Learn more \u2192</a>',
+			'Share your thoughts with other test subjects making sense of this topic together. <a href="#context">Learn more \u2192</a>',
 		contextParagraphs: [
 			'This is a testing environment for the landing page redesign \u2014 placeholder copy.',
 			'Use this region to validate UI changes without affecting any real conversation.'
@@ -179,12 +179,12 @@ export const REGIONS: Record<string, RegionConfig> = {
 		zipPrefixes: ['84'],
 		heroHeader: 'AI and the Future of Our Communities',
 		heroBlurb:
-			'Share your thoughts with 400+ Utah residents who are shaping the impact of artificial intelligence together. <a href="#context" class="text-destructive ">Learn more \u2192</a>',
+			'Share your thoughts with 400+ Utah residents who are shaping the impact of artificial intelligence together. <a href="#context">Learn more \u2192</a>',
 		contextParagraphs: [
 			'AI is reshaping work, school, government services, and daily life across Utah \u2014 and Utahns have a choice in how we respond. This is a place for us to weigh in.'
 		],
 		hostsBlurb:
-			'This conversation is hosted by <a href="https://www.utahcommonground.org/home" class="text-destructive underline">Utah Common Ground</a>, and supported by many other committed organizations, individuals, and partners across Utah.',
+			'This conversation is hosted by <a href="https://www.utahcommonground.org/home">Utah Common Ground</a>, and supported by many other committed organizations, individuals, and partners across Utah.',
 		partners: [
 			{ name: 'Utah Common Ground', url: 'https://www.utahcommonground.org/home' },
 			{ name: 'AEGIX Institute', url: 'https://www.aegixinstitute.org/' },
@@ -197,7 +197,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 			}
 		],
 		hostMessage: [
-			'This space is hosted by <a href="https://www.utahcommonground.org/home" class="text-destructive underline" target="_blank" rel="noopener noreferrer">Utah Common Ground</a>, a coalition of nonprofit organizations from around the state, including Utah State University Center for Anticipatory Intelligence, the AI Ethics and Governance Institute, Engage Forum, Braver Angels and Mormon Women for Ethical Government. We came together to help citizens come together across political differences to identify issues of local concern, consider possible solutions, and take the necessary steps to achieve meaningful, measurable change.',
+			'This space is hosted by <a href="https://www.utahcommonground.org/home" target="_blank" rel="noopener noreferrer">Utah Common Ground</a>, a coalition of nonprofit organizations from around the state, including Utah State University Center for Anticipatory Intelligence, the AI Ethics and Governance Institute, Engage Forum, Braver Angels and Mormon Women for Ethical Government. We came together to help citizens come together across political differences to identify issues of local concern, consider possible solutions, and take the necessary steps to achieve meaningful, measurable change.',
 			'We invite all Utahns to share what matters most to them about the future of AI and its impact on communities across the state. Over several weeks, this process will surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding.',
 			'After this period of broad public input, a representative group of approximately 30 to 50 residents from three counties (Cache, Salt Lake, and Utah Counties) will be invited to convene in person in August and September 2026 for a Solutions Forum.'
 		],
@@ -210,9 +210,9 @@ export const REGIONS: Record<string, RegionConfig> = {
 		campaignPageHosts:
 			'Hosted by Utah Common Ground, a project led by a coalition of organizations, including <a href="https://www.aegixinstitute.org/">AEGIX</a>, <a href="https://braverangels.org/">Braver Angels</a>, <a href="https://www.usu.edu/cai/">Center for Anticipatory Intelligence</a>, <a href="https://www.engageforum.org/">Engage Forum</a>, and <a href="https://www.mormonwomenforethicalgovernment.org/">Mormon Women for Ethical Government</a>.',
 		whatsNext:
-			'<a href="https://www.utahcommonground.org/get-involved" class="font-bold underline">Sign up↗</a> for live conversations about this topic, taking place both online and in-person across Salt Lake, Utah, and Cache counties. These conversations will be an opportunity to connect with your neighbors and develop shared values around AI\'s influence on the people we care about.',
+			'<a href="https://www.utahcommonground.org/get-involved">Sign up↗</a> for live conversations about this topic, taking place both online and in-person across Salt Lake, Utah, and Cache counties. These conversations will be an opportunity to connect with your neighbors and develop shared values around AI\'s influence on the people we care about.',
 		goDeeper:
-			'The ultimate goal of this campaign is to surface common ground that lets Utahns take action from the local to state levels and beyond. If you are interested in getting involved in a deeper way, let us know at <Link href="mailto:hello@bloom-project.org" external class="font-bold">hello@bloom-project.org</Link>.',
+			'The ultimate goal of this campaign is to surface common ground that lets Utahns take action from the local to state levels and beyond. If you are interested in getting involved in a deeper way, let us know at <a href="mailto:hello@bloom-project.org">hello@bloom-project.org</a>.',
 		endCtaJoinDescription:
 			'Conversations with neighbors in Utah are taking place in-person and online.',
 		endCtaShareDescription: 'Anyone in Utah is welcome to participate.',
@@ -352,13 +352,13 @@ export const REGIONS: Record<string, RegionConfig> = {
 		zipPrefixes: ['97'],
 		heroHeader: 'AI & Our Communities',
 		heroBlurb:
-			'Share your thoughts with <strong>300+ Central Oregon residents</strong> who are shaping the impact of artificial intelligence together. <a href="#context" class="text-destructive">Learn more →</a>',
+			'Share your thoughts with <strong>300+ Central Oregon residents</strong> who are shaping the impact of artificial intelligence together. <a href="#context">Learn more →</a>',
 		contextParagraphs: [
 			'AI is reshaping Central Oregon — and we have a choice in how we respond. This is a place for us to weigh in.',
 			'The 2026 Community Solutions Assembly on AI asks how Central Oregon can ensure the benefits of AI are widely shared and its risks responsibly managed in our communities. It starts with an Open Poll you can access today; this only takes a few minutes and it shapes everything that follows.'
 		],
 		hostsBlurb:
-			'This conversation is hosted by the <a href="https://cocap.us/" class="text-destructive underline">Central Oregon Civic Action Project</a>, and supported by many other committed organizations, individuals, and partners throughout Central Oregon.',
+			'This conversation is hosted by the <a href="https://cocap.us/">Central Oregon Civic Action Project</a>, and supported by many other committed organizations, individuals, and partners throughout Central Oregon.',
 		partners: [
 			{ name: 'Central Oregon Civic Action Project', url: 'https://cocap.us/' },
 			{ name: 'Central Oregon Intergovernmental Council', url: 'https://www.coic.org/' },
@@ -368,7 +368,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 		hostMessage: [
 			`
 		  <p>YOUR HOSTS:</p>
-		  <ul class='list-disc list-inside'>
+		  <ul>
 			<li>
 			  Central Oregon Civic Action Project 	  
 			</li>
@@ -394,12 +394,12 @@ export const REGIONS: Record<string, RegionConfig> = {
 			"This Open Poll is hosted by the <a href='http://cocap.us'>Central Oregon Civic Action Project</a> — a coalition of community organizations from across the region.",
 			"Central Oregon is navigating big questions about AI and how it's shaping our communities. This is a space for residents to share what matters most — what you're hopeful about, what concerns you, and what you think our region needs.",
 			'There are no right answers here. This poll is a first step toward understanding where Central Oregonians stand, finding common ground, and building toward solutions together.',
-			"<span class='font-bold'>OPEN POLL (now) → LIVE CONVERSATIONS (May/June) → SOLUTIONS FORUM (Fall)</span>",
-			"<span class='font-bold >Step 1: This Poll</span>",
+			"<strong>OPEN POLL (now) → LIVE CONVERSATIONS (May/June) → SOLUTIONS FORUM (Fall)</strong>",
+			"<strong>Step 1: This Poll</strong>",
 			'Share your views now. Your responses help surface what we agree on, where we differ, and what questions deserve deeper conversation.',
-			"<span class='font-bold'>Step 2: Live Conversations (May/June)</span>",
+			"<strong>Step 2: Live Conversations (May/June)</strong>",
 			'Small group discussions — in person and online — open to anyone in the region. A chance to hear from neighbors, think out loud, and go deeper than a poll allows.',
-			"<span class='font-bold'>Solutions Forum (Fall 2026)</span>",
+			"<strong>Solutions Forum (Fall 2026)</strong>",
 			'A representative group of 30–50 residents will come together to deliberate on what this process surfaced — and work toward recommendations with broad, cross-party support.',
 			"Questions or want to get involved? Reach us at <a href='mailto:info@cocap.us'>info@cocap.us</a>."
 		],
@@ -535,13 +535,13 @@ export const GENERIC_REGION: RegionConfig = {
 	zipPrefixes: [],
 	heroHeader: 'AI and the Future of Our Communities',
 	heroBlurb:
-		'Share your thoughts with others across America who are weighing in on how AI is changing our country. <a href="#context" class="text-destructive">Learn more →</a>',
+		'Share your thoughts with others across America who are weighing in on how AI is changing our country. <a href="#context">Learn more →</a>',
 	contextParagraphs: [
 		"People across America are weighing in on how AI is changing our country — and what we should do about it. Now it's your turn.",
 		'Your responses, combined with everyone else\u2019s, will help surface what Americans have in common, where we differ, and what we might tackle together. Results will be published publicly so anyone can see where people stand.'
 	],
 	hostsBlurb:
-		'This Open Poll is hosted by <a href="https://www.bloom-project.org/" class="text-destructive underline">The Bloom Project</a>, a civic technology initiative that uses deliberative polling to surface where the American public actually stands on complex issues.',
+		'This Open Poll is hosted by <a href="https://www.bloom-project.org/">The Bloom Project</a>, a civic technology initiative that uses deliberative polling to surface where the American public actually stands on complex issues.',
 	partners: [{ name: 'The Bloom Project', url: 'https://www.bloom-project.org/' }],
 	hostMessage: [
 		'First, thank you for being here and for caring about the future of our country.',

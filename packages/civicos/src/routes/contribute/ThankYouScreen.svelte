@@ -11,6 +11,8 @@
 	} from '$lib/components/ui';
 	import { session } from '$lib/services/session.svelte';
 	import { ArrowRight, Check } from 'lucide-svelte';
+	import { sanitizeHostHtml } from '@civicos/shared/sanitize';
+	import { HOST_COPY_PROSE_CLASS, renderHostCopy } from '$lib/config/host-copy';
 	import type { RegionConfig } from '$lib/config/regions';
 
 	// TODO(post-#216): import from '$lib/config/landing-copy' once branch 216 lands.
@@ -33,10 +35,12 @@
 	interface Props {
 		countyName: string;
 		region: RegionConfig;
+		/** Host-configured copy, already resolved against the region defaults. */
+		whatsNext: string;
 		onBackToVoting?: () => void;
 	}
 
-	let { countyName, onBackToVoting, region }: Props = $props();
+	let { countyName, onBackToVoting, region, whatsNext }: Props = $props();
 
 	let emailPanelOpen = $state(false);
 	let sharePanelOpen = $state(false);
@@ -168,11 +172,9 @@
 			<h2 class="font-display text-2xl leading-9 font-medium tracking-display text-yellow-950">
 				What comes next?
 			</h2>
-			<div
-				class="mt-2 font-sans text-base leading-6 font-normal text-yellow-950 [&_a]:font-bold [&_a]:text-destructive [&_a]:underline"
-			>
-				<p>{@html region.whatsNext}</p>
-				<p class="mt-4">{@html region.goDeeper}</p>
+			<div class="mt-2 text-yellow-950 [&_a]:font-bold {HOST_COPY_PROSE_CLASS}">
+				{@html renderHostCopy(whatsNext)}
+				<p class="mt-4">{@html sanitizeHostHtml(region.goDeeper)}</p>
 			</div>
 		</div>
 
