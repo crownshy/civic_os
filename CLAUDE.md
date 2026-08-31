@@ -1,23 +1,27 @@
-You are able to use the Svelte MCP server, where you have access to comprehensive Svelte 5 and SvelteKit documentation. Here's how to use the available tools effectively:
+# CLAUDE.md
 
-## Available MCP Tools:
+Claude Code reads this file automatically. The working agreement lives in
+[AGENTS.md](AGENTS.md) (and the docs it points to: `STYLE_GUIDE.md`, `CONTEXT.md`,
+`docs/component-strategy.md`, `docs/adr`). It is imported below so it is always in
+context; read it before writing code.
 
-### 1. list-sections
+@AGENTS.md
 
-Use this FIRST to discover all available documentation sections. Returns a structured list with titles, use_cases, and paths.
-When asked about Svelte or SvelteKit topics, ALWAYS use this tool at the start of the chat to find relevant sections.
+## Svelte MCP server
 
-### 2. get-documentation
+Use the Svelte MCP server whenever Svelte or SvelteKit work is involved. It provides
+official Svelte 5 / SvelteKit docs, examples, and a code checker.
 
-Retrieves full documentation content for specific sections. Accepts single or multiple sections.
-After calling the list-sections tool, you MUST analyze the returned documentation sections (especially the use_cases field) and then use the get-documentation tool to fetch ALL documentation sections that are relevant for the user's task.
+- **`list-sections`** call this FIRST when a task touches Svelte or SvelteKit, to
+  discover the available documentation sections.
+- **`get-documentation`** after `list-sections`, fetch the full content of every section
+  whose `use_cases` are relevant to the task.
+- **`svelte-autofixer`** run any Svelte component you write through this before finishing,
+  and keep calling it until it returns no issues or suggestions.
+- **`playground-link`** only offer this after code is complete and the user confirms, and
+  never when the code has already been written to files in the project.
 
-### 3. svelte-autofixer
-
-Analyzes Svelte code and returns issues and suggestions.
-You MUST use this tool whenever writing Svelte code before sending it to the user. Keep calling it until no issues or suggestions are returned.
-
-### 4. playground-link
-
-Generates a Svelte Playground link with the provided code.
-After completing the code, ask the user if they want a playground link. Only call this tool after user confirmation and NEVER if code was written to files in their project.
+<!--
+Claude-only notes can go below the import. If agents skip the frontend conventions, add
+`@STYLE_GUIDE.md` here to force the full working agreement into context.
+-->
