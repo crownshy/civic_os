@@ -4,8 +4,10 @@
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import * as Form from '@civicos/shared/ui/form';
 	import { Button } from '@civicos/shared/ui/button';
-	import { ArrowLeft, AlertCircle } from '@lucide/svelte';
+	import { ArrowLeft, AlertCircle, X } from '@lucide/svelte';
 	import { resolve } from '$app/paths';
+	import AddCoHostsDialog from '$lib/components/setup/AddCoHostsDialog.svelte';
+	import { placeFromName } from '$lib/config/place';
 	import {
 		createConversationSchema,
 		type CreateConversationMessage
@@ -39,6 +41,36 @@
 
 	function onTitleInput() {
 		if (!slugEdited) $formData.slug = toSlug($formData.title);
+	}
+
+	// The subdomain the typed Place would be served from, shown so the Host can
+	// see what "Dundee, Scotland" turns into before they commit to it. The action
+	// derives the same slug; this only previews it.
+	const placeSlug = $derived(placeFromName($formData.placeName)?.slug ?? '');
+
+	let cohostPickerOpen = $state(false);
+
+	const orgById = $derived(new Map(data.pickerOrgs.map((o) => [o.id, o])));
+	// Filtered rather than pruned on change: switching the owner to a Host that was
+	// picked as a co-host should not silently rewrite the selection, and the action
+	// drops the duplicate before granting.
+	const selectedCohosts = $derived(
+		$formData.cohostIds
+			.filter((id) => id !== $formData.hostId)
+			.map((id) => ({ id, name: orgById.get(id)?.name ?? id }))
+	);
+
+	// The owning Host cannot also be a co-host, so it drops out of the picker and
+	// out of the selection if it is switched to a Host already picked.
+	const excludeIds = $derived($formData.hostId ? [$formData.hostId] : []);
+
+	function commitCohosts(ids: string[]) {
+		$formData.cohostIds = ids.filter((id) => id !== $formData.hostId);
+		cohostPickerOpen = false;
+	}
+
+	function removeCohost(id: string) {
+		$formData.cohostIds = $formData.cohostIds.filter((c) => c !== id);
 	}
 
 	const inputClass =
@@ -119,6 +151,30 @@
 					<Form.FieldErrors class="mt-1 text-caption text-destructive" />
 				</Form.Field>
 
+				<Form.Field {form} name="placeName">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label class={labelClass}>Place</Form.Label>
+							<p class="mb-1 text-caption text-muted-foreground">
+								Where this conversation runs. It gets its own subdomain, and the slug is scoped to
+								it. You can change it later.
+							</p>
+							<input
+								{...props}
+								bind:value={$formData.placeName}
+								placeholder="e.g. Dundee, Scotland"
+								class={inputClass}
+							/>
+							{#if placeSlug}
+								<p class="mt-1 text-caption text-muted-foreground">
+									Served from {placeSlug}{data.baseDomain ? `.${data.baseDomain}` : ''}
+								</p>
+							{/if}
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors class="mt-1 text-caption text-destructive" />
+				</Form.Field>
+
 				<Form.Field {form} name="keyQuestion">
 					<Form.Control>
 						{#snippet children({ props })}
@@ -134,25 +190,83 @@
 					<Form.FieldErrors class="mt-1 text-caption text-destructive" />
 				</Form.Field>
 
-				{#if data.hosts.length > 1}
-					<Form.Field {form} name="hostId">
-						<Form.Control>
-							{#snippet children({ props })}
-								<Form.Label class={labelClass}>Host</Form.Label>
-								<p class="mb-1 text-caption text-muted-foreground">
-									The organization that owns this conversation.
-								</p>
+				<Form.Field {form} name="hostId">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label class={labelClass}>Host</Form.Label>
+							<p class="mb-1 text-caption text-muted-foreground">
+								The organization that owns this conversation. Set to your Host; change it if you are
+								creating this for another one.
+							</p>
+							{#if data.hosts.length > 1}
 								<select {...props} bind:value={$formData.hostId} class={inputClass}>
-									<option value="">Select a host…</option>
 									{#each data.hosts as host (host.id)}
 										<option value={host.id}>{host.name}</option>
 									{/each}
 								</select>
-							{/snippet}
-						</Form.Control>
-						<Form.FieldErrors class="mt-1 text-caption text-destructive" />
-					</Form.Field>
-				{/if}
+							{:else}
+								<!-- One Host to choose from: it is already the value, so show it
+								     rather than a select with a single option. -->
+								<p class="text-body font-bold">{data.hosts[0].name}</p>
+								<input {...props} type="hidden" bind:value={$formData.hostId} />
+							{/if}
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors class="mt-1 text-caption text-destructive" />
+				</Form.Field>
+
+				<Form.Field {form} name="cohostIds">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label class={labelClass}>Co-Hosts</Form.Label>
+							<p class="mb-1 text-caption text-muted-foreground">
+								Other organizations stewarding this conversation with you. They can see and edit it.
+								You can add more later.
+							</p>
+							<div {...props} class="flex flex-wrap items-center gap-2">
+								{#each selectedCohosts as host (host.id)}
+									<span
+										class="inline-flex items-center gap-1.5 rounded-full border border-stone-300 py-1 pr-2 pl-3 text-body"
+									>
+										{host.name}
+										<button
+											type="button"
+											onclick={() => removeCohost(host.id)}
+											aria-label={`Remove ${host.name}`}
+											class="rounded-full p-0.5 text-muted-foreground hover:text-destructive"
+										>
+											<X class="size-3.5" />
+										</button>
+									</span>
+								{/each}
+								<Button
+									type="button"
+									variant="outline"
+									onclick={() => (cohostPickerOpen = true)}
+									class="rounded-full"
+								>
+									{selectedCohosts.length === 0 ? 'Add co-hosts…' : 'Edit co-hosts…'}
+								</Button>
+							</div>
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors class="mt-1 text-caption text-destructive" />
+				</Form.Field>
+
+				<AddCoHostsDialog
+					bind:open={cohostPickerOpen}
+					pickerOrgs={data.pickerOrgs}
+					{excludeIds}
+					initialSelected={$formData.cohostIds}
+				>
+					{#snippet footer({ selected })}
+						<Button type="button" onclick={() => commitCohosts(selected)}>
+							{selected.length
+								? `Add ${selected.length} co-host${selected.length === 1 ? '' : 's'}`
+								: 'Done'}
+						</Button>
+					{/snippet}
+				</AddCoHostsDialog>
 
 				<Form.Field {form} name="description">
 					<Form.Control>
