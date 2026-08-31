@@ -1,5 +1,6 @@
 import { demoteHeadings, paragraphsToHtml, toBlockHtml } from '@civicos/shared/rich-text';
 import { sanitizeHostHtml } from '@civicos/shared/sanitize';
+import { firstNonEmpty } from '$lib/utils/text';
 import type { RegionConfig } from './regions';
 
 /**
@@ -26,13 +27,6 @@ export interface HostCopy {
 export interface ConversationCopy {
 	description?: string | null;
 	thankYouMessage?: string | null;
-}
-
-function firstNonEmpty(...values: (string | null | undefined)[]): string {
-	for (const value of values) {
-		if (value && value.trim() !== '') return value;
-	}
-	return '';
 }
 
 export function resolveHostCopy(
