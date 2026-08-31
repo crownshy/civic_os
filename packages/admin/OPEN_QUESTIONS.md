@@ -1,6 +1,5 @@
 Working doc of everything that needs an answer before the Insights surface (and the surrounding admin shell) feels finished. Each section explains **what we're doing today** so you shouldn't have to look at code.
 
-
 ## 1. Regions and how we resolve a conversation
 
 ### What we do today
@@ -53,15 +52,16 @@ Downstream calls key off the resolved `campaign` object returned by `routes/c/[s
 The new Themes card design shows "**N claims by M people**" per theme. We render claims (= statement count for the theme). We render people as the literal string `"X"` with a TODO comment because **the data isn't in `/tools/polis/report_data`**.
 
 The current payload gives us:
+
 - `comments[].overall_votes`: aggregate `{ agrees, disagrees, passes }`
 - `comments[].group_votes[]`: same aggregate per group
 - `participants[]`: `{ pid, group_id, pca_position }` but **no per-vote participant ids**
 
-So we can count *votes* on a theme's statements, but we can't say *unique people who voted on any statement in this theme*. That requires per-vote participant data, i.e. a join table of `(comment_id, pid, vote_type)`.
+So we can count _votes_ on a theme's statements, but we can't say _unique people who voted on any statement in this theme_. That requires per-vote participant data, i.e. a join table of `(comment_id, pid, vote_type)`.
 
 ### Questions
 
-- **Q3.1** Is "people who voted on any statement in the theme" the metric we actually want? Or is it "people whose own statement was tagged with the theme" (= submitters), which we *can* compute if comhairle ever returns `submitter_pid` on `comments[]`?
+- **Q3.1** Is "people who voted on any statement in the theme" the metric we actually want? Or is it "people whose own statement was tagged with the theme" (= submitters), which we _can_ compute if comhairle ever returns `submitter_pid` on `comments[]`?
 - **Q3.2** Is exposing per-vote pid data acceptable privacy-wise? Polis's Math API returns `votes-base.json` with `(pid, tid, vote, weight)` rows, and comhairle could surface that, but it lets us correlate one person's votes across statements.
 - **Q3.3** If per-vote data is off-limits, would we accept a privacy-safe approximation: comhairle returns `unique_voters_per_theme` precomputed on the backend, with no individual mapping exposed?
 - **Q3.4** Until we have a real number, what string do we want in the UI? `"X people"`, `"— people"`, hide the line entirely, or show `"≥ N people"` using `max(total_votes_on_any_statement_in_theme)` as a floor?
@@ -86,7 +86,7 @@ Implemented in `packages/admin/src/lib/utils/report.ts` as `themeControversy`.
 - **Q4.1** Are the boundaries (15 / 30) the right ones? Should we calibrate them against a real conversation that's already been hand-labelled?
 - **Q4.2** Should controversy be weighted by **how many people voted** on each statement? Today a 1-vote statement contributes the same as a 100-vote one.
 - **Q4.3** Should there be a **minimum statement count** before we classify a theme? A theme with one statement isn't really "high controversy" even if that statement is divisive.
-- **Q4.4** Same question as Q4.2 but for "passes": a theme where half the votes are passes is *uncertain*, not *controversial*. Should it short-circuit to "low controversy" with an "uncertain" badge instead?
+- **Q4.4** Same question as Q4.2 but for "passes": a theme where half the votes are passes is _uncertain_, not _controversial_. Should it short-circuit to "low controversy" with an "uncertain" badge instead?
 - **Q4.5** Do facilitators want to override the classification per theme (manual high/mod/low)? If yes, we need a place to persist that, either in comhairle or local.
 
 ---
@@ -112,7 +112,6 @@ Hard-coded in `packages/admin/src/lib/utils/report.ts`:
 
 ## 6. T3C ("Talk to the City") integration
 
-
 ### What we do today
 
 Nothing. We parked it. The page reads `comment.topics?: string[]` from Polis NLP when present, otherwise themes are empty. The design's subtopic links and AI-generated theme summaries are not rendered.
@@ -122,7 +121,7 @@ Nothing. We parked it. The page reads `comment.topics?: string[]` from Polis NLP
 - **Q6.1** Is T3C actually in scope for this milestone, or a future one?
 - **Q6.2** Where would T3C output live? Options: a new comhairle endpoint (e.g. `GET /tools/t3c/report_data?conversation_id=...`), a JSON blob uploaded to comhairle and stored on `Conversation`, or a separate service the admin app calls directly.
 - **Q6.3** Who runs T3C, and how often? On-demand by a facilitator? Nightly batch?
-- **Q6.4** Does T3C *replace* `comment.topics` (Polis NLP), or *augment* it (Polis = quick & dirty, T3C = curated)? If both, who wins when they disagree?
+- **Q6.4** Does T3C _replace_ `comment.topics` (Polis NLP), or _augment_ it (Polis = quick & dirty, T3C = curated)? If both, who wins when they disagree?
 - **Q6.5** "Subtopics" in the design: are these T3C's `subtopics`, or our own per-theme tags? What's the cardinality (always 3? variable?).
 - **Q6.6** Goals — moved to its own section, see Section 9.
 
@@ -134,7 +133,7 @@ Nothing. We parked it. The page reads `comment.topics?: string[]` from Polis NLP
 
 `@crownshy/api-client` is a generated Zodios client. `+layout.ts` builds an instance with `createApiClient(url.origin + '/api', ...)` and we consume it as `data.api` in child `+page.ts` loads.
 
-It works for `ListEvents` and `GetEvent`. It **does not** work for `PolisGetReportData` because the response is declared as `z.void()` in `api.ts`, and Zodios throws when it validates the real object payload against `void`.  Worked around this in `insights/+page.ts` by going through the underlying `api.axios` and casting to our local `PolisReportData` type.
+It works for `ListEvents` and `GetEvent`. It **does not** work for `PolisGetReportData` because the response is declared as `z.void()` in `api.ts`, and Zodios throws when it validates the real object payload against `void`. Worked around this in `insights/+page.ts` by going through the underlying `api.axios` and casting to our local `PolisReportData` type.
 
 ### Questions
 
@@ -171,13 +170,14 @@ The Participants tab shows recruitment **goals** at two levels:
 2. **Per-bucket goals** inside each demographic table (Geography county, Race/Ethnicity, Gender, Political Affiliation, Age). `DemographicTable.svelte` already accepts an optional `goal?: number` per row, renders a `GOAL` column, a `% TO GOAL` column, and overlays a goal marker on the progress bar. But **no row is actually given a goal value today** — the rows we pass in are `{ label, count }` only.
 
 So the UI plumbing exists end-to-end, but:
+
 - The numeric goal targets live nowhere — not in comhairle, not in `regions.ts`, not in admin app state.
 - The design shows a "Modify Goals" button per section, but there is no edit UI and no endpoint to persist edits to.
-- Even the demographic *categories themselves* (which counties? which gender buckets? which race labels?) come from whatever the participation form happened to record — there is no curated list a host could set goals against.
+- Even the demographic _categories themselves_ (which counties? which gender buckets? which race labels?) come from whatever the participation form happened to record — there is no curated list a host could set goals against.
 
 ### Questions
 
-- **Q9.1**  Where do we store it?
+- **Q9.1** Where do we store it?
 
 ---
 
@@ -214,14 +214,14 @@ statement) is in flight from Stuart; not yet shipped.
 - **Tagging ≠ moderation.** Two independent actions on the same row;
   admin can do either without the other. Confirmed with Stuart.
 - **Surface split:**
-    - `Open Poll → Moderation` — a new sub-tab. Owns accept/reject and
-      eventually seed-statement authoring. **Stubbed at functional level
-      for now** (basic list with status dropdown, no polished UX) so
-      data can be manipulated during dev. Calls Stuart's moderation
-      endpoint when it lands; until then writes only to aux.
-    - `Open Poll → Insights` — keeps owning analysis, and now also owns
-      **inline theme assignment** on each statement row (chip picker +
-      "Add new"). Tagging happens here because it's an analytical act.
+  - `Open Poll → Moderation` — a new sub-tab. Owns accept/reject and
+    eventually seed-statement authoring. **Stubbed at functional level
+    for now** (basic list with status dropdown, no polished UX) so
+    data can be manipulated during dev. Calls Stuart's moderation
+    endpoint when it lands; until then writes only to aux.
+  - `Open Poll → Insights` — keeps owning analysis, and now also owns
+    **inline theme assignment** on each statement row (chip picker +
+    "Add new"). Tagging happens here because it's an analytical act.
 - **Insights data flow:** assume comhairle's `/tools/polis/report_data`
   endpoint joins aux themes onto `comments[].topics` (server-side join)
   so the admin frontend keeps reading `comment.topics` and the Themes
@@ -235,16 +235,16 @@ statement) is in flight from Stuart; not yet shipped.
 - **Q10.1 — Sync defaults for backfilled statements.** When sync runs on
   Utah/Oregon for the first time, every existing polis statement gets a
   new aux row defaulting to `moderation_status = 'pending'` and
-  `themes = '{}'`. But these statements are *already live* in polis.
+  `themes = '{}'`. But these statements are _already live_ in polis.
   Three options:
-    - (A) Extend sync to read polis's moderation state and map it into
-      aux (`accepted` for shown, `rejected` for hidden). Right answer
-      long-term; mirrors polis truth into aux.
-    - (B) Sync defaults backfilled rows to `accepted` (assumes "exists
-      in polis → already moderated through polis"). Crude but cheap.
-    - (C) Leave as `pending`, add a bulk-accept button. Bad UX first run.
-  Decision deferred; raise with Stuart while he's working on the
-  moderation endpoint.
+  - (A) Extend sync to read polis's moderation state and map it into
+    aux (`accepted` for shown, `rejected` for hidden). Right answer
+    long-term; mirrors polis truth into aux.
+  - (B) Sync defaults backfilled rows to `accepted` (assumes "exists
+    in polis → already moderated through polis"). Crude but cheap.
+  - (C) Leave as `pending`, add a bulk-accept button. Bad UX first run.
+    Decision deferred; raise with Stuart while he's working on the
+    moderation endpoint.
 
 - **Q10.2 — Label manager (rename / merge / delete themes).** Deferred
   to v2. The Insights chip picker + "Add new" is enough to ship Bloom.
@@ -266,4 +266,4 @@ statement) is in flight from Stuart; not yet shipped.
 - **Q10.5 — Insights row visual weight for themes.** Design suggests
   de-emphasizing theme chips on Areas of Consensus / Difference /
   Uncertainty rows (small inline tag, not a dominant column). Implement
-  in the redesign pass on `StatementRow.svelte`. 
+  in the redesign pass on `StatementRow.svelte`.

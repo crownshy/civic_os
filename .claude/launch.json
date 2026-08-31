@@ -1,0 +1,36 @@
+{
+	"version": "0.0.1",
+	"configurations": [
+		{
+			"name": "admin",
+			"runtimeExecutable": "pnpm",
+			"runtimeArgs": [
+				"--filter",
+				"@civicos/admin",
+				"dev"
+			],
+			"port": 5174
+		},
+		{
+			"name": "admin-storybook",
+			"runtimeExecutable": "pnpm",
+			"runtimeArgs": [
+				"--filter",
+				"@civicos/admin",
+				"storybook"
+			],
+			"port": 6007
+		},
+		{
+			"name": "civicos",
+			"runtimeExecutable": "pnpm",
+			"runtimeArgs": [
+				"--filter",
+				"civic-os",
+				"dev"
+			],
+			"port": 5173,
+			"autoPort": true
+		}
+	]
+}
