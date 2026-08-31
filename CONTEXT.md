@@ -19,8 +19,21 @@ no Region table exists.
 Product-facing name for a **Region** (the term used in host/admin UI, e.g. the
 `PLACE(S)` field on a Host). Same comhairle `Region` model behind it. A Host is
 registered to one or more Places, which (per #351) scope where it may run
-Campaigns. Provisioned by BLOOM. `Place ↔ Region` mirrors `Campaign ↔ Conversation`
-and `Host ↔ Organization`: product word ↔ comhairle model.
+Campaigns. `Place ↔ Region` mirrors `Campaign ↔ Conversation` and
+`Host ↔ Organization`: product word ↔ comhairle model.
+
+**A Place is the subdomain**, `<place>.bloomproject.us`. Optional: a Campaign
+with no Place is served from the apex. It is not a record: it
+rides on `Conversation.metadata.place` as `{ slug, name }` (ADR 0006), so nothing
+enumerates Places and two Campaigns in the same Place duplicate the name. The
+Host types a **name** on Setup and the slug is derived from it; the DNS label
+itself is still provisioned by BLOOM (#351).
+
+**A Campaign has exactly one Place** (ADR 0008). Campaigns and Places are
+many-to-many in principle, and each Place would get its own poll, but nothing in
+comhairle supports that and the propagation and ownership rules are unanswered.
+Until then one Campaign, one Place, one poll. Utah and Oregon are two Campaigns,
+not one Campaign in two Places.
 
 ### County
 The geographic unit that the participants **Geography** table groups by (rows are
@@ -98,6 +111,13 @@ Product-facing name for a **Conversation** (the word participants and hosts see;
 "Campaign" in host/admin-facing copy, "Conversation" when talking about the
 comhairle model. `Campaign ↔ Conversation` mirrors `Host ↔ Organization` and
 `Place ↔ Region`.
+
+**A Campaign has exactly one Place, and exactly one poll** (ADR 0008). The
+Conversation behind it is slugged `<campaign>-<place>` (`ai-utah`), derived
+automatically when the Place is saved. The participant URL is
+`<place>.bloomproject.us/<org>/conversations/<campaign-slug>` (ADR 0007); the
+`<org>` segment is decorative and the Place subdomain is optional, so a Campaign
+has a participant site from the moment it is created.
 
 **A Campaign has exactly one Polis step.** comhairle's model is more general: a
 Conversation runs a workflow of many steps (`polis`, `learn`, `heyform`,
@@ -192,6 +212,34 @@ read from the Polis workflow step's `toolConfig.topic`, written with
 it under the name **Topic**, so the two surfaces are two editors of one value.
 A legacy region's hardcoded `question` in `regions.ts` is only a fallback, for
 Campaigns whose Polis step does not resolve.
+
+### Participant site
+Where participants actually go:
+
+    <place>.bloomproject.us/<org>/conversations/<campaign-slug>
+
+`civicos` resolves the Campaign from the **slug**, and the Place subdomain from
+`hooks.server.ts` -> `getRegionBySubdomain`. The `<org>` segment is decorative,
+ignored on resolution (ADR 0007). The poll is `/contribute` under that path, and
+live events are `/events/<event-slug>`.
+
+Three things the admin surfaces have to respect:
+
+- **Every Campaign has a participant site from the moment it is created.** No
+  Place means it is served from the apex; publishing to a Place moves it to that
+  subdomain. It no longer needs a `regions.ts` entry, a code change or a deploy.
+- **The URL is derived, never stored.** `participantUrl()` in
+  `@civicos/shared/data/place` is the only thing that builds it. A legacy
+  region's `shareUrl` still wins for Utah and Oregon, because those hostnames
+  are live.
+- **`is_live` does not gate the participant app.** `civicos` never reads it, and
+  `/contribute` talks to Polis directly, bypassing comhairle. Today the flag only
+  drives the admin badge, so a "draft" Campaign that has been published to a
+  Place is publicly reachable and votable.
+
+Which poll a participant votes in comes from `metadata.poll`, mirrored by admin
+on publish, because the Polis workflow step is 401 to an anonymous caller. Where
+that is missing it falls back to `regions.ts` keyed by zip.
 
 ### Dev region
 A synthetic Region built at runtime from `PUBLIC_DEV_*` env vars, so a local

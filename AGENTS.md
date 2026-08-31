@@ -38,6 +38,9 @@ generic primitives. The full rules for what to share vs keep separate are in
   metrics). Use these terms exactly; they are load bearing.
 - **[docs/adr/](docs/adr)** architectural decisions and their rationale. Check here
   before reversing a design choice.
+- **[docs/regions-migration.md](docs/regions-migration.md)** which `regions.ts` fields
+  survive the move to Host configuration and where they go. Check before adding a field
+  to `regions.ts` or wiring one to the backend.
 
 ## Commands
 
