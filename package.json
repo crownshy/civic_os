@@ -10,6 +10,7 @@
 		"check": "pnpm -r check",
 		"lint": "pnpm --filter civic-os --filter @civicos/admin lint",
 		"format": "pnpm --filter civic-os --filter @civicos/admin format",
-		"test": "pnpm --filter civic-os --filter @civicos/admin exec vitest run"
+		"test": "pnpm --filter civic-os --filter @civicos/admin exec vitest run",
+		"prototype:places": "node --experimental-strip-types --no-warnings prototypes/campaign-places/tui.ts"
 	}
 }
