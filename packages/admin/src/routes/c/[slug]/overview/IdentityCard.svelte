@@ -9,7 +9,7 @@
 		baseUrl: string;
 		slug: string;
 		keyQuestion: string;
-		/** Place names shown as chips, e.g. ["Oregon"]. Provisioned by BLOOM (#351). */
+		/** Place names shown as chips, e.g. ["Oregon"]. */
 		places: string[];
 		/** When provided, replaces the read-only title with an editable field. */
 		titleField?: Snippet;
@@ -17,6 +17,8 @@
 		slugField?: Snippet;
 		/** When provided, replaces the read-only key question with an editable field. */
 		keyQuestionField?: Snippet;
+		/** When provided, replaces the read-only place chips with an editable field. */
+		placeField?: Snippet;
 	}
 
 	let {
@@ -27,7 +29,8 @@
 		places,
 		titleField,
 		slugField,
-		keyQuestionField
+		keyQuestionField,
+		placeField
 	}: Props = $props();
 
 	// Presentational shell only. Real theming (persisted, applied across the
@@ -60,19 +63,23 @@
 			</SetupField>
 
 			<!-- Always rendered, so the row keeps its shape on a Campaign with no
-			     places yet. Places are provisioned by BLOOM (#351), not edited here. -->
+			     places yet. -->
 			<SetupField label="Place(s)">
-				<div class="flex min-h-9 flex-wrap items-center gap-2">
-					{#each places as place (place)}
-						<span
-							class="rounded-[10px] bg-primary/5 px-2.5 py-1.5 text-caption font-medium text-primary"
-						>
-							{place}
-						</span>
-					{:else}
-						<span class="text-body text-muted-foreground">None yet</span>
-					{/each}
-				</div>
+				{#if placeField}
+					{@render placeField()}
+				{:else}
+					<div class="flex min-h-9 flex-wrap items-center gap-2">
+						{#each places as place (place)}
+							<span
+								class="rounded-[10px] bg-primary/5 px-2.5 py-1.5 text-caption font-medium text-primary"
+							>
+								{place}
+							</span>
+						{:else}
+							<span class="text-body text-muted-foreground">None yet</span>
+						{/each}
+					</div>
+				{/if}
 			</SetupField>
 		</div>
 

@@ -23,8 +23,8 @@
 	args={{ places: ['Prineville', 'Deschutes County', 'Jefferson County'] }}
 />
 
-<!-- Places are provisioned by BLOOM (#351), so an unprovisioned Campaign still
-     shows the slot rather than collapsing the row. -->
+<!-- A Campaign nobody has given a Place yet still shows the slot rather than
+     collapsing the row. civicos 404s this one (ADR 0007). -->
 <Story name="No places" args={{ places: [] }} />
 
 <!--
@@ -34,7 +34,7 @@
 -->
 <Story name="Editable">
 	{#snippet template(args)}
-		<IdentityCard {...args} {titleField} {slugField} {keyQuestionField} />
+		<IdentityCard {...args} {titleField} {slugField} {keyQuestionField} {placeField} />
 	{/snippet}
 </Story>
 
@@ -52,6 +52,23 @@
 			value="ai"
 			class="field-sizing-content min-w-24 rounded-[10px] border border-stone-300 bg-muted px-3 py-1.5 focus:border-primary focus:outline-none"
 		/>
+	</div>
+{/snippet}
+
+<!--
+	The Place field on its own, with the derived subdomain under it. The Host
+	types a name and the slug follows from it, so this line is the only place the
+	consequence of a rename is visible before it happens.
+-->
+{#snippet placeField()}
+	<div class="flex min-h-9 flex-col gap-1.5">
+		<input
+			value="Dundee, Scotland"
+			aria-label="Place"
+			placeholder="e.g. Dundee, Scotland"
+			class="field-sizing-content min-w-40 rounded-[10px] border border-stone-300 bg-muted px-3 py-1.5 text-body font-semibold focus:border-primary focus:outline-none"
+		/>
+		<p class="text-caption text-muted-foreground">Served from dundee-scotland.bloomproject.us</p>
 	</div>
 {/snippet}
 

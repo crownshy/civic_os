@@ -1,25 +1,41 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import { invalidate } from '$app/navigation';
+	import type { Snippet } from 'svelte';
 	import * as Dialog from '@civicos/shared/ui/dialog';
-	import { Button } from '@civicos/shared/ui/button';
 	import { Search, X, Check } from '@lucide/svelte';
 
-	type PickerOrg = { id: string; name: string; website?: string | null; email?: string | null };
+	export type PickerOrg = {
+		id: string;
+		name: string;
+		website?: string | null;
+		email?: string | null;
+	};
 
 	interface Props {
 		open: boolean;
-		convId: string;
 		pickerOrgs: PickerOrg[];
 		/** Orgs already attached (owning host plus existing co-hosts), not selectable. */
 		excludeIds: string[];
+		/**
+		 * Commit control, rendered in the footer with the current selection. The
+		 * dialog only picks; what "add" means differs per caller (the Campaign
+		 * already exists on Setup, but not yet on the create form), so the caller
+		 * owns the submit and closes the dialog when it is done.
+		 */
+		footer: Snippet<[{ selected: string[] }]>;
+		/** Preselected ids, for callers that reopen the picker to edit a choice. */
+		initialSelected?: string[];
 	}
 
-	let { open = $bindable(), convId, pickerOrgs, excludeIds }: Props = $props();
+	let {
+		open = $bindable(),
+		pickerOrgs,
+		excludeIds,
+		footer,
+		initialSelected = []
+	}: Props = $props();
 
 	let query = $state('');
 	let selected = $state<string[]>([]);
-	let submitting = $state(false);
 
 	const byId = $derived(new Map(pickerOrgs.map((o) => [o.id, o])));
 	const excluded = $derived(new Set(excludeIds));
@@ -46,7 +62,7 @@
 	function onOpenChange(next: boolean) {
 		if (next) {
 			query = '';
-			selected = [];
+			selected = initialSelected.filter((id) => !excluded.has(id));
 		}
 	}
 </script>
@@ -56,7 +72,7 @@
 		class="flex max-h-[85vh] w-[min(92vw,1000px)] flex-col overflow-hidden font-ui sm:max-w-[1000px]"
 	>
 		<Dialog.Header class="shrink-0">
-			<Dialog.Title class="text-section font-bold">Add New Co-Hosts</Dialog.Title>
+			<Dialog.Title class="text-h4 font-bold">Add New Co-Hosts</Dialog.Title>
 			<Dialog.Description class="text-body text-muted-foreground">
 				Search for existing Hosts on BLOOM in your campaign's location.
 			</Dialog.Description>
@@ -148,33 +164,7 @@
 		</div>
 
 		<Dialog.Footer class="shrink-0 border-t border-border pt-4">
-			<form
-				method="POST"
-				action="?/grantCohosts"
-				use:enhance={() => {
-					submitting = true;
-					return async ({ update, result }) => {
-						// The overview load declares `cohosts:${convId}`; refresh that rather
-						// than letting update() invalidate every load on the page.
-						await update({ invalidateAll: false });
-						if (result.type === 'success') {
-							await invalidate(`cohosts:${convId}`);
-							open = false;
-						}
-						submitting = false;
-					};
-				}}
-			>
-				<input type="hidden" name="convId" value={convId} />
-				{#each selected as id (id)}
-					<input type="hidden" name="orgIds" value={id} />
-				{/each}
-				<Button type="submit" disabled={selected.length === 0 || submitting}>
-					{submitting
-						? 'Adding…'
-						: `Add ${selected.length || ''} co-host${selected.length === 1 ? '' : 's'}`}
-				</Button>
-			</form>
+			{@render footer({ selected })}
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
