@@ -112,7 +112,14 @@ AUTH_HEADER="Cookie: auth-token=$AUTH_COOKIE"
 # SEED_SLUG=my-slug to pin it.
 SEED_TS="$(date +%s)"
 SEED_SLUG="${SEED_SLUG:-local-dev-$SEED_TS}"
-SEED_TITLE="${SEED_TITLE:-Local Dev Conversation ($SEED_TS)}"
+
+# The Place this Campaign runs in. The public URL is heading for
+# <place>.bloomproject.us/<slug>, so the place slug is the subdomain you visit.
+SEED_PLACE_SLUG="${SEED_PLACE_SLUG:-dundee}"
+SEED_PLACE_NAME="${SEED_PLACE_NAME:-Dundee, Scotland}"
+
+SEED_TITLE="${SEED_TITLE:-AI and the Future of $SEED_PLACE_NAME}"
+SEED_QUESTION="${SEED_QUESTION:-How can $SEED_PLACE_NAME ensure the benefits of AI are widely shared and its risks are responsibly managed?}"
 
 info "Step 2: Creating conversation (slug: $SEED_SLUG)..."
 CONV_RESPONSE=$(curl -s -X POST "$BACKEND_URL/conversation" \
@@ -121,10 +128,11 @@ CONV_RESPONSE=$(curl -s -X POST "$BACKEND_URL/conversation" \
   -d "$(jq -nc \
     --arg title "$SEED_TITLE" \
     --arg slug "$SEED_SLUG" \
+    --arg place "$SEED_PLACE_NAME" \
     '{
       title: $title,
-      short_description: "A conversation for local development",
-      description: "Local development conversation for testing Civic OS features. All data is stored in your local Postgres database.",
+      short_description: ("A conversation for " + $place),
+      description: ("People across " + $place + " are weighing in on how AI is changing their city, and what should be done about it. This is a local development seed: everything you submit is stored in your own Postgres."),
       image_url: "https://fakeimg.pl/1000x600",
       tags: ["dev", "local", "testing"],
       is_public: true,
@@ -145,6 +153,25 @@ if [ -z "$CONVERSATION_ID" ]; then
   exit 1
 fi
 ok "conversation: $CONVERSATION_ID"
+
+# --- Place -------------------------------------------------------------------
+# Comhairle has a Region model but nothing links a Conversation to one, Regions
+# have no slug, and /regions is authenticated while the participant app resolves
+# the subdomain anonymously. So the Place rides on metadata for now, which is
+# public on GET /conversation/:slug. See packages/civicos/src/lib/config/place.ts.
+info "Step 2.5: Setting place ($SEED_PLACE_NAME)..."
+PLACE_STATUS=$(curl -s -o /dev/null -w '%{http_code}' -X PATCH \
+  "$BACKEND_URL/conversation/$CONVERSATION_ID/metadata" \
+  -H "Content-Type: application/json" \
+  -H "$AUTH_HEADER" \
+  -d "$(jq -nc --arg s "$SEED_PLACE_SLUG" --arg n "$SEED_PLACE_NAME" \
+    '{place: {slug: $s, name: $n}}')")
+
+if echo "$PLACE_STATUS" | grep -qE '^2[0-9][0-9]$'; then
+  ok "place: $SEED_PLACE_SLUG ($SEED_PLACE_NAME)"
+else
+  info "  ! setting place failed (HTTP $PLACE_STATUS) — civicos will fall back to regions.ts"
+fi
 
 # --- Workflow ----------------------------------------------------------------
 info "Step 3: Creating workflow..."
@@ -174,18 +201,15 @@ WORKFLOW_STEP_RESPONSE=$(curl -s -X POST \
   "$BACKEND_URL/conversation/$CONVERSATION_ID/workflow/$WORKFLOW_ID/workflow_step" \
   -H "Content-Type: application/json" \
   -H "$AUTH_HEADER" \
-  -d '{
-    "name": "Polis Step",
-    "step_order": 1,
-    "activation_rule": "manual",
-    "description": "Polis deliberation step",
-    "required": false,
-    "is_offline": false,
-    "tool_setup": {
-      "type": "polis",
-      "topic": "How can developers ensure the benefits of AI are widely shared and risks are responsibly managed?"
-    }
-  }')
+  -d "$(jq -nc --arg topic "$SEED_QUESTION" '{
+    name: "Polis Step",
+    step_order: 1,
+    activation_rule: "manual",
+    description: "Polis deliberation step",
+    required: false,
+    is_offline: false,
+    tool_setup: { type: "polis", topic: $topic }
+  }')")
 
 WORKFLOW_STEP_ID=$(echo "$WORKFLOW_STEP_RESPONSE" | jq -r '.id // empty')
 POLIS_ID=$(echo "$WORKFLOW_STEP_RESPONSE" | jq -r '.previewToolConfig.poll_id // empty')
@@ -212,7 +236,7 @@ SEED_STATEMENTS=(
   "(dev) Risk-based regulation works better than blanket bans"
   "(dev) Compute access is the real bottleneck for fair AI"
   "(dev) Training data provenance must be disclosed"
-  "(dev) Small models deployed locally beat large remote ones for privacy"
+  "(dev) $SEED_PLACE_NAME should train its own workforce rather than import expertise"
 )
 
 info "Step 4.5: Seeding Polis statements ($POLIS_URL)..."
@@ -245,6 +269,28 @@ if [ -z "$INVITE_ID" ]; then
   exit 1
 fi
 ok "invite: $INVITE_ID"
+
+# --- Poll identity -----------------------------------------------------------
+# The participant app resolves anonymously, and the Polis workflow step is 401
+# to an anonymous caller: GET /conversation/:id/workflow is public but
+# .../workflow_step is not. So the poll id, server and question are mirrored
+# onto the Conversation metadata, which IS public on GET /conversation/:slug.
+# Without this, civicos falls back to the checked-in regions.ts map keyed by zip
+# and serves whichever poll that guesses. Admin writes the same object when a
+# Host publishes a Campaign to a Place. See packages/shared/src/data/place.ts.
+info "Step 5.5: Mirroring poll identity into metadata..."
+POLL_STATUS=$(curl -s -o /dev/null -w '%{http_code}' -X PATCH \
+  "$BACKEND_URL/conversation/$CONVERSATION_ID/metadata" \
+  -H "Content-Type: application/json" \
+  -H "$AUTH_HEADER" \
+  -d "$(jq -nc --arg p "$POLIS_ID" --arg u "$POLIS_URL" --arg i "$INVITE_ID" --arg q "$SEED_QUESTION" \
+    '{poll: {polisId: $p, polisUrl: $u, inviteId: $i, question: $q}}')")
+
+if echo "$POLL_STATUS" | grep -qE '^2[0-9][0-9]$'; then
+  ok "poll: $POLIS_ID"
+else
+  info "  ! mirroring poll failed (HTTP $POLL_STATUS) — civicos will fall back to regions.ts"
+fi
 
 # --- Launch (make conversation live) -----------------------------------------
 # Invites only work against live conversations.
@@ -441,6 +487,9 @@ ENV_FILES="${ENV_FILES:-$DEFAULT_ENV_FILES}"
 
 ENV_BLOCK=$(cat <<EOF
 # --- Local dev region (generated by scripts/seed-dev.sh) ---
+# Which Campaign the Place root redirects to. Participant URLs carry the slug
+# on the path (<place>.host/<campaign-slug>); this is only for bare `/`.
+PUBLIC_CAMPAIGN_SLUG=$SEED_SLUG
 PUBLIC_DEV_CONVERSATION_ID=$CONVERSATION_ID
 PUBLIC_DEV_INVITE_ID=$INVITE_ID
 PUBLIC_DEV_POLIS_ID=$POLIS_ID
@@ -448,12 +497,29 @@ PUBLIC_DEV_POLIS_WORKFLOW_STEP_ID=$WORKFLOW_STEP_ID
 EOF
 )
 
+# Admin builds every Campaign's participant link from this apex, so an .env
+# without it renders "No participant site yet" on every Campaign at once, and
+# only the ones with a hardcoded regions.ts shareUrl look like they work. Older
+# .env files predate the var, so top it up rather than assume .env.example.
+ensure_participant_base() {
+  env_file="$1"
+  case "$env_file" in
+    */admin/.env) ;;
+    *) return 0 ;;
+  esac
+  grep -q '^PUBLIC_PARTICIPANT_BASE_URL=' "$env_file" 2>/dev/null && return 0
+
+  printf '\n# Apex the participant app is served from, without a scheme.\nPUBLIC_PARTICIPANT_BASE_URL=localhost:5173\n' >> "$env_file"
+  ok "added PUBLIC_PARTICIPANT_BASE_URL to $env_file"
+}
+
 write_env() {
   env_file="$1"
   # Strip any prior PUBLIC_DEV_* lines and generated header, then append fresh block.
   if [ -f "$env_file" ]; then
-    grep -v -e '^PUBLIC_DEV_' -e '^# --- Local dev region (generated' "$env_file" > "$env_file.tmp" && mv "$env_file.tmp" "$env_file"
+    grep -v -e '^PUBLIC_DEV_' -e '^PUBLIC_CAMPAIGN_SLUG' -e '^# --- Local dev region (generated' -e '^# Which Campaign the Place root' -e '^# on the path' "$env_file" > "$env_file.tmp" && mv "$env_file.tmp" "$env_file"
   fi
+  ensure_participant_base "$env_file"
   printf '\n%s\n' "$ENV_BLOCK" >> "$env_file"
   ok "wrote $env_file"
 }
@@ -477,5 +543,5 @@ if [ -t 0 ]; then
 fi
 
 echo ""
-echo "Then: pnpm dev → http://dev.localhost:5173"
+echo "Then: pnpm dev → http://$SEED_PLACE_SLUG.localhost:5173/$SEED_SLUG"
 echo ""
