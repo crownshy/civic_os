@@ -72,7 +72,7 @@
 		>
 			<div
 				class={[
-					'flex items-center border-b border-foreground py-4',
+					'flex shrink-0 items-center border-b border-foreground py-4',
 					collapsed && !mobileOpen ? 'justify-center px-0' : 'justify-between gap-2.5 px-1'
 				].join(' ')}
 			>
@@ -122,7 +122,7 @@
 				</button>
 			{/if}
 
-			<nav class="py-2.5">
+			<nav class="shrink-0 py-2.5">
 				<a
 					href={resolve('/')}
 					title="Dashboard"
@@ -157,12 +157,16 @@
 			</nav>
 
 			{#if !collapsed || mobileOpen}
-				<div class="px-2.5 py-2 text-label font-medium tracking-wider text-muted-foreground/70">
+				<div
+					class="shrink-0 px-2.5 py-2 text-label font-medium tracking-wider text-muted-foreground/70"
+				>
 					CONVERSATIONS
 				</div>
 			{/if}
 
-			<div class="flex flex-col gap-0.5 border-b border-border pb-2.5">
+			<div
+				class="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto border-b border-border pb-2.5"
+			>
 				{#each conversations as conversation (conversation.id)}
 					<a
 						href={resolve('/c/[slug]/overview', { slug: conversation.slug })}
@@ -187,7 +191,7 @@
 				{/each}
 			</div>
 
-			<div class="p-2.5">
+			<div class="shrink-0 p-2.5">
 				<a
 					href={resolve('/c/new')}
 					title="New Conversation"
@@ -203,11 +207,9 @@
 				</a>
 			</div>
 
-			<div class="flex-1"></div>
-
 			<div
 				class={[
-					'flex items-center border-t border-border py-2.5',
+					'flex shrink-0 items-center border-t border-border py-2.5',
 					collapsed && !mobileOpen ? 'justify-center px-0' : 'gap-4 px-3.5'
 				].join(' ')}
 			>

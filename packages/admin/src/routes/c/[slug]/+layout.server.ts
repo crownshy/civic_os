@@ -1,7 +1,10 @@
 import { error } from '@sveltejs/kit';
 import { createApiClient } from '$lib/api/client';
 import type { createApiClient as ApiClientFactory } from '@crownshy/api-client/client';
-import { findByRouteSlug, regionFor } from '$lib/conversations';
+import { findByRouteSlug, participantBase, regionFor } from '$lib/conversations';
+import { placeForCampaign } from '$lib/config/place';
+import { polisConfigFor } from '$lib/polis-step';
+import { readPoll } from '@civicos/shared/data/place';
 import type { LayoutServerLoad } from './$types';
 
 type Api = ReturnType<typeof ApiClientFactory>;
@@ -83,14 +86,46 @@ export const load: LayoutServerLoad = async ({ params, parent, cookies, url, dep
 		slug: summary.slug,
 		title: conversation?.title ?? summary.title,
 		status: summary.status,
-		placeName: summary.placeName,
+		// Where this Campaign runs, and so the subdomain it is served from. Stored
+		// on the Conversation's metadata and editable on Setup; a legacy region
+		// entry is the fallback. The list resolves the same thing in `toSummary`,
+		// so this and the dashboard agree.
+		place: placeForCampaign(conversation?.metadata, region),
+		// Utah and Oregon predate place-scoped slugs and their slugs are pinned by
+		// `regions.ts`. Setup must never auto-rename one off the back of a Place
+		// edit: the many-to-many scheme is for new Campaigns (ADR 0007).
+		isLegacyRegion: !!region,
 		shareUrl: summary.shareUrl,
+		// Why there is no link, when there is none. A Campaign no longer needs a
+		// Place to have an address, so "publish it somewhere" stopped being the
+		// answer: either this deployment has no participant apex configured, which
+		// costs every Campaign its link at once, or the Conversation has no slug to
+		// address it by.
+		shareUrlBlocker: summary.shareUrl
+			? null
+			: participantBase()
+				? ('slug' as const)
+				: ('apex' as const),
 		hostName: hostName ?? region?.hostName ?? '',
 		polisWorkflowStepId: region?.polis_workflow_step_id ?? polisStep?.id ?? null,
 		// The Key Question is the Polis conversation's `topic`, edited on Setup
 		// through PolisUpdateConfig. A legacy region's hardcoded `question` is
 		// only the fallback now, for Campaigns whose Polis step did not resolve.
 		keyQuestion: polisStep?.topic ?? region?.question ?? '',
+		// What a mirror writes to `metadata.poll`, merged over what is already
+		// stored. `PatchConversationMetadata` replaces this key wholesale and
+		// comhairle reports no `topic` back on either tool config, so an object
+		// built from the step alone would silently drop the Key Question the create
+		// form collected. Falls back to the stored object when no step resolves, so
+		// a mirror can only ever add to what a Campaign already has.
+		pollIdentity: polisStep?.polisId
+			? {
+					...readPoll(conversation?.metadata),
+					polisId: polisStep.polisId,
+					...(polisStep.polisUrl ? { polisUrl: polisStep.polisUrl } : {}),
+					...(polisStep.topic ? { question: polisStep.topic } : {})
+				}
+			: readPoll(conversation?.metadata),
 		// Still sourced from `regions.ts`, because the Conversation model has
 		// nowhere to put them yet: the public participant URL and the zip
 		// prefixes that scope the participants county rollup. Campaigns without a
@@ -121,13 +156,24 @@ async function resolvePolisStep(api: Api, conversationId: string, pinnedStepId?:
 		const steps = await api.ListConversationWorkflowSteps({
 			params: { conversation_id: conversationId, workflow_id: workflow.id }
 		});
-		const isPolis = (step: (typeof steps)[number]) => step.toolConfig?.type === 'polis';
+		// `polisConfigFor` is both the search and the read, so the step this picks
+		// and the poll it reports cannot come from different places. It looks past
+		// `toolConfig` to the preview config, without which a Campaign created in
+		// admin has no Polis step at all as far as this function is concerned.
+		const isPolis = (step: (typeof steps)[number]) => !!polisConfigFor(step);
 		const step = steps.find((s) => s.id === pinnedStepId && isPolis(s)) ?? steps.find(isPolis);
 		if (!step) return null;
 
+		const polis = polisConfigFor(step);
+
 		return {
 			id: step.id,
-			topic: step.toolConfig?.type === 'polis' ? (step.toolConfig.topic ?? null) : null
+			topic: polis?.topic ?? null,
+			// Mirrored into `metadata.poll` so the participant app can read them:
+			// this step is 401 anonymously, and civicos has no other way to learn
+			// which Polis conversation it is serving.
+			polisId: polis?.pollId ?? null,
+			polisUrl: polis?.serverUrl ?? null
 		};
 	} catch (e) {
 		console.warn('Resolving the Polis workflow step failed', e);

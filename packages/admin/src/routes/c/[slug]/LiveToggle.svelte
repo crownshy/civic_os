@@ -26,7 +26,9 @@
 	}
 </script>
 
-<div class="flex min-w-0 items-center gap-1">
+<!-- shrink-0: the badge and its action are the fixed part of the header meta
+     row, so a long share URL next to it is what gets truncated, not this. -->
+<div class="flex shrink-0 items-center gap-1">
 	{#if error}
 		<span class="truncate text-caption text-destructive" role="alert">{error}</span>
 	{/if}

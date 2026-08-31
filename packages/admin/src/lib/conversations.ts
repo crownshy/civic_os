@@ -17,6 +17,8 @@
 
 import type { LocalizedConversationDto } from '@crownshy/api-client/api';
 import { REGIONS, type RegionConfig } from '$lib/config/regions';
+import { participantUrl, readOrg, readPlace, type Place } from '@civicos/shared/data/place';
+import { env } from '$env/dynamic/public';
 
 /**
  * Slugs the `/c/**` routes already use for something else. A Campaign carrying
@@ -38,9 +40,17 @@ export type ConversationSummary = {
 	status: ConversationStatus;
 	/** The owning Host, used to label the Campaign. Null when unowned. */
 	organizationId: string | null;
+	/** Where this Campaign runs. Null until a Host publishes it to a Place. */
+	place: Place | null;
 	/** Region name from the legacy config; null for backend-only conversations. */
 	placeName: string | null;
-	/** Public participant URL from the legacy config; null when unconfigured. */
+	/**
+	 * Where participants go. Derived from the Place and the Campaign slug rather
+	 * than stored, so every Campaign has one and not just the four in
+	 * `regions.ts`. A Place is not required: without one the Campaign is served
+	 * from the apex. Null only when the Conversation has no slug to address it by,
+	 * or when the apex itself is unconfigured. See `PUBLIC_PARTICIPANT_BASE_URL`.
+	 */
 	shareUrl: string | null;
 };
 
@@ -87,13 +97,56 @@ export function statusFor(
 
 export function toSummary(conversation: LocalizedConversationDto): ConversationSummary {
 	const region = regionFor(conversation);
+
+	// The stored Place first, the legacy region behind it, same order civicos
+	// resolves in. `GetPermittedConversations` returns `metadata`, so this works
+	// on the list and not only on a single Campaign.
+	const place =
+		readPlace(conversation.metadata) ??
+		(region ? { slug: region.slug, name: region.stateName } : null);
+
+	// Derived, not stored: `regions.ts` only ever had a `shareUrl` for its four
+	// entries, so every Campaign created in admin had no participant link at all.
+	// Every Campaign has a participant site from creation: without a Place it is
+	// served from the apex, and publishing to a Place moves it to that subdomain.
+	const org = readOrg(conversation.metadata);
+	const derived = participantUrl(
+		place?.slug ?? '',
+		conversation.slug ?? '',
+		org?.slug ?? region?.hostName ?? '',
+		participantBase()
+	);
+
+	// A legacy region's configured URL still wins, because Utah's and Oregon's
+	// hostnames are live and predate this rule. Only while the region's slug is
+	// still the Place it is served from, though: the env-driven `dev` entry
+	// guesses `dev.localhost` while the seed writes whatever Place it was handed,
+	// and civicos 404s a Campaign asked for under the wrong subdomain (ADR 0007)
+	// rather than serving it anyway. A link that cannot resolve is worse than the
+	// derived one it was overriding.
+	const pinned = region && region.slug === place?.slug ? region.shareUrl : null;
+
 	return {
 		id: conversation.id,
 		slug: routeSlugFor(conversation),
 		title: conversation.title,
 		status: statusFor(conversation),
 		organizationId: conversation.organizationId ?? null,
-		placeName: region?.stateName ?? null,
-		shareUrl: region?.shareUrl ?? null
+		place,
+		placeName: place?.name ?? null,
+		shareUrl: (pinned ?? derived) || null
 	};
+}
+
+/**
+ * The participant apex, e.g. `bloomproject.us`. Configured rather than derived
+ * from admin's own hostname: admin and the participant app are different
+ * deployments and there is no reliable rule turning one into the other.
+ *
+ * Exported so a missing share link can say *why* it is missing: an unset apex
+ * costs every Campaign its link at once, and that reads as a per-Campaign
+ * problem unless the surface can tell the two apart.
+ */
+export function participantBase(): string {
+	return env.PUBLIC_PARTICIPANT_BASE_URL ?? '';
 }
