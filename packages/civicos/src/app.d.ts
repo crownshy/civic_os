@@ -4,7 +4,9 @@ import type { RegionConfig } from '$lib/config/regions';
 
 declare global {
 	namespace App {
-		// interface Error {}
+		interface Error {
+			message: string;
+		}
 		interface Locals {
 			region: RegionConfig;
 		}

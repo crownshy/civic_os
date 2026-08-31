@@ -28,16 +28,27 @@
 	// Region from subdomain (layout server load)
 	const subdomainRegion: RegionConfig = page.data.region;
 
-	// Resolve which Polis to use based on user's zipcode
+	// Which Polis conversation this poll is.
+	//
+	// The Campaign says, when it has been published to a Place: admin mirrors the
+	// Polis step's `poll_id` into `metadata.poll` because the step itself is 401
+	// anonymously. That is what lets a Campaign created in admin be served at all.
+	//
+	// `regions.ts` keyed by zip stays behind it, unchanged, so Utah and Oregon
+	// resolve exactly as they did. Reaching here means the zip already matched
+	// this subdomain (the landing page redirects otherwise), so the two agree for
+	// legacy Campaigns and only the stored value is new.
 	const zipRegion = session.zipCode ? getRegionByZipcode(session.zipCode) : subdomainRegion;
-	const polisId = zipRegion.polisId || config.polisId;
-	const question = zipRegion.question;
+	const campaign = page.data.campaign;
+	const polisId = campaign?.poll?.polisId || zipRegion.polisId || config.polisId;
+	const polisUrl = campaign?.poll?.polisUrl || config.polisUrl;
+	const question = campaign?.poll?.question || zipRegion.question;
 
 	// Use session user ID for Polis xid (falls back to random if not yet joined)
 	const userId = session.userId ?? `bloom-anon-${Math.random().toString(36).slice(2, 8)}`;
 
 	// Pass persisted pid so returning users only see unvoted statements
-	let polis = new PolisApi(userId, polisId, 'en', config.polisUrl, session.pid);
+	let polis = new PolisApi(userId, polisId, 'en', polisUrl, session.pid);
 
 	// Sync pid back to session whenever Polis assigns/updates it
 	$effect(() => {

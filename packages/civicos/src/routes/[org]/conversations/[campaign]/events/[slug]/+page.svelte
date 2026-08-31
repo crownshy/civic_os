@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { campaignPath } from '@civicos/shared/data/place';
 	import { page } from '$app/state';
 	import { AppShell } from '$lib/components/layout';
 	import { Button, InfoBar } from '$lib/components/ui';
@@ -328,7 +329,12 @@
 			<h1 class="font-display text-2xl font-medium tracking-display text-foreground">
 				Conversation not found
 			</h1>
-			<Button variant="primary" size="md" href="/conversations" class="mt-6">
+			<Button
+				variant="primary"
+				size="md"
+				href={campaignPath(page.params.campaign, page.params.org, `events`)}
+				class="mt-6"
+			>
 				← BACK TO CONVERSATIONS
 			</Button>
 		</div>

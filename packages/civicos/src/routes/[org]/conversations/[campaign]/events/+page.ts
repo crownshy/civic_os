@@ -1,11 +1,11 @@
-import type { PageLoad } from '../$types';
+import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ parent }) => {
-	const { region, api } = await parent();
+	const { campaign, api } = await parent();
 
 	try {
 		const eventResults = await api.ListEvents({
-			params: { conversation_id: region.conversationId },
+			params: { conversation_id: campaign.id },
 			queries: { start_time: 'asc' }
 		});
 

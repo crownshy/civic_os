@@ -728,5 +728,7 @@ export function getRegionUrl(
 	const subdomain = region.slug;
 	const url = `${protocol}://${subdomain}.${baseDomain}${port}`;
 
-	return `${url}/landing?zip_code=${encodeURIComponent(zipCode)}`;
+	// The Place root, not a Campaign: we do not know which Campaign the target
+	// Place is running. `/` redirects to whichever one it has configured.
+	return `${url}/?zip_code=${encodeURIComponent(zipCode)}`;
 }

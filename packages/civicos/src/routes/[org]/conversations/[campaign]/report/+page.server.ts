@@ -1,11 +1,12 @@
 import { createApiClient } from '@crownshy/api-client/client';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ locals, cookies, url, depends }) => {
+export const load: PageServerLoad = async ({ parent, locals, cookies, url, depends }) => {
 	depends('report:data');
 
 	const region = locals.region;
-	const conversationId = region.conversationId;
+	const { campaign } = await parent();
+	const conversationId = campaign.id;
 	// Still read from `regions.ts` rather than resolved from the Campaign's
 	// workflow steps the way admin does it. See #401.
 	const workflowStepId = region.polis_workflow_step_id;
@@ -16,7 +17,7 @@ export const load: PageServerLoad = async ({ locals, cookies, url, depends }) =>
 	};
 
 	if (!conversationId) {
-		return empty(`No conversationId configured for region "${region.slug}"`);
+		return empty(`No Conversation resolved for "${campaign.slug}"`);
 	}
 	if (!workflowStepId) {
 		return empty(`No Polis workflow step configured for region "${region.slug}"`);

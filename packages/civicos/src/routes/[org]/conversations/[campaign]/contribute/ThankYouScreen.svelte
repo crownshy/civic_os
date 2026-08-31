@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { campaignPath } from '@civicos/shared/data/place';
 	import { scale } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import {
@@ -9,6 +10,7 @@
 		SharePanelContent,
 		ReviewPanelContent
 	} from '$lib/components/ui';
+	import { page } from '$app/state';
 	import { session } from '$lib/services/session.svelte';
 	import { ArrowRight, Check } from 'lucide-svelte';
 	import { sanitizeHostHtml } from '@civicos/shared/sanitize';
@@ -17,8 +19,14 @@
 
 	// TODO(post-#216): import from '$lib/config/landing-copy' once branch 216 lands.
 	const FOOTER_LINKS: { label: string; href: string; external?: boolean }[] = [
-		{ label: 'Take the Open Poll', href: '/contribute' },
-		{ label: 'Join a Community Conversation', href: '/conversations' },
+		{
+			label: 'Take the Open Poll',
+			href: campaignPath(page.params.campaign, page.params.org, 'contribute')
+		},
+		{
+			label: 'Join a Community Conversation',
+			href: campaignPath(page.params.campaign, page.params.org, 'events')
+		},
 		{ label: 'About BLOOM Project', href: 'https://www.bloom-project.org/', external: true },
 		{
 			label: 'Terms and Conditions',

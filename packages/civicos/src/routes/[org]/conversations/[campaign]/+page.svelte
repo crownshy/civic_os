@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { campaignPath } from '@civicos/shared/data/place';
 	import { fade } from 'svelte/transition';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
@@ -10,6 +11,7 @@
 	import { session } from '$lib/services/session.svelte';
 	import { getRegionByZipcode, getRegionUrl, REGIONS } from '$lib/config/regions';
 	import type { RegionConfig } from '$lib/config/regions';
+	import type { Campaign } from '$lib/config/campaign';
 	import { OPEN_POLL_EXPLAINER, FOOTER_LINKS } from '$lib/config/landing-copy';
 	import { trackEvent } from '@lukulent/svelte-umami';
 	import { safeHref, sanitizeHostHtml } from '@civicos/shared/sanitize';
@@ -17,6 +19,7 @@
 	import { listSeparator } from '$lib/utils/list';
 
 	const region: RegionConfig = page.data.region;
+	const campaign: Campaign = page.data.campaign;
 	const hostCopy = page.data.hostCopy;
 	const isReturning = session.hasSession;
 
@@ -58,7 +61,7 @@
 
 	async function handleJoin() {
 		if (isReturning) {
-			goto('/contribute');
+			goto(campaignPath(campaign.slug, page.params.org, `contribute`));
 			return;
 		}
 
@@ -80,15 +83,21 @@
 		}
 
 		joining = true;
+		// The Campaign the URL resolved to, not the zip's `regions.ts` entry. For
+		// Utah and Oregon these are the same Conversation (the redirect above
+		// guarantees the zip matches this subdomain); for a Campaign created in
+		// admin only `campaign.id` is right, because an unknown subdomain falls
+		// back to GENERIC_REGION and would have put its participants in the USA
+		// catch-all poll.
 		const success = await session.join(
 			zipCode.trim(),
 			undefined,
-			zipRegion.conversationId,
-			zipRegion.inviteId
+			campaign.id,
+			campaign.poll?.inviteId ?? zipRegion.inviteId
 		);
 		joining = false;
 		trackEvent('SucccesfullSignup');
-		if (success) goto('/contribute');
+		if (success) goto(campaignPath(campaign.slug, page.params.org, `contribute`));
 	}
 
 	function isValidEmail(value: string): boolean {
@@ -115,7 +124,7 @@
 		if (session.hasSession) {
 			await session.registerEmail(trimmed);
 		} else {
-			await session.join('', trimmed, region.conversationId, region.inviteId);
+			await session.join('', trimmed, campaign.id, campaign.poll?.inviteId ?? region.inviteId);
 		}
 		emailSubmitting = false;
 		emailSuccess = true;
@@ -123,7 +132,7 @@
 </script>
 
 <svelte:head>
-	<title>{region.heroHeader} — {region.stateName}</title>
+	<title>{campaign.title}{campaign.place ? ` — ${campaign.place.name}` : ''}</title>
 </svelte:head>
 
 <div class="min-h-screen bg-gradient-to-b from-orange-50 to-orange-100 text-yellow-950">
@@ -131,21 +140,23 @@
 	<div class="flex flex-col md:h-screen">
 		<!-- Header chip row — bypasses AppShell. See docs/adr/0001-landing-bypasses-appshell.md -->
 		<header class="flex items-center justify-between px-6 pt-4 pb-2">
-			<div class="flex items-center gap-2 font-mono text-sm font-medium text-stone-500 uppercase">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="14"
-					height="14"
-					viewBox="0 0 24 24"
-					fill="currentColor"
-					aria-hidden="true"
-				>
-					<path
-						d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0Zm-8 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
-					/>
-				</svg>
-				{region.stateName.toUpperCase()}
-			</div>
+			{#if campaign.place}
+				<div class="flex items-center gap-2 font-mono text-sm font-medium text-stone-500 uppercase">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="14"
+						height="14"
+						viewBox="0 0 24 24"
+						fill="currentColor"
+						aria-hidden="true"
+					>
+						<path
+							d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0Zm-8 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+						/>
+					</svg>
+					{campaign.place.name.toUpperCase()}
+				</div>
+			{/if}
 			<button
 				type="button"
 				onclick={() => (showAboutMessage = true)}
@@ -172,7 +183,7 @@
 				<h1
 					class="mt-3 text-center font-display text-5xl leading-[1.05] font-medium tracking-display md:text-6xl"
 				>
-					{region.heroHeader}
+					{campaign.title}
 				</h1>
 				<p
 					class="mt-6 text-center font-sans text-base leading-5 font-medium md:text-lg md:leading-6 [&_a]:text-destructive"

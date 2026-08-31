@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { campaignPath } from '@civicos/shared/data/place';
+	import { page } from '$app/state';
 	import { AppShell } from '$lib/components/layout';
 	import { InfoBar, ConversationEventCard, Button } from '$lib/components/ui';
 	import { Input } from '@civicos/shared/ui/input';
@@ -84,7 +86,7 @@
 			<div class="flex flex-col gap-4 px-7 pt-4 pb-8 md:px-12">
 				{#each filteredEvents as event, i (event.id)}
 					<a
-						href="/conversations/{event.id}"
+						href={campaignPath(page.params.campaign, page.params.org, `events/${event.id}`)}
 						class="block transition-transform active:scale-[0.98]"
 						in:fly={{ y: 30, duration: 350, delay: i * 80, easing: backOut }}
 						out:fade={{ duration: 200 }}

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { campaignPath } from '@civicos/shared/data/place';
+	import { page } from '$app/state';
 	import Dialog from '$lib/components/ui/Dialog.svelte';
 	import { Input } from '@civicos/shared/ui/input';
 	import { Mail, User } from 'lucide-svelte';
@@ -154,7 +156,9 @@
 		{#if status === 'success'}
 			<div class="flex w-full items-center justify-between gap-4 px-7">
 				<EventCalendarInviteButton {event} {region} popupDirection="up" />
-				<Button class="w-full" href="/landing">GO TO POLL</Button>
+				<Button class="w-full" href={campaignPath(page.params.campaign, page.params.org)}
+					>GO TO POLL</Button
+				>
 			</div>
 		{:else}
 			<Button onclick={() => formRef?.requestSubmit()} class="w-full" disabled={!$formData.email}
