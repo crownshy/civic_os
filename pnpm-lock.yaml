@@ -185,6 +185,9 @@ importers:
       embla-carousel-autoplay:
         specifier: ^8.6.0
         version: 8.6.0(embla-carousel@8.6.0)
+      isomorphic-dompurify:
+        specifier: ~3.19.0
+        version: 3.19.0
       layercake:
         specifier: ^10.0.2
         version: 10.0.2(svelte@5.56.4(@typescript-eslint/types@8.62.1))(typescript@5.9.3)

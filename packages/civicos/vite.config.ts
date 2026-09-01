@@ -42,6 +42,14 @@ export default defineConfig({
 			outdir: './src/lib/paraglide'
 		})
 	],
+	ssr: {
+		// jsdom (via isomorphic-dompurify) reaches for files by relative path at
+		// runtime, e.g. css-tree's `require('../data/patch.json')`. Vite inlines it
+		// because `@civicos/shared` is a linked workspace package, and the relative
+		// path does not survive the move into a chunk. Externalizing leaves it as a
+		// plain import resolved from node_modules.
+		external: ['isomorphic-dompurify']
+	},
 	server: {
 		// Allow subdomain-based local dev: utah.localhost, oregon.localhost, etc.
 		allowedHosts: ['.localhost'],
