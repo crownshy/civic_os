@@ -306,8 +306,11 @@ class Session {
 
 			return true;
 		} catch (e) {
+			// The real error goes to the console. `error` is rendered on the landing
+			// page, so it says something a participant can act on rather than
+			// whatever axios called the status code.
 			console.error('[Session] Failed to join:', e);
-			this.error = e instanceof Error ? e.message : 'Failed to join conversation';
+			this.error = 'Something went wrong joining this conversation. Please try again.';
 			return false;
 		} finally {
 			this.loading = false;
