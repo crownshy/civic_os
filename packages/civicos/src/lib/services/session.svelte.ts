@@ -55,6 +55,8 @@ class Session {
 	hasAgreedToTos = $state(false);
 	endCtaShareCompleted = $state(false);
 	endCtaReviewCompleted = $state(false);
+	/** Events of this Campaign this browser registered for. Cache, not record (#420). */
+	registeredEventIds = $state<string[]>([]);
 
 	/**
 	 * Which Campaign the fields above that belong to a poll are currently
@@ -112,6 +114,7 @@ class Session {
 		this.hasSeenPause = record.hasSeenPause;
 		this.endCtaShareCompleted = record.endCtaShareCompleted;
 		this.endCtaReviewCompleted = record.endCtaReviewCompleted;
+		this.registeredEventIds = record.registeredEventIds;
 	}
 
 	private persistAccount() {
@@ -131,7 +134,8 @@ class Session {
 			totalVotes: this.totalVotes,
 			hasSeenPause: this.hasSeenPause,
 			endCtaShareCompleted: this.endCtaShareCompleted,
-			endCtaReviewCompleted: this.endCtaReviewCompleted
+			endCtaReviewCompleted: this.endCtaReviewCompleted,
+			registeredEventIds: this.registeredEventIds
 		});
 	}
 
@@ -190,6 +194,7 @@ class Session {
 		this.hasSeenPause = false;
 		this.endCtaShareCompleted = false;
 		this.endCtaReviewCompleted = false;
+		this.registeredEventIds = [];
 		this.persistAccount();
 		clearCampaigns();
 	}
@@ -228,6 +233,21 @@ class Session {
 	markEndCtaReviewCompleted() {
 		this.endCtaReviewCompleted = true;
 		this.persistCampaign();
+	}
+
+	/**
+	 * Remember that this browser registered for an event. The attendance record
+	 * on the backend is the answer; this covers the gap before the page load
+	 * that reads it re-runs, and a backend that could not answer at all.
+	 */
+	markRegisteredForEvent(eventId: string) {
+		if (!eventId || this.registeredEventIds.includes(eventId)) return;
+		this.registeredEventIds = [...this.registeredEventIds, eventId];
+		this.persistCampaign();
+	}
+
+	isRegisteredForEvent(eventId: string): boolean {
+		return this.registeredEventIds.includes(eventId);
 	}
 
 	savePid(pid: number) {

@@ -28,9 +28,11 @@
 		conversationId: string;
 		region: RegionConfig;
 		api: ApiClient;
+		/** Fired once the attendance is filed, so the page can reflect it. */
+		onRegistered?: () => void;
 	};
 
-	let { open, event, conversationId, region, api }: Props = $props();
+	let { open, event, conversationId, region, api, onRegistered }: Props = $props();
 
 	const formattedDate = $derived(event ? format(new Date(event.startTime), 'EEEE, MMMM d') : '');
 
@@ -57,6 +59,7 @@
 				await registerForEvent(api, { conversationId, eventId: event.id, email, username });
 
 				status = 'success';
+				onRegistered?.();
 			} catch (e) {
 				console.error('[EventRegistration] Failed to register a participant:', e);
 				error = registrationErrorMessage(e);

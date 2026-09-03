@@ -17,9 +17,10 @@
 		format
 	} from 'date-fns';
 	import { onMount, onDestroy } from 'svelte';
+	import { invalidate } from '$app/navigation';
+	import { session } from '$lib/services/session.svelte';
 
 	const region: RegionConfig = page.data.region;
-	const slug = $derived(page.params.slug);
 
 	const { data } = $props();
 	const { event, eventDateFormatter, eventTimeFormatter } = data;
@@ -39,7 +40,17 @@
 	let isPast = $state(false);
 	let interval: ReturnType<typeof setInterval> | null = null;
 	let showForm = $state(false);
-	let isRegistered = $state(false);
+
+	/**
+	 * Whether this participant is on the event's attendance list.
+	 *
+	 * The server load is the answer (#420). The cached flag stands in only when
+	 * it could not resolve one, so a participant whose registration the backend
+	 * cannot confirm is not shown the signup form again.
+	 */
+	let isRegistered = $derived(
+		data.registrationResolved ? data.isRegistered : session.isRegisteredForEvent(event.id)
+	);
 	let activeSection = $state<'details' | 'description'>('details');
 	let scrollContainer = $state<HTMLElement | undefined>(undefined);
 
@@ -71,7 +82,6 @@
 
 	onMount(() => {
 		if (!event) return;
-		isRegistered = localStorage.getItem(`registered-${slug}`) === 'true';
 		updateCountdown();
 		interval = setInterval(updateCountdown, 60000);
 	});
@@ -94,29 +104,15 @@
 		if (interval) clearInterval(interval);
 	});
 
-	function onFrameMessage(e: any) {
-		if (e.origin !== 'https://forms.bloomproject.us') return;
-		if (e.data.eventName === 'HIDE_EMBED_MODAL') {
-			isRegistered = true;
-			localStorage.setItem(`registered-${slug}`, 'true');
-			setTimeout(() => {
-				showForm = false;
-			}, 2000);
-		}
+	/**
+	 * The modal has filed the attendance. Cache it so the button flips now, then
+	 * re-run the load that reads the list back.
+	 */
+	async function onRegistered() {
+		session.markRegisteredForEvent(event.id);
+		await invalidate('civicos:attendance');
 	}
-
-	$effect(() => {
-		window.addEventListener('message', onFrameMessage);
-
-		return () => {
-			window.removeEventListener('message', onFrameMessage);
-		};
-	});
 </script>
-
-<svelte:head>
-	<script src="https://www.unpkg.com/@heyform-inc/embed@latest/dist/index.umd.js"></script>
-</svelte:head>
 
 {#if event}
 	<AppShell>
@@ -124,12 +120,7 @@
 			class="flex h-full flex-col overflow-y-auto scroll-smooth bg-gradient-primary"
 			bind:this={scrollContainer}
 		>
-			<InfoBar
-				{placeName}
-				{region}
-				onBack={() => history.back()}
-				backLabel="← BACK"
-			/>
+			<InfoBar {placeName} {region} onBack={() => history.back()} backLabel="← BACK" />
 
 			<!-- Header -->
 			<div class="flex flex-col items-center px-6 pt-6 pb-0 md:px-12">
@@ -328,6 +319,7 @@
 			conversationId={data.campaign.id}
 			{region}
 			api={data.api}
+			{onRegistered}
 		/>
 	</AppShell>
 {:else}

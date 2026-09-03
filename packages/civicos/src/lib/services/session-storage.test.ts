@@ -67,6 +67,24 @@ describe('campaign records', () => {
 
 		expect(store.length).toBe(0);
 	});
+
+	it('keeps event registrations with the Campaign they belong to', () => {
+		saveCampaign(UTAH, { ...emptyCampaign(), registeredEventIds: ['town-hall'] });
+
+		expect(loadCampaign(UTAH).registeredEventIds).toEqual(['town-hall']);
+		expect(loadCampaign(OREGON).registeredEventIds).toEqual([]);
+	});
+
+	it('reads a malformed registration list as no registrations', () => {
+		saveCampaign(UTAH, emptyCampaign());
+		const stored = JSON.parse(store.getItem(`civic-os-campaign:${UTAH}`)!);
+		store.setItem(
+			`civic-os-campaign:${UTAH}`,
+			JSON.stringify({ ...stored, registeredEventIds: 'town-hall' })
+		);
+
+		expect(loadCampaign(UTAH).registeredEventIds).toEqual([]);
+	});
 });
 
 describe('schema version', () => {

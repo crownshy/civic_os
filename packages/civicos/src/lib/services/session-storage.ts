@@ -37,6 +37,13 @@ export interface CampaignRecord {
 	hasSeenPause: boolean;
 	endCtaShareCompleted: boolean;
 	endCtaReviewCompleted: boolean;
+	/**
+	 * Events of this Campaign this browser has registered for. A cache in front
+	 * of the attendance list, which is the actual record (#420): it covers the
+	 * moment between registering and the load re-running, and a backend that
+	 * cannot answer. An absent entry is not evidence of anything.
+	 */
+	registeredEventIds: string[];
 }
 
 /**
@@ -69,7 +76,8 @@ export function emptyCampaign(): CampaignRecord {
 		totalVotes: 0,
 		hasSeenPause: false,
 		endCtaShareCompleted: false,
-		endCtaReviewCompleted: false
+		endCtaReviewCompleted: false,
+		registeredEventIds: []
 	};
 }
 
@@ -126,6 +134,8 @@ const asBoolean = (value: unknown): boolean => value === true;
 const asString = (value: unknown): string => (typeof value === 'string' ? value : '');
 const asCount = (value: unknown): number =>
 	typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : 0;
+const asStringList = (value: unknown): string[] =>
+	Array.isArray(value) ? value.filter((v): v is string => typeof v === 'string' && v !== '') : [];
 const asOptionalNumber = (value: unknown): number | undefined =>
 	typeof value === 'number' && Number.isFinite(value) ? value : undefined;
 
@@ -146,7 +156,8 @@ function toCampaign(raw: Record<string, unknown>): CampaignRecord {
 		totalVotes: asCount(raw.totalVotes),
 		hasSeenPause: asBoolean(raw.hasSeenPause),
 		endCtaShareCompleted: asBoolean(raw.endCtaShareCompleted),
-		endCtaReviewCompleted: asBoolean(raw.endCtaReviewCompleted)
+		endCtaReviewCompleted: asBoolean(raw.endCtaReviewCompleted),
+		registeredEventIds: asStringList(raw.registeredEventIds)
 	};
 }
 
