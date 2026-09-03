@@ -84,22 +84,6 @@
 		handleJoin();
 	}
 
-	/**
-	 * The invite that registers a participant on this Campaign's workflow.
-	 *
-	 * A legacy region's invite belongs to the Campaign, because the region is the
-	 * Campaign. Any other region's does not, and offering it produces a 404 on
-	 * `AcceptInvite` against a Conversation that never had that invite. So a
-	 * Campaign with no stored invite gets none, and joins without registering
-	 * rather than borrowing one.
-	 */
-	function campaignInviteId(fallback: RegionConfig): string | undefined {
-		if (campaign.poll?.inviteId) return campaign.poll.inviteId;
-		if (campaign.isLegacyRegion) return fallback.inviteId;
-		console.warn(`[Campaign] "${campaign.slug}" has no invite; joining without registering.`);
-		return undefined;
-	}
-
 	async function handleJoin() {
 		if (isReturning) {
 			goto(campaignPath(campaign.slug, page.params.org, `contribute`));
@@ -129,12 +113,7 @@
 		// admin only `campaign.id` is right, because an unknown subdomain falls
 		// back to GENERIC_REGION and would have put its participants in the USA
 		// catch-all poll.
-		const success = await session.join(
-			zipCode.trim(),
-			undefined,
-			campaign.id,
-			campaignInviteId(zipRegion)
-		);
+		const success = await session.join(zipCode.trim(), undefined, campaign.id);
 		joining = false;
 		if (!success) return;
 		trackEvent('SucccesfullSignup');
@@ -168,7 +147,7 @@
 		if (session.hasSession) {
 			await session.registerEmail(trimmed);
 		} else {
-			await session.join('', trimmed, campaign.id, campaignInviteId(region));
+			await session.join('', trimmed, campaign.id);
 			await invalidate('civicos:participant');
 		}
 		emailSubmitting = false;

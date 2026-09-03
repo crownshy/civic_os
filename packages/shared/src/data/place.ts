@@ -150,7 +150,6 @@ export interface CampaignPoll {
 	/** Polis server, when it differs from the app default. `toolConfig.server_url`. */
 	polisUrl?: string;
 	/** Invite record participants join through, when the Campaign has one. */
-	inviteId?: string;
 	/**
 	 * The Key Question, i.e. the Polis step's `topic`. Mirrored for the same
 	 * reason as the poll id: it lives on the step, and the step is 401.
@@ -173,12 +172,11 @@ export function readPoll(metadata: unknown): CampaignPoll | null {
 	const value = (metadata as Record<string, unknown>)[POLL_METADATA_KEY];
 	if (typeof value !== 'object' || value === null) return null;
 
-	const { polisId, polisUrl, inviteId, question } = value as Record<string, unknown>;
+	const { polisId, polisUrl, question } = value as Record<string, unknown>;
 	if (typeof polisId !== 'string' || polisId.trim() === '') return null;
 
 	const poll: CampaignPoll = { polisId: polisId.trim() };
 	if (typeof polisUrl === 'string' && polisUrl.trim() !== '') poll.polisUrl = polisUrl.trim();
-	if (typeof inviteId === 'string' && inviteId.trim() !== '') poll.inviteId = inviteId.trim();
 	if (typeof question === 'string' && question.trim() !== '') poll.question = question.trim();
 
 	return poll;

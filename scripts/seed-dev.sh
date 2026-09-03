@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Seed local development database with conversation, workflow, polis step + invite.
+# Seed local development database with a conversation, workflow and polis step.
 #
 # Prereqs (in the comhairle repo — see comhairle's QUICKSTART.md):
 #   just pg       # postgres on :5434
 #   just api-dev  # axum on :3000
 #   just seed     # creates default admin: admin@crown-shy.com / adminPassword123!
 #
-# This script logs in as that admin and creates a conversation/workflow/polis/invite,
+# This script logs in as that admin and creates a conversation/workflow/polis step,
 # then points both packages' .env files at it (packages/admin/.env and
 # packages/civicos/.env). The Campaign carries its own poll and invite on
 # `metadata.poll`, so nothing else needs configuring.
@@ -257,20 +257,6 @@ for stmt in "${SEED_STATEMENTS[@]}"; do
   fi
 done
 
-# --- Open invite -------------------------------------------------------------
-info "Step 5: Creating open invite..."
-INVITE_RESPONSE=$(curl -s -X POST "$BACKEND_URL/conversation/$CONVERSATION_ID/invite" \
-  -H "Content-Type: application/json" \
-  -H "$AUTH_HEADER" \
-  -d "$(jq -nc --arg w "$WORKFLOW_ID" '{invite_type:"open", workflow_id:$w}')")
-
-INVITE_ID=$(echo "$INVITE_RESPONSE" | jq -r '.id // empty')
-if [ -z "$INVITE_ID" ]; then
-  fail "invite creation failed: $INVITE_RESPONSE"
-  exit 1
-fi
-ok "invite: $INVITE_ID"
-
 # --- Poll identity -----------------------------------------------------------
 # The participant app resolves anonymously, and the Polis workflow step is 401
 # to an anonymous caller: GET /conversation/:id/workflow is public but
@@ -279,13 +265,13 @@ ok "invite: $INVITE_ID"
 # Without this, civicos falls back to the checked-in regions.ts map keyed by zip
 # and serves whichever poll that guesses. Admin writes the same object when a
 # Host publishes a Campaign to a Place. See packages/shared/src/data/place.ts.
-info "Step 5.5: Mirroring poll identity into metadata..."
+info "Step 5: Mirroring poll identity into metadata..."
 POLL_STATUS=$(curl -s -o /dev/null -w '%{http_code}' -X PATCH \
   "$BACKEND_URL/conversation/$CONVERSATION_ID/metadata" \
   -H "Content-Type: application/json" \
   -H "$AUTH_HEADER" \
-  -d "$(jq -nc --arg p "$POLIS_ID" --arg u "$POLIS_URL" --arg i "$INVITE_ID" --arg q "$SEED_QUESTION" \
-    '{poll: {polisId: $p, polisUrl: $u, inviteId: $i, question: $q}}')")
+  -d "$(jq -nc --arg p "$POLIS_ID" --arg u "$POLIS_URL" --arg q "$SEED_QUESTION" \
+    '{poll: {polisId: $p, polisUrl: $u, question: $q}}')")
 
 if echo "$POLL_STATUS" | grep -qE '^2[0-9][0-9]$'; then
   ok "poll: $POLIS_ID"
@@ -294,7 +280,6 @@ else
 fi
 
 # --- Launch (make conversation live) -----------------------------------------
-# Invites only work against live conversations.
 info "Step 6: Launching conversation (making it live)..."
 LAUNCH_RESPONSE=$(curl -s -w '\n%{http_code}' -X PUT \
   "$BACKEND_URL/conversation/$CONVERSATION_ID/launch" \

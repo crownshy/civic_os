@@ -189,8 +189,8 @@ describe('readPoll', () => {
 	});
 
 	it('drops malformed optional fields rather than the whole poll', () => {
-		expect(
-			readPoll({ poll: { polisId: 'abc', polisUrl: 42, inviteId: '', question: null } })
-		).toEqual({ polisId: 'abc' });
+		expect(readPoll({ poll: { polisId: 'abc', polisUrl: 42, question: null } })).toEqual({
+			polisId: 'abc'
+		});
 	});
 });

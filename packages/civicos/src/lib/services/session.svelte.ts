@@ -56,7 +56,6 @@ function loadPersistedSession(): {
 	hasAgreedToTos?: boolean;
 	hasSeenComposeInstructions?: boolean;
 	conversationId?: string;
-	inviteId?: string;
 	endCtaShareCompleted?: boolean;
 	endCtaReviewCompleted?: boolean;
 } {
@@ -83,7 +82,6 @@ class Session {
 	loading = $state(false);
 	hasAgreedToTos = $state(false);
 	_conversationId = $state('');
-	_inviteId = $state('');
 	endCtaShareCompleted = $state(false);
 	endCtaReviewCompleted = $state(false);
 
@@ -117,7 +115,6 @@ class Session {
 		if (saved.hasAgreedToTos) this.hasAgreedToTos = saved.hasAgreedToTos;
 		if (saved.hasSeenComposeInstructions) this.hasSeenComposeInstructions = true;
 		if (saved.conversationId) this._conversationId = saved.conversationId;
-		if (saved.inviteId) this._inviteId = saved.inviteId;
 		if (saved.endCtaShareCompleted) this.endCtaShareCompleted = true;
 		if (saved.endCtaReviewCompleted) this.endCtaReviewCompleted = true;
 	}
@@ -138,7 +135,6 @@ class Session {
 					hasAgreedToTos: this.hasAgreedToTos,
 					hasSeenComposeInstructions: this.hasSeenComposeInstructions,
 					conversationId: this._conversationId,
-					inviteId: this._inviteId,
 					endCtaShareCompleted: this.endCtaShareCompleted,
 					endCtaReviewCompleted: this.endCtaReviewCompleted
 				})
@@ -206,10 +202,6 @@ class Session {
 		return this._conversationId || config.conversationId;
 	}
 
-	get inviteId() {
-		return this._inviteId || config.inviteId;
-	}
-
 	get userId() {
 		return this.user?.id ?? null;
 	}
@@ -262,19 +254,12 @@ class Session {
 		this.persist();
 	}
 
-	async join(
-		zipCode: string,
-		email?: string,
-		regionConversationId?: string,
-		regionInviteId?: string
-	): Promise<boolean> {
+	async join(zipCode: string, email?: string, campaignConversationId?: string): Promise<boolean> {
 		this.loading = true;
 		this.error = null;
 		this.zipCode = zipCode;
 
-		// Store region-specific IDs if provided
-		if (regionConversationId) this._conversationId = regionConversationId;
-		if (regionInviteId) this._inviteId = regionInviteId;
+		if (campaignConversationId) this._conversationId = campaignConversationId;
 
 		try {
 			// 1. Create anonymous user (sets auth-token cookie)
@@ -282,15 +267,9 @@ class Session {
 			this.user = user;
 			this.persist();
 
-			// 2. Accept the invite (registers user for the workflow)
-			if (this.conversationId && this.inviteId) {
-				await this.api.AcceptInvite(undefined, {
-					params: {
-						conversation_id: this.conversationId,
-						invite_id: this.inviteId
-					}
-				});
-			}
+			// 2. Put them on the Campaign's workflow, which is where every
+			// participation number comes from.
+			await this.registerOnWorkflow();
 
 			// 3. Save zipcode to profile. It has to actually land: the server side
 			// gate on `/contribute` reads the stored profile, so a zip that only
@@ -314,6 +293,43 @@ class Session {
 			return false;
 		} finally {
 			this.loading = false;
+		}
+	}
+
+	/**
+	 * Put this participant on the Campaign's workflow.
+	 *
+	 * An invite used to do this, through `AcceptInvite`, and it was ceremony: the
+	 * invite carried nothing we read back, it had to be created and then mirrored
+	 * onto `metadata.poll` before civicos could find it, and a Campaign without
+	 * one of its own was handed another Campaign's, which 404s. Registering says
+	 * the same thing directly and needs only the workflow, which
+	 * `ListConversationWorkflows` answers anonymously.
+	 *
+	 * Not fatal to the join. A participant who votes without a participation row
+	 * is a reporting gap, not a broken session, so this logs and lets them in.
+	 */
+	private async registerOnWorkflow(): Promise<void> {
+		if (!this.conversationId) return;
+
+		try {
+			const workflows = await this.api.ListConversationWorkflows({
+				params: { conversation_id: this.conversationId }
+			});
+			const workflow = workflows.find((w) => w.isActive) ?? workflows[0];
+			if (!workflow) {
+				console.warn('[Session] No workflow to register on');
+				return;
+			}
+
+			await this.api.RegisterUserForConversationWorkflow(undefined, {
+				params: { conversation_id: this.conversationId, workflow_id: workflow.id }
+			});
+		} catch (e) {
+			// 409 is comhairle saying they are already on it, which is the state we
+			// wanted. Anything else is worth knowing about but not worth blocking on.
+			if ((e as { response?: { status?: number } })?.response?.status === 409) return;
+			console.error('[Session] Failed to register on the workflow:', e);
 		}
 	}
 

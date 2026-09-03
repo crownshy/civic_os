@@ -17,7 +17,6 @@ declare global {
 
 	interface ImportMetaEnv {
 		readonly PUBLIC_CONVERSATION_ID: string;
-		readonly PUBLIC_INVITE_ID: string;
 		readonly PUBLIC_POLIS_URL: string;
 		readonly PUBLIC_POLIS_ID: string;
 	}
