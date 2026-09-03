@@ -1,0 +1,24 @@
+{
+	"_readme": "Defining-statement pages for the L0 Groups detail modal, ported from references/group-representative-statements.csv (a Polis repness ranking, top 5 per group, group_id 0/1/2 mapped to A/B/C the same way group-info.json's counts are). ids are full bloom-data.json record ids, in rank order (most representative first). direction is that row's repful_for — whether the statement is representative because this group especially AGREEs or especially DISAGREEs with it; the same statement can appear under two groups with opposite directions (p52 does, under A as agree and C as disagree). The per-group comparison bars on each page are computed live from that record's own vote.{A,B,C}, not stored here.",
+	"A": [
+		{ "id": "p52", "direction": "agree" },
+		{ "id": "p61", "direction": "agree" },
+		{ "id": "p78", "direction": "disagree" },
+		{ "id": "p76", "direction": "disagree" },
+		{ "id": "p64", "direction": "disagree" }
+	],
+	"B": [
+		{ "id": "p43", "direction": "agree" },
+		{ "id": "p7", "direction": "agree" },
+		{ "id": "p16", "direction": "agree" },
+		{ "id": "p63", "direction": "agree" },
+		{ "id": "p59", "direction": "disagree" }
+	],
+	"C": [
+		{ "id": "p116", "direction": "agree" },
+		{ "id": "p48", "direction": "disagree" },
+		{ "id": "p52", "direction": "disagree" },
+		{ "id": "p35", "direction": "disagree" },
+		{ "id": "p50", "direction": "disagree" }
+	]
+}

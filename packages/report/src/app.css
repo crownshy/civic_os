@@ -1,0 +1,181 @@
+/* ─────────────────────────────────────────────
+   TOKENS
+   ───────────────────────────────────────────── */
+:root {
+	--ink: #101011;
+	--paper: #fff;
+	--agree: #1f8a3b;
+	--disagree: #d8362f;
+	--pass: #c4c4c4;
+	--home: #0d1b3e;
+	--amber: #de8a2e; /* mid tier for the card's %-agree readout (0-33 red · 33-67 amber · 67-100 green) */
+	--gold: #e9a23c; /* accent for the Demographics intro page, per its mock */
+
+	--geom: 'Geom', 'Futura', system-ui, sans-serif;
+	--body: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
+	--mono: 'DM Mono', ui-monospace, 'SF Mono', monospace;
+
+	--nav-h: 46px;
+	--bar-blue: #00216f; /* top page-nav bar, deliberately distinct from --home */
+	--bar-pink: #be00c1;
+	--bar-h: 70px;
+}
+* {
+	box-sizing: border-box;
+}
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+/* overflow-x goes on html, not body: putting it on body makes browsers treat
+   body as the sticky/scroll containing block instead of the viewport,
+   which silently breaks every position:sticky element on the page */
+html {
+	/* There is no Tailwind preflight here, so this file is the whole reset.
+	   line-height is the load-bearing part: everything that does not set its
+	   own inherits it, and without it the root falls back to `normal` (~1.2)
+	   and every such element quietly loses a few pixels of leading. */
+	line-height: 1.5;
+	font-family: var(--body);
+	-webkit-text-size-adjust: 100%;
+	overflow-x: hidden;
+}
+body {
+	background: var(--ink);
+	color: #fff;
+	font-family: var(--body);
+	-webkit-font-smoothing: antialiased;
+}
+button {
+	font: inherit;
+	color: inherit;
+	background: none;
+	border: 0;
+	padding: 0;
+	cursor: pointer;
+}
+:focus-visible {
+	outline: 2.5px solid currentColor;
+	outline-offset: 3px;
+	border-radius: 3px;
+}
+/* The whole product lives in one column. Mobile = full bleed.
+   Wide viewports = a ~50% column, same layout, nothing reflows. */
+.shell {
+	width: 100%;
+	max-width: 600px;
+	margin: 0 auto;
+	position: relative;
+	min-height: 100vh;
+	min-height: 100dvh;
+	background: var(--ink);
+	padding-bottom: 0;
+	transition: padding-bottom 0.35s cubic-bezier(0.2, 0.85, 0.3, 1);
+}
+/* reserves room at the bottom to clear #pageBar, kept in sync with its own
+   slide-in/out (see PageBar.svelte) rather than snapping instantly */
+body.navBarOn .shell {
+	padding-bottom: var(--bar-h);
+}
+@media (min-width: 660px) {
+	body {
+		background: var(--c, var(--home));
+	}
+	body.theme-page {
+		background: var(--paper);
+	}
+	.shell {
+		max-width: 800px;
+	}
+	:root {
+		--bar-h: 96px;
+	}
+}
+.label {
+	font-family: var(--mono);
+	font-size: 11px;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+}
+/* ─────────────────────────────────────────────
+   LEVEL 1: THEMES
+   ───────────────────────────────────────────── */
+.masthead {
+	padding: 26px 22px 20px;
+}
+.masthead .eyebrow {
+	color: rgba(255, 255, 255, 0.45);
+	margin-bottom: 9px;
+}
+.masthead h1 {
+	font-family: var(--geom);
+	font-weight: 700;
+	font-size: clamp(30px, 9vw, 40px);
+	line-height: 1.06;
+	margin: 0;
+	letter-spacing: -0.02em;
+	max-width: 16em;
+}
+.masthead p {
+	font-size: 16.5px;
+	line-height: 1.5;
+	color: rgba(255, 255, 255, 0.5);
+	margin: 12px 0 0;
+	max-width: 32em;
+}
+/* Shared entrance animation: the theme grid's tally cells (ThemeBlock.svelte)
+   and the opinion-group bubbles below both use it. */
+@keyframes tallyIn {
+	from {
+		opacity: 0;
+		transform: scale(0.3);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+/* ─────────────────────────────────────────────
+   LEVEL 0: INTRO PAGES
+   A small ordered sequence shown before the theme grid (title → demogs →
+   groups, per INTRO_STEPS in domain/nav.ts; that array is what drives
+   page order and the next-arrow's destination; this is just their shared
+   shell/layout. Each page sets its own background/text color below, per
+   its own mock: title and demogs stay in the dark --home most of the
+   report opens in; groups switches to white/ink. A new page only needs
+   its own #id + .masthead content (+ a one-line color rule if it isn't
+   the dark default) to slot in.
+   ───────────────────────────────────────────── */
+.introPage {
+	position: relative;
+	min-height: 100vh;
+	min-height: 100dvh;
+	padding-bottom: 100px;
+}
+/* the shared .masthead h1/p sizing (above, under LEVEL 1) already reads as
+   a cover page rather than a grid caption; intro pages only need the width
+   constraints relaxed, since L1's are tuned for its own shorter copy */
+.introPage .masthead h1 {
+	max-width: none;
+}
+.introPage .masthead p {
+	max-width: 26em;
+}
+@media (min-width: 660px) {
+	body.groups-page {
+		background: var(--paper);
+	}
+}
+@media (min-width: 660px) {
+	.masthead p {
+		font-size: 18.5px;
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	* {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+}

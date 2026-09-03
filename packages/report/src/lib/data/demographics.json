@@ -1,0 +1,54 @@
+{
+	"_readme": "Category breakdowns for the Demographics detail modal, opened via the 'See full demographics…' link on the L0 Demographics page. Derived by hand from references/conversation-demographics-2026-08-20.csv (437 rows, one per participant profile) — the same source file participant-locations.json's city counts come from. total is every row in the CSV, answered or not. Each category's own answered count is the number of participants with a non-blank value for that field; each breakdown row's pct is that value's share of *only* the participants who answered — not of total — matching the modal's own copy ('Of those N people that provided this information, here is the breakdown'). Each pct is rounded independently for display, the same convention bloom-data.json's vote.pct uses, so a category's rows are not guaranteed to sum to exactly 100. age buckets a continuous field: the youngest bucket reads 'Under 25' rather than the more typical '18-24' because two respondents reported ages 16–17 — the field is self-reported with no minimum enforced upstream, and '18-24' would misstate their own answer. Not touched by scripts/refresh-poll.js, which is a different, Polis-sourced pipeline entirely; re-derive by hand from a fresh demographics CSV export the same way, keeping each category's own answered count as its denominator.",
+	"total": 437,
+	"categories": [
+		{
+			"key": "age",
+			"label": "Age",
+			"answered": 233,
+			"breakdown": [
+				{ "label": "65+", "pct": 30 },
+				{ "label": "55-64", "pct": 20 },
+				{ "label": "45-54", "pct": 19 },
+				{ "label": "35-44", "pct": 18 },
+				{ "label": "25-34", "pct": 10 },
+				{ "label": "Under 25", "pct": 3 }
+			]
+		},
+		{
+			"key": "political",
+			"label": "Political",
+			"answered": 209,
+			"breakdown": [
+				{ "label": "Democrat / Progressive / Liberal", "pct": 54 },
+				{ "label": "No Party Preference / Independent", "pct": 33 },
+				{ "label": "Republican / Conservative", "pct": 12 }
+			]
+		},
+		{
+			"key": "gender",
+			"label": "Gender",
+			"answered": 221,
+			"breakdown": [
+				{ "label": "Female", "pct": 62 },
+				{ "label": "Male", "pct": 35 },
+				{ "label": "Other", "pct": 3 }
+			]
+		},
+		{
+			"key": "ethnicity",
+			"label": "Race / Ethnicity",
+			"answered": 223,
+			"breakdown": [
+				{ "label": "White or Caucasian", "pct": 86 },
+				{ "label": "Multiracial", "pct": 4 },
+				{ "label": "Native American", "pct": 4 },
+				{ "label": "Hispanic or Latino", "pct": 3 },
+				{ "label": "Asian / Pacific Islander", "pct": 1 },
+				{ "label": "Other", "pct": 1 },
+				{ "label": "Black or African American", "pct": 0 },
+				{ "label": "Middle Eastern / North African", "pct": 0 }
+			]
+		}
+	]
+}
