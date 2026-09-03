@@ -321,7 +321,13 @@
 			</div>
 		</div>
 
-		<EventRegistrationModal open={showForm} {event} {region} api={data.api} />
+		<EventRegistrationModal
+			open={showForm}
+			{event}
+			conversationId={data.campaign.id}
+			{region}
+			api={data.api}
+		/>
 	</AppShell>
 {:else}
 	<AppShell>

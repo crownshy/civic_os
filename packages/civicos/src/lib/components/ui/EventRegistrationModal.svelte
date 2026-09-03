@@ -15,15 +15,22 @@
 	import { zod4, zod4Client } from 'sveltekit-superforms/adapters';
 	import otpUserSignupSchema from './OtpUserSignupSchema';
 	import type { ApiClient, LocalizedEventDto } from '@crownshy/api-client/api';
+	import { registerForEvent, registrationErrorMessage } from '$lib/services/event-registration';
 
 	type Props = {
 		open: boolean;
 		event: LocalizedEventDto;
+		/**
+		 * The Campaign's Conversation. The event belongs to it, so the attendance
+		 * does too. The `region` below is for the calendar invite's copy and is not
+		 * an answer to which Conversation this is.
+		 */
+		conversationId: string;
 		region: RegionConfig;
 		api: ApiClient;
 	};
 
-	let { open, event, region, api }: Props = $props();
+	let { open, event, conversationId, region, api }: Props = $props();
 
 	const formattedDate = $derived(event ? format(new Date(event.startTime), 'EEEE, MMMM d') : '');
 
@@ -47,28 +54,12 @@
 			try {
 				status = 'loading';
 
-				try {
-					await api.SignupOtp({ email, username });
-				} catch (e) {
-					console.error(e);
-
-					// Conflict status likely indicates user already exists in which case silently ignore
-					if (e.response?.status !== 409) {
-						throw new Error(e);
-					}
-				}
-
-				await api.CreateEventAttendance(
-					{ role: 'participant', user_email: email },
-					{
-						params: { conversation_id: region.conversationId, event_id: event.id }
-					}
-				);
+				await registerForEvent(api, { conversationId, eventId: event.id, email, username });
 
 				status = 'success';
 			} catch (e) {
-				console.error(e);
-				error = e.response?.data?.err || 'Something went wrong registering you for the event';
+				console.error('[EventRegistration] Failed to register a participant:', e);
+				error = registrationErrorMessage(e);
 				status = 'error';
 			}
 		}
