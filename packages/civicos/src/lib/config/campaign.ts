@@ -143,3 +143,27 @@ export function resolveCampaign(
 		isLegacyRegion: isLegacyRegionConversation(conversation.id)
 	};
 }
+
+/**
+ * The geography to label participant chrome with.
+ *
+ * The Campaign's Place, which `placeForConversation` has already resolved
+ * through the legacy region for Utah and Oregon. The region behind it covers
+ * the Campaign that has not been published to a Place yet and the one whose
+ * backend was unreachable.
+ *
+ * This used to be derived from the participant's zip code, which answered a
+ * different question: which Campaign a zip prefix belongs to, from back when a
+ * zip was the only routing information there was. The URL names the Campaign
+ * now, and the Campaign names its Place.
+ *
+ * The last fallback is still `GENERIC_REGION.stateName` for a subdomain nobody
+ * recognises, because `getRegionBySubdomain` is total. #425 is what makes that
+ * unrepresentable.
+ */
+export function placeNameFor(
+	campaign: Pick<Campaign, 'place'> | null | undefined,
+	region: RegionConfig
+): string {
+	return campaign?.place?.name ?? region.stateName;
+}

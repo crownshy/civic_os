@@ -12,7 +12,7 @@
 	});
 </script>
 
-<Story name="Default" args={{ countyName: 'UTAH COUNTY' }}>
+<Story name="Default" args={{ placeName: 'UTAH COUNTY' }}>
 	{#snippet template(args)}
 		<DidYouKnowScreen {...args} onContinue={() => {}} />
 	{/snippet}

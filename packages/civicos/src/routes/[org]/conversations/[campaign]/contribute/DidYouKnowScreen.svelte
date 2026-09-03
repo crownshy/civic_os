@@ -4,11 +4,11 @@
 	import { Header, Button } from '$lib/components/ui';
 
 	interface Props {
-		countyName: string;
+		placeName: string;
 		onContinue: () => void;
 	}
 
-	let { countyName, onContinue }: Props = $props();
+	let { placeName, onContinue }: Props = $props();
 
 	let countdown = $state(2);
 	let countdownInterval: ReturnType<typeof setInterval> | null = null;
@@ -32,7 +32,7 @@
 	class="flex h-full flex-col bg-gradient-primary"
 	in:fly={{ x: 40, duration: 400, easing: cubicOut }}
 >
-	<Header {countyName} />
+	<Header {placeName} />
 
 	<!-- Scrollable content -->
 	<div class="flex flex-1 flex-col overflow-y-auto px-8 pt-8">

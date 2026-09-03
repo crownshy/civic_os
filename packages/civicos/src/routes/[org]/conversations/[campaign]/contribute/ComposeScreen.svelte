@@ -6,14 +6,14 @@
 
 	interface Props {
 		question: string;
-		countyName: string;
+		placeName: string;
 		firstVisit?: boolean;
 		onSubmit: (text: string, anonymous: boolean) => void;
 		onBack: () => void;
 		region: RegionConfig;
 	}
 
-	let { question, countyName, firstVisit = false, onSubmit, onBack, region }: Props = $props();
+	let { question, placeName, firstVisit = false, onSubmit, onBack, region }: Props = $props();
 
 	let showInstructions = $state(false);
 
@@ -25,7 +25,7 @@
 <div class="relative" in:fly={{ y: 100, duration: 400, easing: cubicOut }}>
 	<ComposeOverlay
 		{question}
-		{countyName}
+		{placeName}
 		{onSubmit}
 		{onBack}
 		onShowInstructions={() => (showInstructions = true)}

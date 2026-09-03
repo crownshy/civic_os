@@ -6,6 +6,7 @@
 	import EventCalendarInviteButton from '$lib/components/ui/EventCalendarInviteButton.svelte';
 	import EventRegistrationModal from '$lib/components/ui/EventRegistrationModal.svelte';
 	import { formatDurationLabel, type RegionConfig } from '$lib/config/regions';
+	import { placeNameFor } from '$lib/config/campaign';
 	import { formatTimeDuration } from '$lib/utils/dates.js';
 	import {
 		differenceInDays,
@@ -22,6 +23,10 @@
 
 	const { data } = $props();
 	const { event, eventDateFormatter, eventTimeFormatter } = data;
+
+	// Where this Campaign runs, from the Campaign rather than from the region the
+	// subdomain matched (#423).
+	const placeName = $derived(placeNameFor(data.campaign, region));
 
 	const eventStartDate = $derived(new Date(event.startTime));
 	const eventEndDate = $derived(new Date(event.endTime));
@@ -40,7 +45,7 @@
 
 	const formattedDate = $derived(event ? format(new Date(event.startTime), 'EEEE, MMMM d') : '');
 	const locationLabel = $derived(
-		event.format === 'online' ? region.stateName : `in ${event.location?.city}`
+		event.format === 'online' ? placeName : `in ${event.location?.city}`
 	);
 
 	const { hours: durationHours, minutes: durationMinutes } = formatTimeDuration(
@@ -120,7 +125,7 @@
 			bind:this={scrollContainer}
 		>
 			<InfoBar
-				countyName={region.stateName}
+				{placeName}
 				{region}
 				onBack={() => history.back()}
 				backLabel="← BACK"

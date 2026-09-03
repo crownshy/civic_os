@@ -5,7 +5,7 @@
 	import type { RegionConfig } from '$lib/config/regions';
 
 	interface Props {
-		countyName: string;
+		placeName: string;
 		statementText: string;
 		statementId: number;
 		/** Statements left in the current batch — drives the progress bar (cycles 0…BATCH_SIZE). */
@@ -24,7 +24,7 @@
 	}
 
 	let {
-		countyName,
+		placeName,
 		statementText,
 		statementId,
 		remaining,
@@ -74,7 +74,7 @@
 </script>
 
 <div class="flex h-full flex-col bg-muted">
-	<InfoBar {countyName} {region} {onEnd} />
+	<InfoBar {placeName} {region} {onEnd} />
 
 	<!-- Statement content (white, centered) -->
 	<div class="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-10">

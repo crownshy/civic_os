@@ -3,7 +3,7 @@
 	import InfoBar from './InfoBar.svelte';
 
 	interface Props {
-		countyName: string;
+		placeName: string;
 		region?: RegionConfig;
 		question?: string;
 		marquee?: boolean;
@@ -13,7 +13,7 @@
 	}
 
 	let {
-		countyName,
+		placeName,
 		region,
 		question,
 		marquee = false,
@@ -28,11 +28,10 @@
 >
 	<!-- Row 1: County name + ABOUT pill or YOU dot -->
 	{#if about && region}
-		<InfoBar {region} {countyName} />
+		<InfoBar {region} {placeName} />
 	{:else}
 		<div class="flex items-center justify-between pt-3.75 pr-3.75 pl-6">
-			<span class="font-mono text-sm font-medium text-foreground/70"
-				>{countyName.toUpperCase()}</span
+			<span class="font-mono text-sm font-medium text-foreground/70">{placeName.toUpperCase()}</span
 			>
 			<span class="flex items-center gap-2">
 				<span class="h-3 w-3 rounded-full border border-foreground/20 bg-secondary"></span>

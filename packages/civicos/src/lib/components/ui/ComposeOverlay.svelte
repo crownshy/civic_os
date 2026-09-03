@@ -7,7 +7,7 @@
 
 	interface Props {
 		question: string;
-		countyName: string;
+		placeName: string;
 		onSubmit?: (text: string, anonymous: boolean) => void;
 		onBack?: () => void;
 		onShowInstructions?: () => void;
@@ -17,7 +17,7 @@
 
 	let {
 		question,
-		countyName,
+		placeName,
 		onSubmit,
 		onBack,
 		onShowInstructions,
@@ -51,7 +51,7 @@
 
 <div class={cn('relative flex h-dvh flex-col bg-gradient-primary', className)}>
 	<!-- Header -->
-	<InfoBar {region} {countyName} />
+	<InfoBar {region} {placeName} />
 
 	<!-- Question -->
 	<div class="px-5 pt-4">

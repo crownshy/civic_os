@@ -42,7 +42,7 @@
 	];
 
 	interface Props {
-		countyName: string;
+		placeName: string;
 		region: RegionConfig;
 		/** Host-configured copy, already resolved against the region defaults. */
 		whatsNext: string;
@@ -61,7 +61,7 @@
 		onBackToVoting?: () => void;
 	}
 
-	let { countyName, onBackToVoting, region, whatsNext, asks, conversationId }: Props = $props();
+	let { placeName, onBackToVoting, region, whatsNext, asks, conversationId }: Props = $props();
 
 	let emailPanelOpen = $state(false);
 	let sharePanelOpen = $state(false);
@@ -84,7 +84,7 @@
 	in:scale={{ start: 0.9, duration: 500, easing: cubicOut }}
 >
 	<div class="flex flex-1 flex-col overflow-y-auto">
-		<InfoBar {region} {countyName} onBack={onBackToVoting} />
+		<InfoBar {region} {placeName} onBack={onBackToVoting} />
 
 		<!-- Hero -->
 		<div class="flex flex-col items-center px-8 pt-14">

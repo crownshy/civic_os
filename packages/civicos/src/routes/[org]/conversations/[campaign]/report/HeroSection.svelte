@@ -5,7 +5,7 @@
 
 	interface Props {
 		title: string;
-		/** Name in the chrome. #423 replaces this with the Campaign's Place. */
+		/** Name in the chrome: the Campaign's Place, uppercased by the caller. */
 		regionName: string;
 		/** InfoBar's "about" panel reads its copy off this. */
 		region: RegionConfig;
@@ -20,7 +20,7 @@
 	class="relative min-h-dvh flex-col overflow-hidden"
 	style="background: var(--gradient-hero);"
 >
-	<InfoBar countyName={regionName} {region} variant="light" buttonText="LEARN MORE →" />
+	<InfoBar placeName={regionName} {region} variant="light" buttonText="LEARN MORE →" />
 
 	<div class="mt-16 px-8">
 		<Badge variant="dark" size="lg" class="px-7">{phase}</Badge>

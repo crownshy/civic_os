@@ -7,12 +7,12 @@
 		component: Header,
 		tags: ['autodocs'],
 		argTypes: {
-			countyName: { control: 'text' }
+			placeName: { control: 'text' }
 		}
 	});
 </script>
 
-<Story name="Default" args={{ countyName: 'UTAH COUNTY' }}>
+<Story name="Default" args={{ placeName: 'UTAH COUNTY' }}>
 	{#snippet template(args)}
 		<div class="rounded-xl bg-primary">
 			<Header {...args} />

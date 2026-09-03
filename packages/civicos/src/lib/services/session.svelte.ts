@@ -8,7 +8,6 @@ import {
 	saveAccount,
 	saveCampaign
 } from './session-storage';
-import { GENERIC_REGION, REGIONS } from '$lib/config/regions';
 import { httpStatusOf } from '$lib/utils/http';
 
 export interface UserProfile {
@@ -29,19 +28,6 @@ export interface User {
 	username?: string | null;
 	email?: string | null;
 	emailVerified: boolean;
-}
-
-export function getCountyFromZip(zip: string): string {
-	const trimmed = zip.trim();
-
-	// Fallback: prefix-based heuristic
-	const prefix = trimmed.slice(0, 2);
-	const region = Object.values(REGIONS).find((region) => region.zipPrefixes.includes(prefix));
-	if (region) {
-		return region.stateName;
-	} else {
-		return GENERIC_REGION.stateName;
-	}
 }
 
 /**
@@ -242,10 +228,6 @@ class Session {
 	markEndCtaReviewCompleted() {
 		this.endCtaReviewCompleted = true;
 		this.persistCampaign();
-	}
-
-	get county(): string {
-		return this.zipCode ? getCountyFromZip(this.zipCode) : 'Utah';
 	}
 
 	savePid(pid: number) {

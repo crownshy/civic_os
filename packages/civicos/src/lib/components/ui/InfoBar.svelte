@@ -6,7 +6,7 @@
 	import type { RegionConfig } from '$lib/config/regions';
 
 	interface Props {
-		countyName: string;
+		placeName: string;
 		onBack?: () => void;
 		backLabel?: string;
 		buttonText?: string;
@@ -17,7 +17,7 @@
 	}
 
 	let {
-		countyName,
+		placeName,
 		onBack,
 		backLabel = '← BACK TO VOTING',
 		buttonText = 'ABOUT →',
@@ -66,7 +66,7 @@
 				class={cn(
 					'font-mono text-sm font-medium text-foreground/70',
 					variant === 'light' && 'text-white/70'
-				)}>{countyName.toUpperCase()}</span
+				)}>{placeName.toUpperCase()}</span
 			>
 		</div>
 	{/if}

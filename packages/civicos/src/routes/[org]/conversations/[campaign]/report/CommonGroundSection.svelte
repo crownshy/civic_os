@@ -7,10 +7,11 @@
 	interface Props {
 		participantCount: number;
 		statements: CommentReportData[];
-		regionName?: string;
+		/** The Campaign's Place. Required so no default can name a state (#423). */
+		regionName: string;
 	}
 
-	let { participantCount, statements, regionName = 'Utah' }: Props = $props();
+	let { participantCount, statements, regionName }: Props = $props();
 
 	function getAgreementPercent(s: CommentReportData): number {
 		const total = s.overall_votes.agrees + s.overall_votes.disagrees + s.overall_votes.passes;

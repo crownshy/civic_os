@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { GENERIC_REGION, REGIONS } from '@civicos/shared/data/regions';
-import { campaignCandidates, resolveCampaign } from './campaign';
+import { campaignCandidates, placeNameFor, resolveCampaign } from './campaign';
 import type { RegionConfig } from './regions';
 import { toPlaceSlug } from './place';
 
@@ -177,5 +177,30 @@ describe('resolveCampaign org', () => {
 
 	it('falls back to the legacy region host, so old URLs keep their segment', () => {
 		expect(resolveCampaign(stored, oregon).org?.name).toBe(oregon.hostName);
+	});
+});
+
+describe('placeNameFor', () => {
+	it("labels the chrome with the Campaign's Place", () => {
+		expect(placeNameFor(resolveCampaign(stored, oregon), oregon)).toBe('Dundee, Scotland');
+	});
+
+	it('falls back to the region for a Campaign with no Place', () => {
+		const unpublished = { ...stored, metadata: {} };
+
+		expect(placeNameFor(resolveCampaign(unpublished, GENERIC_REGION), oregon)).toBe(
+			oregon.stateName
+		);
+	});
+
+	it('keeps a legacy region rendering its own name', () => {
+		// Utah and Oregon predate Places, so theirs is derived from the region
+		// entry rather than stored. The chrome must not change for them.
+		expect(placeNameFor(resolveCampaign(null, oregon), oregon)).toBe(oregon.stateName);
+	});
+
+	it('never answers a hardcoded state for a Campaign it cannot place', () => {
+		expect(placeNameFor(null, GENERIC_REGION)).toBe(GENERIC_REGION.stateName);
+		expect(placeNameFor(undefined, GENERIC_REGION)).not.toBe('Utah');
 	});
 });

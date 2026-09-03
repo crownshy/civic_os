@@ -5,13 +5,13 @@
 	import type { RegionConfig } from '$lib/config/regions';
 
 	interface Props {
-		countyName: string;
+		placeName: string;
 		region: RegionConfig;
 		onBack?: () => void;
 		backLabel?: string;
 	}
 
-	let { countyName, onBack, backLabel = '← BACK TO VOTING', region }: Props = $props();
+	let { placeName, onBack, backLabel = '← BACK TO VOTING', region }: Props = $props();
 	let showAbout = $state(false);
 </script>
 
@@ -34,8 +34,7 @@
 					d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0Zm-8 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
 				/>
 			</svg>
-			<span class="font-mono text-sm font-medium text-foreground/70"
-				>{countyName.toUpperCase()}</span
+			<span class="font-mono text-sm font-medium text-foreground/70">{placeName.toUpperCase()}</span
 			>
 		</div>
 	{/if}

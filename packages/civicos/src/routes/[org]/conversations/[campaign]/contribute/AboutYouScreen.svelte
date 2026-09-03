@@ -7,7 +7,7 @@
 	import type { RegionConfig } from '$lib/config/regions';
 
 	interface Props {
-		countyName: string;
+		placeName: string;
 		/**
 		 * The categories the Host left switched on, already filtered. The screen
 		 * renders what it is handed and keys answers on the category, so turning
@@ -18,7 +18,7 @@
 		onDone: (demographics?: Partial<Record<DemographicKey, string>>) => void;
 	}
 
-	let { countyName, questions, onDone, region }: Props = $props();
+	let { placeName, questions, onDone, region }: Props = $props();
 
 	let openDialog = $state<DemographicKey | null>(null);
 	let dialogOpen = $derived(openDialog !== null);
@@ -55,7 +55,7 @@
 </script>
 
 <div class="flex h-full flex-col bg-gradient-primary">
-	<InfoBar {region} {countyName} />
+	<InfoBar {region} {placeName} />
 
 	<div class="flex flex-1 flex-col overflow-y-auto px-6 pt-8">
 		<span
@@ -67,16 +67,16 @@
 			class="mt-4 font-display text-4xl leading-9 font-medium tracking-display text-foreground"
 			in:fly={{ y: 10, duration: 400, delay: 200, easing: cubicOut }}
 		>
-			Help {region.stateName} see itself.
+			Help {placeName} see itself.
 		</p>
 
 		<p
 			class="mt-3 font-sans text-sm font-medium text-foreground"
 			in:fly={{ y: 10, duration: 400, delay: 300, easing: cubicOut }}
 		>
-			This conversation is richer when it reflects the full range of {region.stateName}. Sharing a
-			little about yourself helps the whole community see who's in this conversation — and whose
-			voices might still be missing.
+			This conversation is richer when it reflects the full range of {placeName}. Sharing a little
+			about yourself helps the whole community see who's in this conversation — and whose voices
+			might still be missing.
 		</p>
 		<p
 			class="mt-3 font-sans text-sm font-medium text-foreground"

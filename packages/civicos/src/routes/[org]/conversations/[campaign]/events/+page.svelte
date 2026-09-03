@@ -5,6 +5,7 @@
 	import { InfoBar, ConversationEventCard, Button } from '$lib/components/ui';
 	import { Input } from '@civicos/shared/ui/input';
 	import { session } from '$lib/services/session.svelte';
+	import { placeNameFor } from '$lib/config/campaign';
 	import { fly, fade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
 	import { cubicOut, backOut } from 'svelte/easing';
@@ -15,6 +16,10 @@
 	const { events, region, campaign, eventDateFormatter, eventTimeFormatter } = data;
 
 	const conversationsActive = region.conversationsActive !== false;
+
+	// Where this Campaign runs, from the Campaign rather than from the region the
+	// subdomain matched (#423).
+	const placeName = $derived(placeNameFor(data.campaign, data.region));
 
 	type Filter = 'all' | 'online' | 'in_person';
 	let activeFilter: Filter = $state('all');
@@ -47,7 +52,7 @@
 
 <AppShell>
 	<div class="flex h-full flex-col overflow-y-auto bg-gradient-primary">
-		<InfoBar countyName={region.stateName} {region} />
+		<InfoBar {placeName} {region} />
 
 		<!-- Header -->
 		<div class="flex flex-col items-center px-6 pt-6 pb-0 md:px-12">
@@ -57,11 +62,11 @@
 			<h1
 				class="mt-3 text-center font-display text-5xl leading-[2.75rem] font-medium tracking-display text-foreground"
 			>
-				Conversations in {region.stateName}
+				Conversations in {placeName}
 			</h1>
 			<p class="mt-4 text-center font-sans text-base leading-5 font-medium text-foreground">
 				Join other residents in a 60-90 minute conversation about artificial intelligence and what
-				it means for communities throughout {region.stateName}.
+				it means for communities throughout {placeName}.
 			</p>
 		</div>
 
@@ -117,7 +122,7 @@
 							Coming Soon
 						</h2>
 						<p class="text-center font-sans text-base leading-6 font-medium text-muted-foreground">
-							Share your email to get notified when live conversations are open for {region.stateName}.
+							Share your email to get notified when live conversations are open for {placeName}.
 						</p>
 						<div class="flex flex-col gap-3.5">
 							<form

@@ -11,7 +11,7 @@
 	});
 
 	const baseArgs = {
-		countyName: 'UTAH COUNTY',
+		placeName: 'UTAH COUNTY',
 		region: REGIONS.utah,
 		remaining: 25,
 		onPrimary: () => {},

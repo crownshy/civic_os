@@ -25,7 +25,7 @@
 
 <Story
 	name="Default — Utah, nothing done"
-	args={{ countyName: 'UTAH COUNTY', whatsNext, asks: DEFAULT_ASK_TOGGLES }}
+	args={{ placeName: 'UTAH COUNTY', whatsNext, asks: DEFAULT_ASK_TOGGLES }}
 	beforeEach={setState(false, false, false)}
 >
 	{#snippet template(args)}
@@ -35,7 +35,7 @@
 
 <Story
 	name="Email already provided"
-	args={{ countyName: 'UTAH COUNTY', whatsNext, asks: DEFAULT_ASK_TOGGLES }}
+	args={{ placeName: 'UTAH COUNTY', whatsNext, asks: DEFAULT_ASK_TOGGLES }}
 	beforeEach={setState(true, false, false)}
 >
 	{#snippet template(args)}
@@ -45,7 +45,7 @@
 
 <Story
 	name="All CTAs completed"
-	args={{ countyName: 'UTAH COUNTY', whatsNext, asks: DEFAULT_ASK_TOGGLES }}
+	args={{ placeName: 'UTAH COUNTY', whatsNext, asks: DEFAULT_ASK_TOGGLES }}
 	beforeEach={setState(true, true, true)}
 >
 	{#snippet template(args)}
@@ -56,7 +56,7 @@
 <Story
 	name="Share switched off in admin"
 	args={{
-		countyName: 'UTAH COUNTY',
+		placeName: 'UTAH COUNTY',
 		whatsNext,
 		asks: { ...DEFAULT_ASK_TOGGLES, share: false }
 	}}
@@ -70,7 +70,7 @@
 <Story
 	name="Every ask switched off"
 	args={{
-		countyName: 'UTAH COUNTY',
+		placeName: 'UTAH COUNTY',
 		whatsNext,
 		asks: { contribute: false, email: false, feedback: false, share: false }
 	}}
@@ -83,7 +83,7 @@
 
 <Story
 	name="Oregon — nothing done"
-	args={{ countyName: 'DESCHUTES COUNTY', whatsNext, asks: DEFAULT_ASK_TOGGLES }}
+	args={{ placeName: 'DESCHUTES COUNTY', whatsNext, asks: DEFAULT_ASK_TOGGLES }}
 	beforeEach={setState(false, false, false)}
 >
 	{#snippet template(args)}

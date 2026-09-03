@@ -7,7 +7,7 @@
 	export type CheckpointVariant = 'contribute' | 'email' | 'feedback' | 'share';
 
 	interface Props {
-		countyName: string;
+		placeName: string;
 		region: RegionConfig;
 		variant?: CheckpointVariant;
 		remaining?: number;
@@ -17,7 +17,7 @@
 	}
 
 	let {
-		countyName,
+		placeName,
 		region,
 		variant = 'contribute',
 		remaining,
@@ -60,7 +60,7 @@
 	class="flex h-full flex-col bg-gradient-primary"
 	in:scale={{ start: 0.9, duration: 500, easing: cubicOut }}
 >
-	<InfoBar {region} {countyName} {onEnd} />
+	<InfoBar {region} {placeName} {onEnd} />
 
 	<div class="flex flex-1 flex-col items-center justify-center overflow-y-auto px-8">
 		<EmojiCircle emoji={c.emoji} size="lg" />

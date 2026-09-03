@@ -8,7 +8,7 @@
 		tags: ['autodocs'],
 		argTypes: {
 			question: { control: 'text' },
-			countyName: { control: 'text' }
+			placeName: { control: 'text' }
 		},
 		parameters: {
 			layout: 'fullscreen'
@@ -20,7 +20,7 @@
 	name="Default"
 	args={{
 		question: 'What should we do to make sure social media helps us, not hurts us?',
-		countyName: 'UTAH COUNTY'
+		placeName: 'UTAH COUNTY'
 	}}
 >
 	{#snippet template(args)}

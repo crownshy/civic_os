@@ -23,7 +23,7 @@
 	});
 </script>
 
-<Story name="Every category on" args={{ countyName: 'UTAH COUNTY', questions: allCategories }}>
+<Story name="Every category on" args={{ placeName: 'UTAH COUNTY', questions: allCategories }}>
 	{#snippet template(args)}
 		<AboutYouScreen {...args} region={REGIONS.utah} onDone={() => {}} />
 	{/snippet}
@@ -31,7 +31,7 @@
 
 <Story
 	name="Gender and party switched off"
-	args={{ countyName: 'UTAH COUNTY', questions: twoCategories }}
+	args={{ placeName: 'UTAH COUNTY', questions: twoCategories }}
 >
 	{#snippet template(args)}
 		<AboutYouScreen {...args} region={REGIONS.utah} onDone={() => {}} />
