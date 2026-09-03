@@ -80,7 +80,7 @@
 
 	function handleAgreeToTos() {
 		trackEvent('AgreedToTerms');
-		session.setSessionField('hasAgreedToTos', true);
+		session.markAgreedToTos();
 		handleJoin();
 	}
 

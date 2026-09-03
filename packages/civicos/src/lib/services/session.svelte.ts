@@ -1,6 +1,13 @@
 import type { ApiClient } from '@crownshy/api-client/api';
 import type { ParticipantSession } from './participant';
 import { config } from './api';
+import {
+	clearCampaigns,
+	loadAccount,
+	loadCampaign,
+	saveAccount,
+	saveCampaign
+} from './session-storage';
 import { GENERIC_REGION, REGIONS } from '$lib/config/regions';
 
 export interface UserProfile {
@@ -23,15 +30,6 @@ export interface User {
 	emailVerified: boolean;
 }
 
-/**
- * The localStorage cache. A cache, not the source of truth: the root layout
- * resolves the participant from the `auth-token` cookie during SSR and
- * `hydrate` reconciles what is here against that answer. What survives on its
- * own is only what the backend has no record of, which is Polis's `pid`, vote
- * progress and the end-of-flow CTA flags.
- */
-const STORAGE_KEY = 'civic-os-session';
-
 export function getCountyFromZip(zip: string): string {
 	const trimmed = zip.trim();
 
@@ -45,29 +43,16 @@ export function getCountyFromZip(zip: string): string {
 	}
 }
 
-function loadPersistedSession(): {
-	userId?: string;
-	emailProvided?: boolean;
-	zipCode?: string;
-	pid?: number;
-	demographicsCompleted?: boolean;
-	totalVotes?: number;
-	hasSeenPause?: boolean;
-	hasAgreedToTos?: boolean;
-	hasSeenComposeInstructions?: boolean;
-	conversationId?: string;
-	endCtaShareCompleted?: boolean;
-	endCtaReviewCompleted?: boolean;
-} {
-	if (typeof window === 'undefined') return {};
-	try {
-		const raw = localStorage.getItem(STORAGE_KEY);
-		return raw ? JSON.parse(raw) : {};
-	} catch {
-		return {};
-	}
-}
-
+/**
+ * The participant as this browser remembers them.
+ *
+ * Two halves, and the split is load bearing. Identity, the zip and the
+ * demographics flag are the same wherever the participant goes and are
+ * reconciled against the server in `hydrate`. Polis's `pid`, the vote counters
+ * and the CTA flags belong to one poll and are read back per Conversation, so
+ * a Place serving a second Campaign cannot resume against the first one's
+ * votes. See `session-storage.ts`.
+ */
 class Session {
 	user = $state<User | null>(null);
 	profile = $state<UserProfile | null>(null);
@@ -81,9 +66,15 @@ class Session {
 	error = $state<string | null>(null);
 	loading = $state(false);
 	hasAgreedToTos = $state(false);
-	_conversationId = $state('');
 	endCtaShareCompleted = $state(false);
 	endCtaReviewCompleted = $state(false);
+
+	/**
+	 * Which Campaign the fields above that belong to a poll are currently
+	 * about. Seeded from the env for the single-Conversation deployments that
+	 * predate stored Campaigns, then set from the route by `useCampaign`.
+	 */
+	#campaignId = $state(config.conversationId);
 
 	#api: ApiClient | null = null;
 
@@ -102,46 +93,59 @@ class Session {
 	}
 
 	constructor() {
-		const saved = loadPersistedSession();
-		if (saved.userId) {
-			this.user = { id: saved.userId, authType: 'anonymous', emailVerified: false };
+		const account = loadAccount();
+		if (account.userId) {
+			this.user = { id: account.userId, authType: 'anonymous', emailVerified: false };
 		}
-		if (saved.emailProvided) this.emailProvided = true;
-		if (saved.zipCode) this.zipCode = saved.zipCode;
-		if (saved.pid !== undefined) this.pid = saved.pid;
-		if (saved.demographicsCompleted) this.demographicsCompleted = true;
-		if (saved.totalVotes) this.totalVotes = saved.totalVotes;
-		if (saved.hasSeenPause) this.hasSeenPause = saved.hasSeenPause;
-		if (saved.hasAgreedToTos) this.hasAgreedToTos = saved.hasAgreedToTos;
-		if (saved.hasSeenComposeInstructions) this.hasSeenComposeInstructions = true;
-		if (saved.conversationId) this._conversationId = saved.conversationId;
-		if (saved.endCtaShareCompleted) this.endCtaShareCompleted = true;
-		if (saved.endCtaReviewCompleted) this.endCtaReviewCompleted = true;
+		this.emailProvided = account.emailProvided;
+		this.zipCode = account.zipCode;
+		this.demographicsCompleted = account.demographicsCompleted;
+		this.hasAgreedToTos = account.hasAgreedToTos;
+		this.hasSeenComposeInstructions = account.hasSeenComposeInstructions;
+		this.#readCampaign();
 	}
 
-	private persist() {
-		if (typeof window === 'undefined') return;
-		try {
-			localStorage.setItem(
-				STORAGE_KEY,
-				JSON.stringify({
-					userId: this.user?.id,
-					emailProvided: this.emailProvided,
-					zipCode: this.zipCode,
-					pid: this.pid,
-					demographicsCompleted: this.demographicsCompleted,
-					totalVotes: this.totalVotes,
-					hasSeenPause: this.hasSeenPause,
-					hasAgreedToTos: this.hasAgreedToTos,
-					hasSeenComposeInstructions: this.hasSeenComposeInstructions,
-					conversationId: this._conversationId,
-					endCtaShareCompleted: this.endCtaShareCompleted,
-					endCtaReviewCompleted: this.endCtaReviewCompleted
-				})
-			);
-		} catch {
-			/* ignore */
-		}
+	/**
+	 * Point the poll-scoped half of the session at a Campaign.
+	 *
+	 * Called from `[campaign]/+layout.svelte`, before any page below it reads
+	 * `pid` or vote progress. Until this runs the fields hold whatever the env
+	 * Conversation had, which for a deployment that sets one is the same answer.
+	 */
+	useCampaign(conversationId: string) {
+		if (!conversationId || conversationId === this.#campaignId) return;
+		this.#campaignId = conversationId;
+		this.#readCampaign();
+	}
+
+	#readCampaign() {
+		const record = loadCampaign(this.#campaignId);
+		this.pid = record.pid;
+		this.totalVotes = record.totalVotes;
+		this.hasSeenPause = record.hasSeenPause;
+		this.endCtaShareCompleted = record.endCtaShareCompleted;
+		this.endCtaReviewCompleted = record.endCtaReviewCompleted;
+	}
+
+	private persistAccount() {
+		saveAccount({
+			userId: this.user?.id,
+			emailProvided: this.emailProvided,
+			zipCode: this.zipCode,
+			demographicsCompleted: this.demographicsCompleted,
+			hasAgreedToTos: this.hasAgreedToTos,
+			hasSeenComposeInstructions: this.hasSeenComposeInstructions
+		});
+	}
+
+	private persistCampaign() {
+		saveCampaign(this.#campaignId, {
+			pid: this.pid,
+			totalVotes: this.totalVotes,
+			hasSeenPause: this.hasSeenPause,
+			endCtaShareCompleted: this.endCtaShareCompleted,
+			endCtaReviewCompleted: this.endCtaReviewCompleted
+		});
 	}
 
 	/**
@@ -173,13 +177,17 @@ class Session {
 		if (participant.zipCode) this.zipCode = participant.zipCode;
 		this.emailProvided ||= participant.emailProvided;
 		this.demographicsCompleted ||= participant.demographicsCompleted;
-		this.persist();
+		this.persistAccount();
 	}
 
 	/**
 	 * Drop the cached participant. Everything cleared here belongs to the user
 	 * the expired cookie named, `pid` included: a new anonymous account gets a
 	 * new Polis xid, so the old participant id would replay someone else's votes.
+	 *
+	 * Every Campaign's record goes, not only this one's: they are all that same
+	 * account's progress, and the next visit to any of them would otherwise pick
+	 * up where a stranger left off.
 	 *
 	 * `hasAgreedToTos` and `hasSeenComposeInstructions` are preferences of this
 	 * browser rather than of that account, so they stay.
@@ -195,11 +203,12 @@ class Session {
 		this.hasSeenPause = false;
 		this.endCtaShareCompleted = false;
 		this.endCtaReviewCompleted = false;
-		this.persist();
+		this.persistAccount();
+		clearCampaigns();
 	}
 
 	get conversationId() {
-		return this._conversationId || config.conversationId;
+		return this.#campaignId;
 	}
 
 	get userId() {
@@ -216,17 +225,22 @@ class Session {
 
 	markComposeInstructionsSeen() {
 		this.hasSeenComposeInstructions = true;
-		this.persist();
+		this.persistAccount();
+	}
+
+	markAgreedToTos() {
+		this.hasAgreedToTos = true;
+		this.persistAccount();
 	}
 
 	markEndCtaShareCompleted() {
 		this.endCtaShareCompleted = true;
-		this.persist();
+		this.persistCampaign();
 	}
 
 	markEndCtaReviewCompleted() {
 		this.endCtaReviewCompleted = true;
-		this.persist();
+		this.persistCampaign();
 	}
 
 	get county(): string {
@@ -235,23 +249,18 @@ class Session {
 
 	savePid(pid: number) {
 		this.pid = pid;
-		this.persist();
+		this.persistCampaign();
 	}
 
 	markDemographicsCompleted() {
 		this.demographicsCompleted = true;
-		this.persist();
+		this.persistAccount();
 	}
 
 	saveVoteProgress(totalVotes: number, hasSeenPause: boolean) {
 		this.totalVotes = totalVotes;
 		this.hasSeenPause = hasSeenPause;
-		this.persist();
-	}
-
-	setSessionField(field: keyof typeof this, value: any) {
-		this[field] = value;
-		this.persist();
+		this.persistCampaign();
 	}
 
 	async join(zipCode: string, email?: string, campaignConversationId?: string): Promise<boolean> {
@@ -259,13 +268,13 @@ class Session {
 		this.error = null;
 		this.zipCode = zipCode;
 
-		if (campaignConversationId) this._conversationId = campaignConversationId;
+		if (campaignConversationId) this.useCampaign(campaignConversationId);
 
 		try {
 			// 1. Create anonymous user (sets auth-token cookie)
 			const user = await this.api.SignupAnnonUser(undefined, {});
 			this.user = user;
-			this.persist();
+			this.persistAccount();
 
 			// 2. Put them on the Campaign's workflow, which is where every
 			// participation number comes from.
@@ -335,7 +344,7 @@ class Session {
 
 	async registerEmail(email: string): Promise<boolean> {
 		this.emailProvided = true;
-		this.persist();
+		this.persistAccount();
 
 		if (!this.conversationId || !email) {
 			console.warn('[Session] registerEmail skipped: missing conversationId or email');
