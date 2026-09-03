@@ -6,10 +6,10 @@
  * Place and the app that serves from it cannot disagree about the shape. See
  * ADR 0006 for why it is metadata and not the Region API.
  *
- * INTERIM STORAGE, like `demographics.ts` and `participant-asks.ts`: a Place is
- * not a record, so "add a Place" means writing the object onto a Conversation.
- * Two Campaigns in the same Place duplicate the name and nothing enumerates
- * Places.
+ * INTERIM STORAGE, like `shared/data/demographics.ts` and its sibling
+ * `participant-asks.ts`: a Place is not a record, so "add a Place" means writing
+ * the object onto a Conversation. Two Campaigns in the same Place duplicate the
+ * name and nothing enumerates Places.
  *
  * ONE PLACE PER CAMPAIGN (ADR 0008). Campaigns and Places are many-to-many in
  * principle, but comhairle cannot express it and the propagation and ownership

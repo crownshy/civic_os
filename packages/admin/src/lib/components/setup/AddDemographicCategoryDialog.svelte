@@ -7,7 +7,7 @@
 		isKeyTaken,
 		toDemographicKey,
 		type CustomDemographicCategory
-	} from '$lib/config/demographics';
+	} from '@civicos/shared/data/demographics';
 
 	interface Props {
 		open: boolean;

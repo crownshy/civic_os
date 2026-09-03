@@ -8,6 +8,7 @@ import {
 	type CampaignConversation
 } from '$lib/config/campaign';
 import { extractSubdomain } from '$lib/config/regions';
+import { resolveParticipation } from '$lib/config/participation';
 
 type ResolvedConversation = CampaignConversation & ConversationCopy;
 
@@ -65,6 +66,10 @@ export const load: LayoutServerLoad = async ({ params, locals, url, depends }) =
 
 	return {
 		campaign,
-		hostCopy: resolveHostCopy(conversation, region)
+		hostCopy: resolveHostCopy(conversation, region),
+		// Which demographics and which asks the Host left switched on. Falling
+		// back to all-on when the Conversation is unreachable keeps a legacy
+		// region asking what it always asked.
+		participation: resolveParticipation(conversation)
 	};
 };

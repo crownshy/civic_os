@@ -15,6 +15,7 @@
 	import { ArrowRight, Check } from 'lucide-svelte';
 	import { sanitizeHostHtml } from '@civicos/shared/sanitize';
 	import { HOST_COPY_PROSE_CLASS, renderHostCopy } from '$lib/config/host-copy';
+	import type { AskToggles } from '$lib/config/participation';
 	import type { RegionConfig } from '$lib/config/regions';
 
 	// TODO(post-#216): import from '$lib/config/landing-copy' once branch 216 lands.
@@ -45,10 +46,20 @@
 		region: RegionConfig;
 		/** Host-configured copy, already resolved against the region defaults. */
 		whatsNext: string;
+		/**
+		 * Which asks the Host left switched on. Email, share and review each have
+		 * a card here and a checkpoint mid-poll, and one switch governs both.
+		 * `contribute` has no card: composing lives in the vote bar.
+		 *
+		 * With all three off the end screen is the hero, the "Join a Conversation."
+		 * card, what comes next, and the footer. That card is not an ask and has no
+		 * switch behind it, so the grid is never empty and there is nothing to skip.
+		 */
+		asks: AskToggles;
 		onBackToVoting?: () => void;
 	}
 
-	let { countyName, onBackToVoting, region, whatsNext }: Props = $props();
+	let { countyName, onBackToVoting, region, whatsNext, asks }: Props = $props();
 
 	let emailPanelOpen = $state(false);
 	let sharePanelOpen = $state(false);
@@ -105,74 +116,80 @@
 				</p>
 			</a>
 
-			<button
-				type="button"
-				data-umami-event="end-cta-email-click"
-				onclick={() => (emailPanelOpen = true)}
-				class={[
-					'group flex flex-col gap-2 rounded-[30px] bg-gradient-to-b from-card to-card/70 p-6 text-left shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-all hover:scale-[1.01]',
-					emailDone && 'opacity-60'
-				]}
-			>
-				<div class="flex items-center gap-2">
-					<span
-						class="flex-1 font-display text-2xl leading-7 font-medium tracking-display text-card-foreground"
-						>Get on the email list.</span
-					>
-					{#if emailDone}
-						<Check class="size-5 text-primary" />
-					{:else}
-						<ArrowRight class="size-5 text-destructive opacity-80" />
-					{/if}
-				</div>
-				<p class="font-sans text-sm leading-4 font-medium text-secondary/80">
-					Share your email to receive more updates on opportunities related to this conversation.
-				</p>
-			</button>
+			{#if asks.email}
+				<button
+					type="button"
+					data-umami-event="end-cta-email-click"
+					onclick={() => (emailPanelOpen = true)}
+					class={[
+						'group flex flex-col gap-2 rounded-[30px] bg-gradient-to-b from-card to-card/70 p-6 text-left shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-all hover:scale-[1.01]',
+						emailDone && 'opacity-60'
+					]}
+				>
+					<div class="flex items-center gap-2">
+						<span
+							class="flex-1 font-display text-2xl leading-7 font-medium tracking-display text-card-foreground"
+							>Get on the email list.</span
+						>
+						{#if emailDone}
+							<Check class="size-5 text-primary" />
+						{:else}
+							<ArrowRight class="size-5 text-destructive opacity-80" />
+						{/if}
+					</div>
+					<p class="font-sans text-sm leading-4 font-medium text-secondary/80">
+						Share your email to receive more updates on opportunities related to this conversation.
+					</p>
+				</button>
+			{/if}
 
-			<button
-				type="button"
-				data-umami-event="end-cta-share-click"
-				onclick={() => (sharePanelOpen = true)}
-				class="group flex flex-col gap-2 rounded-[30px] bg-linear-to-b from-card to-card/70 p-6 text-left shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-all hover:scale-[1.01]"
-			>
-				<div class="flex items-center gap-2">
-					<span
-						class="flex-1 font-display text-2xl leading-7 font-medium tracking-display text-card-foreground"
-						>Share with community.</span
-					>
-					{#if shareDone}
-						<Check class="size-5 text-primary" />
-					{:else}
-						<ArrowRight class="size-5 text-destructive opacity-80" />
-					{/if}
-				</div>
-				<p class="font-sans text-sm leading-4 font-medium text-secondary/80">
-					{region.endCtaShareDescription}
-				</p>
-			</button>
+			{#if asks.share}
+				<button
+					type="button"
+					data-umami-event="end-cta-share-click"
+					onclick={() => (sharePanelOpen = true)}
+					class="group flex flex-col gap-2 rounded-[30px] bg-linear-to-b from-card to-card/70 p-6 text-left shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-all hover:scale-[1.01]"
+				>
+					<div class="flex items-center gap-2">
+						<span
+							class="flex-1 font-display text-2xl leading-7 font-medium tracking-display text-card-foreground"
+							>Share with community.</span
+						>
+						{#if shareDone}
+							<Check class="size-5 text-primary" />
+						{:else}
+							<ArrowRight class="size-5 text-destructive opacity-80" />
+						{/if}
+					</div>
+					<p class="font-sans text-sm leading-4 font-medium text-secondary/80">
+						{region.endCtaShareDescription}
+					</p>
+				</button>
+			{/if}
 
-			<button
-				type="button"
-				data-umami-event="end-cta-review-click"
-				onclick={openReview}
-				class="group flex flex-col gap-2 rounded-[30px] bg-gradient-to-b from-card to-card/70 p-6 text-left shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-all hover:scale-[1.01]"
-			>
-				<div class="flex items-center gap-2">
-					<span
-						class="flex-1 font-display text-2xl leading-7 font-medium tracking-display text-card-foreground"
-						>Leave a review.</span
-					>
-					{#if reviewDone}
-						<Check class="size-5 text-primary" />
-					{:else}
-						<ArrowRight class="size-5 text-destructive opacity-80" />
-					{/if}
-				</div>
-				<p class="font-sans text-sm leading-4 font-medium text-secondary/80">
-					Let us know your honest thoughts and ideas about this experience – we read every word.
-				</p>
-			</button>
+			{#if asks.feedback}
+				<button
+					type="button"
+					data-umami-event="end-cta-review-click"
+					onclick={openReview}
+					class="group flex flex-col gap-2 rounded-[30px] bg-gradient-to-b from-card to-card/70 p-6 text-left shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-all hover:scale-[1.01]"
+				>
+					<div class="flex items-center gap-2">
+						<span
+							class="flex-1 font-display text-2xl leading-7 font-medium tracking-display text-card-foreground"
+							>Leave a review.</span
+						>
+						{#if reviewDone}
+							<Check class="size-5 text-primary" />
+						{:else}
+							<ArrowRight class="size-5 text-destructive opacity-80" />
+						{/if}
+					</div>
+					<p class="font-sans text-sm leading-4 font-medium text-secondary/80">
+						Let us know your honest thoughts and ideas about this experience – we read every word.
+					</p>
+				</button>
+			{/if}
 		</div>
 
 		<!-- What comes next -->

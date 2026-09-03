@@ -9,7 +9,7 @@
 		readCustomDemographics,
 		readDemographicToggles,
 		type DemographicKey
-	} from '$lib/config/demographics';
+	} from '@civicos/shared/data/demographics';
 	import StatusCard from './StatusCard.svelte';
 	import SeedStatementsCard from './SeedStatementsCard.svelte';
 

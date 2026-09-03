@@ -51,3 +51,6 @@ touches none of them.
   deleted on this change.
 - The parked migration in `component-strategy.md` is unaffected. Steps 2 to 4
   remain parked.
+- Narrowed by [ADR 0009](0009-host-switches-may-change-civicos-rendering.md):
+  showing or hiding a route-local `civicos` element on a Host switch is
+  configuration, not a redesign, and is out of the freeze.

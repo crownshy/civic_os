@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import { page } from '$app/state';
@@ -12,7 +13,14 @@
 		SharePanelContent,
 		ReviewPanelContent
 	} from '$lib/components/ui';
-	import { popQuizQuestions, aboutYouQuestions } from '$lib/data/mock';
+	import { popQuizQuestions } from '$lib/data/mock';
+	import {
+		aboutYouQuestionsFor,
+		ageBucketToNumber,
+		askedVariants,
+		type DemographicKey,
+		type Participation
+	} from '$lib/config/participation';
 	import { getRegionByZipcode } from '$lib/config/regions';
 	import type { RegionConfig } from '$lib/config/regions';
 	import PolisApi from '$lib/services/polis-api.svelte';
@@ -53,6 +61,13 @@
 	const polisUrl = campaign?.poll?.polisUrl || config.polisUrl;
 	const question = campaign?.poll?.question || zipRegion.question;
 
+	// What this Host asks participants for, resolved from the Conversation's
+	// metadata in the layout load. Both sets default to all-on, so a Campaign
+	// nobody has configured runs the poll it always ran. Derived, not captured,
+	// so an `invalidate('civicos:conversation')` after a Host edit reaches here.
+	const participation: Participation = $derived(page.data.participation);
+	const aboutYouQuestions = $derived(aboutYouQuestionsFor(participation.demographics));
+
 	// Use the participant's user ID for the Polis xid (falls back to random if not yet joined)
 	const userId =
 		participant?.userId ?? session.userId ?? `bloom-anon-${Math.random().toString(36).slice(2, 8)}`;
@@ -86,15 +101,17 @@
 
 	const BATCH_SIZE = 10;
 
-	// Order of checkpoints. Each batch boundary consumes the next variant whose action
-	// isn't already done (rolling past completed ones), so a returning user with email
-	// already provided sees `contribute → feedback → share` instead of `contribute → (silent skip) → feedback → share`.
+	// The asks the Host left switched on, in checkpoint order. Each batch boundary
+	// consumes the next variant whose action isn't already done (rolling past
+	// completed ones), so a returning user with email already provided sees
+	// `contribute → feedback → share` instead of `contribute → (silent skip) → feedback → share`.
 	//   contribute  — always shows (composing is repeatable)
 	//   email       — skipped if session.emailProvided
 	//   feedback    — skipped if session.endCtaReviewCompleted
 	//   share       — skipped if session.endCtaShareCompleted
-	// Once all four are consumed: no more pauses.
-	const CHECKPOINT_VARIANTS: CheckpointVariant[] = ['contribute', 'email', 'feedback', 'share'];
+	// Once all of them are consumed: no more pauses. An empty list means the Host
+	// switched every ask off, so voting is never interrupted.
+	const checkpointVariants: CheckpointVariant[] = $derived(askedVariants(participation.asks));
 
 	/** Whether a checkpoint variant should be skipped because its action is already done. */
 	function isCheckpointAlreadyDone(variant: CheckpointVariant): boolean {
@@ -117,11 +134,15 @@
 	let totalVotes = $state(session.totalVotes);
 	let hasSeenPause = $state(session.hasSeenPause);
 	let votesInRound = $state(hasSeenPause ? 0 : totalVotes);
-	// Index into CHECKPOINT_VARIANTS for the *next* variant to consider showing.
+	// Index into checkpointVariants for the *next* variant to consider showing.
 	// Advances past variants that have actually been shown (or skipped because all later ones
 	// were also already-done). Returning users approximate from totalVotes.
+	//
+	// `untrack` because this is a cursor, not a mirror: it takes its starting
+	// position from the list once and then walks itself. A Host editing the asks
+	// mid-poll changes what the cursor points at, not where it is.
 	let nextCheckpointIdx = $state(
-		Math.min(Math.floor(totalVotes / BATCH_SIZE), CHECKPOINT_VARIANTS.length)
+		untrack(() => Math.min(Math.floor(totalVotes / BATCH_SIZE), checkpointVariants.length))
 	);
 	// Variant currently displayed on the pause screen. Set when entering 'pause'.
 	let currentVariant = $state<CheckpointVariant>('contribute');
@@ -199,13 +220,13 @@
 			// Roll forward to the next variant whose action isn't already done.
 			// 'contribute' never reports done, so this loop always terminates if any slots remain.
 			while (
-				nextCheckpointIdx < CHECKPOINT_VARIANTS.length &&
-				isCheckpointAlreadyDone(CHECKPOINT_VARIANTS[nextCheckpointIdx])
+				nextCheckpointIdx < checkpointVariants.length &&
+				isCheckpointAlreadyDone(checkpointVariants[nextCheckpointIdx])
 			) {
 				nextCheckpointIdx++;
 			}
-			if (nextCheckpointIdx < CHECKPOINT_VARIANTS.length) {
-				currentVariant = CHECKPOINT_VARIANTS[nextCheckpointIdx];
+			if (nextCheckpointIdx < checkpointVariants.length) {
+				currentVariant = checkpointVariants[nextCheckpointIdx];
 				nextCheckpointIdx++;
 				screen = 'pause';
 			}
@@ -216,7 +237,8 @@
 	/** Transition to the ending sequence: demographics → email → thank-you */
 	function goToEndFlow() {
 		userEndedVoting = true;
-		if (session.demographicsCompleted) {
+		// No categories left on means no screen, not an empty one.
+		if (session.demographicsCompleted || aboutYouQuestions.length === 0) {
 			screen = 'thank-you';
 		} else {
 			screen = 'about-you';
@@ -227,31 +249,11 @@
 		goToEndFlow();
 	}
 
-	/** Map age range strings to representative numbers (midpoints) */
-	function ageRangeToNumber(ageRange: string): number | undefined {
-		const ageMap: Record<string, number> = {
-			'Under 18': 16,
-			'18 - 24': 21,
-			'25 - 34': 29,
-			'35 - 44': 39,
-			'45 - 54': 49,
-			'55 - 64': 59,
-			'65 - 84': 74,
-			'85+': 85
-		};
-		return ageMap[ageRange];
-	}
-
-	async function handleDemographicsDone(demographics?: {
-		age?: string;
-		ethnicity?: string;
-		gender?: string;
-		politicalParty?: string;
-	}) {
+	async function handleDemographicsDone(demographics?: Partial<Record<DemographicKey, string>>) {
 		// Save demographics to backend profile (awaited so it completes before navigation)
 		if (demographics) {
 			await session.saveProfile({
-				age: demographics.age ? ageRangeToNumber(demographics.age) : undefined,
+				age: demographics.age ? ageBucketToNumber(demographics.age) : undefined,
 				ethnicity: demographics.ethnicity || undefined,
 				gender: demographics.gender || undefined,
 				politicalParty: demographics.politicalParty || undefined
@@ -363,6 +365,7 @@
 			onBackToVoting={handleBackToVoting}
 			region={subdomainRegion}
 			whatsNext={page.data.hostCopy.whatsNext}
+			asks={participation.asks}
 		/>
 
 		<!-- Preserved screens (unused in conference flow) -->

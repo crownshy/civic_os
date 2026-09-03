@@ -5,8 +5,7 @@ import type {
 	UserProfile,
 	LearningCard,
 	ThemeSummary,
-	PopQuizQuestion,
-	AboutYouQuestion
+	PopQuizQuestion
 } from '$lib/types/mock-data';
 
 export const county: County = {
@@ -90,49 +89,5 @@ export const popQuizQuestions: PopQuizQuestion[] = [
 		correctIndex: 2,
 		explanation:
 			'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis finibus purus mollis, ultrices lorem quis, facilisis mauris. Nulla tortor magna, consequat sed pharetra quis, blandit elementum velit. Curabitur finibus et felis nec vehicula.'
-	}
-];
-
-export const aboutYouQuestions: AboutYouQuestion[] = [
-	{
-		id: 'about-001',
-		question: 'What is your age?',
-		description: 'Select the one that best describes you.',
-		options: ['Under 18', '18 - 24', '25 - 34', '35 - 44', '45 - 54', '55 - 64', '65 - 84', '85+'],
-		multiSelect: false
-	},
-	{
-		id: 'about-002',
-		question: 'What is your ethnicity?',
-		description: 'Select the one that best describes you.',
-		options: [
-			'White or Caucasian',
-			'Black or African American',
-			'Hispanic or Latino',
-			'Asian / Pacific Islander',
-			'Native American',
-			'Middle Eastern / North African',
-			'Multiracial',
-			'Other'
-		],
-		multiSelect: false
-	},
-	{
-		id: 'about-003',
-		question: 'What is your gender identity?',
-		description: 'Select the one that best describes you.',
-		options: ['Male', 'Female', 'Other'],
-		multiSelect: false
-	},
-	{
-		id: 'about-004',
-		question: 'Which of the following best describes your political leaning?',
-		description: 'Select the one that best describes you.',
-		options: [
-			'Republican / Conservative',
-			'Democrat / Progressive / Liberal',
-			'No Party Preference / Independent'
-		],
-		multiSelect: false
 	}
 ];

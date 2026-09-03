@@ -20,8 +20,8 @@
 		readDemographicToggles,
 		type CustomDemographicCategory,
 		type DemographicKey
-	} from '$lib/config/demographics';
-	import { readAskToggles, type AskKey } from '$lib/config/participant-asks';
+	} from '@civicos/shared/data/demographics';
+	import { readAskToggles, type AskKey } from '@civicos/shared/data/participant-asks';
 	import { placeFromName, rescopedSlug, toPlaceSlug } from '$lib/config/place';
 	import { extractSubdomain } from '@civicos/shared/data/regions';
 	import { RESERVED_ROUTE_SLUGS, routeSlugFor } from '$lib/conversations';

@@ -16,16 +16,15 @@
  * `contribute` has no end-page card (composing lives in the vote bar), and the
  * end page's "Join a Conversation." card has no checkpoint and no switch.
  *
+ * Both apps read this module: `admin` renders the switches and writes them,
+ * `civicos` derives its checkpoint order and its end-page cards from what they
+ * leave on. Shared so the union above and civicos's `CheckpointVariant` cannot
+ * drift, which is the one thing that would make a switch do nothing.
+ *
  * INTERIM STORAGE. The on/off state lives in
  * `conversation.metadata.participantAsks` for the same reason demographics
  * does: there is no backend table for it yet. See [demographics.ts](./demographics.ts)
  * and #363.
- *
- * ⚠️ Nothing reads this in civicos yet. `CHECKPOINT_VARIANTS` is a hardcoded
- * array in `contribute/+page.svelte` and `ThankYouScreen` renders all four
- * cards unconditionally, so a Host's choice is stored and shown back to them
- * but does not change the poll until civicos reads its config from the API
- * (#398).
  */
 
 export const ASK_KEYS = ['contribute', 'email', 'feedback', 'share'] as const;

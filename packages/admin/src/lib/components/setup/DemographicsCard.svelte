@@ -7,7 +7,7 @@
 		type CustomDemographicCategory,
 		type DemographicKey,
 		type DemographicToggles
-	} from '$lib/config/demographics';
+	} from '@civicos/shared/data/demographics';
 
 	interface Props {
 		title: string;

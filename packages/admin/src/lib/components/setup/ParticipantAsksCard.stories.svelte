@@ -1,7 +1,7 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import ParticipantAsksCard from '$lib/components/setup/ParticipantAsksCard.svelte';
-	import { DEFAULT_ASK_TOGGLES } from '$lib/config/participant-asks';
+	import { DEFAULT_ASK_TOGGLES } from '@civicos/shared/data/participant-asks';
 
 	const { Story } = defineMeta({
 		title: 'Setup/ParticipantAsksCard',

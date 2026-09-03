@@ -94,8 +94,9 @@ _Avoid_: "checkpoint" for the Ask itself. A **Checkpoint** is the mid-poll scree
 one of the two places an Ask appears. Host-facing UI says Ask.
 
 Toggles live in `conversation.metadata.participantAsks` (interim storage, same as
-demographics) and are read by `packages/admin/src/lib/config/participant-asks.ts`.
-civicos does not read them yet (#398).
+demographics). The definition and the readers are
+`packages/shared/src/data/participant-asks.ts`: admin writes the switches on
+Setup, civicos derives its checkpoint order and its end-page cards from them.
 
 ### Conversation
 A single Polis-style deliberation. Owned by comhairle (`Conversation` model:

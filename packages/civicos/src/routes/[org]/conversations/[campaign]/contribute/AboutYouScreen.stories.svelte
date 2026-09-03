@@ -2,6 +2,7 @@
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import AboutYouScreen from './AboutYouScreen.svelte';
 	import { REGIONS } from '$lib/config/regions';
+	import { DEFAULT_TOGGLES, aboutYouQuestionsFor } from '$lib/config/participation';
 
 	const { Story } = defineMeta({
 		title: 'Screens/AboutYouScreen',
@@ -12,27 +13,26 @@
 		}
 	});
 
-	const questions = [
-		{
-			id: 'about-001',
-			question: 'What is your age?',
-			description:
-				'This information helps us make sure everyone is represented in the conversation. You can revoke access to this at any time.',
-			options: ['Under 18', '18 - 24', '25-39', '40-64', '65 and older'],
-			multiSelect: false
-		},
-		{
-			id: 'about-002',
-			question: 'Which of the following ethnicities do you identify with?',
-			description:
-				'This information helps us make sure everyone is represented in the conversation. You can revoke access to this at any time.',
-			options: ['Asian', 'Black', 'White', 'Hispanic', 'Other'],
-			multiSelect: true
-		}
-	];
+	// The same call the route makes, so these stories track admin's categories
+	// rather than a fixture that drifts from them.
+	const allCategories = aboutYouQuestionsFor(DEFAULT_TOGGLES);
+	const twoCategories = aboutYouQuestionsFor({
+		...DEFAULT_TOGGLES,
+		gender: false,
+		politicalParty: false
+	});
 </script>
 
-<Story name="Age Question" args={{ countyName: 'UTAH COUNTY', questions }}>
+<Story name="Every category on" args={{ countyName: 'UTAH COUNTY', questions: allCategories }}>
+	{#snippet template(args)}
+		<AboutYouScreen {...args} region={REGIONS.utah} onDone={() => {}} />
+	{/snippet}
+</Story>
+
+<Story
+	name="Gender and party switched off"
+	args={{ countyName: 'UTAH COUNTY', questions: twoCategories }}
+>
 	{#snippet template(args)}
 		<AboutYouScreen {...args} region={REGIONS.utah} onDone={() => {}} />
 	{/snippet}

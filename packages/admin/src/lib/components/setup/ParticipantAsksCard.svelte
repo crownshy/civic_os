@@ -1,7 +1,11 @@
 <script lang="ts">
 	import SetupCard from './SetupCard.svelte';
 	import ToggleRow from './ToggleRow.svelte';
-	import { PARTICIPANT_ASKS, type AskKey, type AskToggles } from '$lib/config/participant-asks';
+	import {
+		PARTICIPANT_ASKS,
+		type AskKey,
+		type AskToggles
+	} from '@civicos/shared/data/participant-asks';
 
 	interface Props {
 		title: string;
