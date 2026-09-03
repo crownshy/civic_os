@@ -16,7 +16,8 @@
 	import { getRegionByZipcode } from '$lib/config/regions';
 	import type { RegionConfig } from '$lib/config/regions';
 	import PolisApi from '$lib/services/polis-api.svelte';
-	import { session } from '$lib/services/session.svelte';
+	import { getCountyFromZip, session } from '$lib/services/session.svelte';
+	import type { ParticipantSession } from '$lib/services/participant';
 	import { config } from '$lib/services/api';
 	import VotingScreen from './VotingScreen.svelte';
 	import ComposeScreen from './ComposeScreen.svelte';
@@ -28,6 +29,14 @@
 	// Region from subdomain (layout server load)
 	const subdomainRegion: RegionConfig = page.data.region;
 
+	// The participant the server resolved from the cookie, so the zip and the
+	// county render on the first paint. The cached session sits behind it for a
+	// load that could not reach the backend, and is still the only source of
+	// `pid` and vote progress, which the backend does not store.
+	const participant: ParticipantSession | null = page.data.participant;
+	const zipCode = participant?.zipCode || session.zipCode;
+	const countyName = zipCode ? getCountyFromZip(zipCode) : session.county;
+
 	// Which Polis conversation this poll is.
 	//
 	// The Campaign says, when it has been published to a Place: admin mirrors the
@@ -38,14 +47,15 @@
 	// resolve exactly as they did. Reaching here means the zip already matched
 	// this subdomain (the landing page redirects otherwise), so the two agree for
 	// legacy Campaigns and only the stored value is new.
-	const zipRegion = session.zipCode ? getRegionByZipcode(session.zipCode) : subdomainRegion;
+	const zipRegion = zipCode ? getRegionByZipcode(zipCode) : subdomainRegion;
 	const campaign = page.data.campaign;
 	const polisId = campaign?.poll?.polisId || zipRegion.polisId || config.polisId;
 	const polisUrl = campaign?.poll?.polisUrl || config.polisUrl;
 	const question = campaign?.poll?.question || zipRegion.question;
 
-	// Use session user ID for Polis xid (falls back to random if not yet joined)
-	const userId = session.userId ?? `bloom-anon-${Math.random().toString(36).slice(2, 8)}`;
+	// Use the participant's user ID for the Polis xid (falls back to random if not yet joined)
+	const userId =
+		participant?.userId ?? session.userId ?? `bloom-anon-${Math.random().toString(36).slice(2, 8)}`;
 
 	// Pass persisted pid so returning users only see unvoted statements
 	let polis = new PolisApi(userId, polisId, 'en', polisUrl, session.pid);
@@ -278,7 +288,7 @@
 	{:else if screen === 'voting'}
 		{#if polis.currentStatement}
 			<VotingScreen
-				countyName={session.county}
+				{countyName}
 				statementText={polis.currentStatement.txt}
 				statementId={polis.currentStatement.tid}
 				remaining={displayedRemaining}
@@ -293,7 +303,7 @@
 		{:else}
 			<!-- Skeleton that reuses real components so layout stays in sync -->
 			<div class="flex h-full flex-col bg-muted">
-				<InfoBar countyName={session.county} region={subdomainRegion} />
+				<InfoBar {countyName} region={subdomainRegion} />
 
 				<!-- Skeleton statement area -->
 				<div class="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-8">
@@ -317,7 +327,7 @@
 	{:else if screen === 'compose'}
 		<ComposeScreen
 			{question}
-			countyName={session.county}
+			{countyName}
 			firstVisit={!session.hasSeenComposeInstructions}
 			onSubmit={(text, anon) => {
 				session.markComposeInstructionsSeen();
@@ -332,7 +342,7 @@
 	{:else if screen === 'pause'}
 		<CheckpointScreen
 			region={subdomainRegion}
-			countyName={session.county}
+			{countyName}
 			variant={currentVariant}
 			remaining={polis.remaining}
 			onPrimary={handleCheckpointPrimary}
@@ -342,14 +352,14 @@
 	{:else if screen === 'about-you'}
 		<AboutYouScreen
 			region={subdomainRegion}
-			countyName={session.county}
+			{countyName}
 			questions={aboutYouQuestions}
-			zipCode={session.zipCode}
+			{zipCode}
 			onDone={handleDemographicsDone}
 		/>
 	{:else if screen === 'thank-you'}
 		<ThankYouScreen
-			countyName={session.county}
+			{countyName}
 			onBackToVoting={handleBackToVoting}
 			region={subdomainRegion}
 			whatsNext={page.data.hostCopy.whatsNext}
@@ -357,19 +367,19 @@
 
 		<!-- Preserved screens (unused in conference flow) -->
 	{:else if screen === 'did-you-know'}
-		<DidYouKnowScreen countyName={session.county} onContinue={resumeVoting} />
+		<DidYouKnowScreen {countyName} onContinue={resumeVoting} />
 	{:else if screen === 'pop-quiz'}
 		<div
 			class="flex h-full flex-col bg-gradient-primary"
 			in:fly={{ x: 40, duration: 400, easing: cubicOut }}
 		>
-			<InfoBar region={subdomainRegion} countyName={session.county} />
+			<InfoBar region={subdomainRegion} {countyName} />
 			<PopQuiz quiz={currentQuiz} onContinue={resumeVoting} onSkip={resumeVoting} />
 		</div>
 	{:else if screen === 'nice-job'}
 		<CheckpointScreen
 			region={subdomainRegion}
-			countyName={session.county}
+			{countyName}
 			onPrimary={handleEnd}
 			onKeepGoing={resumeVoting}
 		/>

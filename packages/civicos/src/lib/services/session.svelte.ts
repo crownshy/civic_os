@@ -1,4 +1,5 @@
 import type { ApiClient } from '@crownshy/api-client/api';
+import type { ParticipantSession } from './participant';
 import { config } from './api';
 import { GENERIC_REGION, REGIONS } from '$lib/config/regions';
 
@@ -22,6 +23,13 @@ export interface User {
 	emailVerified: boolean;
 }
 
+/**
+ * The localStorage cache. A cache, not the source of truth: the root layout
+ * resolves the participant from the `auth-token` cookie during SSR and
+ * `hydrate` reconciles what is here against that answer. What survives on its
+ * own is only what the backend has no record of, which is Polis's `pid`, vote
+ * progress and the end-of-flow CTA flags.
+ */
 const STORAGE_KEY = 'civic-os-session';
 
 export function getCountyFromZip(zip: string): string {
@@ -140,6 +148,60 @@ class Session {
 		}
 	}
 
+	/**
+	 * Reconcile the cache against the participant the server resolved from the
+	 * cookie. Called once from the root layout, before any page reads a flag.
+	 *
+	 * The server is the authority on identity: when it says nobody is signed in,
+	 * a cache naming someone is stale and goes. It is not the authority on the
+	 * two flags below, which it can turn on but never off. Leaving every About
+	 * You field blank stores no demographics, and `RegisterEmailForUpdates` does
+	 * not write `user.email`, so a `false` from the server means "no record of
+	 * it", not "it did not happen".
+	 */
+	hydrate(participant: ParticipantSession | null, resolved: boolean) {
+		// An unreachable backend is not an answer. Keep what we have.
+		if (!resolved) return;
+
+		if (!participant) {
+			this.forget();
+			return;
+		}
+
+		this.user = {
+			id: participant.userId,
+			authType: participant.authType,
+			email: participant.email,
+			emailVerified: participant.emailVerified
+		};
+		if (participant.zipCode) this.zipCode = participant.zipCode;
+		this.emailProvided ||= participant.emailProvided;
+		this.demographicsCompleted ||= participant.demographicsCompleted;
+		this.persist();
+	}
+
+	/**
+	 * Drop the cached participant. Everything cleared here belongs to the user
+	 * the expired cookie named, `pid` included: a new anonymous account gets a
+	 * new Polis xid, so the old participant id would replay someone else's votes.
+	 *
+	 * `hasAgreedToTos` and `hasSeenComposeInstructions` are preferences of this
+	 * browser rather than of that account, so they stay.
+	 */
+	private forget() {
+		this.user = null;
+		this.profile = null;
+		this.zipCode = '';
+		this.emailProvided = false;
+		this.demographicsCompleted = false;
+		this.pid = undefined;
+		this.totalVotes = 0;
+		this.hasSeenPause = false;
+		this.endCtaShareCompleted = false;
+		this.endCtaReviewCompleted = false;
+		this.persist();
+	}
+
 	get conversationId() {
 		return this._conversationId || config.conversationId;
 	}
@@ -230,9 +292,11 @@ class Session {
 				});
 			}
 
-			// 3. Save zipcode to profile (awaited so it completes before navigation)
-			if (zipCode) {
-				await this.saveProfile({ zipcode: zipCode });
+			// 3. Save zipcode to profile. It has to actually land: the server side
+			// gate on `/contribute` reads the stored profile, so a zip that only
+			// ever existed in this tab would bounce them straight back here.
+			if (zipCode && !(await this.saveProfile({ zipcode: zipCode }))) {
+				throw new Error('Could not save your zip code');
 			}
 
 			// 4. Register email if provided (awaited so it completes before navigation)
@@ -286,7 +350,11 @@ class Session {
 		politicalParty?: string;
 	}): Promise<boolean> {
 		const body = {
-			zipcode: data.zipcode ?? null,
+			// The upsert replaces the whole profile, so an omitted field is a
+			// delete. The About You screen sends demographics and no zip, and the
+			// server side gate on `/contribute` reads the stored zip, so dropping
+			// it here would lock the participant out of voting.
+			zipcode: data.zipcode || this.zipCode || null,
 			age: data.age ?? null,
 			ethnicity: data.ethnicity ?? null,
 			gender: data.gender ?? null,

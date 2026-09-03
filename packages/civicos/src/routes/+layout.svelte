@@ -9,8 +9,13 @@
 	let { children, data } = $props();
 
 	// The session writes through the API client built in `load` rather than
-	// making its own. Browser only: `session` is a module singleton.
-	if (browser) session.setApi(data.api);
+	// making its own, and reconciles its localStorage cache against the
+	// participant the server resolved from the cookie. Browser only: `session`
+	// is a module singleton.
+	if (browser) {
+		session.setApi(data.api);
+		session.hydrate(data.participant, data.participantResolved);
+	}
 </script>
 
 <UmamiAnalytics

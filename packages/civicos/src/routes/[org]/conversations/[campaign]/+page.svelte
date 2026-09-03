@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { campaignPath } from '@civicos/shared/data/place';
 	import { fade } from 'svelte/transition';
-	import { goto } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
@@ -9,6 +9,7 @@
 	import { Mail } from 'lucide-svelte';
 	import { Input } from '@civicos/shared/ui/input';
 	import { session } from '$lib/services/session.svelte';
+	import type { ParticipantSession } from '$lib/services/participant';
 	import { getRegionByZipcode, getRegionUrl, REGIONS } from '$lib/config/regions';
 	import type { RegionConfig } from '$lib/config/regions';
 	import type { Campaign } from '$lib/config/campaign';
@@ -21,10 +22,17 @@
 	const region: RegionConfig = page.data.region;
 	const campaign: Campaign = page.data.campaign;
 	const hostCopy = page.data.hostCopy;
-	const isReturning = session.hasSession;
+	// Who the server says this is, resolved from the cookie in the root layout.
+	// A returning participant gets CONTINUE on the first paint instead of after
+	// hydration. Only a zip counts: an email-only signup has an account but has
+	// never told us where they are, so it is not a session to continue.
+	// `session.hasSession` behind it covers the one case the server cannot answer:
+	// a backend it could not reach leaves the cached session as the only evidence.
+	const participant: ParticipantSession | null = $derived(page.data.participant);
+	const isReturning = $derived(!!participant?.zipCode || session.hasSession);
 
 	// --- Join (zip → /contribute) state ---
-	let zipCode = $state(isReturning ? session.zipCode : '');
+	let zipCode = $derived(participant?.zipCode || session.zipCode);
 	let hasZip = $derived(!!zipCode.trim());
 	let joining = $state(false);
 	let zipFlash = $state(false);
@@ -96,8 +104,12 @@
 			campaign.poll?.inviteId ?? zipRegion.inviteId
 		);
 		joining = false;
+		if (!success) return;
 		trackEvent('SucccesfullSignup');
-		if (success) goto(campaignPath(campaign.slug, page.params.org, `contribute`));
+		// The root layout resolved "anonymous" before this. Re-run it so the
+		// server side gate on `/contribute` sees the participant that now exists.
+		await invalidate('civicos:participant');
+		goto(campaignPath(campaign.slug, page.params.org, `contribute`));
 	}
 
 	function isValidEmail(value: string): boolean {
@@ -125,6 +137,7 @@
 			await session.registerEmail(trimmed);
 		} else {
 			await session.join('', trimmed, campaign.id, campaign.poll?.inviteId ?? region.inviteId);
+			await invalidate('civicos:participant');
 		}
 		emailSubmitting = false;
 		emailSuccess = true;
@@ -218,6 +231,9 @@
 					>
 						{isReturning ? 'CONTINUE' : 'JOIN THE CONVERSATION'}
 					</Button>
+					{#if session.error}
+						<p class="mt-2 max-w-sm px-2 font-sans text-sm text-destructive">{session.error}</p>
+					{/if}
 				</div>
 			</div>
 

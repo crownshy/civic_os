@@ -140,12 +140,22 @@ geography a participant ever gives us, so a `/contribute` link shared between
 friends must not skip the page that asks for it. `[campaign]/contribute/+page.ts`
 redirects anyone without a session back to `/<campaign-slug>`.
 
-That check runs in the browser, because the session is `localStorage`. On a cold
-load the server renders the page's loading shell and the redirect happens at
-hydration; a returning participant keeps their bookmark, and someone arriving
-cold gets bounced. It is a funnel, not an authorization boundary: anyone can
-forge the localStorage entry, and nothing behind it is secret. If it ever needs
-to be enforced, the zip has to move into a cookie so a server load can see it.
+**Enforced server-side since #417.** The check used to run in the browser,
+because the session was `localStorage`: a cold load rendered the page's loading
+shell and the redirect happened at hydration. The root `+layout.server.ts` now
+resolves the participant from the `auth-token` cookie the API proxy already
+forwards, so `contribute/+page.ts` reads it through `await parent()` and a cold
+load 307s before anything renders.
+
+The zip did not move into a cookie, which is what this file previously said it
+would take. It did not have to: the cookie names the account, and the zip is
+already on that account's profile, so `CurrentUser` plus `GetUserProfile` answer
+the question without putting geography in a header.
+
+It is still a funnel rather than an authorization boundary, and nothing behind it
+is secret. What changed is that forging localStorage no longer gets you in, and
+that a backend which cannot answer is treated as "unknown" rather than "not
+joined", so an outage does not lock every participant out of voting.
 
 ## What per-org slugs will break
 
