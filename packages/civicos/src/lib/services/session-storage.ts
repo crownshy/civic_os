@@ -54,7 +54,7 @@ const LEGACY_KEY = 'civic-os-session';
 
 const campaignKey = (conversationId: string) => `${CAMPAIGN_PREFIX}${conversationId}`;
 
-export function emptyAccount(): AccountRecord {
+function emptyAccount(): AccountRecord {
 	return {
 		emailProvided: false,
 		zipCode: '',
@@ -122,31 +122,31 @@ function write(key: string, value: object): void {
 	}
 }
 
-const bool = (value: unknown): boolean => value === true;
-const str = (value: unknown): string => (typeof value === 'string' ? value : '');
-const count = (value: unknown): number =>
+const asBoolean = (value: unknown): boolean => value === true;
+const asString = (value: unknown): string => (typeof value === 'string' ? value : '');
+const asCount = (value: unknown): number =>
 	typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : 0;
-const pid = (value: unknown): number | undefined =>
+const asOptionalNumber = (value: unknown): number | undefined =>
 	typeof value === 'number' && Number.isFinite(value) ? value : undefined;
 
 function toAccount(raw: Record<string, unknown>): AccountRecord {
 	return {
 		userId: typeof raw.userId === 'string' && raw.userId ? raw.userId : undefined,
-		emailProvided: bool(raw.emailProvided),
-		zipCode: str(raw.zipCode),
-		demographicsCompleted: bool(raw.demographicsCompleted),
-		hasAgreedToTos: bool(raw.hasAgreedToTos),
-		hasSeenComposeInstructions: bool(raw.hasSeenComposeInstructions)
+		emailProvided: asBoolean(raw.emailProvided),
+		zipCode: asString(raw.zipCode),
+		demographicsCompleted: asBoolean(raw.demographicsCompleted),
+		hasAgreedToTos: asBoolean(raw.hasAgreedToTos),
+		hasSeenComposeInstructions: asBoolean(raw.hasSeenComposeInstructions)
 	};
 }
 
 function toCampaign(raw: Record<string, unknown>): CampaignRecord {
 	return {
-		pid: pid(raw.pid),
-		totalVotes: count(raw.totalVotes),
-		hasSeenPause: bool(raw.hasSeenPause),
-		endCtaShareCompleted: bool(raw.endCtaShareCompleted),
-		endCtaReviewCompleted: bool(raw.endCtaReviewCompleted)
+		pid: asOptionalNumber(raw.pid),
+		totalVotes: asCount(raw.totalVotes),
+		hasSeenPause: asBoolean(raw.hasSeenPause),
+		endCtaShareCompleted: asBoolean(raw.endCtaShareCompleted),
+		endCtaReviewCompleted: asBoolean(raw.endCtaReviewCompleted)
 	};
 }
 
@@ -211,13 +211,15 @@ function migrateLegacy(): void {
 		legacy = null;
 	}
 	store.removeItem(LEGACY_KEY);
-	if (!legacy) return;
+	// Only the unversioned shape is the one this knows how to read. Anything
+	// carrying a `v` was written by a later scheme under a key it has no claim on.
+	if (!legacy || legacy.v !== undefined) return;
 
 	// Never over an existing record: this browser has already been through the
 	// new flow and the blob is the older answer.
 	if (!read(ACCOUNT_KEY)) saveAccount(toAccount(legacy));
 
-	const conversationId = str(legacy.conversationId);
+	const conversationId = asString(legacy.conversationId);
 	if (conversationId && !read(campaignKey(conversationId))) {
 		saveCampaign(conversationId, toCampaign(legacy));
 	}

@@ -9,6 +9,7 @@ import {
 	saveCampaign
 } from './session-storage';
 import { GENERIC_REGION, REGIONS } from '$lib/config/regions';
+import { httpStatusOf } from '$lib/utils/http';
 
 export interface UserProfile {
 	id: string;
@@ -74,7 +75,7 @@ class Session {
 	 * about. Seeded from the env for the single-Conversation deployments that
 	 * predate stored Campaigns, then set from the route by `useCampaign`.
 	 */
-	#campaignId = $state(config.conversationId);
+	#conversationId = $state(config.conversationId);
 
 	#api: ApiClient | null = null;
 
@@ -108,18 +109,18 @@ class Session {
 	/**
 	 * Point the poll-scoped half of the session at a Campaign.
 	 *
-	 * Called from `[campaign]/+layout.svelte`, before any page below it reads
+	 * Called from `[campaign]/+layout.ts`, before any page below it reads
 	 * `pid` or vote progress. Until this runs the fields hold whatever the env
 	 * Conversation had, which for a deployment that sets one is the same answer.
 	 */
 	useCampaign(conversationId: string) {
-		if (!conversationId || conversationId === this.#campaignId) return;
-		this.#campaignId = conversationId;
+		if (!conversationId || conversationId === this.#conversationId) return;
+		this.#conversationId = conversationId;
 		this.#readCampaign();
 	}
 
 	#readCampaign() {
-		const record = loadCampaign(this.#campaignId);
+		const record = loadCampaign(this.#conversationId);
 		this.pid = record.pid;
 		this.totalVotes = record.totalVotes;
 		this.hasSeenPause = record.hasSeenPause;
@@ -139,7 +140,7 @@ class Session {
 	}
 
 	private persistCampaign() {
-		saveCampaign(this.#campaignId, {
+		saveCampaign(this.#conversationId, {
 			pid: this.pid,
 			totalVotes: this.totalVotes,
 			hasSeenPause: this.hasSeenPause,
@@ -208,7 +209,7 @@ class Session {
 	}
 
 	get conversationId() {
-		return this.#campaignId;
+		return this.#conversationId;
 	}
 
 	get userId() {
@@ -337,7 +338,7 @@ class Session {
 		} catch (e) {
 			// 409 is comhairle saying they are already on it, which is the state we
 			// wanted. Anything else is worth knowing about but not worth blocking on.
-			if ((e as { response?: { status?: number } })?.response?.status === 409) return;
+			if (httpStatusOf(e) === 409) return;
 			console.error('[Session] Failed to register on the workflow:', e);
 		}
 	}

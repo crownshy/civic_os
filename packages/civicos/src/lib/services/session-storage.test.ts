@@ -173,6 +173,13 @@ describe('migrating the pre-#418 blob', () => {
 		expect(loadCampaign(UTAH).pid).toBe(99);
 	});
 
+	it('leaves a versioned blob alone, since only the old shape is unversioned', () => {
+		store.setItem('civic-os-session', JSON.stringify({ ...legacy, v: 1 }));
+
+		expect(loadAccount().userId).toBeUndefined();
+		expect(loadCampaign(UTAH)).toEqual(emptyCampaign());
+	});
+
 	it('survives a blob that is not an object', () => {
 		store.setItem('civic-os-session', '"nope"');
 

@@ -1,4 +1,5 @@
 import type { ApiClient, UserDto, UserProfileDto } from '@crownshy/api-client/api';
+import { httpStatusOf } from '$lib/utils/http';
 
 /**
  * The participant as the backend knows them, resolved from the `auth-token`
@@ -59,10 +60,6 @@ export function toParticipantSession(
 		demographicsCompleted: hasDemographics(profile),
 		emailProvided: Boolean(user.email)
 	};
-}
-
-function httpStatusOf(e: unknown): number | undefined {
-	return (e as { response?: { status?: number } })?.response?.status;
 }
 
 /**
