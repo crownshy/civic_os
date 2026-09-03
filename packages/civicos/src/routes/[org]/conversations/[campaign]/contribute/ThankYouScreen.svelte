@@ -56,10 +56,12 @@
 		 * switch behind it, so the grid is never empty and there is nothing to skip.
 		 */
 		asks: AskToggles;
+		/** The Campaign this end screen belongs to, for the email signup. */
+		conversationId: string;
 		onBackToVoting?: () => void;
 	}
 
-	let { countyName, onBackToVoting, region, whatsNext, asks }: Props = $props();
+	let { countyName, onBackToVoting, region, whatsNext, asks, conversationId }: Props = $props();
 
 	let emailPanelOpen = $state(false);
 	let sharePanelOpen = $state(false);
@@ -233,6 +235,7 @@
 	umamiDismissEvent="end-panel-dismiss-email"
 >
 	<EmailPanelContent
+		{conversationId}
 		umamiSubmitEvent="end-email-submit"
 		onComplete={() => (emailPanelOpen = false)}
 	/>

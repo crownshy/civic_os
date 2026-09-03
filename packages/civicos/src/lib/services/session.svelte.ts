@@ -290,7 +290,7 @@ class Session {
 
 			// 4. Register email if provided (awaited so it completes before navigation)
 			if (email) {
-				await this.registerEmail(email);
+				await this.registerEmail(email, this.conversationId);
 			}
 
 			return true;
@@ -343,24 +343,32 @@ class Session {
 		}
 	}
 
-	async registerEmail(email: string): Promise<boolean> {
+	/**
+	 * Sign this email up for updates on one Campaign.
+	 *
+	 * The Conversation is an argument rather than the remembered
+	 * `this.conversationId`, which names whichever Campaign was loaded last and
+	 * not necessarily the one the participant is looking at. `/campaign/ai` sits
+	 * outside the `[campaign]` route and never points it anywhere at all.
+	 */
+	async registerEmail(email: string, conversationId: string): Promise<boolean> {
 		this.emailProvided = true;
 		this.persistAccount();
 
-		if (!this.conversationId || !email) {
+		if (!conversationId || !email) {
 			console.warn('[Session] registerEmail skipped: missing conversationId or email');
 			return false;
 		}
 
 		try {
-			const result = await this.api.RegisterEmailForUpdates(
+			await this.api.RegisterEmailForUpdates(
 				{
 					email,
 					receive_updates_by_email: true,
 					receive_similar_conversation_updates_by_email: false
 				},
 				{
-					params: { conversation_id: this.conversationId }
+					params: { conversation_id: conversationId }
 				}
 			);
 			return true;

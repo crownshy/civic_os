@@ -13,7 +13,7 @@
 	import { addHours, isBefore } from 'date-fns';
 
 	const { data } = $props();
-	const { events, region, eventDateFormatter, eventTimeFormatter } = data;
+	const { events, region, campaign, eventDateFormatter, eventTimeFormatter } = data;
 
 	const conversationsActive = region.conversationsActive !== false;
 
@@ -41,7 +41,7 @@
 		const trimmed = email.trim();
 		if (!trimmed) return;
 		submitting = true;
-		await session.registerEmail(trimmed);
+		await session.registerEmail(trimmed, campaign.id);
 		submitting = false;
 	}
 </script>

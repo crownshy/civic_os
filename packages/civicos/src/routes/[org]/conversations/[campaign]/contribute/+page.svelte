@@ -366,6 +366,7 @@
 			region={subdomainRegion}
 			whatsNext={page.data.hostCopy.whatsNext}
 			asks={participation.asks}
+			conversationId={campaign.id}
 		/>
 
 		<!-- Preserved screens (unused in conference flow) -->
@@ -398,7 +399,11 @@
 		: 'Share your email to receive updates on this conversation and opportunities to share your voice on this issue.'}
 	umamiDismissEvent="checkpoint-panel-dismiss-email"
 >
-	<EmailPanelContent umamiSubmitEvent="checkpoint-email-submit" onComplete={handlePanelComplete} />
+	<EmailPanelContent
+		conversationId={campaign.id}
+		umamiSubmitEvent="checkpoint-email-submit"
+		onComplete={handlePanelComplete}
+	/>
 </ActionPanel>
 
 <ActionPanel

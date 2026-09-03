@@ -46,11 +46,10 @@
 		}
 		submitting = true;
 		// This page predates Campaigns and sits outside the `[campaign]` route, so
-		// nothing has told the session which Conversation it is on. The subdomain's
-		// region is the only one it knows. #419 replaces this with an explicit
-		// argument to `registerEmail`.
-		session.useCampaign(region.conversationId);
-		await session.registerEmail(trimmed);
+		// the subdomain's region is the only Conversation it knows. Naming it here
+		// beats pointing the whole session at it: `useCampaign` also swaps `pid`
+		// and the vote counters, which this page has no business touching.
+		await session.registerEmail(trimmed, region.conversationId);
 		session.emailProvided = true;
 		submitting = false;
 	}

@@ -142,10 +142,11 @@
 			return;
 		}
 		emailSubmitting = true;
-		// If user already has a session, just register the email against it.
-		// Otherwise, create a minimal session (no zip) so registerEmail has a conversationId.
+		// A returning participant only needs the signup. Everyone else gets a
+		// minimal session (no zip) first, because the signup is a call as this
+		// user. Either way the Campaign is this page's, not a remembered one.
 		if (session.hasSession) {
-			await session.registerEmail(trimmed);
+			await session.registerEmail(trimmed, campaign.id);
 		} else {
 			await session.join('', trimmed, campaign.id);
 			await invalidate('civicos:participant');

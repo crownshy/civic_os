@@ -7,12 +7,14 @@
 	import { Input } from '@civicos/shared/ui/input';
 
 	interface Props {
+		/** The Campaign this signup is for, from the route rather than the session. */
+		conversationId: string;
 		umamiSubmitEvent?: string;
 		/** Fired after a successful email submission. Caller typically closes the panel or advances. */
 		onComplete?: () => void;
 	}
 
-	let { umamiSubmitEvent, onComplete }: Props = $props();
+	let { conversationId, umamiSubmitEvent, onComplete }: Props = $props();
 
 	let email = $state('');
 	let submitting = $state(false);
@@ -41,7 +43,7 @@
 			return;
 		}
 		submitting = true;
-		await session.registerEmail(trimmed);
+		await session.registerEmail(trimmed, conversationId);
 		session.emailProvided = true;
 		submitting = false;
 		// Brief success beat so the panel doesn't slam shut on the user.
