@@ -16,7 +16,7 @@
  */
 
 import type { LocalizedConversationDto } from '@crownshy/api-client/api';
-import { REGIONS, type RegionConfig } from '$lib/config/regions';
+import { REGIONS, type RegionConfig } from '@civicos/shared/data/regions';
 import { participantUrl, readOrg, readPlace, type Place } from '@civicos/shared/data/place';
 import { env } from '$env/dynamic/public';
 

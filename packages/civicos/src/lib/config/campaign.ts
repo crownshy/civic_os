@@ -12,7 +12,13 @@
  */
 
 import type { RegionConfig } from './regions';
-import { placeForConversation, placeFromRegion, toPlaceSlug, type Place } from './place';
+import {
+	isLegacyRegionConversation,
+	placeForConversation,
+	placeFromRegion,
+	toPlaceSlug,
+	type Place
+} from './place';
 import {
 	conversationSlugFor,
 	readOrg,
@@ -58,6 +64,13 @@ export interface Campaign {
 	 * `region` means the backend was unreachable or had no such Campaign.
 	 */
 	source: 'conversation' | 'region';
+	/**
+	 * Whether a `regions.ts` entry is this Campaign rather than just the defaults
+	 * behind it. Utah, Oregon and the catch-all are; everything created in admin
+	 * is not. It is what decides whether a zip may route a participant to another
+	 * subdomain, because only for these is a region the same thing as a Campaign.
+	 */
+	isLegacyRegion: boolean;
 }
 
 /**
@@ -111,7 +124,9 @@ export function resolveCampaign(
 			place: placeFromRegion(region),
 			poll: null,
 			org: region.hostName ? { slug: toPlaceSlug(region.hostName), name: region.hostName } : null,
-			source: 'region'
+			source: 'region',
+			// Reached only by falling back to the region, so the region is it.
+			isLegacyRegion: true
 		};
 	}
 
@@ -124,6 +139,7 @@ export function resolveCampaign(
 		org:
 			readOrg(conversation.metadata) ??
 			(region.hostName ? { slug: toPlaceSlug(region.hostName), name: region.hostName } : null),
-		source: 'conversation'
+		source: 'conversation',
+		isLegacyRegion: isLegacyRegionConversation(conversation.id)
 	};
 }

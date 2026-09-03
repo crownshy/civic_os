@@ -17,7 +17,7 @@
  * and what it would take are in `prototypes/campaign-places/`.
  */
 
-import type { RegionConfig } from '$lib/config/regions';
+import type { RegionConfig } from '@civicos/shared/data/regions';
 import {
 	campaignSlugFrom,
 	conversationSlugFor,

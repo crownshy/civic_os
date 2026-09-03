@@ -10,8 +10,7 @@
  *   - Anything else → generic polis
  */
 
-// Pure region data — no SvelteKit env coupling. Civicos overlays a
-// dev region (from PUBLIC_DEV_* env) at its own boundary.
+// Pure region data, no SvelteKit env coupling.
 import type { ConversationEvent } from '../types/conversation-event';
 
 /** A coalition partner / host organization shown on the landing page. */
@@ -118,11 +117,7 @@ const DEFAULT_FAQ: FaqEntry[] = [
 // Region definitions
 // ---------------------------------------------------------------------------
 
-/**
- * Base regions — production data only. The optional `dev` region is added
- * by the civicos app from PUBLIC_DEV_* env vars (kept there to preserve the
- * "no env coupling in shared" rule).
- */
+/** The legacy regions. Every other Campaign is a stored Conversation. */
 export const REGIONS: Record<string, RegionConfig> = {
 	testing: {
 		slug: 'testing',
@@ -394,12 +389,12 @@ export const REGIONS: Record<string, RegionConfig> = {
 			"This Open Poll is hosted by the <a href='http://cocap.us'>Central Oregon Civic Action Project</a> — a coalition of community organizations from across the region.",
 			"Central Oregon is navigating big questions about AI and how it's shaping our communities. This is a space for residents to share what matters most — what you're hopeful about, what concerns you, and what you think our region needs.",
 			'There are no right answers here. This poll is a first step toward understanding where Central Oregonians stand, finding common ground, and building toward solutions together.',
-			"<strong>OPEN POLL (now) → LIVE CONVERSATIONS (May/June) → SOLUTIONS FORUM (Fall)</strong>",
-			"<strong>Step 1: This Poll</strong>",
+			'<strong>OPEN POLL (now) → LIVE CONVERSATIONS (May/June) → SOLUTIONS FORUM (Fall)</strong>',
+			'<strong>Step 1: This Poll</strong>',
 			'Share your views now. Your responses help surface what we agree on, where we differ, and what questions deserve deeper conversation.',
-			"<strong>Step 2: Live Conversations (May/June)</strong>",
+			'<strong>Step 2: Live Conversations (May/June)</strong>',
 			'Small group discussions — in person and online — open to anyone in the region. A chance to hear from neighbors, think out loud, and go deeper than a poll allows.',
-			"<strong>Solutions Forum (Fall 2026)</strong>",
+			'<strong>Solutions Forum (Fall 2026)</strong>',
 			'A representative group of 30–50 residents will come together to deliberate on what this process surfaced — and work toward recommendations with broad, cross-party support.',
 			"Questions or want to get involved? Reach us at <a href='mailto:info@cocap.us'>info@cocap.us</a>."
 		],
@@ -610,10 +605,7 @@ export const GENERIC_REGION: RegionConfig = {
 // ---------------------------------------------------------------------------
 
 /** Generates a full event description from its format, duration, and location. */
-export function getEventFullDescription(
-	event: ConversationEvent,
-	stateName: string
-): string {
+export function getEventFullDescription(event: ConversationEvent, stateName: string): string {
 	const locationLabel = event.format === 'online' ? stateName : event.location.split(',')[0];
 	const duration = event.duration ?? (event.format === 'online' ? '1 hour' : '1.5 hours');
 	const onlineAdj = event.format === 'online' ? 'online ' : '';
@@ -627,34 +619,25 @@ export function formatDurationLabel(hours: number, minutes: number) {
 
 /**
  * Resolve a subdomain string (e.g. "utah", "oregon") to a region config.
- * Pass an optional `devFallback` (civicos does, from env) for the dev region.
+ *
+ * Falls back rather than failing, so it never rejects a subdomain on its own.
+ * A Campaign published to a Place that has no region entry resolves here to
+ * GENERIC_REGION, and the Place check in `[campaign]/+layout.server.ts` is what
+ * decides whether that Campaign is served from this subdomain.
  */
-export function getRegionBySubdomain(
-	subdomain: string,
-	devFallback?: RegionConfig | null
-): RegionConfig {
-	const key = subdomain.toLowerCase();
-	if (REGIONS[key]) return REGIONS[key];
-	if (devFallback) return devFallback;
-	return GENERIC_REGION;
+export function getRegionBySubdomain(subdomain: string): RegionConfig {
+	return REGIONS[subdomain.toLowerCase()] ?? GENERIC_REGION;
 }
 
 /**
  * Given a zipcode, determine which region-specific Polis the user should join.
  * Returns the matching region, or GENERIC_REGION if no prefix matches.
  *
- * LOCAL DEV: when the `dev` region is registered (all four PUBLIC_DEV_* env
- * vars set), this ALWAYS returns the dev region — every zipcode resolves to
- * your local conversation/polis. This is the single source of truth that
- * keeps the landing redirect, contribute polisId lookup, and any future
- * caller all pinned to dev. To exercise the real prod redirect logic, comment
- * out the PUBLIC_DEV_* lines in `.env` and restart `pnpm dev`.
+ * Only meaningful for the legacy regions, where a region IS the Campaign. A
+ * stored Campaign is named by its URL, so its participants are not routed by
+ * zip. See `Campaign.isLegacyRegion`.
  */
-export function getRegionByZipcode(
-	zip: string,
-	devFallback?: RegionConfig | null
-): RegionConfig {
-	if (devFallback) return devFallback;
+export function getRegionByZipcode(zip: string): RegionConfig {
 	const trimmed = zip.trim();
 	for (const region of Object.values(REGIONS)) {
 		for (const prefix of region.zipPrefixes) {

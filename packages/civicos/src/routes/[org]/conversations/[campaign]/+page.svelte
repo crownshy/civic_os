@@ -10,7 +10,7 @@
 	import { Input } from '@civicos/shared/ui/input';
 	import { session } from '$lib/services/session.svelte';
 	import type { ParticipantSession } from '$lib/services/participant';
-	import { getRegionByZipcode, getRegionUrl, REGIONS } from '$lib/config/regions';
+	import { getRegionByZipcode, getRegionUrl } from '$lib/config/regions';
 	import type { RegionConfig } from '$lib/config/regions';
 	import type { Campaign } from '$lib/config/campaign';
 	import { OPEN_POLL_EXPLAINER, FOOTER_LINKS } from '$lib/config/landing-copy';
@@ -18,6 +18,7 @@
 	import { safeHref, sanitizeHostHtml } from '@civicos/shared/sanitize';
 	import { HOST_COPY_PROSE_CLASS, renderHostCopy } from '$lib/config/host-copy';
 	import { listSeparator } from '$lib/utils/list';
+	import JoinSkeleton from './JoinSkeleton.svelte';
 
 	const region: RegionConfig = page.data.region;
 	const campaign: Campaign = page.data.campaign;
@@ -31,8 +32,22 @@
 	const participant: ParticipantSession | null = $derived(page.data.participant);
 	const isReturning = $derived(!!participant?.zipCode || session.hasSession);
 
+	// The cached session is the second half of that answer and only the browser
+	// can read it, so it can turn `isReturning` from false to true but never the
+	// other way. A server "returning" answer is therefore final; a server "new
+	// visitor" answer is a guess until hydration, and rendering the join form on
+	// it is what makes the CTA flip to CONTINUE under you.
+	let hydrated = $state(false);
+	const joinStateSettled = $derived(isReturning || hydrated);
+
 	// --- Join (zip → /contribute) state ---
-	let zipCode = $derived(participant?.zipCode || session.zipCode);
+	// Seeded from the server answer, then owned by the field. Deliberately not a
+	// writable `$derived`: it is bound into ZipInput's `$bindable`, and the local
+	// value there does not survive an unrelated re-render such as the terms
+	// dialog opening, which silently empties the field mid-join. Nothing on this
+	// page changes the participant except a successful join, which navigates away
+	// immediately, so there is no resync to miss.
+	let zipCode = $state(page.data.participant?.zipCode || session.zipCode);
 	let hasZip = $derived(!!zipCode.trim());
 	let joining = $state(false);
 	let zipFlash = $state(false);
@@ -54,6 +69,8 @@
 			const zipParam = params.get('zip_code');
 			if (zipParam) zipCode = zipParam;
 		}
+		// After the zip param, so the field never renders empty and then fills.
+		hydrated = true;
 	});
 
 	function showTermsModal() {
@@ -67,26 +84,41 @@
 		handleJoin();
 	}
 
+	/**
+	 * The invite that registers a participant on this Campaign's workflow.
+	 *
+	 * A legacy region's invite belongs to the Campaign, because the region is the
+	 * Campaign. Any other region's does not, and offering it produces a 404 on
+	 * `AcceptInvite` against a Conversation that never had that invite. So a
+	 * Campaign with no stored invite gets none, and joins without registering
+	 * rather than borrowing one.
+	 */
+	function campaignInviteId(fallback: RegionConfig): string | undefined {
+		if (campaign.poll?.inviteId) return campaign.poll.inviteId;
+		if (campaign.isLegacyRegion) return fallback.inviteId;
+		console.warn(`[Campaign] "${campaign.slug}" has no invite; joining without registering.`);
+		return undefined;
+	}
+
 	async function handleJoin() {
 		if (isReturning) {
 			goto(campaignPath(campaign.slug, page.params.org, `contribute`));
 			return;
 		}
 
-		// LOCAL DEV: when dev region is registered, force every zip to land on dev.
-		// In prod, route by zipcode prefix. See regions.ts for details.
-		const zipRegion = REGIONS.dev ? REGIONS.dev : getRegionByZipcode(zipCode.trim());
+		const zipRegion = getRegionByZipcode(zipCode.trim());
 
-		// Different region than current subdomain → redirect.
-		if (zipRegion.slug !== region.slug) {
-			// Redirect to the appropriate subdomain with zipcode parameter
+		// A zip may send someone to another subdomain only where a region IS the
+		// Campaign, which is Utah, Oregon and the catch-all. For a Campaign
+		// published to a Place, the URL already names which Campaign this is, so
+		// routing by zip would drop its participants on a different one.
+		if (campaign.isLegacyRegion && zipRegion.slug !== region.slug) {
 			trackEvent('UnsupportedZipCode', {
 				zipCode,
 				regionSlug: region.slug,
 				zipRegion: zipRegion.slug
 			});
-			const redirectUrl = getRegionUrl(zipRegion, zipCode.trim(), window.location.hostname);
-			window.location.href = redirectUrl;
+			window.location.href = getRegionUrl(zipRegion, zipCode.trim(), window.location.hostname);
 			return;
 		}
 
@@ -101,7 +133,7 @@
 			zipCode.trim(),
 			undefined,
 			campaign.id,
-			campaign.poll?.inviteId ?? zipRegion.inviteId
+			campaignInviteId(zipRegion)
 		);
 		joining = false;
 		if (!success) return;
@@ -136,7 +168,7 @@
 		if (session.hasSession) {
 			await session.registerEmail(trimmed);
 		} else {
-			await session.join('', trimmed, campaign.id, campaign.poll?.inviteId ?? region.inviteId);
+			await session.join('', trimmed, campaign.id, campaignInviteId(region));
 			await invalidate('civicos:participant');
 		}
 		emailSubmitting = false;
@@ -204,35 +236,39 @@
 					{@html sanitizeHostHtml(region.heroBlurb)}
 				</p>
 
-				<div class="mt-10 flex flex-col items-center">
+				<div class="mt-10 flex w-full max-w-sm flex-col items-center">
 					<span class="font-display text-base font-medium opacity-80 md:text-lg">Your location</span
 					>
-					<div class="mt-1.5 w-full max-w-sm">
-						<ZipInput
-							bind:value={zipCode}
-							disabled={isReturning}
-							bind:flash={zipFlash}
-							regionPrefixes={region.zipPrefixes}
-						/>
-					</div>
-					<Button
-						variant="primary"
-						fullWidth
-						disabled={joining}
-						onclick={() => {
-							if (!hasZip) {
-								zipFlash = true;
-								return;
-							}
-							if (hasAgreedToTos) handleJoin();
-							else showTermsModal();
-						}}
-						class="mt-4 max-w-sm"
-					>
-						{isReturning ? 'CONTINUE' : 'JOIN THE CONVERSATION'}
-					</Button>
-					{#if session.error}
-						<p class="mt-2 max-w-sm px-2 font-sans text-sm text-destructive">{session.error}</p>
+					{#if joinStateSettled}
+						<div class="mt-1.5 flex w-full flex-col items-center" in:fade={{ duration: 150 }}>
+							<ZipInput
+								bind:value={zipCode}
+								disabled={isReturning}
+								bind:flash={zipFlash}
+								regionPrefixes={region.zipPrefixes}
+							/>
+							<Button
+								variant="primary"
+								fullWidth
+								disabled={joining}
+								onclick={() => {
+									if (!hasZip) {
+										zipFlash = true;
+										return;
+									}
+									if (hasAgreedToTos) handleJoin();
+									else showTermsModal();
+								}}
+								class="mt-4"
+							>
+								{isReturning ? 'CONTINUE' : 'JOIN THE CONVERSATION'}
+							</Button>
+							{#if session.error}
+								<p class="mt-2 px-2 font-sans text-sm text-destructive">{session.error}</p>
+							{/if}
+						</div>
+					{:else}
+						<JoinSkeleton class="mt-1.5" />
 					{/if}
 				</div>
 			</div>

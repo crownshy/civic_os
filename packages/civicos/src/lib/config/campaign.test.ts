@@ -51,7 +51,8 @@ describe('resolveCampaign', () => {
 			place: { slug: 'dundee', name: 'Dundee, Scotland' },
 			poll: null,
 			org: { slug: toPlaceSlug(oregon.hostName), name: oregon.hostName },
-			source: 'conversation'
+			source: 'conversation',
+			isLegacyRegion: false
 		});
 	});
 
@@ -63,7 +64,8 @@ describe('resolveCampaign', () => {
 			poll: null,
 			org: { slug: toPlaceSlug(oregon.hostName), name: oregon.hostName },
 			place: { slug: oregon.slug, name: oregon.stateName },
-			source: 'region'
+			source: 'region',
+			isLegacyRegion: true
 		});
 	});
 
@@ -89,6 +91,18 @@ describe('resolveCampaign', () => {
 		);
 
 		expect(campaign.place).toEqual({ slug: oregon.slug, name: oregon.stateName });
+	});
+
+	it('marks a Campaign a legacy region only when a region entry is it', () => {
+		// The zip may route a participant to another subdomain only for these,
+		// because only for these is a region the same thing as a Campaign.
+		const utah = resolveCampaign(
+			{ id: oregon.conversationId, slug: 'oregon', title: 'Oregon', metadata: {} },
+			GENERIC_REGION
+		);
+
+		expect(utah.isLegacyRegion).toBe(true);
+		expect(resolveCampaign(stored, oregon).isLegacyRegion).toBe(false);
 	});
 
 	it('keeps the backend id even when every copy field falls back', () => {

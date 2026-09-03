@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { REGIONS, type RegionConfig } from '$lib/config/regions';
+import { REGIONS, type RegionConfig } from '@civicos/shared/data/regions';
 import { placeForCampaign, placeFromName, rescopedSlug, toPlaceSlug } from './place';
 import { campaignPath, participantUrl } from '@civicos/shared/data/place';
 

@@ -55,3 +55,12 @@ export function placeForConversation(conversationId: string, metadata: unknown):
 	const owning = regionsByConversationId.get(conversationId);
 	return owning ? placeFromRegion(owning) : null;
 }
+
+/**
+ * Whether a `regions.ts` entry IS this Conversation, rather than merely
+ * supplying defaults behind it. True only for Utah, Oregon and the catch-all,
+ * which predate stored Campaigns and are the only ones a zip can route between.
+ */
+export function isLegacyRegionConversation(conversationId: string): boolean {
+	return regionsByConversationId.has(conversationId);
+}
