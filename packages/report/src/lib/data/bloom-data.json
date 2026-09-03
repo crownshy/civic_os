@@ -1,0 +1,3949 @@
+{
+	"themes": [
+		{
+			"key": "governance",
+			"short": "Governance & Decision-Making",
+			"full": "Governance & Decision-making",
+			"color": "#17348C",
+			"tags": ["Governance & Decision-making", "Public Service"]
+		},
+		{
+			"key": "datacenters",
+			"short": "Data Centers",
+			"full": "Data Centers & the Environment",
+			"color": "#CE302B",
+			"tags": ["Data Centers", "Environment", "Consumption"]
+		},
+		{
+			"key": "education",
+			"short": "Education & Children",
+			"full": "Education, Cognition & Children",
+			"color": "#137A22",
+			"tags": ["Education", "Children", "Cognition"]
+		},
+		{
+			"key": "mentalhealth",
+			"short": "Mental Health",
+			"full": "Mental Health & Social Connection",
+			"color": "#B01B6B",
+			"tags": ["Mental Health", "Social Connection", "Humanity"]
+		},
+		{
+			"key": "workforce",
+			"short": "Workforce & Labor",
+			"full": "Workforce & the Economy",
+			"color": "#8E3AD1",
+			"tags": ["Workforce & Labor"]
+		},
+		{
+			"key": "agency",
+			"short": "Existential Risk",
+			"full": "Human Agency, Existential Risk & Moving Fast",
+			"color": "#27756B",
+			"tags": ["Existential Risk", "Human Agency", "Moving Fast"]
+		},
+		{
+			"key": "access",
+			"short": "Access & Accuracy",
+			"full": "Access, Information & Accuracy",
+			"color": "#0E6FA6",
+			"tags": [
+				"Access",
+				"Information",
+				"Accuracy",
+				"AI Literacy",
+				"News & (mis)information",
+				"Inequality"
+			]
+		},
+		{
+			"key": "privacy",
+			"short": "Privacy & Personal Data",
+			"full": "Privacy & Personal Data",
+			"color": "#6B5C1E",
+			"tags": ["Privacy"]
+		}
+	],
+	"records": [
+		{
+			"id": "p0",
+			"kind": "poll",
+			"text": "Oregon now requires large (especially new or expanding) data centers to report their water use. They should also have to report how much electricity they consume.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 235,
+				"A": {
+					"a": 37,
+					"d": 3,
+					"p": 4,
+					"n": 44,
+					"pct": 84
+				},
+				"B": {
+					"a": 103,
+					"d": 1,
+					"p": 2,
+					"n": 106,
+					"pct": 97
+				},
+				"C": {
+					"a": 83,
+					"d": 2,
+					"p": 0,
+					"n": 85,
+					"pct": 98
+				},
+				"gap": 14,
+				"minAgree": 84
+			},
+			"source": "Open Poll",
+			"tags": ["Data Centers"],
+			"inReport": false
+		},
+		{
+			"id": "p2",
+			"kind": "poll",
+			"text": "Tax breaks for AI companies building in Oregon should require demonstrated community benefits.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 218,
+				"A": {
+					"a": 32,
+					"d": 5,
+					"p": 5,
+					"n": 42,
+					"pct": 76
+				},
+				"B": {
+					"a": 76,
+					"d": 3,
+					"p": 10,
+					"n": 89,
+					"pct": 85
+				},
+				"C": {
+					"a": 74,
+					"d": 2,
+					"p": 11,
+					"n": 87,
+					"pct": 85
+				},
+				"gap": 9,
+				"minAgree": 76
+			},
+			"source": "Open Poll",
+			"tags": ["AI Companies", "Workforce & Labor"],
+			"inReport": false
+		},
+		{
+			"id": "p4",
+			"kind": "poll",
+			"text": "For teenagers who can't access or afford therapy, AI chatbots are better than nothing.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 210,
+				"A": {
+					"a": 13,
+					"d": 17,
+					"p": 14,
+					"n": 44,
+					"pct": 30
+				},
+				"B": {
+					"a": 9,
+					"d": 46,
+					"p": 26,
+					"n": 81,
+					"pct": 11
+				},
+				"C": {
+					"a": 5,
+					"d": 69,
+					"p": 11,
+					"n": 85,
+					"pct": 6
+				},
+				"gap": 24,
+				"minAgree": 6
+			},
+			"source": "Open Poll",
+			"tags": ["Youth", "Mental Health"],
+			"inReport": false
+		},
+		{
+			"id": "p5",
+			"kind": "poll",
+			"text": "Parents should be able to see what their minor children discuss with AI mental health or companion apps.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 252,
+				"A": {
+					"a": 30,
+					"d": 9,
+					"p": 6,
+					"n": 45,
+					"pct": 67
+				},
+				"B": {
+					"a": 93,
+					"d": 9,
+					"p": 16,
+					"n": 118,
+					"pct": 79
+				},
+				"C": {
+					"a": 73,
+					"d": 5,
+					"p": 11,
+					"n": 89,
+					"pct": 82
+				},
+				"gap": 15,
+				"minAgree": 67
+			},
+			"source": "Open Poll",
+			"tags": ["Youth", "Privacy"],
+			"inReport": false
+		},
+		{
+			"id": "p6",
+			"kind": "poll",
+			"text": "Oregon schools should have clear rules about when and how students can use AI.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 243,
+				"A": {
+					"a": 38,
+					"d": 2,
+					"p": 2,
+					"n": 42,
+					"pct": 90
+				},
+				"B": {
+					"a": 104,
+					"d": 2,
+					"p": 5,
+					"n": 111,
+					"pct": 94
+				},
+				"C": {
+					"a": 85,
+					"d": 2,
+					"p": 3,
+					"n": 90,
+					"pct": 94
+				},
+				"gap": 4,
+				"minAgree": 90
+			},
+			"source": "Open Poll",
+			"tags": ["Education"],
+			"inReport": false
+		},
+		{
+			"id": "p7",
+			"kind": "poll",
+			"text": "Learning how to use AI responsibly should be part of every Oregon student's education.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 233,
+				"A": {
+					"a": 42,
+					"d": 0,
+					"p": 3,
+					"n": 45,
+					"pct": 93
+				},
+				"B": {
+					"a": 86,
+					"d": 1,
+					"p": 11,
+					"n": 98,
+					"pct": 88
+				},
+				"C": {
+					"a": 51,
+					"d": 23,
+					"p": 16,
+					"n": 90,
+					"pct": 57
+				},
+				"gap": 36,
+				"minAgree": 57
+			},
+			"source": "Open Poll",
+			"tags": ["Education"],
+			"inReport": false
+		},
+		{
+			"id": "p10",
+			"kind": "poll",
+			"text": "Parents who are worried about AI in their children's schools should be educating themselves and organizing with other parents — not waiting for administrators to act.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 228,
+				"A": {
+					"a": 34,
+					"d": 4,
+					"p": 4,
+					"n": 42,
+					"pct": 81
+				},
+				"B": {
+					"a": 80,
+					"d": 7,
+					"p": 10,
+					"n": 97,
+					"pct": 82
+				},
+				"C": {
+					"a": 72,
+					"d": 10,
+					"p": 7,
+					"n": 89,
+					"pct": 81
+				},
+				"gap": 1,
+				"minAgree": 81
+			},
+			"source": "Open Poll",
+			"tags": ["Education"],
+			"inReport": false
+		},
+		{
+			"id": "p12",
+			"kind": "poll",
+			"text": "Companies that use AI to automate jobs should also help fund training for the workers they displace.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 267,
+				"A": {
+					"a": 21,
+					"d": 17,
+					"p": 7,
+					"n": 45,
+					"pct": 47
+				},
+				"B": {
+					"a": 104,
+					"d": 12,
+					"p": 12,
+					"n": 128,
+					"pct": 81
+				},
+				"C": {
+					"a": 80,
+					"d": 4,
+					"p": 10,
+					"n": 94,
+					"pct": 85
+				},
+				"gap": 38,
+				"minAgree": 47
+			},
+			"source": "Open Poll",
+			"tags": ["Workforce & Labor"],
+			"inReport": false
+		},
+		{
+			"id": "p13",
+			"kind": "poll",
+			"text": "Workers should have the right to know when AI is being used to evaluate their performance or productivity.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 234,
+				"A": {
+					"a": 35,
+					"d": 7,
+					"p": 4,
+					"n": 46,
+					"pct": 76
+				},
+				"B": {
+					"a": 95,
+					"d": 0,
+					"p": 5,
+					"n": 100,
+					"pct": 95
+				},
+				"C": {
+					"a": 88,
+					"d": 0,
+					"p": 0,
+					"n": 88,
+					"pct": 100
+				},
+				"gap": 24,
+				"minAgree": 76
+			},
+			"source": "Open Poll",
+			"tags": ["Workforce & Labor"],
+			"inReport": false
+		},
+		{
+			"id": "p16",
+			"kind": "poll",
+			"text": "The algorithms that decide which news and political content Oregonians see online should be required to disclose how they make those decisions.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 242,
+				"A": {
+					"a": 32,
+					"d": 7,
+					"p": 5,
+					"n": 44,
+					"pct": 73
+				},
+				"B": {
+					"a": 101,
+					"d": 2,
+					"p": 2,
+					"n": 105,
+					"pct": 96
+				},
+				"C": {
+					"a": 86,
+					"d": 1,
+					"p": 6,
+					"n": 93,
+					"pct": 92
+				},
+				"gap": 23,
+				"minAgree": 73
+			},
+			"source": "Open Poll",
+			"tags": ["News & (mis)information"],
+			"inReport": false
+		},
+		{
+			"id": "p18",
+			"kind": "poll",
+			"text": "Government should be required to disclose when and how it is using AI to make decisions, and why it thinks it is a better use of taxpayer money than the alternative.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 254,
+				"A": {
+					"a": 32,
+					"d": 6,
+					"p": 6,
+					"n": 44,
+					"pct": 73
+				},
+				"B": {
+					"a": 106,
+					"d": 2,
+					"p": 7,
+					"n": 115,
+					"pct": 92
+				},
+				"C": {
+					"a": 94,
+					"d": 0,
+					"p": 1,
+					"n": 95,
+					"pct": 99
+				},
+				"gap": 26,
+				"minAgree": 73
+			},
+			"source": "Open Poll",
+			"tags": ["Government / Public Sector", "Governance & Decision-making"],
+			"inReport": false
+		},
+		{
+			"id": "p22",
+			"kind": "poll",
+			"text": "Oregon's strong community networks — neighbors, faith groups, civic organizations — have a role to play in helping residents navigate AI, not just governments and tech companies.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 242,
+				"A": {
+					"a": 35,
+					"d": 4,
+					"p": 5,
+					"n": 44,
+					"pct": 80
+				},
+				"B": {
+					"a": 98,
+					"d": 4,
+					"p": 9,
+					"n": 111,
+					"pct": 88
+				},
+				"C": {
+					"a": 64,
+					"d": 8,
+					"p": 15,
+					"n": 87,
+					"pct": 74
+				},
+				"gap": 14,
+				"minAgree": 74
+			},
+			"source": "Open Poll",
+			"tags": ["Governance & Decision-making"],
+			"inReport": false
+		},
+		{
+			"id": "p24",
+			"kind": "poll",
+			"text": "When Oregon decides how to expand AI access or manage its risks, rural communities and lower-income neighborhoods should be fully involved — not an afterthought.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 231,
+				"A": {
+					"a": 39,
+					"d": 2,
+					"p": 2,
+					"n": 43,
+					"pct": 91
+				},
+				"B": {
+					"a": 98,
+					"d": 1,
+					"p": 4,
+					"n": 103,
+					"pct": 95
+				},
+				"C": {
+					"a": 77,
+					"d": 2,
+					"p": 6,
+					"n": 85,
+					"pct": 91
+				},
+				"gap": 4,
+				"minAgree": 91
+			},
+			"source": "Open Poll",
+			"tags": ["Governance & Decision-making"],
+			"inReport": false
+		},
+		{
+			"id": "p35",
+			"kind": "poll",
+			"text": "Data centers bring good-paying jobs and tax revenue to Central Oregon communities that need economic growth.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 245,
+				"A": {
+					"a": 26,
+					"d": 7,
+					"p": 11,
+					"n": 44,
+					"pct": 59
+				},
+				"B": {
+					"a": 29,
+					"d": 53,
+					"p": 28,
+					"n": 110,
+					"pct": 26
+				},
+				"C": {
+					"a": 0,
+					"d": 87,
+					"p": 4,
+					"n": 91,
+					"pct": 0
+				},
+				"gap": 59,
+				"minAgree": 0
+			},
+			"source": "Open Poll",
+			"tags": ["Data Centers"],
+			"inReport": false
+		},
+		{
+			"id": "p38",
+			"kind": "poll",
+			"text": "Small businesses in Central Oregon should get free AI training so they are not left behind by bigger companies that can afford it.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 272,
+				"A": {
+					"a": 25,
+					"d": 13,
+					"p": 8,
+					"n": 46,
+					"pct": 54
+				},
+				"B": {
+					"a": 76,
+					"d": 24,
+					"p": 26,
+					"n": 126,
+					"pct": 60
+				},
+				"C": {
+					"a": 31,
+					"d": 42,
+					"p": 27,
+					"n": 100,
+					"pct": 31
+				},
+				"gap": 29,
+				"minAgree": 31
+			},
+			"source": "Open Poll",
+			"tags": ["Economic Benefit", "Workforce & Labor"],
+			"inReport": false
+		},
+		{
+			"id": "p39",
+			"kind": "poll",
+			"text": "AI companies should be held legally responsible when their products cause real harm to people, just like a doctor or building contractor.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 238,
+				"A": {
+					"a": 25,
+					"d": 11,
+					"p": 10,
+					"n": 46,
+					"pct": 54
+				},
+				"B": {
+					"a": 94,
+					"d": 2,
+					"p": 7,
+					"n": 103,
+					"pct": 91
+				},
+				"C": {
+					"a": 85,
+					"d": 1,
+					"p": 3,
+					"n": 89,
+					"pct": 96
+				},
+				"gap": 42,
+				"minAgree": 54
+			},
+			"source": "Open Poll",
+			"tags": ["AI Companies", "Governance & Decision-making"],
+			"inReport": false
+		},
+		{
+			"id": "p42",
+			"kind": "poll",
+			"text": "The Confederated Tribes of Warm Springs should have a formal seat at the table when Central Oregon leaders make decisions about AI.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 221,
+				"A": {
+					"a": 37,
+					"d": 2,
+					"p": 3,
+					"n": 42,
+					"pct": 88
+				},
+				"B": {
+					"a": 82,
+					"d": 2,
+					"p": 6,
+					"n": 90,
+					"pct": 91
+				},
+				"C": {
+					"a": 81,
+					"d": 3,
+					"p": 5,
+					"n": 89,
+					"pct": 91
+				},
+				"gap": 3,
+				"minAgree": 88
+			},
+			"source": "Open Poll",
+			"tags": ["Governance & Decision-making"],
+			"inReport": false
+		},
+		{
+			"id": "p43",
+			"kind": "poll",
+			"text": "AI tools are already helping ordinary people do things that used to require expensive professionals.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 269,
+				"A": {
+					"a": 40,
+					"d": 3,
+					"p": 4,
+					"n": 47,
+					"pct": 85
+				},
+				"B": {
+					"a": 88,
+					"d": 10,
+					"p": 19,
+					"n": 117,
+					"pct": 75
+				},
+				"C": {
+					"a": 28,
+					"d": 63,
+					"p": 14,
+					"n": 105,
+					"pct": 27
+				},
+				"gap": 58,
+				"minAgree": 27
+			},
+			"source": "Open Poll",
+			"tags": ["Access"],
+			"inReport": false
+		},
+		{
+			"id": "p44",
+			"kind": "poll",
+			"text": "The more Central Oregon residents rely on AI for advice, connection, and even companionship, the less they will turn to each other.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 251,
+				"A": {
+					"a": 15,
+					"d": 20,
+					"p": 11,
+					"n": 46,
+					"pct": 33
+				},
+				"B": {
+					"a": 76,
+					"d": 17,
+					"p": 20,
+					"n": 113,
+					"pct": 67
+				},
+				"C": {
+					"a": 79,
+					"d": 8,
+					"p": 5,
+					"n": 92,
+					"pct": 86
+				},
+				"gap": 53,
+				"minAgree": 33
+			},
+			"source": "Open Poll",
+			"tags": ["Mental Health"],
+			"inReport": false
+		},
+		{
+			"id": "p46",
+			"kind": "poll",
+			"text": "AI is more than one thing, and we should not govern all forms of AI the same way",
+			"origin": "participant",
+			"place": "Sisters",
+			"chips": ["SISTERS, OR", "Not Provided"],
+			"vote": {
+				"total": 236,
+				"A": {
+					"a": 40,
+					"d": 0,
+					"p": 4,
+					"n": 44,
+					"pct": 91
+				},
+				"B": {
+					"a": 83,
+					"d": 6,
+					"p": 10,
+					"n": 99,
+					"pct": 84
+				},
+				"C": {
+					"a": 56,
+					"d": 22,
+					"p": 15,
+					"n": 93,
+					"pct": 60
+				},
+				"gap": 31,
+				"minAgree": 60
+			},
+			"source": "Open Poll",
+			"tags": ["Governance & Decision-making"],
+			"inReport": false
+		},
+		{
+			"id": "p48",
+			"kind": "poll",
+			"text": "AI Companies -- like NVIDIA -- sending ambassadors to Oregon universities will give our students a leg up in the job market.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 234,
+				"A": {
+					"a": 30,
+					"d": 3,
+					"p": 12,
+					"n": 45,
+					"pct": 67
+				},
+				"B": {
+					"a": 38,
+					"d": 9,
+					"p": 49,
+					"n": 96,
+					"pct": 40
+				},
+				"C": {
+					"a": 2,
+					"d": 70,
+					"p": 21,
+					"n": 93,
+					"pct": 2
+				},
+				"gap": 65,
+				"minAgree": 2
+			},
+			"source": "Open Poll",
+			"tags": ["Youth", "Workforce & Labor"],
+			"inReport": false
+		},
+		{
+			"id": "p49",
+			"kind": "poll",
+			"text": "AI for children is fine – it just needs to engage students in ways that don't make it addictive.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 236,
+				"A": {
+					"a": 22,
+					"d": 11,
+					"p": 12,
+					"n": 45,
+					"pct": 49
+				},
+				"B": {
+					"a": 21,
+					"d": 54,
+					"p": 21,
+					"n": 96,
+					"pct": 22
+				},
+				"C": {
+					"a": 3,
+					"d": 86,
+					"p": 6,
+					"n": 95,
+					"pct": 3
+				},
+				"gap": 46,
+				"minAgree": 3
+			},
+			"source": "Open Poll",
+			"tags": ["Youth", "Education"],
+			"inReport": false
+		},
+		{
+			"id": "p50",
+			"kind": "poll",
+			"text": "A small increase in power costs is worth it if we can get a lot of tax revenue out of new data centers.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 211,
+				"A": {
+					"a": 21,
+					"d": 12,
+					"p": 11,
+					"n": 44,
+					"pct": 48
+				},
+				"B": {
+					"a": 10,
+					"d": 52,
+					"p": 21,
+					"n": 83,
+					"pct": 12
+				},
+				"C": {
+					"a": 0,
+					"d": 81,
+					"p": 3,
+					"n": 84,
+					"pct": 0
+				},
+				"gap": 48,
+				"minAgree": 0
+			},
+			"source": "Open Poll",
+			"tags": ["Data Centers", "Economic Benefit"],
+			"inReport": false
+		},
+		{
+			"id": "p51",
+			"kind": "poll",
+			"text": "I trust our local and regional government officials to make the right decisions on new data centers – they are best positioned to make decisions that benefit everyone.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 199,
+				"A": {
+					"a": 8,
+					"d": 24,
+					"p": 7,
+					"n": 39,
+					"pct": 21
+				},
+				"B": {
+					"a": 8,
+					"d": 54,
+					"p": 16,
+					"n": 78,
+					"pct": 10
+				},
+				"C": {
+					"a": 1,
+					"d": 80,
+					"p": 1,
+					"n": 82,
+					"pct": 1
+				},
+				"gap": 20,
+				"minAgree": 1
+			},
+			"source": "Open Poll",
+			"tags": ["Data Centers", "Governance & Decision-making"],
+			"inReport": false
+		},
+		{
+			"id": "p52",
+			"kind": "poll",
+			"text": "The changes coming with AI are inevitable. We should be learning to adapt, not trying to stop it.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 260,
+				"A": {
+					"a": 44,
+					"d": 0,
+					"p": 2,
+					"n": 46,
+					"pct": 96
+				},
+				"B": {
+					"a": 60,
+					"d": 28,
+					"p": 22,
+					"n": 110,
+					"pct": 55
+				},
+				"C": {
+					"a": 6,
+					"d": 89,
+					"p": 9,
+					"n": 104,
+					"pct": 6
+				},
+				"gap": 90,
+				"minAgree": 6
+			},
+			"source": "Open Poll",
+			"tags": ["Existential Risk"],
+			"inReport": false
+		},
+		{
+			"id": "p53",
+			"kind": "poll",
+			"text": "I would be fine with AI-related unemployment as long as Oregon had a better a better social safety net.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 208,
+				"A": {
+					"a": 15,
+					"d": 15,
+					"p": 11,
+					"n": 41,
+					"pct": 37
+				},
+				"B": {
+					"a": 22,
+					"d": 34,
+					"p": 28,
+					"n": 84,
+					"pct": 26
+				},
+				"C": {
+					"a": 7,
+					"d": 56,
+					"p": 20,
+					"n": 83,
+					"pct": 8
+				},
+				"gap": 29,
+				"minAgree": 8
+			},
+			"source": "Open Poll",
+			"tags": ["Workforce & Labor"],
+			"inReport": false
+		},
+		{
+			"id": "p54",
+			"kind": "poll",
+			"text": "The jobs being replaced by AI weren’t that essential to begin with. Let’s find more meaningful work for those affected.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 198,
+				"A": {
+					"a": 14,
+					"d": 12,
+					"p": 15,
+					"n": 41,
+					"pct": 34
+				},
+				"B": {
+					"a": 7,
+					"d": 54,
+					"p": 15,
+					"n": 76,
+					"pct": 9
+				},
+				"C": {
+					"a": 6,
+					"d": 67,
+					"p": 8,
+					"n": 81,
+					"pct": 7
+				},
+				"gap": 27,
+				"minAgree": 7
+			},
+			"source": "Open Poll",
+			"tags": ["Workforce & Labor"],
+			"inReport": false
+		},
+		{
+			"id": "p55",
+			"kind": "poll",
+			"text": "Big corporations that are cutting jobs should be required to pay for their employees' retraining, instead of that cost falling on the government.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 249,
+				"A": {
+					"a": 15,
+					"d": 20,
+					"p": 12,
+					"n": 47,
+					"pct": 32
+				},
+				"B": {
+					"a": 83,
+					"d": 9,
+					"p": 20,
+					"n": 112,
+					"pct": 74
+				},
+				"C": {
+					"a": 77,
+					"d": 5,
+					"p": 8,
+					"n": 90,
+					"pct": 86
+				},
+				"gap": 54,
+				"minAgree": 32
+			},
+			"source": "Open Poll",
+			"tags": ["Workforce & Labor"],
+			"inReport": false
+		},
+		{
+			"id": "p56",
+			"kind": "poll",
+			"text": "Slowing down AI in Oregon means the jobs will just go to another state.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 236,
+				"A": {
+					"a": 35,
+					"d": 4,
+					"p": 6,
+					"n": 45,
+					"pct": 78
+				},
+				"B": {
+					"a": 28,
+					"d": 41,
+					"p": 30,
+					"n": 99,
+					"pct": 28
+				},
+				"C": {
+					"a": 2,
+					"d": 75,
+					"p": 15,
+					"n": 92,
+					"pct": 2
+				},
+				"gap": 76,
+				"minAgree": 2
+			},
+			"source": "Open Poll",
+			"tags": ["Workforce & Labor"],
+			"inReport": false
+		},
+		{
+			"id": "p57",
+			"kind": "poll",
+			"text": "I don't think parents should be able to monitor their teenagers' chat logs in ChatGPT, etc – it's an invasion of privacy.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 193,
+				"A": {
+					"a": 5,
+					"d": 29,
+					"p": 6,
+					"n": 40,
+					"pct": 13
+				},
+				"B": {
+					"a": 4,
+					"d": 58,
+					"p": 13,
+					"n": 75,
+					"pct": 5
+				},
+				"C": {
+					"a": 4,
+					"d": 65,
+					"p": 9,
+					"n": 78,
+					"pct": 5
+				},
+				"gap": 8,
+				"minAgree": 5
+			},
+			"source": "Open Poll",
+			"tags": ["Youth", "Privacy"],
+			"inReport": false
+		},
+		{
+			"id": "p58",
+			"kind": "poll",
+			"text": "We're still learning of the effects of social media on our health. We shouldn't be giving kids more tools until we've figured that out.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 251,
+				"A": {
+					"a": 14,
+					"d": 22,
+					"p": 10,
+					"n": 46,
+					"pct": 30
+				},
+				"B": {
+					"a": 89,
+					"d": 9,
+					"p": 14,
+					"n": 112,
+					"pct": 79
+				},
+				"C": {
+					"a": 87,
+					"d": 1,
+					"p": 5,
+					"n": 93,
+					"pct": 94
+				},
+				"gap": 64,
+				"minAgree": 30
+			},
+			"source": "Open Poll",
+			"tags": ["Youth", "Education"],
+			"inReport": false
+		},
+		{
+			"id": "p59",
+			"kind": "poll",
+			"text": "There should be no regulation of any kind on AI. Let the free market determine how it will be applied.",
+			"origin": "participant",
+			"place": "Prineville",
+			"chips": [
+				"PRINEVILLE, OR",
+				"55-64",
+				"FEMALE",
+				"WHITE OR CAUCASIAN",
+				"NO PARTY PREFERENCE / INDEPENDENT"
+			],
+			"vote": {
+				"total": 184,
+				"A": {
+					"a": 5,
+					"d": 29,
+					"p": 3,
+					"n": 37,
+					"pct": 14
+				},
+				"B": {
+					"a": 0,
+					"d": 69,
+					"p": 0,
+					"n": 69,
+					"pct": 0
+				},
+				"C": {
+					"a": 2,
+					"d": 73,
+					"p": 3,
+					"n": 78,
+					"pct": 3
+				},
+				"gap": 14,
+				"minAgree": 0
+			},
+			"source": "Open Poll",
+			"tags": ["AI Companies", "Governance & Decision-making"],
+			"inReport": false
+		},
+		{
+			"id": "p60",
+			"kind": "poll",
+			"text": "Powerful AI could pose risks to humanity’s long-term survival, and Oregon should take that possibility seriously even when it feels remote.",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": ["BEND, OR", "Not Provided"],
+			"vote": {
+				"total": 260,
+				"A": {
+					"a": 13,
+					"d": 26,
+					"p": 4,
+					"n": 43,
+					"pct": 30
+				},
+				"B": {
+					"a": 96,
+					"d": 8,
+					"p": 19,
+					"n": 123,
+					"pct": 78
+				},
+				"C": {
+					"a": 84,
+					"d": 3,
+					"p": 7,
+					"n": 94,
+					"pct": 89
+				},
+				"gap": 59,
+				"minAgree": 30
+			},
+			"source": "Open Poll",
+			"tags": ["Existential Risk"],
+			"inReport": false
+		},
+		{
+			"id": "p61",
+			"kind": "poll",
+			"text": "Concerns that AI could threaten humanity’s survival are overblown and distract from the real ways AI is affecting people in Oregon right now",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": ["BEND, OR", "Not Provided"],
+			"vote": {
+				"total": 255,
+				"A": {
+					"a": 38,
+					"d": 2,
+					"p": 5,
+					"n": 45,
+					"pct": 84
+				},
+				"B": {
+					"a": 36,
+					"d": 46,
+					"p": 30,
+					"n": 112,
+					"pct": 32
+				},
+				"C": {
+					"a": 7,
+					"d": 77,
+					"p": 14,
+					"n": 98,
+					"pct": 7
+				},
+				"gap": 77,
+				"minAgree": 7
+			},
+			"source": "Open Poll",
+			"tags": ["Existential Risk"],
+			"inReport": false
+		},
+		{
+			"id": "p62",
+			"kind": "poll",
+			"text": "Companies building the most powerful AI systems should be required to show they can prevent catastrophic outcomes before deploying them.",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": ["BEND, OR", "Not Provided"],
+			"vote": {
+				"total": 227,
+				"A": {
+					"a": 23,
+					"d": 7,
+					"p": 9,
+					"n": 39,
+					"pct": 59
+				},
+				"B": {
+					"a": 89,
+					"d": 1,
+					"p": 9,
+					"n": 99,
+					"pct": 90
+				},
+				"C": {
+					"a": 84,
+					"d": 2,
+					"p": 3,
+					"n": 89,
+					"pct": 94
+				},
+				"gap": 35,
+				"minAgree": 59
+			},
+			"source": "Open Poll",
+			"tags": ["AI Companies", "Existential Risk"],
+			"inReport": false
+		},
+		{
+			"id": "p63",
+			"kind": "poll",
+			"text": "There needs to be more education on AI for the general public before many of these statements can be addressed. In using social media anymore there is no way to know if what I am reading/seeing is real or AI so I don't trust it anymore.",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": [
+				"BEND, OR",
+				"65+",
+				"FEMALE",
+				"WHITE OR CAUCASIAN",
+				"NO PARTY PREFERENCE / INDEPENDENT"
+			],
+			"vote": {
+				"total": 200,
+				"A": {
+					"a": 24,
+					"d": 8,
+					"p": 3,
+					"n": 35,
+					"pct": 69
+				},
+				"B": {
+					"a": 75,
+					"d": 2,
+					"p": 4,
+					"n": 81,
+					"pct": 93
+				},
+				"C": {
+					"a": 70,
+					"d": 7,
+					"p": 7,
+					"n": 84,
+					"pct": 83
+				},
+				"gap": 24,
+				"minAgree": 69
+			},
+			"source": "Open Poll",
+			"tags": ["AI Literacy", "News & (mis)information"],
+			"inReport": false
+		},
+		{
+			"id": "p64",
+			"kind": "poll",
+			"text": "AI fundamentally restructures the foundations of capitalism. All training data for AI is either other people's intellectual property or in the public domain. Therefore, AI should be publicly owned only. No private ownership.",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": ["BEND, OR", "Not Provided"],
+			"vote": {
+				"total": 203,
+				"A": {
+					"a": 4,
+					"d": 22,
+					"p": 9,
+					"n": 35,
+					"pct": 11
+				},
+				"B": {
+					"a": 50,
+					"d": 5,
+					"p": 26,
+					"n": 81,
+					"pct": 62
+				},
+				"C": {
+					"a": 67,
+					"d": 2,
+					"p": 18,
+					"n": 87,
+					"pct": 77
+				},
+				"gap": 66,
+				"minAgree": 11
+			},
+			"source": "Open Poll",
+			"tags": ["Government / Public Sector", "Governance & Decision-making"],
+			"inReport": false
+		},
+		{
+			"id": "p65",
+			"kind": "poll",
+			"text": "We need transparency from governments (city and county) on AI usage, from office software to data centers, and a willingness of government officials to listen and scale back AI usage if asked to.",
+			"origin": "participant",
+			"place": "Powell Butte",
+			"chips": ["POWELL BUTTE, OR", "18-24", "FEMALE", "WHITE OR CAUCASIAN"],
+			"vote": {
+				"total": 189,
+				"A": {
+					"a": 19,
+					"d": 10,
+					"p": 5,
+					"n": 34,
+					"pct": 56
+				},
+				"B": {
+					"a": 66,
+					"d": 1,
+					"p": 5,
+					"n": 72,
+					"pct": 92
+				},
+				"C": {
+					"a": 77,
+					"d": 2,
+					"p": 4,
+					"n": 83,
+					"pct": 93
+				},
+				"gap": 37,
+				"minAgree": 56
+			},
+			"source": "Open Poll",
+			"tags": ["Government / Public Sector", "Governance & Decision-making"],
+			"inReport": false
+		},
+		{
+			"id": "p67",
+			"kind": "poll",
+			"text": "AI often provides inaccurate information (occasionally harmfully). While it could be viewed as useful, most students use it as a crutch more than a tool that ends up negatively impacting their ability to think critically and problem solve.",
+			"origin": "participant",
+			"place": "Sisters",
+			"chips": [
+				"SISTERS, OR",
+				"25-34",
+				"OTHER",
+				"WHITE OR CAUCASIAN",
+				"DEMOCRAT / PROGRESSIVE / LIBERAL"
+			],
+			"vote": {
+				"total": 158,
+				"A": {
+					"a": 8,
+					"d": 5,
+					"p": 13,
+					"n": 26,
+					"pct": 31
+				},
+				"B": {
+					"a": 43,
+					"d": 4,
+					"p": 11,
+					"n": 58,
+					"pct": 74
+				},
+				"C": {
+					"a": 73,
+					"d": 0,
+					"p": 1,
+					"n": 74,
+					"pct": 99
+				},
+				"gap": 68,
+				"minAgree": 31
+			},
+			"source": "Open Poll",
+			"tags": ["Education"],
+			"inReport": false
+		},
+		{
+			"id": "p70",
+			"kind": "poll",
+			"text": "This will all be done through education. The only way to mitigate risks or take fear out of something is to educate. Providing opportunities for education is what we've got to focus on.",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": [
+				"BEND, OR",
+				"55-64",
+				"MALE",
+				"WHITE OR CAUCASIAN",
+				"NO PARTY PREFERENCE / INDEPENDENT"
+			],
+			"vote": {
+				"total": 141,
+				"A": {
+					"a": 22,
+					"d": 2,
+					"p": 2,
+					"n": 26,
+					"pct": 85
+				},
+				"B": {
+					"a": 33,
+					"d": 5,
+					"p": 13,
+					"n": 51,
+					"pct": 65
+				},
+				"C": {
+					"a": 15,
+					"d": 25,
+					"p": 24,
+					"n": 64,
+					"pct": 23
+				},
+				"gap": 62,
+				"minAgree": 23
+			},
+			"source": "Open Poll",
+			"tags": ["AI Literacy"],
+			"inReport": false
+		},
+		{
+			"id": "p71",
+			"kind": "poll",
+			"text": "We should not be using children as guinea pigs when it comes to AI. Allowing them to use these tools without guardrails has serious short and long-term risks.",
+			"origin": "participant",
+			"place": "Sisters",
+			"chips": [
+				"SISTERS, OR",
+				"35-44",
+				"MALE",
+				"WHITE OR CAUCASIAN",
+				"DEMOCRAT / PROGRESSIVE / LIBERAL"
+			],
+			"vote": {
+				"total": 153,
+				"A": {
+					"a": 22,
+					"d": 0,
+					"p": 3,
+					"n": 25,
+					"pct": 88
+				},
+				"B": {
+					"a": 54,
+					"d": 1,
+					"p": 3,
+					"n": 58,
+					"pct": 93
+				},
+				"C": {
+					"a": 68,
+					"d": 0,
+					"p": 2,
+					"n": 70,
+					"pct": 97
+				},
+				"gap": 9,
+				"minAgree": 88
+			},
+			"source": "Open Poll",
+			"tags": ["Youth", "Education"],
+			"inReport": false
+		},
+		{
+			"id": "p72",
+			"kind": "poll",
+			"text": "We need stronger transparency around how AI is being used in the education system – by teachers, administrators, and students.",
+			"origin": "participant",
+			"place": "Sisters",
+			"chips": [
+				"SISTERS, OR",
+				"35-44",
+				"MALE",
+				"WHITE OR CAUCASIAN",
+				"DEMOCRAT / PROGRESSIVE / LIBERAL"
+			],
+			"vote": {
+				"total": 143,
+				"A": {
+					"a": 25,
+					"d": 0,
+					"p": 1,
+					"n": 26,
+					"pct": 96
+				},
+				"B": {
+					"a": 47,
+					"d": 1,
+					"p": 3,
+					"n": 51,
+					"pct": 92
+				},
+				"C": {
+					"a": 63,
+					"d": 1,
+					"p": 2,
+					"n": 66,
+					"pct": 95
+				},
+				"gap": 4,
+				"minAgree": 92
+			},
+			"source": "Open Poll",
+			"tags": ["Education"],
+			"inReport": false
+		},
+		{
+			"id": "p73",
+			"kind": "poll",
+			"text": "Central Oregon has massive disparities in AI literacy. We need to help get everyone up to speed on the risks and opportunities AI poses to our communities.",
+			"origin": "participant",
+			"place": "Sisters",
+			"chips": [
+				"SISTERS, OR",
+				"35-44",
+				"MALE",
+				"WHITE OR CAUCASIAN",
+				"DEMOCRAT / PROGRESSIVE / LIBERAL"
+			],
+			"vote": {
+				"total": 140,
+				"A": {
+					"a": 22,
+					"d": 0,
+					"p": 2,
+					"n": 24,
+					"pct": 92
+				},
+				"B": {
+					"a": 42,
+					"d": 2,
+					"p": 9,
+					"n": 53,
+					"pct": 79
+				},
+				"C": {
+					"a": 30,
+					"d": 13,
+					"p": 20,
+					"n": 63,
+					"pct": 48
+				},
+				"gap": 44,
+				"minAgree": 48
+			},
+			"source": "Open Poll",
+			"tags": ["AI Literacy"],
+			"inReport": false
+		},
+		{
+			"id": "p74",
+			"kind": "poll",
+			"text": "The best solutions are education and regulation.",
+			"origin": "participant",
+			"place": "Sisters",
+			"chips": ["SISTERS, OR", "Not Provided"],
+			"vote": {
+				"total": 147,
+				"A": {
+					"a": 17,
+					"d": 4,
+					"p": 5,
+					"n": 26,
+					"pct": 65
+				},
+				"B": {
+					"a": 41,
+					"d": 4,
+					"p": 7,
+					"n": 52,
+					"pct": 79
+				},
+				"C": {
+					"a": 40,
+					"d": 11,
+					"p": 18,
+					"n": 69,
+					"pct": 58
+				},
+				"gap": 21,
+				"minAgree": 58
+			},
+			"source": "Open Poll",
+			"tags": ["AI Literacy"],
+			"inReport": false
+		},
+		{
+			"id": "p75",
+			"kind": "poll",
+			"text": "AI is already causing major issues by providing false information and people are relying upon it. There needs to be some sort of federal check.",
+			"origin": "participant",
+			"place": "Sisters",
+			"chips": [
+				"SISTERS, OR",
+				"55-64",
+				"FEMALE",
+				"WHITE OR CAUCASIAN",
+				"DEMOCRAT / PROGRESSIVE / LIBERAL"
+			],
+			"vote": {
+				"total": 148,
+				"A": {
+					"a": 5,
+					"d": 13,
+					"p": 7,
+					"n": 25,
+					"pct": 20
+				},
+				"B": {
+					"a": 38,
+					"d": 4,
+					"p": 12,
+					"n": 54,
+					"pct": 70
+				},
+				"C": {
+					"a": 61,
+					"d": 4,
+					"p": 4,
+					"n": 69,
+					"pct": 88
+				},
+				"gap": 68,
+				"minAgree": 20
+			},
+			"source": "Open Poll",
+			"tags": ["News & (mis)information"],
+			"inReport": false
+		},
+		{
+			"id": "p76",
+			"kind": "poll",
+			"text": "AI is taking money and opportunity from artists, writers, musicians, and thinkers. It’s taking brain cells from our children.",
+			"origin": "participant",
+			"place": "Sisters",
+			"chips": ["SISTERS, OR", "Not Provided"],
+			"vote": {
+				"total": 152,
+				"A": {
+					"a": 4,
+					"d": 17,
+					"p": 2,
+					"n": 23,
+					"pct": 17
+				},
+				"B": {
+					"a": 37,
+					"d": 5,
+					"p": 13,
+					"n": 55,
+					"pct": 67
+				},
+				"C": {
+					"a": 69,
+					"d": 3,
+					"p": 2,
+					"n": 74,
+					"pct": 93
+				},
+				"gap": 76,
+				"minAgree": 17
+			},
+			"source": "Open Poll",
+			"tags": ["Education"],
+			"inReport": false
+		},
+		{
+			"id": "p77",
+			"kind": "poll",
+			"text": "AI is an opportunity to connect people across demographics and cultures to collaborate on how we can leverage the potential for good.",
+			"origin": "participant",
+			"place": "Sisters",
+			"chips": [
+				"SISTERS, OR",
+				"35-44",
+				"FEMALE",
+				"WHITE OR CAUCASIAN",
+				"DEMOCRAT / PROGRESSIVE / LIBERAL"
+			],
+			"vote": {
+				"total": 140,
+				"A": {
+					"a": 19,
+					"d": 1,
+					"p": 3,
+					"n": 23,
+					"pct": 83
+				},
+				"B": {
+					"a": 26,
+					"d": 9,
+					"p": 17,
+					"n": 52,
+					"pct": 50
+				},
+				"C": {
+					"a": 6,
+					"d": 46,
+					"p": 13,
+					"n": 65,
+					"pct": 9
+				},
+				"gap": 74,
+				"minAgree": 9
+			},
+			"source": "Open Poll",
+			"tags": ["Positive Effects", "Mental Health"],
+			"inReport": false
+		},
+		{
+			"id": "p78",
+			"kind": "poll",
+			"text": "I think the human species is not evolved enough to be able to for see the effects this technology could have on humanity. It is unfortunate that we have the ability to create it.",
+			"origin": "participant",
+			"place": "Sisters",
+			"chips": ["SISTERS, OR", "Not Provided"],
+			"vote": {
+				"total": 155,
+				"A": {
+					"a": 1,
+					"d": 23,
+					"p": 1,
+					"n": 25,
+					"pct": 4
+				},
+				"B": {
+					"a": 28,
+					"d": 13,
+					"p": 17,
+					"n": 58,
+					"pct": 48
+				},
+				"C": {
+					"a": 60,
+					"d": 3,
+					"p": 9,
+					"n": 72,
+					"pct": 83
+				},
+				"gap": 79,
+				"minAgree": 4
+			},
+			"source": "Open Poll",
+			"tags": ["Existential Risk"],
+			"inReport": false
+		},
+		{
+			"id": "p79",
+			"kind": "poll",
+			"text": "Companies shouldn’t get tax breaks for using AI",
+			"origin": "participant",
+			"place": "Redmond",
+			"chips": ["REDMOND, OR", "Not Provided"],
+			"vote": {
+				"total": 135,
+				"A": {
+					"a": 14,
+					"d": 5,
+					"p": 3,
+					"n": 22,
+					"pct": 64
+				},
+				"B": {
+					"a": 43,
+					"d": 1,
+					"p": 4,
+					"n": 48,
+					"pct": 90
+				},
+				"C": {
+					"a": 57,
+					"d": 5,
+					"p": 3,
+					"n": 65,
+					"pct": 88
+				},
+				"gap": 26,
+				"minAgree": 64
+			},
+			"source": "Open Poll",
+			"tags": ["Workforce & Labor", "Economic Benefit"],
+			"inReport": false
+		},
+		{
+			"id": "p80",
+			"kind": "poll",
+			"text": "AI tech companies are moving too fast. I use Anthropic's Claude and find it to be beneficial in many ways. But I do not trust other companies that may be more interested in control, power and financial gain.",
+			"origin": "participant",
+			"place": "Powell Butte",
+			"chips": [
+				"POWELL BUTTE, OR",
+				"65+",
+				"FEMALE",
+				"WHITE OR CAUCASIAN",
+				"DEMOCRAT / PROGRESSIVE / LIBERAL"
+			],
+			"vote": {
+				"total": 125,
+				"A": {
+					"a": 10,
+					"d": 9,
+					"p": 4,
+					"n": 23,
+					"pct": 43
+				},
+				"B": {
+					"a": 26,
+					"d": 8,
+					"p": 10,
+					"n": 44,
+					"pct": 59
+				},
+				"C": {
+					"a": 35,
+					"d": 3,
+					"p": 20,
+					"n": 58,
+					"pct": 60
+				},
+				"gap": 17,
+				"minAgree": 43
+			},
+			"source": "Open Poll",
+			"tags": ["Workforce & Labor", "Existential Risk"],
+			"inReport": false
+		},
+		{
+			"id": "p81",
+			"kind": "poll",
+			"text": "AI is being used by youth, aging workforce should be trained to create a smooth transition to the incoming workforce.",
+			"origin": "participant",
+			"place": "Warm Springs",
+			"chips": [
+				"WARM SPRINGS, OR",
+				"35-44",
+				"MALE",
+				"NATIVE AMERICAN",
+				"DEMOCRAT / PROGRESSIVE / LIBERAL"
+			],
+			"vote": {
+				"total": 117,
+				"A": {
+					"a": 15,
+					"d": 1,
+					"p": 6,
+					"n": 22,
+					"pct": 68
+				},
+				"B": {
+					"a": 18,
+					"d": 2,
+					"p": 15,
+					"n": 35,
+					"pct": 51
+				},
+				"C": {
+					"a": 5,
+					"d": 34,
+					"p": 21,
+					"n": 60,
+					"pct": 8
+				},
+				"gap": 60,
+				"minAgree": 8
+			},
+			"source": "Open Poll",
+			"tags": ["Youth", "Workforce & Labor"],
+			"inReport": false
+		},
+		{
+			"id": "p86",
+			"kind": "poll",
+			"text": "AI if so great should already be intuitive and not need training beyond a basuc online youtube - free. It should be able to create its own training.",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": ["BEND, OR", "Not Provided"],
+			"vote": {
+				"total": 95,
+				"A": {
+					"a": 1,
+					"d": 13,
+					"p": 3,
+					"n": 17,
+					"pct": 6
+				},
+				"B": {
+					"a": 3,
+					"d": 15,
+					"p": 9,
+					"n": 27,
+					"pct": 11
+				},
+				"C": {
+					"a": 4,
+					"d": 26,
+					"p": 21,
+					"n": 51,
+					"pct": 8
+				},
+				"gap": 5,
+				"minAgree": 6
+			},
+			"source": "Open Poll",
+			"tags": ["AI Literacy"],
+			"inReport": false
+		},
+		{
+			"id": "p88",
+			"kind": "poll",
+			"text": "Using Ai instead of a person (which would help the economy), benefit$ a small group of companies that have tax breaks (doesn't benefit econ/community), takes - not provides jobs for uninspired results.",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": ["BEND, OR", "Not Provided"],
+			"vote": {
+				"total": 115,
+				"A": {
+					"a": 2,
+					"d": 10,
+					"p": 7,
+					"n": 19,
+					"pct": 11
+				},
+				"B": {
+					"a": 18,
+					"d": 5,
+					"p": 14,
+					"n": 37,
+					"pct": 49
+				},
+				"C": {
+					"a": 50,
+					"d": 1,
+					"p": 8,
+					"n": 59,
+					"pct": 85
+				},
+				"gap": 74,
+				"minAgree": 11
+			},
+			"source": "Open Poll",
+			"tags": ["Economic Benefit", "Distribution of Public Benefits", "Workforce & Labor"],
+			"inReport": false
+		},
+		{
+			"id": "p89",
+			"kind": "poll",
+			"text": "Data centers bring temporary construction jobs, use out of state contractors (worked at one), gives a temporary housing shortage (thousands of workers that leave) and VERY few jobs once running. It is monitoring temperature.",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": ["BEND, OR", "Not Provided"],
+			"vote": {
+				"total": 108,
+				"A": {
+					"a": 9,
+					"d": 3,
+					"p": 7,
+					"n": 19,
+					"pct": 47
+				},
+				"B": {
+					"a": 25,
+					"d": 2,
+					"p": 8,
+					"n": 35,
+					"pct": 71
+				},
+				"C": {
+					"a": 46,
+					"d": 0,
+					"p": 8,
+					"n": 54,
+					"pct": 85
+				},
+				"gap": 38,
+				"minAgree": 47
+			},
+			"source": "Open Poll",
+			"tags": ["Data Centers"],
+			"inReport": false
+		},
+		{
+			"id": "p100",
+			"kind": "poll",
+			"text": "Cities and counties should continue to give huge tax breaks and limit existing regulations so data centers can be built in their area.",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": [
+				"BEND, OR",
+				"65+",
+				"FEMALE",
+				"WHITE OR CAUCASIAN",
+				"NO PARTY PREFERENCE / INDEPENDENT"
+			],
+			"vote": {
+				"total": 87,
+				"A": {
+					"a": 1,
+					"d": 12,
+					"p": 2,
+					"n": 15,
+					"pct": 7
+				},
+				"B": {
+					"a": 0,
+					"d": 23,
+					"p": 0,
+					"n": 23,
+					"pct": 0
+				},
+				"C": {
+					"a": 2,
+					"d": 47,
+					"p": 0,
+					"n": 49,
+					"pct": 4
+				},
+				"gap": 7,
+				"minAgree": 0
+			},
+			"source": "Open Poll",
+			"tags": ["Data Centers", "Government / Public Sector", "Economic Benefit"],
+			"inReport": false
+		},
+		{
+			"id": "p101",
+			"kind": "poll",
+			"text": "I don't think we really know what AI is. It means different things to different people, and on a very superficial level.",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": ["BEND, OR", "55-64", "MALE", "WHITE OR CAUCASIAN", "REPUBLICAN / CONSERVATIVE"],
+			"vote": {
+				"total": 95,
+				"A": {
+					"a": 11,
+					"d": 5,
+					"p": 1,
+					"n": 17,
+					"pct": 65
+				},
+				"B": {
+					"a": 14,
+					"d": 7,
+					"p": 5,
+					"n": 26,
+					"pct": 54
+				},
+				"C": {
+					"a": 34,
+					"d": 10,
+					"p": 8,
+					"n": 52,
+					"pct": 65
+				},
+				"gap": 11,
+				"minAgree": 54
+			},
+			"source": "Open Poll",
+			"tags": ["AI Literacy"],
+			"inReport": false
+		},
+		{
+			"id": "p103",
+			"kind": "poll",
+			"text": "As a former educator, I am very concerned about how AI is changing the ability of our students to write. It is easy to search for facts, but much harder to evaluate the quality of the info and then present a coherent analysis.",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": ["BEND, OR", "65+", "FEMALE", "WHITE OR CAUCASIAN", "REPUBLICAN / CONSERVATIVE"],
+			"vote": {
+				"total": 107,
+				"A": {
+					"a": 11,
+					"d": 2,
+					"p": 5,
+					"n": 18,
+					"pct": 61
+				},
+				"B": {
+					"a": 31,
+					"d": 0,
+					"p": 2,
+					"n": 33,
+					"pct": 94
+				},
+				"C": {
+					"a": 55,
+					"d": 0,
+					"p": 1,
+					"n": 56,
+					"pct": 98
+				},
+				"gap": 37,
+				"minAgree": 61
+			},
+			"source": "Open Poll",
+			"tags": ["Education"],
+			"inReport": false
+		},
+		{
+			"id": "p106",
+			"kind": "poll",
+			"text": "Fix the corporate tax structure and don't worry about adding more displaced worker programs. We already have unemployment insurance and worker training.",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": ["BEND, OR", "65+", "FEMALE", "WHITE OR CAUCASIAN", "REPUBLICAN / CONSERVATIVE"],
+			"vote": {
+				"total": 87,
+				"A": {
+					"a": 7,
+					"d": 5,
+					"p": 3,
+					"n": 15,
+					"pct": 47
+				},
+				"B": {
+					"a": 3,
+					"d": 8,
+					"p": 12,
+					"n": 23,
+					"pct": 13
+				},
+				"C": {
+					"a": 8,
+					"d": 23,
+					"p": 18,
+					"n": 49,
+					"pct": 16
+				},
+				"gap": 34,
+				"minAgree": 13
+			},
+			"source": "Open Poll",
+			"tags": ["Workforce & Labor", "Distribution of Public Benefits"],
+			"inReport": false
+		},
+		{
+			"id": "p109",
+			"kind": "poll",
+			"text": "I'm not sure Oregon should continue giving tax breaks to AI companies that use increasingly scarce resources like water.",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": ["BEND, OR", "65+", "FEMALE", "WHITE OR CAUCASIAN", "REPUBLICAN / CONSERVATIVE"],
+			"vote": {
+				"total": 101,
+				"A": {
+					"a": 9,
+					"d": 5,
+					"p": 4,
+					"n": 18,
+					"pct": 50
+				},
+				"B": {
+					"a": 27,
+					"d": 0,
+					"p": 2,
+					"n": 29,
+					"pct": 93
+				},
+				"C": {
+					"a": 50,
+					"d": 2,
+					"p": 2,
+					"n": 54,
+					"pct": 93
+				},
+				"gap": 43,
+				"minAgree": 50
+			},
+			"source": "Open Poll",
+			"tags": ["Environment", "Economic Benefit"],
+			"inReport": false
+		},
+		{
+			"id": "p111",
+			"kind": "poll",
+			"text": "Allowing teens to maintain privacy has to be balanced with safety. I trust counselors and teachers to balance those two values much more than I trust an AI chatbot. Some queries should just shut down the bot and direct the teen to a person",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": ["BEND, OR", "65+", "FEMALE", "WHITE OR CAUCASIAN", "REPUBLICAN / CONSERVATIVE"],
+			"vote": {
+				"total": 108,
+				"A": {
+					"a": 14,
+					"d": 1,
+					"p": 3,
+					"n": 18,
+					"pct": 78
+				},
+				"B": {
+					"a": 27,
+					"d": 2,
+					"p": 6,
+					"n": 35,
+					"pct": 77
+				},
+				"C": {
+					"a": 48,
+					"d": 1,
+					"p": 6,
+					"n": 55,
+					"pct": 87
+				},
+				"gap": 10,
+				"minAgree": 77
+			},
+			"source": "Open Poll",
+			"tags": ["Youth", "Privacy"],
+			"inReport": false
+		},
+		{
+			"id": "p112",
+			"kind": "poll",
+			"text": "Insist that governments use AI to help them make transit more successful",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": ["BEND, OR", "65+", "MALE", "WHITE OR CAUCASIAN"],
+			"vote": {
+				"total": 84,
+				"A": {
+					"a": 10,
+					"d": 3,
+					"p": 3,
+					"n": 16,
+					"pct": 63
+				},
+				"B": {
+					"a": 4,
+					"d": 6,
+					"p": 11,
+					"n": 21,
+					"pct": 19
+				},
+				"C": {
+					"a": 1,
+					"d": 33,
+					"p": 13,
+					"n": 47,
+					"pct": 2
+				},
+				"gap": 61,
+				"minAgree": 2
+			},
+			"source": "Open Poll",
+			"tags": ["Governance & Decision-making"],
+			"inReport": false
+		},
+		{
+			"id": "p114",
+			"kind": "poll",
+			"text": "Prolific AI use is causing us to lose cognitive and creative abilities at a rapid rate. While all new technology improves our lives in various ways, we are giving up more than we are gaining with AI.",
+			"origin": "participant",
+			"place": "Madras",
+			"chips": [
+				"MADRAS, OR",
+				"45-54",
+				"FEMALE",
+				"WHITE OR CAUCASIAN",
+				"NO PARTY PREFERENCE / INDEPENDENT"
+			],
+			"vote": {
+				"total": 45,
+				"A": {
+					"a": 1,
+					"d": 5,
+					"p": 1,
+					"n": 7,
+					"pct": 14
+				},
+				"B": {
+					"a": 1,
+					"d": 3,
+					"p": 9,
+					"n": 13,
+					"pct": 8
+				},
+				"C": {
+					"a": 21,
+					"d": 0,
+					"p": 4,
+					"n": 25,
+					"pct": 84
+				},
+				"gap": 76,
+				"minAgree": 8
+			},
+			"source": "Open Poll",
+			"tags": ["Education"],
+			"inReport": false
+		},
+		{
+			"id": "p115",
+			"kind": "poll",
+			"text": "The environmental cost of being more data centers to Central Oregon will outweigh the benefits.",
+			"origin": "participant",
+			"place": "Madras",
+			"chips": [
+				"MADRAS, OR",
+				"45-54",
+				"FEMALE",
+				"WHITE OR CAUCASIAN",
+				"NO PARTY PREFERENCE / INDEPENDENT"
+			],
+			"vote": {
+				"total": 48,
+				"A": {
+					"a": 0,
+					"d": 2,
+					"p": 4,
+					"n": 6,
+					"pct": 0
+				},
+				"B": {
+					"a": 8,
+					"d": 0,
+					"p": 7,
+					"n": 15,
+					"pct": 53
+				},
+				"C": {
+					"a": 27,
+					"d": 0,
+					"p": 0,
+					"n": 27,
+					"pct": 100
+				},
+				"gap": 100,
+				"minAgree": 0
+			},
+			"source": "Open Poll",
+			"tags": ["Environment"],
+			"inReport": false
+		},
+		{
+			"id": "p116",
+			"kind": "poll",
+			"text": "The costs far out weigh any perceived potential benefit to the commonplace",
+			"origin": "participant",
+			"place": "Madras",
+			"chips": ["MADRAS, OR", "Not Provided"],
+			"vote": {
+				"total": 48,
+				"A": {
+					"a": 0,
+					"d": 7,
+					"p": 1,
+					"n": 8,
+					"pct": 0
+				},
+				"B": {
+					"a": 1,
+					"d": 4,
+					"p": 9,
+					"n": 14,
+					"pct": 7
+				},
+				"C": {
+					"a": 23,
+					"d": 0,
+					"p": 3,
+					"n": 26,
+					"pct": 88
+				},
+				"gap": 88,
+				"minAgree": 0
+			},
+			"source": "Open Poll",
+			"tags": ["Distribution of Public Benefits", "Governance & Decision-making"],
+			"inReport": false
+		},
+		{
+			"id": "p117",
+			"kind": "poll",
+			"text": "AI is a tool, just like any other. Tools can be used for harm or good, depending on the user.",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": ["BEND, OR", "Not Provided"],
+			"vote": {
+				"total": 51,
+				"A": {
+					"a": 9,
+					"d": 0,
+					"p": 0,
+					"n": 9,
+					"pct": 100
+				},
+				"B": {
+					"a": 15,
+					"d": 0,
+					"p": 2,
+					"n": 17,
+					"pct": 88
+				},
+				"C": {
+					"a": 13,
+					"d": 10,
+					"p": 2,
+					"n": 25,
+					"pct": 52
+				},
+				"gap": 48,
+				"minAgree": 52
+			},
+			"source": "Open Poll",
+			"tags": ["Existential Risk"],
+			"inReport": false
+		},
+		{
+			"id": "p118",
+			"kind": "poll",
+			"text": "While there are many situations in which AI can be a benefit, I can see that using AI can lead to us forgetting how to think for ourselves, because AI is quick and convenient. That's a huge risk in our education system.",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": [
+				"BEND, OR",
+				"65+",
+				"FEMALE",
+				"WHITE OR CAUCASIAN",
+				"DEMOCRAT / PROGRESSIVE / LIBERAL"
+			],
+			"vote": {
+				"total": 57,
+				"A": {
+					"a": 5,
+					"d": 3,
+					"p": 1,
+					"n": 9,
+					"pct": 56
+				},
+				"B": {
+					"a": 18,
+					"d": 1,
+					"p": 1,
+					"n": 20,
+					"pct": 90
+				},
+				"C": {
+					"a": 26,
+					"d": 0,
+					"p": 2,
+					"n": 28,
+					"pct": 93
+				},
+				"gap": 37,
+				"minAgree": 56
+			},
+			"source": "Open Poll",
+			"tags": ["Education", "Existential Risk"],
+			"inReport": false
+		},
+		{
+			"id": "p119",
+			"kind": "poll",
+			"text": "In the software industry, AI is creating so much new code so quickly that more software developers will be needed, not fewer.",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": ["BEND, OR", "Not Provided"],
+			"vote": {
+				"total": 42,
+				"A": {
+					"a": 3,
+					"d": 5,
+					"p": 0,
+					"n": 8,
+					"pct": 38
+				},
+				"B": {
+					"a": 4,
+					"d": 2,
+					"p": 7,
+					"n": 13,
+					"pct": 31
+				},
+				"C": {
+					"a": 5,
+					"d": 6,
+					"p": 10,
+					"n": 21,
+					"pct": 24
+				},
+				"gap": 14,
+				"minAgree": 24
+			},
+			"source": "Open Poll",
+			"tags": ["Workforce & Labor"],
+			"inReport": false
+		},
+		{
+			"id": "p120",
+			"kind": "poll",
+			"text": "AI is a tool like many others we use daily. It will be used for good and bad, will change the way we work, but should not be viewed as a replacement for people. But, the work we do will change as a result of it.",
+			"origin": "participant",
+			"place": "Redmond",
+			"chips": ["REDMOND, OR", "55-64", "MALE", "WHITE OR CAUCASIAN", "REPUBLICAN / CONSERVATIVE"],
+			"vote": {
+				"total": 53,
+				"A": {
+					"a": 8,
+					"d": 0,
+					"p": 0,
+					"n": 8,
+					"pct": 100
+				},
+				"B": {
+					"a": 14,
+					"d": 1,
+					"p": 2,
+					"n": 17,
+					"pct": 82
+				},
+				"C": {
+					"a": 16,
+					"d": 3,
+					"p": 9,
+					"n": 28,
+					"pct": 57
+				},
+				"gap": 43,
+				"minAgree": 57
+			},
+			"source": "Open Poll",
+			"tags": ["Workforce & Labor"],
+			"inReport": false
+		},
+		{
+			"id": "p121",
+			"kind": "poll",
+			"text": "AI should sharpen human judgment, not substitute for it. If we let it think for us instead of improving us, we trade agency for convenience. The risk is that we will choose the \"easy button\" temptation of AI over improving ones thinking.",
+			"origin": "participant",
+			"place": "Redmond",
+			"chips": [
+				"REDMOND, OR",
+				"65+",
+				"MALE",
+				"WHITE OR CAUCASIAN",
+				"NO PARTY PREFERENCE / INDEPENDENT"
+			],
+			"vote": {
+				"total": 55,
+				"A": {
+					"a": 8,
+					"d": 0,
+					"p": 1,
+					"n": 9,
+					"pct": 89
+				},
+				"B": {
+					"a": 19,
+					"d": 1,
+					"p": 0,
+					"n": 20,
+					"pct": 95
+				},
+				"C": {
+					"a": 25,
+					"d": 0,
+					"p": 1,
+					"n": 26,
+					"pct": 96
+				},
+				"gap": 7,
+				"minAgree": 89
+			},
+			"source": "Open Poll",
+			"tags": ["Existential Risk"],
+			"inReport": false
+		},
+		{
+			"id": "p122",
+			"kind": "poll",
+			"text": "We should not blindly trust developers, promoters of AI. The Pope is correct in saying \"AI should be disarmed.\"",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": [
+				"BEND, OR",
+				"65+",
+				"MALE",
+				"WHITE OR CAUCASIAN",
+				"DEMOCRAT / PROGRESSIVE / LIBERAL"
+			],
+			"vote": {
+				"total": 53,
+				"A": {
+					"a": 4,
+					"d": 1,
+					"p": 3,
+					"n": 8,
+					"pct": 50
+				},
+				"B": {
+					"a": 13,
+					"d": 1,
+					"p": 3,
+					"n": 17,
+					"pct": 76
+				},
+				"C": {
+					"a": 27,
+					"d": 0,
+					"p": 1,
+					"n": 28,
+					"pct": 96
+				},
+				"gap": 46,
+				"minAgree": 50
+			},
+			"source": "Open Poll",
+			"tags": ["Governance & Decision-making"],
+			"inReport": false
+		},
+		{
+			"id": "p123",
+			"kind": "poll",
+			"text": "There should be no tax credits for AI data centers - these centers raise everyone's electric bill, create very few jobs and their usefulness is up for debate. The people of Oregon shouldn't be giving these billionaires a tax break",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": ["BEND, OR", "25-34", "MALE", "WHITE OR CAUCASIAN"],
+			"vote": {
+				"total": 52,
+				"A": {
+					"a": 3,
+					"d": 1,
+					"p": 3,
+					"n": 7,
+					"pct": 43
+				},
+				"B": {
+					"a": 12,
+					"d": 1,
+					"p": 2,
+					"n": 15,
+					"pct": 80
+				},
+				"C": {
+					"a": 30,
+					"d": 0,
+					"p": 0,
+					"n": 30,
+					"pct": 100
+				},
+				"gap": 57,
+				"minAgree": 43
+			},
+			"source": "Open Poll",
+			"tags": ["Economic Benefit", "Workforce & Labor"],
+			"inReport": false
+		},
+		{
+			"id": "p125",
+			"kind": "poll",
+			"text": "Efforts need to be made to get more women involved in controlling AI. Leaving AI power to only the TechBros is what got our world in the mess it is now.",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": ["BEND, OR", "65+", "FEMALE", "WHITE OR CAUCASIAN"],
+			"vote": {
+				"total": 43,
+				"A": {
+					"a": 3,
+					"d": 1,
+					"p": 3,
+					"n": 7,
+					"pct": 43
+				},
+				"B": {
+					"a": 6,
+					"d": 3,
+					"p": 4,
+					"n": 13,
+					"pct": 46
+				},
+				"C": {
+					"a": 13,
+					"d": 4,
+					"p": 6,
+					"n": 23,
+					"pct": 57
+				},
+				"gap": 14,
+				"minAgree": 43
+			},
+			"source": "Open Poll",
+			"tags": ["Governance & Decision-making"],
+			"inReport": false
+		},
+		{
+			"id": "p127",
+			"kind": "poll",
+			"text": "AI does provide benefits - so much so, that I don't see society putting that genie back in the bottle - but I also think that taxation and regulation of the tech companies creating AI are equally important.",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": [
+				"BEND, OR",
+				"55-64",
+				"FEMALE",
+				"WHITE OR CAUCASIAN",
+				"DEMOCRAT / PROGRESSIVE / LIBERAL"
+			],
+			"vote": {
+				"total": 46,
+				"A": {
+					"a": 6,
+					"d": 1,
+					"p": 1,
+					"n": 8,
+					"pct": 75
+				},
+				"B": {
+					"a": 13,
+					"d": 0,
+					"p": 0,
+					"n": 13,
+					"pct": 100
+				},
+				"C": {
+					"a": 16,
+					"d": 3,
+					"p": 6,
+					"n": 25,
+					"pct": 64
+				},
+				"gap": 36,
+				"minAgree": 64
+			},
+			"source": "Open Poll",
+			"tags": ["Governance & Decision-making"],
+			"inReport": false
+		},
+		{
+			"id": "p128",
+			"kind": "poll",
+			"text": "Data center development requires fair, methodical, and unhurried environmental and community review. I would not want to live next to a 5000 acre data center campus that competes with humans and wildlife for water and raises my energy bill.",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": [
+				"BEND, OR",
+				"55-64",
+				"FEMALE",
+				"WHITE OR CAUCASIAN",
+				"DEMOCRAT / PROGRESSIVE / LIBERAL"
+			],
+			"vote": {
+				"total": 53,
+				"A": {
+					"a": 8,
+					"d": 0,
+					"p": 0,
+					"n": 8,
+					"pct": 100
+				},
+				"B": {
+					"a": 15,
+					"d": 1,
+					"p": 1,
+					"n": 17,
+					"pct": 88
+				},
+				"C": {
+					"a": 27,
+					"d": 0,
+					"p": 1,
+					"n": 28,
+					"pct": 96
+				},
+				"gap": 12,
+				"minAgree": 88
+			},
+			"source": "Open Poll",
+			"tags": ["Data Centers", "Governance & Decision-making", "Environment"],
+			"inReport": false
+		},
+		{
+			"id": "p130",
+			"kind": "poll",
+			"text": "AI companies should not receive “liability shields” from lawsuits that stem from negative environmental or health effects that arise from the construction and operation of data centers. They need to pay for negative side effects.",
+			"origin": "participant",
+			"place": "Culver",
+			"chips": ["CULVER, OR", "35-44", "MALE", "WHITE OR CAUCASIAN", "REPUBLICAN / CONSERVATIVE"],
+			"vote": {
+				"total": 56,
+				"A": {
+					"a": 3,
+					"d": 2,
+					"p": 2,
+					"n": 7,
+					"pct": 43
+				},
+				"B": {
+					"a": 17,
+					"d": 0,
+					"p": 1,
+					"n": 18,
+					"pct": 94
+				},
+				"C": {
+					"a": 31,
+					"d": 0,
+					"p": 0,
+					"n": 31,
+					"pct": 100
+				},
+				"gap": 57,
+				"minAgree": 43
+			},
+			"source": "Open Poll",
+			"tags": ["AI Companies", "Governance & Decision-making", "Environment"],
+			"inReport": false
+		},
+		{
+			"id": "p131",
+			"kind": "poll",
+			"text": "There are too many lies and half-truths from AI companies and community leaders about the “job opportunities” that AI data centers will produce once built.",
+			"origin": "participant",
+			"place": "Culver",
+			"chips": ["CULVER, OR", "35-44", "MALE", "WHITE OR CAUCASIAN", "REPUBLICAN / CONSERVATIVE"],
+			"vote": {
+				"total": 53,
+				"A": {
+					"a": 6,
+					"d": 2,
+					"p": 1,
+					"n": 9,
+					"pct": 67
+				},
+				"B": {
+					"a": 13,
+					"d": 0,
+					"p": 3,
+					"n": 16,
+					"pct": 81
+				},
+				"C": {
+					"a": 27,
+					"d": 0,
+					"p": 1,
+					"n": 28,
+					"pct": 96
+				},
+				"gap": 29,
+				"minAgree": 67
+			},
+			"source": "Open Poll",
+			"tags": ["Data Centers", "Workforce & Labor", "AI Literacy"],
+			"inReport": false
+		},
+		{
+			"id": "p134",
+			"kind": "poll",
+			"text": "Every organization should implement an AI policy that protects company data and prevents confidential or proprietary information from being entered into generative AI tools.",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": [
+				"BEND, OR",
+				"45-54",
+				"FEMALE",
+				"WHITE OR CAUCASIAN",
+				"NO PARTY PREFERENCE / INDEPENDENT"
+			],
+			"vote": {
+				"total": 49,
+				"A": {
+					"a": 7,
+					"d": 1,
+					"p": 0,
+					"n": 8,
+					"pct": 88
+				},
+				"B": {
+					"a": 8,
+					"d": 0,
+					"p": 6,
+					"n": 14,
+					"pct": 57
+				},
+				"C": {
+					"a": 27,
+					"d": 0,
+					"p": 0,
+					"n": 27,
+					"pct": 100
+				},
+				"gap": 43,
+				"minAgree": 57
+			},
+			"source": "Open Poll",
+			"tags": ["Privacy"],
+			"inReport": false
+		},
+		{
+			"id": "p135",
+			"kind": "poll",
+			"text": "Tech workers in Oregon should form an Oregon Tech Workers Union to protect ourselves from AI related corporate layoffs, salary reductions, position eliminations, etc.",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": [
+				"BEND, OR",
+				"35-44",
+				"MALE",
+				"WHITE OR CAUCASIAN",
+				"NO PARTY PREFERENCE / INDEPENDENT"
+			],
+			"vote": {
+				"total": 35,
+				"A": {
+					"a": 2,
+					"d": 0,
+					"p": 1,
+					"n": 3,
+					"pct": 67
+				},
+				"B": {
+					"a": 4,
+					"d": 2,
+					"p": 4,
+					"n": 10,
+					"pct": 40
+				},
+				"C": {
+					"a": 14,
+					"d": 0,
+					"p": 8,
+					"n": 22,
+					"pct": 64
+				},
+				"gap": 27,
+				"minAgree": 40
+			},
+			"source": "Open Poll",
+			"tags": ["AI Companies", "Workforce & Labor"],
+			"inReport": false
+		},
+		{
+			"id": "p141",
+			"kind": "poll",
+			"text": "We need to prioritize building a rigorous, apolitical evidence base around AI's impact on many things- child development, worker outcomes, environmental impacts, social connection, professional interactions, research capabilities.",
+			"origin": "participant",
+			"place": "Sisters",
+			"chips": ["SISTERS, OR", "Not Provided"],
+			"vote": {
+				"total": 44,
+				"A": {
+					"a": 4,
+					"d": 0,
+					"p": 0,
+					"n": 4,
+					"pct": 100
+				},
+				"B": {
+					"a": 13,
+					"d": 1,
+					"p": 1,
+					"n": 15,
+					"pct": 87
+				},
+				"C": {
+					"a": 22,
+					"d": 2,
+					"p": 1,
+					"n": 25,
+					"pct": 88
+				},
+				"gap": 13,
+				"minAgree": 87
+			},
+			"source": "Open Poll",
+			"tags": ["AI Literacy"],
+			"inReport": false
+		},
+		{
+			"id": "p142",
+			"kind": "poll",
+			"text": "While AI companies should be engaged in measuring the impact of their tools and responsive to government and community sentiment, it's not their job (alone) to find solutions. Many parts of society need to be part of shaping solutions.",
+			"origin": "participant",
+			"place": "Sisters",
+			"chips": ["SISTERS, OR", "Not Provided"],
+			"vote": {
+				"total": 41,
+				"A": {
+					"a": 3,
+					"d": 0,
+					"p": 1,
+					"n": 4,
+					"pct": 75
+				},
+				"B": {
+					"a": 14,
+					"d": 0,
+					"p": 1,
+					"n": 15,
+					"pct": 93
+				},
+				"C": {
+					"a": 12,
+					"d": 4,
+					"p": 6,
+					"n": 22,
+					"pct": 55
+				},
+				"gap": 38,
+				"minAgree": 55
+			},
+			"source": "Open Poll",
+			"tags": ["AI Companies", "Government / Public Sector", "Governance & Decision-making"],
+			"inReport": false
+		},
+		{
+			"id": "p143",
+			"kind": "poll",
+			"text": "We don't yet know how to effectively regulate AI, but that shouldn't stop us from introducing any regulation or safeguards. We need to be trying good ideas, evaluating carefully, and create mechanisms that can evolve quickly.",
+			"origin": "participant",
+			"place": "Sisters",
+			"chips": ["SISTERS, OR", "Not Provided"],
+			"vote": {
+				"total": 43,
+				"A": {
+					"a": 4,
+					"d": 0,
+					"p": 0,
+					"n": 4,
+					"pct": 100
+				},
+				"B": {
+					"a": 14,
+					"d": 1,
+					"p": 0,
+					"n": 15,
+					"pct": 93
+				},
+				"C": {
+					"a": 20,
+					"d": 3,
+					"p": 1,
+					"n": 24,
+					"pct": 83
+				},
+				"gap": 17,
+				"minAgree": 83
+			},
+			"source": "Open Poll",
+			"tags": ["Governance & Decision-making"],
+			"inReport": false
+		},
+		{
+			"id": "p147",
+			"kind": "poll",
+			"text": "I hope AI’s potential when it is used to advance public good. I support AI if it helps address climate, water, health, education, and workforce challenges while protecting privacy, promoting fairness, and reducing environmental impacts.",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": ["BEND, OR", "Not Provided"],
+			"vote": {
+				"total": 36,
+				"A": {
+					"a": 3,
+					"d": 0,
+					"p": 0,
+					"n": 3,
+					"pct": 100
+				},
+				"B": {
+					"a": 13,
+					"d": 1,
+					"p": 3,
+					"n": 17,
+					"pct": 76
+				},
+				"C": {
+					"a": 4,
+					"d": 7,
+					"p": 5,
+					"n": 16,
+					"pct": 25
+				},
+				"gap": 75,
+				"minAgree": 25
+			},
+			"source": "Open Poll",
+			"tags": ["Governance & Decision-making"],
+			"inReport": false
+		},
+		{
+			"id": "p150",
+			"kind": "poll",
+			"text": "Community members' voices should be included when local leaders are making decisions on using AI in government.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 34,
+				"A": {
+					"a": 3,
+					"d": 0,
+					"p": 1,
+					"n": 4,
+					"pct": 75
+				},
+				"B": {
+					"a": 14,
+					"d": 0,
+					"p": 0,
+					"n": 14,
+					"pct": 100
+				},
+				"C": {
+					"a": 16,
+					"d": 0,
+					"p": 0,
+					"n": 16,
+					"pct": 100
+				},
+				"gap": 25,
+				"minAgree": 75
+			},
+			"source": "Open Poll",
+			"tags": ["Governance & Decision-making"],
+			"inReport": false
+		},
+		{
+			"id": "p151",
+			"kind": "poll",
+			"text": "I would volunteer to participate in a 3-day civic assembly to make recommendations on AI policy to local and state leaders.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 27,
+				"A": {
+					"a": 2,
+					"d": 0,
+					"p": 1,
+					"n": 3,
+					"pct": 67
+				},
+				"B": {
+					"a": 4,
+					"d": 2,
+					"p": 4,
+					"n": 10,
+					"pct": 40
+				},
+				"C": {
+					"a": 9,
+					"d": 2,
+					"p": 3,
+					"n": 14,
+					"pct": 64
+				},
+				"gap": 27,
+				"minAgree": 40
+			},
+			"source": "Open Poll",
+			"tags": ["Governance & Decision-making"],
+			"inReport": false
+		},
+		{
+			"id": "p152",
+			"kind": "poll",
+			"text": "I think about how AI affects my family and community on a weekly basis.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 28,
+				"A": {
+					"a": 3,
+					"d": 0,
+					"p": 1,
+					"n": 4,
+					"pct": 75
+				},
+				"B": {
+					"a": 3,
+					"d": 5,
+					"p": 1,
+					"n": 9,
+					"pct": 33
+				},
+				"C": {
+					"a": 13,
+					"d": 0,
+					"p": 2,
+					"n": 15,
+					"pct": 87
+				},
+				"gap": 54,
+				"minAgree": 33
+			},
+			"source": "Open Poll",
+			"tags": ["Governance & Decision-making"],
+			"inReport": false
+		},
+		{
+			"id": "p153",
+			"kind": "poll",
+			"text": "The most powerful AI models should be open so the public can inspect the code and prevent monopolies.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 27,
+				"A": {
+					"a": 1,
+					"d": 1,
+					"p": 1,
+					"n": 3,
+					"pct": 33
+				},
+				"B": {
+					"a": 5,
+					"d": 3,
+					"p": 3,
+					"n": 11,
+					"pct": 45
+				},
+				"C": {
+					"a": 11,
+					"d": 0,
+					"p": 2,
+					"n": 13,
+					"pct": 85
+				},
+				"gap": 52,
+				"minAgree": 33
+			},
+			"source": "Open Poll",
+			"tags": ["Governance & Decision-making"],
+			"inReport": false
+		},
+		{
+			"id": "p154",
+			"kind": "poll",
+			"text": "Keeping the code behind world's most powerful AI models private is a necessary safety measure to prevent bad actors from using the technology for harm.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 24,
+				"A": {
+					"a": 1,
+					"d": 1,
+					"p": 1,
+					"n": 3,
+					"pct": 33
+				},
+				"B": {
+					"a": 3,
+					"d": 1,
+					"p": 4,
+					"n": 8,
+					"pct": 38
+				},
+				"C": {
+					"a": 1,
+					"d": 5,
+					"p": 7,
+					"n": 13,
+					"pct": 8
+				},
+				"gap": 30,
+				"minAgree": 8
+			},
+			"source": "Open Poll",
+			"tags": ["Governance & Decision-making"],
+			"inReport": false
+		},
+		{
+			"id": "p155",
+			"kind": "poll",
+			"text": "AI companies should be required to watermark all synthetic content so that users can always distinguish between a real human and an AI-generated image or video.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 25,
+				"A": {
+					"a": 2,
+					"d": 0,
+					"p": 1,
+					"n": 3,
+					"pct": 67
+				},
+				"B": {
+					"a": 6,
+					"d": 0,
+					"p": 2,
+					"n": 8,
+					"pct": 75
+				},
+				"C": {
+					"a": 14,
+					"d": 0,
+					"p": 0,
+					"n": 14,
+					"pct": 100
+				},
+				"gap": 33,
+				"minAgree": 67
+			},
+			"source": "Open Poll",
+			"tags": ["News & (mis)information"],
+			"inReport": false
+		},
+		{
+			"id": "p156",
+			"kind": "poll",
+			"text": "Before being deployed in public sectors like law enforcement or healthcare, AI models must be independently audited to prove they do not have racial or gender biases.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 31,
+				"A": {
+					"a": 2,
+					"d": 0,
+					"p": 1,
+					"n": 3,
+					"pct": 67
+				},
+				"B": {
+					"a": 10,
+					"d": 0,
+					"p": 3,
+					"n": 13,
+					"pct": 77
+				},
+				"C": {
+					"a": 13,
+					"d": 0,
+					"p": 2,
+					"n": 15,
+					"pct": 87
+				},
+				"gap": 20,
+				"minAgree": 67
+			},
+			"source": "Open Poll",
+			"tags": ["Governance & Decision-making"],
+			"inReport": false
+		},
+		{
+			"id": "p157",
+			"kind": "poll",
+			"text": "Because AI is trained on historical data, it will inevitably reinforce existing societal prejudices unless we strictly regulate how that data is collected.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 28,
+				"A": {
+					"a": 1,
+					"d": 1,
+					"p": 1,
+					"n": 3,
+					"pct": 33
+				},
+				"B": {
+					"a": 4,
+					"d": 2,
+					"p": 6,
+					"n": 12,
+					"pct": 33
+				},
+				"C": {
+					"a": 13,
+					"d": 0,
+					"p": 0,
+					"n": 13,
+					"pct": 100
+				},
+				"gap": 67,
+				"minAgree": 33
+			},
+			"source": "Open Poll",
+			"tags": ["Access"],
+			"inReport": false
+		},
+		{
+			"id": "p161",
+			"kind": "poll",
+			"text": "The AI industry seems to be moving too fast towards an uncertain outcome. We should not be subsiding building data centers with tax breaks. The downsides are just not worth it: noise, pollution, higher water and electric bills.",
+			"origin": "participant",
+			"place": "Bend",
+			"chips": ["BEND, OR", "Not Provided"],
+			"vote": {
+				"total": 30,
+				"A": {
+					"a": 0,
+					"d": 1,
+					"p": 0,
+					"n": 1,
+					"pct": 0
+				},
+				"B": {
+					"a": 13,
+					"d": 0,
+					"p": 1,
+					"n": 14,
+					"pct": 93
+				},
+				"C": {
+					"a": 15,
+					"d": 0,
+					"p": 0,
+					"n": 15,
+					"pct": 100
+				},
+				"gap": 100,
+				"minAgree": 0
+			},
+			"source": "Open Poll",
+			"tags": ["Environment", "Economic Benefit"],
+			"inReport": false
+		},
+		{
+			"id": "p168",
+			"kind": "poll",
+			"text": "We can and should provide and receive education on critical thinking and evaluation and that includes the utilization of AI. AI can be an invaluable tool, but we must be intentional about its use.",
+			"origin": "participant",
+			"place": "Redmond",
+			"chips": ["REDMOND, OR", "Not Provided"],
+			"vote": {
+				"total": 15,
+				"A": {
+					"a": 1,
+					"d": 0,
+					"p": 0,
+					"n": 1,
+					"pct": 100
+				},
+				"B": {
+					"a": 10,
+					"d": 0,
+					"p": 0,
+					"n": 10,
+					"pct": 100
+				},
+				"C": {
+					"a": 4,
+					"d": 0,
+					"p": 0,
+					"n": 4,
+					"pct": 100
+				},
+				"gap": 0,
+				"minAgree": 100
+			},
+			"source": "Open Poll",
+			"tags": ["AI Literacy"],
+			"inReport": false
+		},
+		{
+			"id": "qbdf7a1e4",
+			"kind": "quote",
+			"text": "And I think that's a big part of the, the issue that people have and why people, you know, don't like data centers in part is because they just happen and then you find out about it later, right? So, continuing to be part of the discussion, I think is vital.",
+			"origin": "listening_session",
+			"place": null,
+			"chips": ["ONLINE A SESSION", "JUN 4, 2026", "ONLINE"],
+			"vote": null,
+			"source": "Listening session — Online A",
+			"tags": ["Governance & Decision-making", "Data Centers"],
+			"inReport": true
+		},
+		{
+			"id": "q93c0d744",
+			"kind": "quote",
+			"text": "Like many things in politics, there's massive profit motives behind it, and I mean that's what's driving the stuff Jonathan's talking about, like the legislature had a solution to keep our data private, and then the Axon and Flock lobbyists came in and he was like, no, we need to strike that because we would need to have access to everybody's data, and they did. And so we can come up with the best, most functional solutions in the world, but then how do we actually get those to happen.",
+			"origin": "listening_session",
+			"place": null,
+			"chips": ["ONLINE A SESSION", "JUN 4, 2026", "ONLINE"],
+			"vote": null,
+			"source": "Listening session — Online A",
+			"tags": ["Governance & Decision-making", "AI Companies", "Public Service"],
+			"inReport": false
+		},
+		{
+			"id": "q0fe7e7b8",
+			"kind": "quote",
+			"text": "And so what I would like to see, I don't want AI to be another one of those things that does that for us. Like I don't want AI to be another way where people are like finding friendship or companionship through that and just another thing where people are, are not spending time in person or with real people.",
+			"origin": "listening_session",
+			"place": null,
+			"chips": ["ONLINE B SESSION", "JUN 9, 2026", "ONLINE"],
+			"vote": null,
+			"source": "Listening session — Online B",
+			"tags": ["Social Connection"],
+			"inReport": true
+		},
+		{
+			"id": "q8d1e7ae2",
+			"kind": "quote",
+			"text": "But also the storytelling that goes along with it, that is a part of our humanity, of sharing with one another. I mean, what we're doing in this room, um, is very different than if we were having, each one of us having a conversation with, with an AI, um.",
+			"origin": "listening_session",
+			"place": "Bend",
+			"chips": ["BEND SESSION", "JUN 6, 2026", "IN_PERSON"],
+			"vote": null,
+			"source": "Listening session — Bend",
+			"tags": ["Social Connection"],
+			"inReport": true
+		},
+		{
+			"id": "qdb10c6a6",
+			"kind": "quote",
+			"text": "Building relationships with online, they'd rather talk to their chatbot than, than an adult, um, sometimes even their friends, because a chatbot will always be there for you. It, it will not push back against you, uh, unless you tell it specifically to tell, tell it to push back against you. Uh, but students don't instinctively know that, right?",
+			"origin": "listening_session",
+			"place": null,
+			"chips": ["ONLINE B SESSION", "JUN 9, 2026", "ONLINE"],
+			"vote": null,
+			"source": "Listening session — Online B",
+			"tags": ["Children", "Social Connection"],
+			"inReport": true
+		},
+		{
+			"id": "qe868a7e9",
+			"kind": "quote",
+			"text": "It was, it was, it was a nightmare trying to regulate the things that she was listening to or watching and then everything was.",
+			"origin": "listening_session",
+			"place": "Bend",
+			"chips": ["BEND SESSION", "JUN 6, 2026", "IN_PERSON"],
+			"vote": null,
+			"source": "Listening session — Bend",
+			"tags": ["Children"],
+			"inReport": false
+		},
+		{
+			"id": "q86644e17",
+			"kind": "quote",
+			"text": "We need to teach people to think and Piper really talked about that that we're not teaching kids to question we're teaching kids to be completely reliant and I think that's the problem is it's the double checking it's the, it's the question it's like kids will question authority but they won't question a computer. I'm like we need to teach the kids to question the computer,",
+			"origin": "listening_session",
+			"place": "Sisters",
+			"chips": ["SISTERS SESSION", "MAY 30, 2026", "IN_PERSON"],
+			"vote": null,
+			"source": "Listening session — Sisters",
+			"tags": ["Children", "Cognition"],
+			"inReport": true
+		},
+		{
+			"id": "qdc48b44a",
+			"kind": "quote",
+			"text": "The thinking on your own, the critical thinking on your own, that you do not wanna lose that. You wanna be able to take some information, formulate your your thought.",
+			"origin": "listening_session",
+			"place": "Bend",
+			"chips": ["BEND SESSION", "JUN 6, 2026", "IN_PERSON"],
+			"vote": null,
+			"source": "Listening session — Bend",
+			"tags": ["Cognition", "Human Agency", "Education"],
+			"inReport": false
+		},
+		{
+			"id": "qe092bd68",
+			"kind": "quote",
+			"text": "An experiential process and so if you take your group and you go outside and you go into the forest and you go to wherever, you know, what you learned in kindergarten is what you really, that was real learning. Uh-huh that's, that's teaching in a different way. That's a different set of experience, but you basically lecture about whatever. I, I'm a teacher. I was a teacher. I taught at college. I've taught, you know, Saint Francis. I mean, so I, I, I, I have a, an understanding of it, but.",
+			"origin": "listening_session",
+			"place": "Bend",
+			"chips": ["BEND SESSION", "JUN 6, 2026", "IN_PERSON"],
+			"vote": null,
+			"source": "Listening session — Bend",
+			"tags": ["Education"],
+			"inReport": false
+		},
+		{
+			"id": "q15e4f7dc",
+			"kind": "quote",
+			"text": "Um, and we're just magnifying it. So, when you have, uh, say, teachers who are taking in, um, AI and replacing the curriculum by, by just relying on this tool, well, AI is a supportive feature. And, and anytime that we step beyond using it supportively for what we're already doing into replacement, then that's when, that's when these bigger, that's when these bigger issues start to happen. And, and I don't know, that was, I think that's, that's where I wanted to answer the, the questions on the screen, which is, is like,",
+			"origin": "listening_session",
+			"place": null,
+			"chips": ["ONLINE B SESSION", "JUN 9, 2026", "ONLINE"],
+			"vote": null,
+			"source": "Listening session — Online B",
+			"tags": ["Education"],
+			"inReport": true
+		},
+		{
+			"id": "q227b95ee",
+			"kind": "quote",
+			"text": "You learn it today, and that's out of date tomorrow because a new model comes out. So people have had great reasons for not diving in, fear of the unknown, all the kind of human nature things. But I think we have to shed more light on how it's being used positively, and I'm thinking I'm going to probably do stories about that. There was a magazine from the street called The Power of AI, and it had all these bite-sized nuggets of all these fields, medicine and education, everything of things that were being done well with it.",
+			"origin": "listening_session",
+			"place": null,
+			"chips": ["ONLINE A SESSION", "JUN 4, 2026", "ONLINE"],
+			"vote": null,
+			"source": "Listening session — Online A",
+			"tags": ["Positive Effects", "Access"],
+			"inReport": true
+		},
+		{
+			"id": "q4e90ecc6",
+			"kind": "quote",
+			"text": "Um, uh, I want to see it supported. I don't want to see it like replacing the coordinated entry system for, for homeless people, you know, since homeless, since homelessness is a, is a topic this group has, has touched on before. Um, I think that that's such an important thing that like people who, uh, are going to accept any need that is going to be met for them because they have that need, um, they have no choice to opt out on how AI is used, uh, to determine whether they deserve housing or not.",
+			"origin": "listening_session",
+			"place": null,
+			"chips": ["ONLINE B SESSION", "JUN 9, 2026", "ONLINE"],
+			"vote": null,
+			"source": "Listening session — Online B",
+			"tags": ["Public Service"],
+			"inReport": true
+		},
+		{
+			"id": "qcd83b285",
+			"kind": "quote",
+			"text": "And then just the whole, when you talk about like overconsumption, I, you know, at a time, there was all this talk about like being carbon neutral, and I read an article maybe a year ago and it's like there's absolutely positively no way in this world that anyone can be carbon neutral. You can reduce your carbon footprint, but you can't be carbon neutral. So it made me think a lot about like the data centers that",
+			"origin": "listening_session",
+			"place": "Sisters",
+			"chips": ["SISTERS SESSION", "MAY 30, 2026", "IN_PERSON"],
+			"vote": null,
+			"source": "Listening session — Sisters",
+			"tags": ["Environment", "Consumption"],
+			"inReport": false
+		},
+		{
+			"id": "q6ef129b1",
+			"kind": "quote",
+			"text": "Um, emissions and CO2 from the power generated, and yes, data centers can be powered by renewable energy, if we had that excess of renewable energy, but right now we don't. It's like we went to all this trouble of like replacing our incandescent light bulbs with LEDs, and that doesn't even touch near the order of magnitude of power that AI uses. So, I think the, is it worth it, and what that balance is, is something.",
+			"origin": "listening_session",
+			"place": null,
+			"chips": ["ONLINE A SESSION", "JUN 4, 2026", "ONLINE"],
+			"vote": null,
+			"source": "Listening session — Online A",
+			"tags": ["Environment"],
+			"inReport": true
+		},
+		{
+			"id": "q8e7ccb1b",
+			"kind": "quote",
+			"text": "Girls, they just assumed that like they were the same as boys but like maybe a little different, we don't know, um, but it like literally it wasn't until Carol Gilligan started to study that, um, so we have reams of data that are going into these like large language models that are based on a certain, a certain group of people who were studied, right, and not necessarily inclusive of like all lived experience and.",
+			"origin": "listening_session",
+			"place": "Bend",
+			"chips": ["BEND SESSION", "JUN 6, 2026", "IN_PERSON"],
+			"vote": null,
+			"source": "Listening session — Bend",
+			"tags": ["Inequality"],
+			"inReport": true
+		},
+		{
+			"id": "q5d77033d",
+			"kind": "quote",
+			"text": "Inaccessibility or you know, the difference between the haves and have-nots is going to get even bigger because people who don't have access because maybe they don't have broadband, which often you need for this. Although we're starting to see local AI solutions. But if you don't have access to this and you don't learn about it, you could be at a very big disadvantage, even more so than just regular digital skills. So that's, that's one of my big worries.",
+			"origin": "listening_session",
+			"place": null,
+			"chips": ["ONLINE A SESSION", "JUN 4, 2026", "ONLINE"],
+			"vote": null,
+			"source": "Listening session — Online A",
+			"tags": ["Inequality", "Access"],
+			"inReport": true
+		},
+		{
+			"id": "q9eb4f840",
+			"kind": "quote",
+			"text": "Well, I completely agree with Mattie on the access, especially with marginalized communities. Uh, I, I work with some of the tribes around broadband in Oregon also. Actually, we'll be talking to Confederate Tribes of Sle's broadband coordinator tomorrow, um, because they did get some funding, and that is helpful. You can't do, well, mostly you can't do AI without, um, connectivity. Uh, we are starting to see some.",
+			"origin": "listening_session",
+			"place": null,
+			"chips": ["ONLINE B SESSION", "JUN 9, 2026", "ONLINE"],
+			"vote": null,
+			"source": "Listening session — Online B",
+			"tags": ["Inequality", "Indigenous", "Access"],
+			"inReport": true
+		},
+		{
+			"id": "q7d2bccae",
+			"kind": "quote",
+			"text": "So I, yeah, I think on Jonathan's points of like using it for permitting, say that's an example of where it can be super useful, if it's used correctly, but if a municipality were to just say, OK, the AI is deciding whether or not to approve permits, AI is not good enough, not accurate enough, doesn't have the judgment to be able to do that accurately, so it's gonna end up like approving things that aren't up to code.",
+			"origin": "listening_session",
+			"place": null,
+			"chips": ["ONLINE A SESSION", "JUN 4, 2026", "ONLINE"],
+			"vote": null,
+			"source": "Listening session — Online A",
+			"tags": ["Information", "Accuracy"],
+			"inReport": true
+		},
+		{
+			"id": "q120e6145",
+			"kind": "quote",
+			"text": "To working everyday folks and kind of democratize the access to information that otherwise the local community might not have the time and access to. Um, so I think that's one area in which there's only a finite amount of hours in the day and the workweek, but it could also help sometimes make that information much more accessible and easily digestible for folks that don't have that on top of their current day job to access and read.",
+			"origin": "listening_session",
+			"place": null,
+			"chips": ["ONLINE B SESSION", "JUN 9, 2026", "ONLINE"],
+			"vote": null,
+			"source": "Listening session — Online B",
+			"tags": ["Information", "Positive Effects"],
+			"inReport": true
+		},
+		{
+			"id": "qfd95ad77",
+			"kind": "quote",
+			"text": "And, and that's something that I don't ever want to change. We have to have humans still being in control of the technology and making the decisions whether to be used or not. I don't want AI systems to make just across the board, oh, we're just going to decide to do this, especially when it comes to weaponization. Uh, but we've seen the federal government didn't want to work with anthropic because anthropic did not want to.",
+			"origin": "listening_session",
+			"place": null,
+			"chips": ["ONLINE A SESSION", "JUN 4, 2026", "ONLINE"],
+			"vote": null,
+			"source": "Listening session — Online A",
+			"tags": ["Governance & Decision-making", "Human Agency"],
+			"inReport": true
+		},
+		{
+			"id": "q4cec744e",
+			"kind": "quote",
+			"text": "At least according to another David Shapiro, is that they're competitive because they're looking for faster, better, cheaper, safer, and the safer is always at the end, which I think is a mistake. It ought to, somewhere it should be safe all the way through, but it, you know, you were saying that, uh, you know, the big frontier labs, you know, they're, they gotta come out with a new model every week or 2 weeks or a month.",
+			"origin": "listening_session",
+			"place": "Bend",
+			"chips": ["BEND SESSION", "JUN 6, 2026", "IN_PERSON"],
+			"vote": null,
+			"source": "Listening session — Bend",
+			"tags": ["Moving Fast"],
+			"inReport": true
+		},
+		{
+			"id": "q7871e861",
+			"kind": "quote",
+			"text": "I would actually counter argue that and say you're actually more important than you think. You're a wisdom keeper. Oh,",
+			"origin": "listening_session",
+			"place": "Madras",
+			"chips": ["MADRAS SESSION", "JUN 6, 2026", "IN_PERSON"],
+			"vote": null,
+			"source": "Listening session — Madras",
+			"tags": ["Humanity"],
+			"inReport": false
+		},
+		{
+			"id": "qe407185b",
+			"kind": "quote",
+			"text": "It doesn't read tone and it doesn't read emotion, but the more that you use it, it's literally meant to predict you, and you can find it if you pay attention to it, but it does require a level of awareness, which has me worried about mental health. I just came from a graduation, you know, and the biggest thing that, that has me concerned about Generation Z and now Generation A is you hear these terms of like this is.",
+			"origin": "listening_session",
+			"place": "Madras",
+			"chips": ["MADRAS SESSION", "JUN 6, 2026", "IN_PERSON"],
+			"vote": null,
+			"source": "Listening session — Madras",
+			"tags": ["Mental Health"],
+			"inReport": true
+		},
+		{
+			"id": "q119adac9",
+			"kind": "quote",
+			"text": "For no, that's for me is the big question in my own little world, and I don't want to get it because I know we have a bigger, but where's the organic human spirit component in this, especially if it's retrieving a bunch of information and then thinking for itself based on just all this statistical information. Where does the organic come into?",
+			"origin": "listening_session",
+			"place": "Prineville",
+			"chips": ["PRINEVILLE SESSION", "MAY 30, 2026", "IN_PERSON"],
+			"vote": null,
+			"source": "Listening session — Prineville",
+			"tags": ["Humanity"],
+			"inReport": false
+		},
+		{
+			"id": "q305166fe",
+			"kind": "quote",
+			"text": "As a quick aside, I also sit on the homeless shelter board of directors, and I know that is a very politically divisive, but I had a conversation not long ago with somebody who has a different view, but we had a conversation in person and recognized, you know, our goals are the same. It's just how do you get there? We have some different thoughts about it, but you lose that, I think, if you don't have that empathy, that compassion, if it's just all information retrieval.",
+			"origin": "listening_session",
+			"place": "Prineville",
+			"chips": ["PRINEVILLE SESSION", "MAY 30, 2026", "IN_PERSON"],
+			"vote": null,
+			"source": "Listening session — Prineville",
+			"tags": ["Mental Health"],
+			"inReport": false
+		},
+		{
+			"id": "q9bfe54b9",
+			"kind": "quote",
+			"text": "How in the world would artificial intelligence analyze that? It seems to me there's a human element that someone who is trained and educated and experienced can talk to an individual maybe over a period of weeks or months and say, OK, you've got this issue or that issue, and everybody's a little different and they can fashion a way forward.",
+			"origin": "listening_session",
+			"place": "Prineville",
+			"chips": ["PRINEVILLE SESSION", "MAY 30, 2026", "IN_PERSON"],
+			"vote": null,
+			"source": "Listening session — Prineville",
+			"tags": ["Humanity", "Mental Health"],
+			"inReport": true
+		},
+		{
+			"id": "qe5e60a7b",
+			"kind": "quote",
+			"text": "And that for me was the question, where's that spiritual component? Where's that organic component, um, but it got me thinking about the algorithms that what if the algorithms become so overbearing, and maybe that's not the right word, but with all, they all put you in one little pigeon hole.",
+			"origin": "listening_session",
+			"place": "Prineville",
+			"chips": ["PRINEVILLE SESSION", "MAY 30, 2026", "IN_PERSON"],
+			"vote": null,
+			"source": "Listening session — Prineville",
+			"tags": ["Humanity"],
+			"inReport": false
+		},
+		{
+			"id": "q7625ed6b",
+			"kind": "quote",
+			"text": "Could have saved my, possibly could have saved my wife's life. Um-hum. Um-hum. And I mean, she died of cancer and we didn't catch it. It wasn't caught until too late to do anything. Yeah. I mean, I don't, you know, I don't, I'm not looking for sympathy or anything. I'm just pointing out that. Yeah. That, that's one thing I definitely would have wished that they had had more, you know. Um-hum. I think they were using some of it, you know, but it was not, you know.",
+			"origin": "listening_session",
+			"place": "Prineville",
+			"chips": ["PRINEVILLE SESSION", "MAY 30, 2026", "IN_PERSON"],
+			"vote": null,
+			"source": "Listening session — Prineville",
+			"tags": ["Positive Effects", "Medicine", "Access"],
+			"inReport": true
+		}
+	],
+	"groups": [
+		{
+			"key": "A",
+			"label": "Group A - Optimists"
+		},
+		{
+			"key": "B",
+			"label": "Group B - Pragmatists"
+		},
+		{
+			"key": "C",
+			"label": "Group C - Skeptics"
+		}
+	]
+}
