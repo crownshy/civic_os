@@ -7,13 +7,36 @@
 		component: VoteBar,
 		tags: ['autodocs'],
 		argTypes: {
-			remaining: { control: { type: 'range', min: 0, max: 20 } },
-			total: { control: { type: 'range', min: 1, max: 20 } }
+			disabled: { control: 'boolean' },
+			skeleton: { control: 'boolean' }
 		}
 	});
 </script>
 
-<Story name="Start" args={{ remaining: 10, total: 10 }}>
+<Story name="Default" args={{}}>
+	{#snippet template(args)}
+		<div class="bg-card">
+			<VoteBar {...args} onAgree={() => {}} onDisagree={() => {}} onSkip={() => {}} />
+		</div>
+	{/snippet}
+</Story>
+
+<!-- The report link only renders when a handler is given, so it is its own story. -->
+<Story name="With Report Link" args={{}}>
+	{#snippet template(args)}
+		<div class="bg-card">
+			<VoteBar
+				{...args}
+				onAgree={() => {}}
+				onDisagree={() => {}}
+				onSkip={() => {}}
+				onReport={() => {}}
+			/>
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Disabled" args={{ disabled: true }}>
 	{#snippet template(args)}
 		<div class="bg-card">
 			<VoteBar {...args} />
@@ -21,23 +44,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Midway" args={{ remaining: 5, total: 10 }}>
-	{#snippet template(args)}
-		<div class="bg-card">
-			<VoteBar {...args} />
-		</div>
-	{/snippet}
-</Story>
-
-<Story name="Almost Done" args={{ remaining: 1, total: 10 }}>
-	{#snippet template(args)}
-		<div class="bg-card">
-			<VoteBar {...args} />
-		</div>
-	{/snippet}
-</Story>
-
-<Story name="Complete" args={{ remaining: 0, total: 10 }}>
+<Story name="Skeleton" args={{ skeleton: true }}>
 	{#snippet template(args)}
 		<div class="bg-card">
 			<VoteBar {...args} />

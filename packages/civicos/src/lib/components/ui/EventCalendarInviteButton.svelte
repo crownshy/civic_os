@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getEventFullDescription, type RegionConfig } from '$lib/config/regions';
+	import type { RegionConfig } from '$lib/config/regions';
 	import type { LocalizedEventDto } from '@crownshy/api-client/api';
 	import { onMount } from 'svelte';
 
@@ -56,9 +56,14 @@
 		return offsets[tzMatch[1]] ?? 'currentBrowser';
 	});
 
+	// `description` is a required string on `LocalizedEventDto`, so the old
+	// `?? getEventFullDescription(event, ...)` fallback could not fire. It would
+	// also have thrown if it had: that helper reads `event.location` as a string
+	// and matches `format` against `'in-person'`, and the DTO has an object and
+	// `'in_person'`. It is for the `regions.ts` events.
 	const description = $derived(
 		event
-			? `${event.description ?? getEventFullDescription(event, region.stateName)}\n\nHosted by ${region.hostName}. Visit ${region.hostUrl} for more details.`
+			? `${event.description}\n\nHosted by ${region.hostName}. Visit ${region.hostUrl} for more details.`
 			: ''
 	);
 </script>

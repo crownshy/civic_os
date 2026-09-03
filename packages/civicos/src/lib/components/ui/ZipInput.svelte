@@ -68,7 +68,7 @@
 
 	function handleKeyDown(e: KeyboardEvent) {
 		if (e.key === 'Enter') {
-			const selectedElement = document.querySelector(
+			const selectedElement = document.querySelector<HTMLElement>(
 				'[data-slot="command-item"][aria-selected="true"]'
 			);
 			const zipValue = selectedElement?.dataset?.value;

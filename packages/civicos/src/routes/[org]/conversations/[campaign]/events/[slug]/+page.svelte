@@ -5,11 +5,7 @@
 	import { Button, InfoBar } from '$lib/components/ui';
 	import EventCalendarInviteButton from '$lib/components/ui/EventCalendarInviteButton.svelte';
 	import EventRegistrationModal from '$lib/components/ui/EventRegistrationModal.svelte';
-	import {
-		formatDurationLabel,
-		getEventFullDescription,
-		type RegionConfig
-	} from '$lib/config/regions';
+	import { formatDurationLabel, type RegionConfig } from '$lib/config/regions';
 	import { formatTimeDuration } from '$lib/utils/dates.js';
 	import {
 		differenceInDays,
@@ -315,7 +311,7 @@
 					<p
 						class="font-sans text-base leading-6 font-medium whitespace-pre-line text-foreground/80"
 					>
-						{event.description ?? getEventFullDescription(event, region.stateName)}
+						{event.description}
 					</p>
 				</section>
 			</div>

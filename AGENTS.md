@@ -48,7 +48,13 @@ Run per-package from `packages/<name>`, or use the root scripts:
 
 - `pnpm dev` civicos dev server. `pnpm dev:admin` admin dev server.
 - `pnpm -r build` / `pnpm run build` build every package.
-- `pnpm -r check` / `pnpm run check` svelte-check (types) across packages.
+- `pnpm -r check` / `pnpm run check` svelte-check (types) across packages. `civicos`
+  has a floor of two errors it cannot fix: `@crownshy/api-client` exports raw `.ts`
+  source generated against zod 3, and under the workspace's zod 4 its two one-arg
+  `z.record()` calls no longer type. Runtime is unaffected (zod 4 still accepts that
+  form and validates values), `skipLibCheck` does not reach a dependency's source, and
+  tsconfig `exclude` does not stop TS diagnosing an imported file. It goes when
+  api-client is regenerated against zod 4. Anything above two is yours.
 - `pnpm --filter civic-os lint` / `pnpm --filter @civicos/admin lint` prettier check +
   eslint. `pnpm run lint` runs both. Both packages are currently red against a backlog of
   pre-existing violations (see Follow-ups below), so read the diff, not just the exit code.
@@ -115,7 +121,7 @@ focused PR; do not let them silently grow:
   exist, but app forms do not use them yet. Migrate forms onto superforms as you touch
   them.
 - Both packages have lint configured but neither passes yet: `admin` has 73 files failing
-  `prettier --check` and 52 eslint errors, `civicos` has 77 eslint errors. The civicos
+  `prettier --check` and 52 eslint errors, `civicos` has 71 eslint errors. The civicos
   ones were invisible until the config's `.gitignore` path was fixed, so they are old, not
   new. Pay them down in focused PRs rather than mixing fixes into feature work.
 - `load` functions do not call `depends()` for explicit invalidation keys. Add them when

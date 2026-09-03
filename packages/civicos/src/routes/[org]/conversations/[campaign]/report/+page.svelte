@@ -126,7 +126,8 @@
 			<div id="hero">
 				<HeroSection
 					title={heroTitle}
-					region={heroRegion}
+					regionName={heroRegion}
+					{region}
 					phase={heroPhase}
 					description={heroDescription}
 				/>

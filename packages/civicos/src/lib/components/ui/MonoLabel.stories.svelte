@@ -15,21 +15,21 @@
 
 <Story name="Primary" args={{ size: 'sm', variant: 'primary' }}>
 	{#snippet template(args)}
-		<MonoLabel {...args}>UTAH COUNTY</MonoLabel>
+		<MonoLabel size={args.size} variant={args.variant}>UTAH COUNTY</MonoLabel>
 	{/snippet}
 </Story>
 
 <Story name="White" args={{ variant: 'white' }}>
 	{#snippet template(args)}
 		<div class="rounded-xl bg-primary p-6">
-			<MonoLabel {...args}>YOU</MonoLabel>
+			<MonoLabel size={args.size} variant={args.variant}>YOU</MonoLabel>
 		</div>
 	{/snippet}
 </Story>
 
 <Story name="Muted" args={{ variant: 'muted' }}>
 	{#snippet template(args)}
-		<MonoLabel {...args}>Jan 02 2026</MonoLabel>
+		<MonoLabel size={args.size} variant={args.variant}>Jan 02 2026</MonoLabel>
 	{/snippet}
 </Story>
 

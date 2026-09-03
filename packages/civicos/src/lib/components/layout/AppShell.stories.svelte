@@ -12,9 +12,9 @@
 	});
 </script>
 
-<Story name="Default" args={{}}>
-	{#snippet template(args)}
-		<AppShell {...args}>
+<Story name="Default">
+	{#snippet template()}
+		<AppShell>
 			<div class="bg-primary px-8 py-6">
 				<span class="font-mono text-sm text-white/80">UTAH COUNTY</span>
 			</div>
@@ -28,9 +28,9 @@
 	{/snippet}
 </Story>
 
-<Story name="With Background" args={{}}>
-	{#snippet template(args)}
-		<AppShell class="bg-primary" {...args}>
+<Story name="With Background">
+	{#snippet template()}
+		<AppShell class="bg-primary">
 			<div class="flex min-h-dvh flex-col items-center justify-center px-8">
 				<h1 class="font-sans text-5xl font-bold text-white">Welcome!</h1>
 				<p class="mt-4 text-center font-sans text-lg text-white/80">
