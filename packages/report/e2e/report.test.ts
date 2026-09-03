@@ -111,6 +111,21 @@ test('a consensus card opens the statement modal', async ({ page }) => {
 	await expect(statement).toBeHidden();
 });
 
+test('the root redirects to the main site', async ({ request }) => {
+	// maxRedirects:0 so the assertion is about our response, and so the suite
+	// never reaches out to bloom-project.org
+	const response = await request.get('/', { maxRedirects: 0 });
+	expect(response.status()).toBe(307);
+	expect(response.headers()['location']).toBe('https://www.bloom-project.org/');
+});
+
+test('the health endpoint the container probes returns 200', async ({ request }) => {
+	// Pinned because the Kubernetes readiness and liveness probes point here; a
+	// non-2xx would leave the pod unready behind a 503.
+	const response = await request.get('/healthz');
+	expect(response.status()).toBe(200);
+});
+
 test('an unknown slug is not found', async ({ page }) => {
 	const response = await page.goto('/not-a-real-report');
 	expect(response?.status()).toBe(404);
