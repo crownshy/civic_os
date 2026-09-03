@@ -142,7 +142,7 @@
 			</div>
 
 			<div id="demographics">
-				<DemographicsSection {demographics} {participantCount} />
+				<DemographicsSection {demographics} />
 			</div>
 
 			<div id="opinion-groups">

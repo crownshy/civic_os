@@ -14,13 +14,11 @@
 		 * one off in admin is the only thing that removes it.
 		 */
 		questions: AboutYouQuestion[];
-		zipCode?: string;
 		region: RegionConfig;
 		onDone: (demographics?: Partial<Record<DemographicKey, string>>) => void;
-		onSkip?: () => void;
 	}
 
-	let { countyName, questions, zipCode = '', onDone, onSkip, region }: Props = $props();
+	let { countyName, questions, onDone, region }: Props = $props();
 
 	let openDialog = $state<DemographicKey | null>(null);
 	let dialogOpen = $derived(openDialog !== null);

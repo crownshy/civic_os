@@ -9,8 +9,8 @@
 	});
 </script>
 
-<Story name="Default" args={{}}>
-	{#snippet template(args)}
+<Story name="Default">
+	{#snippet template()}
 		<div class="mx-auto max-w-md p-8">
 			<EmailCapture
 				onSubmit={(email) => console.log('Submit:', email)}
@@ -20,8 +20,8 @@
 	{/snippet}
 </Story>
 
-<Story name="On Dark Background" args={{}}>
-	{#snippet template(args)}
+<Story name="On Dark Background">
+	{#snippet template()}
 		<div class="flex min-h-[600px] items-center justify-center bg-secondary/95 p-8">
 			<div class="mx-auto max-w-md">
 				<EmailCapture

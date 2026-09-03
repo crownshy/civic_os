@@ -33,8 +33,8 @@
 	{/snippet}
 </Story>
 
-<Story name="All Sizes" args={{}}>
-	{#snippet template(args)}
+<Story name="All Sizes">
+	{#snippet template()}
 		<div class="flex flex-col gap-3">
 			<MonoLabel size="xs">EXTRA SMALL — DID YOU KNOW...</MonoLabel>
 			<MonoLabel size="sm">SMALL — POP QUIZ</MonoLabel>

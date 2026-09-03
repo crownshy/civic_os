@@ -12,7 +12,7 @@
 </script>
 
 <div class={cn('flex items-center justify-center gap-3 overflow-visible px-4', className)}>
-	{#each avatars as avatar}
+	{#each avatars as avatar (avatar.id)}
 		<button
 			aria-label="Select avatar"
 			onclick={() => onSelect?.(avatar.id)}

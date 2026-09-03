@@ -64,7 +64,7 @@
 
 		<!-- Options -->
 		<div class="mt-8 flex flex-col gap-2">
-			{#each quiz.options as option, i}
+			{#each quiz.options as option, i (i)}
 				{@const isSelected = selected === i}
 				{@const isCorrect = i === quiz.correctIndex}
 				{@const answered = selected !== null}

@@ -7,7 +7,6 @@
 		component: SwipeCarousel,
 		tags: ['autodocs'],
 		argTypes: {
-			count: { control: { type: 'range', min: 1, max: 6 } },
 			autoScrollMs: { control: 'number' }
 		}
 	});
@@ -25,8 +24,8 @@
 	];
 </script>
 
-<Story name="Default" args={{ count: 3 }}>
-	{#snippet template(args)}
+<Story name="Default">
+	{#snippet template()}
 		<div class="rounded-xl bg-primary p-8">
 			<SwipeCarousel count={slides.length}>
 				{#snippet children(index)}
@@ -40,10 +39,10 @@
 	{/snippet}
 </Story>
 
-<Story name="Auto Scroll" args={{ count: 3, autoScrollMs: 3000 }}>
+<Story name="Auto Scroll" args={{ autoScrollMs: 3000 }}>
 	{#snippet template(args)}
 		<div class="rounded-xl bg-primary p-8">
-			<SwipeCarousel count={slides.length} autoScrollMs={3000}>
+			<SwipeCarousel count={slides.length} autoScrollMs={args.autoScrollMs}>
 				{#snippet children(index)}
 					<div class="rounded-[20px] bg-white p-6">
 						<h3 class="font-sans text-2xl font-bold text-secondary">{slides[index].title}</h3>

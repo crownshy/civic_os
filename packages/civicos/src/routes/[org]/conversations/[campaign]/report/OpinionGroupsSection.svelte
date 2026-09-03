@@ -94,7 +94,7 @@
 			<div class="flex items-center justify-between px-5 pt-5">
 				<span class="font-mono text-xs font-medium text-muted-foreground">GROUP SELECTION</span>
 				<div class="flex items-center gap-[5px]">
-					{#each groups as _, gi}
+					{#each groups as group, gi (group.group_id)}
 						<button
 							onclick={() => selectGroup(gi)}
 							class="flex h-7 w-7 items-center justify-center rounded-full font-mono text-sm font-medium transition-colors {selectedGroup ===
@@ -148,7 +148,7 @@
 							</div>
 
 							<!-- Groups with vertical stacked bars -->
-							{#each groups as group, gi}
+							{#each groups as group, gi (group.group_id)}
 								{@const percents = getGroupPercents(statement, group.group_id)}
 								{@const isSelected = gi === selectedGroup}
 								<div class="mb-4">
@@ -165,7 +165,7 @@
 									<div class="relative mt-1.5 ml-0 flex flex-col gap-1">
 										<!-- Grid lines -->
 										<div class="pointer-events-none absolute inset-0">
-											{#each [0, 25, 50, 75, 100] as tick}
+											{#each [0, 25, 50, 75, 100] as tick (tick)}
 												<div
 													class="absolute top-0 h-full border-l border-border"
 													style="left: {tick}%"

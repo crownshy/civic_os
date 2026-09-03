@@ -356,7 +356,6 @@
 			region={subdomainRegion}
 			{countyName}
 			questions={aboutYouQuestions}
-			{zipCode}
 			onDone={handleDemographicsDone}
 		/>
 	{:else if screen === 'thank-you'}

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
 	import type { Snippet } from 'svelte';
-	import type { HTMLButtonAttributes, HTMLAnchorAttributes } from 'svelte/elements';
+	import type { HTMLButtonAttributes } from 'svelte/elements';
 
 	type Variant =
 		'primary' | 'secondary' | 'destructive' | 'outline' | 'pill' | 'soft' | 'ghost' | 'gradient';

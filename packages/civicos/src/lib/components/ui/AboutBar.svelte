@@ -45,7 +45,7 @@
 
 <Dialog bind:open={showAbout} title="About this Conversation">
 	<div class="px-7 pt-6">
-		{#each region.aboutConversation as para, index}
+		{#each region.aboutConversation as para, index (index)}
 			{#if index == 0}
 				<p class="font-sans text-lg leading-7 font-medium [&_a]:text-destructive [&_a]:underline">
 					{@html sanitizeHostHtml(para)}

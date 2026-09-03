@@ -105,7 +105,7 @@ export default class PolisApi {
 		this._loading = true;
 		this._error = undefined;
 
-		let authType = this.pid ? { pid: this.pid } : { xid: this.userId };
+		const authType = this.pid ? { pid: this.pid } : { xid: this.userId };
 
 		fetch(`${this.baseUrl}/api/v3/comments`, {
 			method: 'POST',
@@ -149,7 +149,7 @@ export default class PolisApi {
 
 		const voteValue = { agree: -1, disagree: 1, pass: 0 }[vote];
 
-		let authType = this.pid ? { pid: this.pid } : { xid: this.userId };
+		const authType = this.pid ? { pid: this.pid } : { xid: this.userId };
 
 		fetch(`${this.baseUrl}/api/v3/votes`, {
 			method: 'POST',

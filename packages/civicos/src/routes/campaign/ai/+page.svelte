@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { goto } from '$app/navigation';
 	import type { RegionConfig } from '$lib/config/regions';
 	import { AppShell } from '$lib/components/layout';
 	import { Button, Card } from '$lib/components/ui';
@@ -16,15 +15,6 @@
 	let email = $state('');
 	let submitting = $state(false);
 	let emailError = $state('');
-
-	function handleJoinConversation() {
-		goto('/');
-	}
-
-	function handleLearnMore() {
-		// Add link to hosts page
-		console.log('Learn more clicked');
-	}
 
 	function isValidEmail(value: string): boolean {
 		return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);

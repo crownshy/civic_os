@@ -121,8 +121,12 @@ focused PR; do not let them silently grow:
   exist, but app forms do not use them yet. Migrate forms onto superforms as you touch
   them.
 - Both packages have lint configured but neither passes yet: `admin` has 73 files failing
-  `prettier --check` and 52 eslint errors, `civicos` has 71 eslint errors. The civicos
-  ones were invisible until the config's `.gitignore` path was fixed, so they are old, not
-  new. Pay them down in focused PRs rather than mixing fixes into feature work.
+  `prettier --check` and 52 eslint errors. `civicos` is clean on `prettier` and down to 37
+  eslint errors, all of them decisions rather than cleanups: 14 `no-at-html-tags` (#409),
+  14 `no-navigation-without-resolve`, one `no-explicit-any`, and 8 `no-unused-vars` that
+  are each the visible half of a filed bug (#410, #411, #412, #413), a dead county map
+  #423 will want, or a countdown whose markup is commented out. Read the reason before
+  deleting the symptom. Pay them down in focused PRs rather than mixing fixes into
+  feature work.
 - `load` functions do not call `depends()` for explicit invalidation keys. Add them when
   you touch a `load` that needs targeted invalidation.

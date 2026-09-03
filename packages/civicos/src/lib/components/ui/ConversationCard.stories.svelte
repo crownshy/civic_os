@@ -28,8 +28,8 @@
 	{/snippet}
 </Story>
 
-<Story name="List" args={{}}>
-	{#snippet template(args)}
+<Story name="List">
+	{#snippet template()}
 		<div class="flex flex-col gap-2 p-6">
 			<ConversationCard
 				conversation={{

@@ -36,7 +36,7 @@ export function getCountyFromZip(zip: string): string {
 
 	// Fallback: prefix-based heuristic
 	const prefix = trimmed.slice(0, 2);
-	let region = Object.values(REGIONS).find((region) => region.zipPrefixes.includes(prefix));
+	const region = Object.values(REGIONS).find((region) => region.zipPrefixes.includes(prefix));
 	if (region) {
 		return region.stateName;
 	} else {

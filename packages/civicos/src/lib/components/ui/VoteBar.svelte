@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
-	import { Check, X, ArrowRight } from 'lucide-svelte';
+	import { ArrowRight } from 'lucide-svelte';
 	import smiley from '$lib/assets/smiley.svg';
 	import Button from './Button.svelte';
 

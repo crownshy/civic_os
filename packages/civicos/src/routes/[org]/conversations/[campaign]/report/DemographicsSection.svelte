@@ -21,10 +21,9 @@
 
 	interface Props {
 		demographics: DemographicReport | null;
-		participantCount: number;
 	}
 
-	let { demographics, participantCount }: Props = $props();
+	let { demographics }: Props = $props();
 
 	const chartColors = [
 		'bg-chart-1',
@@ -60,18 +59,6 @@
 
 	const politicalData = $derived(
 		demographics?.politicalParty?.length ? toCategoryItems(demographics.politicalParty) : []
-	);
-
-	console.log({ ageData, ethnicityData, politicalData, genderData });
-
-	const totalDisplay = $derived(
-		demographics?.totalParticipants
-			? demographics.totalParticipants >= 1000
-				? `${(demographics.totalParticipants / 1000).toFixed(1)}K`
-				: demographics.totalParticipants.toString()
-			: participantCount >= 1000
-				? `${(participantCount / 1000).toFixed(1)}K`
-				: participantCount.toString()
 	);
 
 	function handleTabClick(index: number) {

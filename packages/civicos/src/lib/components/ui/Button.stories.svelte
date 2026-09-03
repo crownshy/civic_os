@@ -18,8 +18,8 @@
 	});
 </script>
 
-<Story name="All Variants" args={{}}>
-	{#snippet template(args)}
+<Story name="All Variants">
+	{#snippet template()}
 		<div class="flex flex-col gap-4 rounded-xl bg-primary p-8">
 			<Button variant="primary">PRIMARY</Button>
 			<Button variant="secondary">SECONDARY</Button>

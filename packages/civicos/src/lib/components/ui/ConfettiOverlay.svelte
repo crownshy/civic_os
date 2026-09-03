@@ -22,7 +22,7 @@
 
 {#if active}
 	<div class="pointer-events-none absolute inset-0 z-50 overflow-hidden {className}">
-		{#each particles as p}
+		{#each particles as p (p.id)}
 			<div
 				class="confetti-piece absolute rounded-sm"
 				style="left: {p.left}%; top: -20px; width: {p.size}px; height: {p.size}px; background: {p.color}; animation-delay: {p.delay}ms; transform: rotate({p.rotation}deg);"
