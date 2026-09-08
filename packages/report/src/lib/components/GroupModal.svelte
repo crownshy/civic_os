@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { GROUPS, GROUP_INFO, GROUP_STATEMENTS, RECORD_BY_ID } from '../domain/bundled';
-	import { groupTag, groupsOf } from '../domain/data';
+	import { groupsOf } from '../domain/data';
 	import { modals } from '../state.svelte';
 	import ReportDialog from './ReportDialog.svelte';
 	import VoteBars from './VoteBars.svelte';
@@ -60,7 +60,7 @@
 	onpage={turn}
 >
 	{#snippet header()}
-		<div class="gcHead"><div class="ddTitle">{group ? groupTag(group) : ''}</div></div>
+		<div class="gcHead"><div class="ddTitle">{group ? group.label : ''}</div></div>
 	{/snippet}
 
 	{#snippet body()}
@@ -76,7 +76,7 @@
 						{#each rows as row (row.key)}
 							<div class="grow" class:current={row.key === modals.group}>
 								<div class="top">
-									<span>{groupTag(row)}</span>
+									<span>{row.label}</span>
 									<b>{row.pct}% agree</b>
 								</div>
 								<VoteBars tally={row} />
@@ -117,8 +117,7 @@
 	/* #gdetail's own take on the shared .meta/.grow/.bar block above (L3 keeps
 	   the plain mono/dimmed version), a real Geom heading instead of a small
 	   caps label, the vote count moved to its own line under it, group names
-	   read as plain black with no "Group A/B/C" prefix (groupTag() drops it,
-	   which group this is is already the modal's own header), no disagree/
+	   read as plain black, no disagree/
 	   pass/agree legend, and every bar thick. .current (the group the modal
 	   is about, sorted first in JS) is what carries color now; its label and
 	   the card title (#gcName, reusing .ddTitle) are the only colored text in

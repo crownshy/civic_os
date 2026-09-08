@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import {
 	buildThemeView,
 	byStatementRank,
-	groupTag,
 	groupsOf,
 	quotesForTheme,
 	recordsForTheme,
@@ -171,24 +170,5 @@ describe('groupsOf', () => {
 		const v = vote(60, 100, 0, { A: tally(60) });
 		const merged = groupsOf(groups, v);
 		expect(merged[1]).toEqual({ key: 'B', label: 'Group B' });
-	});
-});
-
-describe('groupTag', () => {
-	it.each([
-		['Group A - Optimists', 'Optimists'],
-		['Group A · skeptics', 'Skeptics'],
-		['Group A: skeptics', 'Skeptics'],
-		['Group A (skeptics)', 'Skeptics']
-	])('reduces %j to the part that carries meaning', (label, expected) => {
-		expect(groupTag({ key: 'A', label })).toBe(expected);
-	});
-
-	it('leaves a bare "Group A" alone so the missing editorial pass stays visible', () => {
-		expect(groupTag({ key: 'A', label: 'Group A' })).toBe('Group A');
-	});
-
-	it('leaves a label that does not start with the group prefix alone', () => {
-		expect(groupTag({ key: 'A', label: 'Optimists' })).toBe('Optimists');
 	});
 });

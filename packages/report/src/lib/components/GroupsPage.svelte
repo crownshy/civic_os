@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { GROUPS, GROUP_INFO } from '../domain/bundled';
-	import { groupTag } from '../domain/data';
 	import { getOpenGroup } from '../navigation';
 	import { modals } from '../state.svelte';
 
@@ -27,10 +26,10 @@
 				type="button"
 				data-key={group.key}
 				style="--c:{group.color || 'var(--home)'}"
-				aria-label="{groupTag(group)}: {group.participants || 0} people — see defining statements"
+				aria-label="{group.label}: {group.participants || 0} people — see defining statements"
 				onclick={() => openGroup(group.key)}
 			>
-				<div class="gName">{groupTag(group)}</div>
+				<div class="gName">{group.label}</div>
 				<div class="gCount">{group.participants || 0} people</div>
 				{#if group.tagline}
 					<p class="gTagline">{group.tagline}</p>

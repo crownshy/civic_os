@@ -3935,15 +3935,15 @@
 	"groups": [
 		{
 			"key": "A",
-			"label": "Group A - Optimists"
+			"label": "Optimists"
 		},
 		{
 			"key": "B",
-			"label": "Group B - Pragmatists"
+			"label": "Pragmatists"
 		},
 		{
 			"key": "C",
-			"label": "Group C - Skeptics"
+			"label": "Skeptics"
 		}
 	]
 }

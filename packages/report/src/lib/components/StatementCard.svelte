@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { GROUPS } from '../domain/bundled';
 	import { demoLineFor, emojiFor } from '../domain/copy';
-	import { groupTag, groupsOf } from '../domain/data';
+	import { groupsOf } from '../domain/data';
 	import type { ReportRecord } from '../domain/types';
 	import { tierColorFor } from '../domain/verdict';
 	import { selection } from '../state.svelte';
@@ -20,7 +20,7 @@
 					// the readout shows the raw figure; only the colour and bar clamp
 					const raw = group.pct ?? 0;
 					const pct = Math.max(0, Math.min(100, raw));
-					return { key: group.key, label: groupTag(group), raw, pct, color: tierColorFor(pct) };
+					return { key: group.key, label: group.label, raw, pct, color: tierColorFor(pct) };
 				})
 			: []
 	);

@@ -99,25 +99,3 @@ export function buildThemeView(
 export function groupsOf(groups: readonly Group[], vote: Vote): GroupWithTally[] {
 	return groups.map((group) => ({ ...group, ...tallyFor(vote, group.key) }));
 }
-
-/**
- * The part of a group's label that carries meaning.
- *
- * Labels read "Group A · skeptic-leaning" and the letter is already shown
- * beside them, so only the tail is useful. A refresh resets labels to a bare
- * "Group A", which falls through unchanged; the missing editorial pass stays
- * visible rather than being papered over with an empty string.
- */
-export function groupTag(group: Group): string {
-	const label = group.label.trim();
-	const prefix = `Group ${group.key}`;
-	if (!label.toLowerCase().startsWith(prefix.toLowerCase())) return label;
-	// Separator is whatever the editor typed, "Group A · skeptics",
-	// "Group A: skeptics" and "Group A (skeptics)" all reduce to the same thing.
-	const rest = label
-		.slice(prefix.length)
-		.replace(/^[\s·:—–-]+/, '')
-		.replace(/^\((.*)\)$/, '$1')
-		.trim();
-	return rest ? rest.charAt(0).toUpperCase() + rest.slice(1) : label;
-}
