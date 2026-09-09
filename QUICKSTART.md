@@ -3,9 +3,9 @@
 This will use the staging backend at https://bloom.comhairle.scot and the actual Polis ids for those regions (confim).
 
 ```sh
-# 1. Node (version from .nvmrc) + pnpm 9.15 (skip if you have them)
+# 1. Node (version from .nvmrc) + pnpm 12.3.4 (skip if you have them)
 nvm install && nvm use
-corepack enable && corepack prepare pnpm@9.15.0 --activate
+corepack enable && corepack prepare pnpm@12.3.4 --activate
 
 # 2. Install + config
 pnpm install
