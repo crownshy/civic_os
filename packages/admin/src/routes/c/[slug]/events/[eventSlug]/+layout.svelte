@@ -98,8 +98,10 @@
 {#if !event}
 	<div class="p-8 text-muted-foreground">Event not found.</div>
 {:else}
-	<div class="flex min-h-0 flex-1 flex-col px-8 py-8">
-		<div class="min-h-0 flex-1 overflow-y-auto">
+	<div class="flex min-h-0 flex-1 flex-col">
+		<!-- The scroller owns the padding so its scrollbar sits in the gutter rather
+		     than over the content. -->
+		<div class="min-h-0 flex-1 overflow-y-auto px-8 py-8 [scrollbar-gutter:stable]">
 			{@render children?.()}
 		</div>
 	</div>

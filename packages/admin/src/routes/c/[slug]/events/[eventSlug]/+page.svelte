@@ -6,7 +6,7 @@
 	import { Input } from '@civicos/shared/ui/input';
 	import { Label } from '@civicos/shared/ui/label';
 	import * as ToggleGroup from '@civicos/shared/ui/toggle-group';
-	import { Check, Copy, MapPin, Monitor, Trash2 } from '@lucide/svelte';
+	import { Calendar, Check, Clock, Copy, MapPin, Monitor, Trash2, Video } from '@lucide/svelte';
 	import { resolve } from '$app/paths';
 
 	let { data } = $props();
@@ -31,10 +31,14 @@
 		country_code: string;
 	};
 
+	/** The API has two formats; `online` splits by whether a custom link is set. */
+	type MeetMode = 'in_person' | 'civicos_online' | 'external_online';
+
 	type Form = {
 		name: string;
 		description: string;
-		format: 'in_person' | 'online';
+		meet_mode: MeetMode;
+		custom_event_link: string;
 		start_date: string;
 		start_time: string;
 		end_time: string;
@@ -93,12 +97,26 @@
 		return new Date(ms - offset).toISOString();
 	}
 
+	function tzLabel(tz: string): string {
+		return (
+			new Intl.DateTimeFormat('en-US', { timeZone: tz, timeZoneName: 'long' })
+				.formatToParts(new Date())
+				.find((p) => p.type === 'timeZoneName')?.value ?? tz
+		);
+	}
+
+	function meetModeOf(e: NonNullable<typeof event>): MeetMode {
+		if (e.format === 'in_person') return 'in_person';
+		return e.customEventLink ? 'external_online' : 'civicos_online';
+	}
+
 	function buildForm(e: typeof event): Form {
 		if (!e) {
 			return {
 				name: '',
 				description: '',
-				format: 'in_person',
+				meet_mode: 'in_person',
+				custom_event_link: '',
 				start_date: '',
 				start_time: '',
 				end_time: '',
@@ -115,7 +133,8 @@
 		return {
 			name: e.name ?? '',
 			description: e.description ?? '',
-			format: (e.format as Form['format']) ?? 'in_person',
+			meet_mode: meetModeOf(e),
+			custom_event_link: e.customEventLink ?? '',
 			start_date: start.date,
 			start_time: start.time,
 			end_time: end.time,
@@ -141,6 +160,11 @@
 	let savedTick = $state(0);
 	let deleting = $state(false);
 	let deleteOpen = $state(false);
+	let tzOpen = $state(false);
+
+	let dateEl = $state<HTMLInputElement | null>(null);
+	let startEl = $state<HTMLInputElement | null>(null);
+	let endEl = $state<HTMLInputElement | null>(null);
 
 	$effect(() => {
 		if (loaded || !event) return;
@@ -148,8 +172,19 @@
 		loaded = true;
 	});
 
-	const isInPerson = $derived(form.format === 'in_person');
+	const isInPerson = $derived(form.meet_mode === 'in_person');
 	const rsvpLink = $derived(event ? `civicos.app/c/${page.params.slug}/e/${event.id}` : '');
+	// CivicOS Online meets on the RSVP page; Zoom / Other Online has nowhere to send
+	// people until a custom link is entered.
+	const missingCustomLink = $derived(
+		form.meet_mode === 'external_online' && !form.custom_event_link.trim()
+	);
+
+	const meetModes = [
+		{ value: 'in_person', label: 'In Person', icon: MapPin },
+		{ value: 'civicos_online', label: 'CivicOS Online', icon: Video },
+		{ value: 'external_online', label: 'Zoom / Other Online', icon: Monitor }
+	] as const;
 
 	type Patch = Record<string, unknown>;
 
@@ -169,6 +204,20 @@
 		} finally {
 			saving = false;
 		}
+	}
+
+	function setMeetMode(next: MeetMode) {
+		form.meet_mode = next;
+		const patch: Patch = { format: next === 'in_person' ? 'in_person' : 'online' };
+		// Only the third mode carries a custom link; the others fall back to the RSVP page.
+		if (next !== 'external_online') patch.custom_event_link = null;
+		save(patch);
+	}
+
+	function saveCustomLink() {
+		const link = form.custom_event_link.trim();
+		if (link === (event?.customEventLink ?? '')) return;
+		save({ custom_event_link: link || null });
 	}
 
 	function locationPatch(): LocationForm | null {
@@ -223,16 +272,24 @@
 
 	let copied = $state(false);
 	let copyTimer: ReturnType<typeof setTimeout> | null = null;
-	function copyLink() {
-		navigator.clipboard?.writeText(rsvpLink);
+	function copyLink(link: string) {
+		if (!link) return;
+		navigator.clipboard?.writeText(link);
 		copied = true;
 		if (copyTimer) clearTimeout(copyTimer);
 		copyTimer = setTimeout(() => (copied = false), 1500);
 	}
+
+	const LABEL = 'text-caption font-bold tracking-tight uppercase';
+	const FIELD =
+		'flex h-14 items-center gap-3 rounded-lg border border-input bg-background px-4 focus-within:border-ring';
+	// The lucide glyph replaces the native picker button, so the input keeps none of its own.
+	const NATIVE =
+		'w-full bg-transparent text-body-lg font-semibold outline-none [&::-webkit-calendar-picker-indicator]:hidden';
 </script>
 
 {#if event}
-	<div class="space-y-5">
+	<div class="space-y-8">
 		<div class="flex items-center justify-end gap-3 text-caption">
 			{#if saving}
 				<span class="text-muted-foreground">saving…</span>
@@ -248,215 +305,279 @@
 			{/if}
 		</div>
 
-		<div class="space-y-1.5">
-			<Label class="text-caption tracking-tight text-muted-foreground">MODE</Label>
+		<input
+			aria-label="Event name"
+			bind:value={form.name}
+			onblur={() => form.name.trim() !== event.name && save({ name: form.name.trim() })}
+			class="w-full bg-transparent text-h3 font-bold outline-none md:text-h2"
+		/>
+
+		<div class="border-t border-border"></div>
+
+		<div class="space-y-3">
+			<div class="grid grid-cols-1 gap-6 md:grid-cols-[1fr_auto_auto]">
+				<div class="space-y-2">
+					<Label for="ev-date" class={LABEL}>Date</Label>
+					<div class={FIELD}>
+						<button
+							type="button"
+							aria-label="Open date picker"
+							onclick={() => dateEl?.showPicker?.()}
+							class="cursor-pointer text-foreground"
+						>
+							<Calendar class="size-5" />
+						</button>
+						<input
+							id="ev-date"
+							type="date"
+							bind:this={dateEl}
+							bind:value={form.start_date}
+							onblur={saveTimes}
+							class={NATIVE}
+						/>
+					</div>
+				</div>
+				<div class="space-y-2">
+					<Label for="ev-start" class={LABEL}>Start time</Label>
+					<div class={`${FIELD} md:w-56`}>
+						<button
+							type="button"
+							aria-label="Open start time picker"
+							onclick={() => startEl?.showPicker?.()}
+							class="cursor-pointer text-foreground"
+						>
+							<Clock class="size-5" />
+						</button>
+						<input
+							id="ev-start"
+							type="time"
+							bind:this={startEl}
+							bind:value={form.start_time}
+							onblur={saveTimes}
+							class={NATIVE}
+						/>
+					</div>
+				</div>
+				<div class="space-y-2">
+					<Label for="ev-end" class={LABEL}>End time</Label>
+					<div class={`${FIELD} md:w-56`}>
+						<button
+							type="button"
+							aria-label="Open end time picker"
+							onclick={() => endEl?.showPicker?.()}
+							class="cursor-pointer text-foreground"
+						>
+							<Clock class="size-5" />
+						</button>
+						<input
+							id="ev-end"
+							type="time"
+							bind:this={endEl}
+							bind:value={form.end_time}
+							onblur={saveTimes}
+							class={NATIVE}
+						/>
+					</div>
+				</div>
+			</div>
+
+			<p class="text-body font-semibold italic">
+				All times in {tzLabel(form.time_zone)}.
+				<button
+					type="button"
+					onclick={() => (tzOpen = !tzOpen)}
+					aria-expanded={tzOpen}
+					class="cursor-pointer font-semibold text-primary italic hover:underline"
+				>
+					Change time zone
+				</button>
+			</p>
+
+			{#if tzOpen}
+				<select
+					aria-label="Time zone"
+					bind:value={form.time_zone}
+					onchange={saveTimes}
+					class="h-12 w-full max-w-md rounded-lg border border-input bg-background px-4 text-body outline-none focus-visible:border-ring"
+				>
+					{#each TIMEZONES as tz (tz)}
+						<option value={tz}>{tz}</option>
+					{/each}
+				</select>
+			{/if}
+		</div>
+
+		<div class="border-t border-border"></div>
+
+		<div class="space-y-3">
+			<Label class={LABEL}>How will you meet?</Label>
 			<ToggleGroup.Root
 				type="single"
-				value={form.format}
-				onValueChange={(v) => {
-					if (!v) return;
-					form.format = v as Form['format'];
-					save({ format: form.format });
-				}}
-				aria-label="Event mode"
+				value={form.meet_mode}
+				onValueChange={(v) => v && setMeetMode(v as MeetMode)}
+				aria-label="How will you meet?"
+				class="grid w-full grid-cols-1 gap-5 rounded-none border-0 bg-transparent p-0 shadow-none md:grid-cols-3"
 			>
-				<ToggleGroup.Item value="in_person" aria-label="In-person">
-					<MapPin />
-					in-person
-				</ToggleGroup.Item>
-				<ToggleGroup.Item value="online" aria-label="Online">
-					<Monitor />
-					online
-				</ToggleGroup.Item>
-			</ToggleGroup.Root>
-		</div>
-
-		<div class="space-y-1.5">
-			<Label for="ev-name" class="text-caption tracking-tight text-muted-foreground">NAME</Label>
-			<Input
-				id="ev-name"
-				bind:value={form.name}
-				onblur={() => form.name.trim() !== event.name && save({ name: form.name.trim() })}
-				class="h-10"
-			/>
-		</div>
-
-		<div class="grid grid-cols-1 gap-3.5 md:grid-cols-3">
-			<div class="space-y-1.5">
-				<Label for="ev-date" class="text-caption tracking-tight text-muted-foreground">DATE</Label>
-				<Input
-					id="ev-date"
-					type="date"
-					bind:value={form.start_date}
-					onblur={saveTimes}
-					class="h-10"
-				/>
-			</div>
-			<div class="space-y-1.5">
-				<Label for="ev-start" class="text-caption tracking-tight text-muted-foreground">START</Label
-				>
-				<Input
-					id="ev-start"
-					type="time"
-					bind:value={form.start_time}
-					onblur={saveTimes}
-					class="h-10"
-				/>
-			</div>
-			<div class="space-y-1.5">
-				<Label for="ev-end" class="text-caption tracking-tight text-muted-foreground">END</Label>
-				<Input id="ev-end" type="time" bind:value={form.end_time} onblur={saveTimes} class="h-10" />
-			</div>
-		</div>
-
-		<div class="space-y-1.5">
-			<Label for="ev-tz" class="text-caption tracking-tight text-muted-foreground">TIME ZONE</Label>
-			<select
-				id="ev-tz"
-				bind:value={form.time_zone}
-				onchange={saveTimes}
-				class="h-10 w-full rounded-lg border border-input bg-muted/30 px-3 text-body transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-			>
-				{#each TIMEZONES as tz (tz)}
-					<option value={tz}>{tz}</option>
+				{#each meetModes as mode (mode.value)}
+					{@const Icon = mode.icon}
+					<ToggleGroup.Item
+						value={mode.value}
+						class="h-[76px] w-full justify-center rounded-lg border border-input bg-background text-body-lg font-semibold text-foreground data-[state=on]:border-primary data-[state=on]:bg-primary/5 data-[state=on]:text-primary data-[state=on]:shadow-none [&_svg]:size-5"
+					>
+						<Icon />
+						{mode.label}
+					</ToggleGroup.Item>
 				{/each}
-			</select>
+			</ToggleGroup.Root>
 		</div>
 
 		{#if isInPerson}
 			<div class="space-y-3">
-				<Label class="text-caption tracking-tight text-muted-foreground">LOCATION</Label>
-				<div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+				<Label class={LABEL}>Location</Label>
+				<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 					<Input
 						bind:value={form.location.venue_name}
 						onblur={saveLocation}
 						placeholder="Venue name"
-						class="h-10"
+						class="h-14 bg-background px-4 text-body-lg"
 					/>
 					<Input
 						bind:value={form.location.address_line_1}
 						onblur={saveLocation}
 						placeholder="Address line 1"
-						class="h-10"
+						class="h-14 bg-background px-4 text-body-lg"
 					/>
 					<Input
 						bind:value={form.location.address_line_2}
 						onblur={saveLocation}
 						placeholder="Address line 2 (optional)"
-						class="h-10"
+						class="h-14 bg-background px-4 text-body-lg"
 					/>
 					<Input
 						bind:value={form.location.city}
 						onblur={saveLocation}
 						placeholder="City"
-						class="h-10"
+						class="h-14 bg-background px-4 text-body-lg"
 					/>
 					<Input
 						bind:value={form.location.state_province}
 						onblur={saveLocation}
 						placeholder="State / province"
-						class="h-10"
+						class="h-14 bg-background px-4 text-body-lg"
 					/>
 					<Input
 						bind:value={form.location.postal_code}
 						onblur={saveLocation}
 						placeholder="Postal code"
-						class="h-10"
+						class="h-14 bg-background px-4 text-body-lg"
 					/>
 					<Input
 						bind:value={form.location.country_code}
 						onblur={saveLocation}
 						placeholder="Country code (e.g. US)"
-						class="h-10"
+						class="h-14 bg-background px-4 text-body-lg"
 					/>
 				</div>
-				<p class="text-label text-muted-foreground">
+				<p class="text-body italic">
 					All required address fields must be filled before location saves.
+				</p>
+			</div>
+		{:else if form.meet_mode === 'civicos_online'}
+			<div class="space-y-3">
+				<Label class={LABEL}>Web address</Label>
+				<div class="flex items-center gap-3 rounded-lg border border-input bg-muted/40 px-4 py-5">
+					<div class="min-w-0 flex-1 truncate text-body-lg font-semibold">{rsvpLink}</div>
+					<Button variant="outline" size="sm" onclick={() => copyLink(rsvpLink)}>
+						{#if copied}
+							<Check class="size-3.5" /> copied
+						{:else}
+							<Copy class="size-3.5" /> copy
+						{/if}
+					</Button>
+				</div>
+				<p class="text-body italic">
+					CivicOS hosts this one, so participants meet on the RSVP page. This link will only be sent
+					to participants once they have registered.
+				</p>
+			</div>
+		{:else}
+			<div class="space-y-3">
+				<Label for="ev-link" class={LABEL}>Web address</Label>
+				<div class="flex items-center gap-3">
+					<Input
+						id="ev-link"
+						type="url"
+						required
+						aria-invalid={missingCustomLink}
+						bind:value={form.custom_event_link}
+						onblur={saveCustomLink}
+						placeholder="https://"
+						class="h-[76px] bg-background px-4 text-body-lg font-semibold"
+					/>
+				</div>
+
+				{#if missingCustomLink}
+					<p class="text-body text-destructive">
+						Add the meeting link participants should join. Without it they have nowhere to go.
+					</p>
+				{/if}
+				<p class="text-body italic">
+					This link will only be sent to participants once they have registered.
 				</p>
 			</div>
 		{/if}
 
-		<div class="space-y-1.5">
-			<Label for="ev-desc" class="text-caption tracking-tight text-muted-foreground"
-				>DESCRIPTION</Label
-			>
+		<div class="border-t border-border"></div>
+
+		<div class="space-y-3">
+			<Label for="ev-desc" class={LABEL}>Additional context</Label>
 			<textarea
 				id="ev-desc"
 				bind:value={form.description}
 				onblur={() =>
 					form.description.trim() !== event.description &&
 					save({ description: form.description.trim() })}
-				rows="4"
-				class="w-full rounded-lg border border-input bg-muted/30 px-3 py-2.5 text-body leading-relaxed transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+				rows="5"
+				placeholder="Description of the event..."
+				class="w-full rounded-lg border border-input bg-background px-4 py-4 text-body-lg leading-relaxed outline-none focus-visible:border-ring"
 			></textarea>
 		</div>
 
-		<div class="grid grid-cols-1 gap-3.5 md:grid-cols-3">
-			<div class="space-y-1.5">
-				<Label for="ev-cap" class="text-caption tracking-tight text-muted-foreground"
-					>CAPACITY</Label
-				>
+		<div class="border-t border-border"></div>
+
+		<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+			<div class="space-y-3">
+				<Label for="ev-cap" class={LABEL}>Capacity</Label>
 				<Input
 					id="ev-cap"
 					type="number"
 					min="2"
 					bind:value={form.capacity}
 					onblur={saveCapacity}
-					class="h-10"
+					class="h-14 bg-background px-4 text-body-lg font-semibold"
 				/>
 			</div>
-			<div class="space-y-1.5">
-				<Label for="ev-sign" class="text-caption tracking-tight text-muted-foreground"
-					>SIGNUP MODE</Label
-				>
+			<div class="space-y-3">
+				<Label for="ev-sign" class={LABEL}>Signup mode</Label>
 				<select
 					id="ev-sign"
 					bind:value={form.signup_mode}
 					onchange={() => save({ signup_mode: form.signup_mode })}
-					class="h-10 w-full rounded-lg border border-input bg-muted/30 px-3 text-body transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+					class="h-14 w-full rounded-lg border border-input bg-background px-4 text-body-lg font-semibold outline-none focus-visible:border-ring"
 				>
-					<option value="open">open</option>
-					<option value="invite">invite only</option>
+					<option value="open">Open</option>
+					<option value="invite">Invite only</option>
 				</select>
 			</div>
-			<div class="space-y-1.5">
-				<Label class="text-caption tracking-tight text-muted-foreground">CONTACT / HOST</Label>
-				<div
-					class="flex h-10 items-center rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl bg-card px-3 text-body shadow-card"
-				>
-					{campaign.hostName}
-				</div>
-			</div>
 		</div>
 
-		<div class="space-y-1.5">
-			<Label class="text-caption tracking-tight text-muted-foreground">RSVP LINK</Label>
-			<div class="flex items-center gap-2">
-				<div
-					class="flex-1 truncate rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl bg-card px-3 py-2.5 text-caption shadow-card"
-				>
-					{rsvpLink}
-				</div>
-				<Button variant="outline" size="sm" onclick={copyLink}>
-					{#if copied}
-						<Check class="size-3.5" /> copied
-					{:else}
-						<Copy class="size-3.5" /> copy
-					{/if}
-				</Button>
-			</div>
-			<p class="text-label text-muted-foreground">
-				Autofilled. Replace with a Zoom or other link if you're hosting online.
-			</p>
-		</div>
-
-		<div class="my-4 border-t border-border"></div>
+		<div class="border-t border-border"></div>
 
 		<div
-			class="flex items-center justify-between rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3.5"
+			class="flex items-center justify-between rounded-lg border border-destructive/30 bg-destructive/5 px-6 py-5"
 		>
 			<div>
-				<div class="text-caption font-bold tracking-tight text-destructive">DELETE EVENT</div>
+				<div class={`${LABEL} text-destructive`}>Delete event</div>
 				<div class="text-caption text-muted-foreground">
 					Removes the event, RSVPs, and any uploaded recordings.
 				</div>
