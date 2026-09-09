@@ -18,7 +18,7 @@
 		record.vote
 			? groupsOf(GROUPS, record.vote).map((group) => {
 					// the readout shows the raw figure; only the colour and bar clamp
-					const raw = group.pct ?? 0;
+					const raw = group.pct;
 					const pct = Math.max(0, Math.min(100, raw));
 					return { key: group.key, label: group.label, raw, pct, color: tierColorFor(pct) };
 				})

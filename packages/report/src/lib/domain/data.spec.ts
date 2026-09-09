@@ -5,8 +5,7 @@ import {
 	groupsOf,
 	quotesForTheme,
 	recordsForTheme,
-	statementsForTheme,
-	tallyFor
+	statementsForTheme
 } from './data';
 import type { Group, GroupTally, ReportRecord, Theme, Vote } from './types';
 
@@ -17,7 +16,7 @@ const vote = (
 	total: number,
 	gap = 0,
 	tallies: Record<string, GroupTally> = {}
-): Vote => ({ minAgree, total, gap, ...tallies }) as Vote;
+): Vote => ({ minAgree, total, gap, groups: tallies });
 
 const record = (id: string, over: Partial<ReportRecord> = {}): ReportRecord => ({
 	id,
@@ -39,24 +38,6 @@ const theme = (key: string, tags: string[]): Theme => ({
 	full: key,
 	color: '#000',
 	tags
-});
-
-describe('tallyFor', () => {
-	it('reads a group tally off a vote', () => {
-		const v = vote(50, 100, 0, { A: tally(84) });
-		expect(tallyFor(v, 'A')).toEqual(tally(84));
-	});
-
-	it('does not mistake the numeric summary fields for a group', () => {
-		// the index signature has to admit total/gap/minAgree, so this is the
-		// narrowing that stops `vote.total` being read as a tally
-		expect(tallyFor(vote(50, 100), 'total')).toBeUndefined();
-	});
-
-	it('is undefined for a group the statement has no tally for', () => {
-		// happens when a statement is left behind by a re-clustering
-		expect(tallyFor(vote(50, 100, 0, { A: tally(84) }), 'B')).toBeUndefined();
-	});
 });
 
 describe('recordsForTheme', () => {

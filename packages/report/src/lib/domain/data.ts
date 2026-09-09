@@ -8,7 +8,6 @@
 
 import type {
 	Group,
-	GroupTally,
 	GroupWithTally,
 	Insight,
 	ReportRecord,
@@ -16,19 +15,6 @@ import type {
 	ThemeView,
 	Vote
 } from './types';
-
-/**
- * Read one group's tally off a vote.
- *
- * `Vote`'s index signature has to admit its own numeric summary fields, so
- * this narrows in one place instead of at every call site. Returns undefined
- * for a group the vote has no tally for, which happens when a statement is
- * left behind by a re-clustering.
- */
-export function tallyFor(vote: Vote, groupKey: string): GroupTally | undefined {
-	const tally = vote[groupKey];
-	return typeof tally === 'object' ? tally : undefined;
-}
 
 /**
  * A theme *is* the records carrying any of its tags: membership is derived,
@@ -97,5 +83,5 @@ export function buildThemeView(
 
 /** Each declared group with this statement's tally merged on, in `groups` order. */
 export function groupsOf(groups: readonly Group[], vote: Vote): GroupWithTally[] {
-	return groups.map((group) => ({ ...group, ...tallyFor(vote, group.key) }));
+	return groups.map((group) => ({ ...group, ...vote.groups[group.key] }));
 }

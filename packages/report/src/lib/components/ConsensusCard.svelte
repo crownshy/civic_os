@@ -50,7 +50,7 @@
 		const width = track.clientWidth;
 		const xFor = (pct: number) =>
 			half + ((width - half * 2) * Math.max(0, Math.min(100, pct))) / 100;
-		const xs = groups.map((g) => xFor(g.pct ?? 0));
+		const xs = groups.map((g) => xFor(g.pct));
 		placed = nudgeApart(xs, sq + 2, half, width - half);
 		line = { left: Math.min(...xs), width: Math.max(...xs) - Math.min(...xs) };
 	}

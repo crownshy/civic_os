@@ -22,23 +22,19 @@ export interface GroupTally {
 }
 
 /**
- * A statement's vote summary: three named totals plus one `GroupTally` per
- * declared group key ("A", "B", "C"), which is data rather than constants;
- * see `Group`.
- *
- * The index signature has to admit the numeric summary fields too, so reading
- * a group off a vote goes through `tallyFor()` rather than indexing directly.
+ * A statement's vote summary: three totals across everyone, plus one
+ * `GroupTally` per declared group key ("A", "B", "C"), which is data rather
+ * than constants; see `Group`.
  */
-export type Vote = {
+export interface Vote {
 	/** every vote cast on this statement, across all groups */
 	readonly total: number;
 	/** max agree% − min agree%, so the ceiling needs no field of its own */
 	readonly gap: number;
 	/** the agree% of the group that agrees least */
 	readonly minAgree: number;
-} & {
-	readonly [groupKey: string]: GroupTally | number;
-};
+	readonly groups: Readonly<Record<string, GroupTally>>;
+}
 
 export type RecordKind = 'poll' | 'quote';
 
@@ -81,7 +77,7 @@ export interface Group {
 }
 
 /** A `Group` with one statement's tally merged onto it. */
-export type GroupWithTally = Group & Partial<GroupTally>;
+export type GroupWithTally = Group & GroupTally;
 
 export type InsightDirection = 'agree' | 'disagree' | 'divided' | 'mixed';
 
