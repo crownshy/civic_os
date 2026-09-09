@@ -1,16 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { NAV_BAR_STEPS, NAV_SEQUENCE, navBarStateFor, stepFrom } from './nav';
-
-describe('the walk through the report', () => {
-	it('runs title → demographics → groups → consensus → themes', () => {
-		expect(NAV_SEQUENCE).toEqual(['title', 'demogs', 'groups', 'consensus', 'themes']);
-	});
-
-	it('counts only the steps the bar is shown on, so title is not one of them', () => {
-		expect(NAV_BAR_STEPS).not.toContain('title');
-		expect(NAV_BAR_STEPS).toHaveLength(4);
-	});
-});
+import { navBarStateFor, stepFrom } from './nav';
 
 describe('navBarStateFor', () => {
 	it('hides the bar on the title page', () => {

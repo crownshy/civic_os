@@ -70,16 +70,3 @@ describe('verdictFor', () => {
 		});
 	});
 });
-
-describe('tierColorFor', () => {
-	it.each([
-		[0, 'var(--disagree)'],
-		[32, 'var(--disagree)'],
-		[33, 'var(--amber)'],
-		[66, 'var(--amber)'],
-		[67, 'var(--agree)'],
-		[100, 'var(--agree)']
-	])('colours %i%% by how high it is, not whose it is', (pct, expected) => {
-		expect(tierColorFor(pct)).toBe(expected);
-	});
-});

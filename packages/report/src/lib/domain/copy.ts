@@ -1,9 +1,5 @@
 /**
  * Turning records and editorial claims into the words on screen.
- *
- * Nothing here returns HTML: `claimPhrase` hands back the parts of its
- * headline so the component can render the <em> itself, which keeps escaping
- * Svelte's job and this module's output plain text.
  */
 
 import type { InsightDirection, ReportRecord } from './types';
