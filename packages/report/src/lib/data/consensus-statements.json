@@ -1,0 +1,10 @@
+{
+	"_readme": "Ordered list of poll statement ids shown on the Consensus intro page as the region's clearest common ground. \"Consensus\" generally means high vote.minAgree (the % even the least-agreeing opinion group agrees at) with a low vote.gap (all groups close together): see verdictFor()'s CONSENSUS_OVER_AGREE (66) and DIFFERENCE_OVER_GAP (33) thresholds in domain/verdict.ts, which every id here comfortably clears (minAgree 84-92, gap 4-14). But this list is hand-picked, not a strict top-N-by-minAgree cutoff; reviewed and chosen by hand from the highest-minAgree statements for how well they cover distinct ground rather than all clustering on one topic. Order here is display order on the page, not rank.",
+	"ids": [
+		"p72",
+		"p24",
+		"p6",
+		"p0",
+		"p71"
+	]
+}

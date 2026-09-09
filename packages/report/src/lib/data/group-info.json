@@ -1,0 +1,21 @@
+{
+	"_readme": "Manual snapshot for the Groups landing page (participant headcount, display color, quick-description blurb, and card tagline per opinion group). Deliberately NOT derived by scripts/refresh-poll.js, which explicitly avoids storing cluster sizes in bloom-data.json because they go stale the moment Polis reclusters (see its own comment on that). participants come from references/participants-saturated.csv, a 'saturated' k=3 clustering (group_source: official, meaning it extends Polis's own group_id assignment rather than recomputing it) run against the same poll snapshot bloom-data.json's current vote tallies were refreshed from — group_id 0/1/2 map to keys A/B/C the same way keyForGroup() in refresh-poll.js does. description was written by comparing each group's agree% against the average of the other groups across all 92 poll statements (total >= 40 to avoid small-sample noise) and describing the largest, most consistent deltas in both directions — not just the top-5 in group-representative-statements.csv, which only feeds the separate 'defining statements' pages; it's the #gdetail modal's page-0 content. tagline is a hand-written one-sentence compression of that same description, for the Groups landing page's card — not a mechanical first-sentence extraction, since these descriptions are single flowing paragraphs whose first sentence alone doesn't stand alone well. If bloom-data.json's groups[] is ever regrouped (different key count, or refresh-poll.js prints '!! Polis returned N cluster(s)'), participants/description/tagline are all stale and must be re-derived before this page is trusted again. color is purely decorative.",
+	"A": {
+		"participants": 51,
+		"color": "#1B4EA6",
+		"tagline": "Sees AI's arrival as inevitable, and is the least convinced it's already doing harm.",
+		"description": "Compared to other participants, this group is far more likely to see AI's arrival as inevitable — something to adapt to rather than resist or slow down — and the least persuaded that AI is already causing real harm, from spreading misinformation to displacing artists and writers. They're also the most open to AI-driven economic development, including data centers, and the least convinced its environmental costs outweigh the benefits."
+	},
+	"B": {
+		"participants": 235,
+		"color": "#7C3AED",
+		"tagline": "Agrees AI already delivers real benefits, but wants real accountability from AI companies.",
+		"description": "This is the largest group, and its stance is conditional: they agree AI already delivers real benefits and isn't going away, but — unlike Optimists — take long-term risks to humanity seriously and want real accountability from AI companies, opposing liability shields and tax breaks that aren't tied to responsible use. They reject both the idea that AI is eroding human cognition and the claim that its costs outweigh its benefits."
+	},
+	"C": {
+		"participants": 113,
+		"color": "#1F8A3B",
+		"tagline": "The most doubtful that AI's benefits are worth its environmental and human cost.",
+		"description": "Compared to other participants, this group is the most doubtful that AI's benefits are worth its costs — especially its environmental footprint and its effect on human creativity and thinking — and the most convinced its gains are concentrated among a small number of companies rather than the broader economy. They're the least persuaded that change is simply inevitable, or that AI tools, education, or university partnerships are actually helping ordinary people."
+	}
+}

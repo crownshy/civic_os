@@ -1,0 +1,193 @@
+{
+	"_readme": "Keyed by theme key; each entry is an ordered list of { claim, direction, ids }. ids are full bloom-data.json record ids. direction is agree|disagree|divided|mixed, hand-assigned against each statement's actual polarity (it is not derivable from vote % alone). Themes with no entry here (access, privacy) render their page without a TOC or insights section. Note: datacenters' 'AI companies shouldn't get special treatment' cites p123, which under the current tag model belongs only to workforce (tags: Economic Benefit, Workforce & Labor). That is intentional: buildThemeView appends any insight-cited record missing from the theme's own statement list, so it still displays and pages correctly.",
+	"datacenters": [
+		{
+			"claim": "Data center development needs thorough environmental review and reporting",
+			"direction": "agree",
+			"ids": [
+				"p128",
+				"p0"
+			]
+		},
+		{
+			"claim": "AI companies shouldn't get special treatment",
+			"direction": "agree",
+			"ids": [
+				"p161",
+				"p130",
+				"p109",
+				"p100",
+				"p123"
+			]
+		},
+		{
+			"claim": "The benefits of data centers are not well established",
+			"direction": "divided",
+			"ids": [
+				"p89",
+				"p115"
+			]
+		},
+		{
+			"claim": "People disagree about whether data center benefits outweigh the costs",
+			"direction": "divided",
+			"ids": [
+				"p35",
+				"p50"
+			]
+		}
+	],
+	"governance": [
+		{
+			"claim": "Communities should be involved in decisions about AI",
+			"direction": "agree",
+			"ids": [
+				"p24",
+				"p150",
+				"p42",
+				"p22"
+			]
+		},
+		{
+			"claim": "Government use of AI should be transparent and independently audited",
+			"direction": "agree",
+			"ids": [
+				"p65",
+				"p18",
+				"p156"
+			]
+		},
+		{
+			"claim": "People disagree about whether AI should be publicly or privately owned",
+			"direction": "divided",
+			"ids": [
+				"p64",
+				"p154"
+			]
+		},
+		{
+			"claim": "Some regulation of AI is necessary",
+			"direction": "agree",
+			"ids": [
+				"p59",
+				"p127"
+			]
+		}
+	],
+	"education": [
+		{
+			"claim": "Schools need clear rules and transparency about AI use",
+			"direction": "agree",
+			"ids": [
+				"p6",
+				"p72"
+			]
+		},
+		{
+			"claim": "Children need guardrails before AI is used with them",
+			"direction": "agree",
+			"ids": [
+				"p71",
+				"p49"
+			]
+		},
+		{
+			"claim": "AI poses specific risks to learning and thinking",
+			"direction": "agree",
+			"ids": [
+				"p118",
+				"p103"
+			]
+		},
+		{
+			"claim": "People disagree about how much AI erodes critical thinking and creativity",
+			"direction": "divided",
+			"ids": [
+				"p67",
+				"p76",
+				"p114"
+			]
+		}
+	],
+	"mentalhealth": [
+		{
+			"claim": "People disagree about whether AI erodes social connection",
+			"direction": "divided",
+			"ids": [
+				"p44"
+			]
+		},
+		{
+			"claim": "AI chatbots are not an acceptable substitute for therapy",
+			"direction": "agree",
+			"ids": [
+				"p4"
+			]
+		}
+	],
+	"workforce": [
+		{
+			"claim": "Workers should know when AI is used to evaluate them",
+			"direction": "agree",
+			"ids": [
+				"p13",
+				"p120"
+			]
+		},
+		{
+			"claim": "Companies that automate jobs should help fund retraining",
+			"direction": "mixed",
+			"ids": [
+				"p12",
+				"p106",
+				"p53"
+			]
+		},
+		{
+			"claim": "The jobs AI replaces are essential",
+			"direction": "agree",
+			"ids": [
+				"p54"
+			]
+		},
+		{
+			"claim": "People disagree about AI companies' role in preparing the workforce",
+			"direction": "divided",
+			"ids": [
+				"p48"
+			]
+		}
+	],
+	"agency": [
+		{
+			"claim": "AI should strengthen human judgment, not replace it",
+			"direction": "agree",
+			"ids": [
+				"p121"
+			]
+		},
+		{
+			"claim": "AI companies should prove they can prevent catastrophic outcomes",
+			"direction": "agree",
+			"ids": [
+				"p62"
+			]
+		},
+		{
+			"claim": "People disagree about whether AI is fundamentally different from past technologies",
+			"direction": "divided",
+			"ids": [
+				"p117",
+				"p78",
+				"p61"
+			]
+		},
+		{
+			"claim": "People disagree about whether to adapt to AI or resist it",
+			"direction": "divided",
+			"ids": [
+				"p52"
+			]
+		}
+	]
+}

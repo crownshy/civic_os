@@ -10,6 +10,7 @@ RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/civicos/package.json ./packages/civicos/
 COPY packages/admin/package.json ./packages/admin/
+COPY packages/report/package.json ./packages/report/
 COPY packages/shared/package.json ./packages/shared/
 
 RUN pnpm install --frozen-lockfile

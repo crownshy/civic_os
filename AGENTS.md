@@ -21,6 +21,8 @@ This is a **pnpm workspace**; there is no backend code here. Layout (`packages/*
 - `packages/shared/` (package `@civicos/shared`) the shared kit: shadcn-svelte UI
   primitives (`ui/**`), design tokens (`styles/theme.css`), region/zip data, and
   `cn()` + shared types under `utils.ts`.
+- `packages/report/` (package `@civicos/report`) the standalone public report, deployed
+  separately to `report.bloomproject.us`. 
 
 The two apps intentionally diverge at the theme and domain-component layer while sharing
 generic primitives. The full rules for what to share vs keep separate are in
@@ -46,7 +48,8 @@ generic primitives. The full rules for what to share vs keep separate are in
 
 Run per-package from `packages/<name>`, or use the root scripts:
 
-- `pnpm dev` civicos dev server. `pnpm dev:admin` admin dev server.
+- `pnpm dev` civicos dev server (5173). `pnpm dev:admin` admin (5174).
+  `pnpm dev:report` the public report (5175).
 - `pnpm -r build` / `pnpm run build` build every package.
 - `pnpm -r check` / `pnpm run check` svelte-check (types) across packages. `civicos`
   has a floor of two errors it cannot fix: `@crownshy/api-client` exports raw `.ts`
@@ -56,9 +59,12 @@ Run per-package from `packages/<name>`, or use the root scripts:
   tsconfig `exclude` does not stop TS diagnosing an imported file. It goes when
   api-client is regenerated against zod 4. Anything above two is yours.
 - `pnpm --filter civic-os lint` / `pnpm --filter @civicos/admin lint` prettier check +
-  eslint. `pnpm run lint` runs both. Both packages are currently red against a backlog of
-  pre-existing violations (see Follow-ups below), so read the diff, not just the exit code.
+  eslint. `pnpm run lint` runs all three. `civicos` and `admin` are currently red against
+  a backlog of pre-existing violations (see Follow-ups below), so read the diff, not just
+  the exit code. `@civicos/report` is green and should stay that way.
 - `pnpm --filter civic-os test:unit` / `pnpm --filter @civicos/admin test:unit` Vitest.
+  `pnpm --filter @civicos/report test:e2e` runs the report's Playwright suite (port 4174);
+  it is the only package with e2e, and it does not run in CI.
 - `pnpm --filter civic-os storybook` (port 6006) / `pnpm --filter @civicos/admin storybook`
   (port 6007) run Storybook.
 - Format only files you touched:
@@ -120,7 +126,7 @@ focused PR; do not let them silently grow:
 - `sveltekit-superforms` + `formsnap` are installed and the shared `ui/form` primitives
   exist, but app forms do not use them yet. Migrate forms onto superforms as you touch
   them.
-- Both packages have lint configured but neither passes yet: `admin` has 73 files failing
+- `admin` and `civicos` have lint configured but neither passes yet: `admin` has 73 files failing
   `prettier --check` and 52 eslint errors. `civicos` is clean on `prettier` and down to 37
   eslint errors, all of them decisions rather than cleanups: 14 `no-at-html-tags` (#409),
   14 `no-navigation-without-resolve`, one `no-explicit-any`, and 8 `no-unused-vars` that

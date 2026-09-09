@@ -1,0 +1,36 @@
+{
+	"themes": {
+		"governance": {
+			"description": "There is almost no argument about who belongs in the room: involving rural and lower-income communities draws 91% and 94%, a formal seat for the Confederated Tribes of Warm Springs 91% and 90%. The fight is over what those rooms are for. Skeptics endorse the flat claim that AI's costs outweigh any benefit (83% vs 6%).",
+			"note": "Largest theme in the poll (24 statements) and the one where procedural consensus most clearly outruns substantive agreement."
+		},
+		"datacenters": {
+			"description": "The divide is fundamentally about the economic bargain. Optimists are far more receptive to the jobs-and-tax-revenue case (42% agree, against 1% of Skeptics), while Skeptics overwhelmingly endorse a firsthand account that the construction jobs are temporary and out-of-state (89% vs 54%). Both want disclosure: electricity reporting runs 99%/92%.",
+			"note": "The only theme where a single statement — the jobs-and-tax-revenue framing — is rejected almost absolutely by one group."
+		},
+		"education": {
+			"description": "Everyone wants rules — clear school policies on student use (94%/92%), transparency about how teachers and administrators use it (96%/91%). The disagreement is about cognition. Skeptics accept that AI is taking opportunity from artists and brain cells from children (95%); Optimists mostly don't (41%).",
+			"note": "Second-richest theme in the conversation record — five starred session quotes alongside twelve poll statements."
+		},
+		"mentalhealth": {
+			"description": "The thinnest poll evidence in the set and the thickest conversation record: three statements, nine session quotes. Skeptics far more readily accept that leaning on AI erodes turning to each other (85% vs 49%), and reject the mirror-image framing of AI as connective (11% vs 68%). Both refuse chatbots as teen therapy (6%/20%).",
+			"note": "Read this theme through the quotes, not the poll. The vote sample is too small to carry much weight on its own."
+		},
+		"workforce": {
+			"description": "No session quotes landed here, so this is the poll speaking alone. Worker protections travel across the divide — a right to know when AI is evaluating you runs 99%/87%. The split is over whether standing still has a price: Optimists accept that slowing down sends jobs to another state (51% vs 4%).",
+			"note": "The competitiveness argument is the single most group-defining framing in the theme."
+		},
+		"agency": {
+			"description": "This is a fight over inevitability, not over risk. Optimists accept that the changes are coming and the task is adaptation rather than resistance (73% vs 11%). Yet both groups want the most powerful systems to prove they can prevent catastrophic outcomes before deployment (94%/78%).",
+			"note": "Useful counterweight to the framing that existential-risk concern maps onto AI skepticism. It doesn't, cleanly."
+		},
+		"access": {
+			"description": "Both groups want the same infrastructure of trust: a rigorous, apolitical evidence base (100%/100%, the only perfect agreement in the poll) and disclosure from the algorithms choosing political content (94%/88%). They part company on whether access has arrived — AI replacing expensive professionals draws 82% of Optimists, 38% of Skeptics.",
+			"note": "Highest-participation statement in the whole poll sits here (243 votes) and it is a divergent one."
+		},
+		"privacy": {
+			"description": "The least polarized theme in the set, and the one the report has no section for — four statements added to hold what the other seven left uncovered. Parents seeing what minors discuss with AI companion apps draws 78% and 77%; the inverse phrasing is rejected identically at 7%.",
+			"note": "Claude-added theme, not editorial. Worth deciding whether it survives into a published version."
+		}
+	}
+}

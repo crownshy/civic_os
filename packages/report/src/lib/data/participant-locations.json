@@ -1,0 +1,96 @@
+{
+	"_readme": "City-level participant counts + map marker positions for the Demographics intro page. count is aggregated from references/conversation-demographics-2026-08-20.csv by zipcode: Bend = 97701+97702+97703+97707+97709 (97709 is a Bend PO-box-only zip, folded in rather than plotted separately), Redmond = 97756, Sisters = 97759, Madras = 97754, Prineville = 97741, Powell Butte = 97753, Antelope = 97001, Warm Springs = 97761, La Pine = 97739, Camp Sherman = 97730, Culver = 97734, Terrebonne = 97760. These 12 places are every zip in the CSV that maps to a single identifiable Central-Oregon-area place (verified against zip-codes.com/Census sources, not guessed) with more than zero respondents; every remaining zip, genuinely scattered out-of-region respondents (Portland/Salem/Eugene/Ashland-area, one each in Reedsport and La Grande-area and Heppner-area and Aurora, and one out-of-state), stays folded into 'other'. Antelope is the one exception to 'Central Oregon': its zip is in Wasco County, outside the Deschutes/Crook/Jefferson tri-county area oregon-counties.json highlights, but it's included on the map anyway (real geometry exists for Wasco County in that same 36-county file, it just renders outside the tinted region). lat/lng are each place's real-world WGS84 coordinates (source: Wikipedia/latitude.to/zip-codes.com lookups, not surveyed/exact: place-center precision, not a specific address). IMPORTANT: d3-geo projections take points as [lng, lat], the reverse of these field names' natural reading order; CountyMap.svelte's projection call site has its own comment on this. major (only on the original 5 incorporated cities) is editorial, not derived from count: it's what keeps their labels visible at the default zoom while the other 7 places' labels stay hidden until you zoom in further (see DEMOG_LABEL_MIN_ZOOM/DEMOG_MINOR_LABEL_MIN_ZOOM in domain/map-layout.ts); a place missing this key is simply not major. total is every row in the source CSV, mapped or not.",
+	"cities": [
+		{
+			"name": "Madras",
+			"county": "Jefferson",
+			"count": 34,
+			"lat": 44.6306,
+			"lng": -121.1292,
+			"major": true
+		},
+		{
+			"name": "Prineville",
+			"county": "Crook",
+			"count": 28,
+			"lat": 44.2999,
+			"lng": -120.8345,
+			"major": true
+		},
+		{
+			"name": "Redmond",
+			"county": "Deschutes",
+			"count": 42,
+			"lat": 44.2726,
+			"lng": -121.1739,
+			"major": true
+		},
+		{
+			"name": "Sisters",
+			"county": "Deschutes",
+			"count": 52,
+			"lat": 44.2928,
+			"lng": -121.5531,
+			"major": true
+		},
+		{
+			"name": "Bend",
+			"county": "Deschutes",
+			"count": 223,
+			"lat": 44.0582,
+			"lng": -121.3153,
+			"major": true
+		},
+		{
+			"name": "Powell Butte",
+			"county": "Crook",
+			"count": 9,
+			"lat": 44.2476,
+			"lng": -121.0175
+		},
+		{
+			"name": "Antelope",
+			"county": "Wasco",
+			"count": 9,
+			"lat": 44.9114,
+			"lng": -120.7236
+		},
+		{
+			"name": "Warm Springs",
+			"county": "Jefferson",
+			"count": 8,
+			"lat": 44.7603,
+			"lng": -121.2683
+		},
+		{
+			"name": "La Pine",
+			"county": "Deschutes",
+			"count": 6,
+			"lat": 43.6792,
+			"lng": -121.4958
+		},
+		{
+			"name": "Camp Sherman",
+			"county": "Jefferson",
+			"count": 3,
+			"lat": 44.4603,
+			"lng": -121.6411
+		},
+		{
+			"name": "Culver",
+			"county": "Jefferson",
+			"count": 2,
+			"lat": 44.5247,
+			"lng": -121.2122
+		},
+		{
+			"name": "Terrebonne",
+			"county": "Deschutes",
+			"count": 2,
+			"lat": 44.3533,
+			"lng": -121.1808
+		}
+	],
+	"other": 19,
+	"total": 437
+}
