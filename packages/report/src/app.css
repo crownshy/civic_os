@@ -28,9 +28,6 @@ body {
 	margin: 0;
 	padding: 0;
 }
-/* overflow-x goes on html, not body: putting it on body makes browsers treat
-   body as the sticky/scroll containing block instead of the viewport,
-   which silently breaks every position:sticky element on the page */
 html {
 	/* There is no Tailwind preflight here, so this file is the whole reset.
 	   line-height is the load-bearing part: everything that does not set its
@@ -99,7 +96,7 @@ body.navBarOn .shell {
 	text-transform: uppercase;
 }
 /* ─────────────────────────────────────────────
-   LEVEL 1: THEMES
+   THEMES
    ───────────────────────────────────────────── */
 .masthead {
 	padding: 26px 22px 20px;
@@ -124,8 +121,6 @@ body.navBarOn .shell {
 	margin: 12px 0 0;
 	max-width: 32em;
 }
-/* Shared entrance animation: the theme grid's tally cells (ThemeBlock.svelte)
-   and the opinion-group bubbles below both use it. */
 @keyframes tallyIn {
 	from {
 		opacity: 0;
@@ -136,16 +131,9 @@ body.navBarOn .shell {
 		transform: none;
 	}
 }
+
 /* ─────────────────────────────────────────────
-   LEVEL 0: INTRO PAGES
-   A small ordered sequence shown before the theme grid (title → demogs →
-   groups, per INTRO_STEPS in domain/nav.ts; that array is what drives
-   page order and the next-arrow's destination; this is just their shared
-   shell/layout. Each page sets its own background/text color below, per
-   its own mock: title and demogs stay in the dark --home most of the
-   report opens in; groups switches to white/ink. A new page only needs
-   its own #id + .masthead content (+ a one-line color rule if it isn't
-   the dark default) to slot in.
+   INTRO PAGES
    ───────────────────────────────────────────── */
 .introPage {
 	position: relative;
@@ -153,9 +141,6 @@ body.navBarOn .shell {
 	min-height: 100dvh;
 	padding-bottom: 100px;
 }
-/* the shared .masthead h1/p sizing (above, under LEVEL 1) already reads as
-   a cover page rather than a grid caption; intro pages only need the width
-   constraints relaxed, since L1's are tuned for its own shorter copy */
 .introPage .masthead h1 {
 	max-width: none;
 }
