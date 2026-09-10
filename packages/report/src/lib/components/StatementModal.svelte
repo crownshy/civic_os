@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { trackStatementOpen } from '../analytics';
 	import { GROUPS } from '../domain/bundled';
 	import { titleCaseChip } from '../domain/copy';
 	import { MIN_GROUP_VOTES, groupsOf } from '../domain/data';
@@ -70,6 +71,10 @@
 		return stop;
 	});
 
+	function turn(delta: number) {
+		trackStatementOpen(pageStatement(delta));
+	}
+
 	/**
 	 * Focus goes back to the card you came from, so a keyboard user lands where
 	 * they were rather than at the top of the document. A record can be marked
@@ -94,7 +99,7 @@
 	label="Statement detail"
 	variant="statementDialog"
 	onclose={close}
-	onpage={pageStatement}
+	onpage={turn}
 >
 	{#snippet header()}
 		<!-- quotes carry no vote data, so they get no verdict badge -->
@@ -142,11 +147,7 @@
 
 	{#snippet footer()}
 		<div class="cardfoot">
-			<button
-				aria-label="Previous statement"
-				disabled={index === 0}
-				onclick={() => pageStatement(-1)}
-			>
+			<button aria-label="Previous statement" disabled={index === 0} onclick={() => turn(-1)}>
 				<svg viewBox="0 0 26 14" aria-hidden="true"
 					><path
 						d="M25 7H1.6M7.4 1.4L1.2 7l6.2 5.6"
@@ -156,11 +157,7 @@
 				>
 			</button>
 			<div class="pos">{index + 1} <em>|</em> {count}</div>
-			<button
-				aria-label="Next statement"
-				disabled={index === count - 1}
-				onclick={() => pageStatement(1)}
-			>
+			<button aria-label="Next statement" disabled={index === count - 1} onclick={() => turn(1)}>
 				<svg viewBox="0 0 26 14" aria-hidden="true"
 					><path
 						d="M1 7h23.4M18.6 1.4L24.8 7l-6.2 5.6"

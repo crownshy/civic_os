@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { onNavigate } from '$app/navigation';
+	import { trackEvent } from '@lukulent/svelte-umami';
 	import type { Snippet } from 'svelte';
-	import { THEME_BY_KEY } from './domain/bundled';
+	import { trackStatementOpen } from './analytics';
+	import { GROUPS, THEME_BY_KEY } from './domain/bundled';
 	import { chromeFor } from './domain/page-chrome';
 	import { setOpenDemographics, setOpenGroup, setOpenShare, setOpenStatement } from './navigation';
 	import { closeAllModals, modals, openStatement as open } from './state.svelte';
@@ -21,9 +23,15 @@
 
 	let { step, children }: Props = $props();
 
-	setOpenStatement((view, index) => open(view as never, index));
-	setOpenGroup((key) => (modals.group = { key, page: 0 }));
-	setOpenDemographics(() => (modals.demographics = { index: 0 }));
+	setOpenStatement((view, index) => trackStatementOpen(open(view as never, index)));
+	setOpenGroup((key) => {
+		modals.group = { key, page: 0 };
+		trackEvent('opinion-group-open', { group: GROUPS.find((g) => g.key === key)?.label ?? key });
+	});
+	setOpenDemographics(() => {
+		modals.demographics = { index: 0 };
+		trackEvent('demographics-open');
+	});
 	setOpenShare(() => (modals.share = { copied: false }));
 
 	onNavigate(closeAllModals);

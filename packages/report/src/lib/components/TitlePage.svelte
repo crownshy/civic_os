@@ -1,8 +1,14 @@
 <script lang="ts">
+	import { trackEvent } from '@lukulent/svelte-umami';
 	import mountains from '../assets/sisters_title.webp';
 	import { getNavigate } from '../navigation';
 
 	const navigate = getNavigate();
+
+	function diveIn() {
+		trackEvent('dive-in');
+		navigate('demogs');
+	}
 </script>
 
 <main class="introPage titlePage">
@@ -16,7 +22,7 @@
 			<span class="highlight">over 400 real Central Oregonians</span> from all over the region to hear
 			what they thought should be done about AI.
 		</p>
-		<button class="diveIn" type="button" onclick={() => navigate('demogs')}>Dive In</button>
+		<button class="diveIn" type="button" onclick={diveIn}>Dive In</button>
 	</div>
 </main>
 

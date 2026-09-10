@@ -1,9 +1,20 @@
 <script lang="ts">
+	import { trackEvent } from '@lukulent/svelte-umami';
 	import mountains from '../assets/sisters_bg.webp';
 	import { getNavigate, getOpenShare } from '../navigation';
 
 	const navigate = getNavigate();
 	const openShare = getOpenShare();
+
+	function share() {
+		trackEvent('cta-share');
+		openShare();
+	}
+
+	function explore() {
+		trackEvent('cta-explore');
+		navigate('themes');
+	}
 </script>
 
 <main class="introPage ctaPage">
@@ -21,15 +32,16 @@
 			class="primary"
 			href="https://bloomproject.typeform.com/to/C1N3LI7g?utm_source=report"
 			target="_blank"
-			rel="noopener">Register here</a
+			rel="noopener"
+			onclick={() => trackEvent('cta-signup')}>Register here</a
 		>
-		<button class="secondary" type="button" onclick={openShare}>
+		<button class="secondary" type="button" onclick={share}>
 			<svg viewBox="0 0 20 20" aria-hidden="true"
 				><path d="M2.5 10.3L17 2.7l-4.3 14.7-2.9-6-7.3-1.1z" /></svg
 			>
 			Share this with a friend
 		</button>
-		<button class="secondary" type="button" onclick={() => navigate('themes')}>
+		<button class="secondary" type="button" onclick={explore}>
 			<svg viewBox="0 0 20 20" aria-hidden="true"
 				><rect x="2" y="11" width="4" height="7" rx="1" /><rect
 					x="8"

@@ -43,6 +43,7 @@
 		"vitest": "^4.0.18"
 	},
 	"dependencies": {
+		"@lukulent/svelte-umami": "^0.0.4",
 		"bits-ui": "^2.18.1",
 		"d3-geo": "^3.1.1",
 		"d3-selection": "^3.0.0",
