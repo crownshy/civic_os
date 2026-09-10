@@ -1,3 +1,27 @@
+/* Geomanist ships in only three cuts, so Medium answers every request for 500
+   and up: anything the design marks bold renders in Medium. */
+@font-face {
+	font-family: 'Geomanist';
+	src: url('./lib/assets/fonts/Geomanist-Book.otf') format('opentype');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'Geomanist';
+	src: url('./lib/assets/fonts/Geomanist-Book-Italic.otf') format('opentype');
+	font-weight: 400;
+	font-style: italic;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'Geomanist';
+	src: url('./lib/assets/fonts/Geomanist-Medium.otf') format('opentype');
+	font-weight: 500 900;
+	font-style: normal;
+	font-display: swap;
+}
+
 /* ─────────────────────────────────────────────
    TOKENS
    ───────────────────────────────────────────── */
@@ -8,17 +32,26 @@
 	--disagree: #d8362f;
 	--pass: #c4c4c4;
 	--home: #0d1b3e;
+	--theme-blue: #17348c;
 	--amber: #de8a2e; /* mid tier for the card's %-agree readout (0-33 red · 33-67 amber · 67-100 green) */
-	--gold: #e9a23c; /* accent for the Demographics intro page, per its mock */
+	--gold: #e9a23c;
 
-	--geom: 'Geom', 'Futura', system-ui, sans-serif;
-	--body: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
-	--mono: 'DM Mono', ui-monospace, 'SF Mono', monospace;
+	--geom: 'Geomanist', 'Futura', system-ui, sans-serif;
+	--body: 'Geomanist', system-ui, -apple-system, sans-serif;
+	/* no longer monospaced; the name stays because its callers are the small
+	   tracked uppercase labels */
+	--mono: 'Geomanist', system-ui, -apple-system, sans-serif;
 
 	--nav-h: 46px;
-	--bar-blue: #00216f; /* top page-nav bar, deliberately distinct from --home */
+	--bar-blue: #00216f; /* page-nav bar, deliberately distinct from --home */
 	--bar-pink: #be00c1;
 	--bar-h: 70px;
+	--topbar-h: 44px;
+
+	--grid-bg:
+		linear-gradient(color-mix(in srgb, var(--ink) 6%, transparent) 1px, transparent 1px),
+		linear-gradient(90deg, color-mix(in srgb, var(--ink) 6%, transparent) 1px, transparent 1px);
+	--grid-size: 28px 28px;
 }
 * {
 	box-sizing: border-box;
@@ -87,6 +120,7 @@ body.navBarOn .shell {
 	}
 	:root {
 		--bar-h: 96px;
+		--topbar-h: 52px;
 	}
 }
 .label {
