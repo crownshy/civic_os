@@ -18,7 +18,9 @@
 	const verdict = $derived(verdictFor(vote));
 </script>
 
-<div class="who {verdict.kind} {variant}">
+<!-- wide/large, not the variant's own name: a bare `card` class would pick up
+     the modal's global .card rule -->
+<div class="who {verdict.kind}" class:wide={variant === 'card'} class:large={variant === 'header'}>
 	{#if variant === 'header'}
 		<span class="av">
 			{#if verdict.icon}<img src={ICONS[verdict.icon]} alt="" />{/if}
@@ -40,7 +42,7 @@
 		min-height: 34px;
 		max-width: 82%;
 	}
-	.who.card {
+	.who.wide {
 		display: flex;
 		width: 100%;
 		max-width: none;
@@ -82,7 +84,7 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
-	.who.header .txt {
+	.who.large .txt {
 		font-size: 13px;
 	}
 	@media (min-width: 660px) {
@@ -92,7 +94,7 @@
 			padding-left: 6px;
 			min-height: 38px;
 		}
-		.who.header {
+		.who.large {
 			padding-right: 17px;
 		}
 		.av {
@@ -106,7 +108,7 @@
 		.txt {
 			font-size: 13px;
 		}
-		.who.header .txt {
+		.who.large .txt {
 			font-size: 15px;
 		}
 	}

@@ -10,19 +10,23 @@
 		 * card's own name.
 		 */
 		focusable?: boolean;
+		/** `end` keeps the tip inside a container that clips, for a flag at a row's right end */
+		align?: 'center' | 'end';
 	}
 
-	let { votes, focusable = false }: Props = $props();
+	let { votes, focusable = false, align = 'center' }: Props = $props();
 
 	const tip = $derived(lowDataTip(votes));
 </script>
 
 {#if focusable}
-	<button class="lowFlag" type="button"
+	<button class="lowFlag" class:end={align === 'end'} type="button"
 		><span aria-hidden="true">⚠️</span><span class="tip">{tip}</span></button
 	>
 {:else}
-	<span class="lowFlag"><span aria-hidden="true">⚠️</span><span class="tip">{tip}</span></span>
+	<span class="lowFlag" class:end={align === 'end'}
+		><span aria-hidden="true">⚠️</span><span class="tip">{tip}</span></span
+	>
 {/if}
 
 <style>
@@ -55,6 +59,11 @@
 		opacity: 0;
 		pointer-events: none;
 		transition: opacity 0.15s ease;
+	}
+	.end .tip {
+		left: auto;
+		right: -4px;
+		transform: none;
 	}
 	.lowFlag:hover .tip,
 	.lowFlag:focus-visible .tip {

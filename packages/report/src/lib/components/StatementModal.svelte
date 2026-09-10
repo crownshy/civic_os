@@ -133,6 +133,7 @@
 										>{row.pct}% agree{#if row.n < MIN_GROUP_VOTES}<LowDataFlag
 												votes={row.n}
 												focusable
+												align="end"
 											/>{/if}</b
 									>
 								</div>
