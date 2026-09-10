@@ -5,10 +5,10 @@
 	import ReportDialog from './ReportDialog.svelte';
 	import VoteBars from './VoteBars.svelte';
 
-	let page = $state(0);
+	const key = $derived(modals.group?.key ?? null);
+	const page = $derived(modals.group?.page ?? 0);
 
 	const group = $derived.by(() => {
-		const key = modals.group;
 		if (!key) return null;
 		const base = GROUPS.find((g) => g.key === key);
 		return base ? { ...base, ...(GROUP_INFO[key] ?? {}) } : null;
@@ -16,7 +16,7 @@
 
 	// page 0 is the hand-written description; pages 1..N are the statements
 	// Polis says most define this group, most representative first
-	const statements = $derived(modals.group ? (GROUP_STATEMENTS[modals.group] ?? []) : []);
+	const statements = $derived(key ? (GROUP_STATEMENTS[key] ?? []) : []);
 	const total = $derived(1 + statements.length);
 	const record = $derived(page > 0 ? RECORD_BY_ID.get(statements[page - 1]?.id) : undefined);
 
@@ -28,7 +28,6 @@
 	 */
 	const rows = $derived.by(() => {
 		if (!record?.vote) return [];
-		const key = modals.group;
 		return groupsOf(GROUPS, record.vote)
 			.slice()
 			.sort((a, b) => (a.key === key ? -1 : b.key === key ? 1 : 0));
@@ -42,12 +41,11 @@
 
 	function turn(delta: number) {
 		const next = page + delta;
-		if (next >= 0 && next < total) page = next;
+		if (modals.group && next >= 0 && next < total) modals.group.page = next;
 	}
 
 	function close() {
 		modals.group = null;
-		page = 0;
 	}
 </script>
 
@@ -74,7 +72,7 @@
 						<h4>Open Poll Responses</h4>
 						<div class="gdVoteCount">{record.vote?.total} votes</div>
 						{#each rows as row (row.key)}
-							<div class="grow" class:current={row.key === modals.group}>
+							<div class="grow" class:current={row.key === key}>
 								<div class="top">
 									<span>{row.label}</span>
 									<b>{row.pct}% agree</b>

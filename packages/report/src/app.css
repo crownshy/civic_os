@@ -71,8 +71,13 @@ html {
 	-webkit-text-size-adjust: 100%;
 	overflow-x: hidden;
 }
+/* --page-bg and --page-grid are the current step's colour, set by
+   BloomReport.svelte (see domain/page-chrome.ts) */
 body {
-	background: var(--ink);
+	background-color: var(--page-bg, var(--home));
+	background-image: var(--page-grid, none);
+	background-size: var(--grid-size);
+	background-position: 50% 0;
 	color: #fff;
 	font-family: var(--body);
 	-webkit-font-smoothing: antialiased;
@@ -99,22 +104,23 @@ button {
 	position: relative;
 	min-height: 100vh;
 	min-height: 100dvh;
-	background: var(--ink);
+	/* positioned like body's, so the two grids meet at the column edge */
+	background-color: var(--page-bg);
+	background-image: var(--page-grid);
+	background-size: var(--grid-size);
+	background-position: 50% 0;
 	padding-bottom: 0;
 	transition: padding-bottom 0.35s cubic-bezier(0.2, 0.85, 0.3, 1);
 }
-/* reserves room at the bottom to clear #pageBar, kept in sync with its own
-   slide-in/out (see PageBar.svelte) rather than snapping instantly */
-body.navBarOn .shell {
+.shell.withTopBar {
+	padding-top: var(--topbar-h);
+}
+/* reserves room at the bottom to clear the page bar, kept in sync with its
+   own slide-in/out (see PageBar.svelte) rather than snapping instantly */
+.shell.withBottomBar {
 	padding-bottom: var(--bar-h);
 }
 @media (min-width: 660px) {
-	body {
-		background: var(--c, var(--home));
-	}
-	body.theme-page {
-		background: var(--paper);
-	}
 	.shell {
 		max-width: 800px;
 	}
@@ -133,11 +139,7 @@ body.navBarOn .shell {
    THEMES
    ───────────────────────────────────────────── */
 .masthead {
-	padding: 26px 22px 20px;
-}
-.masthead .eyebrow {
-	color: rgba(255, 255, 255, 0.45);
-	margin-bottom: 9px;
+	padding: 32px 22px 20px;
 }
 .masthead h1 {
 	font-family: var(--geom);
@@ -153,7 +155,6 @@ body.navBarOn .shell {
 	line-height: 1.5;
 	color: rgba(255, 255, 255, 0.5);
 	margin: 12px 0 0;
-	max-width: 32em;
 }
 @keyframes tallyIn {
 	from {
@@ -171,24 +172,23 @@ body.navBarOn .shell {
    ───────────────────────────────────────────── */
 .introPage {
 	position: relative;
-	min-height: 100vh;
-	min-height: 100dvh;
+	min-height: calc(100vh - var(--topbar-h));
+	min-height: calc(100dvh - var(--topbar-h));
 	padding-bottom: 100px;
 }
 .introPage .masthead h1 {
 	max-width: none;
 }
-.introPage .masthead p {
-	max-width: 26em;
-}
 @media (min-width: 660px) {
-	body.groups-page {
-		background: var(--paper);
+	.masthead {
+		padding-top: 44px;
 	}
-}
-@media (min-width: 660px) {
+	.masthead h1 {
+		font-size: 54px;
+		line-height: 1.05;
+	}
 	.masthead p {
-		font-size: 18.5px;
+		font-size: 20.5px;
 	}
 }
 @media (prefers-reduced-motion: reduce) {

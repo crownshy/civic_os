@@ -124,7 +124,6 @@
 	   full-bleed color block.
 	   ───────────────────────────────────────────── */
 	.themePage {
-		background: var(--paper);
 		color: var(--ink);
 		min-height: 100vh;
 		min-height: 100dvh;

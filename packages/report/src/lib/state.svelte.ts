@@ -9,17 +9,19 @@ import type { ReportRecord } from './domain/types';
 export const selection = $state<{ recordId: string | null }>({ recordId: null });
 
 /**
- * The three modals. They are opened from pages that know nothing about each
- * other, so their state lives here rather than being threaded through props.
+ * The modals. They are opened from pages that know nothing about each other,
+ * so their state lives here rather than being threaded through props. Where a
+ * modal pages through something, its position lives inside the object that
+ * goes null on close, so a modal never reopens where it was left.
  */
 export const modals = $state<{
 	statement: { view: readonly ReportRecord[]; index: number } | null;
-	group: string | null;
-	demographics: boolean;
+	group: { key: string; page: number } | null;
+	demographics: { index: number } | null;
 }>({
 	statement: null,
 	group: null,
-	demographics: false
+	demographics: null
 });
 
 export function openStatement(view: readonly ReportRecord[], index: number) {
@@ -42,4 +44,10 @@ export function pageStatement(delta: number) {
 export function closeStatement() {
 	modals.statement = null;
 	selection.recordId = null;
+}
+
+export function closeAllModals() {
+	closeStatement();
+	modals.group = null;
+	modals.demographics = null;
 }

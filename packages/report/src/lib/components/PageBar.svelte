@@ -2,7 +2,8 @@
 	import { navBarStateFor, stepFrom } from '../domain/nav';
 	import { getNavigate } from '../navigation';
 
-	let { step }: { step: string } = $props();
+	/** `shown` is bindable so the column can reserve the bar's height in step with it */
+	let { step, shown = $bindable(false) }: { step: string; shown?: boolean } = $props();
 
 	const navigate = getNavigate();
 	const bar = $derived(navBarStateFor(step));
@@ -12,23 +13,15 @@
 	 * "slides in once, then stays" rather than re-animating on every step
 	 * between bar pages.
 	 */
-	let shown = $state(false);
-
 	$effect(() => {
 		if (!bar) {
 			shown = false;
-			document.body.classList.remove('navBarOn');
 			return;
 		}
 		if (shown) return;
-		const timer = setTimeout(() => {
-			shown = true;
-			document.body.classList.add('navBarOn');
-		}, 500);
+		const timer = setTimeout(() => (shown = true), 500);
 		return () => clearTimeout(timer);
 	});
-
-	$effect(() => () => document.body.classList.remove('navBarOn'));
 
 	const go = (delta: number) => {
 		const next = stepFrom(step, delta);
