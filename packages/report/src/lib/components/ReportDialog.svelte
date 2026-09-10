@@ -13,7 +13,7 @@
 		onpage?: (delta: number) => void;
 		/** extra class on the dialog, so a modal can key its own rules off it */
 		variant?: string;
-		header: Snippet;
+		header?: Snippet;
 		body: Snippet;
 		footer?: Snippet;
 	}
@@ -56,7 +56,7 @@
 			<Dialog.Title class="sr-only">{label}</Dialog.Title>
 			<div class="card">
 				<div class="cardtop">
-					{@render header()}
+					{@render header?.()}
 					<Dialog.Close class="closeb" aria-label="Close">
 						<svg viewBox="0 0 16 16" aria-hidden="true"
 							><path d="M2.5 2.5l11 11M13.5 2.5l-11 11" stroke-linecap="round" /></svg

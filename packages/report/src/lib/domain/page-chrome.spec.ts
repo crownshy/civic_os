@@ -21,6 +21,14 @@ describe('chromeFor', () => {
 		});
 	});
 
+	it('puts the call to action on the theme blue with white top-bar text', () => {
+		expect(chromeFor('cta')).toMatchObject({
+			background: 'var(--theme-blue)',
+			grid: false,
+			topBarText: '#fff'
+		});
+	});
+
 	it('drops the top bar on a single theme page and takes the theme colour as accent', () => {
 		expect(chromeFor('governance', theme)).toEqual({
 			background: 'var(--paper)',
