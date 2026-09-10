@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
+	import { trackEvent } from '@lukulent/svelte-umami';
 	import { modals } from '../state.svelte';
 	import ReportDialog from './ReportDialog.svelte';
 
@@ -23,6 +24,7 @@
 		share.copied = true;
 		clearTimeout(timer);
 		timer = setTimeout(() => (share.copied = false), 1800);
+		trackEvent('share-copy');
 	}
 
 	function close() {

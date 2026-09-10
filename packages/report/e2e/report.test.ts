@@ -20,6 +20,11 @@ async function advanceToNextIntroPage(page: Page) {
 	await page.getByRole('button', { name: 'Next', exact: true }).click();
 }
 
+// the report loads Umami everywhere it runs; test runs should not count as visits
+test.beforeEach(async ({ page }) => {
+	await page.route('https://cloud.umami.is/**', (route) => route.abort());
+});
+
 test('drills down from the report home page to a theme page and opens a statement', async ({
 	page
 }) => {

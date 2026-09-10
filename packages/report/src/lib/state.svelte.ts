@@ -27,14 +27,17 @@ export const modals = $state<{
 	share: null
 });
 
+/** Returns the record now showing, or undefined when nothing opened. */
 export function openStatement(view: readonly ReportRecord[], index: number) {
 	// a card whose record is not in its own page's list arrives as -1; there is
 	// nothing to show, so do not open
 	if (index < 0 || index >= view.length) return;
 	modals.statement = { view, index };
 	selection.recordId = view[index].id;
+	return view[index];
 }
 
+/** Returns the record now showing, or undefined at either end of the list. */
 export function pageStatement(delta: number) {
 	const open = modals.statement;
 	if (!open) return;
@@ -42,6 +45,7 @@ export function pageStatement(delta: number) {
 	if (index < 0 || index >= open.view.length) return;
 	modals.statement = { view: open.view, index };
 	selection.recordId = open.view[index].id;
+	return open.view[index];
 }
 
 export function closeStatement() {
