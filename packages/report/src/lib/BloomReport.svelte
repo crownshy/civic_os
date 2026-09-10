@@ -70,6 +70,7 @@
 	class="shell"
 	class:withTopBar={chrome.topBarText !== null}
 	class:withBottomBar={barShown}
+	class:fitViewport={step === 'demogs'}
 	style:--page-bg={chrome.background}
 	style:--page-grid={grid}
 >

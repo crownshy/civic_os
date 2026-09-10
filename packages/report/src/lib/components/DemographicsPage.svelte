@@ -4,30 +4,18 @@
 
 	const openDemographics = getOpenDemographics();
 
-	let map = $state<ReturnType<typeof CountyMap>>();
+	let statHeight = $state(0);
 </script>
 
 <main class="introPage demogsPage">
-	<CountyMap bind:this={map} />
+	<CountyMap {statHeight} />
 
-	<button
-		class="introNext demogReset"
-		type="button"
-		aria-label="Reset map view"
-		onclick={() => map?.reset()}
-	>
-		<svg viewBox="0 0 22 22" aria-hidden="true"
-			><path
-				d="M11 4v4M11 4a7 7 0 1 1-6.1 3.6M4.9 4.6V8h3.4"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			/></svg
-		>
-	</button>
-
-	<div class="demogStat">
+	<div class="demogStat" bind:offsetHeight={statHeight}>
 		<h1>400+</h1>
-		<p>People across the region participated in this conversation, both online and in person.</p>
+		<p>
+			People across the region participated in this conversation, both through our Open Poll and
+			live conversations.
+		</p>
 		<button class="demogLink" type="button" onclick={openDemographics}
 			>See full demographics…</button
 		>
@@ -35,36 +23,21 @@
 </main>
 
 <style>
+	/* the page never scrolls: it is exactly the viewport below the top bar,
+	   and dragging pans the map instead */
 	.demogsPage {
+		height: calc(100vh - var(--topbar-h));
+		height: calc(100dvh - var(--topbar-h));
+		min-height: 0;
+		padding-bottom: 0;
+		overflow: hidden;
 		color: #fff;
 	}
-	/* .demogMap going position:absolute promotes it into the "positioned"
-	   paint bucket ahead of these still-static siblings by default; without
-	   an explicit stack here they'd paint (and sit) underneath the map instead
-	   of over it as the intended overlay. */
-	.demogsPage .demogStat {
+	/* the map is positioned, which would otherwise paint it over this block;
+	   the gradient grounds the text against the map underneath it */
+	.demogStat {
 		position: relative;
 		z-index: 2;
-	}
-	.demogsPage .introNext {
-		z-index: 2;
-	}
-	/* the reset button borrows .introNext's whole visual shell (circle, shadow,
-	   hover transition) via a second class on the same element; the arrow's
-	   own bottom-right slot is already taken by page navigation, so this sits
-	   at bottom-left instead, both thumb-reachable on mobile. Compound selector
-	   (not a same-specificity bare .demogReset) so this reliably beats the base
-	   .introNext rule regardless of declaration order. */
-	.introNext.demogReset {
-		left: 22px;
-		right: auto;
-		bottom: 26px;
-	}
-	/* the headline stat sits below the map rather than inside .masthead;
-	   the mock centers this block, unlike Title's left-aligned copy. Its own
-	   gradient (solid --home fading to transparent going down) grounds the
-	   text against the map underneath it. */
-	.demogStat {
 		padding: 35px 22px 24px;
 		text-align: center;
 		background: linear-gradient(180deg, var(--home) 0%, transparent 100%);
@@ -83,11 +56,6 @@
 		margin: 8px auto 0;
 		max-width: 26em;
 	}
-	@media (min-width: 660px) {
-		.demogStat p {
-			font-size: 20px;
-		}
-	}
 	.demogLink {
 		display: inline-block;
 		margin-top: 16px;
@@ -104,32 +72,27 @@
 	.demogLink:active {
 		transform: scale(0.96);
 	}
-	/* the "continue to the next intro page" bubble, same position/style on
-	   every intro page. Only the map reset uses it now. */
-	.introNext {
-		position: absolute;
-		right: 22px;
-		bottom: 26px;
-		width: 52px;
-		height: 52px;
-		border-radius: 50%;
-		background: #fff;
-		color: var(--home);
-		display: grid;
-		place-items: center;
-		box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
-		transition: transform 0.2s ease;
-	}
 	@media (hover: hover) {
-		.introNext:hover {
-			transform: scale(1.07);
+		.demogLink:hover {
+			transform: scale(1.04);
 		}
 	}
-	.introNext svg {
-		width: 22px;
-		height: 12px;
-		stroke: currentColor;
-		stroke-width: 2;
-		fill: none;
+	/* squeezed tight on mobile so the map gets the room */
+	@media (max-width: 659px) {
+		.demogStat {
+			padding: 12px 22px 14px;
+		}
+		.demogStat p {
+			line-height: 1.3;
+			margin-top: 3px;
+		}
+		.demogLink {
+			margin-top: 9px;
+		}
+	}
+	@media (min-width: 660px) {
+		.demogStat p {
+			font-size: 20px;
+		}
 	}
 </style>

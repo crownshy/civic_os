@@ -1,39 +1,35 @@
 <script lang="ts">
 	import { geoMercator, geoPath, type ExtendedFeatureCollection } from 'd3-geo';
 	import { select } from 'd3-selection';
-	import 'd3-transition';
-	import { zoom, zoomIdentity, type ZoomBehavior, type ZoomTransform } from 'd3-zoom';
+	import { zoom, zoomIdentity, type ZoomTransform } from 'd3-zoom';
+	import { onMount } from 'svelte';
 
 	import { OREGON_COUNTIES, PARTICIPANT_LOCATIONS } from '../domain/bundled';
 	import {
 		DEMOG_MAX_ZOOM_IN,
-		DEMOG_RESET_DURATION,
 		TRI_COUNTY_FIPS,
 		dotRadius,
+		homeFitCities,
 		homeFitExtent,
 		hoverBox,
+		isMobileWidth,
+		labelModeFor,
+		labelPaintOrder,
 		labelTextX,
-		labelVisibility,
+		miniLabelX,
 		minZoomScale,
 		pillBox,
 		type Box
 	} from '../domain/map-layout';
 
+	/** height of the stat block overlaid at the top, which the home view fits below */
+	let { statHeight }: { statHeight: number } = $props();
+
 	const cities = PARTICIPANT_LOCATIONS.cities;
 	const maxCount = Math.max(...cities.map((c) => c.count));
 	/** Radius never changes with zoom: markers keep a fixed screen size. */
 	const radii = cities.map((city) => dotRadius(city.count, maxCount));
-
-	// d3-geo takes points as [lng, lat], the reverse of these field names' own
-	// reading order (see participant-locations.json's _readme)
-	const cityPoints: ExtendedFeatureCollection = {
-		type: 'FeatureCollection',
-		features: cities.map((c) => ({
-			type: 'Feature',
-			properties: null,
-			geometry: { type: 'Point', coordinates: [c.lng, c.lat] }
-		}))
-	};
+	const paintOrder = labelPaintOrder(cities);
 
 	// the bundled GeoJSON is asserted, not validated, same boundary cast as
 	// domain/bundled.ts makes for the rest of the data
@@ -44,9 +40,11 @@
 
 	let frame = $state<HTMLDivElement>();
 	let svg = $state<SVGSVGElement>();
-	let size = $state({ width: 0, height: 0 });
+	let size = $state({ width: 0, height: 0, barHeight: 0 });
 	let transform = $state<ZoomTransform>(zoomIdentity);
 	let hovered = $state<string | null>(null);
+
+	const mobile = $derived(isMobileWidth(size.width));
 
 	/**
 	 * Fitting the projection is a mutation, so everything read off it is derived
@@ -54,9 +52,19 @@
 	 * bounds the zoom's limits come from.
 	 */
 	const fitted = $derived.by(() => {
-		const { width, height } = size;
+		const { width, height, barHeight } = size;
 		if (width <= 0 || height <= 0) return null;
-		projection.fitExtent(homeFitExtent(width, height), cityPoints);
+		// d3-geo takes points as [lng, lat], the reverse of these field names' own
+		// reading order (see participant-locations.json's _readme)
+		const points: ExtendedFeatureCollection = {
+			type: 'FeatureCollection',
+			features: homeFitCities(cities, mobile).map((c) => ({
+				type: 'Feature',
+				properties: null,
+				geometry: { type: 'Point', coordinates: [c.lng, c.lat] }
+			}))
+		};
+		projection.fitExtent(homeFitExtent({ width, height, statHeight, barHeight }), points);
 		return {
 			counties: counties.features.map((f) => path(f) ?? ''),
 			projected: cities.map(
@@ -66,7 +74,9 @@
 		};
 	});
 
-	const tiers = $derived(labelVisibility(transform.k));
+	const modes = $derived(
+		cities.map((city) => labelModeFor(transform.k, { mobile, major: Boolean(city.major) }))
+	);
 
 	const at = (i: number) => {
 		const [x, y] = transform.apply(fitted!.projected[i]);
@@ -80,20 +90,27 @@
 	let pills = $state<(Box & { rx: number })[]>([]);
 	let tooltips = $state<(Box & { rx: number })[]>([]);
 
+	// the web font swaps in after first paint, and text measured in the
+	// fallback face would size every pill wrong
+	let fontsLoaded = $state(false);
+	onMount(() => {
+		Promise.allSettled(
+			['400 16px Geomanist', '600 16px Geomanist'].map((font) => document.fonts.load(font))
+		).then(() => (fontsLoaded = true));
+	});
+
 	/**
 	 * getBBox() reads the text's own rendered geometry, independent of the svg's
 	 * viewBox or zoom transform, so this is safe before the projection has ever
-	 * been fitted. Measured once: the text and its offset never change.
+	 * been fitted.
 	 */
 	$effect(() => {
-		if (pills.length || !labelText.length || labelText.some((t) => !t)) return;
-		pills = labelText.map((t) => pillBox(t.getBBox()));
+		if (!fontsLoaded || labelText.length < cities.length || labelText.some((t) => !t)) return;
+		pills = labelText.map((t, i) => pillBox(t.getBBox(), radii[i]));
 		tooltips = hoverName.map((n, i) => hoverBox(n.getBBox(), hoverCount[i].getBBox()));
 	});
 
 	// --- pan/zoom -------------------------------------------------------------
-	let behaviour: ZoomBehavior<SVGSVGElement, unknown> | null = null;
-
 	$effect(() => {
 		const el = svg;
 		const box = fitted;
@@ -111,12 +128,10 @@
 		const sel = select<SVGSVGElement, unknown>(el);
 		sel.call(z);
 		sel.on('dblclick.zoom', null); // double-tap/dblclick-to-zoom wasn't asked for
-		sel.call(z.transform, zoomIdentity); // a resize always returns to the home view
-		behaviour = z;
+		sel.call(z.transform, zoomIdentity); // a refit always returns to the home view
 
 		return () => {
 			sel.on('.zoom', null);
-			behaviour = null;
 		};
 	});
 
@@ -131,7 +146,10 @@
 			clearTimeout(timer);
 			timer = setTimeout(() => {
 				const rect = el.getBoundingClientRect();
-				size = { width: rect.width, height: rect.height };
+				// the bar's own reveal is delayed, so its height comes from the token
+				const barHeight =
+					parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bar-h')) || 70;
+				size = { width: rect.width, height: rect.height, barHeight };
 			}, 220);
 		});
 		observer.observe(el);
@@ -140,17 +158,6 @@
 			observer.disconnect();
 		};
 	});
-
-	export function reset() {
-		hovered = null;
-		if (!svg || !behaviour) return;
-		const sel = select<SVGSVGElement, unknown>(svg);
-		const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-		(reduced ? sel : sel.transition().duration(DEMOG_RESET_DURATION)).call(
-			behaviour.transform,
-			zoomIdentity
-		);
-	}
 
 	/** Only ever one city's tooltip at a time; null clears them all. */
 	const show = (name: string | null) => (hovered = name);
@@ -180,16 +187,11 @@
 			label paints above every dot, and every tooltip above everything, no
 			matter which city comes first in the data.
 		-->
-		<g
-			class="demogMarkers"
-			class:labelsHidden={tiers.labelsHidden}
-			class:minorLabelsShown={tiers.minorLabelsShown}
-		>
+		<g class="demogMarkers">
 			<g class="demogDotsLayer">
 				{#each cities as city, i (city.name)}
 					<g
 						class="demogCity"
-						class:minor={!city.major}
 						class:hovered={hovered === city.name}
 						transform={fitted ? at(i) : undefined}
 						onpointerenter={() => show(city.name)}
@@ -206,10 +208,10 @@
 			</g>
 
 			<g class="demogLabelsLayer">
-				{#each cities as city, i (city.name)}
+				{#each paintOrder as i (cities[i].name)}
+					{@const city = cities[i]}
 					<g
-						class="demogCity"
-						class:minor={!city.major}
+						class="demogCity {modes[i]}"
 						class:hovered={hovered === city.name}
 						transform={fitted ? at(i) : undefined}
 						onpointerenter={() => show(city.name)}
@@ -232,6 +234,7 @@
 						<text class="demogDotLabel" x={labelTextX(radii[i])} y="4" bind:this={labelText[i]}
 							>{city.name}</text
 						>
+						<text class="demogMiniLabel" x={miniLabelX(radii[i])}>{city.name}</text>
 					</g>
 				{/each}
 			</g>
@@ -240,7 +243,6 @@
 				{#each cities as city, i (city.name)}
 					<g
 						class="demogCity"
-						class:minor={!city.major}
 						class:hovered={hovered === city.name}
 						transform={fitted ? at(i) : undefined}
 						onpointerenter={() => show(city.name)}
@@ -273,15 +275,33 @@
 </div>
 
 <style>
+	/* Full-bleed behind the whole page. overflow:hidden is cheap defensive
+	   insurance on top of d3-zoom's own translateExtent clamp. Dragging pans
+	   the map, never the page. */
+	.demogMap {
+		position: absolute;
+		inset: 0;
+		overflow: hidden;
+		z-index: 1;
+		cursor: move;
+		touch-action: none;
+	}
 	.demogMap > svg {
 		display: block;
 		width: 100%;
 		height: 100%;
+		touch-action: none;
 	}
-	/* county fill/stroke: vector-effect:non-scaling-stroke keeps the boundary
-	   lines a constant screen width across zoom levels, the CSS-only half of
-	   the "stays legible at any zoom" requirement (the other half, keeping
-	   city marker/label size constant, is handled in JS; see demogZoomed()) */
+	/* fixed so the map fills the whole window below the top bar, not just the
+	   column; the stat block stays centred in the column on top of it */
+	@media (min-width: 660px) {
+		.demogMap {
+			position: fixed;
+			inset: var(--topbar-h) 0 0;
+		}
+	}
+	/* vector-effect:non-scaling-stroke keeps the boundary lines a constant
+	   screen width across zoom levels */
 	.demogCounty {
 		fill: none;
 		stroke: rgba(255, 255, 255, 0.35);
@@ -300,41 +320,54 @@
 	}
 	.demogDot {
 		fill: var(--gold);
-		fill-opacity: 0.9;
 	}
-	/* white pill behind each city name, tucked slightly under the dot's edge
-	   (see DEMOG_LABEL_OVERLAP in domain/map-layout.ts) so the two visibly overlap */
 	.demogLabelBg {
-		fill: #fff;
+		fill: var(--home);
 		pointer-events: none;
 	}
 	.demogDotLabel {
 		font-family: var(--geom);
 		font-weight: 600;
 		font-size: 16px;
-		fill: var(--home);
+		fill: #fff;
 		pointer-events: none;
 	}
-	/* major-city labels fade out once you've zoomed out past DEMOG_LABEL_MIN_ZOOM,
-	   so a wide view reads as dots-in-context rather than a wall of pills. The 7
-	   smaller places (.minor) start hidden and only appear once you've zoomed in
-	   past DEMOG_MINOR_LABEL_MIN_ZOOM, kept simple for now/deliberately equal in
-	   every other way (size, color) rather than visually downweighting them. */
+	.demogMiniLabel {
+		font-family: var(--mono);
+		font-weight: 500;
+		font-size: 9px;
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+		fill: #fff;
+		fill-opacity: 0.6;
+		dominant-baseline: middle;
+		pointer-events: none;
+	}
+	/* which of the two labels shows comes from labelModeFor in
+	   domain/map-layout.ts, as a class on each place */
 	.demogLabelBg,
-	.demogDotLabel {
+	.demogDotLabel,
+	.demogMiniLabel {
+		opacity: 0;
 		transition: opacity 0.2s ease;
 	}
-	.demogMarkers.labelsHidden .demogCity:not(.minor) .demogLabelBg,
-	.demogMarkers.labelsHidden .demogCity:not(.minor) .demogDotLabel {
-		opacity: 0;
-	}
-	.demogCity.minor .demogLabelBg,
-	.demogCity.minor .demogDotLabel {
-		opacity: 0;
-	}
-	.demogMarkers.minorLabelsShown .demogCity.minor .demogLabelBg,
-	.demogMarkers.minorLabelsShown .demogCity.minor .demogDotLabel {
+	.demogCity.pill .demogLabelBg,
+	.demogCity.pill .demogDotLabel,
+	.demogCity.mini .demogMiniLabel {
 		opacity: 1;
+	}
+	/* hovering a visible pill opens the tooltip; a hidden one must not catch
+	   the pointer meant for a neighbouring place */
+	.demogCity.pill .demogLabelBg {
+		pointer-events: auto;
+	}
+	/* The tooltip sits at the label's anchor, in its own layer so it paints
+	   above every dot and label. pointer-events:none while hidden, so an
+	   invisible tooltip never blocks a nearby city; auto once shown, so moving
+	   onto the box itself keeps it open. */
+	.demogHoverBg {
+		fill: var(--home);
+		pointer-events: none;
 	}
 	.demogCity.hovered .demogHoverBg {
 		pointer-events: auto;
@@ -364,32 +397,5 @@
 	.demogCity.hovered .demogHoverName,
 	.demogCity.hovered .demogHoverCount {
 		opacity: 1;
-	}
-	/* darker at the very top, settling into the flat --agree green (same token
-	   .who.consensus's pill already uses; "consensus" and "agree" are the
-	   same color throughout the report) by ~20% down the page */
-
-	/* the county map, a sibling of .masthead, not inside it. Full-bleed behind
-	   the whole page: real Oregon county geometry (data/oregon-counties.json)
-	   rendered and panned/zoomed by d3-geo and d3-zoom. overflow:hidden is
-	   cheap defensive insurance on top of d3-zoom's own translateExtent clamp. */
-	.demogMap {
-		position: absolute;
-		inset: 0;
-		overflow: hidden;
-		z-index: 1;
-	}
-	/* hover/tap info tooltip: sits in the same spot as the plain pill label
-	   (same overlap anchor, see DEMOG_LABEL_OVERLAP), just a taller two-line
-	   dark card instead of a one-line white pill. Lives in its own layer
-	   (.demogHoverLayer, painted after dots and labels) so it
-	   always paints above every dot/label, on any city, at any zoom. */
-	/* pointer-events:none while hidden, so an invisible tooltip never blocks a
-	   nearby city's dot/label; auto once .hovered, so drifting the mouse onto
-	   the now-visible box itself keeps it open instead of immediately flickering
-	   away the instant it stops being over the dot/label that triggered it */
-	.demogHoverBg {
-		fill: var(--home);
-		pointer-events: none;
 	}
 </style>
