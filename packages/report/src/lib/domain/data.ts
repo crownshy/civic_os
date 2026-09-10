@@ -6,15 +6,7 @@
  * keeping the whole file testable with small fixtures.
  */
 
-import type {
-	Group,
-	GroupWithTally,
-	Insight,
-	ReportRecord,
-	Theme,
-	ThemeView,
-	Vote
-} from './types';
+import type { Group, GroupWithTally, Insight, ReportRecord, Theme, ThemeView, Vote } from './types';
 
 /**
  * A theme *is* the records carrying any of its tags: membership is derived,
@@ -33,15 +25,25 @@ export function quotesForTheme(records: readonly ReportRecord[], theme: Theme): 
 	return recordsForTheme(records, theme).filter((record) => record.kind === 'quote');
 }
 
+/** A group that cast fewer votes than this on a statement gets its readout flagged. */
+export const MIN_GROUP_VOTES = 8;
+
+/** A statement is low-data when any one group's readout rests on too few votes. */
+export function isLowData(vote: Vote): boolean {
+	return Object.values(vote.groups).some((tally) => tally.n < MIN_GROUP_VOTES);
+}
+
 /**
- * Display order for a theme's statements: broadest agreement first, and among
- * equals the one more people voted on. Records without a vote sort last rather
- * than throwing; quotes never reach here, but a malformed poll record might.
+ * Display order for a theme's statements: low-data statements after all the
+ * others, then broadest agreement first, and among equals the one more people
+ * voted on. Records without a vote sort last rather than throwing; quotes never
+ * reach here, but a malformed poll record might.
  */
 export function byStatementRank(a: ReportRecord, b: ReportRecord): number {
+	const lowData = (r: ReportRecord) => (r.vote && isLowData(r.vote) ? 1 : 0);
 	const minAgree = (r: ReportRecord) => r.vote?.minAgree ?? -1;
 	const total = (r: ReportRecord) => r.vote?.total ?? -1;
-	return minAgree(b) - minAgree(a) || total(b) - total(a);
+	return lowData(a) - lowData(b) || minAgree(b) - minAgree(a) || total(b) - total(a);
 }
 
 export function indexById(records: readonly ReportRecord[]): Map<string, ReportRecord> {

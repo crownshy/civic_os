@@ -7,19 +7,23 @@
 	// the domain names an icon; the asset URL is a rendering concern
 	const ICONS = { consensus: consensusIcon, difference: differenceIcon };
 
-	let { vote }: { vote: Vote } = $props();
+	interface Props {
+		vote: Vote;
+		/** on a card the pill spans the card with its label centred and no icon */
+		variant: 'card' | 'header';
+	}
+
+	let { vote, variant }: Props = $props();
 
 	const verdict = $derived(verdictFor(vote));
 </script>
 
-<!--
-	.who and its state modifiers are still global in app.css: the statement
-	modal renders the same badge and has not been converted yet.
--->
-<div class="who {verdict.kind}">
-	<span class="av">
-		{#if verdict.icon}<img src={ICONS[verdict.icon]} alt="" />{/if}
-	</span>
+<div class="who {verdict.kind} {variant}">
+	{#if variant === 'header'}
+		<span class="av">
+			{#if verdict.icon}<img src={ICONS[verdict.icon]} alt="" />{/if}
+		</span>
+	{/if}
 	<span class="txt">{verdict.label}</span>
 </div>
 
@@ -29,12 +33,19 @@
 	.who {
 		display: inline-flex;
 		align-items: center;
-		gap: 8px;
+		gap: 9px;
 		color: #fff;
 		border-radius: 999px;
-		padding: 5px 13px 5px 5px;
-		min-height: 30px;
+		padding: 5px 15px 5px 5px;
+		min-height: 34px;
 		max-width: 82%;
+	}
+	.who.card {
+		display: flex;
+		width: 100%;
+		max-width: none;
+		justify-content: center;
+		padding-inline: 14px;
 	}
 	.who.consensus,
 	.who.consensus-against {
@@ -46,28 +57,57 @@
 	.who.neutral {
 		background: #484848;
 	}
-	.who .av {
-		width: 21px;
-		height: 21px;
+	.av {
+		width: 24px;
+		height: 24px;
 		border-radius: 50%;
 		background: #fff;
 		flex: none;
 		display: grid;
 		place-items: center;
 	}
-	.who .av img {
-		width: 14px;
-		height: 14px;
+	.av img {
+		width: 16px;
+		height: 16px;
 		object-fit: contain;
 		display: block;
 	}
-	.who .txt {
+	.txt {
 		font-family: var(--mono);
-		font-size: 10.5px;
+		font-size: 12px;
+		font-weight: 700;
 		letter-spacing: 0.09em;
 		text-transform: uppercase;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+	}
+	.who.header .txt {
+		font-size: 13px;
+	}
+	@media (min-width: 660px) {
+		.who {
+			gap: 10px;
+			padding-block: 6px;
+			padding-left: 6px;
+			min-height: 38px;
+		}
+		.who.header {
+			padding-right: 17px;
+		}
+		.av {
+			width: 27px;
+			height: 27px;
+		}
+		.av img {
+			width: 18px;
+			height: 18px;
+		}
+		.txt {
+			font-size: 13px;
+		}
+		.who.header .txt {
+			font-size: 15px;
+		}
 	}
 </style>

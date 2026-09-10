@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { GROUPS } from '../domain/bundled';
 	import { titleCaseChip } from '../domain/copy';
-	import { groupsOf } from '../domain/data';
+	import { MIN_GROUP_VOTES, groupsOf } from '../domain/data';
+	import { tierColorFor } from '../domain/verdict';
 	import { closeStatement, modals, pageStatement, selection } from '../state.svelte';
+	import LowDataFlag from './LowDataFlag.svelte';
 	import ReportDialog from './ReportDialog.svelte';
 	import VerdictPill from './VerdictPill.svelte';
 	import VoteBars from './VoteBars.svelte';
@@ -68,13 +70,6 @@
 		return stop;
 	});
 
-	// keys the dark reading treatment app.css puts on the page behind the modal
-	$effect(() => {
-		const open = Boolean(modals.statement);
-		document.body.classList.toggle('reading', open);
-		return () => document.body.classList.remove('reading');
-	});
-
 	/**
 	 * Focus goes back to the card you came from, so a keyboard user lands where
 	 * they were rather than at the top of the document. A record can be marked
@@ -86,11 +81,9 @@
 		closeStatement();
 		if (!id) return;
 		queueMicrotask(() => {
-			const card = [
-				...document.querySelectorAll<HTMLElement>(
-					`.icard[data-rid="${id}"], .lcard[data-rid="${id}"]`
-				)
-			].find((n) => n.offsetParent !== null);
+			const card = [...document.querySelectorAll<HTMLElement>(`.icard[data-rid="${id}"]`)].find(
+				(n) => n.offsetParent !== null
+			);
 			card?.focus({ preventScroll: true });
 		});
 	}
@@ -99,20 +92,21 @@
 <ReportDialog
 	open={Boolean(modals.statement)}
 	label="Statement detail"
+	variant="statementDialog"
 	onclose={close}
 	onpage={pageStatement}
 >
 	{#snippet header()}
 		<!-- quotes carry no vote data, so they get no verdict badge -->
 		{#if record?.vote}
-			<VerdictPill vote={record.vote} />
+			<VerdictPill vote={record.vote} variant="header" />
 		{/if}
 	{/snippet}
 
 	{#snippet body()}
 		<div class="cardbody" bind:this={scroller}>
 			<div class="quotewrap" bind:this={quote}>
-				<blockquote style="--qs:30px">“{record?.text ?? ''}”</blockquote>
+				<blockquote>“{record?.text ?? ''}”</blockquote>
 			</div>
 			<div class="meta">
 				<section>
@@ -124,31 +118,22 @@
 				</section>
 
 				{#if record?.vote}
-					<section>
+					<section class="poll">
 						<h4>Open poll responses · {record.vote.total} votes</h4>
 						{#each rows as row (row.key)}
 							<div class="grow">
 								<div class="top">
 									<span>{row.label}</span>
-									<b>{row.pct}% agree</b>
+									<b style="color:{tierColorFor(row.pct)}"
+										>{row.pct}% agree{#if row.n < MIN_GROUP_VOTES}<LowDataFlag
+												votes={row.n}
+												focusable
+											/>{/if}</b
+									>
 								</div>
 								<VoteBars tally={row} />
 							</div>
 						{/each}
-						<div class="barkey">
-							<span><i class="d"></i>Disagree</span>
-							<span><i class="p"></i>Pass</span>
-							<span><i class="a"></i>Agree</span>
-						</div>
-					</section>
-				{/if}
-
-				{#if record?.tags.length}
-					<section>
-						<h4>Tags</h4>
-						<div class="tags">
-							{#each record.tags as tag (tag)}<i>{tag}</i>{/each}
-						</div>
 					</section>
 				{/if}
 			</div>
@@ -187,3 +172,108 @@
 		</div>
 	{/snippet}
 </ReportDialog>
+
+<style>
+	/* Below the quote everything is a shade of grey; the only colour is each
+	   group's agree%, tiered by value like the statement card's. */
+	:global(.statementDialog .cardtop) {
+		padding: 14px 18px 14px 16px;
+	}
+	:global(.statementDialog .cardfoot) {
+		padding: 12px 18px;
+	}
+	.quotewrap {
+		padding: 28px 24px;
+	}
+	.quotewrap blockquote {
+		font-size: 28px;
+	}
+	.meta {
+		padding: 22px 24px 28px;
+		border-top-color: color-mix(in srgb, var(--ink) 12%, transparent);
+	}
+	.meta h4 {
+		font-size: 14.5px;
+		color: color-mix(in srgb, var(--ink) 52%, transparent);
+	}
+	.meta section + section {
+		margin-top: 16px;
+		padding-top: 22px;
+		border-top: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+	}
+	.poll h4 {
+		margin-bottom: 14px;
+	}
+	.src {
+		font-size: 16.5px;
+		font-weight: 400;
+		color: color-mix(in srgb, var(--ink) 82%, transparent);
+	}
+	.src small {
+		font-size: 14.5px;
+		color: color-mix(in srgb, var(--ink) 52%, transparent);
+	}
+	.grow {
+		margin-bottom: 16px;
+	}
+	.grow .top {
+		font-size: 14.5px;
+		color: color-mix(in srgb, var(--ink) 75%, transparent);
+		margin-bottom: 9px;
+	}
+	.grow .top span {
+		text-transform: none;
+		letter-spacing: 0.01em;
+	}
+	.grow .top b {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		font-size: 14.5px;
+		font-weight: 700;
+		letter-spacing: 0;
+	}
+	.grow :global(.bar) {
+		height: 6px;
+	}
+	@media (min-width: 660px) {
+		:global(.statementDialog .card) {
+			max-width: 620px;
+		}
+		:global(.statementDialog .cardtop) {
+			padding: 18px 28px 18px 26px;
+		}
+		:global(.statementDialog .cardfoot) {
+			padding: 15px 28px;
+		}
+		.quotewrap {
+			padding: 40px 40px 34px;
+		}
+		.quotewrap blockquote {
+			font-size: 33px;
+		}
+		.meta {
+			padding: 30px 40px 40px;
+		}
+		.meta h4 {
+			font-size: 18px;
+		}
+		.src {
+			font-size: 19.5px;
+		}
+		.src small,
+		.grow .top,
+		.grow .top b {
+			font-size: 18px;
+		}
+		.grow .top {
+			margin-bottom: 11px;
+		}
+		.grow {
+			margin-bottom: 20px;
+		}
+		.grow :global(.bar) {
+			height: 7px;
+		}
+	}
+</style>
