@@ -120,6 +120,10 @@ button {
 .shell.withBottomBar {
 	padding-bottom: var(--bar-h);
 }
+/* a page sized to the viewport (the map) already sits under the bar */
+.shell.fitViewport {
+	padding-bottom: 0;
+}
 @media (min-width: 660px) {
 	.shell {
 		max-width: 800px;
