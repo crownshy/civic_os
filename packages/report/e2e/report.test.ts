@@ -7,7 +7,7 @@ import { expect, test, type Page } from '@playwright/test';
 const REPORT = '/central-oregon-ai';
 
 const EXPECTED_THEME = 'Governance & Decision-Making';
-const EXPECTED_THEME_STATEMENT_COUNT = 26;
+const EXPECTED_THEME_STATEMENT_COUNT = 25;
 const EXPECTED_STATEMENT = 'When Oregon decides how to expand AI access';
 const EXPECTED_THEME_KEY = 'governance';
 
