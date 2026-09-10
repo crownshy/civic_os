@@ -28,6 +28,7 @@ const STEP_CHROME = {
 		topBarText: '#fff',
 		accent: 'var(--agree)'
 	},
+	cta: { background: 'var(--theme-blue)', grid: false, topBarText: '#fff', accent: 'var(--home)' },
 	themes: { ...PAPER, topBarText: 'var(--theme-blue)', accent: 'var(--home)' }
 } satisfies Record<StepKey, PageChrome>;
 

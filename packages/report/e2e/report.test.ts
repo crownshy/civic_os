@@ -11,9 +11,13 @@ const EXPECTED_THEME_STATEMENT_COUNT = 25;
 const EXPECTED_STATEMENT = 'When Oregon decides how to expand AI access';
 const EXPECTED_THEME_KEY = 'governance';
 
-/** Walk the intro sequence via the page bar's NEXT, which is how a reader advances. */
+/**
+ * Walk the intro sequence via the page bar's Next, which is how a reader
+ * advances. Exact, because the group and statement modals page with their
+ * own "Next" buttons.
+ */
 async function advanceToNextIntroPage(page: Page) {
-	await page.getByRole('button', { name: 'NEXT' }).click();
+	await page.getByRole('button', { name: 'Next', exact: true }).click();
 }
 
 test('drills down from the report home page to a theme page and opens a statement', async ({
@@ -55,6 +59,10 @@ test('drills down from the report home page to a theme page and opens a statemen
 	await expect(
 		page.getByRole('heading', { name: /we found a lot of common ground/i })
 	).toBeVisible();
+
+	// Call to Action
+	await advanceToNextIntroPage(page);
+	await expect(page.getByRole('heading', { name: /Now is the time to act/i })).toBeVisible();
 
 	// Theme Grid
 	await advanceToNextIntroPage(page);
@@ -111,6 +119,23 @@ test('a consensus card opens the statement modal', async ({ page }) => {
 	await expect(statement).toBeHidden();
 });
 
+test('the call to action shares a link to the report', async ({ page }) => {
+	await page.goto(`${REPORT}/cta`);
+	await page.getByRole('button', { name: /Share this with a friend/i }).click();
+
+	const share = page.getByRole('dialog', { name: 'Share this report' });
+	await expect(share).toBeVisible();
+	await expect(share.getByRole('textbox', { name: 'Report URL' })).toHaveValue(
+		new RegExp(`${REPORT}$`)
+	);
+
+	await share.getByRole('button', { name: 'Copy Link' }).click();
+	await expect(share.getByRole('button', { name: 'Copied!' })).toBeVisible();
+
+	await page.keyboard.press('Escape');
+	await expect(share).toBeHidden();
+});
+
 test('the root redirects to the main site', async ({ request }) => {
 	// maxRedirects:0 so the assertion is about our response, and so the suite
 	// never reaches out to bloom-project.org
@@ -143,6 +168,9 @@ test('each step has its own URL, and a deep link lands on it cold', async ({ pag
 
 	await advanceToNextIntroPage(page);
 	await expect(page).toHaveURL(new RegExp(`${REPORT}/consensus$`));
+
+	await advanceToNextIntroPage(page);
+	await expect(page).toHaveURL(new RegExp(`${REPORT}/cta$`));
 
 	await advanceToNextIntroPage(page);
 	await expect(page).toHaveURL(new RegExp(`${REPORT}/themes$`));

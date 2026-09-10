@@ -3,11 +3,12 @@
 	import type { Snippet } from 'svelte';
 	import { THEME_BY_KEY } from './domain/bundled';
 	import { chromeFor } from './domain/page-chrome';
-	import { setOpenDemographics, setOpenGroup, setOpenStatement } from './navigation';
+	import { setOpenDemographics, setOpenGroup, setOpenShare, setOpenStatement } from './navigation';
 	import { closeAllModals, modals, openStatement as open } from './state.svelte';
 	import DemographicsModal from './components/DemographicsModal.svelte';
 	import GroupModal from './components/GroupModal.svelte';
 	import PageBar from './components/PageBar.svelte';
+	import ShareModal from './components/ShareModal.svelte';
 	import StatementModal from './components/StatementModal.svelte';
 	import TopBar from './components/TopBar.svelte';
 
@@ -23,6 +24,7 @@
 	setOpenStatement((view, index) => open(view as never, index));
 	setOpenGroup((key) => (modals.group = { key, page: 0 }));
 	setOpenDemographics(() => (modals.demographics = { index: 0 }));
+	setOpenShare(() => (modals.share = { copied: false }));
 
 	onNavigate(closeAllModals);
 
@@ -81,3 +83,4 @@
 <StatementModal />
 <GroupModal />
 <DemographicsModal />
+<ShareModal />

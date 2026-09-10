@@ -52,8 +52,13 @@
 				/></svg
 			>
 		</button>
-		<button class="pageBarNext" type="button" disabled={bar?.atEnd} onclick={() => go(1)}>
-			NEXT
+		<button
+			class="pageBarNext"
+			type="button"
+			aria-label="Next"
+			disabled={bar?.atEnd}
+			onclick={() => go(1)}
+		>
 			<svg viewBox="0 0 26 14" aria-hidden="true"
 				><path
 					d="M1 7h23.4M18.6 1.4L24.8 7l-6.2 5.6"
@@ -66,14 +71,10 @@
 </nav>
 
 <style>
-	/* ─────────────────────────────────────────────
-	   TOP PAGE BAR, shared across demogs/groups/consensus/themes (see
-	   domain/nav.ts). Column-width-matched to .shell
-	   rather than full-viewport, so it reads as part of the same one-column
-	   layout on wide viewports instead of a separate full-bleed strip.
-	   Hidden state is off-screen via transform, not display:none, so both the
-	   entrance (delayed, see JS) and the exit (immediate) can transition;
-	   .shown is the only thing toggling it either direction. ───────────────*/
+	/* Column-width-matched to .shell rather than full-viewport, so it reads as
+	   part of the same one-column layout on wide viewports. Hidden state is
+	   off-screen via transform, not display:none, so both the entrance
+	   (delayed, see above) and the exit (immediate) can transition. */
 	.pageBar {
 		position: fixed;
 		bottom: 0;
@@ -86,12 +87,17 @@
 		transition: transform 0.35s cubic-bezier(0.2, 0.85, 0.3, 1);
 		background: var(--bar-blue);
 		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 0 18px;
+		align-items: stretch;
+		padding-left: 18px;
+		/* overflow clips the flush-right buttons into the rounded corner */
+		border-radius: 16px 16px 0 0;
+		overflow: hidden;
 	}
 	.pageBar.shown {
 		transform: translate(-50%, 0);
+	}
+	.pageBar button:focus-visible {
+		outline-offset: -4px;
 	}
 	@media (min-width: 660px) {
 		.pageBar {
@@ -99,8 +105,7 @@
 		}
 	}
 	/* track (faint, full width) + fill (solid, X/Y of the way across); the
-	   track alone reads as a subtle top divider even at step 1, same job the
-	   plain border it replaced was doing */
+	   track alone reads as a subtle top divider even at step 1 */
 	.pageBarProgress {
 		position: absolute;
 		top: 0;
@@ -116,15 +121,17 @@
 		transition: width 0.3s ease;
 	}
 	.pageBarName {
+		flex: 1;
+		min-width: 0;
+		align-self: center;
 		font-family: var(--geom);
 		font-weight: 600;
 		color: #fff;
-		font-size: 17px;
+		font-size: 19px;
 		letter-spacing: -0.01em;
 		display: flex;
 		align-items: baseline;
 		gap: 8px;
-		min-width: 0;
 	}
 	.pageBarStep {
 		opacity: 0.6;
@@ -138,63 +145,60 @@
 	.pageBarNav {
 		flex: none;
 		display: flex;
-		align-items: center;
-		gap: 10px;
+		align-items: stretch;
 	}
-	.pageBarBack {
-		width: 38px;
-		height: 38px;
-		border-radius: 50%;
-		background: rgba(255, 255, 255, 0.16);
-		color: #fff;
-		display: grid;
-		place-items: center;
-		transition: background 0.2s ease;
-	}
-	@media (hover: hover) {
-		.pageBarBack:hover {
-			background: rgba(255, 255, 255, 0.26);
-		}
-	}
-	.pageBarBack svg {
-		width: 16px;
-		height: 9px;
-		stroke: currentColor;
-		stroke-width: 2;
-		fill: none;
-	}
+	.pageBarBack,
 	.pageBarNext {
+		width: var(--bar-h);
 		display: flex;
 		align-items: center;
-		gap: 7px;
-		background: var(--bar-pink);
+		justify-content: center;
 		color: #fff;
-		padding: 10px 18px;
-		border-radius: 999px;
-		font-family: var(--mono);
-		font-size: 11.5px;
-		font-weight: 600;
-		letter-spacing: 0.08em;
-		transition: opacity 0.2s ease;
+		transition: background 0.2s ease;
+	}
+	.pageBarBack {
+		background: rgba(255, 255, 255, 0.12);
+	}
+	.pageBarNext {
+		background: var(--bar-pink);
 	}
 	.pageBarNext[disabled] {
 		opacity: 0.35;
 		pointer-events: none;
 	}
+	.pageBarBack svg,
 	.pageBarNext svg {
-		width: 15px;
-		height: 9px;
 		stroke: currentColor;
-		stroke-width: 2;
+		stroke-width: 2.6;
 		fill: none;
+	}
+	.pageBarBack svg {
+		width: 25px;
+		height: 14px;
+	}
+	.pageBarNext svg {
+		width: 23px;
+		height: 13px;
+	}
+	@media (hover: hover) {
+		.pageBarBack:hover {
+			background: rgba(255, 255, 255, 0.24);
+		}
+		.pageBarNext:hover {
+			background: color-mix(in srgb, var(--bar-pink) 82%, #000);
+		}
 	}
 	@media (min-width: 660px) {
 		.pageBarName {
-			font-size: 22px;
+			font-size: 24px;
 		}
-		.pageBarNext {
-			font-size: 13px;
-			padding: 12px 22px;
+		.pageBarBack svg {
+			width: 29px;
+			height: 16px;
+		}
+		.pageBarNext svg {
+			width: 27px;
+			height: 15px;
 		}
 	}
 </style>

@@ -18,10 +18,13 @@ export const modals = $state<{
 	statement: { view: readonly ReportRecord[]; index: number } | null;
 	group: { key: string; page: number } | null;
 	demographics: { index: number } | null;
+	/** `copied` flips the button to "Copied!" for a moment */
+	share: { copied: boolean } | null;
 }>({
 	statement: null,
 	group: null,
-	demographics: null
+	demographics: null,
+	share: null
 });
 
 export function openStatement(view: readonly ReportRecord[], index: number) {
@@ -50,4 +53,5 @@ export function closeAllModals() {
 	closeStatement();
 	modals.group = null;
 	modals.demographics = null;
+	modals.share = null;
 }

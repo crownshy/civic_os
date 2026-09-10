@@ -58,3 +58,16 @@ export function setOpenDemographics(open: OpenDemographics) {
 export function getOpenDemographics(): OpenDemographics {
 	return getContext<OpenDemographics>(OPEN_DEMOGRAPHICS);
 }
+
+/** Opens the share-this-report modal. */
+export type OpenShare = () => void;
+
+const OPEN_SHARE = Symbol('bloom-report:openShare');
+
+export function setOpenShare(open: OpenShare) {
+	setContext(OPEN_SHARE, open);
+}
+
+export function getOpenShare(): OpenShare {
+	return getContext<OpenShare>(OPEN_SHARE);
+}
