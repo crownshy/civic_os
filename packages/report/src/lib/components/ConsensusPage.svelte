@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { CONSENSUS_RECORDS } from '../domain/bundled';
 	import { getOpenStatement } from '../navigation';
-	import ConsensusCard from './ConsensusCard.svelte';
+	import StatementCard from './StatementCard.svelte';
 
 	const openStatement = getOpenStatement();
 </script>
@@ -14,9 +14,9 @@
 			community involvement in AI-related decision-making.
 		</p>
 	</div>
-	<div class="lane listView">
+	<div class="cards">
 		{#each CONSENSUS_RECORDS as record, index (record.id)}
-			<ConsensusCard {record} onopen={() => openStatement(CONSENSUS_RECORDS, index)} />
+			<StatementCard {record} onopen={() => openStatement(CONSENSUS_RECORDS, index)} />
 		{/each}
 	</div>
 </main>
@@ -28,21 +28,10 @@
 	.consensusPage .masthead p {
 		color: #fff;
 	}
-
-	/* ─── L0: CONSENSUS card stack ───────────────────────────────────── */
-	/* The List tab's card styles, kept when the tab system was removed because
-	   the Consensus page is now their only consumer.
-	   Deliberately distinct from the .icard used on theme pages: the point of
-	   this page is the 0-100% axis with one lettered square per opinion group. */
-	.lane {
-		position: relative;
-		overflow: visible;
-		display: flow-root;
-	}
-	.lane.listView {
+	.cards {
 		display: flex;
 		flex-direction: column;
-		gap: 12px;
+		gap: 14px;
 		padding: 6px 22px 46px;
 	}
 </style>

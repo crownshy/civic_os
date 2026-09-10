@@ -281,42 +281,6 @@
 	:global(.bar .a) {
 		background: var(--agree);
 	}
-	:global(.barkey) {
-		display: flex;
-		gap: 13px;
-		margin-top: 9px;
-		font-family: var(--mono);
-		font-size: 9px;
-		letter-spacing: 0.09em;
-		text-transform: uppercase;
-		color: color-mix(in srgb, var(--c) 48%, #fff);
-	}
-	:global(.barkey span) {
-		display: inline-flex;
-		align-items: center;
-		gap: 5px;
-	}
-	:global(.barkey i) {
-		width: 9px;
-		height: 3px;
-		border-radius: 2px;
-		flex: none;
-	}
-	:global(.tags) {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 6px;
-	}
-	:global(.tags i) {
-		font-style: normal;
-		font-family: var(--mono);
-		font-size: 10px;
-		letter-spacing: 0.06em;
-		padding: 4px 9px;
-		border-radius: 999px;
-		background: color-mix(in srgb, var(--c) 11%, #fff);
-		color: var(--c);
-	}
 	:global(.cardfoot) {
 		flex: none;
 		display: flex;

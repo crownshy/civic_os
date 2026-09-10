@@ -59,6 +59,11 @@ export function countLabel(statements: number, quotes: number): string {
 	return `${s} · ${q}`;
 }
 
+/** The tooltip on a group's low-data flag. */
+export function lowDataTip(votes: number): string {
+	return `Low data (${votes} vote${votes === 1 ? '' : 's'})`;
+}
+
 export interface ClaimPhrase {
 	/** flat text, for the table of contents */
 	toc: string;

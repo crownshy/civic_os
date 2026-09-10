@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { claimPhrase, countLabel, demoLineFor, emojiFor, titleCaseChip } from './copy';
+import { claimPhrase, countLabel, demoLineFor, emojiFor, lowDataTip, titleCaseChip } from './copy';
 import type { ReportRecord } from './types';
 
 const record = (over: Partial<ReportRecord> = {}): ReportRecord => ({
@@ -88,6 +88,16 @@ describe('countLabel', () => {
 		expect(countLabel(1, 1)).toBe('1 statement · 1 quote');
 		expect(countLabel(26, 4)).toBe('26 statements · 4 quotes');
 		expect(countLabel(0, 0)).toBe('0 statements · 0 quotes');
+	});
+});
+
+describe('lowDataTip', () => {
+	it('says how many votes the readout rests on', () => {
+		expect(lowDataTip(4)).toBe('Low data (4 votes)');
+	});
+
+	it('uses the singular for one vote', () => {
+		expect(lowDataTip(1)).toBe('Low data (1 vote)');
 	});
 });
 

@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { GROUPS } from '../domain/bundled';
 	import { demoLineFor, emojiFor } from '../domain/copy';
-	import { groupsOf } from '../domain/data';
+	import { MIN_GROUP_VOTES, groupsOf } from '../domain/data';
 	import type { ReportRecord } from '../domain/types';
 	import { tierColorFor } from '../domain/verdict';
 	import { selection } from '../state.svelte';
+	import LowDataFlag from './LowDataFlag.svelte';
 	import VerdictPill from './VerdictPill.svelte';
 
 	interface Props {
@@ -20,7 +21,15 @@
 					// the readout shows the raw figure; only the colour and bar clamp
 					const raw = group.pct;
 					const pct = Math.max(0, Math.min(100, raw));
-					return { key: group.key, label: group.label, raw, pct, color: tierColorFor(pct) };
+					return {
+						key: group.key,
+						label: group.label,
+						raw,
+						pct,
+						color: tierColorFor(pct),
+						votes: group.n,
+						lowData: group.n < MIN_GROUP_VOTES
+					};
 				})
 			: []
 	);
@@ -34,7 +43,7 @@
 >
 	<!-- an insight may cite a session quote, which carries no vote to judge -->
 	{#if record.vote}
-		<VerdictPill vote={record.vote} />
+		<VerdictPill vote={record.vote} variant="card" />
 	{/if}
 
 	<p class="icText">“{record.text}”</p>
@@ -44,21 +53,29 @@
 		<span class="icDemo">{demoLineFor(record)}</span>
 	</div>
 
-	<div class="icStats">
-		{#each stats as stat (stat.key)}
-			<div class="icStat">
-				<div class="icVal" style="color:{stat.color}">{stat.raw}%</div>
-				<div class="icLabel">{stat.label}</div>
-				<div class="icBarTrack">
-					<div class="icBarFill" style="width:{stat.pct}%;background:{stat.color}"></div>
-				</div>
+	{#if stats.length}
+		<div class="icStatsWrap">
+			<div class="icStatsCap"><span class="capKey">% who agree</span>, by opinion group</div>
+			<div class="icStats">
+				{#each stats as stat (stat.key)}
+					<div class="icStat">
+						<div class="icVal" style="color:{stat.color}">
+							{stat.raw}%{#if stat.lowData}<LowDataFlag votes={stat.votes} />{/if}
+						</div>
+						<div class="icLabel">{stat.label}</div>
+						<div class="icBarTrack">
+							<div class="icBarFill" style="width:{stat.pct}%;background:{stat.color}"></div>
+						</div>
+					</div>
+				{/each}
 			</div>
-		{/each}
-	</div>
+		</div>
+	{/if}
 </button>
 
 <style>
-	/* ─── the new statement card, shared by carousels and the full list */
+	/* ─── the statement card, shared by carousels, the full list and the
+	   consensus page */
 	.icard {
 		display: block;
 		width: 100%;
@@ -66,7 +83,7 @@
 		background: var(--paper);
 		border: 1px solid color-mix(in srgb, var(--c) 22%, #fff);
 		border-radius: 20px;
-		padding: 16px 18px 18px;
+		padding: 20px 22px 22px;
 		-webkit-tap-highlight-color: transparent;
 		transition:
 			transform 0.2s ease,
@@ -85,11 +102,11 @@
 			0 10px 30px rgba(0, 0, 0, 0.22);
 	}
 	.icText {
-		margin: 14px 0 16px;
+		margin: 18px 0 20px;
 		color: var(--ink);
 		font-family: var(--geom);
 		font-weight: 600;
-		font-size: 19px;
+		font-size: 20px;
 		line-height: 1.32;
 		letter-spacing: -0.01em;
 	}
@@ -98,7 +115,7 @@
 		align-items: center;
 		gap: 9px;
 		margin-bottom: 2px;
-		color: color-mix(in srgb, var(--c) 62%, #000);
+		color: color-mix(in srgb, var(--c) 74%, #000);
 	}
 	.icWho .icAv {
 		flex: none;
@@ -113,21 +130,38 @@
 	}
 	.icWho .icDemo {
 		font-family: var(--mono);
-		font-size: 10.5px;
+		font-size: 11.5px;
 		font-weight: 600;
-		letter-spacing: 0.08em;
+		letter-spacing: 0.07em;
 		text-transform: uppercase;
 		overflow: hidden;
 		white-space: nowrap;
 		text-overflow: ellipsis;
 	}
+	/* bleeds to the card's edges, so its negative margins track the card's padding */
+	.icStatsWrap {
+		margin: 16px -22px -22px;
+		padding: 13px 22px 15px;
+		background: color-mix(in srgb, var(--c) 2.5%, #fff);
+		border-radius: 0 0 19px 19px;
+	}
+	.icStatsCap {
+		font-family: var(--mono);
+		font-size: 11px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: color-mix(in srgb, var(--ink) 55%, transparent);
+		text-align: center;
+		padding-bottom: 9px;
+		margin-bottom: 13px;
+		border-bottom: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+	}
+	.capKey {
+		color: var(--agree);
+	}
 	.icStats {
 		display: flex;
 		gap: 10px;
-		margin: 16px -18px -18px;
-		padding: 12px 18px 14px;
-		background: color-mix(in srgb, var(--c) 6%, #fff);
-		border-radius: 0 0 19px 19px;
 	}
 	.icStat {
 		flex: 1;
@@ -140,13 +174,16 @@
 		font-weight: 700;
 		font-size: 19px;
 		margin-bottom: 1px;
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
 	}
 	.icStat .icLabel {
 		font-family: var(--mono);
-		font-size: 9.5px;
-		letter-spacing: 0.1em;
+		font-size: 10.5px;
+		letter-spacing: 0.09em;
 		text-transform: uppercase;
-		color: color-mix(in srgb, var(--ink) 55%, transparent);
+		color: color-mix(in srgb, var(--ink) 75%, transparent);
 		margin-bottom: 6px;
 	}
 	.icStat .icBarTrack {
@@ -157,5 +194,41 @@
 	.icStat .icBarFill {
 		height: 100%;
 		border-radius: 2px;
+	}
+	@media (min-width: 660px) {
+		.icard {
+			padding: 26px 28px 28px;
+		}
+		.icText {
+			font-size: 26px;
+			line-height: 1.28;
+			margin: 22px 0 24px;
+		}
+		.icWho .icDemo {
+			font-size: 13px;
+		}
+		.icWho .icAv {
+			width: 26px;
+			height: 26px;
+			font-size: 14px;
+		}
+		.icStatsWrap {
+			margin: 20px -28px -28px;
+			padding: 15px 28px 17px;
+		}
+		.icStatsCap {
+			font-size: 12.5px;
+			padding-bottom: 10px;
+			margin-bottom: 15px;
+		}
+		/* on desktop the per-group readout is the loudest thing on the card */
+		.icStat .icVal {
+			font-size: 30px;
+			margin-bottom: 3px;
+		}
+		.icStat .icLabel {
+			font-size: 13px;
+			margin-bottom: 8px;
+		}
 	}
 </style>

@@ -3,6 +3,7 @@ import {
 	buildThemeView,
 	byStatementRank,
 	groupsOf,
+	isLowData,
 	quotesForTheme,
 	recordsForTheme,
 	statementsForTheme
@@ -90,6 +91,28 @@ describe('byStatementRank', () => {
 		const voteless = record('none', { vote: null });
 		const normal = record('normal', { vote: vote(0, 0) });
 		expect([voteless, normal].sort(byStatementRank).map((r) => r.id)).toEqual(['normal', 'none']);
+	});
+
+	it('sorts a low-data statement after the others, however broad its agreement', () => {
+		const thin = record('thin', { vote: vote(99, 300, 0, { A: tally(99, 4), B: tally(99, 40) }) });
+		const plain = record('plain', { vote: vote(40, 100, 0, { A: tally(40), B: tally(40) }) });
+		expect([thin, plain].sort(byStatementRank).map((r) => r.id)).toEqual(['plain', 'thin']);
+	});
+
+	it('keeps the usual ranking among low-data statements', () => {
+		const low = record('low', { vote: vote(40, 100, 0, { A: tally(40, 3) }) });
+		const high = record('high', { vote: vote(90, 100, 0, { A: tally(90, 3) }) });
+		expect([low, high].sort(byStatementRank).map((r) => r.id)).toEqual(['high', 'low']);
+	});
+});
+
+describe('isLowData', () => {
+	it('flags a statement when any one group cast fewer than 8 votes', () => {
+		expect(isLowData(vote(50, 100, 0, { A: tally(50, 30), B: tally(50, 7) }))).toBe(true);
+	});
+
+	it('does not flag a group that cast exactly 8', () => {
+		expect(isLowData(vote(50, 100, 0, { A: tally(50, 30), B: tally(50, 8) }))).toBe(false);
 	});
 });
 
