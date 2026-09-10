@@ -54,10 +54,10 @@
 		align-items: flex-start;
 		gap: 14px;
 		overflow-x: auto;
-		padding: 2px 7% 14px;
+		padding: 2px 5% 14px;
 		margin: 0 -22px;
 		scroll-snap-type: x mandatory;
-		scroll-padding-inline: 7%;
+		scroll-padding-inline: 5%;
 		-webkit-overflow-scrolling: touch;
 		scrollbar-width: none;
 	}
@@ -67,16 +67,16 @@
 	/* each card takes most of the row and centers when snapped, with a
 	   sliver of its neighbor peeking on either side */
 	.carousel :global(.icard) {
-		flex: 0 0 86%;
+		flex: 0 0 90%;
 		scroll-snap-align: center;
 	}
 	@media (min-width: 660px) {
 		.carousel {
-			padding-inline: 3%;
-			scroll-padding-inline: 3%;
+			padding-inline: 2.5%;
+			scroll-padding-inline: 2.5%;
 		}
 		.carousel :global(.icard) {
-			flex-basis: 94%;
+			flex-basis: 95%;
 		}
 	}
 </style>

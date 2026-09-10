@@ -64,46 +64,32 @@ export function lowDataTip(votes: number): string {
 	return `Low data (${votes} vote${votes === 1 ? '' : 's'})`;
 }
 
+/** A claim split so the component renders the emphasised verb itself. */
 export interface ClaimPhrase {
-	/** flat text, for the table of contents */
-	toc: string;
-	/** the headline, split so the component renders the emphasis itself */
-	head: {
-		before: string;
-		emphasis: string;
-		after: string;
-		/** colours the emphasised verb; null leaves it plain italic */
-		tone: 'agree' | 'disagree' | null;
-	};
+	before: string;
+	emphasis: string;
+	after: string;
+	/** colours the emphasised verb */
+	tone: InsightDirection;
 }
 
 /** Claims already written as "People agree/disagree …" are used as-is. */
 const CLAIM_VERB_RE = /^People (agree|disagree)\b/i;
 
-const TOC_LEAD: Record<InsightDirection, string> = {
-	agree: 'AGREE that',
-	disagree: 'DISAGREE that',
-	divided: 'are DIVIDED on whether',
-	mixed: 'are MIXED on whether'
-};
-
 /**
- * Turns an editorial claim plus its hand-assigned direction into the table-of-
- * contents line and the section headline.
+ * Turns an editorial claim plus its hand-assigned direction into the line used
+ * both as its section headline and as its table-of-contents entry.
  *
- * A claim already phrased as "People disagree about whether X" is used verbatim
- * with its verb emphasised, rather than being double-wrapped in another
- * "People X that …" template.
+ * A claim already phrased as "People disagree about whether X" is used verbatim,
+ * its own verb emphasised and coloured whatever the direction, rather than being
+ * double-wrapped in another "People X that …" template.
  */
 export function claimPhrase(claim: string, direction: InsightDirection): ClaimPhrase {
 	const verbatim = claim.match(CLAIM_VERB_RE);
 	if (verbatim) {
 		const verb = verbatim[1].toLowerCase() as 'agree' | 'disagree';
 		const rest = claim.slice(verbatim[0].length);
-		return {
-			toc: `People ${verb.toUpperCase()}${rest}`,
-			head: { before: 'People ', emphasis: verb, after: `${rest}.`, tone: verb }
-		};
+		return { before: 'People ', emphasis: verb, after: `${rest}.`, tone: verb };
 	}
 
 	// An acronym opening the claim ("AI should …") keeps its capitals; an
@@ -112,40 +98,28 @@ export function claimPhrase(claim: string, direction: InsightDirection): ClaimPh
 	const isAcronym = /^[A-Z]{2,}$/.test(firstWord.replace(/[^A-Za-z]/g, ''));
 	const lead = isAcronym ? claim : claim.charAt(0).toLowerCase() + claim.slice(1);
 
-	const known: InsightDirection = TOC_LEAD[direction] ? direction : 'mixed';
-	const toc = `People ${TOC_LEAD[known]} ${lead}`;
-
-	switch (known) {
+	switch (direction) {
 		case 'agree':
 		case 'disagree':
 			return {
-				toc,
-				head: {
-					before: 'People generally ',
-					emphasis: known,
-					after: ` that ${lead}.`,
-					tone: known
-				}
+				before: 'People generally ',
+				emphasis: direction,
+				after: ` that ${lead}.`,
+				tone: direction
 			};
 		case 'divided':
 			return {
-				toc,
-				head: {
-					before: 'People are ',
-					emphasis: 'divided',
-					after: ` over whether ${lead}.`,
-					tone: null
-				}
+				before: 'People are ',
+				emphasis: 'divided',
+				after: ` over whether ${lead}.`,
+				tone: 'divided'
 			};
 		default:
 			return {
-				toc,
-				head: {
-					before: 'People have ',
-					emphasis: 'mixed',
-					after: ` views on whether ${lead}.`,
-					tone: null
-				}
+				before: 'People have ',
+				emphasis: 'mixed',
+				after: ` views on whether ${lead}.`,
+				tone: 'mixed'
 			};
 	}
 }
