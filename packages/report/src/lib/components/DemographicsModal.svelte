@@ -4,29 +4,32 @@
 	import ReportDialog from './ReportDialog.svelte';
 
 	const categories = DEMOGRAPHICS.categories;
-	let key = $state(categories[0].key);
+	const index = $derived(modals.demographics?.index ?? 0);
 
-	const category = $derived(categories.find((c) => c.key === key) ?? categories[0]);
+	const category = $derived(categories[index] ?? categories[0]);
 	// each breakdown is a share of only the people who answered that question,
 	// not of everyone; the copy spells that denominator out per tab
 	const pctAnswered = $derived(Math.round((category.answered / DEMOGRAPHICS.total) * 100));
 
 	let scroller = $state<HTMLDivElement>();
 	$effect(() => {
-		void key;
+		void index;
 		if (scroller) scroller.scrollTop = 0;
 	});
 
+	function show(next: number) {
+		if (modals.demographics) modals.demographics.index = next;
+	}
+
 	function close() {
-		modals.demographics = false;
-		key = categories[0].key;
+		modals.demographics = null;
 	}
 </script>
 
 <!-- accent pinned to ink: this modal's chrome stays neutral rather than
      picking up whatever theme colour the page behind is using -->
 <ReportDialog
-	open={modals.demographics}
+	open={modals.demographics !== null}
 	label="Demographics detail"
 	accent="var(--ink)"
 	onclose={close}
@@ -37,13 +40,8 @@
 
 	{#snippet body()}
 		<div class="ddTabs label" role="tablist" aria-label="Demographic category">
-			{#each categories as cat (cat.key)}
-				<button
-					type="button"
-					role="tab"
-					aria-selected={cat.key === key}
-					onclick={() => (key = cat.key)}
-				>
+			{#each categories as cat, i (cat.key)}
+				<button type="button" role="tab" aria-selected={i === index} onclick={() => show(i)}>
 					{cat.label.toUpperCase()}
 				</button>
 			{/each}

@@ -1,53 +1,56 @@
 <script lang="ts">
+	import { onNavigate } from '$app/navigation';
+	import type { Snippet } from 'svelte';
 	import { THEME_BY_KEY } from './domain/bundled';
+	import { chromeFor } from './domain/page-chrome';
 	import { setOpenDemographics, setOpenGroup, setOpenStatement } from './navigation';
-	import { closeStatement, modals, openStatement as open } from './state.svelte';
+	import { closeAllModals, modals, openStatement as open } from './state.svelte';
 	import DemographicsModal from './components/DemographicsModal.svelte';
 	import GroupModal from './components/GroupModal.svelte';
 	import PageBar from './components/PageBar.svelte';
 	import StatementModal from './components/StatementModal.svelte';
+	import TopBar from './components/TopBar.svelte';
 
 	interface Props {
 		/** a step key ('title', 'demogs', ...) or a theme key */
 		step: string;
 		/** the current route's page, rendered inside the report's own column */
-		children?: import('svelte').Snippet;
+		children?: Snippet;
 	}
 
 	let { step, children }: Props = $props();
 
 	setOpenStatement((view, index) => open(view as never, index));
-	setOpenGroup((key) => (modals.group = key));
-	setOpenDemographics(() => (modals.demographics = true));
+	setOpenGroup((key) => (modals.group = { key, page: 0 }));
+	setOpenDemographics(() => (modals.demographics = { index: 0 }));
+
+	onNavigate(closeAllModals);
 
 	const theme = $derived(THEME_BY_KEY.get(step));
+	const chrome = $derived(chromeFor(step, theme));
+	const grid = $derived(chrome.grid ? 'var(--grid-bg)' : 'none');
+
+	let barShown = $state(false);
 
 	/**
-	 * The document-level consequences of being on a step: the title, the accent
-	 * the desktop gutter and the modals read, and the body classes app.css keys
-	 * its gutter rules off. Navigating also dismisses anything left open.
+	 * The page colour is set twice: inline on .shell, so the server-rendered
+	 * page is already the right colour, and here on the root, so <body> (which
+	 * is what shows in the desktop gutter) matches it too.
 	 */
-	$effect(() => {
-		void step;
-		closeStatement();
-		modals.group = null;
-		modals.demographics = false;
-	});
-
 	$effect(() => {
 		document.title = theme
 			? `${theme.short} — Bloom`
 			: 'Bloom — A Conversation on AI in Central Oregon';
 
-		const accent = theme ? theme.color : step === 'consensus' ? 'var(--agree)' : 'var(--home)';
-		document.documentElement.style.setProperty('--c', accent);
-
-		document.body.classList.toggle('groups-page', step === 'groups');
-		document.body.classList.toggle('theme-page', Boolean(theme));
+		const root = document.documentElement.style;
+		root.setProperty('--c', chrome.accent);
+		root.setProperty('--page-bg', chrome.background);
+		root.setProperty('--page-grid', grid);
 
 		return () => {
-			document.documentElement.style.removeProperty('--c');
-			document.body.classList.remove('groups-page', 'theme-page');
+			root.removeProperty('--c');
+			root.removeProperty('--page-bg');
+			root.removeProperty('--page-grid');
 		};
 	});
 
@@ -61,8 +64,17 @@
 	{/if}
 </svelte:head>
 
-<div class="shell">
-	<PageBar {step} />
+<div
+	class="shell"
+	class:withTopBar={chrome.topBarText !== null}
+	class:withBottomBar={barShown}
+	style:--page-bg={chrome.background}
+	style:--page-grid={grid}
+>
+	{#if chrome.topBarText}
+		<TopBar color={chrome.topBarText} />
+	{/if}
+	<PageBar {step} bind:shown={barShown} />
 	{@render children?.()}
 </div>
 

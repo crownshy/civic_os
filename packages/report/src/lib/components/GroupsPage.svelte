@@ -13,20 +13,21 @@
 
 <main class="introPage groupsPage">
 	<div class="masthead">
-		<div class="eyebrow label">Bloom Project · COCAP · Central Oregon</div>
-		<h1>We identified a few different kinds of people…</h1>
-		<p>Click each to learn more about what distinguished them from the rest.</p>
+		<h1>Participants represented a range of perspectives on AI…</h1>
+		<p>
+			We found three opinion groups based on our analysis of people's voting patterns. Click each
+			group to learn about what distinguished them from the rest.
+		</p>
 	</div>
 
 	<div class="groupBubbles">
 		{#each groups as group (group.key)}
 			<button
 				class="gbubble"
-				class:sel={modals.group === group.key}
+				class:sel={modals.group?.key === group.key}
 				type="button"
-				data-key={group.key}
 				style="--c:{group.color || 'var(--home)'}"
-				aria-label="{group.label}: {group.participants || 0} people — see defining statements"
+				aria-label="{group.label}: {group.participants || 0} people, see defining statements"
 				onclick={() => openGroup(group.key)}
 			>
 				<div class="gName">{group.label}</div>
@@ -41,18 +42,14 @@
 
 <style>
 	.groupsPage {
-		background: var(--paper);
 		color: var(--ink);
 	}
-	.groupsPage .masthead .eyebrow {
-		color: color-mix(in srgb, var(--ink) 55%, transparent);
+	.groupsPage .masthead h1 {
+		color: var(--theme-blue);
 	}
-	/* Geom + solid ink per design call; the shared .masthead p rule (light,
-	   body-font) is right for a dark background but reads as unreadable here,
-	   the one intro page that isn't dark */
 	.groupsPage .masthead p {
 		font-family: var(--geom);
-		font-weight: 500;
+		font-weight: 400;
 		color: var(--ink);
 	}
 
@@ -63,57 +60,61 @@
 		gap: 14px;
 	}
 
-	/* a plain bordered card per group; the outline is the only thing carrying
-	   the group's color; everything else on the card is black/gray so the
-	   name (the one colored line) is what actually draws the eye */
+	/* the gradient is only a sheen over the group's own colour, so the card
+	   still reads as that group rather than a different colour */
 	.gbubble {
 		display: block;
 		width: 100%;
 		text-align: left;
-		background: none;
-		border: 1.5px solid color-mix(in srgb, var(--c, var(--home)) 55%, #fff);
-		border-radius: 16px;
-		padding: 16px 18px;
-		cursor: pointer;
-		/* tallyIn is declared globally in app.css; the theme grid's tally cells
-		   use it too, and Svelte only renames keyframes a component declares */
-		animation: tallyIn 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+		color: #fff;
+		background: linear-gradient(180deg, color-mix(in srgb, var(--c) 82%, #000) 0%, var(--c) 100%);
+		border-radius: 22px;
+		padding: 22px 24px 24px;
+		box-shadow: 0 10px 26px rgba(0, 0, 0, 0.22);
+		/* backwards, not both: a fill that outlives the animation would pin
+		   transform and swallow the hover lift. tallyIn is declared in app.css,
+		   since the theme grid's tally cells use it too */
+		animation: tallyIn 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) backwards;
 		transition:
-			background 0.2s ease,
-			transform 0.15s ease;
+			transform 0.15s ease,
+			box-shadow 0.2s ease;
 	}
 	@media (hover: hover) {
 		.gbubble:hover {
-			background: color-mix(in srgb, var(--c, var(--home)) 6%, transparent);
+			transform: translateY(-2px);
+			box-shadow: 0 14px 32px rgba(0, 0, 0, 0.3);
 		}
 	}
 	.gbubble:active {
 		transform: scale(0.98);
 	}
 	.gbubble.sel {
-		background: color-mix(in srgb, var(--c, var(--home)) 10%, transparent);
+		box-shadow:
+			0 0 0 3px rgba(255, 255, 255, 0.65),
+			0 14px 32px rgba(0, 0, 0, 0.3);
 	}
 
 	.gName {
 		font-family: var(--geom);
 		font-weight: 700;
-		font-size: 21px;
-		color: var(--c, var(--home));
+		font-size: 26px;
 	}
 	.gCount {
+		display: inline-block;
+		margin-top: 9px;
 		font-family: var(--mono);
-		font-size: 13px;
+		font-size: 12px;
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
-		color: rgba(0, 0, 0, 0.5);
-		margin-top: 4px;
+		background: rgba(255, 255, 255, 0.22);
+		padding: 5px 12px;
+		border-radius: 999px;
 	}
 	.gTagline {
-		font-style: italic;
-		color: rgba(0, 0, 0, 0.65);
-		font-size: 17px;
-		line-height: 1.4;
-		margin: 10px 0 0;
+		color: rgba(255, 255, 255, 0.92);
+		font-size: 16.5px;
+		line-height: 1.45;
+		margin: 14px 0 0;
 	}
 
 	@media (min-width: 660px) {
@@ -122,7 +123,7 @@
 			gap: 16px;
 		}
 		.gName {
-			font-size: 24px;
+			font-size: 30px;
 		}
 		.gCount {
 			font-size: 14px;

@@ -8,11 +8,10 @@
 
 <main class="introPage consensusPage">
 	<div class="masthead">
-		<div class="eyebrow label">Bloom Project · COCAP · Central Oregon</div>
 		<h1>…but we found a lot of common ground.</h1>
 		<p>
-			Despite their differences, everyone generally agreed on the importance of transparency and
-			community involvement.
+			Despite their differences, almost everyone agreed on the importance of transparency and
+			community involvement in AI-related decision-making.
 		</p>
 	</div>
 	<div class="lane listView">
@@ -24,11 +23,9 @@
 
 <style>
 	.consensusPage {
-		background: linear-gradient(
-			180deg,
-			color-mix(in srgb, var(--agree) 60%, #000) 0%,
-			var(--agree) 20%
-		);
+		color: #fff;
+	}
+	.consensusPage .masthead p {
 		color: #fff;
 	}
 

@@ -8,10 +8,6 @@
 </script>
 
 <main class="introPage demogsPage">
-	<div class="masthead">
-		<div class="eyebrow label">Central Oregon &amp; AI</div>
-	</div>
-
 	<CountyMap bind:this={map} />
 
 	<button
@@ -40,26 +36,18 @@
 
 <style>
 	.demogsPage {
-		background: var(--home);
 		color: #fff;
 	}
 	/* .demogMap going position:absolute promotes it into the "positioned"
 	   paint bucket ahead of these still-static siblings by default; without
 	   an explicit stack here they'd paint (and sit) underneath the map instead
-	   of over it as the intended overlay. Scoped to the page since .masthead
-	   is shared across every L0 page. */
-	.demogsPage .masthead,
+	   of over it as the intended overlay. */
 	.demogsPage .demogStat {
 		position: relative;
 		z-index: 2;
 	}
 	.demogsPage .introNext {
 		z-index: 2;
-	}
-	/* the map runs to the very top of the page with no scrim, so the eyebrow
-	   needs a solid band behind it to stay legible */
-	.demogsPage .masthead {
-		background: var(--home);
 	}
 	/* the reset button borrows .introNext's whole visual shell (circle, shadow,
 	   hover transition) via a second class on the same element; the arrow's

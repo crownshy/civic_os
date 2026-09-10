@@ -41,9 +41,15 @@
 		width: 100%;
 		text-align: left;
 		background: var(--c);
-		padding: 22px 22px 24px;
+		color: #fff;
+		border-radius: 22px;
+		padding: 22px 24px 24px;
 		position: relative;
-		transition: filter 0.25s ease;
+		box-shadow: 0 10px 26px rgba(0, 0, 0, 0.16);
+		transition:
+			filter 0.25s ease,
+			transform 0.15s ease,
+			box-shadow 0.2s ease;
 		-webkit-tap-highlight-color: transparent;
 	}
 	.theme-block h2 {
@@ -56,14 +62,15 @@
 		max-width: 13em;
 	}
 	.theme-block .count {
-		color: rgba(255, 255, 255, 0.78);
+		color: rgba(255, 255, 255, 0.82);
 		margin-bottom: 16px;
+		font-size: 13px;
 	}
 	.theme-block .arrow {
 		position: absolute;
-		top: 24px;
+		top: 22px;
 		right: 20px;
-		font-size: 17px;
+		font-size: 23px;
 		opacity: 0.45;
 		transition:
 			transform 0.3s ease,
@@ -72,6 +79,8 @@
 	@media (hover: hover) {
 		.theme-block:hover {
 			filter: brightness(1.12) saturate(1.05);
+			transform: translateY(-2px);
+			box-shadow: 0 16px 34px rgba(0, 0, 0, 0.22);
 		}
 		.theme-block:hover .arrow {
 			transform: translateX(5px);
@@ -80,6 +89,7 @@
 	}
 	.theme-block:active {
 		filter: brightness(0.94);
+		transform: scale(0.99);
 	}
 
 	/* the tally: one cell per record. filled = poll statement, ring = session quote */

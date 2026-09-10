@@ -27,7 +27,7 @@ test('drills down from the report home page to a theme page and opens a statemen
 	).toBeVisible();
 
 	// Demographics Page
-	await page.getByRole('button', { name: 'Dive in' }).click();
+	await page.getByRole('button', { name: 'Dive In' }).click();
 	await expect(page.getByRole('heading', { name: '400+' })).toBeVisible();
 
 	// Full Demographics Modal
@@ -40,7 +40,7 @@ test('drills down from the report home page to a theme page and opens a statemen
 	// Opinion Groups
 	await advanceToNextIntroPage(page);
 	await expect(
-		page.getByRole('heading', { name: /We identified a few different kinds/i })
+		page.getByRole('heading', { name: /Participants represented a range of perspectives/i })
 	).toBeVisible();
 
 	// Individual Opinion Group Modal
@@ -135,7 +135,7 @@ test('each step has its own URL, and a deep link lands on it cold', async ({ pag
 	await page.goto(REPORT);
 	await expect(page).toHaveURL(new RegExp(`${REPORT}$`));
 
-	await page.getByRole('button', { name: 'Dive in' }).click();
+	await page.getByRole('button', { name: 'Dive In' }).click();
 	await expect(page).toHaveURL(new RegExp(`${REPORT}/demographics$`));
 
 	await advanceToNextIntroPage(page);
