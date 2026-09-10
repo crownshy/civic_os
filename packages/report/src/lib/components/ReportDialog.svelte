@@ -27,8 +27,7 @@
 	 *
 	 * preventScroll is off deliberately. bits-ui locks scrolling with
 	 * `body { overflow: hidden }`, which makes the body the sticky containing
-	 * block and stops a theme page's .l2nav sticking, the exact hazard
-	 * app.css's own comment warns about.
+	 * block and stops a theme page's .l2nav sticking.
 	 */
 	function onkeydown(event: KeyboardEvent) {
 		if (!onpage) return;
@@ -73,8 +72,7 @@
 </Dialog.Root>
 
 <style>
-	/* the dialog element itself is only a positioning shell; .card and .scrim
-	   are still global in app.css while the three modals share them */
+	/* the dialog element itself is only a positioning shell */
 	:global(.reportDialog) {
 		position: fixed;
 		inset: 0;
@@ -103,8 +101,8 @@
 	}
 	/*
 	 * The modal chrome. It is :global because the pieces are split between this
-	 * shell (card, cardtop, close) and the three modals that fill it (cardbody,
-	 * quotewrap, meta, the per-modal blocks). One stylesheet, one owner.
+	 * shell (card, cardtop, close) and the modals that fill it (cardbody,
+	 * quotewrap, meta, cardfoot). Each modal's own blocks live with that modal.
 	 */
 	@keyframes fadeIn {
 		from {
@@ -144,11 +142,30 @@
 	:global(.cardtop) {
 		display: flex;
 		align-items: center;
-		padding: 13px 16px 13px 14px;
+		padding: 16px 16px 16px 14px;
 		flex: none;
 		background: var(--paper);
 		border-bottom: 1px solid color-mix(in srgb, var(--c) 16%, #fff);
 		border-radius: 24px 24px 0 0;
+	}
+	/* the header the group and demographics modals share; the 8px lines the
+	   title up with the content rows below it */
+	:global(.gcHead) {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		min-width: 0;
+		padding-left: 8px;
+	}
+	:global(.ddTitle) {
+		font-family: var(--geom);
+		font-weight: 700;
+		font-size: 24px;
+		line-height: 1.15;
+		color: var(--home);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 	:global(.closeb) {
 		flex: none;
@@ -344,119 +361,5 @@
 	:global(.cardfoot .pos em) {
 		font-style: normal;
 		opacity: 0.45;
-	}
-	:global(.gcHead) {
-		display: flex;
-		flex-direction: column;
-		gap: 2px;
-		min-width: 0;
-	}
-	:global(.gdDesc) {
-		padding: 28px 22px 26px;
-	}
-	:global(.gdText) {
-		margin: 0;
-		color: var(--ink);
-		font-family: var(--geom);
-		font-weight: 600;
-		font-size: 22px;
-		line-height: 1.34;
-		letter-spacing: -0.01em;
-	}
-	:global(.ddTitle) {
-		font-family: var(--geom);
-		font-weight: 700;
-		font-size: 32px;
-		color: var(--ink);
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-	:global(.ddTabs) {
-		display: flex;
-		flex-wrap: nowrap;
-		gap: 6px;
-		padding: 0 16px 14px;
-		flex: none;
-		overflow-x: auto;
-		-webkit-overflow-scrolling: touch;
-		scrollbar-width: thin;
-		border-bottom: 1px solid color-mix(in srgb, var(--c) 16%, #fff);
-	}
-	:global(.ddTabs button) {
-		flex: none;
-		font-size: 10.5px;
-		letter-spacing: 0.08em;
-		padding: 7px 12px;
-		border-radius: 999px;
-		background: color-mix(in srgb, var(--home) 10%, #fff);
-		color: var(--home);
-		transition:
-			background 0.2s ease,
-			color 0.2s ease;
-	}
-	/* aria-selected, not aria-pressed: role=tab does not support pressed, and
-	   the attribute the tab list actually sets is what has to be styled */
-	:global(.ddTabs button[aria-selected='true']) {
-		background: var(--home);
-		color: #fff;
-		font-weight: 500;
-	}
-	:global(.ddIntro) {
-		margin: 0;
-		padding: 20px 22px 4px;
-		font-size: 17px;
-		line-height: 1.5;
-		color: var(--ink);
-	}
-	:global(.ddIntro b) {
-		font-weight: 700;
-		color: var(--agree);
-	}
-	:global(.ddList) {
-		padding: 6px 0 0;
-	}
-	:global(.ddRow) {
-		position: relative;
-		isolation: isolate;
-		display: flex;
-		align-items: center;
-		gap: 10px;
-		padding: 14px 22px;
-		border-top: 1px solid rgba(0, 0, 0, 0.08);
-		font-size: 16px;
-		overflow: hidden;
-	}
-	:global(.ddRow:last-child) {
-		border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-	}
-	:global(.ddRow::before) {
-		content: '';
-		position: absolute;
-		inset: 0;
-		z-index: -1;
-		width: var(--pct);
-		background: color-mix(in srgb, var(--rc) 10%, #fff);
-	}
-	:global(.ddSwatch) {
-		width: 11px;
-		height: 11px;
-		border-radius: 3px;
-		flex: none;
-		background: var(--rc);
-	}
-	:global(.ddLabel) {
-		flex: 1 1 auto;
-		min-width: 0;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		color: var(--ink);
-	}
-	:global(.ddPct) {
-		font-family: var(--mono);
-		font-weight: 600;
-		color: var(--ink);
-		flex: none;
 	}
 </style>

@@ -20,12 +20,7 @@
 	const total = $derived(1 + statements.length);
 	const record = $derived(page > 0 ? RECORD_BY_ID.get(statements[page - 1]?.id) : undefined);
 
-	/**
-	 * The same per-group agree% numbers the statement modal shows, but its own
-	 * presentation: no "Group A/B/C" prefix (the header already says which group
-	 * this is), no legend, and the group in question sorted first with a visibly
-	 * thicker bar rather than sitting wherever GROUPS' own order puts it.
-	 */
+	/** The group this modal is about is listed first, whatever GROUPS' own order. */
 	const rows = $derived.by(() => {
 		if (!record?.vote) return [];
 		return groupsOf(GROUPS, record.vote)
@@ -64,19 +59,18 @@
 	{#snippet body()}
 		<div class="cardbody" bind:this={scroller}>
 			{#if page === 0}
-				<div class="gdDesc"><p class="gdText">{group?.description ?? ''}</p></div>
+				<div class="description">
+					<h4>Brief Description</h4>
+					<p>{group?.description ?? ''}</p>
+				</div>
 			{:else if record}
 				<div class="quotewrap"><blockquote>“{record.text}”</blockquote></div>
 				<div class="meta">
 					<section>
-						<h4>Open Poll Responses</h4>
-						<div class="gdVoteCount">{record.vote?.total} votes</div>
+						<h4>Open Poll Responses ({record.vote?.total} votes)</h4>
 						{#each rows as row (row.key)}
 							<div class="grow" class:current={row.key === key}>
-								<div class="top">
-									<span>{row.label}</span>
-									<b>{row.pct}% agree</b>
-								</div>
+								<div class="top"><span>{row.label}:</span> <b>{row.pct}% agree</b></div>
 								<VoteBars tally={row} />
 							</div>
 						{/each}
@@ -112,63 +106,98 @@
 </ReportDialog>
 
 <style>
-	/* #gdetail's own take on the shared .meta/.grow/.bar block above (L3 keeps
-	   the plain mono/dimmed version), a real Geom heading instead of a small
-	   caps label, the vote count moved to its own line under it, group names
-	   read as plain black, no disagree/
-	   pass/agree legend, and every bar thick. .current (the group the modal
-	   is about, sorted first in JS) is what carries color now; its label and
-	   the card title (#gcName, reusing .ddTitle) are the only colored text in
-	   the whole modal; everything else is plain black/gray. */
-	:global(.groupDialog) .meta h4 {
+	/* The only colour in this modal is the group's own: its title and the pill
+	   around its row. Everything else is ink. */
+	.ddTitle {
+		color: var(--c);
+	}
+	.description {
+		padding: 26px 24px 24px;
+	}
+	.description h4 {
+		font-family: var(--mono);
+		font-weight: 500;
+		font-size: 11px;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: color-mix(in srgb, var(--c) 65%, transparent);
+		margin: 0 0 10px;
+	}
+	.description p {
+		margin: 0;
+		color: var(--ink);
+		font-family: var(--geom);
+		font-weight: 600;
+		font-size: 26px;
+		line-height: 1.3;
+		letter-spacing: -0.01em;
+	}
+	.quotewrap {
+		padding: 28px 24px;
+	}
+	.quotewrap blockquote {
+		color: var(--ink);
+	}
+	.meta {
+		padding: 22px 24px 26px;
+	}
+	.meta h4 {
 		font-family: var(--geom);
 		font-weight: 700;
-		font-size: 16px;
+		font-size: 14.5px;
 		letter-spacing: 0;
 		text-transform: none;
 		color: var(--ink);
 	}
-
-	:global(.groupDialog) .gdVoteCount {
-		font-family: var(--mono);
-		font-size: 11px;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: rgba(0, 0, 0, 0.55);
-		margin: 2px 0 14px;
+	.grow {
+		margin-bottom: 16px;
 	}
-
-	:global(.groupDialog) .grow .top {
-		align-items: center;
-	}
-
-	:global(.groupDialog) .grow .top span {
+	/* block, not the shared flex row: a flex item drops the space after the
+	   colon, and label and number should read as one line */
+	.grow .top {
+		display: block;
+		font-size: 14.5px;
 		color: var(--ink);
 	}
-
-	:global(.groupDialog) .grow .top b {
-		color: var(--ink);
+	.grow .top b {
+		color: inherit;
 	}
-
-	/* the current group's label is a small solid badge (white on theme color)
-	   instead of plain colored text, and a touch larger than the others */
-	:global(.groupDialog) .grow.current .top span {
+	.grow.current .top {
+		display: inline-block;
 		color: #fff;
 		background: var(--c);
-		padding: 3px 9px;
+		padding: 5px 12px;
 		border-radius: 999px;
-		font-size: 11.5px;
+	}
+	.grow :global(.bar) {
+		height: 6px;
 	}
 
-	:global(.groupDialog) .ddTitle {
-		color: var(--c);
-	}
-
-	:global(.groupDialog) .quotewrap blockquote {
-		color: var(--ink);
-	}
-
-	:global(.groupDialog) :global(.bar) {
-		height: 8px;
+	@media (min-width: 660px) {
+		:global(.groupDialog .card) {
+			max-width: 620px;
+		}
+		.description {
+			padding: 36px 40px 32px;
+		}
+		.description p {
+			font-size: 32px;
+		}
+		.quotewrap {
+			padding: 40px 40px 34px;
+		}
+		.meta {
+			padding: 30px 40px 38px;
+		}
+		.meta h4,
+		.grow .top {
+			font-size: 18px;
+		}
+		.grow {
+			margin-bottom: 20px;
+		}
+		.grow :global(.bar) {
+			height: 7px;
+		}
 	}
 </style>
