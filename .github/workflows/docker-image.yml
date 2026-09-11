@@ -64,7 +64,7 @@ jobs:
           tags: crownshy/civic_os_stage:${{github.sha}}
       - name: Update GitOps manifests
         run: |
-            git clone https://${{ secrets.GITOPS_TOKEN }}@github.com/crownshy/bloom_charts.git
+            git clone https://${{ secrets.GITOPS_TOKEN }}@github.com/theBLOOMproject/bloom_charts.git
             cd bloom_charts
             sed -i "s|^dockerTag:.*|dockerTag: \"${{ github.sha }}\"|" civic-os/values-staging.yaml
             git add .
@@ -99,7 +99,7 @@ jobs:
           tags: crownshy/civic_os:${{github.sha}}
       - name: Update GitOps manifests
         run: |
-          git clone https://${{ secrets.GITOPS_TOKEN }}@github.com/crownshy/bloom_charts.git
+          git clone https://${{ secrets.GITOPS_TOKEN }}@github.com/theBLOOMproject/bloom_charts.git
           cd bloom_charts
           sed -i "s|^dockerTag:.*|dockerTag: \"${{ github.sha }}\"|" civic-os/values.yaml
           git add .
@@ -164,7 +164,7 @@ jobs:
           tags: crownshy/civic_os_admin:${{ github.sha }}
       - name: Update GitOps manifests
         run: |
-          git clone https://${{ secrets.GITOPS_TOKEN }}@github.com/crownshy/bloom_charts.git
+          git clone https://${{ secrets.GITOPS_TOKEN }}@github.com/theBLOOMproject/bloom_charts.git
           cd bloom_charts
           sed -i "s|^  dockerTag:.*|  dockerTag: \"${{ github.sha }}\"|" civic-os/values-staging.yaml
           git add .
@@ -201,7 +201,7 @@ jobs:
           tags: crownshy/civic_os_admin:${{ github.sha }}
       - name: Update GitOps manifests
         run: |
-          git clone https://${{ secrets.GITOPS_TOKEN }}@github.com/crownshy/bloom_charts.git
+          git clone https://${{ secrets.GITOPS_TOKEN }}@github.com/theBLOOMproject/bloom_charts.git
           cd bloom_charts
           sed -i "s|^  dockerTag:.*|  dockerTag: \"${{ github.sha }}\"|" civic-os/values.yaml
           git add .
@@ -241,7 +241,7 @@ jobs:
       # civic-os jobs, whose admin block is indented two spaces.
       - name: Update GitOps manifests
         run: |
-          git clone https://${{ secrets.GITOPS_TOKEN }}@github.com/crownshy/bloom_charts.git
+          git clone https://${{ secrets.GITOPS_TOKEN }}@github.com/theBLOOMproject/bloom_charts.git
           cd bloom_charts
           sed -i "s|^dockerTag:.*|dockerTag: \"${{ github.sha }}\"|" report/values-staging.yaml
           git add .
@@ -278,7 +278,7 @@ jobs:
           tags: crownshy/civic_os_report:${{ github.sha }}
       - name: Update GitOps manifests
         run: |
-          git clone https://${{ secrets.GITOPS_TOKEN }}@github.com/crownshy/bloom_charts.git
+          git clone https://${{ secrets.GITOPS_TOKEN }}@github.com/theBLOOMproject/bloom_charts.git
           cd bloom_charts
           sed -i "s|^dockerTag:.*|dockerTag: \"${{ github.sha }}\"|" report/values.yaml
           git add .
