@@ -2,8 +2,8 @@
 FROM node:22 AS base
 WORKDIR /app
 
-# Install pnpm globally
-RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+# Install the pnpm version used by this workspace
+RUN corepack enable && corepack prepare pnpm@12.3.4 --activate
 
 # Copy workspace manifests and every package manifest first so the install
 # layer is cacheable and pnpm can resolve the workspace graph.

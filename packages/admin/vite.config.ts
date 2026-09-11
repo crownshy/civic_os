@@ -8,94 +8,101 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const dirname =
-	typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
+    typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
+
+// Resolve Chromium path for NixOS environments, defaulting to undefined for standard OSs
+const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
 
 // Mirror the api-client ESM resolution fix from civicos.
 // dist/client.js imports './api' without .js extension.
 function fixApiClientPlugin() {
-	return {
-		name: 'fix-api-client-esm',
-		enforce: 'pre' as const,
-		resolveId(source: string, importer: string | undefined) {
-			if (
-				source === './api' &&
-				importer &&
-				importer.includes('@crownshy/api-client') &&
-				importer.endsWith('client.js')
-			) {
-				return importer.replace('client.js', 'api.js');
-			}
-		}
-	};
+    return {
+        name: 'fix-api-client-esm',
+        enforce: 'pre' as const,
+        resolveId(source: string, importer: string | undefined) {
+            if (
+                source === './api' &&
+                importer &&
+                importer.includes('@crownshy/api-client') &&
+                importer.endsWith('client.js')
+            ) {
+                return importer.replace('client.js', 'api.js');
+            }
+        }
+    };
 }
 
 export default defineConfig({
-	plugins: [fixApiClientPlugin(), tailwindcss(), sveltekit()],
-	resolve: {
-		alias: [
-			// sveltekit-superforms' adapter barrel eagerly evaluates every adapter,
-			// and adapters/typebox.js does a top-level `class extends Type.Base`.
-			// We use the zod4 adapter and don't install TypeBox, so this bare import
-			// resolves to `undefined` in dev SSR and 500s any page using superforms.
-			// Point it at a tiny stub. See src/lib/stubs/typebox.js for the details.
-			{ find: /^typebox$/, replacement: path.join(dirname, 'src/lib/stubs/typebox.js') }
-		]
-	},
-	server: {
-		port: 5173,
-		allowedHosts: ['.localhost'],
-		fs: {
-			// Allow serving from sibling workspace packages (e.g. @civicos/shared).
-			allow: ['..']
-		}
-	},
-	test: {
-		expect: {
-			// Every test must make at least one assertion (mirrors civicos).
-			requireAssertions: true
-		},
-		projects: [
-			{
-				extends: './vite.config.ts',
-				test: {
-					name: 'client',
-					browser: {
-						enabled: true,
-						provider: playwright(),
-						instances: [{ browser: 'chromium', headless: true }]
-					},
-					include: ['src/**/*.svelte.{test,spec}.{js,ts}']
-				}
-			},
-			{
-				extends: './vite.config.ts',
-				test: {
-					name: 'server',
-					environment: 'node',
-					include: ['src/**/*.{test,spec}.{js,ts}'],
-					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}']
-				}
-			},
-			{
-				extends: true,
-				plugins: [
-					// The plugin will run tests for the stories defined in your Storybook config.
-					// See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
-					storybookTest({
-						configDir: path.join(dirname, '.storybook')
-					})
-				],
-				test: {
-					name: 'storybook',
-					browser: {
-						enabled: true,
-						headless: true,
-						provider: playwright({}),
-						instances: [{ browser: 'chromium' }]
-					},
-					setupFiles: ['.storybook/vitest.setup.ts']
-				}
-			}
-		]
-	}
+    plugins: [fixApiClientPlugin(), tailwindcss(), sveltekit()],
+    resolve: {
+        alias: [
+            // sveltekit-superforms' adapter barrel eagerly evaluates every adapter,
+            // and adapters/typebox.js does a top-level `class extends Type.Base`.
+            // We use the zod4 adapter and don't install TypeBox, so this bare import
+            // resolves to `undefined` in dev SSR and 500s any page using superforms.
+            // Point it at a tiny stub. See src/lib/stubs/typebox.js for the details.
+            { find: /^typebox$/, replacement: path.join(dirname, 'src/lib/stubs/typebox.js') }
+        ]
+    },
+    server: {
+        port: 5173,
+        allowedHosts: ['.localhost'],
+        fs: {
+            // Allow serving from sibling workspace packages (e.g. @civicos/shared).
+            allow: ['..']
+        }
+    },
+    test: {
+        expect: {
+            // Every test must make at least one assertion (mirrors civicos).
+            requireAssertions: true
+        },
+        projects: [
+            {
+                extends: './vite.config.ts',
+                test: {
+                    name: 'client',
+                    browser: {
+                        enabled: true,
+                        provider: playwright({
+                            launchOptions: executablePath ? { executablePath } : {}
+                        }),
+                        instances: [{ browser: 'chromium', headless: true }]
+                    },
+                    include: ['src/**/*.svelte.{test,spec}.{js,ts}']
+                }
+            },
+            {
+                extends: './vite.config.ts',
+                test: {
+                    name: 'server',
+                    environment: 'node',
+                    include: ['src/**/*.{test,spec}.{js,ts}'],
+                    exclude: ['src/**/*.svelte.{test,spec}.{js,ts}']
+                }
+            },
+            {
+                extends: true,
+                plugins: [
+                    // The plugin will run tests for the stories defined in your Storybook config.
+                    // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
+                    storybookTest({
+                        configDir: path.join(dirname, '.storybook')
+                    })
+                ],
+                test: {
+                    name: 'storybook',
+                    browser: {
+                        enabled: true,
+                        headless: true,
+                        provider: playwright({
+                            launchOptions: executablePath ? { executablePath } : {}
+                        }),
+                        instances: [{ browser: 'chromium' }]
+                    },
+                    setupFiles: ['.storybook/vitest.setup.ts']
+                }
+            }
+        ]
+    }
 });
