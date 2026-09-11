@@ -14,8 +14,8 @@ importers:
         specifier: workspace:*
         version: link:../shared
       '@crownshy/api-client':
-        specifier: ^0.0.44-rc.1
-        version: 0.0.44-rc.1(axios@1.18.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0))(zod@4.4.3)
+        specifier: ^0.0.44-rc.2
+        version: 0.0.44-rc.2(axios@1.18.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0))(zod@4.4.3)
       '@lucide/svelte':
         specifier: ^1.16.0
         version: 1.22.0(svelte@5.56.4(@typescript-eslint/types@8.62.1))
@@ -360,7 +360,7 @@ importers:
     devDependencies:
       '@eslint/compat':
         specifier: ^2.0.2
-        version: 2.1.0(eslint@9.39.4(jiti@2.7.0))
+        version: 2.1.0(eslint@9.39.4(jiti@2.7.0)(supports-color@7.2.0))
       '@eslint/js':
         specifier: ^9.39.2
         version: 9.39.4
@@ -393,13 +393,13 @@ importers:
         version: 22.20.0
       eslint:
         specifier: ^9.39.2
-        version: 9.39.4(jiti@2.7.0)
+        version: 9.39.4(jiti@2.7.0)(supports-color@7.2.0)
       eslint-config-prettier:
         specifier: ^10.1.8
-        version: 10.1.8(eslint@9.39.4(jiti@2.7.0))
+        version: 10.1.8(eslint@9.39.4(jiti@2.7.0)(supports-color@7.2.0))
       eslint-plugin-svelte:
         specifier: ^3.14.0
-        version: 3.20.0(eslint@9.39.4(jiti@2.7.0))(svelte@5.56.4(@typescript-eslint/types@8.62.1))
+        version: 3.20.0(eslint@9.39.4(jiti@2.7.0)(supports-color@7.2.0))(svelte@5.56.4(@typescript-eslint/types@8.62.1))
       globals:
         specifier: ^17.3.0
         version: 17.7.0
@@ -423,7 +423,7 @@ importers:
         version: 5.9.3
       typescript-eslint:
         specifier: ^8.54.0
-        version: 8.62.1(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3)
+        version: 8.62.1(eslint@9.39.4(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@5.9.3)
       vite:
         specifier: ^7.3.1
         version: 7.3.6(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)
@@ -535,8 +535,8 @@ packages:
   '@crownshy/api-client@0.0.43':
     resolution: {integrity: sha512-XWJNPfmn9lUs5tixMqqZ32l+GsEhafEoCCjC9Pb91VvEn/XOlGVwStJgRghTJhaRo+a/U3zdKzP69bKYHTDbcA==}
 
-  '@crownshy/api-client@0.0.44-rc.1':
-    resolution: {integrity: sha512-3A64HP458BC5BCqZRpAXLlLxK0eW1K2Uk6PTzRAIZmTOFyQ2Ok/FDFCHuMsUeuUL7t9KRaeZkHAk2fEI5ce8Uw==}
+  '@crownshy/api-client@0.0.44-rc.2':
+    resolution: {integrity: sha512-qWG98yd91gE7mSdNJS1R5qryVo5x2yHsb56FfQXPTv2LXpJKD6FQe55+8AHGzq1EUHyhD0h6hu8Om/vcck5jUA==}
 
   '@csstools/color-helpers@6.1.1':
     resolution: {integrity: sha512-gLNsunvwf3mCi5u5o46/Z/JcJMnhbHSaZ69rkgPzNM3J4s8hWwpPUQB6/tt0EDFyCiWzxANlx+2LJwpYj4zS1w==}
@@ -2042,6 +2042,7 @@ packages:
   add-to-calendar-button@2.14.0:
     resolution: {integrity: sha512-2zVz1xm1AoaGKdZrRHIBNfB3fDL3xpfyRy8uUDJzzCp0b5zBJlmrv6zaJ7PO2XciJIaQvg3wvdWkiJ2LJ/P4gQ==}
     engines: {node: '>=18.17.0', npm: '>=9.6.7'}
+    deprecated: Versions below v3 are deprecated. Migrate to add-to-calendar-button v3 or later for better performance, security, and compatibility.
 
   agent-base@6.0.2:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
@@ -3989,7 +3990,7 @@ snapshots:
       - axios
       - zod
 
-  '@crownshy/api-client@0.0.44-rc.1(axios@1.18.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0))(zod@4.4.3)':
+  '@crownshy/api-client@0.0.44-rc.2(axios@1.18.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0))(zod@4.4.3)':
     dependencies:
       '@zodios/core': 10.9.6(axios@1.18.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0))(zod@4.4.3)
       typescript: 5.9.3
