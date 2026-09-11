@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Trash2 } from '@lucide/svelte';
+	import { Pencil, Trash2 } from '@lucide/svelte';
 
 	interface Props {
 		/** Left column: the thing being switched on or off. */
@@ -12,15 +12,17 @@
 		/** Read-only cards, and rows with a write in flight, pass true. */
 		disabled?: boolean;
 		onToggle: () => void;
+		/** Renders an edit button left of the delete button. */
+		onEdit?: () => void;
 		/** Renders a delete button left of the switch. */
 		onRemove?: () => void;
 	}
 
-	let { name, detail, note, on, disabled = false, onToggle, onRemove }: Props = $props();
+	let { name, detail, note, on, disabled = false, onToggle, onEdit, onRemove }: Props = $props();
 </script>
 
 <div
-	class="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)_auto] items-center gap-4 px-2 py-5 {on
+	class="col-span-full grid grid-cols-subgrid items-center gap-4 px-2 py-5 {on
 		? ''
 		: 'opacity-50'}"
 >
@@ -32,6 +34,18 @@
 		{/if}
 	</div>
 	<div class="flex items-center justify-end gap-3">
+		{#if onEdit}
+			<button
+				type="button"
+				onclick={onEdit}
+				{disabled}
+				aria-label={`Edit ${name}`}
+				title="Edit this category"
+				class="cursor-pointer p-1 text-muted-foreground hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
+			>
+				<Pencil class="size-4" />
+			</button>
+		{/if}
 		{#if onRemove}
 			<button
 				type="button"

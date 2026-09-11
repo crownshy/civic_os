@@ -21,11 +21,14 @@
 	const error = $derived(data.error);
 
 	let modalOpen = $state(false);
-	let modalMetric = $state<GoalMetric | null>(null);
+	let modalMetric = $state<string | null>(null);
+	let modalMetricLabel = $state<string | undefined>();
+	let modalBuckets = $state<string[] | undefined>();
 
-	function openModal(metric: GoalMetric) {
-		console.log('Opening modal');
+	function openModal(metric: string, label?: string, buckets?: string[]) {
 		modalMetric = metric;
+		modalMetricLabel = label;
+		modalBuckets = buckets;
 		modalOpen = true;
 	}
 
@@ -50,6 +53,7 @@
 	const genderRows = $derived(rowsFor(demographics?.gender, goals.gender));
 	const politicalRows = $derived(rowsFor(demographics?.politicalParty, goals.politicalParty));
 	const ageRows = $derived(rowsFor(demographics?.ageRanges, goals.ageRanges));
+	const customDemographicResults = $derived(data.customDemographicResults ?? []);
 
 	// Geography now groups by county (rolled up server-side). Rows = counties with
 	// participants ∪ counties with a goal set, so under-recruited (0-count) counties
@@ -102,17 +106,25 @@
 		return out;
 	});
 
-	const jumpLinks = [
+	const jumpLinks = $derived([
 		{ href: '#geography', label: 'Geography' },
 		{ href: '#ethnicity', label: 'Race / Ethnicity' },
 		{ href: '#gender', label: 'Gender' },
 		{ href: '#political', label: 'Political Affiliation' },
-		{ href: '#age', label: 'Age' }
-	];
+		{ href: '#age', label: 'Age' },
+		...customDemographicResults.map((question) => ({
+			href: `#demographic-${question.slug}`,
+			label: question.displayName
+		}))
+	]);
 
-	const currentGoals = $derived(
-		modalMetric && modalMetric !== 'totalParticipants' ? goals[modalMetric] : {}
-	);
+	const currentGoals = $derived.by(() => {
+		if (!modalMetric || modalMetric === 'totalParticipants') return {};
+		if (modalMetric in goals && modalMetric !== 'custom') {
+			return goals[modalMetric as Exclude<GoalMetric, 'totalParticipants'>];
+		}
+		return goals.custom[modalMetric] ?? {};
+	});
 </script>
 
 {#if error}
@@ -283,15 +295,33 @@
 					onModifyGoals={() => openModal('ageRanges')}
 				/>
 			</div>
+
+			{#each customDemographicResults as question (question.slug)}
+				<div id={`demographic-${question.slug}`} class="scroll-mt-4">
+					<DemographicTable
+						title={question.displayName}
+						rows={question.rows.filter((row) => row.count > 0 || row.goal !== undefined)}
+						total={question.rows.filter((row) => row.count > 0 || row.goal !== undefined).reduce((sum, row) => sum + row.count, 0)}
+						participantCount={totalParticipants}
+						onModifyGoals={() =>
+							openModal(
+								question.slug,
+								question.displayName,
+								question.rows.map((row) => row.label)
+							)}
+					/>
+				</div>
+			{/each}
 		</div>
 	</div>
 
 	<EditGoalsModal
 		bind:open={modalOpen}
 		metric={modalMetric}
+		metricLabel={modalMetricLabel}
 		currentGoals={currentGoals as Record<string, number>}
 		totalGoal={participantsGoal}
-		buckets={modalMetric === 'county' ? countyBuckets : undefined}
+		buckets={modalMetric === 'county' ? countyBuckets : modalBuckets}
 		{conversationId}
 		{workflowId}
 	/>

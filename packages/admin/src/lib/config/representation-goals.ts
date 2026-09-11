@@ -16,6 +16,8 @@ export interface RegionGoals {
 	gender: Record<string, number>;
 	/** Geography goals, keyed by county name (buckets are per-region, not static). */
 	county: Record<string, number>;
+	/** Host-authored demographic question slug to option goals. */
+	custom: Record<string, Record<string, number>>;
 }
 
 export type GoalMetric =
@@ -62,6 +64,7 @@ export function emptyGoals(): RegionGoals {
 		politicalParty: {},
 		ageRanges: {},
 		gender: {},
-		county: {}
+		county: {},
+		custom: {}
 	};
 }

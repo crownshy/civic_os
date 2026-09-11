@@ -9,7 +9,8 @@
 
 	interface Props {
 		open: boolean;
-		metric: GoalMetric | null;
+		metric: string | null;
+		metricLabel?: string;
 		currentGoals: Record<string, number>;
 		totalGoal: number;
 		conversationId: string;
@@ -21,6 +22,7 @@
 	let {
 		open = $bindable(),
 		metric,
+		metricLabel,
 		currentGoals,
 		totalGoal,
 		conversationId,
@@ -28,9 +30,17 @@
 		buckets: bucketsOverride
 	}: Props = $props();
 
-	const title = $derived(metric ? `Modify ${METRIC_LABELS[metric]} Goals` : '');
+	const knownMetric = $derived(
+		metric && metric in METRIC_LABELS ? (metric as GoalMetric) : null
+	);
+	const title = $derived(
+		metric ? `Modify ${metricLabel ?? (knownMetric ? METRIC_LABELS[knownMetric] : metric)} Goals` : ''
+	);
 	const buckets = $derived(
-		metric && metric !== 'totalParticipants' ? (bucketsOverride ?? METRIC_BUCKETS[metric]) : []
+		metric && metric !== 'totalParticipants'
+			? (bucketsOverride ??
+				(knownMetric && knownMetric !== 'totalParticipants' ? METRIC_BUCKETS[knownMetric] : []))
+			: []
 	);
 
 	let submitting = $state(false);
