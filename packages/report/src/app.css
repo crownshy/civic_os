@@ -2,21 +2,27 @@
    and up: anything the design marks bold renders in Medium. */
 @font-face {
 	font-family: 'Geomanist';
-	src: url('./lib/assets/fonts/Geomanist-Book.otf') format('opentype');
+	src:
+		url('./lib/assets/fonts/Geomanist-Book.woff2') format('woff2'),
+		url('./lib/assets/fonts/Geomanist-Book.woff') format('woff');
 	font-weight: 400;
 	font-style: normal;
 	font-display: swap;
 }
 @font-face {
 	font-family: 'Geomanist';
-	src: url('./lib/assets/fonts/Geomanist-Book-Italic.otf') format('opentype');
+	src:
+		url('./lib/assets/fonts/Geomanist-Book-Italic.woff2') format('woff2'),
+		url('./lib/assets/fonts/Geomanist-Book-Italic.woff') format('woff');
 	font-weight: 400;
 	font-style: italic;
 	font-display: swap;
 }
 @font-face {
 	font-family: 'Geomanist';
-	src: url('./lib/assets/fonts/Geomanist-Medium.otf') format('opentype');
+	src:
+		url('./lib/assets/fonts/Geomanist-Medium.woff2') format('woff2'),
+		url('./lib/assets/fonts/Geomanist-Medium.woff') format('woff');
 	font-weight: 500 900;
 	font-style: normal;
 	font-display: swap;
