@@ -1,0 +1,88 @@
+{
+	"cities": [
+		{
+			"name": "Madras",
+			"county": "Jefferson",
+			"count": 34,
+			"lat": 44.6306,
+			"lng": -121.1292,
+			"major": true
+		},
+		{
+			"name": "Prineville",
+			"county": "Crook",
+			"count": 28,
+			"lat": 44.2999,
+			"lng": -120.8345,
+			"major": true
+		},
+		{
+			"name": "Redmond",
+			"county": "Deschutes",
+			"count": 42,
+			"lat": 44.2726,
+			"lng": -121.1739,
+			"major": true
+		},
+		{
+			"name": "Sisters",
+			"county": "Deschutes",
+			"count": 52,
+			"lat": 44.2928,
+			"lng": -121.5531,
+			"major": true
+		},
+		{
+			"name": "Bend",
+			"county": "Deschutes",
+			"count": 223,
+			"lat": 44.0582,
+			"lng": -121.3153,
+			"major": true
+		},
+		{
+			"name": "Powell Butte",
+			"county": "Crook",
+			"count": 9,
+			"lat": 44.2476,
+			"lng": -121.0175
+		},
+		{
+			"name": "Antelope",
+			"county": "Wasco",
+			"count": 9,
+			"lat": 44.9114,
+			"lng": -120.7236
+		},
+		{
+			"name": "La Pine",
+			"county": "Deschutes",
+			"count": 6,
+			"lat": 43.6792,
+			"lng": -121.4958
+		},
+		{
+			"name": "Camp Sherman",
+			"county": "Jefferson",
+			"count": 3,
+			"lat": 44.4603,
+			"lng": -121.6411
+		},
+		{
+			"name": "Culver",
+			"county": "Jefferson",
+			"count": 2,
+			"lat": 44.5247,
+			"lng": -121.2122
+		},
+		{
+			"name": "Terrebonne",
+			"county": "Deschutes",
+			"count": 2,
+			"lat": 44.3533,
+			"lng": -121.1808
+		}
+	],
+	"other": 27,
+	"total": 437
+}

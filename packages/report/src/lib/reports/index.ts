@@ -9,7 +9,8 @@ import type { Report } from '../domain/report';
  * (GET /conversation/{id_or_slug} already accepts a slug) rather than a table.
  */
 const REPORTS: Record<string, () => Promise<{ report: Report }>> = {
-	'central-oregon-ai': () => import('./central-oregon-ai')
+	'central-oregon-ai': () => import('./central-oregon-ai'),
+	'utah-ai': () => import('./utah-ai')
 };
 
 const loaded = new Map<string, Report>();

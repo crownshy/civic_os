@@ -1,0 +1,138 @@
+{
+	"poll": {
+		"total": 595,
+		"categories": [
+			{
+				"key": "age",
+				"label": "Age",
+				"answered": 316,
+				"breakdown": [
+					{
+						"label": "Under 18",
+						"pct": 1
+					},
+					{
+						"label": "18-24",
+						"pct": 12
+					},
+					{
+						"label": "25-34",
+						"pct": 12
+					},
+					{
+						"label": "35-44",
+						"pct": 30
+					},
+					{
+						"label": "45-54",
+						"pct": 16
+					},
+					{
+						"label": "55-64",
+						"pct": 16
+					},
+					{
+						"label": "65+",
+						"pct": 13
+					}
+				]
+			},
+			{
+				"key": "political",
+				"label": "Political",
+				"answered": 282,
+				"breakdown": [
+					{
+						"label": "No Party Preference / Independent",
+						"pct": 49
+					},
+					{
+						"label": "Democrat / Progressive / Liberal",
+						"pct": 31
+					},
+					{
+						"label": "Republican / Conservative",
+						"pct": 20
+					}
+				]
+			},
+			{
+				"key": "gender",
+				"label": "Gender",
+				"answered": 302,
+				"breakdown": [
+					{
+						"label": "Female",
+						"pct": 63
+					},
+					{
+						"label": "Male",
+						"pct": 35
+					},
+					{
+						"label": "Other",
+						"pct": 2
+					}
+				]
+			},
+			{
+				"key": "ethnicity",
+				"label": "Race / Ethnicity",
+				"answered": 306,
+				"breakdown": [
+					{
+						"label": "White or Caucasian",
+						"pct": 92
+					},
+					{
+						"label": "Multiracial",
+						"pct": 4
+					},
+					{
+						"label": "Hispanic or Latino",
+						"pct": 3
+					},
+					{
+						"label": "Other",
+						"pct": 2
+					},
+					{
+						"label": "Asian / Pacific Islander",
+						"pct": 0
+					}
+				]
+			}
+		]
+	},
+	"actual": {
+		"age": {
+			"Under 18": 4,
+			"18-24": 14,
+			"25-34": 20,
+			"35-44": 18,
+			"45-54": 15,
+			"55-64": 13,
+			"65+": 16
+		},
+		"political": {
+			"No Party Preference / Independent": 35,
+			"Democrat / Progressive / Liberal": 20,
+			"Republican / Conservative": 45
+		},
+		"gender": {
+			"Female": 50,
+			"Male": 49,
+			"Other": 1
+		},
+		"ethnicity": {
+			"White or Caucasian": 75,
+			"Multiracial": 3,
+			"Hispanic or Latino": 15,
+			"Other": 1,
+			"Asian / Pacific Islander": 3,
+			"Native American": 1,
+			"Black or African American": 1,
+			"Middle Eastern / North African": 1
+		}
+	}
+}

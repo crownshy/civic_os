@@ -1,0 +1,14 @@
+{
+	"A": {
+		"participants": 70,
+		"color": "#1B4EA6",
+		"tagline": "See AI already helping ordinary people, and want Utah to put it to work.",
+		"description": "The smaller of the two groups, about one in eight participants. Compared with everyone else, people here are far more likely to say AI tools are already helping ordinary people do what used to take an expensive professional, and that the state should use chatbots when they answer residents' questions better than a person can. They reject the idea that AI's gains flow only to the rich or that it will make it harder for families to get by, and they would rather bring AI into kids' education safely than hold it back. Far fewer of them back mandates on companies, like paying to retrain displaced workers, but they join the majority on transparency: data center reporting, consent before personal data is used, and knowing when AI is evaluating you."
+	},
+	"B": {
+		"participants": 457,
+		"color": "#7C3AED",
+		"tagline": "Want to slow down, protect Utah's water and workers, and make AI companies answer for the costs.",
+		"description": "By far the larger group, nearly nine in ten participants, so its views set the tone for most of this report. Compared with Group A, people here want much more caution before AI spreads further: they would hold off on giving kids new AI tools until the effects of social media are understood, and most would pause new data centers until the public knows what they're for, with water the concern that comes up again and again. They see AI raising everyday costs while companies profit, oppose replacing state workers with chatbots to cut costs, and expect companies that automate jobs to help pay for retraining. They aren't uniformly against AI: about half agree AI tools are already helping ordinary people."
+	}
+}

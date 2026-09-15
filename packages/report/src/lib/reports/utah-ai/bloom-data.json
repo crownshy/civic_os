@@ -1,0 +1,3124 @@
+{
+	"themes": [
+		{
+			"key": "datacenters",
+			"short": "Data Centers & Natural Resources",
+			"color": "#CE302B",
+			"tags": ["Natural Resources", "Data Centers / Building"]
+		},
+		{
+			"key": "jobs",
+			"short": "Jobs, Costs & Benefits",
+			"color": "#8E3AD1",
+			"tags": ["Jobs", "Economic Fairness"]
+		},
+		{
+			"key": "companies",
+			"short": "Corporate Responsibility",
+			"color": "#0E6FA6",
+			"tags": ["Companies / AI Companies"]
+		},
+		{
+			"key": "kids",
+			"short": "Kids, Schools & Mental Health",
+			"color": "#137A22",
+			"tags": ["Youth", "Schools, Teachers, Parents, Students"]
+		},
+		{
+			"key": "government",
+			"short": "Government & Public Life",
+			"color": "#17348C",
+			"tags": ["Government / Public Sector", "News / Information", "Civil Society"]
+		},
+		{
+			"key": "health",
+			"short": "Health & Mental Health",
+			"color": "#B01B6B",
+			"tags": ["Health / Mental Health"]
+		}
+	],
+	"records": [
+		{
+			"id": "p0",
+			"kind": "poll",
+			"text": "Utah now requires new data centers to report their water use. They should also have to report how much electricity they consume and how much air pollution they produce.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 315,
+				"gap": 20,
+				"minAgree": 76,
+				"groups": {
+					"A": {
+						"a": 45,
+						"d": 8,
+						"p": 6,
+						"n": 59,
+						"pct": 76
+					},
+					"B": {
+						"a": 246,
+						"d": 2,
+						"p": 8,
+						"n": 256,
+						"pct": 96
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Natural Resources", "Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p2",
+			"kind": "poll",
+			"text": "Tax breaks for AI companies building in Utah should require demonstrated community benefits.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 314,
+				"gap": 16,
+				"minAgree": 77,
+				"groups": {
+					"A": {
+						"a": 46,
+						"d": 6,
+						"p": 8,
+						"n": 60,
+						"pct": 77
+					},
+					"B": {
+						"a": 236,
+						"d": 5,
+						"p": 13,
+						"n": 254,
+						"pct": 93
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Data Centers / Building", "Companies / AI Companies"],
+			"inReport": false
+		},
+		{
+			"id": "p4",
+			"kind": "poll",
+			"text": "For teenagers who can't access or afford therapy, AI chatbots are better than nothing.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 286,
+				"gap": 28,
+				"minAgree": 10,
+				"groups": {
+					"A": {
+						"a": 21,
+						"d": 20,
+						"p": 15,
+						"n": 56,
+						"pct": 38
+					},
+					"B": {
+						"a": 23,
+						"d": 158,
+						"p": 49,
+						"n": 230,
+						"pct": 10
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Youth", "Health / Mental Health"],
+			"inReport": false
+		},
+		{
+			"id": "p5",
+			"kind": "poll",
+			"text": "Parents should be able to see what their minor children discuss with AI mental health or companion apps.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 309,
+				"gap": 2,
+				"minAgree": 82,
+				"groups": {
+					"A": {
+						"a": 47,
+						"d": 1,
+						"p": 9,
+						"n": 57,
+						"pct": 82
+					},
+					"B": {
+						"a": 212,
+						"d": 16,
+						"p": 24,
+						"n": 252,
+						"pct": 84
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Youth", "Health / Mental Health"],
+			"inReport": false
+		},
+		{
+			"id": "p10",
+			"kind": "poll",
+			"text": "Parents who are worried about AI in their children's schools should be educating themselves and organizing with other parents — not waiting for administrators to act.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 308,
+				"gap": 5,
+				"minAgree": 76,
+				"groups": {
+					"A": {
+						"a": 42,
+						"d": 5,
+						"p": 8,
+						"n": 55,
+						"pct": 76
+					},
+					"B": {
+						"a": 206,
+						"d": 22,
+						"p": 25,
+						"n": 253,
+						"pct": 81
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Schools, Teachers, Parents, Students"],
+			"inReport": false
+		},
+		{
+			"id": "p12",
+			"kind": "poll",
+			"text": "Companies that use AI to automate jobs should also help fund training for the workers they displace.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 407,
+				"gap": 46,
+				"minAgree": 33,
+				"groups": {
+					"A": {
+						"a": 22,
+						"d": 32,
+						"p": 13,
+						"n": 67,
+						"pct": 33
+					},
+					"B": {
+						"a": 270,
+						"d": 33,
+						"p": 37,
+						"n": 340,
+						"pct": 79
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Jobs", "Companies / AI Companies"],
+			"inReport": false
+		},
+		{
+			"id": "p13",
+			"kind": "poll",
+			"text": "Workers should have the right to know when AI is being used to evaluate their performance or productivity.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 320,
+				"gap": 18,
+				"minAgree": 79,
+				"groups": {
+					"A": {
+						"a": 44,
+						"d": 9,
+						"p": 3,
+						"n": 56,
+						"pct": 79
+					},
+					"B": {
+						"a": 255,
+						"d": 3,
+						"p": 6,
+						"n": 264,
+						"pct": 97
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Jobs"],
+			"inReport": false
+		},
+		{
+			"id": "p14",
+			"kind": "poll",
+			"text": "Companies that produce or offer to the public AI companions or advice should be held responsible for injuries people experience as a result of trusting content provided by those features.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 330,
+				"gap": 41,
+				"minAgree": 47,
+				"groups": {
+					"A": {
+						"a": 27,
+						"d": 11,
+						"p": 20,
+						"n": 58,
+						"pct": 47
+					},
+					"B": {
+						"a": 238,
+						"d": 13,
+						"p": 21,
+						"n": 272,
+						"pct": 88
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Companies / AI Companies"],
+			"inReport": false
+		},
+		{
+			"id": "p15",
+			"kind": "poll",
+			"text": "When AI companies profit from Utahns' personal data, residents should have a legal right to a share of those profits.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 344,
+				"gap": 39,
+				"minAgree": 49,
+				"groups": {
+					"A": {
+						"a": 31,
+						"d": 13,
+						"p": 19,
+						"n": 63,
+						"pct": 49
+					},
+					"B": {
+						"a": 246,
+						"d": 12,
+						"p": 23,
+						"n": 281,
+						"pct": 88
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Companies / AI Companies"],
+			"inReport": false
+		},
+		{
+			"id": "p20",
+			"kind": "poll",
+			"text": "When Utah government agencies plan to use AI in services that affect residents, the public should be able to weigh in before — not after — changes are rolled out.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 324,
+				"gap": 32,
+				"minAgree": 66,
+				"groups": {
+					"A": {
+						"a": 40,
+						"d": 11,
+						"p": 10,
+						"n": 61,
+						"pct": 66
+					},
+					"B": {
+						"a": 258,
+						"d": 2,
+						"p": 3,
+						"n": 263,
+						"pct": 98
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Government / Public Sector"],
+			"inReport": false
+		},
+		{
+			"id": "p32",
+			"kind": "poll",
+			"text": "Utah residents should be able to find out whether AI was used in any government decision that directly affected them.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 288,
+				"gap": 33,
+				"minAgree": 64,
+				"groups": {
+					"A": {
+						"a": 37,
+						"d": 10,
+						"p": 11,
+						"n": 58,
+						"pct": 64
+					},
+					"B": {
+						"a": 223,
+						"d": 1,
+						"p": 6,
+						"n": 230,
+						"pct": 97
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Government / Public Sector"],
+			"inReport": false
+		},
+		{
+			"id": "p34",
+			"kind": "poll",
+			"text": "AI companies should not be able to use your personal data to train their systems without your clear, informed permission.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 269,
+				"gap": 19,
+				"minAgree": 78,
+				"groups": {
+					"A": {
+						"a": 42,
+						"d": 3,
+						"p": 9,
+						"n": 54,
+						"pct": 78
+					},
+					"B": {
+						"a": 209,
+						"d": 4,
+						"p": 2,
+						"n": 215,
+						"pct": 97
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Companies / AI Companies"],
+			"inReport": false
+		},
+		{
+			"id": "p37",
+			"kind": "poll",
+			"text": "Parents should be notified when their child's schoolwork is being graded or evaluated with the help of an AI tool.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 324,
+				"gap": 37,
+				"minAgree": 45,
+				"groups": {
+					"A": {
+						"a": 26,
+						"d": 23,
+						"p": 9,
+						"n": 58,
+						"pct": 45
+					},
+					"B": {
+						"a": 219,
+						"d": 20,
+						"p": 27,
+						"n": 266,
+						"pct": 82
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Schools, Teachers, Parents, Students"],
+			"inReport": false
+		},
+		{
+			"id": "p40",
+			"kind": "poll",
+			"text": "Workers in Utah who lose their jobs to AI automation deserve access to affordable retraining programs close to home.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 301,
+				"gap": 35,
+				"minAgree": 55,
+				"groups": {
+					"A": {
+						"a": 33,
+						"d": 14,
+						"p": 13,
+						"n": 60,
+						"pct": 55
+					},
+					"B": {
+						"a": 217,
+						"d": 8,
+						"p": 16,
+						"n": 241,
+						"pct": 90
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Jobs"],
+			"inReport": false
+		},
+		{
+			"id": "p44",
+			"kind": "poll",
+			"text": "AI is making everyday life more expensive for ordinary people, even if it makes companies more profitable.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 293,
+				"gap": 62,
+				"minAgree": 7,
+				"groups": {
+					"A": {
+						"a": 4,
+						"d": 35,
+						"p": 20,
+						"n": 59,
+						"pct": 7
+					},
+					"B": {
+						"a": 162,
+						"d": 20,
+						"p": 52,
+						"n": 234,
+						"pct": 69
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Economic Fairness"],
+			"inReport": false
+		},
+		{
+			"id": "p45",
+			"kind": "poll",
+			"text": "The changes AI will bring to our economy are so large that small fixes will not be enough.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 290,
+				"gap": 28,
+				"minAgree": 38,
+				"groups": {
+					"A": {
+						"a": 22,
+						"d": 14,
+						"p": 22,
+						"n": 58,
+						"pct": 38
+					},
+					"B": {
+						"a": 154,
+						"d": 22,
+						"p": 56,
+						"n": 232,
+						"pct": 66
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Jobs"],
+			"inReport": false
+		},
+		{
+			"id": "p46",
+			"kind": "poll",
+			"text": "Utah's state government should not replace thousands of state workers with AI chatbots just to cut costs.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 306,
+				"gap": 54,
+				"minAgree": 34,
+				"groups": {
+					"A": {
+						"a": 20,
+						"d": 24,
+						"p": 15,
+						"n": 59,
+						"pct": 34
+					},
+					"B": {
+						"a": 218,
+						"d": 7,
+						"p": 22,
+						"n": 247,
+						"pct": 88
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Government / Public Sector"],
+			"inReport": false
+		},
+		{
+			"id": "p48",
+			"kind": "poll",
+			"text": "AI tools are already helping ordinary people do things that used to require expensive professionals.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 355,
+				"gap": 46,
+				"minAgree": 49,
+				"groups": {
+					"A": {
+						"a": 61,
+						"d": 1,
+						"p": 2,
+						"n": 64,
+						"pct": 95
+					},
+					"B": {
+						"a": 142,
+						"d": 105,
+						"p": 44,
+						"n": 291,
+						"pct": 49
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Jobs"],
+			"inReport": false
+		},
+		{
+			"id": "p49",
+			"kind": "poll",
+			"text": "If AI chatbots can answer residents' questions faster and more accurately than a person, the state should use them.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 336,
+				"gap": 58,
+				"minAgree": 25,
+				"groups": {
+					"A": {
+						"a": 52,
+						"d": 3,
+						"p": 8,
+						"n": 63,
+						"pct": 83
+					},
+					"B": {
+						"a": 69,
+						"d": 141,
+						"p": 63,
+						"n": 273,
+						"pct": 25
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Jobs"],
+			"inReport": false
+		},
+		{
+			"id": "p52",
+			"kind": "poll",
+			"text": "Experts should weigh in on laws and regulations. Educate the public. Technology and AI should be available to everyone through public access such as schools and libraries.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 311,
+				"gap": 23,
+				"minAgree": 63,
+				"groups": {
+					"A": {
+						"a": 49,
+						"d": 4,
+						"p": 4,
+						"n": 57,
+						"pct": 86
+					},
+					"B": {
+						"a": 161,
+						"d": 43,
+						"p": 50,
+						"n": 254,
+						"pct": 63
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Government / Public Sector"],
+			"inReport": false
+		},
+		{
+			"id": "p53",
+			"kind": "poll",
+			"text": "The best case scenario for AI is that most people don’t use it. It’s highly regulated and reserved for things that 1) humans can’t do and 2) produce a net benefit greater to humanity than the damage their data centers cause.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 346,
+				"gap": 59,
+				"minAgree": 10,
+				"groups": {
+					"A": {
+						"a": 6,
+						"d": 49,
+						"p": 8,
+						"n": 63,
+						"pct": 10
+					},
+					"B": {
+						"a": 195,
+						"d": 63,
+						"p": 25,
+						"n": 283,
+						"pct": 69
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Government / Public Sector"],
+			"inReport": false
+		},
+		{
+			"id": "p55",
+			"kind": "poll",
+			"text": "A small increase in power costs is worth it if we can get a lot of tax revenue out of new data centers.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 217,
+				"gap": 25,
+				"minAgree": 3,
+				"groups": {
+					"A": {
+						"a": 13,
+						"d": 10,
+						"p": 24,
+						"n": 47,
+						"pct": 28
+					},
+					"B": {
+						"a": 5,
+						"d": 138,
+						"p": 27,
+						"n": 170,
+						"pct": 3
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p56",
+			"kind": "poll",
+			"text": "We already have data centers – what’s the big deal in adding one or two more?",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 210,
+				"gap": 19,
+				"minAgree": 1,
+				"groups": {
+					"A": {
+						"a": 9,
+						"d": 20,
+						"p": 17,
+						"n": 46,
+						"pct": 20
+					},
+					"B": {
+						"a": 1,
+						"d": 156,
+						"p": 7,
+						"n": 164,
+						"pct": 1
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p57",
+			"kind": "poll",
+			"text": "I would be fine with data centers if they didn’t consume so much water.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 236,
+				"gap": 13,
+				"minAgree": 16,
+				"groups": {
+					"A": {
+						"a": 15,
+						"d": 9,
+						"p": 27,
+						"n": 51,
+						"pct": 29
+					},
+					"B": {
+						"a": 30,
+						"d": 116,
+						"p": 39,
+						"n": 185,
+						"pct": 16
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Natural Resources", "Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p58",
+			"kind": "poll",
+			"text": "Data centers should be built where they won’t interrupt anyone’s lives.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 299,
+				"gap": 14,
+				"minAgree": 56,
+				"groups": {
+					"A": {
+						"a": 33,
+						"d": 13,
+						"p": 13,
+						"n": 59,
+						"pct": 56
+					},
+					"B": {
+						"a": 168,
+						"d": 26,
+						"p": 46,
+						"n": 240,
+						"pct": 70
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p59",
+			"kind": "poll",
+			"text": "I trust our local and regional government officials to make the right decisions on new data centers – they are best positioned to make decisions that benefit everyone.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 206,
+				"gap": 12,
+				"minAgree": 1,
+				"groups": {
+					"A": {
+						"a": 6,
+						"d": 27,
+						"p": 12,
+						"n": 45,
+						"pct": 13
+					},
+					"B": {
+						"a": 2,
+						"d": 154,
+						"p": 5,
+						"n": 161,
+						"pct": 1
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p60",
+			"kind": "poll",
+			"text": "Data centers should also serve local computing needs, not just those of large multinational corporations.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 281,
+				"gap": 5,
+				"minAgree": 75,
+				"groups": {
+					"A": {
+						"a": 42,
+						"d": 6,
+						"p": 8,
+						"n": 56,
+						"pct": 75
+					},
+					"B": {
+						"a": 180,
+						"d": 15,
+						"p": 30,
+						"n": 225,
+						"pct": 80
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p61",
+			"kind": "poll",
+			"text": "As long as chatbots still guide kids through the learning process, I think they could boost our children’s education.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 312,
+				"gap": 51,
+				"minAgree": 19,
+				"groups": {
+					"A": {
+						"a": 40,
+						"d": 5,
+						"p": 12,
+						"n": 57,
+						"pct": 70
+					},
+					"B": {
+						"a": 49,
+						"d": 155,
+						"p": 51,
+						"n": 255,
+						"pct": 19
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Schools, Teachers, Parents, Students"],
+			"inReport": false
+		},
+		{
+			"id": "p62",
+			"kind": "poll",
+			"text": "We should be focused on how to integrate AI into our kids’ education safely, not whether or not to ban it.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 353,
+				"gap": 35,
+				"minAgree": 52,
+				"groups": {
+					"A": {
+						"a": 53,
+						"d": 5,
+						"p": 3,
+						"n": 61,
+						"pct": 87
+					},
+					"B": {
+						"a": 152,
+						"d": 99,
+						"p": 41,
+						"n": 292,
+						"pct": 52
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Schools, Teachers, Parents, Students"],
+			"inReport": false
+		},
+		{
+			"id": "p63",
+			"kind": "poll",
+			"text": "It's important for kids to learn how to use AI without it becoming a cognitive crutch.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 295,
+				"gap": 16,
+				"minAgree": 75,
+				"groups": {
+					"A": {
+						"a": 52,
+						"d": 2,
+						"p": 3,
+						"n": 57,
+						"pct": 91
+					},
+					"B": {
+						"a": 178,
+						"d": 36,
+						"p": 24,
+						"n": 238,
+						"pct": 75
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Youth"],
+			"inReport": false
+		},
+		{
+			"id": "p64",
+			"kind": "poll",
+			"text": "If people use AI to outsource skills they don't possess, they'll be dependent on that tool for the rest of their lives.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 280,
+				"gap": 40,
+				"minAgree": 30,
+				"groups": {
+					"A": {
+						"a": 17,
+						"d": 28,
+						"p": 11,
+						"n": 56,
+						"pct": 30
+					},
+					"B": {
+						"a": 157,
+						"d": 35,
+						"p": 32,
+						"n": 224,
+						"pct": 70
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Jobs"],
+			"inReport": false
+		},
+		{
+			"id": "p65",
+			"kind": "poll",
+			"text": "We should make AI chatbots more accessible to disadvantaged students so that they don't fall behind.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 253,
+				"gap": 30,
+				"minAgree": 16,
+				"groups": {
+					"A": {
+						"a": 26,
+						"d": 10,
+						"p": 21,
+						"n": 57,
+						"pct": 46
+					},
+					"B": {
+						"a": 32,
+						"d": 105,
+						"p": 59,
+						"n": 196,
+						"pct": 16
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Schools, Teachers, Parents, Students"],
+			"inReport": false
+		},
+		{
+			"id": "p66",
+			"kind": "poll",
+			"text": "Kids already have access to the internet. Chatbots don't change that much.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 218,
+				"gap": 17,
+				"minAgree": 6,
+				"groups": {
+					"A": {
+						"a": 11,
+						"d": 28,
+						"p": 8,
+						"n": 47,
+						"pct": 23
+					},
+					"B": {
+						"a": 11,
+						"d": 147,
+						"p": 13,
+						"n": 171,
+						"pct": 6
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Youth"],
+			"inReport": false
+		},
+		{
+			"id": "p67",
+			"kind": "poll",
+			"text": "I'm worried that kids building relationships with chatbots will negatively affect their social development.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 284,
+				"gap": 15,
+				"minAgree": 81,
+				"groups": {
+					"A": {
+						"a": 48,
+						"d": 6,
+						"p": 5,
+						"n": 59,
+						"pct": 81
+					},
+					"B": {
+						"a": 216,
+						"d": 4,
+						"p": 5,
+						"n": 225,
+						"pct": 96
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Youth"],
+			"inReport": false
+		},
+		{
+			"id": "p68",
+			"kind": "poll",
+			"text": "I don't think parents should be able to monitor their teenagers' chat logs in ChatGPT and other tools – it's an invasion of privacy.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 210,
+				"gap": 2,
+				"minAgree": 7,
+				"groups": {
+					"A": {
+						"a": 3,
+						"d": 35,
+						"p": 6,
+						"n": 44,
+						"pct": 7
+					},
+					"B": {
+						"a": 15,
+						"d": 130,
+						"p": 21,
+						"n": 166,
+						"pct": 9
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Youth"],
+			"inReport": false
+		},
+		{
+			"id": "p69",
+			"kind": "poll",
+			"text": "We're still learning of the effects of social media on our health. We shouldn't be giving kids more tools until we've figured that out.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 301,
+				"gap": 64,
+				"minAgree": 25,
+				"groups": {
+					"A": {
+						"a": 15,
+						"d": 24,
+						"p": 20,
+						"n": 59,
+						"pct": 25
+					},
+					"B": {
+						"a": 215,
+						"d": 10,
+						"p": 17,
+						"n": 242,
+						"pct": 89
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Youth"],
+			"inReport": false
+		},
+		{
+			"id": "p70",
+			"kind": "poll",
+			"text": "More than anything else, I'm concerned about kids being misinformed by AI tools and chatbots.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 308,
+				"gap": 29,
+				"minAgree": 50,
+				"groups": {
+					"A": {
+						"a": 29,
+						"d": 24,
+						"p": 5,
+						"n": 58,
+						"pct": 50
+					},
+					"B": {
+						"a": 197,
+						"d": 26,
+						"p": 27,
+						"n": 250,
+						"pct": 79
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Youth"],
+			"inReport": false
+		},
+		{
+			"id": "p71",
+			"kind": "poll",
+			"text": "Kids older than 13 should have as much say in their AI use as their parents.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 223,
+				"gap": 6,
+				"minAgree": 6,
+				"groups": {
+					"A": {
+						"a": 3,
+						"d": 43,
+						"p": 3,
+						"n": 49,
+						"pct": 6
+					},
+					"B": {
+						"a": 21,
+						"d": 126,
+						"p": 27,
+						"n": 174,
+						"pct": 12
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Youth"],
+			"inReport": false
+		},
+		{
+			"id": "p72",
+			"kind": "poll",
+			"text": "I would be fine with AI-related unemployment if Utah had a better a better social safety net.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 253,
+				"gap": 1,
+				"minAgree": 23,
+				"groups": {
+					"A": {
+						"a": 12,
+						"d": 21,
+						"p": 19,
+						"n": 52,
+						"pct": 23
+					},
+					"B": {
+						"a": 48,
+						"d": 108,
+						"p": 45,
+						"n": 201,
+						"pct": 24
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Jobs"],
+			"inReport": false
+		},
+		{
+			"id": "p73",
+			"kind": "poll",
+			"text": "The jobs being replaced by AI weren’t that essential to begin with. Let’s find more meaningful work for those affected.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 214,
+				"gap": 14,
+				"minAgree": 11,
+				"groups": {
+					"A": {
+						"a": 12,
+						"d": 17,
+						"p": 19,
+						"n": 48,
+						"pct": 25
+					},
+					"B": {
+						"a": 19,
+						"d": 119,
+						"p": 28,
+						"n": 166,
+						"pct": 11
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Jobs"],
+			"inReport": false
+		},
+		{
+			"id": "p74",
+			"kind": "poll",
+			"text": "The corporations that are cutting jobs should be required to pay for their employees' retraining, instead of that cost falling on the government.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 294,
+				"gap": 46,
+				"minAgree": 32,
+				"groups": {
+					"A": {
+						"a": 18,
+						"d": 24,
+						"p": 15,
+						"n": 57,
+						"pct": 32
+					},
+					"B": {
+						"a": 185,
+						"d": 13,
+						"p": 39,
+						"n": 237,
+						"pct": 78
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Jobs", "Companies / AI Companies"],
+			"inReport": false
+		},
+		{
+			"id": "p75",
+			"kind": "poll",
+			"text": "Employers shouldn't be making hiring decisions with AI. If they do, the applicants should at least know about it.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 297,
+				"gap": 50,
+				"minAgree": 40,
+				"groups": {
+					"A": {
+						"a": 23,
+						"d": 26,
+						"p": 9,
+						"n": 58,
+						"pct": 40
+					},
+					"B": {
+						"a": 216,
+						"d": 8,
+						"p": 15,
+						"n": 239,
+						"pct": 90
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Jobs"],
+			"inReport": false
+		},
+		{
+			"id": "p76",
+			"kind": "poll",
+			"text": "I'm okay with AI being used to automate rote tasks in medical treatment, like refilling prescriptions.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 310,
+				"gap": 42,
+				"minAgree": 35,
+				"groups": {
+					"A": {
+						"a": 47,
+						"d": 3,
+						"p": 11,
+						"n": 61,
+						"pct": 77
+					},
+					"B": {
+						"a": 86,
+						"d": 116,
+						"p": 47,
+						"n": 249,
+						"pct": 35
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Jobs"],
+			"inReport": false
+		},
+		{
+			"id": "p77",
+			"kind": "poll",
+			"text": "Slowing down AI in Utah means the jobs will just go to another state.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 247,
+				"gap": 50,
+				"minAgree": 9,
+				"groups": {
+					"A": {
+						"a": 32,
+						"d": 6,
+						"p": 16,
+						"n": 54,
+						"pct": 59
+					},
+					"B": {
+						"a": 18,
+						"d": 133,
+						"p": 42,
+						"n": 193,
+						"pct": 9
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Jobs"],
+			"inReport": false
+		},
+		{
+			"id": "p78",
+			"kind": "poll",
+			"text": "I would move away from a community that approved a large data center nearby.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 262,
+				"gap": 49,
+				"minAgree": 15,
+				"groups": {
+					"A": {
+						"a": 8,
+						"d": 29,
+						"p": 15,
+						"n": 52,
+						"pct": 15
+					},
+					"B": {
+						"a": 135,
+						"d": 24,
+						"p": 51,
+						"n": 210,
+						"pct": 64
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p79",
+			"kind": "poll",
+			"text": "AI-powered homeschooling tools could be better for my kids than what their school offers.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 232,
+				"gap": 41,
+				"minAgree": 7,
+				"groups": {
+					"A": {
+						"a": 24,
+						"d": 10,
+						"p": 16,
+						"n": 50,
+						"pct": 48
+					},
+					"B": {
+						"a": 12,
+						"d": 126,
+						"p": 44,
+						"n": 182,
+						"pct": 7
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Schools, Teachers, Parents, Students"],
+			"inReport": false
+		},
+		{
+			"id": "p80",
+			"kind": "poll",
+			"text": "A company that replaces workers with AI but keeps prices low is doing the right thing.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 208,
+				"gap": 26,
+				"minAgree": 2,
+				"groups": {
+					"A": {
+						"a": 13,
+						"d": 8,
+						"p": 25,
+						"n": 46,
+						"pct": 28
+					},
+					"B": {
+						"a": 4,
+						"d": 112,
+						"p": 46,
+						"n": 162,
+						"pct": 2
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Jobs"],
+			"inReport": false
+		},
+		{
+			"id": "p81",
+			"kind": "poll",
+			"text": "If AI can do a government worker's job faster and cheaper, the state should replace them.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 218,
+				"gap": 39,
+				"minAgree": 4,
+				"groups": {
+					"A": {
+						"a": 21,
+						"d": 10,
+						"p": 18,
+						"n": 49,
+						"pct": 43
+					},
+					"B": {
+						"a": 6,
+						"d": 122,
+						"p": 41,
+						"n": 169,
+						"pct": 4
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Jobs"],
+			"inReport": false
+		},
+		{
+			"id": "p82",
+			"kind": "poll",
+			"text": "The benefits of AI only go to people who are already rich.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 311,
+				"gap": 51,
+				"minAgree": 0,
+				"groups": {
+					"A": {
+						"a": 0,
+						"d": 59,
+						"p": 2,
+						"n": 61,
+						"pct": 0
+					},
+					"B": {
+						"a": 128,
+						"d": 79,
+						"p": 43,
+						"n": 250,
+						"pct": 51
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Economic Fairness"],
+			"inReport": false
+		},
+		{
+			"id": "p83",
+			"kind": "poll",
+			"text": "I believe AI will make it tougher for families like mine to make ends meet.",
+			"origin": "cocap_seed",
+			"place": null,
+			"chips": ["SEED STATEMENT"],
+			"vote": {
+				"total": 278,
+				"gap": 59,
+				"minAgree": 6,
+				"groups": {
+					"A": {
+						"a": 3,
+						"d": 39,
+						"p": 12,
+						"n": 54,
+						"pct": 6
+					},
+					"B": {
+						"a": 145,
+						"d": 23,
+						"p": 56,
+						"n": 224,
+						"pct": 65
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Jobs", "Economic Fairness"],
+			"inReport": false
+		},
+		{
+			"id": "p87",
+			"kind": "poll",
+			"text": "I do not  believe that mental health providers should use AI. We are loosing human connection and communication.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 154,
+				"gap": 51,
+				"minAgree": 28,
+				"groups": {
+					"A": {
+						"a": 7,
+						"d": 12,
+						"p": 6,
+						"n": 25,
+						"pct": 28
+					},
+					"B": {
+						"a": 102,
+						"d": 9,
+						"p": 18,
+						"n": 129,
+						"pct": 79
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Health / Mental Health"],
+			"inReport": false
+		},
+		{
+			"id": "p88",
+			"kind": "poll",
+			"text": "We will have to turn to a Universal Basic Income system due to the overwhelming job losses facing our country.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 120,
+				"gap": 23,
+				"minAgree": 13,
+				"groups": {
+					"A": {
+						"a": 3,
+						"d": 12,
+						"p": 8,
+						"n": 23,
+						"pct": 13
+					},
+					"B": {
+						"a": 35,
+						"d": 22,
+						"p": 40,
+						"n": 97,
+						"pct": 36
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Jobs"],
+			"inReport": false
+		},
+		{
+			"id": "p89",
+			"kind": "poll",
+			"text": "Have a well researched outline before making any decisions, with data centers, introducing AI to the education system, and everyday use and regulations. We need a reliable risk assessment and plan to continue assessing such a new technology",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 155,
+				"gap": 18,
+				"minAgree": 70,
+				"groups": {
+					"A": {
+						"a": 19,
+						"d": 7,
+						"p": 1,
+						"n": 27,
+						"pct": 70
+					},
+					"B": {
+						"a": 113,
+						"d": 4,
+						"p": 11,
+						"n": 128,
+						"pct": 88
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p90",
+			"kind": "poll",
+			"text": "Ideally, a successful adoption of AI across society should reduce the workload of citizens to enjoy the same (or better) standard of living while working less hours per week. This may require new labor/tech policies unique to such a moment.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 141,
+				"gap": 11,
+				"minAgree": 67,
+				"groups": {
+					"A": {
+						"a": 21,
+						"d": 3,
+						"p": 3,
+						"n": 27,
+						"pct": 78
+					},
+					"B": {
+						"a": 76,
+						"d": 20,
+						"p": 18,
+						"n": 114,
+						"pct": 67
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Jobs"],
+			"inReport": false
+		},
+		{
+			"id": "p91",
+			"kind": "poll",
+			"text": "Policies on AI's use in schools should be made with parents, children, AI experts, AI harm's experts, and researchers before we come to conclusions about how and when it should be used in the public education system.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 144,
+				"gap": 19,
+				"minAgree": 75,
+				"groups": {
+					"A": {
+						"a": 21,
+						"d": 4,
+						"p": 3,
+						"n": 28,
+						"pct": 75
+					},
+					"B": {
+						"a": 109,
+						"d": 1,
+						"p": 6,
+						"n": 116,
+						"pct": 94
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Schools, Teachers, Parents, Students"],
+			"inReport": false
+		},
+		{
+			"id": "p92",
+			"kind": "poll",
+			"text": "AI is a tool, not a replacement. Responses should be fact-checked and monitored.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 147,
+				"gap": 8,
+				"minAgree": 88,
+				"groups": {
+					"A": {
+						"a": 27,
+						"d": 1,
+						"p": 0,
+						"n": 28,
+						"pct": 96
+					},
+					"B": {
+						"a": 105,
+						"d": 8,
+						"p": 6,
+						"n": 119,
+						"pct": 88
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["News / Information"],
+			"inReport": false
+		},
+		{
+			"id": "p94",
+			"kind": "poll",
+			"text": "There should not be AI mental heath or companion apps. They are more detrimental than helpful, especially for developing children. If the general public can barely understand computers, let alone AI systems, how can we expect children to?",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 134,
+				"gap": 43,
+				"minAgree": 32,
+				"groups": {
+					"A": {
+						"a": 7,
+						"d": 9,
+						"p": 6,
+						"n": 22,
+						"pct": 32
+					},
+					"B": {
+						"a": 84,
+						"d": 6,
+						"p": 22,
+						"n": 112,
+						"pct": 75
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Youth", "Health / Mental Health"],
+			"inReport": false
+		},
+		{
+			"id": "p95",
+			"kind": "poll",
+			"text": "Data centers will interrupt all life simply by existing, regardless of location. The only question is how direct and significant the impact will be on different communities.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 130,
+				"gap": 39,
+				"minAgree": 35,
+				"groups": {
+					"A": {
+						"a": 9,
+						"d": 12,
+						"p": 5,
+						"n": 26,
+						"pct": 35
+					},
+					"B": {
+						"a": 77,
+						"d": 10,
+						"p": 17,
+						"n": 104,
+						"pct": 74
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p96",
+			"kind": "poll",
+			"text": "We need to understand how AI works and create policies that are clear about boundaries. AI is a tool but can be used for both good and bad. We need to define what that looks like.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 148,
+				"gap": 10,
+				"minAgree": 78,
+				"groups": {
+					"A": {
+						"a": 18,
+						"d": 3,
+						"p": 2,
+						"n": 23,
+						"pct": 78
+					},
+					"B": {
+						"a": 110,
+						"d": 4,
+						"p": 11,
+						"n": 125,
+						"pct": 88
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Government / Public Sector"],
+			"inReport": false
+		},
+		{
+			"id": "p98",
+			"kind": "poll",
+			"text": "We never build something that doesn't disrupt someone somehow. So that is an unrealistic requirement. But we can draw hard red lines on responsible data center development around water use, energy use, and sensitive ecological areas.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 131,
+				"gap": 6,
+				"minAgree": 74,
+				"groups": {
+					"A": {
+						"a": 17,
+						"d": 3,
+						"p": 3,
+						"n": 23,
+						"pct": 74
+					},
+					"B": {
+						"a": 86,
+						"d": 10,
+						"p": 12,
+						"n": 108,
+						"pct": 80
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Natural Resources", "Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p99",
+			"kind": "poll",
+			"text": "Data centers and AI will be part of our future. We have to accept that and lean into it responsibly. We also have to be intentional about what we want for our future and shape AI policy to work for us, not the other way around.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 147,
+				"gap": 39,
+				"minAgree": 57,
+				"groups": {
+					"A": {
+						"a": 23,
+						"d": 1,
+						"p": 0,
+						"n": 24,
+						"pct": 96
+					},
+					"B": {
+						"a": 70,
+						"d": 42,
+						"p": 11,
+						"n": 123,
+						"pct": 57
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p104",
+			"kind": "poll",
+			"text": "Consider what long-term benefits a data center can provide (10+ years after going online) to a community that may help offset negative impacts. Infrastructure upgrades are a one-time investment not a long-term strategy for community benefit",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 106,
+				"gap": 11,
+				"minAgree": 26,
+				"groups": {
+					"A": {
+						"a": 5,
+						"d": 2,
+						"p": 12,
+						"n": 19,
+						"pct": 26
+					},
+					"B": {
+						"a": 32,
+						"d": 26,
+						"p": 29,
+						"n": 87,
+						"pct": 37
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p106",
+			"kind": "poll",
+			"text": "The impact of ai data centers on our environment is not sustainable.   The implications of an unchecked ai controlling people and policy is terrifying.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 136,
+				"gap": 41,
+				"minAgree": 50,
+				"groups": {
+					"A": {
+						"a": 10,
+						"d": 8,
+						"p": 2,
+						"n": 20,
+						"pct": 50
+					},
+					"B": {
+						"a": 106,
+						"d": 3,
+						"p": 7,
+						"n": 116,
+						"pct": 91
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Natural Resources", "Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p107",
+			"kind": "poll",
+			"text": "We don’t have enough water for this. Protect our land!!!",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 126,
+				"gap": 71,
+				"minAgree": 25,
+				"groups": {
+					"A": {
+						"a": 5,
+						"d": 9,
+						"p": 6,
+						"n": 20,
+						"pct": 25
+					},
+					"B": {
+						"a": 102,
+						"d": 0,
+						"p": 4,
+						"n": 106,
+						"pct": 96
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Natural Resources", "Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p108",
+			"kind": "poll",
+			"text": "Too often, AI is used as a shortcut to creativity, which in turn causes a drought of critical thinking and chic reasoning skills. Our children deserve to be raised in communities that support their cognitive development. Period.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 132,
+				"gap": 39,
+				"minAgree": 53,
+				"groups": {
+					"A": {
+						"a": 10,
+						"d": 7,
+						"p": 2,
+						"n": 19,
+						"pct": 53
+					},
+					"B": {
+						"a": 104,
+						"d": 2,
+						"p": 7,
+						"n": 113,
+						"pct": 92
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Schools, Teachers, Parents, Students"],
+			"inReport": false
+		},
+		{
+			"id": "p112",
+			"kind": "poll",
+			"text": "Charge the users, not the masses! Don't build anymore. Clean up the storage servers already existing.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 106,
+				"gap": 72,
+				"minAgree": 6,
+				"groups": {
+					"A": {
+						"a": 1,
+						"d": 9,
+						"p": 6,
+						"n": 16,
+						"pct": 6
+					},
+					"B": {
+						"a": 70,
+						"d": 3,
+						"p": 17,
+						"n": 90,
+						"pct": 78
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p113",
+			"kind": "poll",
+			"text": "Water conservation and consumption should be at the very top of everyone's concern list",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 118,
+				"gap": 38,
+				"minAgree": 56,
+				"groups": {
+					"A": {
+						"a": 10,
+						"d": 6,
+						"p": 2,
+						"n": 18,
+						"pct": 56
+					},
+					"B": {
+						"a": 94,
+						"d": 2,
+						"p": 4,
+						"n": 100,
+						"pct": 94
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Natural Resources"],
+			"inReport": false
+		},
+		{
+			"id": "p114",
+			"kind": "poll",
+			"text": "We need to be listening to the experts and to the point, environmental experts on how this technology is affecting people and our land.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 118,
+				"gap": 49,
+				"minAgree": 45,
+				"groups": {
+					"A": {
+						"a": 9,
+						"d": 7,
+						"p": 4,
+						"n": 20,
+						"pct": 45
+					},
+					"B": {
+						"a": 92,
+						"d": 1,
+						"p": 5,
+						"n": 98,
+						"pct": 94
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Natural Resources"],
+			"inReport": false
+		},
+		{
+			"id": "p115",
+			"kind": "poll",
+			"text": "Data centers should not be built in areas that are already drought prone and experiencing water scarcity.  They should be built in places that are remote and already cold",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 112,
+				"gap": 49,
+				"minAgree": 32,
+				"groups": {
+					"A": {
+						"a": 7,
+						"d": 7,
+						"p": 8,
+						"n": 22,
+						"pct": 32
+					},
+					"B": {
+						"a": 73,
+						"d": 7,
+						"p": 10,
+						"n": 90,
+						"pct": 81
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Natural Resources", "Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p116",
+			"kind": "poll",
+			"text": "Regulation needs to be on pace with the technology. We are woefully behind and AI is posed to take advantage of people because of it, not the other way around.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 125,
+				"gap": 66,
+				"minAgree": 26,
+				"groups": {
+					"A": {
+						"a": 5,
+						"d": 7,
+						"p": 7,
+						"n": 19,
+						"pct": 26
+					},
+					"B": {
+						"a": 97,
+						"d": 5,
+						"p": 4,
+						"n": 106,
+						"pct": 92
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Government / Public Sector"],
+			"inReport": false
+		},
+		{
+			"id": "p117",
+			"kind": "poll",
+			"text": "AI is oversold and will not actually be able to deliver on the promises that proponents are pushing.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 103,
+				"gap": 55,
+				"minAgree": 17,
+				"groups": {
+					"A": {
+						"a": 3,
+						"d": 7,
+						"p": 8,
+						"n": 18,
+						"pct": 17
+					},
+					"B": {
+						"a": 61,
+						"d": 4,
+						"p": 20,
+						"n": 85,
+						"pct": 72
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Companies / AI Companies"],
+			"inReport": false
+		},
+		{
+			"id": "p118",
+			"kind": "poll",
+			"text": "AI is best utilized in small scale operations. These mega centers that know and do everything like a Swiss Army Knife are designed for profits, not human development. \n",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 116,
+				"gap": 70,
+				"minAgree": 11,
+				"groups": {
+					"A": {
+						"a": 2,
+						"d": 11,
+						"p": 6,
+						"n": 19,
+						"pct": 11
+					},
+					"B": {
+						"a": 79,
+						"d": 4,
+						"p": 14,
+						"n": 97,
+						"pct": 81
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p119",
+			"kind": "poll",
+			"text": "I don’t think any more data centers should be built at all until we the people clearly understand what they will be used for. And under no circumstances should the massive ones like Stratos be permitted at all.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 116,
+				"gap": 75,
+				"minAgree": 5,
+				"groups": {
+					"A": {
+						"a": 1,
+						"d": 11,
+						"p": 7,
+						"n": 19,
+						"pct": 5
+					},
+					"B": {
+						"a": 78,
+						"d": 7,
+						"p": 12,
+						"n": 97,
+						"pct": 80
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p120",
+			"kind": "poll",
+			"text": "It seems like AI is being developed for the public sector at the expense of private citizens.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 111,
+				"gap": 47,
+				"minAgree": 20,
+				"groups": {
+					"A": {
+						"a": 4,
+						"d": 12,
+						"p": 4,
+						"n": 20,
+						"pct": 20
+					},
+					"B": {
+						"a": 61,
+						"d": 16,
+						"p": 14,
+						"n": 91,
+						"pct": 67
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Government / Public Sector"],
+			"inReport": false
+		},
+		{
+			"id": "p122",
+			"kind": "poll",
+			"text": "Utah’s economy relies on tourism. It is not in Utah’s best interest to host a project that will damage that industry. We should protect our natural resources so people can continue to enjoy our ski resorts, national parks, and wildlife.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 118,
+				"gap": 47,
+				"minAgree": 42,
+				"groups": {
+					"A": {
+						"a": 8,
+						"d": 7,
+						"p": 4,
+						"n": 19,
+						"pct": 42
+					},
+					"B": {
+						"a": 88,
+						"d": 3,
+						"p": 8,
+						"n": 99,
+						"pct": 89
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Natural Resources", "Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p123",
+			"kind": "poll",
+			"text": "We need to teach critical thinking skills to our children and teens and provide parents and teachers with the support and resources to make this happen. If we are wiser than AI, it will be far more likely to benefit us.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 102,
+				"gap": 1,
+				"minAgree": 87,
+				"groups": {
+					"A": {
+						"a": 14,
+						"d": 0,
+						"p": 2,
+						"n": 16,
+						"pct": 88
+					},
+					"B": {
+						"a": 75,
+						"d": 6,
+						"p": 5,
+						"n": 86,
+						"pct": 87
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Youth", "Schools, Teachers, Parents, Students"],
+			"inReport": false
+		},
+		{
+			"id": "p124",
+			"kind": "poll",
+			"text": "We need a moratorium on new ai data centers until effective state regulation is enacted and local governments are empowered to block projects that  burn fossil fuels or threaten water supplies.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 99,
+				"gap": 53,
+				"minAgree": 40,
+				"groups": {
+					"A": {
+						"a": 6,
+						"d": 7,
+						"p": 2,
+						"n": 15,
+						"pct": 40
+					},
+					"B": {
+						"a": 78,
+						"d": 2,
+						"p": 4,
+						"n": 84,
+						"pct": 93
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Natural Resources", "Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p125",
+			"kind": "poll",
+			"text": "We are getting \"free AI\" now to train the models as part of the inevitable future that big tech wants. We should reject that future and demand legislation that prioritizes citizens over servers.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 102,
+				"gap": 70,
+				"minAgree": 27,
+				"groups": {
+					"A": {
+						"a": 4,
+						"d": 7,
+						"p": 4,
+						"n": 15,
+						"pct": 27
+					},
+					"B": {
+						"a": 84,
+						"d": 0,
+						"p": 3,
+						"n": 87,
+						"pct": 97
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Companies / AI Companies"],
+			"inReport": false
+		},
+		{
+			"id": "p127",
+			"kind": "poll",
+			"text": "AI will only empower the wealthy while flattening our society, dividing us further, and used as a tool to fool & coerce us. \n",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 86,
+				"gap": 65,
+				"minAgree": 8,
+				"groups": {
+					"A": {
+						"a": 1,
+						"d": 9,
+						"p": 3,
+						"n": 13,
+						"pct": 8
+					},
+					"B": {
+						"a": 53,
+						"d": 5,
+						"p": 15,
+						"n": 73,
+						"pct": 73
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Economic Fairness"],
+			"inReport": false
+		},
+		{
+			"id": "p128",
+			"kind": "poll",
+			"text": "We should stop building data centers altogether, AI is not the future of humanity, it's the current revenue avenue of tech giants and those who prey on others lack of restrictions.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 88,
+				"gap": 73,
+				"minAgree": 0,
+				"groups": {
+					"A": {
+						"a": 0,
+						"d": 12,
+						"p": 3,
+						"n": 15,
+						"pct": 0
+					},
+					"B": {
+						"a": 53,
+						"d": 12,
+						"p": 8,
+						"n": 73,
+						"pct": 73
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Data Centers / Building", "Companies / AI Companies"],
+			"inReport": false
+		},
+		{
+			"id": "p130",
+			"kind": "poll",
+			"text": "I believe we can find positive sum, win-win, solutions with new technologies & innovation. Not just using AI but in building datacenters & power and water usage. A century ago our current prosperity was unthinkable, let's do it again.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 83,
+				"gap": 40,
+				"minAgree": 40,
+				"groups": {
+					"A": {
+						"a": 12,
+						"d": 0,
+						"p": 3,
+						"n": 15,
+						"pct": 80
+					},
+					"B": {
+						"a": 27,
+						"d": 27,
+						"p": 14,
+						"n": 68,
+						"pct": 40
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Natural Resources", "Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p131",
+			"kind": "poll",
+			"text": "In terms of AI taking low income jobs, I think that could very well happen. But that may not be a bad thing if those jobs become more about managing AI's work and thus more innovation which will create more work to be done and more jobs.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 76,
+				"gap": 41,
+				"minAgree": 21,
+				"groups": {
+					"A": {
+						"a": 8,
+						"d": 0,
+						"p": 5,
+						"n": 13,
+						"pct": 62
+					},
+					"B": {
+						"a": 13,
+						"d": 33,
+						"p": 17,
+						"n": 63,
+						"pct": 21
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Jobs"],
+			"inReport": false
+		},
+		{
+			"id": "p132",
+			"kind": "poll",
+			"text": "Let's not reject AI, because it is coming and will be the new reality. But I agree that legislation to protect the economy and vulnerable classes is essential.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 105,
+				"gap": 13,
+				"minAgree": 60,
+				"groups": {
+					"A": {
+						"a": 11,
+						"d": 4,
+						"p": 0,
+						"n": 15,
+						"pct": 73
+					},
+					"B": {
+						"a": 54,
+						"d": 28,
+						"p": 8,
+						"n": 90,
+						"pct": 60
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Government / Public Sector", "Economic Fairness"],
+			"inReport": false
+		},
+		{
+			"id": "p136",
+			"kind": "poll",
+			"text": "Data centers in Utah should look into how they can lean into the states environmental strengths instead of blindly thinking the same thing that works elsewhere can work here. Solar and electric cooling should potentially be considered.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 49,
+				"gap": 3,
+				"minAgree": 77,
+				"groups": {
+					"A": {
+						"a": 8,
+						"d": 1,
+						"p": 1,
+						"n": 10,
+						"pct": 80
+					},
+					"B": {
+						"a": 30,
+						"d": 3,
+						"p": 6,
+						"n": 39,
+						"pct": 77
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Natural Resources", "Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p137",
+			"kind": "poll",
+			"text": "I'd rather figure things out myself rather than use AI. It's more dumbing down of humans - like we're too stupid to figure things out ourselves. AI treats us like we're unable to think or create ourselves and sometimes it's wrong.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 45,
+				"gap": 75,
+				"minAgree": 0,
+				"groups": {
+					"A": {
+						"a": 0,
+						"d": 5,
+						"p": 4,
+						"n": 9,
+						"pct": 0
+					},
+					"B": {
+						"a": 27,
+						"d": 6,
+						"p": 3,
+						"n": 36,
+						"pct": 75
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Jobs"],
+			"inReport": false
+		},
+		{
+			"id": "p138",
+			"kind": "poll",
+			"text": "Wise AI use: repetitive time-consuming tasks; education-training to think, reason, problem-solve, collaborate at high level.\nFoolish AI use: as proxy for above; hyper-convenience, hyper-pleasure, manipulation, attention-capture for money.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 64,
+				"gap": 18,
+				"minAgree": 59,
+				"groups": {
+					"A": {
+						"a": 10,
+						"d": 2,
+						"p": 1,
+						"n": 13,
+						"pct": 77
+					},
+					"B": {
+						"a": 30,
+						"d": 8,
+						"p": 13,
+						"n": 51,
+						"pct": 59
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Jobs", "Schools, Teachers, Parents, Students"],
+			"inReport": false
+		},
+		{
+			"id": "p139",
+			"kind": "poll",
+			"text": "AI risk analysis must extend further than simply reporting resource usage. The recently approved rules that govern this do not detail any retribution for overuse. Moreover, air & water quality standards were reduced so vetting is meritless",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 66,
+				"gap": 47,
+				"minAgree": 33,
+				"groups": {
+					"A": {
+						"a": 4,
+						"d": 4,
+						"p": 4,
+						"n": 12,
+						"pct": 33
+					},
+					"B": {
+						"a": 43,
+						"d": 0,
+						"p": 11,
+						"n": 54,
+						"pct": 80
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Natural Resources", "Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p141",
+			"kind": "poll",
+			"text": "It is important that AI corporations and other businesses do not get greedy. They need to put the benefits to users and society above profits. AI needs to be regulated to prevent misuse by the corporations, businesses, and governments.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 51,
+				"gap": 25,
+				"minAgree": 67,
+				"groups": {
+					"A": {
+						"a": 8,
+						"d": 3,
+						"p": 1,
+						"n": 12,
+						"pct": 67
+					},
+					"B": {
+						"a": 36,
+						"d": 1,
+						"p": 2,
+						"n": 39,
+						"pct": 92
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Companies / AI Companies"],
+			"inReport": false
+		},
+		{
+			"id": "p143",
+			"kind": "poll",
+			"text": "Data Centers should be required to report how much electricity they consume and how much air pollution they produce. They should be held liable for negative health effects on communities due to pollution.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 70,
+				"gap": 11,
+				"minAgree": 85,
+				"groups": {
+					"A": {
+						"a": 11,
+						"d": 0,
+						"p": 2,
+						"n": 13,
+						"pct": 85
+					},
+					"B": {
+						"a": 55,
+						"d": 0,
+						"p": 2,
+						"n": 57,
+						"pct": 96
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Natural Resources", "Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p144",
+			"kind": "poll",
+			"text": "EU law requires data centers over 1MW to share waste heat with homes via district heating networks. Utah should do the same, and  turn AI’s data center energy burden into a community asset that provides low cost heat to homes and businesses",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 40,
+				"gap": 10,
+				"minAgree": 50,
+				"groups": {
+					"A": {
+						"a": 6,
+						"d": 3,
+						"p": 1,
+						"n": 10,
+						"pct": 60
+					},
+					"B": {
+						"a": 15,
+						"d": 4,
+						"p": 11,
+						"n": 30,
+						"pct": 50
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Natural Resources", "Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p145",
+			"kind": "poll",
+			"text": "The effect generative AI has on a populations ability to determine truth and think critically for themselves is so dangerous it should be outlawed entirely.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 40,
+				"gap": 53,
+				"minAgree": 0,
+				"groups": {
+					"A": {
+						"a": 0,
+						"d": 10,
+						"p": 0,
+						"n": 10,
+						"pct": 0
+					},
+					"B": {
+						"a": 16,
+						"d": 5,
+						"p": 9,
+						"n": 30,
+						"pct": 53
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["News / Information"],
+			"inReport": false
+		},
+		{
+			"id": "p146",
+			"kind": "poll",
+			"text": "AI is being pushed on societies by the wealthy and powerful 1%. They are not doing it for the benefit of the masses of people. It will only help the rich get richer, at everyone else's expense.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 46,
+				"gap": 81,
+				"minAgree": 0,
+				"groups": {
+					"A": {
+						"a": 0,
+						"d": 6,
+						"p": 4,
+						"n": 10,
+						"pct": 0
+					},
+					"B": {
+						"a": 29,
+						"d": 2,
+						"p": 5,
+						"n": 36,
+						"pct": 81
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Economic Fairness"],
+			"inReport": false
+		},
+		{
+			"id": "p148",
+			"kind": "poll",
+			"text": "We should not be granting tax breaks to any for profit corporations. Profitable businesses should pay a fair share of taxes.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 45,
+				"gap": 48,
+				"minAgree": 44,
+				"groups": {
+					"A": {
+						"a": 4,
+						"d": 2,
+						"p": 3,
+						"n": 9,
+						"pct": 44
+					},
+					"B": {
+						"a": 33,
+						"d": 0,
+						"p": 3,
+						"n": 36,
+						"pct": 92
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Companies / AI Companies"],
+			"inReport": false
+		},
+		{
+			"id": "p170",
+			"kind": "poll",
+			"text": "AI data centers that require a huge amount of water should not be built in drought-prone states like Utah.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 46,
+				"gap": 36,
+				"minAgree": 55,
+				"groups": {
+					"A": {
+						"a": 6,
+						"d": 2,
+						"p": 3,
+						"n": 11,
+						"pct": 55
+					},
+					"B": {
+						"a": 32,
+						"d": 2,
+						"p": 1,
+						"n": 35,
+						"pct": 91
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Natural Resources", "Data Centers / Building"],
+			"inReport": false
+		},
+		{
+			"id": "p171",
+			"kind": "poll",
+			"text": "If there is a clear understanding of what AI is and how it works, to responsibly manage it is to minimize its use to only critical matters, because the harm it is causing is outweighing the good",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 42,
+				"gap": 73,
+				"minAgree": 0,
+				"groups": {
+					"A": {
+						"a": 0,
+						"d": 5,
+						"p": 4,
+						"n": 9,
+						"pct": 0
+					},
+					"B": {
+						"a": 24,
+						"d": 2,
+						"p": 7,
+						"n": 33,
+						"pct": 73
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Government / Public Sector"],
+			"inReport": false
+		},
+		{
+			"id": "p183",
+			"kind": "poll",
+			"text": "Between deskilling, job displacement and the risk of human extinction, the risks of AI appear to outweigh the benefits. I'm a techno-optimist, but unregulated AI is incredibly dangerous.",
+			"origin": "participant",
+			"place": null,
+			"chips": [],
+			"vote": {
+				"total": 24,
+				"gap": 50,
+				"minAgree": 50,
+				"groups": {
+					"A": {
+						"a": 1,
+						"d": 1,
+						"p": 0,
+						"n": 2,
+						"pct": 50
+					},
+					"B": {
+						"a": 22,
+						"d": 0,
+						"p": 0,
+						"n": 22,
+						"pct": 100
+					}
+				}
+			},
+			"source": "Open Poll",
+			"tags": ["Jobs", "Government / Public Sector"],
+			"inReport": false
+		}
+	],
+	"groups": [
+		{
+			"key": "A",
+			"label": "AI Optimists"
+		},
+		{
+			"key": "B",
+			"label": "Cautious Majority"
+		}
+	]
+}

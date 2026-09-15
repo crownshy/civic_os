@@ -1,0 +1,46 @@
+{
+	"A": [
+		{
+			"id": "p49",
+			"direction": "agree"
+		},
+		{
+			"id": "p48",
+			"direction": "agree"
+		},
+		{
+			"id": "p82",
+			"direction": "disagree"
+		},
+		{
+			"id": "p83",
+			"direction": "disagree"
+		},
+		{
+			"id": "p53",
+			"direction": "disagree"
+		}
+	],
+	"B": [
+		{
+			"id": "p69",
+			"direction": "agree"
+		},
+		{
+			"id": "p44",
+			"direction": "agree"
+		},
+		{
+			"id": "p107",
+			"direction": "agree"
+		},
+		{
+			"id": "p119",
+			"direction": "agree"
+		},
+		{
+			"id": "p46",
+			"direction": "agree"
+		}
+	]
+}

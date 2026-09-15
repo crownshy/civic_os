@@ -1,0 +1,62 @@
+{
+	"datacenters": [
+		{
+			"claim": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+			"direction": "agree",
+			"ids": ["p0", "p2"]
+		},
+		{
+			"claim": "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+			"direction": "agree",
+			"ids": ["p58", "p60"]
+		}
+	],
+	"jobs": [
+		{
+			"claim": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+			"direction": "agree",
+			"ids": ["p12", "p48"]
+		},
+		{
+			"claim": "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+			"direction": "agree",
+			"ids": ["p49", "p13"]
+		}
+	],
+	"companies": [
+		{
+			"claim": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+			"direction": "agree",
+			"ids": ["p12", "p15"]
+		},
+		{
+			"claim": "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+			"direction": "agree",
+			"ids": ["p14", "p2"]
+		}
+	],
+	"kids": [
+		{
+			"claim": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+			"direction": "agree",
+			"ids": ["p62", "p37"]
+		},
+		{
+			"claim": "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+			"direction": "agree",
+			"ids": ["p61", "p5"]
+		}
+	],
+	"government": [
+		{
+			"claim": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+			"direction": "agree",
+			"ids": ["p53", "p20"]
+		},
+		{
+			"claim": "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+			"direction": "agree",
+			"ids": ["p52", "p46"]
+		}
+	]
+}
