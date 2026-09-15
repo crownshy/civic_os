@@ -22,7 +22,7 @@
       {
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
-            chromium
+            google-chrome
             nodejs_24
             playwright-driver.browsers
             pnpm
@@ -31,7 +31,7 @@
           shellHook = ''
             export PLAYWRIGHT_BROWSERS_PATH="${pkgs.playwright-driver.browsers}"
             export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
-            export PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH="${pkgs.chromium}/bin/chromium"
+            export PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH="${pkgs.google-chrome}/bin/google-chrome-stable"
           '';
         };
       }
