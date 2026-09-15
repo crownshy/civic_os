@@ -1,4 +1,20 @@
 import { getContext, setContext } from 'svelte';
+import type { Report } from './domain/report';
+
+/**
+ * The report being shown. Set once by the [slug] layout from its own `load`,
+ * so every page and modal under it reads the same one without it having to be
+ * threaded through each component in between.
+ */
+const REPORT = Symbol('bloom-report:report');
+
+export function setReport(report: Report) {
+	setContext(REPORT, report);
+}
+
+export function getReport(): Report {
+	return getContext<Report>(REPORT);
+}
 
 /**
  * How a page asks the report to move. The layout owns the one implementation

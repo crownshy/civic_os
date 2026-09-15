@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { trackEvent } from '@lukulent/svelte-umami';
-	import mountains from '../assets/sisters_bg.webp';
-	import { REPORT_CONFIG } from '../data/report-config';
-	import { getNavigate, getOpenShare } from '../navigation';
+	import { getNavigate, getOpenShare, getReport } from '../navigation';
 	import RichCopy from './RichCopy.svelte';
 
-	const copy = REPORT_CONFIG.pages.cta;
+	const report = getReport();
+	const copy = report.config.pages.cta;
 
 	const navigate = getNavigate();
 	const openShare = getOpenShare();
@@ -24,7 +23,7 @@
 {#snippet highlight(phrase: string)}<span class="highlight">{phrase}</span>{/snippet}
 
 <main class="introPage ctaPage">
-	<img class="mountains" src={mountains} alt="" />
+	<img class="mountains" src={report.images.cta} alt="" />
 	<div class="masthead">
 		<h1>{copy.heading}</h1>
 		<p><RichCopy text={copy.body} {highlight} /></p>

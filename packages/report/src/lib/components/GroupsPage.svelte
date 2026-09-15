@@ -1,16 +1,17 @@
 <script lang="ts">
-	import { REPORT_CONFIG } from '../data/report-config';
-	import { GROUPS, GROUP_INFO } from '../domain/bundled';
-	import { getOpenGroup } from '../navigation';
+	import { getOpenGroup, getReport } from '../navigation';
 	import { modals } from '../state.svelte';
 
 	const openGroup = getOpenGroup();
-	const copy = REPORT_CONFIG.pages.groups;
+	const report = getReport();
+	const copy = report.config.pages.groups;
 
 	// group-info.json's per-key extras (participants/colour/tagline) merged onto
 	// bloom-data.json's own {key, label}, so the bubble and the modal it opens
 	// always agree on a group's display name and colour.
-	const groups = $derived(GROUPS.map((group) => ({ ...group, ...(GROUP_INFO[group.key] ?? {}) })));
+	const groups = $derived(
+		report.groups.map((group) => ({ ...group, ...(report.groupInfo[group.key] ?? {}) }))
+	);
 </script>
 
 <main class="introPage groupsPage">

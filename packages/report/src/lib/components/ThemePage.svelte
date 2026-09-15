@@ -1,29 +1,28 @@
 <script lang="ts">
-	import { REPORT_CONFIG } from '../data/report-config';
-	import { INSIGHTS, RECORD_BY_ID, THEME_DESCRIPTIONS, THEME_VIEWS } from '../domain/bundled';
 	import { claimPhrase, type ClaimPhrase } from '../domain/copy';
 	import type { ReportRecord, Theme } from '../domain/types';
-	import { getNavigate, getOpenStatement } from '../navigation';
+	import { getNavigate, getOpenStatement, getReport } from '../navigation';
 	import InsightCarousel from './InsightCarousel.svelte';
 	import StatementCard from './StatementCard.svelte';
 
 	let { theme }: { theme: Theme } = $props();
 
+	const report = getReport();
 	const navigate = getNavigate();
 	const openStatement = getOpenStatement();
 
-	const view = $derived(THEME_VIEWS[theme.key]);
+	const view = $derived(report.themeViews[theme.key]);
 	const statements = $derived(view.statements);
-	const description = $derived(THEME_DESCRIPTIONS[theme.key]?.description ?? '');
+	const description = $derived(report.themeDescriptions[theme.key]?.description ?? '');
 
 	/** Insights whose cited records still resolve; one that cites nothing is skipped. */
 	const insights = $derived(
-		(INSIGHTS[theme.key] ?? [])
+		(report.insights[theme.key] ?? [])
 			.map((insight) => ({
 				...insight,
 				phrase: claimPhrase(insight.claim, insight.direction),
 				records: insight.ids
-					.map((id) => RECORD_BY_ID.get(id))
+					.map((id) => report.recordById.get(id))
 					.filter((r): r is ReportRecord => Boolean(r))
 			}))
 			.filter((insight) => insight.records.length > 0)
@@ -52,8 +51,8 @@
 	<div class="l2nav">
 		<button onclick={() => navigate('themes')}>← Back</button>
 		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- the report config's own external URL, nothing for resolve() to route -->
-		<a class="nextT" href={REPORT_CONFIG.learnMore.href} target="_blank" rel="noopener"
-			>{REPORT_CONFIG.learnMore.label}<svg viewBox="0 0 16 16" aria-hidden="true"
+		<a class="nextT" href={report.config.learnMore.href} target="_blank" rel="noopener"
+			>{report.config.learnMore.label}<svg viewBox="0 0 16 16" aria-hidden="true"
 				><path
 					d="M4.5 11.5 11.5 4.5M5.5 4.5H11.5V10.5"
 					stroke-linecap="round"

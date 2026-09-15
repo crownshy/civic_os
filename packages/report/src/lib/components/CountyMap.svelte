@@ -4,8 +4,6 @@
 	import { zoom, zoomIdentity, type ZoomTransform } from 'd3-zoom';
 	import { onMount } from 'svelte';
 
-	import { REPORT_CONFIG } from '../data/report-config';
-	import { OREGON_COUNTIES, PARTICIPANT_LOCATIONS } from '../domain/bundled';
 	import {
 		DEMOG_MAX_ZOOM_IN,
 		dotRadius,
@@ -22,20 +20,22 @@
 		pillBox,
 		type Box
 	} from '../domain/map-layout';
+	import { getReport } from '../navigation';
 
 	/** height of the stat block overlaid at the top, which the home view fits below */
 	let { statHeight }: { statHeight: number } = $props();
 
-	const homeCounties = homeCountySets(REPORT_CONFIG.map.homeCounties);
-	const cities = PARTICIPANT_LOCATIONS.cities;
+	const report = getReport();
+	const homeCounties = homeCountySets(report.config.map.homeCounties);
+	const cities = report.participantLocations.cities;
 	const maxCount = Math.max(...cities.map((c) => c.count));
 	/** Radius never changes with zoom: markers keep a fixed screen size. */
 	const radii = cities.map((city) => dotRadius(city.count, maxCount));
 	const paintOrder = labelPaintOrder(cities);
 
-	// the bundled GeoJSON is asserted, not validated, same boundary cast as
-	// domain/bundled.ts makes for the rest of the data
-	const counties = OREGON_COUNTIES as unknown as ExtendedFeatureCollection;
+	// the bundled GeoJSON is asserted, not validated, the same boundary cast
+	// domain/report.ts makes for the rest of the data
+	const counties = report.counties as ExtendedFeatureCollection;
 
 	const projection = geoMercator();
 	const path = geoPath(projection);

@@ -3,11 +3,17 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import BloomReport from '$lib/BloomReport.svelte';
-	import { THEME_BY_KEY } from '$lib/domain/bundled';
 	import type { StepKey } from '$lib/domain/nav';
-	import { setNavigate } from '$lib/navigation';
+	import { setNavigate, setReport } from '$lib/navigation';
+	import { loadedReport } from '$lib/reports';
 
-	let { children } = $props();
+	let { children, data } = $props();
+
+	// One report per slug, and nothing in the report links to another one, so
+	// the report the layout starts with is the one it keeps.
+	// svelte-ignore state_referenced_locally
+	const report = loadedReport(data.slug);
+	setReport(report);
 
 	/**
 	 * Where each step lives. Route ids rather than paths, so `resolve` can
@@ -38,7 +44,7 @@
 
 	function navigate(key: string) {
 		const slug = page.params.slug ?? '';
-		if (THEME_BY_KEY.has(key)) {
+		if (report.themeByKey.has(key)) {
 			return goto(resolve(THEME_ROUTE, { slug, theme: key }));
 		}
 		const route = STEP_ROUTES[key as StepKey];

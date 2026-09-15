@@ -1,10 +1,9 @@
 <script lang="ts">
-	import { REPORT_CONFIG } from '../data/report-config';
-	import { getOpenDemographics } from '../navigation';
+	import { getOpenDemographics, getReport } from '../navigation';
 	import CountyMap from './CountyMap.svelte';
 
 	const openDemographics = getOpenDemographics();
-	const copy = REPORT_CONFIG.pages.demogs;
+	const copy = getReport().config.pages.demogs;
 
 	let statHeight = $state(0);
 </script>

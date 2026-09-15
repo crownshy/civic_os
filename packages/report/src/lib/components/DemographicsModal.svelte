@@ -1,17 +1,19 @@
 <script lang="ts">
-	import { DEMOGRAPHICS, THEME_COLORS } from '../domain/bundled';
 	import { demographicRows } from '../domain/demographics';
+	import { getReport } from '../navigation';
 	import { modals } from '../state.svelte';
 	import ReportDialog from './ReportDialog.svelte';
 
-	const categories = DEMOGRAPHICS.poll.categories;
+	const report = getReport();
+	const demographics = report.demographics;
+	const categories = demographics.poll.categories;
 	const index = $derived(modals.demographics?.index ?? 0);
 
 	const category = $derived(categories[index] ?? categories[0]);
-	const rows = $derived(demographicRows(category, DEMOGRAPHICS.actual));
+	const rows = $derived(demographicRows(category, demographics.actual));
 	// each breakdown is a share of only the people who answered that question,
 	// not of everyone; the copy spells that denominator out per category
-	const pctAnswered = $derived(Math.round((category.answered / DEMOGRAPHICS.poll.total) * 100));
+	const pctAnswered = $derived(Math.round((category.answered / demographics.poll.total) * 100));
 
 	let scroller = $state<HTMLDivElement>();
 	$effect(() => {
@@ -60,7 +62,10 @@
 			<div>
 				{#each rows as row, i (row.label)}
 					<!-- the tint behind a row is sized by the poll share -->
-					<div class="row" style="--rc:{THEME_COLORS[i % THEME_COLORS.length]};--pct:{row.pct}%">
+					<div
+						class="row"
+						style="--rc:{report.themeColors[i % report.themeColors.length]};--pct:{row.pct}%"
+					>
 						<span class="swatch"></span>
 						<span class="name">{row.label}</span>
 						<span class="num">{row.pct}%</span>

@@ -187,6 +187,12 @@ test('each step has its own URL, and a deep link lands on it cold', async ({ pag
 	await page.reload();
 	await expect(page.getByRole('heading', { name: EXPECTED_THEME, exact: true })).toBeVisible();
 
+	// The heading is in the server-rendered HTML, so it is visible before the
+	// router has taken over. Going back in that window is a plain browser
+	// navigation the half-started router then cancels, which is a race with
+	// hydration rather than anything this test is about.
+	await page.waitForLoadState('networkidle');
+
 	await page.goBack();
 	await expect(page).toHaveURL(new RegExp(`${REPORT}/themes$`));
 	await expect(

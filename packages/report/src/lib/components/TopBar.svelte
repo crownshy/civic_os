@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import { REPORT_CONFIG } from '../data/report-config';
+	import { getReport } from '../navigation';
 
 	let { color }: { color: string } = $props();
 
+	const report = getReport();
 	const home = $derived(resolve('/[slug]', { slug: page.params.slug ?? '' }));
 </script>
 
@@ -17,11 +18,11 @@
 				stroke-linejoin="round"
 			/></svg
 		>
-		<span class="wordmark">{REPORT_CONFIG.brand}</span>
+		<span class="wordmark">{report.config.brand}</span>
 	</a>
 	<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- the report config's own external URL, nothing for resolve() to route -->
-	<a class="link" href={REPORT_CONFIG.learnMore.href} target="_blank" rel="noopener">
-		{REPORT_CONFIG.learnMore.label}
+	<a class="link" href={report.config.learnMore.href} target="_blank" rel="noopener">
+		{report.config.learnMore.label}
 		<svg viewBox="0 0 16 16" aria-hidden="true"
 			><path
 				d="M4.5 11.5 11.5 4.5M5.5 4.5H11.5V10.5"

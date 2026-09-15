@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { GROUPS } from '../domain/bundled';
 	import { demoLineFor, emojiFor } from '../domain/copy';
 	import { MIN_GROUP_VOTES, groupsOf } from '../domain/data';
 	import type { ReportRecord } from '../domain/types';
 	import { tierColorFor } from '../domain/verdict';
+	import { getReport } from '../navigation';
 	import { selection } from '../state.svelte';
 	import LowDataFlag from './LowDataFlag.svelte';
 	import VerdictPill from './VerdictPill.svelte';
@@ -15,9 +15,11 @@
 
 	let { record, onopen }: Props = $props();
 
+	const report = getReport();
+
 	const stats = $derived(
 		record.vote
-			? groupsOf(GROUPS, record.vote).map((group) => {
+			? groupsOf(report.groups, record.vote).map((group) => {
 					// the readout shows the raw figure; only the colour and bar clamp
 					const raw = group.pct;
 					const pct = Math.max(0, Math.min(100, raw));

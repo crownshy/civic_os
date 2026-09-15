@@ -1,29 +1,31 @@
 <script lang="ts">
-	import { GROUPS, GROUP_INFO, GROUP_STATEMENTS, RECORD_BY_ID } from '../domain/bundled';
 	import { groupsOf } from '../domain/data';
+	import { getReport } from '../navigation';
 	import { modals } from '../state.svelte';
 	import ReportDialog from './ReportDialog.svelte';
 	import VoteBars from './VoteBars.svelte';
+
+	const report = getReport();
 
 	const key = $derived(modals.group?.key ?? null);
 	const page = $derived(modals.group?.page ?? 0);
 
 	const group = $derived.by(() => {
 		if (!key) return null;
-		const base = GROUPS.find((g) => g.key === key);
-		return base ? { ...base, ...(GROUP_INFO[key] ?? {}) } : null;
+		const base = report.groups.find((g) => g.key === key);
+		return base ? { ...base, ...(report.groupInfo[key] ?? {}) } : null;
 	});
 
 	// page 0 is the hand-written description; pages 1..N are the statements
 	// Polis says most define this group, most representative first
-	const statements = $derived(key ? (GROUP_STATEMENTS[key] ?? []) : []);
+	const statements = $derived(key ? (report.groupStatements[key] ?? []) : []);
 	const total = $derived(1 + statements.length);
-	const record = $derived(page > 0 ? RECORD_BY_ID.get(statements[page - 1]?.id) : undefined);
+	const record = $derived(page > 0 ? report.recordById.get(statements[page - 1]?.id) : undefined);
 
-	/** The group this modal is about is listed first, whatever GROUPS' own order. */
+	/** The group this modal is about is listed first, whatever the data's own order. */
 	const rows = $derived.by(() => {
 		if (!record?.vote) return [];
-		return groupsOf(GROUPS, record.vote)
+		return groupsOf(report.groups, record.vote)
 			.slice()
 			.sort((a, b) => (a.key === key ? -1 : b.key === key ? 1 : 0));
 	});

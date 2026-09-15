@@ -1,14 +1,16 @@
 <script lang="ts">
 	import { trackStatementOpen } from '../analytics';
-	import { GROUPS } from '../domain/bundled';
 	import { titleCaseChip } from '../domain/copy';
 	import { MIN_GROUP_VOTES, groupsOf } from '../domain/data';
 	import { tierColorFor } from '../domain/verdict';
+	import { getReport } from '../navigation';
 	import { closeStatement, modals, pageStatement, selection } from '../state.svelte';
 	import LowDataFlag from './LowDataFlag.svelte';
 	import ReportDialog from './ReportDialog.svelte';
 	import VerdictPill from './VerdictPill.svelte';
 	import VoteBars from './VoteBars.svelte';
+
+	const report = getReport();
 
 	const record = $derived(modals.statement?.view[modals.statement.index]);
 	const count = $derived(modals.statement?.view.length ?? 0);
@@ -20,7 +22,7 @@
 		return (record.chips.length ? record.chips : ['Anonymous']).map(titleCaseChip).join(', ');
 	});
 
-	const rows = $derived(record?.vote ? groupsOf(GROUPS, record.vote) : []);
+	const rows = $derived(record?.vote ? groupsOf(report.groups, record.vote) : []);
 
 	let scroller = $state<HTMLDivElement>();
 	let quote = $state<HTMLDivElement>();

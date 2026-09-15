@@ -1,4 +1,4 @@
-import type { ReportConfig } from '../domain/types';
+import type { ReportConfig } from '../../domain/types';
 
 /** Central Oregon's own copy, links and map region. */
 export const REPORT_CONFIG: ReportConfig = {

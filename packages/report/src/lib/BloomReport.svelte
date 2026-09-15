@@ -3,10 +3,14 @@
 	import { trackEvent } from '@lukulent/svelte-umami';
 	import type { Snippet } from 'svelte';
 	import { trackStatementOpen } from './analytics';
-	import { REPORT_CONFIG } from './data/report-config';
-	import { GROUPS, THEME_BY_KEY } from './domain/bundled';
 	import { chromeFor } from './domain/page-chrome';
-	import { setOpenDemographics, setOpenGroup, setOpenShare, setOpenStatement } from './navigation';
+	import {
+		getReport,
+		setOpenDemographics,
+		setOpenGroup,
+		setOpenShare,
+		setOpenStatement
+	} from './navigation';
 	import { closeAllModals, modals, openStatement as open } from './state.svelte';
 	import DemographicsModal from './components/DemographicsModal.svelte';
 	import GroupModal from './components/GroupModal.svelte';
@@ -24,10 +28,14 @@
 
 	let { step, children }: Props = $props();
 
+	const report = getReport();
+
 	setOpenStatement((view, index) => trackStatementOpen(open(view as never, index)));
 	setOpenGroup((key) => {
 		modals.group = { key, page: 0 };
-		trackEvent('opinion-group-open', { group: GROUPS.find((g) => g.key === key)?.label ?? key });
+		trackEvent('opinion-group-open', {
+			group: report.groups.find((g) => g.key === key)?.label ?? key
+		});
 	});
 	setOpenDemographics(() => {
 		modals.demographics = { index: 0 };
@@ -37,7 +45,7 @@
 
 	onNavigate(closeAllModals);
 
-	const theme = $derived(THEME_BY_KEY.get(step));
+	const theme = $derived(report.themeByKey.get(step));
 	const chrome = $derived(chromeFor(step, theme));
 	const grid = $derived(chrome.grid ? 'var(--grid-bg)' : 'none');
 
@@ -49,7 +57,7 @@
 	 * is what shows in the desktop gutter) matches it too.
 	 */
 	$effect(() => {
-		const { siteTitle } = REPORT_CONFIG;
+		const { siteTitle } = report.config;
 		document.title = theme ? `${theme.short} — ${siteTitle}` : siteTitle;
 
 		const root = document.documentElement.style;

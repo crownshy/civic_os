@@ -7,13 +7,12 @@
 
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { REPORT_CONFIG } from '../data/report-config';
-	import { THEMES } from '../domain/bundled';
-	import { getNavigate } from '../navigation';
+	import { getNavigate, getReport } from '../navigation';
 	import ThemeBlock from './ThemeBlock.svelte';
 
 	const navigate = getNavigate();
-	const copy = REPORT_CONFIG.pages.themes;
+	const report = getReport();
+	const copy = report.config.pages.themes;
 
 	onMount(() => {
 		if (rememberedScroll === null) return;
@@ -39,7 +38,7 @@
 	</div>
 
 	<div class="blocks">
-		{#each THEMES as theme, index (theme.key)}
+		{#each report.themes as theme, index (theme.key)}
 			<ThemeBlock {theme} {index} onopen={() => openTheme(theme.key)} />
 		{/each}
 	</div>

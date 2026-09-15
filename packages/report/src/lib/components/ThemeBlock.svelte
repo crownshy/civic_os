@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { RECORDS } from '../domain/bundled';
 	import { countLabel } from '../domain/copy';
 	import { quotesForTheme, statementsForTheme } from '../domain/data';
 	import type { Theme } from '../domain/types';
+	import { getReport } from '../navigation';
 
 	interface Props {
 		theme: Theme;
@@ -13,8 +13,9 @@
 
 	let { theme, index, onopen }: Props = $props();
 
-	const statements = $derived(statementsForTheme(RECORDS, theme).length);
-	const quotes = $derived(quotesForTheme(RECORDS, theme).length);
+	const report = getReport();
+	const statements = $derived(statementsForTheme(report.records, theme).length);
+	const quotes = $derived(quotesForTheme(report.records, theme).length);
 	const total = $derived(statements + quotes);
 </script>
 

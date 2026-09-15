@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { trackEvent } from '@lukulent/svelte-umami';
-	import mountains from '../assets/sisters_title.webp';
-	import { REPORT_CONFIG } from '../data/report-config';
-	import { getNavigate } from '../navigation';
+	import { getNavigate, getReport } from '../navigation';
 	import RichCopy from './RichCopy.svelte';
 
-	const copy = REPORT_CONFIG.pages.title;
+	const report = getReport();
+	const copy = report.config.pages.title;
 
 	const navigate = getNavigate();
 
@@ -24,7 +23,7 @@
 	</div>
 	<img
 		class="mountains"
-		src={mountains}
+		src={report.images.title}
 		alt=""
 		width={copy.image.width}
 		height={copy.image.height}

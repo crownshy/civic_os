@@ -3,183 +3,117 @@
 		{
 			"claim": "Data center development needs thorough environmental review and reporting",
 			"direction": "agree",
-			"ids": [
-				"p128",
-				"p0"
-			]
+			"ids": ["p128", "p0"]
 		},
 		{
 			"claim": "AI companies shouldn't get special treatment (though Optimists are less certain about the negative impacts)",
 			"direction": "agree",
-			"ids": [
-				"p100",
-				"p161",
-				"p130",
-				"p109",
-				"p123"
-			]
+			"ids": ["p100", "p161", "p130", "p109", "p123"]
 		},
 		{
 			"claim": "The benefits of data centers are not well established",
 			"direction": "divided",
-			"ids": [
-				"p89",
-				"p115"
-			]
+			"ids": ["p89", "p115"]
 		},
 		{
 			"claim": "People disagree about whether data center benefits outweigh the costs",
 			"direction": "divided",
-			"ids": [
-				"p35",
-				"p50"
-			]
+			"ids": ["p35", "p50"]
 		}
 	],
 	"governance": [
 		{
 			"claim": "Communities should be involved in decisions about AI",
 			"direction": "agree",
-			"ids": [
-				"p24",
-				"p150",
-				"p22",
-				"p51"
-			]
+			"ids": ["p24", "p150", "p22", "p51"]
 		},
 		{
 			"claim": "Government use of AI should be transparent and independently audited",
 			"direction": "agree",
-			"ids": [
-				"p18",
-				"p156"
-			]
+			"ids": ["p18", "p156"]
 		},
 		{
 			"claim": "People disagree about whether AI should be publicly- or privately-owned",
 			"direction": "divided",
-			"ids": [
-				"p64",
-				"p154",
-				"p153"
-			]
+			"ids": ["p64", "p154", "p153"]
 		},
 		{
 			"claim": "Some regulation of AI is necessary",
 			"direction": "agree",
-			"ids": [
-				"p59"
-			]
+			"ids": ["p59"]
 		}
 	],
 	"education": [
 		{
 			"claim": "Schools need clear rules and transparency about AI use",
 			"direction": "agree",
-			"ids": [
-				"p6",
-				"p72"
-			]
+			"ids": ["p6", "p72"]
 		},
 		{
 			"claim": "Children need guardrails before AI is used with them",
 			"direction": "agree",
-			"ids": [
-				"p71"
-			]
+			"ids": ["p71"]
 		},
 		{
 			"claim": "People disagree about how much AI erodes critical thinking and creativity",
 			"direction": "divided",
-			"ids": [
-				"p67",
-				"p76",
-				"p114",
-				"p118",
-				"p103"
-			]
+			"ids": ["p67", "p76", "p114", "p118", "p103"]
 		},
 		{
 			"claim": "parents should be able to monitor their children's interactions with AI",
 			"direction": "agree",
-			"ids": [
-				"p5",
-				"p57",
-				"p111"
-			]
+			"ids": ["p5", "p57", "p111"]
 		}
 	],
 	"mentalhealth": [
 		{
 			"claim": "People disagree about whether AI erodes social connection",
 			"direction": "divided",
-			"ids": [
-				"p44"
-			]
+			"ids": ["p44"]
 		},
 		{
 			"claim": "AI chatbots are not an acceptable substitute for therapy",
 			"direction": "agree",
-			"ids": [
-				"p4"
-			]
+			"ids": ["p4"]
 		}
 	],
 	"workforce": [
 		{
 			"claim": "Workers should know when AI is used to evaluate them",
 			"direction": "agree",
-			"ids": [
-				"p13"
-			]
+			"ids": ["p13"]
 		},
 		{
 			"claim": "Companies that automate jobs should help fund retraining",
 			"direction": "mixed",
-			"ids": [
-				"p12",
-				"p106",
-				"p53"
-			]
+			"ids": ["p12", "p106", "p53"]
 		},
 		{
 			"claim": "The jobs AI replaces are essential",
 			"direction": "agree",
-			"ids": [
-				"p54"
-			]
+			"ids": ["p54"]
 		},
 		{
 			"claim": "People disagree about AI companies' role in preparing the workforce",
 			"direction": "divided",
-			"ids": [
-				"p48"
-			]
+			"ids": ["p48"]
 		}
 	],
 	"agency": [
 		{
 			"claim": "AI should strengthen human judgment, not replace it",
 			"direction": "agree",
-			"ids": [
-				"p121"
-			]
+			"ids": ["p121"]
 		},
 		{
 			"claim": "People disagree about whether AI is fundamentally different from past technologies",
 			"direction": "divided",
-			"ids": [
-				"p117",
-				"p78",
-				"p61"
-			]
+			"ids": ["p117", "p78", "p61"]
 		},
 		{
 			"claim": "People disagree about whether to adapt to AI or resist it",
 			"direction": "divided",
-			"ids": [
-				"p52"
-			]
+			"ids": ["p52"]
 		}
 	]
 }

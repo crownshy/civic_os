@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { REPORT_CONFIG } from '../data/report-config';
-	import { CONSENSUS_RECORDS } from '../domain/bundled';
-	import { getOpenStatement } from '../navigation';
+	import { getOpenStatement, getReport } from '../navigation';
 	import StatementCard from './StatementCard.svelte';
 
 	const openStatement = getOpenStatement();
-	const copy = REPORT_CONFIG.pages.consensus;
+	const report = getReport();
+	const copy = report.config.pages.consensus;
+	const records = report.consensusRecords;
 </script>
 
 <main class="introPage consensusPage">
@@ -14,8 +14,8 @@
 		<p>{copy.body}</p>
 	</div>
 	<div class="cards">
-		{#each CONSENSUS_RECORDS as record, index (record.id)}
-			<StatementCard {record} onopen={() => openStatement(CONSENSUS_RECORDS, index)} />
+		{#each records as record, index (record.id)}
+			<StatementCard {record} onopen={() => openStatement(records, index)} />
 		{/each}
 	</div>
 </main>
