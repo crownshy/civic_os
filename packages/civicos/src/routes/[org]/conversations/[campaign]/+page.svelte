@@ -160,7 +160,7 @@
 	<title>{campaign.title}{campaign.place ? ` — ${campaign.place.name}` : ''}</title>
 </svelte:head>
 
-<div class="min-h-screen bg-gradient-to-b from-orange-50 to-orange-100 text-yellow-950">
+<div class="min-h-screen bg-background text-yellow-950">
 	<!-- Above-fold container: header + hero fill the viewport on desktop -->
 	<div class="flex flex-col md:h-screen">
 		<!-- Header chip row — bypasses AppShell. See docs/adr/0001-landing-bypasses-appshell.md -->
@@ -425,7 +425,7 @@
 <!-- Loading overlay during join -->
 {#if joining}
 	<div
-		class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-linear-to-b from-orange-50 to-orange-100"
+		class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background"
 		transition:fade={{ duration: 200 }}
 	>
 		<div

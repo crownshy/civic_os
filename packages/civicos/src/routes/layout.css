@@ -53,17 +53,13 @@
 	--tracking-display: var(--tracking-display);
 }
 
-@utility bg-gradient-primary {
-	background-image: var(--gradient-primary);
-}
-
 @layer base {
 	* {
 		@apply border-border outline-ring/50;
 	}
 
 	body {
-		@apply bg-background bg-gradient-primary text-foreground;
+		@apply bg-background text-foreground;
 	}
 }
 

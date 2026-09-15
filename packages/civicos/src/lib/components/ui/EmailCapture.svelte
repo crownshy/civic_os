@@ -14,7 +14,7 @@
 </script>
 
 <div class="flex w-full flex-col items-center">
-	<div class="w-full rounded-[20px] bg-white p-6 shadow-[0px_20px_40px_rgba(0,0,0,0.35)]">
+	<div class="w-full rounded-[20px] bg-card p-6 shadow-[0px_20px_40px_rgba(0,0,0,0.35)]">
 		<h2 class="font-display text-4xl leading-10 font-medium tracking-display text-secondary">
 			Share your email
 		</h2>
@@ -27,7 +27,7 @@
 				e.preventDefault();
 				onSubmit(email);
 			}}
-			class="mt-5 flex h-12 items-center overflow-hidden rounded-full bg-white px-5 shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)] outline-2 outline-primary"
+			class="mt-5 flex h-12 items-center overflow-hidden rounded-full bg-card px-5 shadow-[inset_2.2px_4.4px_4.4px_0px_rgba(0,0,0,0.10)] outline-2 outline-primary"
 		>
 			<Input
 				bind:value={email}

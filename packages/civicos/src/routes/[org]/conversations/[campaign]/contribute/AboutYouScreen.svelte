@@ -54,7 +54,7 @@
 	let dialogQuestion = $derived(questions.find((q) => q.key === openDialog) ?? null);
 </script>
 
-<div class="flex h-full flex-col bg-gradient-primary">
+<div class="flex h-full flex-col bg-background">
 	<InfoBar {region} {placeName} />
 
 	<div class="flex flex-1 flex-col overflow-y-auto px-6 pt-8">
@@ -130,7 +130,7 @@
 		</div>
 	</div>
 
-	<div class="flex shrink-0 items-center gap-3.5 border-t border-secondary/70 bg-accent px-7 py-8">
+	<div class="flex shrink-0 items-center gap-3.5 px-7 py-8">
 		<Button variant="primary" fullWidth onclick={() => onDone(collectDemographics())}>
 			CONTINUE
 		</Button>

@@ -77,10 +77,7 @@
 </script>
 
 <div
-	class={[
-		'sticky z-30 w-full overflow-x-auto bg-gradient-to-b from-orange-50 to-orange-50/95 backdrop-blur-sm',
-		className
-	]
+	class={['sticky z-30 w-full overflow-x-auto bg-background/95 backdrop-blur-sm', className]
 		.filter(Boolean)
 		.join(' ')}
 	style:top="{topOffset}px"

@@ -14,9 +14,7 @@
 </svelte:head>
 
 <AppShell border={false}>
-	<div
-		class="flex h-full flex-col items-center justify-center bg-gradient-primary px-6 text-yellow-950"
-	>
+	<div class="flex h-full flex-col items-center justify-center bg-background px-6 text-yellow-950">
 		<span class="rounded-[30px] bg-yellow-950 px-3.5 py-2 font-mono text-sm font-medium text-white">
 			{status}
 		</span>

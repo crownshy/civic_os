@@ -28,21 +28,18 @@
 	startCountdown();
 </script>
 
-<div
-	class="flex h-full flex-col bg-gradient-primary"
-	in:fly={{ x: 40, duration: 400, easing: cubicOut }}
->
+<div class="flex h-full flex-col bg-background" in:fly={{ x: 40, duration: 400, easing: cubicOut }}>
 	<Header {placeName} />
 
 	<!-- Scrollable content -->
 	<div class="flex flex-1 flex-col overflow-y-auto px-8 pt-8">
-		<span class="font-mono text-sm font-medium text-white/80">DID YOU KNOW?</span>
-		<p class="mt-4 font-sans text-4xl font-bold text-white">
+		<span class="font-mono text-sm font-medium text-foreground/80">DID YOU KNOW?</span>
+		<p class="mt-4 font-sans text-4xl font-bold text-foreground">
 			4 in 5 teenagers in Utah are chatting with AI friends online.
 		</p>
 
 		<!-- Body text -->
-		<p class="mt-8 font-sans text-lg leading-9 font-medium text-white">
+		<p class="mt-8 font-sans text-lg leading-9 font-medium text-foreground">
 			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis finibus purus mollis, ultrices
 			lorem quis, facilisis mauris. Nulla tortor magna, consequat sed pharetra quis, blandit
 			elementum velit. Curabitur finibus et felis nec vehicula. Vivamus facilisis nunc sed dui

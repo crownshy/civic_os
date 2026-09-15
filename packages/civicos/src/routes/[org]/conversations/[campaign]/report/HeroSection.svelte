@@ -121,7 +121,7 @@
 
 	.bubble {
 		border-radius: 9999px;
-		background: linear-gradient(to bottom, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0));
+		background: rgba(255, 255, 255, 0.12);
 		flex-shrink: 0;
 	}
 

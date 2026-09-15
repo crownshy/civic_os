@@ -2,7 +2,7 @@
 	import type { CommentReportData } from '$lib/types/report';
 	import Badge from '@civicos/shared/ui/Badge.svelte';
 	import SwipeCarousel from '$lib/components/ui/SwipeCarousel.svelte';
-	import GradientCard from '$lib/components/ui/GradientCard.svelte';
+	import PanelCard from '$lib/components/ui/PanelCard.svelte';
 
 	interface Props {
 		participantCount: number;
@@ -53,15 +53,9 @@
 				{@const statement = consensusStatements[i]}
 				<div class="relative flex flex-col items-center">
 					<!-- Avatar -->
-					<div
-						class="z-10 h-12 w-12 rounded-full bg-linear-to-b from-background to-accent outline-[0.8px] outline-border"
-					></div>
+					<div class="z-10 h-12 w-12 rounded-full bg-accent outline-[0.8px] outline-border"></div>
 					<!-- Card body (overlaps avatar) -->
-					<GradientCard
-						borderGradient="bg-linear-to-b from-border to-transparent"
-						bg="bg-linear-to-b from-card to-background"
-						class="-mt-5"
-					>
+					<PanelCard borderClass="border border-border" bg="bg-card" class="-mt-5">
 						<div class="flex min-h-48 w-full flex-col justify-between px-7 pt-10 pb-7">
 							<p class="font-sans text-xl leading-6 font-semibold text-foreground">
 								"{statement.text}"
@@ -72,7 +66,7 @@
 								</Badge>
 							</div>
 						</div>
-					</GradientCard>
+					</PanelCard>
 				</div>
 			{/snippet}
 		</SwipeCarousel>

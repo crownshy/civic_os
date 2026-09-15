@@ -73,10 +73,10 @@
 	}
 </script>
 
-<div class="flex h-full flex-col bg-muted">
+<div class="flex h-full flex-col bg-background">
 	<InfoBar {placeName} {region} {onEnd} />
 
-	<!-- Statement content (white, centered) -->
+	<!-- Statement content, centered on the page surface -->
 	<div class="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-10">
 		<div class="absolute top-0 left-0 h-[3px] w-full bg-secondary/30">
 			<div class="h-full bg-secondary transition-all duration-300" style="width: {progress}%"></div>

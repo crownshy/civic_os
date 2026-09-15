@@ -83,7 +83,7 @@
 			{#each filteredStatements as statement (statement.tid)}
 				<div class="flex items-start gap-4 border-y border-border px-0 py-4">
 					<div
-						class="mt-2 ml-5 h-8 w-8 shrink-0 rounded-full border border-border bg-linear-to-b from-muted-foreground to-accent/0"
+						class="mt-2 ml-5 h-8 w-8 shrink-0 rounded-full border border-border bg-muted-foreground"
 					></div>
 					<div class="flex flex-1 flex-col pr-5">
 						<p class="font-sans text-sm leading-6 font-semibold text-foreground">
