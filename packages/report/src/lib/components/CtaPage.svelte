@@ -22,9 +22,11 @@
 	<div class="masthead">
 		<h1>Now is the time to act for the future of our communities.</h1>
 		<p>
-			We're organizing a Civic Assembly in December, where 30 residents will develop policies to
-			make sure the public has a meaningful role in the government's AI-related decisions.
-			<span class="highlight">You are invited to participate.</span> Register your interest below.
+			We're organizing a Civic Assembly in December 2026, where 30-40 residents will develop
+			policies to make sure the public has a meaningful role in the government's AI-related
+			decisions.
+			<span class="highlight">You are invited to participate;</span> selected delegates will receive a
+			$250 stipend.
 		</p>
 	</div>
 	<div class="actions">

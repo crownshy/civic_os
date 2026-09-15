@@ -48,9 +48,8 @@
 	 * is what shows in the desktop gutter) matches it too.
 	 */
 	$effect(() => {
-		document.title = theme
-			? `${theme.short} — Bloom`
-			: 'Bloom — A Conversation on AI in Central Oregon';
+		const siteTitle = 'Public Report on AI & Central Oregon';
+		document.title = theme ? `${theme.short} — ${siteTitle}` : siteTitle;
 
 		const root = document.documentElement.style;
 		root.setProperty('--c', chrome.accent);

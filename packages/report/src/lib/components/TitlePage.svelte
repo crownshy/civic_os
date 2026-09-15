@@ -13,14 +13,14 @@
 
 <main class="introPage titlePage">
 	<div class="head">
-		<h1>What did Central Oregonians have to say about AI?</h1>
+		<h1>What did Central Oregonians have to say about <span class="ai">AI?</span></h1>
 	</div>
 	<img class="mountains" src={mountains} alt="" width="1800" height="849" fetchpriority="high" />
 	<div class="intro">
 		<p>
-			Central Oregon Civic Action Project (COCAP) and its partners talked to
-			<span class="highlight">over 400 real Central Oregonians</span> from all over the region to hear
-			what they thought should be done about AI.
+			Central Oregon Civic Action Project and its partners talked to
+			<span class="highlight">over 400 residents</span> from around the region to hear what they thought
+			should be done about AI.
 		</p>
 		<button class="diveIn" type="button" onclick={diveIn}>Dive In</button>
 	</div>
@@ -31,24 +31,35 @@
 	.titlePage {
 		display: flex;
 		flex-direction: column;
-		justify-content: center;
-		padding-bottom: 0;
+		/* safe: a stack taller than a short viewport top-aligns and scrolls instead of clipping Dive In */
+		justify-content: safe center;
+		padding-bottom: 24px;
 		/* the mountains bleed past the column's edges on mobile */
 		overflow-x: clip;
 		color: var(--theme-blue);
 		text-align: center;
 	}
 	.head {
-		padding: 24px 22px 0;
+		padding: 16px 22px 0;
+		position: relative;
+		z-index: 2;
 	}
 	h1 {
 		font-family: var(--geom);
 		font-weight: 700;
 		font-size: clamp(36px, 10.5vw, 52px);
-		line-height: 1.05;
+		line-height: 1.16;
 		letter-spacing: -0.02em;
 		margin: 10px auto 0;
 		max-width: 13em;
+	}
+	.ai {
+		background: var(--theme-blue);
+		color: #fff;
+		border-radius: 0.18em;
+		padding: 0.02em 0.18em;
+		-webkit-box-decoration-break: clone;
+		box-decoration-break: clone;
 	}
 	.mountains {
 		display: block;
@@ -56,10 +67,10 @@
 		width: 100%;
 		height: auto;
 		aspect-ratio: 1800 / 849;
-		margin: 24px auto 0;
+		margin: 0 auto;
 	}
 	.intro {
-		padding: 34px 22px 24px;
+		padding: 18px 22px 8px;
 	}
 	.intro p {
 		font-size: 17.5px;
@@ -93,14 +104,21 @@
 		.mountains {
 			width: 132%;
 			margin-inline: -16%;
+			/* into the silhouette's own transparent top margin, so it sits right under the headline */
+			margin-top: -20px;
 		}
 	}
 	@media (min-width: 660px) {
 		.mountains {
 			width: min(68%, 620px);
 		}
+		h1 {
+			font-size: 54px;
+			line-height: 1.1;
+		}
 		.intro p {
-			font-size: 19px;
+			font-size: 25px;
+			line-height: 1.45;
 			margin-bottom: 22px;
 			max-width: 34em;
 		}
