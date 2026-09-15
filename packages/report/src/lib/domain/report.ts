@@ -89,6 +89,8 @@ export interface Report {
 	themeViews: Readonly<Record<string, ThemeView>>;
 	/** The hand-picked common ground shown on the Consensus page, in order. */
 	consensusRecords: readonly ReportRecord[];
+	/** As picked, before unknown ids were dropped: what the data asked for. */
+	consensusIds: readonly string[];
 }
 
 export function buildReport(sources: ReportSources): Report {
@@ -128,6 +130,7 @@ export function buildReport(sources: ReportSources): Report {
 		),
 		consensusRecords: Object.freeze(
 			consensus.ids.map((id) => recordById.get(id)).filter((r): r is ReportRecord => Boolean(r))
-		)
+		),
+		consensusIds: Object.freeze(consensus.ids)
 	};
 }

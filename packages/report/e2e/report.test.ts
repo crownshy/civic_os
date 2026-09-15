@@ -5,6 +5,7 @@ import { expect, test, type Page } from '@playwright/test';
  */
 
 const REPORT = '/central-oregon-ai';
+const UTAH = '/utah-ai';
 
 const EXPECTED_THEME = 'Governance & Decision-Making';
 const EXPECTED_THEME_STATEMENT_COUNT = 25;
@@ -154,6 +155,36 @@ test('the health endpoint the container probes returns 200', async ({ request })
 	// non-2xx would leave the pod unready behind a 503.
 	const response = await request.get('/healthz');
 	expect(response.status()).toBe(200);
+});
+
+test('a second report is served from its own slug, with its own data', async ({ page }) => {
+	// Utah is the report that is not Central Oregon: different copy, two opinion
+	// groups rather than three, its own themes, and no session quotes.
+	await page.goto(UTAH);
+	await expect(
+		page.getByRole('heading', { name: /What did Utahns have to say about AI/i })
+	).toBeVisible();
+
+	await page.goto(`${UTAH}/groups`);
+	const groups = page.getByRole('button', { name: /people, see defining statements/ });
+	await expect(groups).toHaveCount(2);
+	await expect(page.getByRole('button', { name: /AI Optimists/ })).toBeVisible();
+
+	await page.goto(`${UTAH}/themes`);
+	await page.getByRole('button', { name: 'Health & Mental Health' }).click();
+	await expect(page).toHaveURL(new RegExp(`${UTAH}/themes/health$`));
+	// this theme has no editorial description and no insights, so it renders the
+	// statements alone rather than a "What we learned" section
+	await expect(page.getByRole('heading', { name: 'What we learned' })).toBeHidden();
+	await expect(page.getByRole('heading', { name: 'All Statements' })).toBeVisible();
+
+	await page.goto(`${UTAH}/cta`);
+	await page.getByRole('button', { name: /Share this with a friend/i }).click();
+	await expect(
+		page.getByRole('dialog', { name: 'Share this report' }).getByRole('textbox', {
+			name: 'Report URL'
+		})
+	).toHaveValue(new RegExp(`${UTAH}$`));
 });
 
 test('an unknown slug is not found', async ({ page }) => {
