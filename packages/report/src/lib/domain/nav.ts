@@ -6,7 +6,7 @@
  */
 
 /** The intro sequence shown before the theme grid. */
-export const INTRO_STEPS = ['title', 'demogs', 'groups', 'consensus'] as const;
+export const INTRO_STEPS = ['title', 'demogs', 'groups', 'consensus', 'cta'] as const;
 
 /** Intro steps plus the theme grid they lead into. */
 export const NAV_SEQUENCE = [...INTRO_STEPS, 'themes'] as const;
@@ -21,6 +21,7 @@ export const NAV_BAR_LABELS: Partial<Record<StepKey, string>> = {
 	demogs: 'Who participated?',
 	groups: 'Opinion Groups',
 	consensus: 'Consensus',
+	cta: 'Call to Action',
 	themes: 'Data Explorer'
 };
 

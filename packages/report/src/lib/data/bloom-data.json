@@ -44,8 +44,8 @@
 		},
 		{
 			"key": "access",
-			"short": "Access & Accuracy",
-			"full": "Access, Information & Accuracy",
+			"short": "Access to Quality Information",
+			"full": "Access to Quality Information",
 			"color": "#0E6FA6",
 			"tags": [
 				"Access",
@@ -55,13 +55,6 @@
 				"News & (mis)information",
 				"Inequality"
 			]
-		},
-		{
-			"key": "privacy",
-			"short": "Privacy & Personal Data",
-			"full": "Privacy & Personal Data",
-			"color": "#6B5C1E",
-			"tags": ["Privacy"]
 		}
 	],
 	"records": [
@@ -218,7 +211,7 @@
 				}
 			},
 			"source": "Open Poll",
-			"tags": ["Youth", "Privacy"],
+			"tags": ["Youth", "Children"],
 			"inReport": false
 		},
 		{
@@ -687,45 +680,6 @@
 			},
 			"source": "Open Poll",
 			"tags": ["AI Companies", "Governance & Decision-making"],
-			"inReport": false
-		},
-		{
-			"id": "p42",
-			"kind": "poll",
-			"text": "The Confederated Tribes of Warm Springs should have a formal seat at the table when Central Oregon leaders make decisions about AI.",
-			"origin": "cocap_seed",
-			"place": null,
-			"chips": ["SEED STATEMENT"],
-			"vote": {
-				"total": 221,
-				"gap": 3,
-				"minAgree": 88,
-				"groups": {
-					"A": {
-						"a": 37,
-						"d": 2,
-						"p": 3,
-						"n": 42,
-						"pct": 88
-					},
-					"B": {
-						"a": 82,
-						"d": 2,
-						"p": 6,
-						"n": 90,
-						"pct": 91
-					},
-					"C": {
-						"a": 81,
-						"d": 3,
-						"p": 5,
-						"n": 89,
-						"pct": 91
-					}
-				}
-			},
-			"source": "Open Poll",
-			"tags": ["Governance & Decision-making"],
 			"inReport": false
 		},
 		{
@@ -1232,7 +1186,7 @@
 				}
 			},
 			"source": "Open Poll",
-			"tags": ["Youth", "Privacy"],
+			"tags": ["Youth", "Children"],
 			"inReport": false
 		},
 		{
@@ -2474,7 +2428,7 @@
 				}
 			},
 			"source": "Open Poll",
-			"tags": ["Youth", "Privacy"],
+			"tags": ["Youth", "Children"],
 			"inReport": false
 		},
 		{
@@ -3185,7 +3139,7 @@
 				}
 			},
 			"source": "Open Poll",
-			"tags": ["Privacy"],
+			"tags": ["Human Agency"],
 			"inReport": false
 		},
 		{
