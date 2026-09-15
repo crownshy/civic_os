@@ -1,6 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { GENERIC_REGION } from '@civicos/shared/data/regions';
-import type { RegionConfig } from '$lib/config/regions';
 
 /**
  * What the Campaign lookup answers when it does not find one.
@@ -23,19 +21,16 @@ function httpError(status: number) {
 	return Object.assign(new Error(`HTTP ${status}`), { response: { status } });
 }
 
-const region = GENERIC_REGION as RegionConfig;
-
-/** Run the layout load for `/<slug>` on the apex, and return how it failed. */
+/** Run the layout load for `/<org>/conversations/<slug>`, and return how it failed. */
 async function loadFailure(slug: string) {
 	const { load } = await import('./+layout.server');
 
 	try {
 		await load({
 			params: { campaign: slug },
-			locals: { region },
 			url: new URL(`http://localhost:5173/dandan/conversations/${slug}`),
 			depends: () => {}
-			// The load reads only these four. The rest of the SvelteKit event is
+			// The load reads only these three. The rest of the SvelteKit event is
 			// irrelevant here and typing it out would only pin things this does not
 			// test.
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -90,13 +85,5 @@ describe('campaign lookup failures', () => {
 		GetConversation.mockRejectedValue(new Error('ECONNREFUSED'));
 
 		expect((await loadFailure('test-convo')).status).toBe(503);
-	});
-
-	it('prefers the draft answer when one candidate 403s and another is unreachable', async () => {
-		// A 403 came from a backend that was up and did know the slug, so it is the
-		// more definite answer whatever some other candidate did.
-		GetConversation.mockRejectedValueOnce(httpError(403)).mockRejectedValueOnce(new Error('boom'));
-
-		expect((await loadFailure('ai')).status).toBe(404);
 	});
 });

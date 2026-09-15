@@ -26,9 +26,10 @@ export const createConversationSchema = z.object({
 	/**
 	 * Where the Campaign runs, collected here so it has a Place from the start
 	 * rather than only once someone visits Setup. Optional: a Campaign with no
-	 * Place is served from the apex, and the Place can be changed later.
+	 * Place is served all the same, it is only listed on no Place page, and the
+	 * Place can be changed later.
 	 *
-	 * A name, not a slug. The subdomain is derived (`placeFromName`), and the
+	 * A name, not a slug. The slug is derived (`placeFromName`), and the
 	 * Conversation slug is scoped to it by the action, the same rule Setup
 	 * applies on a Place change.
 	 */

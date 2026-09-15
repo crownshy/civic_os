@@ -1,8 +1,9 @@
 import { createApiClient } from '@crownshy/api-client/client';
 import { resolveParticipant } from '$lib/services/participant';
+import { GENERIC_REGION } from '$lib/config/regions';
 import type { LayoutServerLoad } from './$types';
 
-export const load: LayoutServerLoad = async ({ locals, cookies, url, depends }) => {
+export const load: LayoutServerLoad = async ({ cookies, url, depends }) => {
 	// Joining writes the participant from the browser, so this answer goes stale
 	// the moment someone signs up. The key is what `invalidate` targets.
 	depends('civicos:participant');
@@ -16,10 +17,12 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url, depends }) 
 
 	const { participant, resolved } = await resolveParticipant(api, authToken);
 
-	// The Place, from the subdomain. The Campaign is resolved one level down, in
-	// `[campaign]/+layout.server.ts`, because that is where the slug lives.
 	return {
-		region: locals.region,
+		// The catch-all defaults, for the pages that are not a Campaign. A Campaign
+		// replaces this with its own one level down, in `[campaign]/+layout.server.ts`,
+		// because the slug that picks it lives there. Nothing reads the hostname
+		// (ADR 0011).
+		region: GENERIC_REGION,
 		participant,
 		participantResolved: resolved
 	};

@@ -1,12 +1,11 @@
 /**
- * A Place: the geography a Campaign runs in, and the subdomain it is served
- * from. The public URL is heading for `<place>.bloomproject.us/<campaign-slug>`.
+ * A Place: the geography a Campaign runs in, and the page at `/<place-slug>`
+ * that lists the Campaigns running there (ADR 0011).
  *
  * A Place has no backend table, so it rides on `Conversation.metadata.place`.
  * ADR 0006 has the full reasoning and the way out; the short version is that
  * comhairle's Region model has no slug, no link to a Conversation, and no
- * anonymous read, and the participant app resolves the subdomain before anyone
- * has logged in.
+ * anonymous read.
  *
  * One Place per Campaign, and one poll behind it (ADR 0008). Many-to-many is the
  * agreed direction but nothing in comhairle supports it yet, so `place` is a
@@ -20,7 +19,7 @@
  */
 
 export interface Place {
-	/** URL-safe key. The subdomain this Campaign is served from. */
+	/** URL-safe key. The `/<place-slug>` segment its Campaigns are listed under. */
 	slug: string;
 	/** Display name, e.g. "Dundee, Scotland". */
 	name: string;
@@ -29,7 +28,10 @@ export interface Place {
 /** Key this rides under inside the Conversation's `metadata` jsonb. */
 export const PLACE_METADATA_KEY = 'place';
 
-/** Longest a single DNS label may be, and so the longest a Place slug may be. */
+/**
+ * Longest a Place slug may be. The DNS label limit, from when a Place was a
+ * subdomain, kept so that every slug already stored stays valid.
+ */
 const MAX_SLUG_LENGTH = 63;
 
 /**
@@ -52,19 +54,19 @@ export function readPlace(metadata: unknown): Place | null {
 }
 
 /**
- * The subdomain a Place name becomes. Hosts type a name, not a slug, so this is
- * the only thing standing between "Dundee, Scotland" and a DNS label.
+ * The slug a Place name becomes. Hosts type a name, not a slug, so this is the
+ * only thing standing between "Dundee, Scotland" and a URL segment.
  *
  * Accents are folded rather than dropped so "Córdoba" is `cordoba` and not
- * `c-rdoba`. The result is trimmed to a leading/trailing-hyphen-free label
+ * `c-rdoba`. The result is trimmed to a leading/trailing-hyphen-free slug
  * within the 63-character limit, and is empty when the name carries nothing a
- * label can be built from (`"..."`, `"日本"`); callers treat empty as "this
+ * slug can be built from (`"..."`, `"日本"`); callers treat empty as "this
  * name cannot be a Place" rather than writing a blank slug.
  */
 export function toPlaceSlug(name: string): string {
 	return name
 		.normalize('NFKD')
-		.replace(/[\u0300-\u036f]/g, '')
+		.replace(/[̀-ͯ]/g, '')
 		.toLowerCase()
 		.replace(/[^a-z0-9]+/g, '-')
 		.replace(/^-+|-+$/g, '')
@@ -87,11 +89,10 @@ export function placeFromName(name: string): Place | null {
  * Conversations need distinct slugs while the Campaign keeps one name. The
  * Place is appended to make them distinct: `ai` in `utah` is `ai-utah`.
  *
- * The public URL does not show this. It stays `<place>.bloomproject.us/<ai>`;
- * the suffix is how that pair is looked up, which is what lets
- * `GET /conversation/:idOrSlug` resolve it with no campaign entity and no
- * metadata read. The subdomain is load bearing rather than decorative, which is
- * the state ADR 0007 wanted and could not reach.
+ * The suffix is part of the public URL, `/<org>/conversations/ai-utah`. That is
+ * what lets `GET /conversation/:idOrSlug` resolve the pair from the path alone,
+ * with no campaign entity, no metadata read and nothing taken from the hostname
+ * (ADR 0011).
  *
  * DERIVE FORWARD, NEVER PARSE BACK. `ai-central-oregon` is `ai` in
  * `central-oregon` or `ai-central` in `oregon`, and nothing in the string says
@@ -185,10 +186,10 @@ export function readPoll(metadata: unknown): CampaignPoll | null {
 /**
  * Where participants go for one Campaign.
  *
- * `<place>.<base>/<org>/conversations/<campaign-slug>`, mirroring comhairle's
- * own URLs. This is the single definition of that path; admin renders share
- * links from it and civicos routes to match, so a scheme change is a change
- * here and at the civicos route directory, and nowhere else.
+ * `<base>/<org>/conversations/<conversation-slug>`, mirroring comhairle's own
+ * URLs. This is the single definition of that path; admin renders share links
+ * from it and civicos routes to match, so a scheme change is a change here and
+ * at the civicos route directory, and nowhere else.
  *
  * **The `<org>` segment is decorative.** civicos resolves a Campaign from the
  * slug alone and ignores it: an Organization has no URL-safe identifier (the DTO
@@ -200,39 +201,37 @@ export function readPoll(metadata: unknown): CampaignPoll | null {
  * segment without an org slug on the backend, or every link already in the wild
  * breaks.
  *
- * **The Place subdomain is optional.** A Campaign has a participant site from
- * the moment it is created; publishing it to a Place gives it a nicer address,
- * it does not give it its first one. With no Place the site is the apex.
+ * **No Place in the hostname.** A Place used to be a subdomain, which cost a
+ * certificate and a Polis allowlist entry per Place. The Conversation slug
+ * already carries the Place (`ai-utah`), so one host serves every Campaign and
+ * a Place is a page at `placePath()` instead (ADR 0011).
  */
 export function participantUrl(
-	placeSlug: string,
-	campaignSlug: string,
+	conversationSlug: string,
 	orgSlug: string,
 	base: string,
 	protocol = 'https'
 ): string {
-	const apex = base
+	const host = base
 		.trim()
 		.replace(/^https?:\/\//, '')
 		.replace(/\/+$/, '');
-	if (!apex || !campaignSlug.trim()) return '';
+	if (!host || !conversationSlug.trim()) return '';
 
 	// localhost has no TLS in dev, and a link that opens on the wrong scheme is
 	// worse than one that opens plainly.
-	const scheme = /^localhost([:/]|$)/.test(apex) || apex.endsWith('.localhost') ? 'http' : protocol;
-	const place = placeSlug.trim();
-	const host = place ? `${place}.${apex}` : apex;
+	const scheme = /^localhost([:/]|$)/.test(host) || host.endsWith('.localhost') ? 'http' : protocol;
 
-	return `${scheme}://${host}${campaignPath(campaignSlug, orgSlug)}`;
+	return `${scheme}://${host}${campaignPath(conversationSlug, orgSlug)}`;
 }
 
 /** Fallback `<org>` segment for a Campaign whose Host is not known. */
 export const UNKNOWN_ORG_SLUG = 'host';
 
 /**
- * The path part, `/<org>/conversations/<campaign-slug>`. Internal links build
- * from this rather than interpolating the shape by hand, so the route directory
- * and every link in the app move together.
+ * The path part, `/<org>/conversations/<conversation-slug>`. Internal links
+ * build from this rather than interpolating the shape by hand, so the route
+ * directory and every link in the app move together.
  */
 export function campaignPath(
 	campaignSlug: string | undefined,
@@ -246,6 +245,13 @@ export function campaignPath(
 	const tail = rest.filter((part) => part && part.trim() !== '').map((part) => `/${part.trim()}`);
 
 	return `/${org}/conversations/${campaign}${tail.join('')}`;
+}
+
+/** A Place's page, `/<place-slug>`. Empty for a blank slug. */
+export function placePath(placeSlug: string | undefined): string {
+	const place = (placeSlug ?? '').trim();
+
+	return place ? `/${place}` : '';
 }
 
 /**

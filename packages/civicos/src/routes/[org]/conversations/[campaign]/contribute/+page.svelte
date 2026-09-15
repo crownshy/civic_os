@@ -35,8 +35,8 @@
 	import CheckpointScreen, { type CheckpointVariant } from './CheckpointScreen.svelte';
 	import ThankYouScreen from './ThankYouScreen.svelte';
 
-	// Region from subdomain (layout server load)
-	const subdomainRegion: RegionConfig = page.data.region;
+	// The Campaign's `regions.ts` defaults, picked by the Campaign in the layout load
+	const region: RegionConfig = page.data.region;
 
 	// The participant the server resolved from the cookie, so the zip renders on
 	// the first paint. The cached session sits behind it for a load that could
@@ -53,9 +53,9 @@
 	//
 	// `regions.ts` keyed by zip stays behind it, unchanged, so Utah and Oregon
 	// resolve exactly as they did. Reaching here means the zip already matched
-	// this subdomain (the landing page redirects otherwise), so the two agree for
+	// this Campaign (the landing page redirects otherwise), so the two agree for
 	// legacy Campaigns and only the stored value is new.
-	const zipRegion = zipCode ? getRegionByZipcode(zipCode) : subdomainRegion;
+	const zipRegion = zipCode ? getRegionByZipcode(zipCode) : region;
 	const campaign = page.data.campaign;
 	const polisId = campaign?.poll?.polisId || zipRegion.polisId || config.polisId;
 	const polisUrl = campaign?.poll?.polisUrl || config.polisUrl;
@@ -63,7 +63,7 @@
 
 	// The geography the chrome labels itself with. The Campaign's Place, not the
 	// zip's region: the URL says which Campaign this is (#423).
-	const placeName = placeNameFor(campaign, subdomainRegion);
+	const placeName = placeNameFor(campaign, region);
 
 	// What this Host asks participants for, resolved from the Conversation's
 	// metadata in the layout load. Both sets default to all-on, so a Campaign
@@ -304,12 +304,12 @@
 				onVote={handleVote}
 				onEnd={handleEnd}
 				onCompose={() => (screen = 'compose')}
-				region={subdomainRegion}
+				{region}
 			/>
 		{:else}
 			<!-- Skeleton that reuses real components so layout stays in sync -->
 			<div class="flex h-full flex-col bg-background">
-				<InfoBar {placeName} region={subdomainRegion} />
+				<InfoBar {placeName} {region} />
 
 				<!-- Skeleton statement area -->
 				<div class="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-8">
@@ -343,11 +343,11 @@
 				session.markComposeInstructionsSeen();
 				screen = 'voting';
 			}}
-			region={subdomainRegion}
+			{region}
 		/>
 	{:else if screen === 'pause'}
 		<CheckpointScreen
-			region={subdomainRegion}
+			{region}
 			{placeName}
 			variant={currentVariant}
 			remaining={polis.remaining}
@@ -357,7 +357,7 @@
 		/>
 	{:else if screen === 'about-you'}
 		<AboutYouScreen
-			region={subdomainRegion}
+			{region}
 			{placeName}
 			questions={aboutYouQuestions}
 			onDone={handleDemographicsDone}
@@ -366,7 +366,7 @@
 		<ThankYouScreen
 			{placeName}
 			onBackToVoting={handleBackToVoting}
-			region={subdomainRegion}
+			{region}
 			whatsNext={page.data.hostCopy.whatsNext}
 			asks={participation.asks}
 			conversationId={campaign.id}
@@ -380,16 +380,11 @@
 			class="flex h-full flex-col bg-background"
 			in:fly={{ x: 40, duration: 400, easing: cubicOut }}
 		>
-			<InfoBar region={subdomainRegion} {placeName} />
+			<InfoBar {region} {placeName} />
 			<PopQuiz quiz={currentQuiz} onContinue={resumeVoting} onSkip={resumeVoting} />
 		</div>
 	{:else if screen === 'nice-job'}
-		<CheckpointScreen
-			region={subdomainRegion}
-			{placeName}
-			onPrimary={handleEnd}
-			onKeepGoing={resumeVoting}
-		/>
+		<CheckpointScreen {region} {placeName} onPrimary={handleEnd} onKeepGoing={resumeVoting} />
 	{/if}
 </AppShell>
 
@@ -415,7 +410,7 @@
 	umamiDismissEvent="checkpoint-panel-dismiss-share"
 >
 	<SharePanelContent
-		region={subdomainRegion}
+		{region}
 		umamiTextEvent="checkpoint-share-text"
 		umamiEmailEvent="checkpoint-share-email"
 		umamiLinkEvent="checkpoint-share-link"

@@ -295,6 +295,20 @@ class Session {
 	}
 
 	/**
+	 * Put a participant who already has an account on this Campaign's workflow.
+	 *
+	 * Every Campaign shares one origin, and so one `auth-token`, since the Place
+	 * left the hostname (ADR 0011). Someone who joined Utah arrives at Oregon
+	 * already known, skips `join`, and would otherwise vote without ever being
+	 * registered on Oregon's workflow. A second registration is a 409, which
+	 * `registerOnWorkflow` already treats as done.
+	 */
+	async enterCampaign(conversationId: string): Promise<void> {
+		this.useCampaign(conversationId);
+		await this.registerOnWorkflow();
+	}
+
+	/**
 	 * Put this participant on the Campaign's workflow.
 	 *
 	 * An invite used to do this, through `AcceptInvite`, and it was ceremony: the

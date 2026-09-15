@@ -22,12 +22,12 @@ registered to one or more Places, which (per #351) scope where it may run
 Campaigns. `Place ↔ Region` mirrors `Campaign ↔ Conversation` and
 `Host ↔ Organization`: product word ↔ comhairle model.
 
-**A Place is the subdomain**, `<place>.bloomproject.us`. Optional: a Campaign
-with no Place is served from the apex. It is not a record: it
+**A Place is a page**, `/<place-slug>`, listing the open Campaigns whose Place
+has that slug (ADR 0011). It used to be the subdomain. Optional: a Campaign with
+no Place is listed only in the `/conversations` directory. It is not a record: it
 rides on `Conversation.metadata.place` as `{ slug, name }` (ADR 0006), so nothing
 enumerates Places and two Campaigns in the same Place duplicate the name. The
-Host types a **name** on Setup and the slug is derived from it; the DNS label
-itself is still provisioned by BLOOM (#351).
+Host types a **name** on Setup and the slug is derived from it.
 
 **A Campaign has exactly one Place** (ADR 0008). Campaigns and Places are
 many-to-many in principle, and each Place would get its own poll, but nothing in
@@ -116,9 +116,9 @@ comhairle model. `Campaign ↔ Conversation` mirrors `Host ↔ Organization` and
 **A Campaign has exactly one Place, and exactly one poll** (ADR 0008). The
 Conversation behind it is slugged `<campaign>-<place>` (`ai-utah`), derived
 automatically when the Place is saved. The participant URL is
-`<place>.bloomproject.us/<org>/conversations/<campaign-slug>` (ADR 0007); the
-`<org>` segment is decorative and the Place subdomain is optional, so a Campaign
-has a participant site from the moment it is created.
+`/<org>/conversations/<conversation-slug>` on one host (ADR 0007, ADR 0011); the
+`<org>` segment is decorative, so a Campaign has a participant site from the
+moment it is created.
 
 **A Campaign has exactly one Polis step.** comhairle's model is more general: a
 Conversation runs a workflow of many steps (`polis`, `learn`, `heyform`,
@@ -217,22 +217,22 @@ Campaigns whose Polis step does not resolve.
 ### Participant site
 Where participants actually go:
 
-    <place>.bloomproject.us/<org>/conversations/<campaign-slug>
+    <host>/<org>/conversations/<conversation-slug>
 
-`civicos` resolves the Campaign from the **slug**, and the Place subdomain from
-`hooks.server.ts` -> `getRegionBySubdomain`. The `<org>` segment is decorative,
-ignored on resolution (ADR 0007). The poll is `/contribute` under that path, and
-live events are `/events/<event-slug>`.
+`civicos` resolves the Campaign from the **slug** alone; nothing about the
+hostname is read (ADR 0011). The `<org>` segment is decorative, ignored on
+resolution (ADR 0007). The poll is `/contribute` under that path, and live
+events are `/events/<event-slug>`. A Place's Campaigns are listed at
+`/<place-slug>`.
 
 Three things the admin surfaces have to respect:
 
-- **Every Campaign has a participant site from the moment it is created.** No
-  Place means it is served from the apex; publishing to a Place moves it to that
-  subdomain. It no longer needs a `regions.ts` entry, a code change or a deploy.
+- **Every Campaign has a participant site from the moment it is created.** It
+  needs no `regions.ts` entry, code change or deploy, and publishing it to a
+  Place adds it to that Place's page without moving it.
 - **The URL is derived, never stored.** `participantUrl()` in
-  `@civicos/shared/data/place` is the only thing that builds it. A legacy
-  region's `shareUrl` still wins for Utah and Oregon, because those hostnames
-  are live.
+  `@civicos/shared/data/place` is the only thing that builds it. Admin no longer
+  prefers a legacy region's `shareUrl`, which names a Place subdomain.
 - **`is_live` does not gate the participant app.** `civicos` never reads it, and
   `/contribute` talks to Polis directly, bypassing comhairle. Today the flag only
   drives the admin badge, so a "draft" Campaign that has been published to a

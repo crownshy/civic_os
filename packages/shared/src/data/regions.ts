@@ -1,8 +1,9 @@
 /**
  * Region configuration for multi-state deployment.
  *
- * Each region maps to a subdomain (utah.bloomproject.us, oregon.bloomproject.us)
- * and carries its own Polis conversation ID, captions, host info, etc.
+ * Each region is the default layer behind a Campaign (picked by the Campaign,
+ * not the hostname, since ADR 0011) and carries its own Polis conversation ID,
+ * captions, host info, etc.
  *
  * Zipcode lookup determines which region-specific Polis a user joins:
  *   - Utah zip (84xxx) → utah polis
@@ -28,7 +29,7 @@ export interface FaqEntry {
 }
 
 export interface RegionConfig {
-	/** Slug used in subdomain and as map key */
+	/** Map key, and the Campaign slug a legacy region still resolves under */
 	slug: string;
 	/** Full state name */
 	stateName: string;
@@ -510,7 +511,7 @@ export const REGIONS: Record<string, RegionConfig> = {
 	}
 };
 
-/** Fallback region for unknown subdomains or non-matching zipcodes */
+/** Fallback region for Campaigns no region claims, and for non-matching zipcodes */
 export const GENERIC_REGION: RegionConfig = {
 	slug: 'all',
 	stateName: 'USA',
@@ -612,18 +613,6 @@ export function formatDurationLabel(hours: number, minutes: number) {
 }
 
 /**
- * Resolve a subdomain string (e.g. "utah", "oregon") to a region config.
- *
- * Falls back rather than failing, so it never rejects a subdomain on its own.
- * A Campaign published to a Place that has no region entry resolves here to
- * GENERIC_REGION, and the Place check in `[campaign]/+layout.server.ts` is what
- * decides whether that Campaign is served from this subdomain.
- */
-export function getRegionBySubdomain(subdomain: string): RegionConfig {
-	return REGIONS[subdomain.toLowerCase()] ?? GENERIC_REGION;
-}
-
-/**
  * Given a zipcode, determine which region-specific Polis the user should join.
  * Returns the matching region, or GENERIC_REGION if no prefix matches.
  *
@@ -644,8 +633,12 @@ export function getRegionByZipcode(zip: string): RegionConfig {
 }
 
 /**
- * Extract subdomain from a hostname.
- * Handles production (utah.bloomproject.us) and local dev (utah.localhost).
+ * The first label of a hostname, when it has one to spare: `utah` for both
+ * `utah.bloomproject.us` and `utah.localhost`, empty for an apex.
+ *
+ * Nothing resolves a Campaign or a Place from this any more (ADR 0011). It is
+ * kept for one redirect: the root of the legacy region hosts production still
+ * serves (`utah.`, `oregon.`, `testing.`, `all.`) opens that region's Campaign.
  */
 export function extractSubdomain(hostname: string): string {
 	// Strip port if present
@@ -667,45 +660,4 @@ export function extractSubdomain(hostname: string): string {
 	}
 
 	return '';
-}
-
-/**
- * Build the full URL for a region's subdomain with zipcode parameter.
- * Handles both production and local development environments.
- */
-export function getRegionUrl(
-	region: RegionConfig,
-	zipCode: string,
-	currentHostname: string
-): string {
-	const host = currentHostname.split(':')[0];
-	const port = currentHostname.includes(':') ? ':' + currentHostname.split(':')[1] : '';
-
-	// Determine base domain
-	let baseDomain: string;
-	if (host === 'localhost' || host.endsWith('.localhost')) {
-		// Local dev on .localhost
-		baseDomain = 'localhost';
-	} else if (host === 'local' || host.endsWith('.local')) {
-		// Local dev on .local
-		baseDomain = 'local';
-	} else {
-		// Production - extract base domain from current hostname
-		// e.g., utah.bloomproject.us → bloomproject.us
-		const parts = host.split('.');
-		if (parts.length >= 2) {
-			baseDomain = parts.slice(-2).join('.');
-		} else {
-			baseDomain = 'bloomproject.us'; // fallback
-		}
-	}
-
-	// Build the full URL
-	const protocol = host.includes('localhost') || host.includes('.local') ? 'http' : 'https';
-	const subdomain = region.slug;
-	const url = `${protocol}://${subdomain}.${baseDomain}${port}`;
-
-	// The Place root, not a Campaign: we do not know which Campaign the target
-	// Place is running. `/` redirects to whichever one it has configured.
-	return `${url}/?zip_code=${encodeURIComponent(zipCode)}`;
 }
