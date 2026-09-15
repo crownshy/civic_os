@@ -1,4 +1,10 @@
-import { demoteHeadings, paragraphsToHtml, toBlockHtml } from '@civicos/shared/rich-text';
+import {
+	demoteHeadings,
+	paragraphsToHtml,
+	splitAtHeadings,
+	toBlockHtml
+} from '@civicos/shared/rich-text';
+import { readFaqs, type FaqEntry } from '@civicos/shared/data/faq';
 import { sanitizeHostHtml } from '@civicos/shared/sanitize';
 import { firstNonEmpty } from '$lib/utils/text';
 import type { RegionConfig } from './regions';
@@ -27,6 +33,7 @@ export interface HostCopy {
 export interface ConversationCopy {
 	description?: string | null;
 	thankYouMessage?: string | null;
+	faqs?: string | null;
 }
 
 export function resolveHostCopy(
@@ -48,6 +55,84 @@ export function resolveHostCopy(
 /** Safe, correctly-levelled HTML for an {@html} block. Sanitize first, then demote. */
 export function renderHostCopy(html: string): string {
 	return demoteHeadings(sanitizeHostHtml(html));
+}
+
+/**
+ * The FAQ accordion's entries, from the Conversation when a Host has authored
+ * one and from `regions.ts` until then.
+ *
+ * All or nothing rather than per entry: the two sources are separate lists, and
+ * interleaving a Host's questions with the seed placeholders would show a
+ * participant both. One saved question means the Host owns the list.
+ *
+ * `readFaqs` already returns block HTML for an answer, because that is how the
+ * field is stored. A `regions.ts` answer is a bare sentence or one paragraph of
+ * inline markup, so it goes through `toBlockHtml` to arrive in the same shape.
+ */
+export function resolveFaq(
+	conversation: ConversationCopy | null | undefined,
+	region: RegionConfig
+): FaqEntry[] {
+	const stored = readFaqs(conversation?.faqs);
+	if (stored.length > 0) return stored;
+
+	return region.faq.map((entry) => ({
+		question: entry.question,
+		answer: toBlockHtml(entry.answer)
+	}));
+}
+
+/**
+ * One landing section, with the anchor and pill label the nav needs alongside
+ * the copy. Ids are prefixed so a Host heading can never collide with a fixed
+ * section id such as `faq`.
+ */
+export interface ContextSection {
+	/** Anchor on the section, and the StickyNav scroll target. */
+	id: string;
+	/** Nav pill label. Uppercase, like the fixed pills. */
+	label: string;
+	/** Heading rendered above the copy. */
+	heading: string;
+	/** Sanitized, correctly-levelled HTML for an {@html} block. */
+	html: string;
+}
+
+const CONTEXT_ID = 'context';
+
+function slugify(value: string): string {
+	return value
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, '-')
+		.replace(/^-+|-+$/g, '');
+}
+
+/**
+ * The Context copy as one section per heading the Host wrote, so a long brief
+ * reads as a run of linkable sections rather than one wall of text under a
+ * single Context pill. See #414 for why the levels shift on the way out.
+ *
+ * Copy before the first heading keeps the `context` id and the Context
+ * heading, which is what a description with no headings at all resolves to.
+ * A description that opens on a heading has no lead, and then the Host's own
+ * first heading is the first pill.
+ */
+export function toContextSections(context: string): ContextSection[] {
+	const taken = new Set<string>();
+
+	return splitAtHeadings(sanitizeHostHtml(context)).map((section, i) => {
+		const html = demoteHeadings(section.html);
+		if (section.heading === '')
+			return { id: CONTEXT_ID, label: 'CONTEXT', heading: 'Context', html };
+
+		// A heading of nothing but punctuation slugs to '', hence the index.
+		const base = `${CONTEXT_ID}-${slugify(section.heading) || i}`;
+		let id = base;
+		for (let n = 2; taken.has(id); n++) id = `${base}-${n}`;
+		taken.add(id);
+
+		return { id, label: section.heading.toUpperCase(), heading: section.heading, html };
+	});
 }
 
 /**

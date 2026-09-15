@@ -54,10 +54,7 @@
 			></div>
 			<div class="relative h-4 w-4 rounded-full" style="background-color: var(--{color})"></div>
 		</div>
-		<div
-			class="w-0.5 flex-1"
-			style="background: linear-gradient(to bottom, var(--{color}), transparent)"
-		></div>
+		<div class="w-0.5 flex-1" style="background-color: var(--{color})"></div>
 	</div>
 {/snippet}
 
@@ -67,7 +64,7 @@
 {/snippet}
 
 <AppShell>
-	<div class="flex h-full flex-col overflow-y-auto bg-gradient-primary">
+	<div class="flex h-full flex-col overflow-y-auto bg-background">
 		<!-- Header Bar -->
 		<div class="flex items-center justify-between pt-3.75 pr-3.75 pb-2 pl-6 md:pr-8 md:pl-12">
 			<div class="flex items-center gap-1.5">

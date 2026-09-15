@@ -1,4 +1,4 @@
-import type { ApiClient, UserDto, UserProfileDto } from '@crownshy/api-client/api';
+import type { ApiClient, DemographicsResponse, UserDto } from '@crownshy/api-client/api';
 import { httpStatusOf } from '$lib/utils/http';
 
 /**
@@ -14,7 +14,7 @@ export interface ParticipantSession {
 	authType: UserDto['authType'];
 	email: string | null;
 	emailVerified: boolean;
-	/** From the stored profile. Empty for an email-only signup, which never gives one. */
+	/** Empty for an email-only signup, which never gives one. */
 	zipCode: string;
 	demographicsCompleted: boolean;
 	emailProvided: boolean;
@@ -34,30 +34,41 @@ export interface ParticipantResolution {
 	resolved: boolean;
 }
 
-type ParticipantApi = Pick<ApiClient, 'CurrentUser' | 'GetUserProfile'>;
+type ParticipantApi = Pick<ApiClient, 'CurrentUser' | 'GetDemographicsResponses'>;
+
+const ZIPCODE_SLUG = 'zipcode';
 
 /**
- * A profile exists from the moment a zip is saved, so its presence proves
- * nothing. Only an answered demographic field means the About You screen was
- * filled in.
+ * The About You screen's questions. Zip is deliberately not one of them: it is
+ * collected at join, so counting it would mark every joiner as done.
  */
-function hasDemographics(profile: UserProfileDto | null): boolean {
-	if (!profile) return false;
-	return Boolean(profile.age || profile.ethnicity || profile.gender || profile.politicalParty);
+const ABOUT_YOU_SLUGS = ['age', 'ethnicity', 'gender', 'political_party'];
+
+function answerFor(responses: DemographicsResponse[], slug: string): string {
+	return String(responses.find((r) => r.questionSlug === slug)?.value ?? '');
+}
+
+/**
+ * A participant has a demographics row from the moment their zip is saved, so
+ * the row's presence proves nothing. Only an answered About You question means
+ * the screen was filled in.
+ */
+function hasDemographics(responses: DemographicsResponse[]): boolean {
+	return responses.some((r) => ABOUT_YOU_SLUGS.includes(r.questionSlug) && Boolean(r.value));
 }
 
 /** Flatten the two backend records into the shape the app reasons about. */
 export function toParticipantSession(
 	user: UserDto,
-	profile: UserProfileDto | null
+	responses: DemographicsResponse[]
 ): ParticipantSession {
 	return {
 		userId: user.id,
 		authType: user.authType,
 		email: user.email ?? null,
 		emailVerified: user.emailVerified,
-		zipCode: profile?.zipcode ?? '',
-		demographicsCompleted: hasDemographics(profile),
+		zipCode: answerFor(responses, ZIPCODE_SLUG),
+		demographicsCompleted: hasDemographics(responses),
 		emailProvided: Boolean(user.email)
 	};
 }
@@ -65,8 +76,9 @@ export function toParticipantSession(
 /**
  * Identify the participant behind an `auth-token` cookie.
  *
- * The two calls run together because the profile is wanted for every signed-in
- * participant and neither depends on the other.
+ * Two round trips rather than one: demographics are keyed by user id, and
+ * `/demographics/responses` is not scoped to the caller, so the id has to be in
+ * hand before the second call can be asked for this participant's rows alone.
  */
 export async function resolveParticipant(
 	api: ParticipantApi,
@@ -74,22 +86,27 @@ export async function resolveParticipant(
 ): Promise<ParticipantResolution> {
 	if (!authToken) return { participant: null, resolved: true };
 
-	const [user, profile] = await Promise.allSettled([api.CurrentUser(), api.GetUserProfile()]);
-
-	if (user.status === 'rejected') {
-		const status = httpStatusOf(user.reason);
+	let user: UserDto;
+	try {
+		user = await api.CurrentUser();
+	} catch (e) {
+		const status = httpStatusOf(e);
 		// A rejected cookie is an answer. Anything else means we did not get one.
 		if (status === 401 || status === 403) return { participant: null, resolved: true };
-		console.error('[Participant] Could not resolve the session:', user.reason);
+		console.error('[Participant] Could not resolve the session:', e);
 		return { participant: null, resolved: false };
 	}
 
-	// A rejected profile is ordinary: the account exists, the profile does not yet.
-	return {
-		participant: toParticipantSession(
-			user.value,
-			profile.status === 'fulfilled' ? profile.value : null
-		),
-		resolved: true
-	};
+	// Ordinary for someone who has answered nothing yet, so a failure here is
+	// not a failure to resolve: it costs the zip, which the caller falls back to
+	// its localStorage copy for.
+	let responses: DemographicsResponse[] = [];
+	try {
+		const page = await api.GetDemographicsResponses({ queries: { user_id: user.id } });
+		responses = page.records;
+	} catch (e) {
+		console.error('[Participant] Could not read demographics:', e);
+	}
+
+	return { participant: toParticipantSession(user, responses), resolved: true };
 }

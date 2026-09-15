@@ -49,7 +49,7 @@
 	});
 </script>
 
-<div class={cn('relative flex h-dvh flex-col bg-gradient-primary', className)}>
+<div class={cn('relative flex h-dvh flex-col bg-background', className)}>
 	<!-- Header -->
 	<InfoBar {region} {placeName} />
 

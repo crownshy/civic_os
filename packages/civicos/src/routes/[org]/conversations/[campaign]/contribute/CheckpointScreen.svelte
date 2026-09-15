@@ -57,7 +57,7 @@
 </script>
 
 <div
-	class="flex h-full flex-col bg-gradient-primary"
+	class="flex h-full flex-col bg-background"
 	in:scale={{ start: 0.9, duration: 500, easing: cubicOut }}
 >
 	<InfoBar {region} {placeName} {onEnd} />

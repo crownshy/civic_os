@@ -15,8 +15,24 @@ export function isHtml(value: string): boolean {
 	return HTML_TAG.test(value);
 }
 
-function escapeHtml(value: string): string {
+export function escapeHtml(value: string): string {
 	return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+/**
+ * Paragraph HTML for plain text: a blank line opens a new paragraph, a single
+ * newline is a `<br>` within one.
+ *
+ * Escaping is unconditional, which is what separates this from
+ * `toRichTextHtml`: that function treats "contains a tag" as "is already HTML"
+ * and passes the value through. Callers holding text that is known to be plain
+ * (a textarea, not an editor) want the escape, so they come here.
+ */
+export function plainTextToParagraphs(text: string): string {
+	return text
+		.split(/\n{2,}/)
+		.map((block) => `<p>${escapeHtml(block).replace(/\n/g, '<br>')}</p>`)
+		.join('');
 }
 
 /** Editor- and render-ready HTML for a value that may still be plain text. */
@@ -25,10 +41,7 @@ export function toRichTextHtml(value: string): string {
 	if (text === '') return '';
 	if (isHtml(text)) return text;
 
-	return text
-		.split(/\n{2,}/)
-		.map((block) => `<p>${escapeHtml(block).replace(/\n/g, '<br>')}</p>`)
-		.join('');
+	return plainTextToParagraphs(text);
 }
 
 /**
@@ -73,4 +86,91 @@ export function toBlockHtml(value: string): string {
 /** Block HTML for copy held as one paragraph per array entry. */
 export function paragraphsToHtml(paragraphs: readonly string[]): string {
 	return paragraphs.map(toBlockHtml).join('');
+}
+
+/** A Host heading and the block HTML that runs under it. */
+export interface RichTextSection {
+	/** Heading text, markup stripped. Empty only for the lead block. */
+	heading: string;
+	/** Everything up to the next heading. */
+	html: string;
+}
+
+const ENTITIES: Record<string, string> = {
+	amp: '&',
+	lt: '<',
+	gt: '>',
+	quot: '"',
+	'#39': "'"
+};
+
+function decodeEntities(text: string): string {
+	return text.replace(/&(amp|lt|gt|quot|#39);/g, (_match, name: string) => ENTITIES[name]);
+}
+
+/** Heading markup down to the text a nav pill can carry. */
+function toPlainText(html: string): string {
+	return decodeEntities(html.replace(/<[^>]*>/g, ''))
+		.replace(/\s+/g, ' ')
+		.trim();
+}
+
+const BLOCK_END = /<\/(p|div|li|h[1-6]|blockquote|tr)\s*>/gi;
+const LINE_BREAK = /<br\s*\/?>/gi;
+
+/**
+ * Block HTML back down to plain text, paragraph breaks intact.
+ *
+ * `toPlainText` is the wrong tool for a body of copy: it flattens all
+ * whitespace to single spaces, so two paragraphs come back as one line. This
+ * is the inverse of `plainTextToParagraphs`, and round-trips with it.
+ */
+export function blockHtmlToPlainText(html: string): string {
+	return decodeEntities(
+		html
+			.replace(LINE_BREAK, '\n')
+			.replace(BLOCK_END, '\n\n')
+			.replace(/<[^>]*>/g, '')
+	)
+		.replace(/[ \t]+/g, ' ')
+		.replace(/ *\n */g, '\n')
+		.replace(/\n{3,}/g, '\n\n')
+		.trim();
+}
+
+/**
+ * Splits block HTML at every `h2`, the level the Setup editor's Heading button
+ * writes, into the lead block and one entry per heading. A surface that gives
+ * each heading its own section and nav pill needs the heading text separate
+ * from the copy under it, which is not something `{@html}` on one blob can do.
+ *
+ * The returned `html` still holds whatever nested headings the Host wrote, so
+ * run `demoteHeadings` on it as before.
+ */
+export function splitAtHeadings(html: string): RichTextSection[] {
+	// A capturing group interleaves the captures between the parts, so this
+	// reads [lead, heading, body, heading, body, ...].
+	const parts = html.split(/<h2\b[^>]*>([\s\S]*?)<\/h2>/i);
+	const sections: RichTextSection[] = [];
+
+	const lead = parts[0].trim();
+	if (lead !== '') sections.push({ heading: '', html: lead });
+
+	for (let i = 1; i < parts.length; i += 2) {
+		const heading = toPlainText(parts[i]);
+		const body = (parts[i + 1] ?? '').trim();
+
+		// An empty heading has no label to put on a pill, so its copy joins what
+		// came before rather than opening a section nothing can link to.
+		if (heading === '') {
+			const previous = sections.at(-1);
+			if (previous) previous.html += body;
+			else if (body !== '') sections.push({ heading: '', html: body });
+			continue;
+		}
+
+		sections.push({ heading, html: body });
+	}
+
+	return sections;
 }

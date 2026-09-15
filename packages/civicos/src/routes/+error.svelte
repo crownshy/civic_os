@@ -14,9 +14,7 @@
 </svelte:head>
 
 <AppShell border={false}>
-	<div
-		class="flex h-full flex-col items-center justify-center bg-gradient-primary px-6 text-yellow-950"
-	>
+	<div class="flex h-full flex-col items-center justify-center bg-background px-6 text-yellow-950">
 		<span class="rounded-[30px] bg-yellow-950 px-3.5 py-2 font-mono text-sm font-medium text-white">
 			{status}
 		</span>
@@ -33,10 +31,11 @@
 			</p>
 		{/if}
 
-		<!-- No "go to the right Place" link: a Campaign runs in several Places at
-		     once, so there is no single correct address to offer. -->
-		<Button variant="soft" size="md" href="https://www.bloom-project.org/" class="mt-8">
-			BLOOM PROJECT
+		<!-- The directory, not a corrective link. Nothing here knows which Campaign
+		     was meant, and ADR 0007 keeps it that way; a list of what is running
+		     lets the participant pick without the page guessing. -->
+		<Button variant="soft" size="md" href="/conversations" class="mt-8">
+			SEE LIVE CONVERSATIONS
 		</Button>
 	</div>
 </AppShell>

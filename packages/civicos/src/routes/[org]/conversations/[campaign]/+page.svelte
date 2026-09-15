@@ -13,30 +13,50 @@
 	import { getRegionByZipcode, getRegionUrl } from '$lib/config/regions';
 	import type { RegionConfig } from '$lib/config/regions';
 	import type { Campaign } from '$lib/config/campaign';
-	import { OPEN_POLL_EXPLAINER, FOOTER_LINKS } from '$lib/config/landing-copy';
+	import { OPEN_POLL_EXPLAINER, FOOTER_LINKS, NAV_SECTIONS } from '$lib/config/landing-copy';
 	import { trackEvent } from '@lukulent/svelte-umami';
 	import { safeHref, sanitizeHostHtml } from '@civicos/shared/sanitize';
-	import { HOST_COPY_PROSE_CLASS, renderHostCopy } from '$lib/config/host-copy';
+	import { HOST_COPY_PROSE_CLASS, renderHostCopy, toContextSections } from '$lib/config/host-copy';
 	import { listSeparator } from '$lib/utils/list';
 	import JoinSkeleton from './JoinSkeleton.svelte';
 
 	const region: RegionConfig = page.data.region;
 	const campaign: Campaign = page.data.campaign;
 	const hostCopy = page.data.hostCopy;
+	// Resolved in the layout load, so a Host's saved questions replace the
+	// `regions.ts` placeholders without this page knowing which it got.
+	const faq = page.data.faq;
+	// The Host's Context copy, cut at its headings so each one gets its own
+	// section and its own nav pill. A description with no headings comes back as
+	// the single Context section this page rendered before.
+	const contextSections = toContextSections(hostCopy.context);
+	// `context` in NAV_SECTIONS is a placeholder for those pills; FAQ drops out
+	// when there are no questions, matching the section below.
+	const navSections = NAV_SECTIONS.flatMap((section) => {
+		if (section.id === 'context') return contextSections.map(({ id, label }) => ({ id, label }));
+		if (section.id === 'faq' && faq.length === 0) return [];
+		return [section];
+	});
 	// Who the server says this is, resolved from the cookie in the root layout.
 	// A returning participant gets CONTINUE on the first paint instead of after
 	// hydration. Only a zip counts: an email-only signup has an account but has
 	// never told us where they are, so it is not a session to continue.
-	// `session.hasSession` behind it covers the one case the server cannot answer:
-	// a backend it could not reach leaves the cached session as the only evidence.
+	//
+	// This has to agree with the gate on `/contribute`, which reads the server
+	// answer and nothing else. Anything CONTINUE lets through that the gate then
+	// turns away is a redirect straight back to this page, and on a client side
+	// navigation that is silent: the button appears dead. So the cached session
+	// only stands in where the server has no answer to disagree with, which is
+	// the one case it was ever meant to cover.
 	const participant: ParticipantSession | null = $derived(page.data.participant);
-	const isReturning = $derived(!!participant?.zipCode || session.hasSession);
+	const participantResolved: boolean = $derived(page.data.participantResolved);
+	const isReturning = $derived(
+		!!participant?.zipCode || (!participantResolved && session.hasSession)
+	);
 
-	// The cached session is the second half of that answer and only the browser
-	// can read it, so it can turn `isReturning` from false to true but never the
-	// other way. A server "returning" answer is therefore final; a server "new
-	// visitor" answer is a guess until hydration, and rendering the join form on
-	// it is what makes the CTA flip to CONTINUE under you.
+	// Only the browser can read the cached session, so on the outage path
+	// `isReturning` is false during SSR and may turn true at hydration. Rendering
+	// the join form before then is what makes the CTA flip to CONTINUE under you.
 	let hydrated = $state(false);
 	const joinStateSettled = $derived(isReturning || hydrated);
 
@@ -160,7 +180,7 @@
 	<title>{campaign.title}{campaign.place ? ` — ${campaign.place.name}` : ''}</title>
 </svelte:head>
 
-<div class="min-h-screen bg-gradient-to-b from-orange-50 to-orange-100 text-yellow-950">
+<div class="min-h-screen bg-background text-yellow-950">
 	<!-- Above-fold container: header + hero fill the viewport on desktop -->
 	<div class="flex flex-col md:h-screen">
 		<!-- Header chip row — bypasses AppShell. See docs/adr/0001-landing-bypasses-appshell.md -->
@@ -286,15 +306,17 @@
 	</div>
 
 	<!-- Sticky pill nav -->
-	<StickyNav class="mx-auto max-w-4xl" />
+	<StickyNav sections={navSections} class="mx-auto max-w-4xl" />
 
-	<!-- Context -->
-	<section id="context" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
-		<h2 class="font-display text-2xl font-medium md:text-3xl">Context</h2>
-		<div class="mt-6 opacity-80 {HOST_COPY_PROSE_CLASS}">
-			{@html renderHostCopy(hostCopy.context)}
-		</div>
-	</section>
+	<!-- Context, one section per heading the Host wrote -->
+	{#each contextSections as section (section.id)}
+		<section id={section.id} class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
+			<h2 class="font-display text-2xl font-medium md:text-3xl">{section.heading}</h2>
+			<div class="mt-6 opacity-80 {HOST_COPY_PROSE_CLASS}">
+				{@html section.html}
+			</div>
+		</section>
+	{/each}
 
 	<!-- What is an Open Poll? -->
 	<section id="how-it-works" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
@@ -339,12 +361,12 @@
 		</div>
 	</section>
 
-	<!-- FAQ — hide when empty -->
-	{#if region.faq.length > 0}
+	<!-- FAQ, hidden when empty -->
+	{#if faq.length > 0}
 		<section id="faq" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
 			<h2 class="font-display text-2xl font-medium md:text-3xl">Frequently Asked Questions</h2>
 			<div class="mt-6">
-				<Accordion items={region.faq} />
+				<Accordion items={faq} />
 			</div>
 		</section>
 	{/if}
@@ -425,7 +447,7 @@
 <!-- Loading overlay during join -->
 {#if joining}
 	<div
-		class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-linear-to-b from-orange-50 to-orange-100"
+		class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background"
 		transition:fade={{ duration: 200 }}
 	>
 		<div

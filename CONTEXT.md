@@ -257,6 +257,25 @@ everyone else (labelled **"Participant"**). Showing the real participant id
 the author pid to `ReportComment`. Assumption to confirm: the seed author is
 always Polis pid `0`.
 
+### Brand
+The colours, type and shape a Host puts on its Campaigns' participant pages
+(#428). A set of CSS custom properties, layered: the `theme.css` shipped with the
+server, overridden by the Host, overridden by the Campaign, plus free-form
+`--name: value` declarations for variables the allowlist does not name.
+
+**Brand, not Theme**, because a Theme in this product is a topic tag on a
+statement (below) and the two would sit two tabs apart in admin. Say Brand when
+you mean how it looks and Theme when you mean what a statement is about.
+
+Not a record: it rides on `Conversation.metadata.brand`, with the Host's layer
+mirrored to `metadata.hostBrand` because `/organizations` is 401 to an anonymous
+participant. Same reasoning and same exit as a Place (ADR 0006). One shared
+module, `@civicos/shared/data/brand`, is the whole contract.
+
+A Brand reaches 17 of `theme.css`'s 60 variables, so a rebrand is a tint, not a
+skin: `--destructive` and the rest stay BLOOM's. Whether that is the end state is
+open (#428).
+
 ### Theme
 A topic tag attached to a statement. **Themes are human-authored today** — a
 host adds them via the admin picker, and they live in the comhairle

@@ -282,9 +282,9 @@
 	}
 </script>
 
-<AppShell>
+<AppShell border={false}>
 	{#if screen === 'loading'}
-		<div class="flex h-full flex-col items-center justify-center bg-gradient-primary">
+		<div class="flex h-full flex-col items-center justify-center bg-background">
 			<div class="animate-pulse text-center">
 				<span class="font-mono text-base font-medium text-muted-foreground/60 uppercase"
 					>LOADING...</span
@@ -308,7 +308,7 @@
 			/>
 		{:else}
 			<!-- Skeleton that reuses real components so layout stays in sync -->
-			<div class="flex h-full flex-col bg-muted">
+			<div class="flex h-full flex-col bg-background">
 				<InfoBar {placeName} region={subdomainRegion} />
 
 				<!-- Skeleton statement area -->
@@ -377,7 +377,7 @@
 		<DidYouKnowScreen {placeName} onContinue={resumeVoting} />
 	{:else if screen === 'pop-quiz'}
 		<div
-			class="flex h-full flex-col bg-gradient-primary"
+			class="flex h-full flex-col bg-background"
 			in:fly={{ x: 40, duration: 400, easing: cubicOut }}
 		>
 			<InfoBar region={subdomainRegion} {placeName} />

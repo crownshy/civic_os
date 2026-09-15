@@ -74,11 +74,20 @@ export const load: LayoutServerLoad = async ({ params, parent, cookies, url, dep
 	// runtime-validated shape through this narrow local type.
 	const tx =
 		conversation && 'translations' in conversation
-			? (conversation.translations as { title?: TxField; description?: TxField })
+			? (conversation.translations as {
+					title?: TxField;
+					description?: TxField;
+					faqs?: TxField;
+				})
 			: null;
+	// `faqs` is nullable on the Conversation, and an unset one has no TextContent
+	// at all rather than an empty one: `translations.faqs` comes back null, so this
+	// resolves to null and the first save has to create the record before it can
+	// write to it. See `saveFaqs` on Setup.
 	const textContent = {
 		title: fieldTarget(tx?.title),
-		description: fieldTarget(tx?.description)
+		description: fieldTarget(tx?.description),
+		faqs: fieldTarget(tx?.faqs)
 	};
 
 	const campaign = {

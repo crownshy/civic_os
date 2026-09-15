@@ -24,7 +24,7 @@
 </script>
 
 <header
-	class="shrink-0 overflow-hidden rounded-br-[20px] rounded-bl-[20px] border-b border-secondary bg-linear-to-r from-[#FFEDD3] to-[#FFEDD3]/40 {className}"
+	class="shrink-0 overflow-hidden rounded-br-[20px] rounded-bl-[20px] border-b border-secondary bg-[#FFEDD3] {className}"
 >
 	<!-- Row 1: County name + ABOUT pill or YOU dot -->
 	{#if about && region}

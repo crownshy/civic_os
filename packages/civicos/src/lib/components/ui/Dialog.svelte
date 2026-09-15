@@ -81,7 +81,7 @@
 	<DialogPrimitive.Portal>
 		{#if centered}
 			<DialogPrimitive.Overlay
-				class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-primary px-4 backdrop-blur-sm duration-300 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0"
+				class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background px-4 backdrop-blur-sm duration-300 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0"
 			/>
 			<DialogPrimitive.Content
 				class="fixed inset-0 z-50 mx-auto flex max-w-[800px] flex-col items-center justify-center px-4 duration-300 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
@@ -118,7 +118,7 @@
 			</DialogPrimitive.Content>
 		{:else}
 			<DialogPrimitive.Overlay
-				class="fixed inset-0 z-50 bg-gradient-primary backdrop-blur-sm duration-300 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0"
+				class="fixed inset-0 z-50 bg-background backdrop-blur-sm duration-300 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0"
 			/>
 			<DialogPrimitive.Content
 				onOpenAutoFocus={handleOpenAutoFocus}
@@ -126,8 +126,8 @@
 			>
 				<button
 					type="button"
-					class="absolute top-12 right-12 rounded-full bg-red-100 p-2"
-					onclick={handleClose}><X class="text-red-400" /></button
+					class="absolute top-12 right-12 rounded-full bg-destructive/15 p-2"
+					onclick={handleClose}><X class="text-destructive" /></button
 				>
 				<div
 					class={cn(

@@ -9,19 +9,31 @@
 	import * as Form from '@civicos/shared/ui/form';
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import { Button } from '@civicos/shared/ui/button';
-	import { Trash2 } from '@lucide/svelte';
+	import { Palette, Trash2 } from '@lucide/svelte';
 	import IdentityCard from './IdentityCard.svelte';
 	import CoHostsCard from './CoHostsCard.svelte';
 	import AddCoHostsDialog from '$lib/components/setup/AddCoHostsDialog.svelte';
 	import DemographicsCard from '$lib/components/setup/DemographicsCard.svelte';
+	import FaqCard from '$lib/components/setup/FaqCard.svelte';
 	import ParticipantAsksCard from '$lib/components/setup/ParticipantAsksCard.svelte';
+	import BrandDialog from '$lib/components/setup/BrandDialog.svelte';
+	import {
+		BRAND_PRESETS,
+		EMPTY_BRAND,
+		presetFor,
+		readBrand,
+		readHostBrand,
+		type Brand
+	} from '@civicos/shared/data/brand';
 	import {
 		readCustomDemographics,
 		readDemographicToggles,
 		type CustomDemographicCategory,
 		type DemographicKey
 	} from '@civicos/shared/data/demographics';
+	import { readFaqs, toFaqsHtml, type FaqEntry } from '@civicos/shared/data/faq';
 	import { readAskToggles, type AskKey } from '@civicos/shared/data/participant-asks';
+	import { previewCategories } from '$lib/components/setup/preview/categories';
 	import { placeFromName, rescopedSlug, toPlaceSlug } from '$lib/config/place';
 	import { extractSubdomain } from '@civicos/shared/data/regions';
 	import { RESERVED_ROUTE_SLUGS, routeSlugFor } from '$lib/conversations';
@@ -326,8 +338,77 @@
 	const removeCustomDemographic = (key: string) =>
 		patchMetadata({ customDemographics: customDemographics.filter((c) => c.key !== key) });
 
+	// --- FAQ -------------------------------------------------------------------
+	// A fifth destination. `Conversation.faqs` is a TextContentId reference like
+	// title and description, not metadata and not a text column, so the list is
+	// encoded as h2-per-question markup in that one field. The format lives in
+	// `@civicos/shared/data/faq` because civicos parses what this writes.
+	const faqs = $derived(readFaqs(conversation?.faqs));
+
+	/**
+	 * Write the whole list. Two calls the first time, one after that.
+	 *
+	 * `faqs` is nullable and an unset one has no TextContent at all, so there is
+	 * nothing to translate against until one exists: `translations.faqs` comes
+	 * back null and `data.textContent.faqs` with it. Hence create-then-link on
+	 * the first save. `UpdateConversation` takes the TextContent *id* here, not
+	 * prose, and 422s on a plain string the same way title and description do
+	 * (#391), which is why the link step sends `created.id`.
+	 */
+	async function saveFaqs(next: FaqEntry[]) {
+		const content = toFaqsHtml(next);
+		const target = data.textContent.faqs;
+
+		if (target) {
+			await data.api.CreateOrUpdateTextTranslation(
+				{ content },
+				{ params: { text_content_id: target.id, locale: target.locale } }
+			);
+		} else {
+			const created = await data.api.CreateTextContent({
+				content,
+				// The stored value is markup regardless of answers being plain text,
+				// and `rich` is what `description` uses for the same reason.
+				format: 'rich',
+				primary_locale: conversation?.primaryLocale ?? 'en'
+			});
+			await data.api.UpdateConversation(
+				{ faqs: created.id },
+				{ params: { conversation_id: campaign.id } }
+			);
+		}
+
+		await invalidate(`campaign:${page.params.slug}`);
+	}
+
 	// Same interim metadata storage as demographics, same whole-key write.
 	const asks = $derived(readAskToggles(conversation?.metadata));
+
+	// --- Brand -----------------------------------------------------------------
+	// Same interim storage again. `hostBrand` is the read-only layer underneath:
+	// admin mirrors the Host's Brand there because `/organizations` is 401 to an
+	// anonymous participant, so civicos has no other way to see it.
+	const brand = $derived(readBrand(conversation?.metadata) ?? EMPTY_BRAND);
+	const hostBrand = $derived(readHostBrand(conversation?.metadata) ?? EMPTY_BRAND);
+
+	const saveBrand = (next: Brand) => patchMetadata({ brand: next });
+
+	// The Setup card's colour swatches. A preset is a Brand fragment, so this
+	// merges into whatever else the Brand already sets rather than replacing it:
+	// picking a scheme should not wipe a background the Host typed by hand.
+	const presetId = $derived(presetFor(brand)?.id ?? null);
+
+	let brandOpen = $state(false);
+	// What the phone mocks stand in for: this Campaign's own copy, not sample
+	// text, so a Host is judging their own title at its real length.
+	const previewCats = $derived(previewCategories(demographics, customDemographics));
+
+	function selectPreset(id: string) {
+		const chosen = BRAND_PRESETS.find((p) => p.id === id);
+		if (!chosen) return Promise.resolve();
+
+		return saveBrand({ ...brand, tokens: { ...brand.tokens, ...chosen.tokens } });
+	}
 
 	const setAsk = (key: AskKey, next: boolean) =>
 		patchMetadata({ participantAsks: { ...asks, [key]: next } });
@@ -497,6 +578,13 @@
 	</Form.Field>
 {/snippet}
 
+{#snippet brandAction()}
+	<Button variant="outline" size="sm" onclick={() => (brandOpen = true)}>
+		<Palette />
+		Customize Brand…
+	</Button>
+{/snippet}
+
 {#snippet keyQuestionField()}
 	<Form.Field {form} name="keyQuestion">
 		<Form.Control>
@@ -582,6 +670,30 @@
 			{slugField}
 			{keyQuestionField}
 			{placeField}
+			{presetId}
+			onSelectPreset={selectPreset}
+			{brandAction}
+		/>
+
+		<!-- ===== Brand (#428) =====
+		     Colours, type and shape for this Campaign's participant pages. Sits
+		     over whatever the Host set and under nothing: `theme.css` shows
+		     through wherever both are blank. Named Brand because Theme already
+		     means a statement's topic tag in Insights.
+
+		     Behind the Setup card's swatch row rather than a card of its own:
+		     sixteen fields plus a preview is a screen, not a row, and inlining it
+		     pushed everything below it off the page. -->
+		<BrandDialog
+			bind:open={brandOpen}
+			{brand}
+			inherited={hostBrand}
+			campaignTitle={title}
+			keyQuestion={campaign.keyQuestion}
+			placeName={campaign.place?.name ?? 'Your place'}
+			hostName={campaign.hostName ?? 'Your Host'}
+			categories={previewCats}
+			onSave={saveBrand}
 		/>
 
 		<!-- ===== Co-Hosts ===== -->
@@ -654,6 +766,17 @@
 
 		<!-- ===== Context for Participants ===== -->
 		<ContextCard {description} {descriptionField} />
+
+		<!-- ===== FAQ =====
+		     Its own card rather than a section inside ContextCard: it writes to a
+		     different Conversation field on its own schedule, while the fields in
+		     that card share one debounced superform. -->
+		<FaqCard
+			title="FAQ"
+			subtitle="Questions and answers shown on the Campaign homepage as an expandable list. Participants see them in the order set here."
+			entries={faqs}
+			onSave={saveFaqs}
+		/>
 
 		<!-- Danger zone: not in the Figma refresh and currently non-functional.
 		     Kept to avoid dropping an affordance; open question whether to wire

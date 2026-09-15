@@ -51,7 +51,7 @@
 </script>
 
 <AppShell>
-	<div class="flex h-full flex-col overflow-y-auto bg-gradient-primary">
+	<div class="flex h-full flex-col overflow-y-auto bg-background">
 		<InfoBar {placeName} {region} />
 
 		<!-- Header -->

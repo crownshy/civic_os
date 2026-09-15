@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { REGIONS } from '@civicos/shared/data/regions';
-import { renderHostCopy, resolveHostCopy } from './host-copy';
+import { renderHostCopy, resolveFaq, resolveHostCopy, toContextSections } from './host-copy';
 import type { RegionConfig } from './regions';
 
 const oregon = REGIONS.oregon as RegionConfig;
@@ -51,6 +51,45 @@ describe('resolveHostCopy', () => {
 	});
 });
 
+describe('resolveFaq', () => {
+	it('falls back to the region when there is no conversation', () => {
+		expect(resolveFaq(null, oregon).map((e) => e.question)).toEqual(
+			oregon.faq.map((e) => e.question)
+		);
+	});
+
+	it('gives a region answer paragraph structure, so it renders like a stored one', () => {
+		for (const entry of resolveFaq(null, oregon)) {
+			expect(entry.answer.startsWith('<p>')).toBe(true);
+		}
+	});
+
+	it('prefers the Conversation once a Host has saved questions', () => {
+		const faq = resolveFaq({ faqs: '<h2>Host asked this?</h2><p>And answered it.</p>' }, oregon);
+
+		expect(faq).toEqual([{ question: 'Host asked this?', answer: '<p>And answered it.</p>' }]);
+	});
+
+	it('replaces the whole list rather than interleaving the seed questions', () => {
+		const faq = resolveFaq({ faqs: '<h2>Only question?</h2><p>Only answer.</p>' }, oregon);
+
+		expect(faq).toHaveLength(1);
+	});
+
+	it('treats an unparseable stored value as absent and keeps the region list', () => {
+		// Copy with no heading has no question, so it is not an FAQ.
+		const faq = resolveFaq({ faqs: '<p>Prose with no questions in it.</p>' }, oregon);
+
+		expect(faq.map((e) => e.question)).toEqual(oregon.faq.map((e) => e.question));
+	});
+
+	it('treats blank and missing stored values as absent', () => {
+		for (const faqs of ['', '   ', null, undefined]) {
+			expect(resolveFaq({ faqs }, oregon)).toHaveLength(oregon.faq.length);
+		}
+	});
+});
+
 describe('renderHostCopy', () => {
 	it('demotes editor headings so they sit under the section heading', () => {
 		expect(renderHostCopy('<h2>Section</h2><h3>Sub</h3>')).toBe('<h3>Section</h3><h4>Sub</h4>');
@@ -65,5 +104,67 @@ describe('renderHostCopy', () => {
 	it('leaves paragraphs and lists alone', () => {
 		const html = '<p>One</p><ul><li>Two</li></ul>';
 		expect(renderHostCopy(html)).toBe(html);
+	});
+});
+
+describe('toContextSections', () => {
+	it('keeps a description with no headings as the one Context section', () => {
+		const [section, ...rest] = toContextSections('<p>Just prose.</p>');
+
+		expect(rest).toEqual([]);
+		expect(section).toEqual({
+			id: 'context',
+			label: 'CONTEXT',
+			heading: 'Context',
+			html: '<p>Just prose.</p>'
+		});
+	});
+
+	it('opens a section at every heading', () => {
+		const sections = toContextSections(
+			'<p>Lead.</p><h2>Who gets a seat?</h2><p>A.</p><h2>What adults do</h2><p>B.</p>'
+		);
+
+		expect(sections.map((s) => [s.id, s.label, s.html])).toEqual([
+			['context', 'CONTEXT', '<p>Lead.</p>'],
+			['context-who-gets-a-seat', 'WHO GETS A SEAT?', '<p>A.</p>'],
+			['context-what-adults-do', 'WHAT ADULTS DO', '<p>B.</p>']
+		]);
+	});
+
+	it('drops the Context section when the copy opens on a heading', () => {
+		const sections = toContextSections('<h2>Straight in</h2><p>A.</p>');
+
+		expect(sections.map((s) => s.id)).toEqual(['context-straight-in']);
+	});
+
+	it('demotes headings nested under a section, since the heading is now the page h2', () => {
+		const [section] = toContextSections('<h2>Power</h2><h3>How much?</h3><p>A.</p>');
+
+		expect(section.html).toBe('<h4>How much?</h4><p>A.</p>');
+	});
+
+	it('strips markup from a heading before it becomes a label', () => {
+		const [section] = toContextSections('<h2>Tokenism &amp; <strong>power</strong></h2><p>A.</p>');
+
+		expect(section.heading).toBe('Tokenism & power');
+		expect(section.id).toBe('context-tokenism-power');
+	});
+
+	it('keeps ids unique when two headings slug the same', () => {
+		const sections = toContextSections('<h2>Next</h2><p>A.</p><h2>Next!</h2><p>B.</p>');
+
+		expect(sections.map((s) => s.id)).toEqual(['context-next', 'context-next-2']);
+	});
+
+	it('sanitizes before splitting, so a script tag cannot open a section', () => {
+		const sections = toContextSections('<p>A.</p><script>alert(1)</script><h2>B</h2><p>C.</p>');
+
+		expect(sections[0].html).toBe('<p>A.</p>');
+		expect(sections.map((s) => s.id)).toEqual(['context', 'context-b']);
+	});
+
+	it('gives an empty description no sections at all', () => {
+		expect(toContextSections('')).toEqual([]);
 	});
 });

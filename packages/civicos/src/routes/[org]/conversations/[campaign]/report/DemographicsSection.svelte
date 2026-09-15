@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Badge from '@civicos/shared/ui/Badge.svelte';
-	import GradientCard from '$lib/components/ui/GradientCard.svelte';
+	import PanelCard from '$lib/components/ui/PanelCard.svelte';
 	import SwipeCarousel from '$lib/components/ui/SwipeCarousel.svelte';
 	import DonutChart from '$lib/components/ui/DonutChart.svelte';
 
@@ -82,11 +82,7 @@
 	</p>
 
 	<!-- Demographics card -->
-	<GradientCard
-		bg="bg-linear-to-b from-card to-background"
-		borderGradient="bg-linear-to-b from-border to-transparent"
-		class="mx-6 mt-10"
-	>
+	<PanelCard bg="bg-card" borderClass="border border-border" class="mx-6 mt-10">
 		<!-- Tabs -->
 		<div class="scrollbar-hide flex gap-8 overflow-x-auto px-6 pt-5">
 			{#each tabs as tab, i (tab)}
@@ -122,9 +118,7 @@
 								>
 								<div class="flex w-full items-center gap-2">
 									<span class="font-mono text-[10px] text-muted-foreground">0</span>
-									<div
-										class="h-3.5 flex-1 rounded-sm bg-linear-to-r from-primary/20 to-primary"
-									></div>
+									<div class="h-3.5 flex-1 rounded-sm bg-primary"></div>
 									<span class="font-mono text-[10px] text-muted-foreground">X</span>
 								</div>
 							</div>
@@ -160,7 +154,7 @@
 				</div>
 			{/snippet}
 		</SwipeCarousel>
-	</GradientCard>
+	</PanelCard>
 </section>
 
 <style>

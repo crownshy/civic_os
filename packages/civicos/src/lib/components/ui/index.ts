@@ -29,7 +29,7 @@ export { default as EmailPanelContent } from './EmailPanelContent.svelte';
 export { default as SharePanelContent } from './SharePanelContent.svelte';
 export { default as ReviewPanelContent } from './ReviewPanelContent.svelte';
 export { default as ZipInput } from './ZipInput.svelte';
-export { default as GradientCard } from './GradientCard.svelte';
+export { default as PanelCard } from './PanelCard.svelte';
 export { default as DonutChart } from './DonutChart.svelte';
 export { default as ConversationEventCard } from './ConversationEventCard.svelte';
 export { default as ReportPanel } from './ReportPanel.svelte';

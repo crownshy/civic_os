@@ -2,6 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import SetupField from '$lib/components/setup/SetupField.svelte';
+	import { BRAND_PRESETS } from '@civicos/shared/data/brand';
 
 	interface Props {
 		title: string;
@@ -19,6 +20,20 @@
 		keyQuestionField?: Snippet;
 		/** When provided, replaces the read-only place chips with an editable field. */
 		placeField?: Snippet;
+		/**
+		 * Id of the colour scheme this Campaign is on, from its stored Brand. Null
+		 * when its primary is a colour no preset offers, or when it has no Brand
+		 * yet, and then no swatch is ringed.
+		 */
+		presetId?: string | null;
+		/** Persist a scheme. Omit to render the row read-only. */
+		onSelectPreset?: (id: string) => Promise<void>;
+		/**
+		 * Way into the full Brand, rendered at the end of the swatch row. The six
+		 * swatches are the quick path; everything a swatch does not reach lives
+		 * behind this.
+		 */
+		brandAction?: Snippet;
 	}
 
 	let {
@@ -30,13 +45,35 @@
 		titleField,
 		slugField,
 		keyQuestionField,
-		placeField
+		placeField,
+		presetId = null,
+		onSelectPreset,
+		brandAction
 	}: Props = $props();
 
-	// Presentational shell only. Real theming (persisted, applied across the
-	// participant surfaces) is #365; this just previews the picker affordance.
-	const colorOptions = ['#C2410C', '#2563EB', '#16A34A', '#9333EA', '#DB2777', '#0891B2'];
-	let selectedColor = $state(0);
+	// The selected swatch is read from the stored Brand, never held locally. It
+	// used to be `$state(0)`, which is why every reload came back orange no
+	// matter what had been picked (#428).
+	//
+	// A preset writes `primary`, so this row and the Brand card's Primary field
+	// edit the same value: picking a swatch fills that field, and typing a colour
+	// no preset offers clears the ring here.
+	let pending = $state<string | null>(null);
+	let error = $state<string | null>(null);
+
+	async function select(id: string) {
+		if (!onSelectPreset || pending) return;
+		pending = id;
+		error = null;
+		try {
+			await onSelectPreset(id);
+		} catch (e) {
+			console.error('PatchConversationMetadata failed', e);
+			error = e instanceof Error ? e.message : 'Could not save that colour scheme.';
+		} finally {
+			pending = null;
+		}
+	}
 </script>
 
 <Card
@@ -93,20 +130,27 @@
 
 		<SetupField label="Color Scheme">
 			<div class="flex flex-wrap items-center gap-4">
-				{#each colorOptions as color, i (color)}
+				{#each BRAND_PRESETS as option (option.id)}
 					<button
 						type="button"
-						aria-label={`Color option ${i + 1}`}
-						aria-pressed={selectedColor === i}
-						onclick={() => (selectedColor = i)}
-						style={`background-color: ${color}`}
-						class="size-12 rounded-[10px] border border-stone-300 transition-transform hover:scale-105 {selectedColor ===
-						i
+						aria-label={option.label}
+						aria-pressed={presetId === option.id}
+						disabled={!onSelectPreset || !!pending}
+						onclick={() => select(option.id)}
+						style={`background-color: ${option.tokens.primary}`}
+						class="size-12 rounded-[10px] border border-stone-300 transition-transform hover:scale-105 disabled:cursor-not-allowed {presetId ===
+						option.id
 							? 'ring-2 ring-primary ring-offset-2 ring-offset-background'
-							: ''}"
+							: ''} {pending === option.id ? 'animate-pulse' : ''}"
 					></button>
 				{/each}
+				{#if brandAction}
+					<div class="ml-auto">{@render brandAction()}</div>
+				{/if}
 			</div>
+			{#if error}
+				<p class="mt-2 text-caption text-destructive">{error}</p>
+			{/if}
 		</SetupField>
 	</div>
 </Card>

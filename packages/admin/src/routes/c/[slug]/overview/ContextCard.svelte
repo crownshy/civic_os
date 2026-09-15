@@ -31,6 +31,6 @@
 		{/if}
 	</SetupField>
 
-	<!-- FAQ is intentionally omitted for now per #352 (still deciding how/where
-	     FAQs are used). Add the FAQ section here when that's settled. -->
+	<!-- The FAQ #352 deferred is now its own card on Setup (`FaqCard`), because it
+	     writes to `Conversation.faqs` rather than to this card's superform. -->
 </SetupCard>

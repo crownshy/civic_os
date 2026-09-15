@@ -80,7 +80,7 @@
 </script>
 
 <div
-	class="flex h-full flex-col bg-gradient-to-b from-orange-50 to-orange-100 text-yellow-950"
+	class="flex h-full flex-col bg-background text-foreground"
 	in:scale={{ start: 0.9, duration: 500, easing: cubicOut }}
 >
 	<div class="flex flex-1 flex-col overflow-y-auto">
@@ -104,7 +104,7 @@
 			<a
 				href="/conversations"
 				data-umami-event="end-cta-join-click"
-				class="group flex flex-col gap-2 rounded-[30px] bg-gradient-to-b from-card to-card/70 p-6 shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-transform hover:scale-[1.01]"
+				class="group flex flex-col gap-2 rounded-[30px] bg-card p-6 shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-transform hover:scale-[1.01]"
 			>
 				<div class="flex items-center gap-2">
 					<span
@@ -124,7 +124,7 @@
 					data-umami-event="end-cta-email-click"
 					onclick={() => (emailPanelOpen = true)}
 					class={[
-						'group flex flex-col gap-2 rounded-[30px] bg-gradient-to-b from-card to-card/70 p-6 text-left shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-all hover:scale-[1.01]',
+						'group flex flex-col gap-2 rounded-[30px] bg-card p-6 text-left shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-all hover:scale-[1.01]',
 						emailDone && 'opacity-60'
 					]}
 				>
@@ -150,7 +150,7 @@
 					type="button"
 					data-umami-event="end-cta-share-click"
 					onclick={() => (sharePanelOpen = true)}
-					class="group flex flex-col gap-2 rounded-[30px] bg-linear-to-b from-card to-card/70 p-6 text-left shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-all hover:scale-[1.01]"
+					class="group flex flex-col gap-2 rounded-[30px] bg-card p-6 text-left shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-all hover:scale-[1.01]"
 				>
 					<div class="flex items-center gap-2">
 						<span
@@ -174,7 +174,7 @@
 					type="button"
 					data-umami-event="end-cta-review-click"
 					onclick={openReview}
-					class="group flex flex-col gap-2 rounded-[30px] bg-gradient-to-b from-card to-card/70 p-6 text-left shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-all hover:scale-[1.01]"
+					class="group flex flex-col gap-2 rounded-[30px] bg-card p-6 text-left shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-all hover:scale-[1.01]"
 				>
 					<div class="flex items-center gap-2">
 						<span
@@ -196,10 +196,10 @@
 
 		<!-- What comes next -->
 		<div class="mx-auto mt-10 w-full max-w-4xl px-7 pb-10">
-			<h2 class="font-display text-2xl leading-9 font-medium tracking-display text-yellow-950">
+			<h2 class="font-display text-2xl leading-9 font-medium tracking-display text-foreground">
 				What comes next?
 			</h2>
-			<div class="mt-2 text-yellow-950 [&_a]:font-bold {HOST_COPY_PROSE_CLASS}">
+			<div class="mt-2 text-foreground [&_a]:font-bold {HOST_COPY_PROSE_CLASS}">
 				{@html renderHostCopy(whatsNext)}
 				<p class="mt-4">{@html sanitizeHostHtml(region.goDeeper)}</p>
 			</div>
@@ -214,7 +214,7 @@
 							href={link.href}
 							target={link.external ? '_blank' : undefined}
 							rel={link.external ? 'noopener noreferrer' : undefined}
-							class="font-sans text-base leading-6 font-medium text-white hover:opacity-80"
+							class="font-sans text-base leading-6 font-medium text-primary-foreground hover:opacity-80"
 						>
 							{link.label}
 						</a>

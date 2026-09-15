@@ -10,7 +10,9 @@
 		"./sanitize": "./src/sanitize.ts",
 		"./rich-text": "./src/rich-text.ts",
 		"./data/demographics": "./src/data/demographics.ts",
+		"./data/faq": "./src/data/faq.ts",
 		"./data/participant-asks": "./src/data/participant-asks.ts",
+		"./data/brand": "./src/data/brand.ts",
 		"./data/place": "./src/data/place.ts",
 		"./data/regions": "./src/data/regions.ts",
 		"./data/zipcodes": "./src/data/zipcodes.ts",
@@ -36,7 +38,9 @@
 		"./ui/Link.svelte": "./src/ui/Link.svelte",
 		"./ui/MonoLabel.svelte": "./src/ui/MonoLabel.svelte"
 	},
-	"files": ["src"],
+	"files": [
+		"src"
+	],
 	"dependencies": {
 		"@lucide/svelte": "^1.16.0",
 		"bits-ui": "^2.18.1",

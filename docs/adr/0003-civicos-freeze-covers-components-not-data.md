@@ -18,7 +18,7 @@ string is hardcoded per region in `packages/shared/src/data/regions.ts`:
 | "What's Next?" (landing + ThankYouScreen) | `region.whatsNext` | `thankYouMessage` |
 | Landing "Context" section | `region.contextParagraphs` | `callToAction` |
 | End-screen CTA copy | `region.endCtaJoinDescription`, `endCtaShareDescription` | none yet (#368) |
-| FAQ | `region.faq` | `faqs` |
+| FAQ | `region.faq` | `faqs` (done, #429) |
 
 Read literally, the freeze makes those milestones impossible: admin would write
 config that nothing ever reads. That is not what the freeze was for.

@@ -8,7 +8,7 @@
  * (the `regions.ts` fallback, the subdomain swap) stays below.
  */
 
-import { REGIONS } from '@civicos/shared/data/regions';
+import { REGIONS, extractSubdomain } from '@civicos/shared/data/regions';
 import { readPlace, type Place } from '@civicos/shared/data/place';
 import type { RegionConfig } from './regions';
 
@@ -63,4 +63,25 @@ export function placeForConversation(conversationId: string, metadata: unknown):
  */
 export function isLegacyRegionConversation(conversationId: string): boolean {
 	return regionsByConversationId.has(conversationId);
+}
+
+/**
+ * The apex this deployment answers on, taken from the host the request arrived
+ * under. `utah.bloomproject.us` is `bloomproject.us`, `dundee.localhost:5173`
+ * is `localhost:5173`, and an apex request is already itself.
+ *
+ * Derived rather than configured because civicos serves the apex and every
+ * Place subdomain, so a request always knows which deployment it belongs to.
+ * Admin cannot do this and reads `PUBLIC_PARTICIPANT_BASE_URL` instead, because
+ * it is a separate deployment on a hostname of its own.
+ *
+ * The label it strips is the one `extractSubdomain` found, so this can never
+ * disagree with the Place resolution about where the subdomain ends.
+ */
+export function apexHost(host: string): string {
+	const [name, port] = host.split(':');
+	const subdomain = extractSubdomain(name);
+	const apex = subdomain ? name.slice(subdomain.length + 1) : name;
+
+	return port ? `${apex}:${port}` : apex;
 }

@@ -117,7 +117,7 @@
 {#if event}
 	<AppShell>
 		<div
-			class="flex h-full flex-col overflow-y-auto scroll-smooth bg-gradient-primary"
+			class="flex h-full flex-col overflow-y-auto scroll-smooth bg-background"
 			bind:this={scrollContainer}
 		>
 			<InfoBar {placeName} {region} onBack={() => history.back()} backLabel="← BACK" />
@@ -226,7 +226,7 @@
 				<!-- Details section -->
 				<section id="details" class="scroll-mt-12">
 					<div
-						class="overflow-hidden rounded-[30px] bg-linear-to-b from-white to-white/80 shadow-[0px_4px_24.3px_0px_rgba(134,101,73,0.20)]"
+						class="overflow-hidden rounded-[30px] bg-white shadow-[0px_4px_24.3px_0px_rgba(134,101,73,0.20)]"
 					>
 						<!-- Location row -->
 						<div class="flex items-start gap-4 border-b border-foreground/10 px-5 py-5">
@@ -324,7 +324,7 @@
 	</AppShell>
 {:else}
 	<AppShell>
-		<div class="flex h-full flex-col items-center justify-center bg-gradient-primary px-6">
+		<div class="flex h-full flex-col items-center justify-center bg-background px-6">
 			<h1 class="font-display text-2xl font-medium tracking-display text-foreground">
 				Conversation not found
 			</h1>

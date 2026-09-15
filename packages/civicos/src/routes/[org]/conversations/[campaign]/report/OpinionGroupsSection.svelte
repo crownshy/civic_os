@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { CommentReportData, GroupReportData } from '$lib/types/report';
 	import Badge from '@civicos/shared/ui/Badge.svelte';
-	import GradientCard from '$lib/components/ui/GradientCard.svelte';
+	import PanelCard from '$lib/components/ui/PanelCard.svelte';
 	import SwipeCarousel from '$lib/components/ui/SwipeCarousel.svelte';
 
 	interface Props {
@@ -84,9 +84,9 @@
 
 	<!-- Statement flipper card -->
 	{#if representativeStatements.length > 0}
-		<GradientCard
-			borderGradient="bg-linear-to-b from-border to-transparent"
-			bg="bg-linear-to-b from-card to-background"
+		<PanelCard
+			borderClass="border border-border"
+			bg="bg-card"
 			shadow="shadow-[0px_4px_24.3px_0px_rgba(134,101,73,0.20)]"
 			class="relative z-10 mx-6 mt-10"
 		>
@@ -129,7 +129,7 @@
 							class="flex items-center gap-5 rounded-[10px] border-b border-muted bg-muted px-5 py-4"
 						>
 							<div
-								class="h-8 w-8 shrink-0 rounded-full bg-linear-to-b from-background to-accent outline outline-[0.54px] outline-border"
+								class="h-8 w-8 shrink-0 rounded-full bg-accent outline outline-[0.54px] outline-border"
 							></div>
 							<p class="font-sans text-sm leading-4 font-semibold text-foreground">
 								"{statement.text}"
@@ -201,6 +201,6 @@
 					<span class="font-mono text-xs font-medium text-muted-foreground">PASS/UNSURE</span>
 				</div>
 			</div>
-		</GradientCard>
+		</PanelCard>
 	{/if}
 </section>
