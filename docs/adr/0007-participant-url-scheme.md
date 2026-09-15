@@ -110,6 +110,24 @@ model back to one Campaign per Place, which would make the link expressible
 again. It stays out: less code, and it becomes wrong the moment the wider model
 lands.
 
+**The directory is the other answer (2026-09-03).** `/conversations` lists every
+live, public, non-invite-only Campaign and links each at its own address. It is
+not a corrective link: it does not claim to know which Campaign the wrong URL
+meant, so it stays right under either model. The 404 points at it instead of off
+the product.
+
+It is built from `GET /conversation`, the one list endpoint the anonymous app can
+reach. That endpoint returns only `is_live` Campaigns and ignores the `is_live`
+query param, which is a defect for admin (see `sysadmin/hosts/[id]`) and exactly
+the filter this page wants. It returns `metadata`, so `place` and `org` are on
+every row and each entry addresses itself through `participantUrl()`. The apex
+those absolute URLs are built on comes from the request host, not from
+`PUBLIC_PARTICIPANT_BASE_URL`: civicos answers on the apex and on every Place
+subdomain, so it already knows (`apexHost()` in `$lib/config/place`).
+
+`/conversations` is a static route and so wins over `[org]`, which would
+otherwise treat it as a legacy single-segment Campaign slug.
+
 This needs the Place to be keyed on the Conversation, not on the request.
 `getRegionBySubdomain` falls back rather than failing, so deriving the Place
 from the subdomain's region would make every Campaign look like it belonged
