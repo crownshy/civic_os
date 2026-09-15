@@ -1,12 +1,18 @@
 import { redirect, type Handle } from '@sveltejs/kit';
-import { createBackendClient, serviceKeyHeader } from '$lib/server/backend-client';
+import { createBackendClient } from '$lib/server/backend-client';
 
 const PUBLIC_PATHS = ['/login', '/logout'];
 const PUBLIC_PREFIXES = ['/api/auth/', '/_app/', '/favicon'];
 
 /**
- * Probe an admin-gated comhairle endpoint with the user's cookie.
- * 200 → user is an admin. 401 → no/expired session. 403 → logged in but not admin.
+ * Probe an admin-gated comhairle endpoint with the user's cookie, and nothing
+ * else. comhairle authenticates an `Authorization: Bearer` token in preference
+ * to the cookie, so a service key sent alongside would probe the key's owner
+ * instead of this user, and a stale key would 401 every admin back to login.
+ *
+ * 200 → user is an admin. 401 → no/expired session, or logged in but not admin
+ * (comhairle answers both with 401). 403 → forbidden, though `/regions` does
+ * not return it today.
  *
  * Only the status decides, never the body, so a reply that arrives but fails
  * schema validation still counts as admin: drift between the generated client
@@ -20,7 +26,7 @@ async function probeAdmin(authToken: string): Promise<'admin' | 'unauthorized' |
 	const api = createBackendClient(authToken);
 
 	try {
-		await api.ListRegions({ queries: { limit: 1 }, headers: serviceKeyHeader() });
+		await api.ListRegions({ queries: { limit: 1 } });
 		return 'admin';
 	} catch (e) {
 		const err = e as {

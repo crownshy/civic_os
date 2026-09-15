@@ -21,11 +21,3 @@ const API_PREFIX = env.API_PREFIX || '';
 export function createBackendClient(authToken?: string) {
 	return createApiClient(`${BACKEND_URL}${API_PREFIX}`, authToken, 'server');
 }
-
-/**
- * The service key that admin-gated calls send alongside the user's cookie.
- * Undefined when unset, which is the normal local-dev case.
- */
-export function serviceKeyHeader(): Record<string, string> | undefined {
-	return env.COMHAIRLE_API_KEY ? { Authorization: `Bearer ${env.COMHAIRLE_API_KEY}` } : undefined;
-}
