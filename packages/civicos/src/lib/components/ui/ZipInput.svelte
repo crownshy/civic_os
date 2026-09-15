@@ -126,6 +126,15 @@
 						flashing && 'flash-border-active'
 					)}
 					placeholder={displayLabel || placeholder}
+					type="text"
+					name="postal-code"
+					autocomplete="postal-code"
+					autocapitalize="off"
+					autocorrect="off"
+					spellcheck={false}
+					data-1p-ignore
+					data-lpignore="true"
+					data-form-type="other"
 					inputmode="numeric"
 					pattern="[0-9]*"
 				/>
