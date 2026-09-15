@@ -9,6 +9,7 @@ import {
 } from '$lib/config/campaign';
 import { extractSubdomain } from '$lib/config/regions';
 import { resolveParticipation } from '$lib/config/participation';
+import { httpStatusOf } from '$lib/utils/http';
 
 type ResolvedConversation = CampaignConversation & ConversationCopy;
 
@@ -30,13 +31,28 @@ export const load: LayoutServerLoad = async ({ params, locals, url, depends }) =
 	// is the Conversation `ai-utah`. See `conversationSlugFor`.
 	const place = extractSubdomain(url.hostname);
 
+	// Why the lookup failed, when it did. A 404 is the only ordinary miss: the
+	// list is candidates, not guarantees. The other two are not misses at all and
+	// used to be swallowed as one, which told a Host their Campaign did not exist
+	// when the truth was that it was still a draft or that comhairle was down.
+	let draft = false;
+	let unreachable = false;
+
 	let conversation: ResolvedConversation | null = null;
 	for (const candidate of campaignCandidates(slug, region, place)) {
 		try {
 			conversation = await api.GetConversation({ params: { conversation_id: candidate } });
 			break;
-		} catch {
-			// A miss here is ordinary: the list is candidates, not guarantees.
+		} catch (e) {
+			const status = httpStatusOf(e);
+			if (status === 401 || status === 403) {
+				// `GET /conversation/:id` is public only once a Campaign is live, and
+				// refuses anonymously otherwise. Nothing else on this endpoint answers
+				// 403, so it means the Campaign exists and has not been launched.
+				draft = true;
+			} else if (status === undefined || status >= 500) {
+				unreachable = true;
+			}
 		}
 	}
 
@@ -45,6 +61,25 @@ export const load: LayoutServerLoad = async ({ params, locals, url, depends }) =
 	// an unreachable backend must not take Utah or Oregon down with it.
 	if (!conversation) {
 		if (region.slug !== slug) {
+			// A draft answers exactly what an unclaimed slug answers. Saying it exists
+			// but is not live would leak that the slug is taken to anyone who guesses
+			// it; the Host learns this from admin, where the Campaign is theirs to
+			// launch. The log is where the two cases stay distinguishable.
+			//
+			// Checked before `unreachable` because it is the more definite answer: a
+			// 403 came from a backend that was up and did know this slug, whatever
+			// some other candidate did.
+			if (draft) {
+				console.warn(`[Campaign] "${slug}" exists but is not live yet`);
+			} else if (unreachable) {
+				// Distinct from a 404 because it is temporary and not the participant's
+				// doing. Answering "no such Campaign" to an outage tells a Host their
+				// Campaign was deleted and invites them to go and re-create it.
+				error(503, {
+					message: `We could not reach the service that knows about "${slug}". Try again in a moment.`
+				});
+			}
+
 			error(404, { message: `There is no Campaign called "${slug}".` });
 		}
 		console.warn(`[Campaign] "${slug}" unreachable, falling back to region defaults`);
