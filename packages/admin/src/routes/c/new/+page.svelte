@@ -43,9 +43,9 @@
 		if (!slugEdited) $formData.slug = toSlug($formData.title);
 	}
 
-	// The subdomain the typed Place would be served from, shown so the Host can
-	// see what "Dundee, Scotland" turns into before they commit to it. The action
-	// derives the same slug; this only previews it.
+	// The slug the typed Place becomes, shown so the Host can see what
+	// "Dundee, Scotland" turns into before they commit to it. The action derives
+	// the same slug; this only previews it.
 	const placeSlug = $derived(placeFromName($formData.placeName)?.slug ?? '');
 
 	let cohostPickerOpen = $state(false);
@@ -156,8 +156,8 @@
 						{#snippet children({ props })}
 							<Form.Label class={labelClass}>Place</Form.Label>
 							<p class="mb-1 text-caption text-muted-foreground">
-								Where this conversation runs. It gets its own subdomain, and the slug is scoped to
-								it. You can change it later.
+								Where this conversation runs. It is listed on that Place's page, and the slug is
+								scoped to it. You can change it later.
 							</p>
 							<input
 								{...props}
@@ -167,7 +167,7 @@
 							/>
 							{#if placeSlug}
 								<p class="mt-1 text-caption text-muted-foreground">
-									Served from {placeSlug}{data.baseDomain ? `.${data.baseDomain}` : ''}
+									Listed at {data.baseDomain}/{placeSlug}
 								</p>
 							{/if}
 						{/snippet}

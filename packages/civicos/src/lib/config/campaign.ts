@@ -7,25 +7,20 @@
  * the default layer behind it, the same way Host copy already resolves
  * (see `host-copy.ts` and ADR 0003).
  *
- * The URL is `<place>.bloomproject.us/<campaign-slug>`: the subdomain is the
- * Place, the first path segment is the Campaign.
+ * The URL is `/<org>/conversations/<conversation-slug>`: the last segment names
+ * the Conversation, and nothing about the hostname is read (ADR 0011).
  */
 
-import type { RegionConfig } from './regions';
+import { GENERIC_REGION, REGIONS, type RegionConfig } from './regions';
 import {
 	isLegacyRegionConversation,
+	legacyRegionForConversation,
 	placeForConversation,
 	placeFromRegion,
 	toPlaceSlug,
 	type Place
 } from './place';
-import {
-	conversationSlugFor,
-	readOrg,
-	readPoll,
-	type CampaignOrg,
-	type CampaignPoll
-} from '@civicos/shared/data/place';
+import { readOrg, readPoll, type CampaignOrg, type CampaignPoll } from '@civicos/shared/data/place';
 import { firstNonEmpty } from '$lib/utils/text';
 
 /** The fields of a Conversation a Campaign identity is built from. */
@@ -39,12 +34,12 @@ export interface CampaignConversation {
 export interface Campaign {
 	/** Backend Conversation id. Every downstream call keys on this. */
 	id: string;
-	/** Backend slug. Becomes the `/<campaign-slug>` path segment under #349. */
+	/** Backend slug. The `<conversation-slug>` segment of the URL. */
 	slug: string;
 	title: string;
 	/**
 	 * Where this Campaign runs. Null when it does not say and no legacy region
-	 * claims it, which the route treats as unserveable (ADR 0007).
+	 * claims it, which leaves it off every Place page (ADR 0011).
 	 */
 	place: Place | null;
 	/**
@@ -68,46 +63,64 @@ export interface Campaign {
 	 * Whether a `regions.ts` entry is this Campaign rather than just the defaults
 	 * behind it. Utah, Oregon and the catch-all are; everything created in admin
 	 * is not. It is what decides whether a zip may route a participant to another
-	 * subdomain, because only for these is a region the same thing as a Campaign.
+	 * Campaign, because only for these is a region the same thing as a Campaign.
 	 */
 	isLegacyRegion: boolean;
 }
 
 /**
  * Retired. A Campaign no longer needs a Place to be served: the path identifies
- * it and an unpublished one is served from the apex, so `place` is optional at
- * every render site.
+ * it, so `place` is optional at every render site.
  *
  * @deprecated Use `Campaign` and handle `place === null`.
  */
 export type ServedCampaign = Campaign;
 
 /**
- * Identifiers to try against `GET /conversation/:id` for a `/<slug>` URL, best
+ * The `regions.ts` entry a URL slug names, the catch-all included, or null.
+ * Own keys only, so a slug such as `constructor` cannot reach
+ * `Object.prototype`.
+ */
+export function legacyRegionForSlug(slug: string): RegionConfig | null {
+	const key = slug.trim();
+	if (key === GENERIC_REGION.slug) return GENERIC_REGION;
+
+	return Object.hasOwn(REGIONS, key) ? REGIONS[key] : null;
+}
+
+/**
+ * Identifiers to try against `GET /conversation/:id` for a URL slug, best
  * first. That endpoint accepts a slug or a UUID, so both forms go through one
  * call shape.
  *
- * The legacy id leads when the slug names a `regions.ts` entry, so `/utah` and
- * `/oregon` keep resolving to the Campaign they always did even if some other
- * Conversation later takes those slugs. It is offered only on a match:
- * `getRegionBySubdomain` answers `GENERIC_REGION` for any subdomain it does not
- * know, and that hardcoded id must never stand in for a slug nobody asked for.
+ * The legacy id leads when the slug names a `regions.ts` entry, so `utah` and
+ * `oregon` keep resolving to the Campaign they always did even if some other
+ * Conversation later takes those slugs. Any other slug is tried as it is: the
+ * Place is already part of it (`ai-utah`), so there is nothing to add.
  */
-export function campaignCandidates(
-	slug: string,
-	region: RegionConfig,
-	placeSlug?: string
-): string[] {
-	const legacyId = region.slug === slug ? region.conversationId : null;
+export function campaignCandidates(slug: string): string[] {
+	const legacyId = legacyRegionForSlug(slug)?.conversationId ?? null;
 
-	// A Campaign runs in many Places and each pair is its own Conversation, so
-	// the Conversation for `/ai` under `utah.` is `ai-utah`. That is tried first:
-	// a bare `ai` would either miss or, worse, hit some other Place's poll.
-	// Campaigns that predate the convention still resolve on the bare slug
-	// behind it.
-	const scoped = placeSlug ? conversationSlugFor(slug, placeSlug) : null;
+	return [...new Set([legacyId, slug].filter((c): c is string => !!c && c.trim() !== ''))];
+}
 
-	return [...new Set([legacyId, scoped, slug].filter((c): c is string => !!c && c.trim() !== ''))];
+/**
+ * The `regions.ts` defaults behind a Campaign: the entry that owns its
+ * Conversation, else the one its slug names, else the catch-all.
+ *
+ * This used to be whichever region the request's subdomain named, which dressed
+ * a Campaign in another region's copy whenever it was opened under that host.
+ * The Campaign picks its own now (ADR 0011).
+ */
+export function regionForCampaign(
+	conversationId: string | null | undefined,
+	slug: string
+): RegionConfig {
+	return (
+		(conversationId ? legacyRegionForConversation(conversationId) : null) ??
+		legacyRegionForSlug(slug) ??
+		GENERIC_REGION
+	);
 }
 
 /** Merge the stored Conversation over the region defaults. */
@@ -157,8 +170,8 @@ export function resolveCampaign(
  * zip was the only routing information there was. The URL names the Campaign
  * now, and the Campaign names its Place.
  *
- * The last fallback is still `GENERIC_REGION.stateName` for a subdomain nobody
- * recognises, because `getRegionBySubdomain` is total. #425 is what makes that
+ * The last fallback is still `GENERIC_REGION.stateName` for a Campaign no
+ * region claims, because `regionForCampaign` is total. #425 is what makes that
  * unrepresentable.
  */
 export function placeNameFor(

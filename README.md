@@ -36,12 +36,12 @@ See `src/lib/services/session.svelte.ts`. Cookie is httpOnly, set by backend thr
 
 ## Regions + Polis redirect
 
-Region picked in two stages:
+The URL picks the Campaign: `/<org>/conversations/<conversation-slug>`. Nothing is read from the hostname (ADR 0011). A Place's Campaigns are listed at `/<place-slug>`.
 
-1. **Subdomain** → page chrome (host name, slides, question). `utah.localhost` = utah, `oregon.localhost` = oregon, bare `localhost` = `dev` if `PUBLIC_DEV_*` set else `all` (generic). Logic: `extractSubdomain` + `getRegionBySubdomain` in `src/lib/config/regions.ts`.
-2. **Zipcode at JOIN** → which Polis you actually vote on. `84xxx → utah`, `97xxx → oregon`, else generic. If zip-region ≠ host-region, browser redirects to that region's subdomain before registering.
+1. **Campaign** → page chrome (host name, slides, question), with `regions.ts` defaults behind it: the region that owns the Conversation, else `all` (generic). Logic: `regionForCampaign` in `src/lib/config/campaign.ts`.
+2. **Zipcode at JOIN** → which Polis you vote on, for the legacy Utah, Oregon and catch-all Campaigns only. `84xxx → utah`, `97xxx → oregon`, else generic. If zip-region ≠ the Campaign's region, the browser goes to that region's Campaign before registering.
 
-**Local override**: when `PUBLIC_DEV_*` set, landing forces `dev` region — any zip, any subdomain lands on your seeded poll. No accidental hits on shared staging Polis.
+The root `/` of the old `utah.`, `oregon.`, `testing.` and `all.` hosts still opens their Campaign, because production serves those hosts.
 
 ⚠️ Region ids are **hardcoded in `regions.ts` for now** we're still developing. Per-environment overrides via env vars is a TODO. Editing `regions.ts` = changing live deploys, so for local play use the `dev` region or the `testing` region.
 

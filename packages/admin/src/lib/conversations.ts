@@ -45,11 +45,10 @@ export type ConversationSummary = {
 	/** Region name from the legacy config; null for backend-only conversations. */
 	placeName: string | null;
 	/**
-	 * Where participants go. Derived from the Place and the Campaign slug rather
-	 * than stored, so every Campaign has one and not just the four in
-	 * `regions.ts`. A Place is not required: without one the Campaign is served
-	 * from the apex. Null only when the Conversation has no slug to address it by,
-	 * or when the apex itself is unconfigured. See `PUBLIC_PARTICIPANT_BASE_URL`.
+	 * Where participants go. Derived from the Conversation slug rather than
+	 * stored, so every Campaign has one and not just the four in `regions.ts`.
+	 * Null only when the Conversation has no slug to address it by, or when the
+	 * participant host itself is unconfigured. See `PUBLIC_PARTICIPANT_BASE_URL`.
 	 */
 	shareUrl: string | null;
 };
@@ -107,24 +106,16 @@ export function toSummary(conversation: LocalizedConversationDto): ConversationS
 
 	// Derived, not stored: `regions.ts` only ever had a `shareUrl` for its four
 	// entries, so every Campaign created in admin had no participant link at all.
-	// Every Campaign has a participant site from creation: without a Place it is
-	// served from the apex, and publishing to a Place moves it to that subdomain.
+	// The Conversation slug is the whole address, Place included (`ai-utah`), so
+	// every Campaign has one from creation. A legacy region's hardcoded `shareUrl`
+	// no longer wins: it names a Place subdomain, and nothing reads the Place from
+	// the hostname any more (ADR 0011).
 	const org = readOrg(conversation.metadata);
-	const derived = participantUrl(
-		place?.slug ?? '',
-		conversation.slug ?? '',
+	const shareUrl = participantUrl(
+		conversation.slug || region?.slug || '',
 		org?.slug ?? region?.hostName ?? '',
 		participantBase()
 	);
-
-	// A legacy region's configured URL still wins, because Utah's and Oregon's
-	// hostnames are live and predate this rule. Only while the region's slug is
-	// still the Place it is served from, though: the env-driven `dev` entry
-	// guesses `dev.localhost` while the seed writes whatever Place it was handed,
-	// and civicos 404s a Campaign asked for under the wrong subdomain (ADR 0007)
-	// rather than serving it anyway. A link that cannot resolve is worse than the
-	// derived one it was overriding.
-	const pinned = region && region.slug === place?.slug ? region.shareUrl : null;
 
 	return {
 		id: conversation.id,
@@ -134,7 +125,7 @@ export function toSummary(conversation: LocalizedConversationDto): ConversationS
 		organizationId: conversation.organizationId ?? null,
 		place,
 		placeName: place?.name ?? null,
-		shareUrl: (pinned ?? derived) || null
+		shareUrl: shareUrl || null
 	};
 }
 

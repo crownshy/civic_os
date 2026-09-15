@@ -4,18 +4,18 @@ import type { LayoutServerLoad } from './$types';
 import { resolveFaq, resolveHostCopy, type ConversationCopy } from '$lib/config/host-copy';
 import {
 	campaignCandidates,
+	legacyRegionForSlug,
+	regionForCampaign,
 	resolveCampaign,
 	type CampaignConversation
 } from '$lib/config/campaign';
-import { extractSubdomain } from '$lib/config/regions';
 import { resolveParticipation } from '$lib/config/participation';
 import { readBrand, readHostBrand, resolveBrand } from '@civicos/shared/data/brand';
 import { httpStatusOf } from '$lib/utils/http';
 
 type ResolvedConversation = CampaignConversation & ConversationCopy;
 
-export const load: LayoutServerLoad = async ({ params, locals, url, depends }) => {
-	const region = locals.region;
+export const load: LayoutServerLoad = async ({ params, url, depends }) => {
 	const slug = params.campaign;
 
 	// Admin edits this copy in real time, so it needs a key an invalidation can
@@ -28,10 +28,6 @@ export const load: LayoutServerLoad = async ({ params, locals, url, depends }) =
 	// `campaign` and `hostCopy` are plain data, so they transport.
 	const api = createApiClient(`${url.origin}/api`, undefined, 'server');
 
-	// The Place is part of the lookup, not just the branding: `/ai` under `utah.`
-	// is the Conversation `ai-utah`. See `conversationSlugFor`.
-	const place = extractSubdomain(url.hostname);
-
 	// Why the lookup failed, when it did. A 404 is the only ordinary miss: the
 	// list is candidates, not guarantees. The other two are not misses at all and
 	// used to be swallowed as one, which told a Host their Campaign did not exist
@@ -40,7 +36,7 @@ export const load: LayoutServerLoad = async ({ params, locals, url, depends }) =
 	let unreachable = false;
 
 	let conversation: ResolvedConversation | null = null;
-	for (const candidate of campaignCandidates(slug, region, place)) {
+	for (const candidate of campaignCandidates(slug)) {
 		try {
 			conversation = await api.GetConversation({ params: { conversation_id: candidate } });
 			break;
@@ -61,7 +57,7 @@ export const load: LayoutServerLoad = async ({ params, locals, url, depends }) =
 	// one. The exception is a legacy region: those predate stored Campaigns, so
 	// an unreachable backend must not take Utah or Oregon down with it.
 	if (!conversation) {
-		if (region.slug !== slug) {
+		if (!legacyRegionForSlug(slug)) {
 			// A draft answers exactly what an unclaimed slug answers. Saying it exists
 			// but is not live would leak that the slug is taken to anyone who guesses
 			// it; the Host learns this from admin, where the Campaign is theirs to
@@ -86,21 +82,14 @@ export const load: LayoutServerLoad = async ({ params, locals, url, depends }) =
 		console.warn(`[Campaign] "${slug}" unreachable, falling back to region defaults`);
 	}
 
+	// Picked by the Campaign, not by the host it was opened under: any host
+	// serves any Campaign now (ADR 0011). Returned so every page below reads this
+	// region rather than the root layout's catch-all.
+	const region = regionForCampaign(conversation?.id, slug);
 	const campaign = resolveCampaign(conversation, region);
 
-	// A Campaign has a participant site from the moment it is created. The path
-	// alone identifies it, so an unpublished Campaign is served from the apex;
-	// publishing it to a Place gives it a nicer address, not its first one.
-	//
-	// Once it HAS a Place it is served only from there. Without that check any
-	// subdomain serves any Campaign, because the region lookup falls back rather
-	// than failing and so never rejects anything. No corrective link: see
-	// ADR 0007.
-	if (campaign.place && campaign.place.slug !== place) {
-		error(404, { message: `This Campaign does not run here.` });
-	}
-
 	return {
+		region,
 		campaign,
 		hostCopy: resolveHostCopy(conversation, region),
 		// The Host's own questions when they have written any, the `regions.ts`
