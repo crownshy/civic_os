@@ -103,3 +103,28 @@ export interface ThemeView {
 	/** `statements`, plus any insight-cited record not already among them */
 	readonly items: readonly ReportRecord[];
 }
+
+/** One demographic category as the poll measured it. */
+export interface DemographicCategory {
+	key: string;
+	label: string;
+	/** respondents who answered this question, the denominator of every `pct` */
+	answered: number;
+	breakdown: { label: string; pct: number }[];
+}
+
+/**
+ * The poll's respondents next to the real population. `actual` is keyed by
+ * category key, then by row label, as a percentage.
+ */
+export interface Demographics {
+	poll: { total: number; categories: DemographicCategory[] };
+	actual: Record<string, Record<string, number>>;
+}
+
+/** A demographics modal row: the poll's share beside the population's. */
+export interface DemographicRow {
+	label: string;
+	pct: number;
+	actual: number | undefined;
+}

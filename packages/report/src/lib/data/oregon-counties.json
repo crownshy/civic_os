@@ -1,5 +1,4 @@
 {
-	"_readme": "Oregon county boundaries for the Demographics page map. Sourced from us-atlas (github.com/topojson/us-atlas), specifically counties-10m.json, itself built from the U.S. Census Bureau's cartographic boundary shapefiles (2017 edition) — public domain, U.S. federal government work. Converted from TopoJSON to GeoJSON via the topojson-client npm package's topojson.feature(topology, topology.objects.counties), then filtered to the 36 features whose id (5-digit FIPS code) starts with \"41\" (Oregon's state FIPS prefix). Reproducible with that same short script against a fresh counties-10m.json — this repo takes on no permanent npm dependency for it, the conversion is a one-off. feature.id is the county's FIPS code; feature.properties.name is its plain name. The three Central Oregon counties the Demographics page treats as the default/home view are Deschutes (41017), Crook (41013), and Jefferson (41031) — the other 33 features exist so the map's zoomed-all-the-way-out bound is the real state outline, not an arbitrary crop.",
 	"type": "FeatureCollection",
 	"features": [
 		{

@@ -21,6 +21,14 @@ describe('titleCaseChip', () => {
 		expect(titleCaseChip('BEND, OR')).toBe('Bend, OR');
 	});
 
+	it('keeps any state abbreviation uppercase', () => {
+		expect(titleCaseChip('SALT LAKE CITY, UT')).toBe('Salt Lake City, UT');
+	});
+
+	it('title-cases a two-letter word that is not a trailing state', () => {
+		expect(titleCaseChip('UP, NORTH')).toBe('Up, North');
+	});
+
 	it('lowercases the same word when it is the conjunction', () => {
 		// the whole reason the special case exists; these two differ only by
 		// the comma before them

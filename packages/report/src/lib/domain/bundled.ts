@@ -22,24 +22,27 @@ import participantLocationsData from '../data/participant-locations.json';
 import oregonCountiesData from '../data/oregon-counties.json';
 
 import { buildThemeView, indexById } from './data';
-import type { Group, GroupInfo, Insight, ReportRecord, Theme, ThemeView } from './types';
-
-/** Editorial JSON files carry a `_readme` describing where their numbers came from. */
-const withoutReadme = <T>(source: Record<string, unknown>): Record<string, T> =>
-	Object.fromEntries(Object.entries(source).filter(([key]) => !key.startsWith('_'))) as Record<
-		string,
-		T
-	>;
+import type {
+	Demographics,
+	Group,
+	GroupInfo,
+	Insight,
+	ReportRecord,
+	Theme,
+	ThemeView
+} from './types';
 
 export const THEMES = bloomData.themes as readonly Theme[];
 export const RECORDS = bloomData.records as unknown as readonly ReportRecord[];
 export const GROUPS = bloomData.groups as readonly Group[];
 
-export const INSIGHTS = withoutReadme<Insight[]>(insightsData);
-export const GROUP_INFO = withoutReadme<GroupInfo>(groupInfoData);
+export const INSIGHTS = insightsData as Record<string, Insight[]>;
+export const GROUP_INFO = groupInfoData as Record<string, GroupInfo>;
 /** Per group, the statements Polis says most define it, in rank order. */
-export const GROUP_STATEMENTS =
-	withoutReadme<{ id: string; direction: string }[]>(groupStatementsData);
+export const GROUP_STATEMENTS = groupStatementsData as Record<
+	string,
+	{ id: string; direction: string }[]
+>;
 
 export const THEME_DESCRIPTIONS = themeDescriptionsData.themes as Record<
 	string,
@@ -68,7 +71,7 @@ export const CONSENSUS_RECORDS: readonly ReportRecord[] = Object.freeze(
 );
 
 /** The Demographics detail modal, one category per tab. */
-export const DEMOGRAPHICS = demographicsData;
+export const DEMOGRAPHICS = demographicsData as Demographics;
 
 /**
  * Cities with participant counts and real lat/lng for the Demographics map,

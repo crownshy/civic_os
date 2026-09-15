@@ -5,13 +5,19 @@
 import type { InsightDirection, ReportRecord } from './types';
 
 /**
- * Title-cases a raw ALL-CAPS chip, with one special case: a bare "or" stays
- * uppercase right after a comma, since that is the Oregon abbreviation
- * ("Bend, OR"), not the conjunction ("White or Caucasian").
+ * Title-cases a raw ALL-CAPS chip, with two special cases: a two-letter word
+ * ending the chip right after a comma is a state abbreviation and stays
+ * uppercase ("Bend, OR"), and any other "or" is the conjunction and stays
+ * lowercase ("White or Caucasian").
  */
 export function titleCaseChip(chip: string): string {
 	return chip.toLowerCase().replace(/\b\w+/g, (word, offset: number, whole: string) => {
-		if (word === 'or') return whole.slice(0, offset).trimEnd().endsWith(',') ? 'OR' : 'or';
+		const isState =
+			word.length === 2 &&
+			offset + word.length === whole.length &&
+			whole.slice(0, offset).trimEnd().endsWith(',');
+		if (isState) return word.toUpperCase();
+		if (word === 'or') return 'or';
 		return word.charAt(0).toUpperCase() + word.slice(1);
 	});
 }

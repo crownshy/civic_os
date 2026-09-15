@@ -55,7 +55,7 @@
 		const { width, height, barHeight } = size;
 		if (width <= 0 || height <= 0) return null;
 		// d3-geo takes points as [lng, lat], the reverse of these field names' own
-		// reading order (see participant-locations.json's _readme)
+		// reading order
 		const points: ExtendedFeatureCollection = {
 			type: 'FeatureCollection',
 			features: homeFitCities(cities, mobile).map((c) => ({
