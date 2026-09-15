@@ -9,13 +9,22 @@
 	import * as Form from '@civicos/shared/ui/form';
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import { Button } from '@civicos/shared/ui/button';
-	import { Trash2 } from '@lucide/svelte';
+	import { Palette, Trash2 } from '@lucide/svelte';
 	import IdentityCard from './IdentityCard.svelte';
 	import CoHostsCard from './CoHostsCard.svelte';
 	import AddCoHostsDialog from '$lib/components/setup/AddCoHostsDialog.svelte';
 	import DemographicsCard from '$lib/components/setup/DemographicsCard.svelte';
 	import FaqCard from '$lib/components/setup/FaqCard.svelte';
 	import ParticipantAsksCard from '$lib/components/setup/ParticipantAsksCard.svelte';
+	import BrandDialog from '$lib/components/setup/BrandDialog.svelte';
+	import {
+		BRAND_PRESETS,
+		EMPTY_BRAND,
+		presetFor,
+		readBrand,
+		readHostBrand,
+		type Brand
+	} from '@civicos/shared/data/brand';
 	import {
 		readCustomDemographics,
 		readDemographicToggles,
@@ -24,6 +33,7 @@
 	} from '@civicos/shared/data/demographics';
 	import { readFaqs, toFaqsHtml, type FaqEntry } from '@civicos/shared/data/faq';
 	import { readAskToggles, type AskKey } from '@civicos/shared/data/participant-asks';
+	import { previewCategories } from '$lib/components/setup/preview/categories';
 	import { placeFromName, rescopedSlug, toPlaceSlug } from '$lib/config/place';
 	import { extractSubdomain } from '@civicos/shared/data/regions';
 	import { RESERVED_ROUTE_SLUGS, routeSlugFor } from '$lib/conversations';
@@ -374,6 +384,32 @@
 	// Same interim metadata storage as demographics, same whole-key write.
 	const asks = $derived(readAskToggles(conversation?.metadata));
 
+	// --- Brand -----------------------------------------------------------------
+	// Same interim storage again. `hostBrand` is the read-only layer underneath:
+	// admin mirrors the Host's Brand there because `/organizations` is 401 to an
+	// anonymous participant, so civicos has no other way to see it.
+	const brand = $derived(readBrand(conversation?.metadata) ?? EMPTY_BRAND);
+	const hostBrand = $derived(readHostBrand(conversation?.metadata) ?? EMPTY_BRAND);
+
+	const saveBrand = (next: Brand) => patchMetadata({ brand: next });
+
+	// The Setup card's colour swatches. A preset is a Brand fragment, so this
+	// merges into whatever else the Brand already sets rather than replacing it:
+	// picking a scheme should not wipe a background the Host typed by hand.
+	const presetId = $derived(presetFor(brand)?.id ?? null);
+
+	let brandOpen = $state(false);
+	// What the phone mocks stand in for: this Campaign's own copy, not sample
+	// text, so a Host is judging their own title at its real length.
+	const previewCats = $derived(previewCategories(demographics, customDemographics));
+
+	function selectPreset(id: string) {
+		const chosen = BRAND_PRESETS.find((p) => p.id === id);
+		if (!chosen) return Promise.resolve();
+
+		return saveBrand({ ...brand, tokens: { ...brand.tokens, ...chosen.tokens } });
+	}
+
 	const setAsk = (key: AskKey, next: boolean) =>
 		patchMetadata({ participantAsks: { ...asks, [key]: next } });
 
@@ -542,6 +578,13 @@
 	</Form.Field>
 {/snippet}
 
+{#snippet brandAction()}
+	<Button variant="outline" size="sm" onclick={() => (brandOpen = true)}>
+		<Palette />
+		Customize Brand…
+	</Button>
+{/snippet}
+
 {#snippet keyQuestionField()}
 	<Form.Field {form} name="keyQuestion">
 		<Form.Control>
@@ -627,6 +670,30 @@
 			{slugField}
 			{keyQuestionField}
 			{placeField}
+			{presetId}
+			onSelectPreset={selectPreset}
+			{brandAction}
+		/>
+
+		<!-- ===== Brand (#428) =====
+		     Colours, type and shape for this Campaign's participant pages. Sits
+		     over whatever the Host set and under nothing: `theme.css` shows
+		     through wherever both are blank. Named Brand because Theme already
+		     means a statement's topic tag in Insights.
+
+		     Behind the Setup card's swatch row rather than a card of its own:
+		     sixteen fields plus a preview is a screen, not a row, and inlining it
+		     pushed everything below it off the page. -->
+		<BrandDialog
+			bind:open={brandOpen}
+			{brand}
+			inherited={hostBrand}
+			campaignTitle={title}
+			keyQuestion={campaign.keyQuestion}
+			placeName={campaign.place?.name ?? 'Your place'}
+			hostName={campaign.hostName ?? 'Your Host'}
+			categories={previewCats}
+			onSave={saveBrand}
 		/>
 
 		<!-- ===== Co-Hosts ===== -->

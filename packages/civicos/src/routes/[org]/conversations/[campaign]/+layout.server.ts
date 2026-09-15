@@ -9,6 +9,7 @@ import {
 } from '$lib/config/campaign';
 import { extractSubdomain } from '$lib/config/regions';
 import { resolveParticipation } from '$lib/config/participation';
+import { readBrand, readHostBrand, resolveBrand } from '@civicos/shared/data/brand';
 import { httpStatusOf } from '$lib/utils/http';
 
 type ResolvedConversation = CampaignConversation & ConversationCopy;
@@ -108,6 +109,12 @@ export const load: LayoutServerLoad = async ({ params, locals, url, depends }) =
 		// Which demographics and which asks the Host left switched on. Falling
 		// back to all-on when the Conversation is unreachable keeps a legacy
 		// region asking what it always asked.
-		participation: resolveParticipation(conversation)
+		participation: resolveParticipation(conversation),
+		// Host first, Campaign second (#428), so a Campaign overrides the Host that runs
+		// it. The Host layer is `metadata.hostBrand`, a mirror admin writes,
+		// because `/organizations` answers 401 to an anonymous participant and
+		// this is the only anonymous read there is. Anything neither layer sets
+		// falls through to `theme.css`, which is already on the page.
+		brand: resolveBrand(readHostBrand(conversation?.metadata), readBrand(conversation?.metadata))
 	};
 };
