@@ -35,7 +35,6 @@
 	import { readAskToggles, type AskKey } from '@civicos/shared/data/participant-asks';
 	import { previewCategories } from '$lib/components/setup/preview/categories';
 	import { placeFromName, rescopedSlug, toPlaceSlug } from '$lib/config/place';
-	import { extractSubdomain } from '@civicos/shared/data/regions';
 	import { RESERVED_ROUTE_SLUGS, routeSlugFor } from '$lib/conversations';
 	import ContextCard from './ContextCard.svelte';
 	import RichTextEditor from '$lib/components/RichTextEditor.svelte';
@@ -50,21 +49,12 @@
 	const title = $derived(campaign.title);
 	const description = $derived(conversation?.description ?? '');
 	const slug = $derived(conversation?.slug ?? campaign.slug);
-	// Host portion of the public URL (strip protocol + any path). Empty for
-	// Campaigns with no legacy region entry, which have no public URL yet.
+	// Host portion of the public URL (strip protocol + any path). Empty when the
+	// Campaign has no participant link, see `shareUrlBlocker`.
 	const baseUrl = $derived(
 		campaign.shareUrl?.replace(/^https?:\/\//, '').replace(/\/.*$/, '') ?? ''
 	);
 	const places = $derived(campaign.place ? [campaign.place.name] : []);
-
-	// Whatever is left of the public URL once the current Place is stripped off,
-	// so the subdomain preview below reads as a real address rather than a bare
-	// label. Empty for a Campaign with no region entry and so no public URL yet.
-	const baseDomain = $derived.by(() => {
-		if (!baseUrl) return '';
-		const current = extractSubdomain(baseUrl);
-		return current ? baseUrl.slice(current.length + 1) : baseUrl;
-	});
 
 	// Live co-hosts: the owning host (Admin badge) plus organizations granted the
 	// co-host role on this Conversation. Resolved server-side in +page.server.ts
@@ -419,16 +409,16 @@
 	// through the same PatchConversationMetadata path as demographics and asks.
 	//
 	// The Host types a name; the slug is derived from it, never typed, because it
-	// is a DNS label and the two must not drift. That does mean renaming a Place
-	// moves its subdomain, which is why the resulting address is shown under the
-	// field instead of being computed silently. The subdomain still has to exist
-	// in the ingress for the new address to resolve (#351).
+	// is a URL segment and the two must not drift. That does mean renaming a Place
+	// moves the Campaign to another Place page and rescopes its slug, which is why
+	// the resulting address is shown under the field instead of being computed
+	// silently (ADR 0011).
 	let placeName = $state(untrack(() => data.campaign.place?.name ?? ''));
 	let savedPlaceName = $state(untrack(() => data.campaign.place?.name ?? ''));
 	let placeError = $state<string | null>(null);
 
 	// Two different facts, and conflating them is a lie: the slug the Campaign is
-	// *currently* served from is whatever was stored, which need not match what
+	// *currently* listed under is whatever was stored, which need not match what
 	// this name derives to (the dev seed stores `dundee` for "Dundee, Scotland").
 	// So the line under the field reports the stored slug until the name is
 	// edited, and only then previews where saving would move it.
@@ -443,8 +433,8 @@
 		if (next === savedPlaceName) return;
 
 		// Clearing the field unpublishes the Campaign from its Place rather than
-		// storing a blank one. civicos 404s a Campaign with no Place (ADR 0007),
-		// so this is a real action, not a no-op.
+		// storing a blank one. It drops off that Place's page, and its slug loses
+		// the Place suffix, so this is a real action, not a no-op.
 		const place = next === '' ? null : placeFromName(next);
 		if (next !== '' && !place) {
 			placeError = 'The name needs at least one letter or number.';
@@ -492,9 +482,11 @@
 	 * Keep the Conversation slug scoped to the Place it now runs in.
 	 *
 	 * A Campaign runs in many Places and each pair is its own Conversation, so
-	 * those Conversations are slugged `<campaign>-<place>`: that is what lets
-	 * `<place>.bloomproject.us/<campaign>` narrow to one of them (ADR 0007). The
-	 * Host never types it. They name a Place, and the slug follows.
+	 * those Conversations are slugged `<campaign>-<place>`: that is what keeps
+	 * `/<org>/conversations/ai-utah` and `.../ai-oregon` two addresses
+	 * (ADR 0011). The Host never types it. They name a Place, and the slug
+	 * follows. The slug is the public URL, so a link shared before a Place edit
+	 * stops resolving after it.
 	 *
 	 * The old Place's suffix is stripped before the new one is applied, so moving
 	 * Utah to Oregon gives `ai-oregon` rather than `ai-utah-oregon`. Clearing the
@@ -616,11 +608,11 @@
 			<p class="text-caption text-destructive">{placeError}</p>
 		{:else if placeMoves}
 			<p class="text-caption text-muted-foreground">
-				Moves to {nextPlaceSlug}{baseDomain ? `.${baseDomain}` : ''}
+				Will be listed at {baseUrl}/{nextPlaceSlug}
 			</p>
 		{:else if storedPlaceSlug}
 			<p class="text-caption text-muted-foreground">
-				Served from {storedPlaceSlug}{baseDomain ? `.${baseDomain}` : ''}
+				Listed at {baseUrl}/{storedPlaceSlug}
 			</p>
 		{/if}
 	</div>

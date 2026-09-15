@@ -6,7 +6,7 @@
 
 	interface Props {
 		title: string;
-		/** Host portion of the public URL, e.g. "oregon.bloomproject.us". */
+		/** Host portion of the public URL, e.g. "bloomproject.us". */
 		baseUrl: string;
 		slug: string;
 		keyQuestion: string;

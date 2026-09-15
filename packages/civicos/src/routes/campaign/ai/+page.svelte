@@ -36,7 +36,8 @@
 		}
 		submitting = true;
 		// This page predates Campaigns and sits outside the `[campaign]` route, so
-		// the subdomain's region is the only Conversation it knows. Naming it here
+		// the root layout's catch-all region is the only Conversation it knows
+		// (ADR 0011). Naming it here
 		// beats pointing the whole session at it: `useCampaign` also swaps `pid`
 		// and the vote counters, which this page has no business touching.
 		await session.registerEmail(trimmed, region.conversationId);

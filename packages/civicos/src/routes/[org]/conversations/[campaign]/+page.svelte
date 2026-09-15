@@ -10,7 +10,7 @@
 	import { Input } from '@civicos/shared/ui/input';
 	import { session } from '$lib/services/session.svelte';
 	import type { ParticipantSession } from '$lib/services/participant';
-	import { getRegionByZipcode, getRegionUrl } from '$lib/config/regions';
+	import { getRegionByZipcode } from '$lib/config/regions';
 	import type { RegionConfig } from '$lib/config/regions';
 	import type { Campaign } from '$lib/config/campaign';
 	import { OPEN_POLL_EXPLAINER, FOOTER_LINKS, NAV_SECTIONS } from '$lib/config/landing-copy';
@@ -82,7 +82,7 @@
 	let emailError = $state('');
 	let emailSuccess = $state(false);
 
-	// Pick up zip from URL on mount (used when redirecting between region subdomains)
+	// Pick up a zip carried over by the zip redirect in `handleJoin`
 	onMount(() => {
 		if (browser && !isReturning) {
 			const params = new URLSearchParams(window.location.search);
@@ -106,13 +106,19 @@
 
 	async function handleJoin() {
 		if (isReturning) {
+			// Every Campaign shares one origin, so someone who joined a different
+			// Campaign arrives here already known and never passes through `join`.
+			// Put them on this Campaign's workflow on the way in. Not awaited: a
+			// missing participation row is a reporting gap, not a reason to hold
+			// CONTINUE back, and the request outlives the client-side navigation.
+			void session.enterCampaign(campaign.id);
 			goto(campaignPath(campaign.slug, page.params.org, `contribute`));
 			return;
 		}
 
 		const zipRegion = getRegionByZipcode(zipCode.trim());
 
-		// A zip may send someone to another subdomain only where a region IS the
+		// A zip may send someone to another Campaign only where a region IS the
 		// Campaign, which is Utah, Oregon and the catch-all. For a Campaign
 		// published to a Place, the URL already names which Campaign this is, so
 		// routing by zip would drop its participants on a different one.
@@ -122,17 +128,20 @@
 				regionSlug: region.slug,
 				zipRegion: zipRegion.slug
 			});
-			window.location.href = getRegionUrl(zipRegion, zipCode.trim(), window.location.hostname);
+			// A full load on this host rather than `goto`: the zip is read back in
+			// `onMount`, which a client-side navigation between two Campaigns does
+			// not re-run, because it reuses this component.
+			const target = campaignPath(zipRegion.slug, zipRegion.hostName);
+			window.location.href = `${target}?zip_code=${encodeURIComponent(zipCode.trim())}`;
 			return;
 		}
 
 		joining = true;
 		// The Campaign the URL resolved to, not the zip's `regions.ts` entry. For
 		// Utah and Oregon these are the same Conversation (the redirect above
-		// guarantees the zip matches this subdomain); for a Campaign created in
-		// admin only `campaign.id` is right, because an unknown subdomain falls
-		// back to GENERIC_REGION and would have put its participants in the USA
-		// catch-all poll.
+		// guarantees the zip matches this Campaign); for a Campaign created in
+		// admin only `campaign.id` is right, because its region is the catch-all
+		// and would have put its participants in the USA catch-all poll.
 		const success = await session.join(zipCode.trim(), undefined, campaign.id);
 		joining = false;
 		if (!success) return;

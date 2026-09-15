@@ -95,7 +95,7 @@ export const load: LayoutServerLoad = async ({ params, parent, cookies, url, dep
 		slug: summary.slug,
 		title: conversation?.title ?? summary.title,
 		status: summary.status,
-		// Where this Campaign runs, and so the subdomain it is served from. Stored
+		// Where this Campaign runs, and so the Place page it is listed on. Stored
 		// on the Conversation's metadata and editable on Setup; a legacy region
 		// entry is the fallback. The list resolves the same thing in `toSummary`,
 		// so this and the dashboard agree.

@@ -15,10 +15,10 @@
 	const isLive = $derived(conversation ? conversation.isLive : campaign.status === 'live');
 
 	// Where participants actually land:
-	// `<place>.<base>/<org>/conversations/<campaign-slug>`. Derived in `toSummary`
+	// `<base>/<org>/conversations/<conversation-slug>`. Derived in `toSummary`
 	// rather than read out of `regions.ts`, so every Campaign has one from the
-	// moment it is created; publishing it to a Place moves it to that subdomain,
-	// it does not give it its first address (ADR 0007).
+	// moment it is created; publishing it to a Place lists it on that Place's
+	// page, it does not give it its first address (ADR 0011).
 	const publicUrl = $derived(campaign.shareUrl?.replace(/\/$/, '') ?? '');
 
 	// Only reached when there is genuinely no address to link to. Which of the two

@@ -15,10 +15,8 @@ import type { RegionConfig, Partner, FaqEntry } from '@civicos/shared/data/regio
 export type { RegionConfig, Partner, FaqEntry };
 export {
 	GENERIC_REGION,
-	getRegionBySubdomain,
 	getRegionByZipcode,
 	extractSubdomain,
-	getRegionUrl,
 	getEventFullDescription,
 	formatDurationLabel
 } from '@civicos/shared/data/regions';

@@ -1,11 +1,10 @@
 import { createApiClient } from '@crownshy/api-client/client';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ parent, locals, cookies, url, depends }) => {
+export const load: PageServerLoad = async ({ parent, cookies, url, depends }) => {
 	depends('report:data');
 
-	const region = locals.region;
-	const { campaign } = await parent();
+	const { campaign, region } = await parent();
 	const conversationId = campaign.id;
 	// Still read from `regions.ts` rather than resolved from the Campaign's
 	// workflow steps the way admin does it. See #401.

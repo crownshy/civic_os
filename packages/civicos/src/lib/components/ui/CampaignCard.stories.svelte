@@ -16,7 +16,7 @@
 		title: 'AI and our communities',
 		description: 'What should artificial intelligence be allowed to do where you live?',
 		place: { slug: 'dundee', name: 'Dundee, Scotland' },
-		url: 'https://dundee.bloomproject.us/young-scot/conversations/ai'
+		href: '/young-scot/conversations/ai-dundee'
 	};
 </script>
 
@@ -25,7 +25,7 @@
 <Story
 	name="No Place"
 	args={{
-		campaign: { ...campaign, place: null, url: 'https://bloomproject.us/host/conversations/ai' }
+		campaign: { ...campaign, place: null, href: '/host/conversations/ai' }
 	}}
 />
 
