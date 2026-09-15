@@ -4,11 +4,12 @@
 	import { zoom, zoomIdentity, type ZoomTransform } from 'd3-zoom';
 	import { onMount } from 'svelte';
 
+	import { REPORT_CONFIG } from '../data/report-config';
 	import { OREGON_COUNTIES, PARTICIPANT_LOCATIONS } from '../domain/bundled';
 	import {
 		DEMOG_MAX_ZOOM_IN,
-		TRI_COUNTY_FIPS,
 		dotRadius,
+		homeCountySets,
 		homeFitCities,
 		homeFitExtent,
 		hoverBox,
@@ -25,6 +26,7 @@
 	/** height of the stat block overlaid at the top, which the home view fits below */
 	let { statHeight }: { statHeight: number } = $props();
 
+	const homeCounties = homeCountySets(REPORT_CONFIG.map.homeCounties);
 	const cities = PARTICIPANT_LOCATIONS.cities;
 	const maxCount = Math.max(...cities.map((c) => c.count));
 	/** Radius never changes with zoom: markers keep a fixed screen size. */
@@ -58,7 +60,7 @@
 		// reading order
 		const points: ExtendedFeatureCollection = {
 			type: 'FeatureCollection',
-			features: homeFitCities(cities, mobile).map((c) => ({
+			features: homeFitCities(cities, mobile, homeCounties.names).map((c) => ({
 				type: 'Feature',
 				properties: null,
 				geometry: { type: 'Point', coordinates: [c.lng, c.lat] }
@@ -173,7 +175,7 @@
 				{#each counties.features as feature, i (feature.id)}
 					<path
 						class="demogCounty"
-						class:inRegion={TRI_COUNTY_FIPS.has(String(feature.id))}
+						class:inRegion={homeCounties.fips.has(String(feature.id))}
 						d={fitted.counties[i]}
 					/>
 				{/each}

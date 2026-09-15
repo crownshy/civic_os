@@ -1,7 +1,11 @@
 <script lang="ts">
 	import { trackEvent } from '@lukulent/svelte-umami';
 	import mountains from '../assets/sisters_bg.webp';
+	import { REPORT_CONFIG } from '../data/report-config';
 	import { getNavigate, getOpenShare } from '../navigation';
+	import RichCopy from './RichCopy.svelte';
+
+	const copy = REPORT_CONFIG.pages.cta;
 
 	const navigate = getNavigate();
 	const openShare = getOpenShare();
@@ -17,26 +21,24 @@
 	}
 </script>
 
+{#snippet highlight(phrase: string)}<span class="highlight">{phrase}</span>{/snippet}
+
 <main class="introPage ctaPage">
 	<img class="mountains" src={mountains} alt="" />
 	<div class="masthead">
-		<h1>Now is the time to act for the future of our communities.</h1>
-		<p>
-			We're organizing a Civic Assembly in December 2026, where 30-40 residents will develop
-			policies to make sure the public has a meaningful role in the government's AI-related
-			decisions.
-			<span class="highlight">You are invited to participate;</span> selected delegates will receive a
-			$250 stipend.
-		</p>
+		<h1>{copy.heading}</h1>
+		<p><RichCopy text={copy.body} {highlight} /></p>
 	</div>
 	<div class="actions">
+		<!-- eslint-disable svelte/no-navigation-without-resolve -- the report config's own external URL, nothing for resolve() to route -->
 		<a
 			class="primary"
-			href="https://bloomproject.typeform.com/to/C1N3LI7g?utm_source=report"
+			href={copy.signupUrl}
 			target="_blank"
 			rel="noopener"
-			onclick={() => trackEvent('cta-signup')}>Register here</a
+			onclick={() => trackEvent('cta-signup')}>{copy.signupLabel}</a
 		>
+		<!-- eslint-enable svelte/no-navigation-without-resolve -->
 		<button class="secondary" type="button" onclick={share}>
 			<svg viewBox="0 0 20 20" aria-hidden="true"
 				><path d="M2.5 10.3L17 2.7l-4.3 14.7-2.9-6-7.3-1.1z" /></svg

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
+	import { REPORT_CONFIG } from '../data/report-config';
 
 	let { color }: { color: string } = $props();
 
@@ -16,10 +17,11 @@
 				stroke-linejoin="round"
 			/></svg
 		>
-		<span class="wordmark">AI &amp; Central Oregon</span>
+		<span class="wordmark">{REPORT_CONFIG.brand}</span>
 	</a>
-	<a class="link" href="https://cocap.us/ai" target="_blank" rel="noopener">
-		Learn more at COCAP.US
+	<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- the report config's own external URL, nothing for resolve() to route -->
+	<a class="link" href={REPORT_CONFIG.learnMore.href} target="_blank" rel="noopener">
+		{REPORT_CONFIG.learnMore.label}
 		<svg viewBox="0 0 16 16" aria-hidden="true"
 			><path
 				d="M4.5 11.5 11.5 4.5M5.5 4.5H11.5V10.5"

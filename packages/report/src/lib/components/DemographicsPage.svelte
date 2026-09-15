@@ -1,8 +1,10 @@
 <script lang="ts">
+	import { REPORT_CONFIG } from '../data/report-config';
 	import { getOpenDemographics } from '../navigation';
 	import CountyMap from './CountyMap.svelte';
 
 	const openDemographics = getOpenDemographics();
+	const copy = REPORT_CONFIG.pages.demogs;
 
 	let statHeight = $state(0);
 </script>
@@ -11,11 +13,8 @@
 	<CountyMap {statHeight} />
 
 	<div class="demogStat" bind:offsetHeight={statHeight}>
-		<h1>400+</h1>
-		<p>
-			People across the region participated in this conversation, both through our Open Poll and
-			live conversations.
-		</p>
+		<h1>{copy.stat}</h1>
+		<p>{copy.body}</p>
 		<button class="demogLink" type="button" onclick={openDemographics}
 			>See full demographics…</button
 		>

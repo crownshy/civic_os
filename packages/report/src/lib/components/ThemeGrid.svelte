@@ -7,11 +7,13 @@
 
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { REPORT_CONFIG } from '../data/report-config';
 	import { THEMES } from '../domain/bundled';
 	import { getNavigate } from '../navigation';
 	import ThemeBlock from './ThemeBlock.svelte';
 
 	const navigate = getNavigate();
+	const copy = REPORT_CONFIG.pages.themes;
 
 	onMount(() => {
 		if (rememberedScroll === null) return;
@@ -27,11 +29,8 @@
 
 <main class="themeGrid">
 	<div class="masthead">
-		<h1>What 400+ people had to say about AI in Central Oregon</h1>
-		<p>
-			Responses gathered in six listening sessions around the region and one open poll, sorted into
-			seven themes. Each square below is one poll statement or one comment from a live session.
-		</p>
+		<h1>{copy.heading}</h1>
+		<p>{copy.body}</p>
 	</div>
 
 	<div class="legend label">

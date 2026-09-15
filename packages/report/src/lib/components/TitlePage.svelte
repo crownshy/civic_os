@@ -1,7 +1,11 @@
 <script lang="ts">
 	import { trackEvent } from '@lukulent/svelte-umami';
 	import mountains from '../assets/sisters_title.webp';
+	import { REPORT_CONFIG } from '../data/report-config';
 	import { getNavigate } from '../navigation';
+	import RichCopy from './RichCopy.svelte';
+
+	const copy = REPORT_CONFIG.pages.title;
 
 	const navigate = getNavigate();
 
@@ -11,17 +15,23 @@
 	}
 </script>
 
+{#snippet highlight(word: string)}<span class="ai">{word}</span>{/snippet}
+{#snippet emphasis(phrase: string)}<span class="highlight">{phrase}</span>{/snippet}
+
 <main class="introPage titlePage">
 	<div class="head">
-		<h1>What did Central Oregonians have to say about <span class="ai">AI?</span></h1>
+		<h1><RichCopy text={copy.heading} {highlight} /></h1>
 	</div>
-	<img class="mountains" src={mountains} alt="" width="1800" height="849" fetchpriority="high" />
+	<img
+		class="mountains"
+		src={mountains}
+		alt=""
+		width={copy.image.width}
+		height={copy.image.height}
+		fetchpriority="high"
+	/>
 	<div class="intro">
-		<p>
-			Central Oregon Civic Action Project and its partners talked to
-			<span class="highlight">over 400 residents</span> from around the region to hear what they thought
-			should be done about AI.
-		</p>
+		<p><RichCopy text={copy.body} highlight={emphasis} /></p>
 		<button class="diveIn" type="button" onclick={diveIn}>Dive In</button>
 	</div>
 </main>

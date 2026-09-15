@@ -1,18 +1,17 @@
 <script lang="ts">
+	import { REPORT_CONFIG } from '../data/report-config';
 	import { CONSENSUS_RECORDS } from '../domain/bundled';
 	import { getOpenStatement } from '../navigation';
 	import StatementCard from './StatementCard.svelte';
 
 	const openStatement = getOpenStatement();
+	const copy = REPORT_CONFIG.pages.consensus;
 </script>
 
 <main class="introPage consensusPage">
 	<div class="masthead">
-		<h1>…but we found a lot of common ground.</h1>
-		<p>
-			Despite their differences, almost everyone agreed on the importance of transparency and
-			community involvement in AI-related decision-making.
-		</p>
+		<h1>{copy.heading}</h1>
+		<p>{copy.body}</p>
 	</div>
 	<div class="cards">
 		{#each CONSENSUS_RECORDS as record, index (record.id)}

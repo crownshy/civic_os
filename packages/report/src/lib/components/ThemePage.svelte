@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { REPORT_CONFIG } from '../data/report-config';
 	import { INSIGHTS, RECORD_BY_ID, THEME_DESCRIPTIONS, THEME_VIEWS } from '../domain/bundled';
 	import { claimPhrase, type ClaimPhrase } from '../domain/copy';
 	import type { ReportRecord, Theme } from '../domain/types';
@@ -50,8 +51,9 @@
 <section class="themePage" style="--c:{theme.color}">
 	<div class="l2nav">
 		<button onclick={() => navigate('themes')}>← Back</button>
-		<a class="nextT" href="https://cocap.us/ai" target="_blank" rel="noopener"
-			>Learn more at COCAP.US<svg viewBox="0 0 16 16" aria-hidden="true"
+		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- the report config's own external URL, nothing for resolve() to route -->
+		<a class="nextT" href={REPORT_CONFIG.learnMore.href} target="_blank" rel="noopener"
+			>{REPORT_CONFIG.learnMore.label}<svg viewBox="0 0 16 16" aria-hidden="true"
 				><path
 					d="M4.5 11.5 11.5 4.5M5.5 4.5H11.5V10.5"
 					stroke-linecap="round"

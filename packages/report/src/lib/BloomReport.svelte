@@ -3,6 +3,7 @@
 	import { trackEvent } from '@lukulent/svelte-umami';
 	import type { Snippet } from 'svelte';
 	import { trackStatementOpen } from './analytics';
+	import { REPORT_CONFIG } from './data/report-config';
 	import { GROUPS, THEME_BY_KEY } from './domain/bundled';
 	import { chromeFor } from './domain/page-chrome';
 	import { setOpenDemographics, setOpenGroup, setOpenShare, setOpenStatement } from './navigation';
@@ -48,7 +49,7 @@
 	 * is what shows in the desktop gutter) matches it too.
 	 */
 	$effect(() => {
-		const siteTitle = 'Public Report on AI & Central Oregon';
+		const { siteTitle } = REPORT_CONFIG;
 		document.title = theme ? `${theme.short} — ${siteTitle}` : siteTitle;
 
 		const root = document.documentElement.style;

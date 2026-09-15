@@ -128,3 +128,23 @@ export interface DemographicRow {
 	pct: number;
 	actual: number | undefined;
 }
+
+/** Copy whose highlighted phrases are data: plain runs, with emphasis marked. */
+export type RichText = readonly (string | { highlight: string })[];
+
+/** One report's own copy, links and map region: everything not in its data. */
+export interface ReportConfig {
+	siteTitle: string;
+	brand: string;
+	learnMore: { href: string; label: string };
+	/** the counties this report is about: tinted on the map, and what its home view fits */
+	map: { homeCounties: Record<string, string> };
+	pages: {
+		title: { heading: RichText; body: RichText; image: { width: number; height: number } };
+		demogs: { stat: string; body: string };
+		groups: { heading: string; body: string };
+		consensus: { heading: string; body: string };
+		cta: { heading: string; body: RichText; signupUrl: string; signupLabel: string };
+		themes: { heading: string; body: string };
+	};
+}

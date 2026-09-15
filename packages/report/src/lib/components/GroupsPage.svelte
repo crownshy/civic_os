@@ -1,9 +1,11 @@
 <script lang="ts">
+	import { REPORT_CONFIG } from '../data/report-config';
 	import { GROUPS, GROUP_INFO } from '../domain/bundled';
 	import { getOpenGroup } from '../navigation';
 	import { modals } from '../state.svelte';
 
 	const openGroup = getOpenGroup();
+	const copy = REPORT_CONFIG.pages.groups;
 
 	// group-info.json's per-key extras (participants/colour/tagline) merged onto
 	// bloom-data.json's own {key, label}, so the bubble and the modal it opens
@@ -13,11 +15,8 @@
 
 <main class="introPage groupsPage">
 	<div class="masthead">
-		<h1>Participants represented a range of perspectives on AI…</h1>
-		<p>
-			We found three opinion groups based on our analysis of people's voting patterns. Click each
-			group to learn about what distinguished them from the rest.
-		</p>
+		<h1>{copy.heading}</h1>
+		<p>{copy.body}</p>
 	</div>
 
 	<div class="groupBubbles">

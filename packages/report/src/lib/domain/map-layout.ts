@@ -7,16 +7,16 @@
  * place carries at a given zoom.
  */
 
-/** Deschutes, Crook and Jefferson: the region the report is about. */
-export const TRI_COUNTIES = [
-	{ fips: '41017', name: 'Deschutes' },
-	{ fips: '41013', name: 'Crook' },
-	{ fips: '41031', name: 'Jefferson' }
-] as const;
-
-/** the county GeoJSON is keyed by FIPS code, the city data by county name */
-export const TRI_COUNTY_FIPS: ReadonlySet<string> = new Set(TRI_COUNTIES.map((c) => c.fips));
-const TRI_COUNTY_NAMES: ReadonlySet<string> = new Set(TRI_COUNTIES.map((c) => c.name));
+/**
+ * A report's home counties, as the map needs them: the county GeoJSON is keyed
+ * by FIPS code, the city data by county name.
+ */
+export function homeCountySets(homeCounties: Record<string, string>): {
+	fips: ReadonlySet<string>;
+	names: ReadonlySet<string>;
+} {
+	return { fips: new Set(Object.keys(homeCounties)), names: new Set(Object.values(homeCounties)) };
+}
 
 /** the map is laid out for mobile below this width */
 export const MOBILE_MAX_WIDTH = 660;
@@ -151,15 +151,19 @@ export function homeFitExtent({
 
 /**
  * The places the home view fits: the points, not the county polygons, which
- * include a lot of empty land. Mobile fits only the tri-county places, so the
- * view starts zoomed in on them; the one outside still renders, just above the
- * frame, behind the stat block.
+ * include a lot of empty land. Mobile fits only the home-county places, so the
+ * view starts zoomed in on them; those outside still render, just above the
+ * frame, behind the stat block. A report whose cities all sit outside its home
+ * counties falls back to every place, which beats fitting nothing.
  */
 export function homeFitCities<T extends { county: string }>(
 	cities: readonly T[],
-	mobile: boolean
+	mobile: boolean,
+	homeCountyNames: ReadonlySet<string>
 ): T[] {
-	return mobile ? cities.filter((c) => TRI_COUNTY_NAMES.has(c.county)) : [...cities];
+	if (!mobile) return [...cities];
+	const home = cities.filter((c) => homeCountyNames.has(c.county));
+	return home.length > 0 ? home : [...cities];
 }
 
 /** City indices in label paint order: majors last, so their pills cover the minor places' mini labels. */
@@ -170,9 +174,9 @@ export function labelPaintOrder(cities: readonly { major?: boolean }[]): number[
 }
 
 /**
- * How far out the map may zoom: the scale at which the FULL 36-county
- * collection fits the viewport. That is what makes "zoom all the way out" land
- * on the real Oregon outline rather than an arbitrary crop.
+ * How far out the map may zoom: the scale at which the FULL county collection
+ * fits the viewport. That is what makes "zoom all the way out" land on the
+ * whole region's outline rather than an arbitrary crop.
  */
 export function minZoomScale(bounds: Extent, width: number, height: number): number {
 	const [[x0, y0], [x1, y1]] = bounds;
