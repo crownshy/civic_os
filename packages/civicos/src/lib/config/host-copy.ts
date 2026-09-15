@@ -4,6 +4,7 @@ import {
 	splitAtHeadings,
 	toBlockHtml
 } from '@civicos/shared/rich-text';
+import { readFaqs, type FaqEntry } from '@civicos/shared/data/faq';
 import { sanitizeHostHtml } from '@civicos/shared/sanitize';
 import { firstNonEmpty } from '$lib/utils/text';
 import type { RegionConfig } from './regions';
@@ -32,6 +33,7 @@ export interface HostCopy {
 export interface ConversationCopy {
 	description?: string | null;
 	thankYouMessage?: string | null;
+	faqs?: string | null;
 }
 
 export function resolveHostCopy(
@@ -53,6 +55,31 @@ export function resolveHostCopy(
 /** Safe, correctly-levelled HTML for an {@html} block. Sanitize first, then demote. */
 export function renderHostCopy(html: string): string {
 	return demoteHeadings(sanitizeHostHtml(html));
+}
+
+/**
+ * The FAQ accordion's entries, from the Conversation when a Host has authored
+ * one and from `regions.ts` until then.
+ *
+ * All or nothing rather than per entry: the two sources are separate lists, and
+ * interleaving a Host's questions with the seed placeholders would show a
+ * participant both. One saved question means the Host owns the list.
+ *
+ * `readFaqs` already returns block HTML for an answer, because that is how the
+ * field is stored. A `regions.ts` answer is a bare sentence or one paragraph of
+ * inline markup, so it goes through `toBlockHtml` to arrive in the same shape.
+ */
+export function resolveFaq(
+	conversation: ConversationCopy | null | undefined,
+	region: RegionConfig
+): FaqEntry[] {
+	const stored = readFaqs(conversation?.faqs);
+	if (stored.length > 0) return stored;
+
+	return region.faq.map((entry) => ({
+		question: entry.question,
+		answer: toBlockHtml(entry.answer)
+	}));
 }
 
 /**

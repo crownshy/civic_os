@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { REGIONS } from '@civicos/shared/data/regions';
-import { renderHostCopy, resolveHostCopy, toContextSections } from './host-copy';
+import { renderHostCopy, resolveFaq, resolveHostCopy, toContextSections } from './host-copy';
 import type { RegionConfig } from './regions';
 
 const oregon = REGIONS.oregon as RegionConfig;
@@ -48,6 +48,45 @@ describe('resolveHostCopy', () => {
 
 		expect(copy.context).toBe('<p>Only context.</p>');
 		expect(copy.whatsNext).toContain('<p>');
+	});
+});
+
+describe('resolveFaq', () => {
+	it('falls back to the region when there is no conversation', () => {
+		expect(resolveFaq(null, oregon).map((e) => e.question)).toEqual(
+			oregon.faq.map((e) => e.question)
+		);
+	});
+
+	it('gives a region answer paragraph structure, so it renders like a stored one', () => {
+		for (const entry of resolveFaq(null, oregon)) {
+			expect(entry.answer.startsWith('<p>')).toBe(true);
+		}
+	});
+
+	it('prefers the Conversation once a Host has saved questions', () => {
+		const faq = resolveFaq({ faqs: '<h2>Host asked this?</h2><p>And answered it.</p>' }, oregon);
+
+		expect(faq).toEqual([{ question: 'Host asked this?', answer: '<p>And answered it.</p>' }]);
+	});
+
+	it('replaces the whole list rather than interleaving the seed questions', () => {
+		const faq = resolveFaq({ faqs: '<h2>Only question?</h2><p>Only answer.</p>' }, oregon);
+
+		expect(faq).toHaveLength(1);
+	});
+
+	it('treats an unparseable stored value as absent and keeps the region list', () => {
+		// Copy with no heading has no question, so it is not an FAQ.
+		const faq = resolveFaq({ faqs: '<p>Prose with no questions in it.</p>' }, oregon);
+
+		expect(faq.map((e) => e.question)).toEqual(oregon.faq.map((e) => e.question));
+	});
+
+	it('treats blank and missing stored values as absent', () => {
+		for (const faqs of ['', '   ', null, undefined]) {
+			expect(resolveFaq({ faqs }, oregon)).toHaveLength(oregon.faq.length);
+		}
 	});
 });
 

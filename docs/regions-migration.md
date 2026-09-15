@@ -86,7 +86,7 @@ value is derived, or the copy becomes hardcoded UI text.
 | `endCtaJoinDescription` | string | ~100 | **Remove** | Standardize across Campaigns |
 | `endCtaShareDescription` | string | ~100 | **Remove** | Standardize across Campaigns |
 | `polis_workflow_step_id` | UUID | 36 | **Move?** | Resolved from the workflow, see ADR 0004 |
-| `faq` | shared constant | | Undecided | `Conversation.faqs` exists with no editor. #352 is still deciding how FAQs are used |
+| `faq` | shared constant | | **Keep** as `Conversation.faqs` | Editable on Setup (#429). Stored as one rich-text field, `h2` per question, parsed by `@civicos/shared/data/faq` |
 | `shareUrl` | url | ~50 | **Keep**, but derived | Should be base URL plus slug rather than a stored string |
 
 ### Not covered
@@ -104,9 +104,9 @@ the copy fields above and none of them is landing-page prose:
 ## What has to happen before a field can go
 
 1. A backend field to hold it, or a rule that derives it.
-2. An editor in admin, otherwise the field ships dead. `thankYouMessage`,
-   `callToAction` and `faqs` are all in this state today: they exist on the
-   Conversation model and nothing in admin can write them.
+2. An editor in admin, otherwise the field ships dead. `callToAction` is still
+   in this state: it exists on the Conversation model and nothing in admin can
+   write it. `thankYouMessage` got its editor in #398, `faqs` in #429.
 3. The live Utah and Oregon values saved into their Conversation records. Until
    that is done by hand, removing the `regions.ts` entry removes the copy from
    a live site.
@@ -114,7 +114,7 @@ the copy fields above and none of them is landing-page prose:
 
 ## Open questions
 
-- `zipPrefixes` and `faq` have no disposition yet.
+- `zipPrefixes` has no disposition yet.
 - `demonym` is the awkward one. It is interpolated into copy that is itself
   being removed, so it may disappear on its own once `heroBlurb` and
   `contextParagraphs` go. Worth checking rather than assuming.

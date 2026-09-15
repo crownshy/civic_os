@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { Accordion as AccordionPrimitive } from 'bits-ui';
 	import { sanitizeHostHtml } from '@civicos/shared/sanitize';
-	import type { FaqEntry } from '$lib/config/regions';
+	// The shared FAQ type, not the `regions.ts` one: entries now come from
+	// `resolveFaq`, which reads the Conversation and falls back to the region.
+	import type { FaqEntry } from '@civicos/shared/data/faq';
 
 	interface Props {
 		items: FaqEntry[];
@@ -40,7 +42,10 @@
 			<AccordionPrimitive.Content
 				class="overflow-hidden font-sans text-base leading-6 font-medium text-foreground/80 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down md:text-lg md:leading-7"
 			>
-				<div class="pb-4 [&_a]:text-destructive [&_a]:underline">
+				<!-- An answer is block HTML now that a Host can write one, so paragraphs
+				     need separating. `last-child:mb-0` is what keeps the single-paragraph
+				     case (every answer today) rendering exactly as it did. -->
+				<div class="pb-4 [&_a]:text-destructive [&_a]:underline [&_p]:mb-4 [&_p:last-child]:mb-0">
 					{@html sanitizeHostHtml(item.answer)}
 				</div>
 			</AccordionPrimitive.Content>

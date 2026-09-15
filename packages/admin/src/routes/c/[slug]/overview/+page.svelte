@@ -14,6 +14,7 @@
 	import CoHostsCard from './CoHostsCard.svelte';
 	import AddCoHostsDialog from '$lib/components/setup/AddCoHostsDialog.svelte';
 	import DemographicsCard from '$lib/components/setup/DemographicsCard.svelte';
+	import FaqCard from '$lib/components/setup/FaqCard.svelte';
 	import ParticipantAsksCard from '$lib/components/setup/ParticipantAsksCard.svelte';
 	import {
 		readCustomDemographics,
@@ -21,6 +22,7 @@
 		type CustomDemographicCategory,
 		type DemographicKey
 	} from '@civicos/shared/data/demographics';
+	import { readFaqs, toFaqsHtml, type FaqEntry } from '@civicos/shared/data/faq';
 	import { readAskToggles, type AskKey } from '@civicos/shared/data/participant-asks';
 	import { placeFromName, rescopedSlug, toPlaceSlug } from '$lib/config/place';
 	import { extractSubdomain } from '@civicos/shared/data/regions';
@@ -325,6 +327,49 @@
 
 	const removeCustomDemographic = (key: string) =>
 		patchMetadata({ customDemographics: customDemographics.filter((c) => c.key !== key) });
+
+	// --- FAQ -------------------------------------------------------------------
+	// A fifth destination. `Conversation.faqs` is a TextContentId reference like
+	// title and description, not metadata and not a text column, so the list is
+	// encoded as h2-per-question markup in that one field. The format lives in
+	// `@civicos/shared/data/faq` because civicos parses what this writes.
+	const faqs = $derived(readFaqs(conversation?.faqs));
+
+	/**
+	 * Write the whole list. Two calls the first time, one after that.
+	 *
+	 * `faqs` is nullable and an unset one has no TextContent at all, so there is
+	 * nothing to translate against until one exists: `translations.faqs` comes
+	 * back null and `data.textContent.faqs` with it. Hence create-then-link on
+	 * the first save. `UpdateConversation` takes the TextContent *id* here, not
+	 * prose, and 422s on a plain string the same way title and description do
+	 * (#391), which is why the link step sends `created.id`.
+	 */
+	async function saveFaqs(next: FaqEntry[]) {
+		const content = toFaqsHtml(next);
+		const target = data.textContent.faqs;
+
+		if (target) {
+			await data.api.CreateOrUpdateTextTranslation(
+				{ content },
+				{ params: { text_content_id: target.id, locale: target.locale } }
+			);
+		} else {
+			const created = await data.api.CreateTextContent({
+				content,
+				// The stored value is markup regardless of answers being plain text,
+				// and `rich` is what `description` uses for the same reason.
+				format: 'rich',
+				primary_locale: conversation?.primaryLocale ?? 'en'
+			});
+			await data.api.UpdateConversation(
+				{ faqs: created.id },
+				{ params: { conversation_id: campaign.id } }
+			);
+		}
+
+		await invalidate(`campaign:${page.params.slug}`);
+	}
 
 	// Same interim metadata storage as demographics, same whole-key write.
 	const asks = $derived(readAskToggles(conversation?.metadata));
@@ -654,6 +699,17 @@
 
 		<!-- ===== Context for Participants ===== -->
 		<ContextCard {description} {descriptionField} />
+
+		<!-- ===== FAQ =====
+		     Its own card rather than a section inside ContextCard: it writes to a
+		     different Conversation field on its own schedule, while the fields in
+		     that card share one debounced superform. -->
+		<FaqCard
+			title="FAQ"
+			subtitle="Questions and answers shown on the Campaign homepage as an expandable list. Participants see them in the order set here."
+			entries={faqs}
+			onSave={saveFaqs}
+		/>
 
 		<!-- Danger zone: not in the Figma refresh and currently non-functional.
 		     Kept to avoid dropping an affordance; open question whether to wire

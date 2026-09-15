@@ -15,8 +15,24 @@ export function isHtml(value: string): boolean {
 	return HTML_TAG.test(value);
 }
 
-function escapeHtml(value: string): string {
+export function escapeHtml(value: string): string {
 	return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+/**
+ * Paragraph HTML for plain text: a blank line opens a new paragraph, a single
+ * newline is a `<br>` within one.
+ *
+ * Escaping is unconditional, which is what separates this from
+ * `toRichTextHtml`: that function treats "contains a tag" as "is already HTML"
+ * and passes the value through. Callers holding text that is known to be plain
+ * (a textarea, not an editor) want the escape, so they come here.
+ */
+export function plainTextToParagraphs(text: string): string {
+	return text
+		.split(/\n{2,}/)
+		.map((block) => `<p>${escapeHtml(block).replace(/\n/g, '<br>')}</p>`)
+		.join('');
 }
 
 /** Editor- and render-ready HTML for a value that may still be plain text. */
@@ -25,10 +41,7 @@ export function toRichTextHtml(value: string): string {
 	if (text === '') return '';
 	if (isHtml(text)) return text;
 
-	return text
-		.split(/\n{2,}/)
-		.map((block) => `<p>${escapeHtml(block).replace(/\n/g, '<br>')}</p>`)
-		.join('');
+	return plainTextToParagraphs(text);
 }
 
 /**
@@ -99,6 +112,29 @@ function decodeEntities(text: string): string {
 function toPlainText(html: string): string {
 	return decodeEntities(html.replace(/<[^>]*>/g, ''))
 		.replace(/\s+/g, ' ')
+		.trim();
+}
+
+const BLOCK_END = /<\/(p|div|li|h[1-6]|blockquote|tr)\s*>/gi;
+const LINE_BREAK = /<br\s*\/?>/gi;
+
+/**
+ * Block HTML back down to plain text, paragraph breaks intact.
+ *
+ * `toPlainText` is the wrong tool for a body of copy: it flattens all
+ * whitespace to single spaces, so two paragraphs come back as one line. This
+ * is the inverse of `plainTextToParagraphs`, and round-trips with it.
+ */
+export function blockHtmlToPlainText(html: string): string {
+	return decodeEntities(
+		html
+			.replace(LINE_BREAK, '\n')
+			.replace(BLOCK_END, '\n\n')
+			.replace(/<[^>]*>/g, '')
+	)
+		.replace(/[ \t]+/g, ' ')
+		.replace(/ *\n */g, '\n')
+		.replace(/\n{3,}/g, '\n\n')
 		.trim();
 }
 

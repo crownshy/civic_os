@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 import { createApiClient } from '@crownshy/api-client/client';
 import type { LayoutServerLoad } from './$types';
-import { resolveHostCopy, type ConversationCopy } from '$lib/config/host-copy';
+import { resolveFaq, resolveHostCopy, type ConversationCopy } from '$lib/config/host-copy';
 import {
 	campaignCandidates,
 	resolveCampaign,
@@ -102,6 +102,9 @@ export const load: LayoutServerLoad = async ({ params, locals, url, depends }) =
 	return {
 		campaign,
 		hostCopy: resolveHostCopy(conversation, region),
+		// The Host's own questions when they have written any, the `regions.ts`
+		// placeholders until then.
+		faq: resolveFaq(conversation, region),
 		// Which demographics and which asks the Host left switched on. Falling
 		// back to all-on when the Conversation is unreachable keeps a legacy
 		// region asking what it always asked.

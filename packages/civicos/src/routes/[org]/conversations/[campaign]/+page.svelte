@@ -23,13 +23,18 @@
 	const region: RegionConfig = page.data.region;
 	const campaign: Campaign = page.data.campaign;
 	const hostCopy = page.data.hostCopy;
+	// Resolved in the layout load, so a Host's saved questions replace the
+	// `regions.ts` placeholders without this page knowing which it got.
+	const faq = page.data.faq;
 	// The Host's Context copy, cut at its headings so each one gets its own
 	// section and its own nav pill. A description with no headings comes back as
 	// the single Context section this page rendered before.
 	const contextSections = toContextSections(hostCopy.context);
-	// `context` in NAV_SECTIONS is a placeholder for those pills.
+	// `context` in NAV_SECTIONS is a placeholder for those pills; FAQ drops out
+	// when there are no questions, matching the section below.
 	const navSections = NAV_SECTIONS.flatMap((section) => {
 		if (section.id === 'context') return contextSections.map(({ id, label }) => ({ id, label }));
+		if (section.id === 'faq' && faq.length === 0) return [];
 		return [section];
 	});
 	// Who the server says this is, resolved from the cookie in the root layout.
@@ -356,12 +361,12 @@
 		</div>
 	</section>
 
-	<!-- FAQ — hide when empty -->
-	{#if region.faq.length > 0}
+	<!-- FAQ, hidden when empty -->
+	{#if faq.length > 0}
 		<section id="faq" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
 			<h2 class="font-display text-2xl font-medium md:text-3xl">Frequently Asked Questions</h2>
 			<div class="mt-6">
-				<Accordion items={region.faq} />
+				<Accordion items={faq} />
 			</div>
 		</section>
 	{/if}

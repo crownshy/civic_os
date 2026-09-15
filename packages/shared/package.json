@@ -10,6 +10,7 @@
 		"./sanitize": "./src/sanitize.ts",
 		"./rich-text": "./src/rich-text.ts",
 		"./data/demographics": "./src/data/demographics.ts",
+		"./data/faq": "./src/data/faq.ts",
 		"./data/participant-asks": "./src/data/participant-asks.ts",
 		"./data/place": "./src/data/place.ts",
 		"./data/regions": "./src/data/regions.ts",
