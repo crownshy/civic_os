@@ -10,18 +10,6 @@ import {
 } from './session-storage';
 import { httpStatusOf } from '$lib/utils/http';
 
-export interface UserProfile {
-	id: string;
-	userId: string;
-	consented: boolean;
-	ethnicity?: string | null;
-	age?: number | null;
-	gender?: string | null;
-	zipcode?: string | null;
-	createdAt: string;
-	updatedAt: string;
-}
-
 export interface User {
 	id: string;
 	authType: string;
@@ -42,7 +30,6 @@ export interface User {
  */
 class Session {
 	user = $state<User | null>(null);
-	profile = $state<UserProfile | null>(null);
 	emailProvided = $state(false);
 	zipCode = $state('');
 	pid = $state<number | undefined>(undefined);
@@ -84,7 +71,7 @@ class Session {
 	constructor() {
 		const account = loadAccount();
 		if (account.userId) {
-			this.user = { id: account.userId, authType: 'anonymous', emailVerified: false };
+			this.user = { id: account.userId, authType: 'guest', emailVerified: false };
 		}
 		this.emailProvided = account.emailProvided;
 		this.zipCode = account.zipCode;
@@ -185,7 +172,6 @@ class Session {
 	 */
 	private forget() {
 		this.user = null;
-		this.profile = null;
 		this.zipCode = '';
 		this.emailProvided = false;
 		this.demographicsCompleted = false;
@@ -274,8 +260,8 @@ class Session {
 		if (campaignConversationId) this.useCampaign(campaignConversationId);
 
 		try {
-			// 1. Create anonymous user (sets auth-token cookie)
-			const user = await this.api.SignupAnnonUser(undefined, {});
+			// 1. Create guest user (sets auth-token cookie)
+			const user = await this.api.SignupGuestUser(undefined, {});
 			this.user = user;
 			this.persistAccount();
 
@@ -283,8 +269,8 @@ class Session {
 			// participation number comes from.
 			await this.registerOnWorkflow();
 
-			// 3. Save zipcode to profile. It has to actually land: the server side
-			// gate on `/contribute` reads the stored profile, so a zip that only
+			// 3. Save the zip. It has to actually land: the server side gate on
+			// `/contribute` reads it back out of demographics, so a zip that only
 			// ever existed in this tab would bounce them straight back here.
 			if (zipCode && !(await this.saveProfile({ zipcode: zipCode }))) {
 				throw new Error('Could not save your zip code');
@@ -401,8 +387,7 @@ class Session {
 			politicalParty: data.politicalParty ?? null
 		};
 		try {
-			const res = await this.api.UpsertUserProfile(body);
-			this.profile = res;
+			await this.api.UpsertUserProfile(body);
 			return true;
 		} catch (e) {
 			console.error('[Session] Failed to save profile:', e);
