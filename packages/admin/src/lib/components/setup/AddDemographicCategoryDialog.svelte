@@ -5,7 +5,7 @@
 	import SetupField from './SetupField.svelte';
 	import {
 		isKeyTaken,
-		toDemographicKey,
+		toDemographicSlug,
 		type CustomDemographicCategory
 	} from '@civicos/shared/data/demographics';
 
@@ -26,15 +26,15 @@
 	let submitting = $state(false);
 	let error = $state<string | null>(null);
 
-	const key = $derived(toDemographicKey(name));
+	const slug = $derived(toDemographicSlug(name));
 
 	// Withheld until they have started, so an untouched dialog is not already scolding.
 	const started = $derived(!!name.trim() || options.length > 0);
 
 	const problem = $derived.by(() => {
 		if (!name.trim()) return 'Give the category a name.';
-		if (!key) return 'The name needs at least one letter or number.';
-		if (isKeyTaken(key, existing)) return 'A category with that name already exists.';
+		if (!slug) return 'The name needs at least one letter or number.';
+		if (isKeyTaken(slug, existing)) return 'A category with that name already exists.';
 		if (options.length < 2) return 'Add at least two options.';
 		if (new Set(options).size !== options.length) return 'Options must be unique.';
 		return null;
@@ -118,7 +118,7 @@
 		submitting = true;
 		error = null;
 		try {
-			await onSave({ key, name: name.trim(), options, enabled: true });
+			await onSave({ slug, displayName: name.trim(), options, enabled: true });
 			open = false;
 		} catch (e) {
 			console.error('Adding a demographic category failed', e);

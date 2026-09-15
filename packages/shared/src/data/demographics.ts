@@ -1,23 +1,52 @@
 /**
  * Demographic categories a Host can switch on or off.
  *
- * This is the definition both apps read: `admin` renders the switches on Setup
- * and writes them to `metadata`, `civicos` builds its About You screen from the
- * categories the switches leave on. It lives here so the app that configures a
- * category and the app that asks it cannot disagree about its options, the same
- * contract `place.ts` draws for a Place (ADR 0003).
+ * Admin reads question definitions and enabled relationships from comhairle.
+ * The legacy constants below remain for civicos until its participant response
+ * flow moves from profile columns to first-class demographics responses.
  *
  * The four keys are fixed because both ends of the pipe are fixed: civicos's
  * `AboutYouScreen` collects exactly these fields, and comhairle's
- * `DemographicReport` buckets them under the same names. Custom categories need
- * backend tables (Demographic Question / Question Option) and are #364.
+ * `DemographicReport` buckets them under the same names. Custom categories use
+ * comhairle's demographics question model.
  *
- * INTERIM STORAGE. The on/off state lives in `conversation.metadata.demographics`
- * because there is nowhere else to put it today. When the backend promotes
- * demographics to a real entity model, this is read once and dropped. See #363.
+ * `conversation.metadata.demographics` is now only a civicos compatibility
+ * fallback. Admin uses the ConversationDemographics relationship.
  */
 
 export const DEMOGRAPHIC_KEYS = ['age', 'ethnicity', 'gender', 'politicalParty'] as const;
+
+/** Question definitions seeded by comhairle's first-class demographics migrations. */
+export const DEFAULT_DEMOGRAPHIC_QUESTIONS = [
+	{
+		slug: 'age',
+		displayName: 'Age',
+		responseType: 'number' as const,
+		bucketConfig: {
+			type: 'numeric' as const,
+			buckets: [
+				{ label: 'Under 18', min: null, max: 17 },
+				{ label: '18-24', min: 18, max: 24 },
+				{ label: '25-34', min: 25, max: 34 },
+				{ label: '35-44', min: 35, max: 44 },
+				{ label: '45-54', min: 45, max: 54 },
+				{ label: '55-64', min: 55, max: 64 },
+				{ label: '65+', min: 65, max: null }
+			]
+		}
+	},
+	{ slug: 'ethnicity', displayName: 'Ethnicity', responseType: 'string' as const },
+	{ slug: 'gender', displayName: 'Gender', responseType: 'string' as const },
+	{
+		slug: 'political_party',
+		displayName: 'Political Party',
+		responseType: 'string' as const
+	}
+];
+
+export const DEFAULT_DEMOGRAPHIC_SLUGS = DEFAULT_DEMOGRAPHIC_QUESTIONS.map(
+	(question) => question.slug
+);
 
 export type DemographicKey = (typeof DEMOGRAPHIC_KEYS)[number];
 
@@ -110,64 +139,73 @@ export function readDemographicToggles(metadata: unknown): DemographicToggles {
 }
 
 /**
- * A Host-authored category (#364).
- *
- * Kept in a separate `customDemographics` array rather than folded into the
- * `demographics` booleans, because the two are different kinds of thing today:
- * the four defaults map onto comhairle's `DemographicReport` buckets and have
- * fixed options, while these map onto nothing at all and carry their own.
- *
- * ⚠️ Nothing asks these of a participant yet. civicos builds its About You
- * screen from the four fixed categories above and the profile upsert has a
- * column for each; a custom category maps onto neither, so it is stored and
- * shown back to the Host but never reaches the poll. #364 carries it.
+ * A Host-authored category backed by a comhairle demographics question.
+ * `enabled` is derived from the ConversationDemographics relationship rather
+ * than stored on the question itself.
  */
 export interface CustomDemographicCategory {
-	/** Slug derived from the name at creation; stable across renames. */
-	key: string;
-	name: string;
+	slug: string;
+	displayName: string;
 	options: string[];
 	enabled: boolean;
 }
 
-/** Slugify a category name into a metadata key. */
-export function toDemographicKey(name: string): string {
+/** The generated API fields needed to render a demographics question. */
+export interface DemographicQuestionData {
+	slug: string;
+	displayName: string;
+	bucketConfig?:
+		| { type: 'string'; options: { label: string; value: string }[] }
+		| { type: 'numeric'; buckets: { label: string; min?: number | null; max?: number | null }[] }
+		| null;
+}
+
+/** The generated API fields that enable a question for a Conversation. */
+export interface ConversationDemographicData {
+	conversationId: string;
+	questionSlug: string;
+}
+
+/** Slugify a category name for the backend question model. */
+export function toDemographicSlug(name: string): string {
 	return name
 		.toLowerCase()
 		.replace(/[^a-z0-9]+/g, '-')
 		.replace(/^-+|-+$/g, '');
 }
 
-function isCustomCategory(v: unknown): v is CustomDemographicCategory {
-	if (!v || typeof v !== 'object') return false;
-	const c = v as Record<string, unknown>;
-	return (
-		typeof c.key === 'string' &&
-		typeof c.name === 'string' &&
-		Array.isArray(c.options) &&
-		c.options.every((o) => typeof o === 'string')
+/** Convert backend questions and relationship rows into Setup card categories. */
+export function demographicsFromBackend(
+	questions: DemographicQuestionData[],
+	relationships: ConversationDemographicData[]
+): CustomDemographicCategory[] {
+	const enabledSlugs = new Set(relationships.map((relationship) => relationship.questionSlug));
+
+	return questions.map((question) => ({
+			slug: question.slug,
+			displayName: question.displayName,
+			options:
+				question.bucketConfig?.type === 'string'
+					? question.bucketConfig.options.map((option) => option.label)
+					: (question.bucketConfig?.buckets.map((bucket) => bucket.label) ?? []),
+			enabled: enabledSlugs.has(question.slug)
+		}));
+}
+
+/** Return only Host-authored questions, excluding comhairle's seeded defaults. */
+export function customDemographicsFromBackend(
+	questions: DemographicQuestionData[],
+	relationships: ConversationDemographicData[]
+): CustomDemographicCategory[] {
+	return demographicsFromBackend(questions, relationships).filter(
+		(question) => !(DEFAULT_DEMOGRAPHIC_SLUGS as readonly string[]).includes(question.slug)
 	);
 }
 
-/** Read Host-authored categories out of the untyped `metadata` jsonb. */
-export function readCustomDemographics(metadata: unknown): CustomDemographicCategory[] {
-	const bag =
-		metadata && typeof metadata === 'object'
-			? (metadata as Record<string, unknown>).customDemographics
-			: null;
-	if (!Array.isArray(bag)) return [];
-
-	return bag.filter(isCustomCategory).map((c) => ({
-		key: c.key,
-		name: c.name,
-		options: c.options,
-		enabled: typeof c.enabled === 'boolean' ? c.enabled : true
-	}));
-}
-
 /** Reserved keys a new category cannot collide with. */
-export function isKeyTaken(key: string, existing: CustomDemographicCategory[]): boolean {
+export function isKeyTaken(slug: string, existing: CustomDemographicCategory[]): boolean {
 	return (
-		(DEMOGRAPHIC_KEYS as readonly string[]).includes(key) || existing.some((c) => c.key === key)
+		(DEFAULT_DEMOGRAPHIC_SLUGS as readonly string[]).includes(slug) ||
+		existing.some((category) => category.slug === slug)
 	);
 }

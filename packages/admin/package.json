@@ -18,7 +18,7 @@
 	},
 	"dependencies": {
 		"@civicos/shared": "workspace:*",
-		"@crownshy/api-client": "^0.0.44-rc.1",
+		"@crownshy/api-client": "^0.0.44-rc.2",
 		"@lucide/svelte": "^1.16.0",
 		"@tiptap/core": "^3.30.5",
 		"@tiptap/pm": "^3.30.5",

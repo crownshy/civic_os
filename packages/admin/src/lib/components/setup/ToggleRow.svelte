@@ -31,7 +31,7 @@
 			<div class="mt-1 text-body text-muted-foreground">{note}</div>
 		{/if}
 	</div>
-	<div class="flex items-center justify-end gap-3">
+	<div class="flex items-center justify-end gap-3 {onRemove ? '' : 'pl-9'}">
 		{#if onRemove}
 			<button
 				type="button"

@@ -2,38 +2,30 @@
 	import SetupCard from './SetupCard.svelte';
 	import ToggleRow from './ToggleRow.svelte';
 	import AddDemographicCategoryDialog from './AddDemographicCategoryDialog.svelte';
-	import {
-		DEMOGRAPHIC_CATEGORIES,
-		type CustomDemographicCategory,
-		type DemographicKey,
-		type DemographicToggles
-	} from '@civicos/shared/data/demographics';
+	import type { CustomDemographicCategory } from '@civicos/shared/data/demographics';
 
 	interface Props {
 		title: string;
 		subtitle: string;
-		/** Current on/off state, read from conversation.metadata.demographics. */
-		toggles: DemographicToggles;
-		/**
-		 * Persist a single change. Omit to render read-only, which is what the
-		 * Campaign Setup card does until #363 wires its own write path.
-		 */
-		onToggle?: (key: DemographicKey, next: boolean) => Promise<void>;
-		/** Host-authored categories (#364), stored in metadata.customDemographics. */
+		/** Backend-seeded categories and their Conversation relationship state. */
+		defaults: CustomDemographicCategory[];
+		/** Persist a default category relationship change. */
+		onToggle?: (slug: string, next: boolean) => Promise<void>;
+		/** Host-authored categories from the backend demographics question model. */
 		custom?: CustomDemographicCategory[];
 		/** Toggle a custom category on or off. */
-		onToggleCustom?: (key: string, next: boolean) => Promise<void>;
+		onToggleCustom?: (slug: string, next: boolean) => Promise<void>;
 		/** Create a category. Only Campaign Setup passes this; the Open Poll card
 		    points the Host here instead (#363). */
 		onAddCustom?: (category: CustomDemographicCategory) => Promise<void>;
 		/** Remove a category the Host added. */
-		onRemoveCustom?: (key: string) => Promise<void>;
+		onRemoveCustom?: (slug: string) => Promise<void>;
 	}
 
 	let {
 		title,
 		subtitle,
-		toggles,
+		defaults,
 		onToggle,
 		custom = [],
 		onToggleCustom,
@@ -79,27 +71,27 @@
 		</div>
 
 		<div class="divide-y divide-border">
-			{#each DEMOGRAPHIC_CATEGORIES as category (category.key)}
-				{@const on = toggles[category.key]}
+			{#each defaults as category (category.slug)}
+				{@const on = category.enabled}
 				<ToggleRow
-					name={category.name}
+					name={category.displayName}
 					detail={category.options.join(', ')}
 					{on}
-					disabled={!editable || pending[category.key]}
-					onToggle={() => run(category.key, () => onToggle!(category.key, !on))}
+					disabled={!editable || pending[category.slug]}
+					onToggle={() => run(category.slug, () => onToggle!(category.slug, !on))}
 				/>
 			{/each}
 
-			{#each custom as category (category.key)}
+			{#each custom as category (category.slug)}
 				{@const on = category.enabled}
 				<ToggleRow
-					name={category.name}
+					name={category.displayName}
 					detail={category.options.join(', ')}
 					{on}
-					disabled={!onToggleCustom || pending[category.key]}
-					onToggle={() => run(category.key, () => onToggleCustom!(category.key, !on))}
+					disabled={!onToggleCustom || pending[category.slug]}
+					onToggle={() => run(category.slug, () => onToggleCustom!(category.slug, !on))}
 					onRemove={onRemoveCustom
-						? () => run(category.key, () => onRemoveCustom(category.key))
+						? () => run(category.slug, () => onRemoveCustom(category.slug))
 						: undefined}
 				/>
 			{/each}

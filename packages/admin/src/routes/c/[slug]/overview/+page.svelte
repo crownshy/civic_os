@@ -15,12 +15,7 @@
 	import AddCoHostsDialog from '$lib/components/setup/AddCoHostsDialog.svelte';
 	import DemographicsCard from '$lib/components/setup/DemographicsCard.svelte';
 	import ParticipantAsksCard from '$lib/components/setup/ParticipantAsksCard.svelte';
-	import {
-		readCustomDemographics,
-		readDemographicToggles,
-		type CustomDemographicCategory,
-		type DemographicKey
-	} from '@civicos/shared/data/demographics';
+	import type { CustomDemographicCategory } from '@civicos/shared/data/demographics';
 	import { readAskToggles, type AskKey } from '@civicos/shared/data/participant-asks';
 	import { placeFromName, rescopedSlug, toPlaceSlug } from '$lib/config/place';
 	import { extractSubdomain } from '@civicos/shared/data/regions';
@@ -291,8 +286,8 @@
 				? `Couldn't save ${failedFields.map((k) => FIELD_LABELS[k]).join(' and ')}`
 				: statusLabel[saveStatus]
 	);
-	const demographics = $derived(readDemographicToggles(conversation?.metadata));
-	const customDemographics = $derived(readCustomDemographics(conversation?.metadata));
+	const defaultDemographics = $derived(data.defaultDemographics);
+	const customDemographics = $derived(data.customDemographics);
 
 	/**
 	 * INTERIM STORAGE (#363/#364). Demographics config has no backend table yet,
@@ -310,21 +305,46 @@
 		await invalidate(`campaign:${page.params.slug}`);
 	}
 
-	const setDemographic = (key: DemographicKey, next: boolean) =>
-		patchMetadata({ demographics: { ...demographics, [key]: next } });
-
-	const addCustomDemographic = (category: CustomDemographicCategory) =>
-		patchMetadata({ customDemographics: [...customDemographics, category] });
-
-	const toggleCustomDemographic = (key: string, next: boolean) =>
-		patchMetadata({
-			customDemographics: customDemographics.map((c) =>
-				c.key === key ? { ...c, enabled: next } : c
-			)
+	async function addCustomDemographic(category: CustomDemographicCategory) {
+		await data.api.CreateDemographicsQuestion({
+			slug: category.slug,
+			displayName: category.displayName,
+			responseType: 'string',
+			bucketConfig: {
+				type: 'string',
+				options: category.options.map((option) => ({ label: option, value: option }))
+			}
 		});
+		await data.api.CreateConversationDemographics({
+			conversationId: campaign.id,
+			questionSlug: category.slug
+		});
+		await invalidate(`campaign:${page.params.slug}`);
+	}
 
-	const removeCustomDemographic = (key: string) =>
-		patchMetadata({ customDemographics: customDemographics.filter((c) => c.key !== key) });
+	async function toggleCustomDemographic(slug: string, next: boolean) {
+		if (next) {
+			await data.api.CreateConversationDemographics({
+				conversationId: campaign.id,
+				questionSlug: slug
+			});
+		} else {
+			await data.api.DeleteConversationDemographicsByQuestion(undefined, {
+				params: { conversation_id: campaign.id, question_slug: slug }
+			});
+		}
+		await invalidate(`campaign:${page.params.slug}`);
+	}
+
+	async function removeCustomDemographic(slug: string) {
+		if (customDemographics.find((category) => category.slug === slug)?.enabled) {
+			await data.api.DeleteConversationDemographicsByQuestion(undefined, {
+				params: { conversation_id: campaign.id, question_slug: slug }
+			});
+		}
+		await data.api.DeleteDemographicsQuestion(undefined, { params: { question_slug: slug } });
+		await invalidate(`campaign:${page.params.slug}`);
+	}
 
 	// Same interim metadata storage as demographics, same whole-key write.
 	const asks = $derived(readAskToggles(conversation?.metadata));
@@ -624,15 +644,12 @@
 			{/snippet}
 		</AddCoHostsDialog>
 
-		<!-- ===== Demographics =====
-		     Reads the same conversation.metadata.demographics the Open Poll Setup
-		     card writes, so the two views cannot disagree. Read-only here: the
-		     Campaign-side write path plus Add New are #363/#364. -->
+		<!-- ===== Demographics ===== -->
 		<DemographicsCard
 			title="Demographics"
 			subtitle="Participants will be shown these questions at the end of the Open Poll. You can turn on/off any questions, or add your own."
-			toggles={demographics}
-			onToggle={setDemographic}
+			defaults={defaultDemographics}
+			onToggle={toggleCustomDemographic}
 			custom={customDemographics}
 			onToggleCustom={toggleCustomDemographic}
 			onAddCustom={addCustomDemographic}

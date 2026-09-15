@@ -48,7 +48,10 @@ function targetsToGoals(targets: RecruitmentTargetDto[]): RegionGoals {
 		if ((METRIC_NAMES as string[]).includes(t.metric) && t.metric !== 'totalParticipants') {
 			const key = t.metric as Exclude<GoalMetric, 'totalParticipants'>;
 			goals[key][t.bucket] = t.targetCount;
+			continue;
 		}
+		goals.custom[t.metric] ??= {};
+		goals.custom[t.metric][t.bucket] = t.targetCount;
 	}
 	return goals;
 }
@@ -57,7 +60,8 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 	depends('open-poll:demographics');
 	depends('open-poll:goals');
 
-	const { campaign } = await parent();
+	const { campaign, customDemographics } = await parent();
+	const enabledCustomDemographics = customDemographics.filter((question) => question.enabled);
 	const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
 	const conversationId = campaign.id;
 
@@ -74,6 +78,11 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 	// USPS state codes the choropleth needs, derived from where participants
 	// actually live (scoped like the county rollup). Empty ⇒ no map to draw.
 	let mapStates: string[] = [];
+	let customDemographicResults: {
+		slug: string;
+		displayName: string;
+		rows: { label: string; count: number, goal?: number }[];
+	}[] = [];
 
 	try {
 		const workflows = await api.ListConversationWorkflows({
@@ -89,20 +98,57 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 			// Goals are optional furniture on this page, so a failure there leaves
 			// the empty set rather than blanking the demographics the page exists
 			// to show.
-			const [report, targets] = await Promise.all([
+			const [report, targets, customResponses] = await Promise.all([
 				api.GetConversationWorkflowParticipationReport({ params }),
 				api.ListRecruitmentTargets({ params }).catch((e) => {
 					console.warn('ListRecruitmentTargets failed', e);
 					return null;
-				})
+				}),
+				Promise.all(
+					enabledCustomDemographics.map(async (question) => ({
+						question,
+						responses: await api
+							.GetDemographicsResponses({
+								queries: {
+									conversation_id: conversationId,
+									question_slug: question.slug,
+									limit: 1000
+								}
+							})
+							.then((result) => result.records)
+							.catch((e) => {
+								console.warn(`GetDemographicsResponses failed for ${question.slug}`, e);
+								return [];
+							})
+					}))
+				)
 			]);
 
 			demographics = report;
 			const zips = zipCounts(report);
 			countyCounts = rollUpByCounty(zips, campaign.zipPrefixes);
 			mapStates = statesForZipCounts(zips, campaign.zipPrefixes);
-
 			if (targets) goals = targetsToGoals(targets);
+
+			customDemographicResults = customResponses.map(({ question, responses }) => {
+				const counts = new Map<string, number>();
+				for (const response of responses) {
+					const label = String(response.value);
+					counts.set(label, (counts.get(label) ?? 0) + 1);
+				}
+				const labels = [...question.options, ...counts.keys()].filter(
+					(label, index, all) => all.indexOf(label) === index
+				);
+				return {
+					slug: question.slug,
+					displayName: question.displayName,
+					rows: labels.map((label) => ({
+						label,
+						count: counts.get(label) ?? 0,
+						goal: goals.custom[question.slug]?.[label]
+					}))
+				};
+			});
 		}
 	} catch (e) {
 		console.warn('Loading participants failed', e);
@@ -115,6 +161,7 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 		countyCounts,
 		regionCounties,
 		mapStates,
+		customDemographicResults,
 		workflowId,
 		conversationId,
 		error
@@ -132,8 +179,18 @@ export const actions: Actions = {
 		if (!conversationId || !workflowId) {
 			return fail(400, { error: 'Missing conversationId or workflowId.' });
 		}
-		if (!(METRIC_NAMES as string[]).includes(metric)) {
-			return fail(400, { error: `Unknown metric: ${metric}` });
+		const isKnownMetric = (METRIC_NAMES as string[]).includes(metric);
+		if (!isKnownMetric) {
+			try {
+				const relationships = await api.GetConversationDemographics({
+					queries: { conversation_id: conversationId, question_slug: metric, limit: 1 }
+				});
+				if (!relationships.records.some((relationship) => relationship.questionSlug === metric)) {
+					return fail(400, { error: `Unknown metric: ${metric}` });
+				}
+			} catch {
+				return fail(400, { error: `Unknown metric: ${metric}` });
+			}
 		}
 
 		// Parse: for each canonical bucket, either upsert a target_count or clear it.
@@ -160,7 +217,7 @@ export const actions: Actions = {
 			// County buckets are per-region, not static — read them from the submitted
 			// `bucket:*` fields. Other metrics validate against their canonical list.
 			const known =
-				metric === 'county'
+				metric === 'county' || !isKnownMetric
 					? [...form.keys()]
 							.filter((k) => k.startsWith('bucket:'))
 							.map((k) => k.slice('bucket:'.length))
