@@ -74,3 +74,67 @@ export function toBlockHtml(value: string): string {
 export function paragraphsToHtml(paragraphs: readonly string[]): string {
 	return paragraphs.map(toBlockHtml).join('');
 }
+
+/** A Host heading and the block HTML that runs under it. */
+export interface RichTextSection {
+	/** Heading text, markup stripped. Empty only for the lead block. */
+	heading: string;
+	/** Everything up to the next heading. */
+	html: string;
+}
+
+const ENTITIES: Record<string, string> = {
+	amp: '&',
+	lt: '<',
+	gt: '>',
+	quot: '"',
+	'#39': "'"
+};
+
+function decodeEntities(text: string): string {
+	return text.replace(/&(amp|lt|gt|quot|#39);/g, (_match, name: string) => ENTITIES[name]);
+}
+
+/** Heading markup down to the text a nav pill can carry. */
+function toPlainText(html: string): string {
+	return decodeEntities(html.replace(/<[^>]*>/g, ''))
+		.replace(/\s+/g, ' ')
+		.trim();
+}
+
+/**
+ * Splits block HTML at every `h2`, the level the Setup editor's Heading button
+ * writes, into the lead block and one entry per heading. A surface that gives
+ * each heading its own section and nav pill needs the heading text separate
+ * from the copy under it, which is not something `{@html}` on one blob can do.
+ *
+ * The returned `html` still holds whatever nested headings the Host wrote, so
+ * run `demoteHeadings` on it as before.
+ */
+export function splitAtHeadings(html: string): RichTextSection[] {
+	// A capturing group interleaves the captures between the parts, so this
+	// reads [lead, heading, body, heading, body, ...].
+	const parts = html.split(/<h2\b[^>]*>([\s\S]*?)<\/h2>/i);
+	const sections: RichTextSection[] = [];
+
+	const lead = parts[0].trim();
+	if (lead !== '') sections.push({ heading: '', html: lead });
+
+	for (let i = 1; i < parts.length; i += 2) {
+		const heading = toPlainText(parts[i]);
+		const body = (parts[i + 1] ?? '').trim();
+
+		// An empty heading has no label to put on a pill, so its copy joins what
+		// came before rather than opening a section nothing can link to.
+		if (heading === '') {
+			const previous = sections.at(-1);
+			if (previous) previous.html += body;
+			else if (body !== '') sections.push({ heading: '', html: body });
+			continue;
+		}
+
+		sections.push({ heading, html: body });
+	}
+
+	return sections;
+}

@@ -13,16 +13,25 @@
 	import { getRegionByZipcode, getRegionUrl } from '$lib/config/regions';
 	import type { RegionConfig } from '$lib/config/regions';
 	import type { Campaign } from '$lib/config/campaign';
-	import { OPEN_POLL_EXPLAINER, FOOTER_LINKS } from '$lib/config/landing-copy';
+	import { OPEN_POLL_EXPLAINER, FOOTER_LINKS, NAV_SECTIONS } from '$lib/config/landing-copy';
 	import { trackEvent } from '@lukulent/svelte-umami';
 	import { safeHref, sanitizeHostHtml } from '@civicos/shared/sanitize';
-	import { HOST_COPY_PROSE_CLASS, renderHostCopy } from '$lib/config/host-copy';
+	import { HOST_COPY_PROSE_CLASS, renderHostCopy, toContextSections } from '$lib/config/host-copy';
 	import { listSeparator } from '$lib/utils/list';
 	import JoinSkeleton from './JoinSkeleton.svelte';
 
 	const region: RegionConfig = page.data.region;
 	const campaign: Campaign = page.data.campaign;
 	const hostCopy = page.data.hostCopy;
+	// The Host's Context copy, cut at its headings so each one gets its own
+	// section and its own nav pill. A description with no headings comes back as
+	// the single Context section this page rendered before.
+	const contextSections = toContextSections(hostCopy.context);
+	// `context` in NAV_SECTIONS is a placeholder for those pills.
+	const navSections = NAV_SECTIONS.flatMap((section) => {
+		if (section.id === 'context') return contextSections.map(({ id, label }) => ({ id, label }));
+		return [section];
+	});
 	// Who the server says this is, resolved from the cookie in the root layout.
 	// A returning participant gets CONTINUE on the first paint instead of after
 	// hydration. Only a zip counts: an email-only signup has an account but has
@@ -292,15 +301,17 @@
 	</div>
 
 	<!-- Sticky pill nav -->
-	<StickyNav class="mx-auto max-w-4xl" />
+	<StickyNav sections={navSections} class="mx-auto max-w-4xl" />
 
-	<!-- Context -->
-	<section id="context" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
-		<h2 class="font-display text-2xl font-medium md:text-3xl">Context</h2>
-		<div class="mt-6 opacity-80 {HOST_COPY_PROSE_CLASS}">
-			{@html renderHostCopy(hostCopy.context)}
-		</div>
-	</section>
+	<!-- Context, one section per heading the Host wrote -->
+	{#each contextSections as section (section.id)}
+		<section id={section.id} class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
+			<h2 class="font-display text-2xl font-medium md:text-3xl">{section.heading}</h2>
+			<div class="mt-6 opacity-80 {HOST_COPY_PROSE_CLASS}">
+				{@html section.html}
+			</div>
+		</section>
+	{/each}
 
 	<!-- What is an Open Poll? -->
 	<section id="how-it-works" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">

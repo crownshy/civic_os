@@ -7,21 +7,29 @@
  * See: docs/adr/0001-landing-bypasses-appshell.md for the architecture context.
  */
 
+/** One pill in the sticky nav. `id` is the anchor it scrolls to. */
+export interface NavSection {
+	id: string;
+	label: string;
+}
+
 /**
  * Pill nav sections, in order. The `id` matches the anchor on the corresponding
  * section in `/landing/+page.svelte`; the StickyNav component uses it for
  * IntersectionObserver targets and click-to-scroll.
+ *
+ * `context` is a placeholder: the landing page expands it into one pill per
+ * heading the Host wrote in their Context copy. The order still lives here so
+ * there is one place that says where those pills sit.
  */
-export const NAV_SECTIONS = [
+export const NAV_SECTIONS: NavSection[] = [
 	{ id: 'join', label: 'JOIN' },
 	{ id: 'context', label: 'CONTEXT' },
 	{ id: 'how-it-works', label: 'HOW IT WORKS' },
 	{ id: 'your-host', label: 'YOUR HOST' },
 	{ id: 'whats-next', label: "WHAT'S NEXT" },
 	{ id: 'faq', label: 'FAQ' }
-] as const;
-
-export type NavSectionId = (typeof NAV_SECTIONS)[number]['id'];
+];
 
 /**
  * Body paragraphs for the "What is an 'Open Poll'?" section.
