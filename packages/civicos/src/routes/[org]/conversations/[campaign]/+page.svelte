@@ -27,16 +27,22 @@
 	// A returning participant gets CONTINUE on the first paint instead of after
 	// hydration. Only a zip counts: an email-only signup has an account but has
 	// never told us where they are, so it is not a session to continue.
-	// `session.hasSession` behind it covers the one case the server cannot answer:
-	// a backend it could not reach leaves the cached session as the only evidence.
+	//
+	// This has to agree with the gate on `/contribute`, which reads the server
+	// answer and nothing else. Anything CONTINUE lets through that the gate then
+	// turns away is a redirect straight back to this page, and on a client side
+	// navigation that is silent: the button appears dead. So the cached session
+	// only stands in where the server has no answer to disagree with, which is
+	// the one case it was ever meant to cover.
 	const participant: ParticipantSession | null = $derived(page.data.participant);
-	const isReturning = $derived(!!participant?.zipCode || session.hasSession);
+	const participantResolved: boolean = $derived(page.data.participantResolved);
+	const isReturning = $derived(
+		!!participant?.zipCode || (!participantResolved && session.hasSession)
+	);
 
-	// The cached session is the second half of that answer and only the browser
-	// can read it, so it can turn `isReturning` from false to true but never the
-	// other way. A server "returning" answer is therefore final; a server "new
-	// visitor" answer is a guess until hydration, and rendering the join form on
-	// it is what makes the CTA flip to CONTINUE under you.
+	// Only the browser can read the cached session, so on the outage path
+	// `isReturning` is false during SSR and may turn true at hydration. Rendering
+	// the join form before then is what makes the CTA flip to CONTINUE under you.
 	let hydrated = $state(false);
 	const joinStateSettled = $derived(isReturning || hydrated);
 
