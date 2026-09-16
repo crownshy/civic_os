@@ -21,7 +21,7 @@ export const DEFAULT_DEMOGRAPHIC_QUESTIONS = [
 	{
 		"slug": "age",
 		"displayName": "Age",
-		"responseType": "number",
+		"responseType": "number" as const,
 		"bucketConfig": {
 			"type": "string" as const,
 			"options": [
@@ -38,7 +38,7 @@ export const DEFAULT_DEMOGRAPHIC_QUESTIONS = [
 	{
 		"slug": "ethnicity",
 		"displayName": "Ethnicity",
-		"responseType": "string",
+		"responseType": "string" as const,
 		"bucketConfig": {
 			"type": "string" as const,
 			"options": [
@@ -52,7 +52,7 @@ export const DEFAULT_DEMOGRAPHIC_QUESTIONS = [
 	{
 		"slug": "gender",
 		"displayName": "Gender",
-		"responseType": "string",
+		"responseType": "string" as const,
 		"bucketConfig": {
 			"type": "string" as const,
 			"options": [
@@ -66,7 +66,7 @@ export const DEFAULT_DEMOGRAPHIC_QUESTIONS = [
 	{
 		"slug": "political_party",
 		"displayName": "Political Party",
-		"responseType": "string",
+		"responseType": "string" as const,
 		"bucketConfig": {
 			"type": "string" as const,
 			"options": [

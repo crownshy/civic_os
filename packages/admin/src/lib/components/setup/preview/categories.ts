@@ -29,7 +29,7 @@ export function previewCategories(
 
 	const added = custom
 		.filter((c) => c.enabled)
-		.map((c) => ({ name: c.name, answer: c.options[0] ?? '' }));
+		.map((c) => ({ name: c.displayName, answer: c.options[0] ?? '' }));
 
 	return [...defaults, ...added];
 }
