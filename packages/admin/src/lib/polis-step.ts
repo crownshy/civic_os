@@ -3,11 +3,12 @@
  *
  * Comhairle exposes two tool configs on a step and they do not always agree:
  * `toolConfig`, and `previewToolConfig`. A step created through `tool_setup`
- * comes back with only the preview one, and `toolConfig` stays null for a long
- * time after, through going live and beyond. Reading `toolConfig` alone
- * therefore finds no poll on any Campaign created in admin, which is why those
- * Campaigns had no Key Question, no mirrored `metadata.poll`, and sent their
- * participants to whichever poll `regions.ts` guessed from their zip.
+ * comes back with only the preview one: the draft poll a Host tests against.
+ * `toolConfig` stays null until the Conversation is launched, which clones the
+ * draft into a new live poll. Reading `toolConfig` alone therefore finds no poll
+ * on a draft Campaign, which is why those Campaigns had no Key Question, no
+ * mirrored `metadata.poll`, and sent their participants to whichever poll
+ * `regions.ts` guessed from their zip.
  *
  * `toolConfig` first, `previewToolConfig` behind it. That is comhairle's own
  * resolution order, not an assumption: `PUT /tools/polis/config` returns the
@@ -47,6 +48,18 @@ interface StepLike {
  */
 export function polisConfigFor(step: StepLike | null | undefined): PolisStepConfig | null {
 	return readPolisConfig(step?.toolConfig) ?? readPolisConfig(step?.previewToolConfig);
+}
+
+/**
+ * Whether this step has been launched, i.e. has a live poll of its own.
+ *
+ * Launching is not repeatable: each launch clones the draft into yet another
+ * poll and repoints the step at it, orphaning every vote the previous live poll
+ * collected. So this is what decides between launching and merely turning a
+ * Conversation back on.
+ */
+export function hasLivePoll(step: StepLike | null | undefined): boolean {
+	return readPolisConfig(step?.toolConfig) !== null;
 }
 
 /**

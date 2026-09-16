@@ -3,7 +3,7 @@ import { createApiClient } from '$lib/api/client';
 import type { createApiClient as ApiClientFactory } from '@crownshy/api-client/client';
 import { findByRouteSlug, participantBase, regionFor } from '$lib/conversations';
 import { placeForCampaign } from '$lib/config/place';
-import { polisConfigFor } from '$lib/polis-step';
+import { hasLivePoll, polisConfigFor } from '$lib/polis-step';
 import { readPoll } from '@civicos/shared/data/place';
 import type { LayoutServerLoad } from './$types';
 
@@ -117,6 +117,11 @@ export const load: LayoutServerLoad = async ({ params, parent, cookies, url, dep
 				: ('apex' as const),
 		hostName: hostName ?? region?.hostName ?? '',
 		polisWorkflowStepId: region?.polis_workflow_step_id ?? polisStep?.id ?? null,
+		// Whether going live means launching (draft poll cloned into a new live
+		// one) or only turning the Conversation back on. Null when the step did
+		// not resolve: guessing "not launched" there would launch a Campaign that
+		// already has live votes and strand them on the old poll.
+		pollLaunched: polisStep ? polisStep.launched : null,
 		// The Key Question is the Polis conversation's `topic`, edited on Setup
 		// through PolisUpdateConfig. A legacy region's hardcoded `question` is
 		// only the fallback now, for Campaigns whose Polis step did not resolve.
@@ -182,7 +187,8 @@ async function resolvePolisStep(api: Api, conversationId: string, pinnedStepId?:
 			// this step is 401 anonymously, and civicos has no other way to learn
 			// which Polis conversation it is serving.
 			polisId: polis?.pollId ?? null,
-			polisUrl: polis?.serverUrl ?? null
+			polisUrl: polis?.serverUrl ?? null,
+			launched: hasLivePoll(step)
 		};
 	} catch (e) {
 		console.warn('Resolving the Polis workflow step failed', e);

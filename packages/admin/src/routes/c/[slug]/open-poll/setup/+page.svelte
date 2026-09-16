@@ -2,6 +2,7 @@
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/state';
 	import { moderateStatementAux, postSeed, syncStatementAux } from '$lib/api/aux';
+	import { setCampaignLive } from '$lib/api/campaign-live';
 	import type { PolisStatementAux } from '$lib/types/aux';
 	import SetupCard from '$lib/components/setup/SetupCard.svelte';
 	import DemographicsCard from '$lib/components/setup/DemographicsCard.svelte';
@@ -36,15 +37,18 @@
 	 * no state to render. `conversation.isLive` is readable and already drives the
 	 * header badge. See #354.
 	 */
-	async function setLive(next: boolean) {
-		await data.api.UpdateConversation(
-			{ is_live: next },
-			{ params: { conversation_id: campaign.id } }
-		);
-		await invalidate(`campaign:${page.params.slug}`);
-		// The sidebar's status dot reads the permitted list, not this page's data.
-		await invalidate('app:conversations');
-	}
+	const setLive = (next: boolean) =>
+		setCampaignLive({
+			api: data.api,
+			conversationId: campaign.id,
+			next,
+			pollLaunched: campaign.pollLaunched,
+			reload: async () => {
+				await invalidate(`campaign:${page.params.slug}`);
+				await invalidate('app:conversations');
+			},
+			pollIdentity: () => campaign.pollIdentity
+		});
 
 	const stepId = $derived(campaign.polisWorkflowStepId);
 

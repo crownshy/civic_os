@@ -3,6 +3,7 @@
 	import { invalidate } from '$app/navigation';
 	import ConversationTabSkeleton from '$lib/components/skeletons/ConversationTabSkeleton.svelte';
 	import LiveToggle from './LiveToggle.svelte';
+	import { setCampaignLive } from '$lib/api/campaign-live';
 	import { resolve } from '$app/paths';
 
 	let { data, children } = $props();
@@ -37,44 +38,19 @@
 	} as const;
 	const blocker = $derived(blockerCopy[campaign.shareUrlBlocker ?? 'slug']);
 
-	/** Same write the Open Poll Status card makes, so the two cannot disagree. */
-	async function setLive(next: boolean) {
-		await data.api.UpdateConversation(
-			{ is_live: next },
-			{ params: { conversation_id: campaign.id } }
-		);
-		if (next) await mirrorPoll();
-		await invalidate(`campaign:${page.params.slug}`);
-		await invalidate('app:conversations');
-	}
-
-	/**
-	 * Put this Campaign's poll identity on the public payload as it goes live.
-	 *
-	 * civicos reads `metadata.poll` because the Polis step is 401 anonymously, and
-	 * until this runs a Campaign sends its participants to whichever poll
-	 * `regions.ts` guesses from their zip. Publishing to a Place writes the same
-	 * object, but a Place is no longer what makes a Campaign reachable, so that
-	 * can no longer be the only moment it happens.
-	 *
-	 * Nothing to do when the Polis step has not yet exposed a poll id
-	 * (`toolConfig` is null for a while after a step is created). Going live again
-	 * later re-runs this, so it heals rather than needing a one-off repair.
-	 */
-	async function mirrorPoll() {
-		if (!campaign.pollIdentity) return;
-
-		try {
-			await data.api.PatchConversationMetadata(
-				{ poll: campaign.pollIdentity },
-				{ params: { conversation_id: campaign.id } }
-			);
-		} catch (e) {
-			// Not worth blocking the launch: the Campaign is live either way, it just
-			// falls back to the `regions.ts` poll until this succeeds.
-			console.error('Mirroring the poll identity into metadata failed', e);
-		}
-	}
+	const setLive = (next: boolean) =>
+		setCampaignLive({
+			api: data.api,
+			conversationId: campaign.id,
+			next,
+			pollLaunched: campaign.pollLaunched,
+			reload: async () => {
+				await invalidate(`campaign:${page.params.slug}`);
+				// The sidebar's status dot reads the permitted list, not this page's data.
+				await invalidate('app:conversations');
+			},
+			pollIdentity: () => campaign.pollIdentity
+		});
 
 	// Main conversation tabs
 	const tabs = [

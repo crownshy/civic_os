@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { polisConfigFor } from './polis-step';
+import { hasLivePoll, polisConfigFor } from './polis-step';
 
 const polis = (pollId: string, extra: Record<string, unknown> = {}) => ({
 	type: 'polis',
@@ -66,5 +66,21 @@ describe('polisConfigFor', () => {
 		const step = { toolConfig: { type: 'polis' }, previewToolConfig: polis('872udjsx3u') };
 
 		expect(polisConfigFor(step)?.pollId).toBe('872udjsx3u');
+	});
+});
+
+describe('hasLivePoll', () => {
+	it('is false for a draft step, which only has the preview poll', () => {
+		expect(hasLivePoll({ toolConfig: null, previewToolConfig: polis('872udjsx3u') })).toBe(false);
+	});
+
+	it('is true once launch has given the step a live poll', () => {
+		expect(
+			hasLivePoll({ toolConfig: polis('6rnbindc56'), previewToolConfig: polis('9pdkph6vef') })
+		).toBe(true);
+	});
+
+	it('is false for a step that is not a Polis step', () => {
+		expect(hasLivePoll({ toolConfig: { type: 'heyform' } })).toBe(false);
 	});
 });
