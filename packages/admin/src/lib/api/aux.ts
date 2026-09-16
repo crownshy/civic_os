@@ -4,6 +4,8 @@ import type {
 	CreatePolisStatementAux,
 	UpdatePolisStatementAux,
 	ModerateStatementAuxRequest,
+	ModerateStatementAuxBatchRequest,
+	ModerateStatementAuxBatchResponse,
 	SyncStatementAuxResponse,
 	PostSeedResponse
 } from '$lib/types/aux';
@@ -42,6 +44,19 @@ export function moderateStatementAux(
 	body: ModerateStatementAuxRequest
 ): Promise<PolisStatementAux> {
 	return api.PolisModerateStatementAux(body, { params: { id } });
+}
+
+/**
+ * Accept/reject many rows in one request. The backend logs in to Polis once and
+ * reports per-row failures in `failed` instead of failing the whole batch, so a
+ * resolved promise does not mean every row changed. All ids must belong to the
+ * same workflow step.
+ */
+export function moderateStatementAuxBatch(
+	api: Api,
+	body: ModerateStatementAuxBatchRequest
+): Promise<ModerateStatementAuxBatchResponse> {
+	return api.PolisModerateStatementAuxBatch(body);
 }
 
 /**

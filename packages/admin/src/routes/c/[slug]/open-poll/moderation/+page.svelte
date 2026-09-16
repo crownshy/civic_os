@@ -1,88 +1,76 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
 	import type { PolisStatementAux } from '$lib/types/aux';
-	import { moderateStatementAux, postSeed, syncStatementAux } from '$lib/api/aux';
-	import RowAccentStripe from '$lib/components/insights/RowAccentStripe.svelte';
-	import Card from '@civicos/shared/ui/Card.svelte';
+	import {
+		moderateStatementAux,
+		moderateStatementAuxBatch,
+		postSeed,
+		syncStatementAux
+	} from '$lib/api/aux';
 	import { Button } from '@civicos/shared/ui/button';
+	import { Spinner } from '@civicos/shared/ui/spinner';
 	import { invalidate } from '$app/navigation';
-	import { Check, X, Upload, RefreshCw } from '@lucide/svelte';
+	import { RefreshCw } from '@lucide/svelte';
+	import AddSeedStatementsDialog from '$lib/components/seeds/AddSeedStatementsDialog.svelte';
+	import StatementsTable from './StatementsTable.svelte';
 
 	let { data }: PageProps = $props();
 
-	// Pull latest Polis submissions into the aux table. Submissions don't appear
-	// in moderation until this runs — the aux rows are synced, not created live.
-	let syncing = $state(false);
-	let syncMessage = $state<string | null>(null);
+	type Status = 'accepted' | 'rejected';
 
-	async function syncFromPolis() {
-		const stepId = data.campaign.polisWorkflowStepId;
-		if (!stepId || syncing) return;
-		syncing = true;
-		syncMessage = null;
-		try {
-			const res = await syncStatementAux(data.api, stepId);
-			syncMessage = `Synced ${res.synced} statement${res.synced === 1 ? '' : 's'} from Polis.`;
-			await invalidate('open-poll:aux');
-		} catch (e) {
-			console.error('syncStatementAux failed', e);
-			syncMessage = 'Sync failed — see console for details.';
-		} finally {
-			syncing = false;
-		}
-	}
+	const stepId = $derived(data.campaign.polisWorkflowStepId);
+
+	const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
+
+	// Admin has no toast surface, so outcomes land in the line under the heading.
+	let notice = $state<{ text: string; error: boolean } | null>(null);
 
 	// Tracks the load data, but stays writable so accept/reject can render
 	// optimistically. Any re-run of the load (invalidation, navigating between
 	// conversations) discards the local override.
 	let statements = $derived(data.statements);
 
-	// --- Bulk seed import ---
-	// Writing one statement at a time lives on the Setup tab; this page keeps the
-	// CSV path because that is a moderator-scale job with nowhere else to sit.
-	// Comhairle posts to Polis server-side, so no Polis credentials in the browser.
-	let csvImporting = $state(false);
-	let csvError = $state<string | null>(null);
-	let fileInput = $state<HTMLInputElement>();
+	// --- Sync from Polis ---
+	// Submissions don't appear in moderation until this runs: the aux rows are
+	// synced, not created live.
+	let syncing = $state(false);
 
-	const stepId = $derived(data.campaign.polisWorkflowStepId);
-	const canSeed = $derived(!!stepId);
-
-	/** Post each seed, then pull the new comment(s) back into aux. */
-	async function postSeeds(texts: string[]) {
-		if (!stepId) return;
-		for (const t of texts) {
-			await postSeed(data.api, stepId, t);
+	async function syncFromPolis() {
+		if (!stepId || syncing) return;
+		syncing = true;
+		notice = null;
+		try {
+			const res = await syncStatementAux(data.api, stepId);
+			const skipped = res.skipped_invalid_xid ? ` (${res.skipped_invalid_xid} skipped)` : '';
+			notice = {
+				text: `Synced ${plural(res.synced, 'statement')} from Polis${skipped}.`,
+				error: false
+			};
+			// Spinner stays up through the reload so the button does not flicker.
+			await invalidate('open-poll:aux');
+		} catch (e) {
+			console.error('syncStatementAux failed', e);
+			notice = { text: 'Could not sync statements from Polis.', error: true };
+		} finally {
+			syncing = false;
 		}
+	}
+
+	// --- Seeds ---
+	// Comhairle posts to Polis server-side, so no Polis credentials in the browser.
+	// The aux table only learns about a seed on the next sync.
+	async function postOneSeed(text: string) {
+		if (!stepId) throw new Error('This conversation has no Polis workflow step.');
+		await postSeed(data.api, stepId, text);
+	}
+
+	async function syncAfterSeeding() {
+		if (!stepId) return;
 		await syncStatementAux(data.api, stepId);
 		await invalidate('open-poll:aux');
 	}
 
-	async function importCsv(e: Event) {
-		const input = e.currentTarget as HTMLInputElement;
-		const file = input.files?.[0];
-		if (!file || !canSeed || csvImporting) return;
-		csvImporting = true;
-		csvError = null;
-		try {
-			// One statement per line; strip wrapping quotes and a leading header row.
-			const lines = (await file.text())
-				.split(/\r?\n/)
-				.map((l) => l.replace(/^"(.*)"$/, '$1').trim())
-				.filter(Boolean);
-			if (['statement', 'statements', 'text'].includes(lines[0]?.toLowerCase())) {
-				lines.shift();
-			}
-			if (lines.length) await postSeeds(lines);
-		} catch (err) {
-			console.error('CSV import failed', err);
-			csvError = err instanceof Error ? err.message : 'CSV import failed.';
-		} finally {
-			csvImporting = false;
-			input.value = '';
-		}
-	}
-
+	// --- Filters ---
 	type Filter = 'all' | 'seeded' | 'accepted' | 'pending' | 'rejected';
 	let filter = $state<Filter>('all');
 
@@ -101,32 +89,6 @@
 		return [...list].sort((a, b) => b.polis_statement_id - a.polis_statement_id);
 	});
 
-	// Track in-flight requests per aux row so the buttons can disable mid-call.
-	let pending = $state<Record<string, boolean>>({});
-
-	async function setStatus(row: PolisStatementAux, status: 'accepted' | 'rejected') {
-		if (pending[row.id] || row.moderation_status === status) return;
-		const decision = status === 'accepted' ? 'accept' : 'reject';
-		pending = { ...pending, [row.id]: true };
-
-		const prevStatus = row.moderation_status;
-		statements = statements.map((s) => (s.id === row.id ? { ...s, moderation_status: status } : s));
-
-		try {
-			const updated = await moderateStatementAux(data.api, row.id, { decision });
-			statements = statements.map((s) => (s.id === row.id ? updated : s));
-		
-			await invalidate('open-poll:aux');
-		} catch (e) {
-			console.error('moderateStatementAux failed', e);
-			statements = statements.map((s) =>
-				s.id === row.id ? { ...s, moderation_status: prevStatus } : s
-			);
-		} finally {
-			pending = { ...pending, [row.id]: false };
-		}
-	}
-
 	const filters: { key: Filter; label: string }[] = [
 		{ key: 'all', label: 'All' },
 		{ key: 'seeded', label: 'Seeded' },
@@ -134,6 +96,107 @@
 		{ key: 'pending', label: 'Pending' },
 		{ key: 'rejected', label: 'Rejected' }
 	];
+
+	// --- Selection ---
+	// Keyed by aux row id. Select-all and the bulk actions only reach visible rows,
+	// so a selection made under one filter never acts on rows hidden by another.
+	let selected = $state<Record<string, boolean>>({});
+	const selectedVisible = $derived(visible.filter((r) => selected[r.id]));
+
+	// Anchor for shift-click ranges: the last plainly clicked row. Ranges follow
+	// `visible`, so they match the order on screen rather than the data order.
+	let anchorId = $state<string | null>(null);
+
+	function toggleSelect(id: string, checked: boolean, range = false) {
+		if (range && anchorId !== null && anchorId !== id) {
+			const order = visible.map((r) => r.id);
+			const a = order.indexOf(anchorId);
+			const b = order.indexOf(id);
+			if (a !== -1 && b !== -1) {
+				const [lo, hi] = a < b ? [a, b] : [b, a];
+				const next = { ...selected };
+				for (let i = lo; i <= hi; i++) next[order[i]] = true;
+				selected = next;
+				// Anchor stays put so another shift-click can resize the range.
+				return;
+			}
+		}
+		selected = { ...selected, [id]: checked };
+		anchorId = id;
+	}
+
+	function toggleSelectAll(checked: boolean) {
+		const next = { ...selected };
+		for (const r of visible) next[r.id] = checked;
+		selected = next;
+	}
+
+	function clearSelection() {
+		selected = {};
+		anchorId = null;
+	}
+
+	// --- Moderation ---
+	let bulkAction = $state<Status | null>(null);
+	let pending = $state<Record<string, boolean>>({});
+
+	async function bulkModerate(status: Status) {
+		const targets = selectedVisible.filter((r) => r.moderation_status !== status);
+		if (bulkAction !== null) return;
+		if (!targets.length) {
+			clearSelection();
+			return;
+		}
+		bulkAction = status;
+		notice = null;
+
+		const ids = targets.map((t) => t.id);
+		const idSet = new Set(ids);
+		statements = statements.map((s) => (idSet.has(s.id) ? { ...s, moderation_status: status } : s));
+
+		try {
+			const res = await moderateStatementAuxBatch(data.api, {
+				ids,
+				decision: status === 'accepted' ? 'accept' : 'reject'
+			});
+			notice = res.failed.length
+				? { text: `${res.failed.length} of ${targets.length} failed to update.`, error: true }
+				: { text: `${plural(targets.length, 'statement')} ${status}.`, error: false };
+		} catch (e) {
+			console.error('moderateStatementAuxBatch failed', e);
+			notice = { text: 'Could not update the selected statements.', error: true };
+		}
+		clearSelection();
+		// Server truth, which also undoes the optimistic flip for any row that failed.
+		await invalidate('open-poll:aux');
+		bulkAction = null;
+	}
+
+	async function setStatus(row: PolisStatementAux, status: Status) {
+		// A row inside the selection acts on the whole selection, like the bulk bar.
+		if (selected[row.id]) return bulkModerate(status);
+		if (pending[row.id] || row.moderation_status === status) return;
+		pending = { ...pending, [row.id]: true };
+
+		const prevStatus = row.moderation_status;
+		statements = statements.map((s) => (s.id === row.id ? { ...s, moderation_status: status } : s));
+
+		try {
+			const updated = await moderateStatementAux(data.api, row.id, {
+				decision: status === 'accepted' ? 'accept' : 'reject'
+			});
+			statements = statements.map((s) => (s.id === row.id ? updated : s));
+			await invalidate('open-poll:aux');
+		} catch (e) {
+			console.error('moderateStatementAux failed', e);
+			statements = statements.map((s) =>
+				s.id === row.id ? { ...s, moderation_status: prevStatus } : s
+			);
+			notice = { text: 'Could not update the statement.', error: true };
+		} finally {
+			pending = { ...pending, [row.id]: false };
+		}
+	}
 </script>
 
 <div class="flex flex-col gap-6 px-8 py-8">
@@ -141,48 +204,45 @@
 		<div class="text-body text-destructive">Could not load statements: {data.error}</div>
 	{/if}
 
-	<!-- Page heading + actions -->
-	<div class="flex items-start justify-between gap-4">
+	<div class="flex flex-wrap items-start justify-between gap-4">
 		<div class="flex max-w-3xl flex-col gap-1">
-			<h2 class="font-display text-display font-semibold text-foreground">Statements moderation</h2>
-			<p class="text-section text-muted-foreground">
-				{#if syncMessage}
-					{syncMessage}
-				{:else}
-					Moderate and view all statements.
-				{/if}
+			<h2 class="font-display text-h4 font-semibold text-foreground md:text-h3">
+				Statements moderation
+			</h2>
+			<p
+				class={`text-body-lg ${notice?.error ? 'text-destructive' : 'text-muted-foreground'}`}
+				aria-live="polite"
+			>
+				{notice?.text ?? 'Moderate and view all statements.'}
 			</p>
 		</div>
-		<div class="flex shrink-0 items-center gap-2">
+		<div class="flex shrink-0 flex-wrap items-center gap-2">
 			<Button
 				variant="secondary"
 				onclick={syncFromPolis}
-				disabled={syncing || !data.campaign.polisWorkflowStepId}
+				disabled={syncing || !stepId}
 				title="Pull the latest submitted statements from Polis"
 			>
-				<RefreshCw class={`size-4 ${syncing ? 'animate-spin' : ''}`} />
+				{#if syncing}
+					<Spinner />
+				{:else}
+					<RefreshCw class="size-4" />
+				{/if}
 				{syncing ? 'Syncing…' : 'Sync from Polis'}
 			</Button>
-			<Button
-				onclick={() => fileInput?.click()}
-				disabled={!canSeed || csvImporting}
-				title="Import seed statements from a CSV (one statement per line)"
-			>
-				<Upload class="size-4" />
-				{csvImporting ? 'Importing…' : 'Import CSV'}
-			</Button>
+			<AddSeedStatementsDialog
+				disabled={!stepId}
+				onPost={postOneSeed}
+				onPosted={syncAfterSeeding}
+				onDone={(n) => (notice = { text: `Added ${plural(n, 'seed statement')}.`, error: false })}
+			/>
 		</div>
 	</div>
 
-	<input bind:this={fileInput} type="file" accept=".csv,.txt" class="hidden" onchange={importCsv} />
-
-	{#if !canSeed}
+	{#if !stepId}
 		<p class="text-caption text-muted-foreground">
-			This conversation has no Polis workflow step, so statements cannot be imported.
+			This conversation has no Polis workflow step, so seed statements cannot be added.
 		</p>
-	{/if}
-	{#if csvError}
-		<p class="text-caption text-destructive">{csvError}</p>
 	{/if}
 
 	<!-- Status filter chips -->
@@ -202,75 +262,15 @@
 		{/each}
 	</div>
 
-	<!-- Statements list (matches Insights StatementSection card style) -->
-	<div>
-		<Card class="shadow-card transition-colors duration-200 hover:border-muted-foreground/40">
-			<div class="flex flex-col">
-				<!-- Column headings -->
-				<div
-					class="grid grid-cols-[1.5rem_minmax(0,1fr)_auto] items-center gap-4 px-4 py-2 font-ui text-caption font-semibold text-foreground uppercase"
-				>
-					<div>#</div>
-					<div>Statement</div>
-					<div class="pr-4">Action</div>
-				</div>
-
-				{#if visible.length === 0}
-					<p class="px-4 py-6 text-caption text-muted-foreground italic">
-						No statements match this filter.
-					</p>
-				{:else}
-					{#each visible as row (row.id)}
-						{@const accent = row.is_seed
-							? 'bg-muted-foreground/40'
-							: row.moderation_status === 'accepted'
-								? 'bg-success'
-								: row.moderation_status === 'rejected'
-									? 'bg-destructive'
-									: 'bg-destructive/60'}
-						<div
-							class="group relative grid grid-cols-[1.5rem_minmax(0,1fr)_auto] items-start gap-4 border-b border-border py-4 pl-4 transition-colors duration-150 hover:bg-muted/40"
-						>
-							<!-- Left accent bar (status color) -->
-							<RowAccentStripe {accent} />
-
-							<!-- # -->
-							<div class="pt-1 text-center font-ui text-label text-muted-foreground tabular-nums">
-								{row.polis_statement_id}
-							</div>
-
-							<!-- Statement text -->
-							<div class="min-w-0">
-								<p class="font-ui text-body-lg font-medium text-foreground">
-									{row.statement_text}
-								</p>
-							</div>
-
-							<!-- Action -->
-							<div class="flex items-center gap-2 self-center pr-4">
-								<button
-									type="button"
-									disabled={pending[row.id] || row.moderation_status === 'accepted'}
-									onclick={() => setStatus(row, 'accepted')}
-									title="Accept"
-									class="inline-flex size-10 cursor-pointer items-center justify-center rounded-full text-success transition-all duration-150 hover:scale-110 hover:bg-success/15 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-transparent"
-								>
-									<Check class="size-6" />
-								</button>
-								<button
-									type="button"
-									disabled={pending[row.id] || row.moderation_status === 'rejected'}
-									onclick={() => setStatus(row, 'rejected')}
-									title="Reject"
-									class="inline-flex size-10 cursor-pointer items-center justify-center rounded-full text-destructive transition-all duration-150 hover:scale-110 hover:bg-destructive/15 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-transparent"
-								>
-									<X class="size-6" />
-								</button>
-							</div>
-						</div>
-					{/each}
-				{/if}
-			</div>
-		</Card>
-	</div>
+	<StatementsTable
+		rows={visible}
+		{selected}
+		{pending}
+		{bulkAction}
+		onToggleSelect={toggleSelect}
+		onToggleAll={toggleSelectAll}
+		onClear={clearSelection}
+		onBulkModerate={bulkModerate}
+		onModerate={setStatus}
+	/>
 </div>

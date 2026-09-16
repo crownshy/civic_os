@@ -11,6 +11,8 @@ export type {
 	UpdatePolisStatementAux,
 	ModerationStatus,
 	ModerateStatementAuxRequest,
+	ModerateStatementAuxBatchRequest,
+	ModerateStatementAuxBatchResponse,
 	ModerationDecisionRequest,
 	SyncStatementAuxResponse,
 	PostSeedResponse

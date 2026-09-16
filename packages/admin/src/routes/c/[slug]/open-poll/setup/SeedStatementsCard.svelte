@@ -1,30 +1,29 @@
 <script lang="ts">
 	import { Plus, X } from '@lucide/svelte';
-	import { Button } from '@civicos/shared/ui/button';
 	import SetupCard from '$lib/components/setup/SetupCard.svelte';
+	import AddSeedStatementsDialog from '$lib/components/seeds/AddSeedStatementsDialog.svelte';
 	import type { PolisStatementAux } from '$lib/types/aux';
 
 	interface Props {
 		/** Every aux row for this poll; the card filters to host seeds itself. */
 		statements: PolisStatementAux[];
-		/** Resolve once the new statement is loaded. */
-		onAdd: (text: string) => Promise<void>;
+		/** Post one statement to Polis. The dialog calls it once per statement. */
+		onPost: (text: string) => Promise<void>;
+		/** Sync the new statements into aux and reload. Runs once, after the last post. */
+		onPosted: () => Promise<void>;
 		/** Reject removes a seed from rotation; accept puts it back. */
 		onSetStatus: (row: PolisStatementAux, decision: 'accept' | 'reject') => Promise<void>;
 		/** False when the region has no polis_workflow_step_id. */
 		canEdit?: boolean;
 	}
 
-	let { statements, onAdd, onSetStatus, canEdit = true }: Props = $props();
+	let { statements, onPost, onPosted, onSetStatus, canEdit = true }: Props = $props();
 
 	const seeds = $derived(statements.filter((s) => s.is_seed));
 	const active = $derived(seeds.filter((s) => s.moderation_status !== 'rejected'));
 	const removed = $derived(seeds.filter((s) => s.moderation_status === 'rejected'));
 
 	let showRemoved = $state(false);
-	let showAddForm = $state(false);
-	let draft = $state('');
-	let busy = $state(false);
 	let error = $state<string | null>(null);
 
 	// Per-row in-flight tracking so one X doesn't disable the whole table.
@@ -41,23 +40,6 @@
 			then.getMonth() === today.getMonth() &&
 			then.getDate() === today.getDate();
 		return sameDay ? 'Today' : dateFmt.format(then);
-	}
-
-	async function submit() {
-		const text = draft.trim();
-		if (!text || busy) return;
-		busy = true;
-		error = null;
-		try {
-			await onAdd(text);
-			draft = '';
-			showAddForm = false;
-		} catch (e) {
-			console.error('postSeed failed', e);
-			error = e instanceof Error ? e.message : 'Could not add the statement.';
-		} finally {
-			busy = false;
-		}
 	}
 
 	async function setStatus(row: PolisStatementAux, decision: 'accept' | 'reject') {
@@ -118,43 +100,19 @@
 		{/each}
 
 		<div class="border-t border-border px-3.5 py-4">
-			{#if showAddForm}
-				<div class="flex flex-col gap-2">
-					<!-- svelte-ignore a11y_autofocus -->
-					<textarea
-						bind:value={draft}
-						autofocus
-						rows="2"
-						placeholder="Write a seed statement…"
-						class="w-full rounded-[10px] border border-input bg-background px-3 py-2 text-body focus:ring-2 focus:ring-ring focus:outline-none"
-					></textarea>
-					<div class="flex items-center gap-2">
-						<Button onclick={submit} disabled={busy || !draft.trim()}>
-							{busy ? 'Adding…' : 'Add statement'}
-						</Button>
-						<Button
-							variant="secondary"
-							onclick={() => {
-								showAddForm = false;
-								draft = '';
-							}}
-							disabled={busy}
-						>
-							Cancel
-						</Button>
-					</div>
-				</div>
-			{:else}
-				<button
-					type="button"
-					onclick={() => (showAddForm = true)}
-					disabled={!canEdit}
-					class="inline-flex cursor-pointer items-center gap-1 text-body font-semibold text-primary disabled:cursor-not-allowed disabled:opacity-40"
-				>
-					<Plus class="size-4" />
-					Add New…
-				</button>
-			{/if}
+			<AddSeedStatementsDialog {onPost} {onPosted} disabled={!canEdit}>
+				{#snippet trigger({ open, disabled })}
+					<button
+						type="button"
+						onclick={open}
+						{disabled}
+						class="inline-flex cursor-pointer items-center gap-1 text-body font-semibold text-primary disabled:cursor-not-allowed disabled:opacity-40"
+					>
+						<Plus class="size-4" />
+						Add New…
+					</button>
+				{/snippet}
+			</AddSeedStatementsDialog>
 		</div>
 
 		{#if removed.length}

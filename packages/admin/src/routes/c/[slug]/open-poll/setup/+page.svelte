@@ -54,12 +54,16 @@
 
 	/**
 	 * Comhairle posts the seed to Polis server-side (owner session, no browser
-	 * CORS), but the aux table only learns about it on the next sync, so the
-	 * write is post -> sync -> invalidate rather than a single call.
+	 * CORS), but the aux table only learns about it on the next sync. The dialog
+	 * posts every statement first and syncs once, so a CSV is not N syncs.
 	 */
-	async function addSeed(text: string) {
-		if (!stepId) return;
+	async function postOneSeed(text: string) {
+		if (!stepId) throw new Error('This conversation has no Polis workflow step.');
 		await postSeed(data.api, stepId, text);
+	}
+
+	async function syncAfterSeeding() {
+		if (!stepId) return;
 		await syncStatementAux(data.api, stepId);
 		await invalidate('open-poll:aux');
 	}
@@ -118,7 +122,8 @@
 
 	<SeedStatementsCard
 		statements={data.aux}
-		onAdd={addSeed}
+		onPost={postOneSeed}
+		onPosted={syncAfterSeeding}
 		onSetStatus={setSeedStatus}
 		canEdit={!!stepId}
 	/>
