@@ -21,10 +21,8 @@ const handler: RequestHandler = async ({ request, params, cookies }) => {
 	const origin = request.headers.get('origin') || url.origin;
 	headers.set('origin', origin);
 
-	if (env.COMHAIRLE_API_KEY) {
-		headers.set('Authorization', `Bearer ${env.COMHAIRLE_API_KEY}`);
-	}
-
+	// Cookie only, no service key: comhairle authenticates a bearer token before
+	// the cookie, so a key here would act as its owner, and a stale one 401s.
 	const authToken = cookies.get('auth-token');
 	if (authToken) {
 		headers.set('cookie', `auth-token=${authToken}`);
