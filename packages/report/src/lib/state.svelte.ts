@@ -9,27 +9,35 @@ import type { ReportRecord } from './domain/types';
 export const selection = $state<{ recordId: string | null }>({ recordId: null });
 
 /**
- * The three modals. They are opened from pages that know nothing about each
- * other, so their state lives here rather than being threaded through props.
+ * The modals. They are opened from pages that know nothing about each other,
+ * so their state lives here rather than being threaded through props. Where a
+ * modal pages through something, its position lives inside the object that
+ * goes null on close, so a modal never reopens where it was left.
  */
 export const modals = $state<{
 	statement: { view: readonly ReportRecord[]; index: number } | null;
-	group: string | null;
-	demographics: boolean;
+	group: { key: string; page: number } | null;
+	demographics: { index: number } | null;
+	/** `copied` flips the button to "Copied!" for a moment */
+	share: { copied: boolean } | null;
 }>({
 	statement: null,
 	group: null,
-	demographics: false
+	demographics: null,
+	share: null
 });
 
+/** Returns the record now showing, or undefined when nothing opened. */
 export function openStatement(view: readonly ReportRecord[], index: number) {
 	// a card whose record is not in its own page's list arrives as -1; there is
 	// nothing to show, so do not open
 	if (index < 0 || index >= view.length) return;
 	modals.statement = { view, index };
 	selection.recordId = view[index].id;
+	return view[index];
 }
 
+/** Returns the record now showing, or undefined at either end of the list. */
 export function pageStatement(delta: number) {
 	const open = modals.statement;
 	if (!open) return;
@@ -37,9 +45,17 @@ export function pageStatement(delta: number) {
 	if (index < 0 || index >= open.view.length) return;
 	modals.statement = { view: open.view, index };
 	selection.recordId = open.view[index].id;
+	return open.view[index];
 }
 
 export function closeStatement() {
 	modals.statement = null;
 	selection.recordId = null;
+}
+
+export function closeAllModals() {
+	closeStatement();
+	modals.group = null;
+	modals.demographics = null;
+	modals.share = null;
 }

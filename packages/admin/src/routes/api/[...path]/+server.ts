@@ -2,6 +2,8 @@ import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
 import { dev } from '$app/environment';
 
+export const trailingSlash = 'ignore';
+
 //TODO: THIS STUFF SHOULD GO AWAY (me thinks)
 const BACKEND_URL = env.API_URL || 'http://localhost:3000';
 // In production, set API_PREFIX=/api so requests go to e.g. bloom.comhairle.scot/api/auth/...

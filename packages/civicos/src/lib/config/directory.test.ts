@@ -1,7 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { REGIONS } from '@civicos/shared/data/regions';
-import { toDirectory, type DirectoryConversation } from './directory';
-import { apexHost } from './place';
+import { inPlace, listDirectory, toDirectory, type DirectoryConversation } from './directory';
 import type { RegionConfig } from './regions';
 
 const oregon = REGIONS.oregon as RegionConfig;
@@ -21,26 +20,11 @@ function conversation(overrides: Partial<DirectoryConversation> = {}): Directory
 	};
 }
 
-describe('apexHost', () => {
-	it('strips the Place subdomain', () => {
-		expect(apexHost('utah.bloomproject.us')).toBe('bloomproject.us');
-	});
-
-	it('leaves an apex request alone', () => {
-		expect(apexHost('bloomproject.us')).toBe('bloomproject.us');
-	});
-
-	it('keeps the port, which local dev is served on', () => {
-		expect(apexHost('dundee.localhost:5173')).toBe('localhost:5173');
-		expect(apexHost('localhost:5173')).toBe('localhost:5173');
-	});
-});
-
 describe('toDirectory', () => {
-	it('addresses a Campaign at its own Place, not at the host asking', () => {
-		const [entry] = toDirectory([conversation()], 'bloomproject.us');
+	it('links a Campaign by its whole Conversation slug, on this host', () => {
+		const [entry] = toDirectory([conversation()]);
 
-		expect(entry.url).toBe('https://dundee.bloomproject.us/host/conversations/ai');
+		expect(entry.href).toBe('/host/conversations/ai-dundee');
 		expect(entry.place).toEqual({ slug: 'dundee', name: 'Dundee' });
 	});
 
@@ -49,26 +33,24 @@ describe('toDirectory', () => {
 			metadata: { place: { slug: 'dundee', name: 'Dundee' }, org: { name: 'Young Scot' } }
 		});
 
-		expect(toDirectory([listed], 'bloomproject.us')[0].url).toBe(
-			'https://dundee.bloomproject.us/young-scot/conversations/ai'
-		);
+		expect(toDirectory([listed])[0].href).toBe('/young-scot/conversations/ai-dundee');
 	});
 
-	it('serves a Campaign with no Place from the apex', () => {
+	it('lists a Campaign with no Place, with no Place on it', () => {
 		const listed = conversation({ slug: 'ai', metadata: {} });
 
-		expect(toDirectory([listed], 'bloomproject.us')[0]).toMatchObject({
+		expect(toDirectory([listed])[0]).toMatchObject({
 			place: null,
-			url: 'https://bloomproject.us/host/conversations/ai'
+			href: '/host/conversations/ai'
 		});
 	});
 
 	it('resolves a legacy region through the Conversation it owns', () => {
 		const listed = conversation({ id: oregon.conversationId, slug: 'oregon', metadata: {} });
+		const [entry] = toDirectory([listed]);
 
-		expect(toDirectory([listed], 'bloomproject.us')[0].url).toBe(
-			`https://oregon.bloomproject.us/host/conversations/oregon`
-		);
+		expect(entry.href).toBe('/host/conversations/oregon');
+		expect(entry.place?.slug).toBe(oregon.slug);
 	});
 
 	it('leaves out what a stranger cannot join', () => {
@@ -80,7 +62,7 @@ describe('toDirectory', () => {
 			conversation({ id: 'unaddressable', slug: null })
 		];
 
-		expect(toDirectory(closed, 'bloomproject.us')).toEqual([]);
+		expect(toDirectory(closed)).toEqual([]);
 	});
 
 	it('orders by Place, then title, with the unplaced last', () => {
@@ -100,6 +82,41 @@ describe('toDirectory', () => {
 			})
 		];
 
-		expect(toDirectory(listed, 'bloomproject.us').map((e) => e.id)).toEqual(['c1', 'c2', 'c3']);
+		expect(toDirectory(listed).map((e) => e.id)).toEqual(['c1', 'c2', 'c3']);
+	});
+});
+
+describe('inPlace', () => {
+	it('keeps only the Campaigns listed under that Place', () => {
+		const entries = toDirectory([
+			conversation({ id: 'dundee' }),
+			conversation({
+				id: 'aberdeen',
+				slug: 'ai-aberdeen',
+				metadata: { place: { slug: 'aberdeen', name: 'Aberdeen' } }
+			}),
+			conversation({ id: 'nowhere', slug: 'ai', metadata: {} })
+		]);
+
+		expect(inPlace(entries, 'dundee').map((e) => e.id)).toEqual(['dundee']);
+		expect(inPlace(entries, 'glasgow')).toEqual([]);
+	});
+});
+
+describe('listDirectory', () => {
+	it('builds the directory from the listed Conversations', async () => {
+		const api = {
+			ListConverastions: vi.fn().mockResolvedValue({ records: [conversation()], total: 1 })
+		};
+
+		expect((await listDirectory(api))?.map((e) => e.id)).toEqual(['c1']);
+		expect(api.ListConverastions).toHaveBeenCalledWith({ queries: { limit: 100 } });
+	});
+
+	it('answers null, not an empty list, when the list cannot be fetched', async () => {
+		vi.spyOn(console, 'warn').mockImplementation(() => {});
+		const api = { ListConverastions: vi.fn().mockRejectedValue(new Error('down')) };
+
+		expect(await listDirectory(api)).toBeNull();
 	});
 });

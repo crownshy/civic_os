@@ -62,7 +62,7 @@
 {/snippet}
 
 <!--
-	The Place field on its own, with the derived subdomain under it. The Host
+	The Place field on its own, with the derived Place page address under it. The Host
 	types a name and the slug follows from it, so this line is the only place the
 	consequence of a rename is visible before it happens.
 -->

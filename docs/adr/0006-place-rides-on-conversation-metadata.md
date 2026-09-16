@@ -1,5 +1,9 @@
 # A Place rides on Conversation metadata, not the Region API
 
+> **The subdomain half is superseded by [ADR 0011](0011-the-place-leaves-the-hostname.md).**
+> A Place is a page at `/<place-slug>` now, not a hostname. It still rides on
+> metadata, for the reasons below.
+
 The public URL is heading for `<place>.bloomproject.us/<campaign-slug>`. A Place
 is therefore load bearing: it is the subdomain, and it is the "Place(s)" chip
 admin already renders on the Setup Identity card. Comhairle has a Region model

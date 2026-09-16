@@ -1,8 +1,7 @@
 <script lang="ts">
 	/* eslint-disable svelte/no-navigation-without-resolve --
-	   The href is absolute and cross-origin by construction: a Campaign published
-	   to a Place is served only from that Place's subdomain. `resolve()` would
-	   rewrite it against this host, the one host it is known not to be on. */
+	   The href is `campaignPath()`, the one definition of a Campaign URL, built
+	   in `directory.ts`. `resolve()` would restate that shape by route id. */
 	import { cn } from '$lib/utils';
 	import ArrowRight from '$lib/assets/icons/arrow-right.svelte';
 	import type { DirectoryEntry } from '$lib/config/directory';
@@ -16,7 +15,7 @@
 </script>
 
 <a
-	href={campaign.url}
+	href={campaign.href}
 	class={cn(
 		'group relative flex items-center overflow-hidden rounded-[20px] bg-card px-6 py-5 shadow-[0px_5px_15px_0px_rgba(12,34,95,0.13)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0px_8px_24px_0px_rgba(12,34,95,0.2)]',
 		className

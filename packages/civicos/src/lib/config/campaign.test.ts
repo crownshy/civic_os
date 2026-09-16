@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { GENERIC_REGION, REGIONS } from '@civicos/shared/data/regions';
-import { campaignCandidates, placeNameFor, resolveCampaign } from './campaign';
+import {
+	campaignCandidates,
+	legacyRegionForSlug,
+	placeNameFor,
+	regionForCampaign,
+	resolveCampaign
+} from './campaign';
 import type { RegionConfig } from './regions';
 import { toPlaceSlug } from './place';
 
@@ -15,30 +21,56 @@ const stored = {
 
 describe('campaignCandidates', () => {
 	it('resolves a legacy region slug to its hardcoded id first', () => {
-		expect(campaignCandidates('oregon', oregon)).toEqual([oregon.conversationId, 'oregon']);
+		expect(campaignCandidates('oregon')).toEqual([oregon.conversationId, 'oregon']);
 	});
 
-	it('tries a stored slug directly', () => {
-		expect(campaignCandidates('ai-in-dundee', GENERIC_REGION)).toEqual(['ai-in-dundee']);
+	it('tries a stored slug directly, Place suffix and all', () => {
+		expect(campaignCandidates('ai-in-dundee')).toEqual(['ai-in-dundee']);
 	});
 
-	it('never offers a mismatched region id', () => {
-		// getRegionBySubdomain answers GENERIC_REGION for subdomains it does not
-		// know, so its hardcoded id must not stand in for a slug nobody asked for.
-		expect(campaignCandidates('ai-in-dundee', GENERIC_REGION)).not.toContain(
-			GENERIC_REGION.conversationId
-		);
+	it('never offers a region id for a slug no region names', () => {
+		expect(campaignCandidates('ai-in-dundee')).not.toContain(GENERIC_REGION.conversationId);
 	});
 
-	it('drops duplicates', () => {
-		const generic = campaignCandidates(GENERIC_REGION.slug, GENERIC_REGION);
+	it('resolves the catch-all slug to its id', () => {
+		expect(campaignCandidates(GENERIC_REGION.slug)).toEqual([
+			GENERIC_REGION.conversationId,
+			GENERIC_REGION.slug
+		]);
+	});
 
-		expect(generic).toEqual([GENERIC_REGION.conversationId, GENERIC_REGION.slug]);
-		expect(new Set(generic).size).toBe(generic.length);
+	it('does not read an inherited key as a region', () => {
+		expect(campaignCandidates('constructor')).toEqual(['constructor']);
 	});
 
 	it('drops a blank slug', () => {
-		expect(campaignCandidates('   ', GENERIC_REGION)).toEqual([]);
+		expect(campaignCandidates('   ')).toEqual([]);
+	});
+});
+
+describe('legacyRegionForSlug', () => {
+	it('names the legacy regions and the catch-all', () => {
+		expect(legacyRegionForSlug('oregon')).toBe(oregon);
+		expect(legacyRegionForSlug(GENERIC_REGION.slug)).toBe(GENERIC_REGION);
+	});
+
+	it('is null for anything else, including an empty subdomain', () => {
+		expect(legacyRegionForSlug('stage')).toBeNull();
+		expect(legacyRegionForSlug('')).toBeNull();
+	});
+});
+
+describe('regionForCampaign', () => {
+	it('takes the region that owns the Conversation, whatever the slug', () => {
+		expect(regionForCampaign(oregon.conversationId, 'renamed')).toBe(oregon);
+	});
+
+	it('falls back to the region the slug names when nothing resolved', () => {
+		expect(regionForCampaign(null, 'oregon')).toBe(oregon);
+	});
+
+	it('gives a Campaign created in admin the catch-all', () => {
+		expect(regionForCampaign(stored.id, stored.slug)).toBe(GENERIC_REGION);
 	});
 });
 
@@ -76,9 +108,9 @@ describe('resolveCampaign', () => {
 		expect(campaign.source).toBe('conversation');
 	});
 
-	it('never borrows the place of the region the request arrived under', () => {
-		// Otherwise every Campaign looks like it belongs wherever it was asked
-		// for, and the route's Place check can never reject anything.
+	it('never borrows the place of the region supplying its defaults', () => {
+		// Otherwise every Campaign would list under whichever region's copy it
+		// happened to fall back to.
 		const campaign = resolveCampaign({ ...stored, metadata: {} }, oregon);
 
 		expect(campaign.place?.slug).not.toBe(oregon.slug);
@@ -94,7 +126,7 @@ describe('resolveCampaign', () => {
 	});
 
 	it('marks a Campaign a legacy region only when a region entry is it', () => {
-		// The zip may route a participant to another subdomain only for these,
+		// The zip may route a participant to another Campaign only for these,
 		// because only for these is a region the same thing as a Campaign.
 		const utah = resolveCampaign(
 			{ id: oregon.conversationId, slug: 'oregon', title: 'Oregon', metadata: {} },
@@ -111,30 +143,6 @@ describe('resolveCampaign', () => {
 		expect(campaign.id).toBe(stored.id);
 		expect(campaign.slug).toBe(oregon.slug);
 		expect(campaign.title).toBe(oregon.heroHeader);
-	});
-});
-
-describe('campaignCandidates with a Place', () => {
-	it('tries the place-scoped conversation slug first', () => {
-		// `/ai` under `utah.` is the Conversation `ai-utah`. The bare slug stays
-		// behind it for Campaigns that predate the convention.
-		expect(campaignCandidates('ai', GENERIC_REGION, 'utah')).toEqual(['ai-utah', 'ai']);
-	});
-
-	it('still leads with the legacy id when the slug names that region', () => {
-		expect(campaignCandidates('oregon', oregon, 'oregon')).toEqual([
-			oregon.conversationId,
-			'oregon'
-		]);
-	});
-
-	it('does not double up when the campaign and place slugs match', () => {
-		expect(campaignCandidates('ai', GENERIC_REGION, 'ai')).toEqual(['ai']);
-	});
-
-	it('falls back to the bare slug when there is no subdomain', () => {
-		expect(campaignCandidates('ai', GENERIC_REGION, '')).toEqual(['ai']);
-		expect(campaignCandidates('ai', GENERIC_REGION)).toEqual(['ai']);
 	});
 });
 

@@ -27,39 +27,42 @@
 
 <main class="themeGrid">
 	<div class="masthead">
-		<div class="eyebrow label">Bloom Project · COCAP · Central Oregon</div>
 		<h1>What 400+ people had to say about AI in Central Oregon</h1>
 		<p>
-			Six listening sessions and one open poll, sorted into eight themes. Each square below is one
-			statement or one thing somebody said out loud.
+			Responses gathered in six listening sessions around the region and one open poll, sorted into
+			seven themes. Each square below is one poll statement or one comment from a live session.
 		</p>
 	</div>
-
-	{#each THEMES as theme, index (theme.key)}
-		<ThemeBlock {theme} {index} onopen={() => openTheme(theme.key)} />
-	{/each}
 
 	<div class="legend label">
 		<span><i></i> Poll statement</span>
 		<span><i class="q"></i> Session quote</span>
+	</div>
+
+	<div class="blocks">
+		{#each THEMES as theme, index (theme.key)}
+			<ThemeBlock {theme} {index} onopen={() => openTheme(theme.key)} />
+		{/each}
 	</div>
 </main>
 
 <style>
 	.themeGrid {
 		display: block;
+		color: var(--ink);
 	}
-	/* the hairline between adjacent blocks: the sibling relationship only exists
-	   here, in the {#each}, so :global reaches across the component boundary */
-	.themeGrid :global(.theme-block + .theme-block) {
-		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+	.themeGrid .masthead h1 {
+		color: var(--theme-blue);
+	}
+	.themeGrid .masthead p {
+		color: var(--ink);
 	}
 	.legend {
-		padding: 20px 22px 46px;
+		padding: 24px 22px 18px;
 		display: flex;
 		gap: 20px;
 		flex-wrap: wrap;
-		color: rgba(255, 255, 255, 0.42);
+		color: color-mix(in srgb, var(--ink) 48%, transparent);
 	}
 	.legend span {
 		display: inline-flex;
@@ -70,11 +73,17 @@
 		width: 11px;
 		height: 11px;
 		border-radius: 1.5px;
-		background: rgba(255, 255, 255, 0.6);
+		background: color-mix(in srgb, var(--ink) 55%, transparent);
 		flex: none;
 	}
 	.legend i.q {
 		background: transparent;
-		box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.6);
+		box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--ink) 55%, transparent);
+	}
+	.blocks {
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+		padding: 6px 22px 20px;
 	}
 </style>

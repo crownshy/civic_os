@@ -4,6 +4,11 @@ import type { createApiClient as ApiClientFactory } from '@crownshy/api-client/c
 import { findByRouteSlug, participantBase, regionFor } from '$lib/conversations';
 import { placeForCampaign } from '$lib/config/place';
 import { hasLivePoll, polisConfigFor } from '$lib/polis-step';
+import { ensureDefaultDemographicQuestions } from '$lib/api/demographics';
+import {
+	DEFAULT_DEMOGRAPHIC_SLUGS,
+	demographicsFromBackend
+} from '@civicos/shared/data/demographics';
 import { readPoll } from '@civicos/shared/data/place';
 import type { LayoutServerLoad } from './$types';
 
@@ -57,12 +62,36 @@ export const load: LayoutServerLoad = async ({ params, parent, cookies, url, dep
 				.then((organization) => organization.name)
 				.catch(() => null)
 		: Promise.resolve(null);
+	const demographicQuestionsPromise = ensureDefaultDemographicQuestions(api).catch((e) => {
+		console.warn('Ensuring default demographic questions failed', e);
+		return [];
+	});
+	const conversationDemographicsPromise = api
+		.GetConversationDemographics({ queries: { conversation_id: summary.id, limit: 200 } })
+		.then((result) => result.records)
+		.catch((e) => {
+			console.warn('GetConversationDemographics failed', e);
+			return [];
+		});
 
-	const [conversation, polisStep, hostName] = await Promise.all([
-		conversationPromise,
-		polisStepPromise,
-		hostNamePromise
-	]);
+	const [conversation, polisStep, hostName, demographicQuestions, conversationDemographics] =
+		await Promise.all([
+			conversationPromise,
+			polisStepPromise,
+			hostNamePromise,
+			demographicQuestionsPromise,
+			conversationDemographicsPromise
+		]);
+	const demographicCategories = demographicsFromBackend(
+		demographicQuestions,
+		conversationDemographics
+	);
+	const defaultDemographics = demographicCategories.filter((question) =>
+		(DEFAULT_DEMOGRAPHIC_SLUGS as readonly string[]).includes(question.slug)
+	);
+	const customDemographics = demographicCategories.filter(
+		(question) => !(DEFAULT_DEMOGRAPHIC_SLUGS as readonly string[]).includes(question.slug)
+	);
 
 	// Pull out the { id, locale } we POST title/description edits against. Null
 	// when the backend didn't return translation detail (non-admin, or the
@@ -95,7 +124,7 @@ export const load: LayoutServerLoad = async ({ params, parent, cookies, url, dep
 		slug: summary.slug,
 		title: conversation?.title ?? summary.title,
 		status: summary.status,
-		// Where this Campaign runs, and so the subdomain it is served from. Stored
+		// Where this Campaign runs, and so the Place page it is listed on. Stored
 		// on the Conversation's metadata and editable on Setup; a legacy region
 		// entry is the fallback. The list resolves the same thing in `toSummary`,
 		// so this and the dashboard agree.
@@ -147,7 +176,7 @@ export const load: LayoutServerLoad = async ({ params, parent, cookies, url, dep
 		zipPrefixes: region?.zipPrefixes ?? []
 	};
 
-	return { campaign, conversation, textContent };
+	return { campaign, conversation, textContent, defaultDemographics, customDemographics };
 };
 
 /**

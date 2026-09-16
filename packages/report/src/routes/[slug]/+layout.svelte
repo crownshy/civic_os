@@ -19,6 +19,7 @@
 		demogs: '/[slug]/demographics',
 		groups: '/[slug]/groups',
 		consensus: '/[slug]/consensus',
+		cta: '/[slug]/cta',
 		themes: '/[slug]/themes'
 	} as const satisfies Record<StepKey, string>;
 

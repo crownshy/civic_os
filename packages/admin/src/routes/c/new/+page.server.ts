@@ -11,6 +11,7 @@ import {
 } from '@civicos/shared/data/place';
 import { rescopedSlug } from '$lib/config/place';
 import { describeApiFailure } from '$lib/api/describe-failure';
+import { enableDefaultDemographics } from '$lib/api/demographics';
 import { polisConfigFor } from '$lib/polis-step';
 import { COHOST_ROLE, CONVERSATION_RESOURCE } from '$lib/permissions';
 import { participantBase } from '$lib/conversations';
@@ -73,8 +74,8 @@ export const load: PageServerLoad = async ({ cookies, url, depends }) => {
 	const form = await superValidate(zod4(createConversationSchema));
 	form.data.hostId = defaultHostId;
 
-	// Only to show what subdomain the typed Place will be served from. Empty on a
-	// deployment with no participant apex configured, where the form says nothing
+	// Only to preview the Place page the typed Place will be listed on. Empty on a
+	// deployment with no participant host configured, where the form says nothing
 	// rather than guessing a domain.
 	const baseDomain = participantBase()
 		.replace(/^https?:\/\//, '')
@@ -149,6 +150,13 @@ export const actions: Actions = {
 			}
 			return fail(text);
 		};
+
+		try {
+			await enableDefaultDemographics(api, conversationId);
+		} catch (e) {
+			console.error('Enabling default demographics failed', e);
+			return rollback(`Could not enable default demographics: ${describeApiFailure(e)}`);
+		}
 
 		// 2. The workflow that holds the steps. One active workflow per Campaign
 		//    (CONTEXT.md: a Campaign has exactly one Polis step).
@@ -243,8 +251,8 @@ export const actions: Actions = {
 		}
 
 		// 6. Mirror the two things the participant app cannot read for itself.
-		//    A Campaign is reachable at `<place>.<apex>/<org>/conversations/<slug>`
-		//    from the moment it exists (a Place only moves it to a subdomain), so
+		//    A Campaign is reachable at `<base>/<org>/conversations/<slug>` from the
+		//    moment it exists (a Place only lists it on a Place page), so
 		//    what that link needs belongs on the public payload now rather than at
 		//    publish time: `metadata.org` because `/organizations` is 401 to the
 		//    participant app, `metadata.poll` because the Polis step is too.

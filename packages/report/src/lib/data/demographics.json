@@ -1,5 +1,5 @@
 {
-	"_readme": "Category breakdowns for the Demographics detail modal, opened via the 'See full demographics…' link on the L0 Demographics page. Derived by hand from references/conversation-demographics-2026-08-20.csv (437 rows, one per participant profile) — the same source file participant-locations.json's city counts come from. total is every row in the CSV, answered or not. Each category's own answered count is the number of participants with a non-blank value for that field; each breakdown row's pct is that value's share of *only* the participants who answered — not of total — matching the modal's own copy ('Of those N people that provided this information, here is the breakdown'). Each pct is rounded independently for display, the same convention bloom-data.json's vote.pct uses, so a category's rows are not guaranteed to sum to exactly 100. age buckets a continuous field: the youngest bucket reads 'Under 25' rather than the more typical '18-24' because two respondents reported ages 16–17 — the field is self-reported with no minimum enforced upstream, and '18-24' would misstate their own answer. Not touched by scripts/refresh-poll.js, which is a different, Polis-sourced pipeline entirely; re-derive by hand from a fresh demographics CSV export the same way, keeping each category's own answered count as its denominator.",
+	"_readme": "Category breakdowns for the Demographics detail modal, opened via the 'See full demographics…' link on the L0 Demographics page. Derived by hand from references/conversation-demographics-2026-08-20.csv (437 rows, one per participant profile) — the same source file participant-locations.json's city counts come from. total is every row in the CSV, answered or not. Each category's own answered count is the number of participants with a non-blank value for that field; each breakdown row's pct is that value's share of *only* the participants who answered — not of total — matching the modal's own copy ('Of those N people that provided this information, here is the breakdown'). Each pct is rounded independently for display, the same convention bloom-data.json's vote.pct uses, so a category's rows are not guaranteed to sum to exactly 100. age buckets a continuous field: the youngest bucket reads 'Under 25' rather than the more typical '18-24' because two respondents reported ages 16–17 — the field is self-reported with no minimum enforced upstream, and '18-24' would misstate their own answer. Not touched by scripts/refresh-poll.js, which is a different, Polis-sourced pipeline entirely; re-derive by hand from a fresh demographics CSV export the same way, keeping each category's own answered count as its denominator. Each row's actual is the real tri-county population's share for that subcategory, from the 'Tri-County Weighted %' column of references/'OR Demographic Goals - Goals.csv' (Deschutes, Crook and Jefferson populations weighted together), rounded the same independent way as pct. It is the modal's Actual column, shown next to the In Poll pct so a reader can see which subgroups are over- or under-represented among respondents. age's actual uses that CSV's '18-24' row for the 'Under 25' bucket: the census source has no bucket younger than 18, so it is the closest real-population figure, not a literal match.",
 	"total": 437,
 	"categories": [
 		{
@@ -7,12 +7,12 @@
 			"label": "Age",
 			"answered": 233,
 			"breakdown": [
-				{ "label": "65+", "pct": 30 },
-				{ "label": "55-64", "pct": 20 },
-				{ "label": "45-54", "pct": 19 },
-				{ "label": "35-44", "pct": 18 },
-				{ "label": "25-34", "pct": 10 },
-				{ "label": "Under 25", "pct": 3 }
+				{ "label": "65+", "pct": 30, "actual": 25 },
+				{ "label": "55-64", "pct": 20, "actual": 18 },
+				{ "label": "45-54", "pct": 19, "actual": 15 },
+				{ "label": "35-44", "pct": 18, "actual": 17 },
+				{ "label": "25-34", "pct": 10, "actual": 16 },
+				{ "label": "Under 25", "pct": 3, "actual": 10 }
 			]
 		},
 		{
@@ -20,9 +20,9 @@
 			"label": "Political",
 			"answered": 209,
 			"breakdown": [
-				{ "label": "Democrat / Progressive / Liberal", "pct": 54 },
-				{ "label": "No Party Preference / Independent", "pct": 33 },
-				{ "label": "Republican / Conservative", "pct": 12 }
+				{ "label": "Democrat / Progressive / Liberal", "pct": 54, "actual": 25 },
+				{ "label": "No Party Preference / Independent", "pct": 33, "actual": 33 },
+				{ "label": "Republican / Conservative", "pct": 12, "actual": 42 }
 			]
 		},
 		{
@@ -30,9 +30,9 @@
 			"label": "Gender",
 			"answered": 221,
 			"breakdown": [
-				{ "label": "Female", "pct": 62 },
-				{ "label": "Male", "pct": 35 },
-				{ "label": "Other", "pct": 3 }
+				{ "label": "Female", "pct": 62, "actual": 50 },
+				{ "label": "Male", "pct": 35, "actual": 50 },
+				{ "label": "Other", "pct": 3, "actual": 0 }
 			]
 		},
 		{
@@ -40,14 +40,14 @@
 			"label": "Race / Ethnicity",
 			"answered": 223,
 			"breakdown": [
-				{ "label": "White or Caucasian", "pct": 86 },
-				{ "label": "Multiracial", "pct": 4 },
-				{ "label": "Native American", "pct": 4 },
-				{ "label": "Hispanic or Latino", "pct": 3 },
-				{ "label": "Asian / Pacific Islander", "pct": 1 },
-				{ "label": "Other", "pct": 1 },
-				{ "label": "Black or African American", "pct": 0 },
-				{ "label": "Middle Eastern / North African", "pct": 0 }
+				{ "label": "White or Caucasian", "pct": 86, "actual": 78 },
+				{ "label": "Multiracial", "pct": 4, "actual": 5 },
+				{ "label": "Native American", "pct": 4, "actual": 4 },
+				{ "label": "Hispanic or Latino", "pct": 3, "actual": 10 },
+				{ "label": "Asian / Pacific Islander", "pct": 1, "actual": 2 },
+				{ "label": "Other", "pct": 1, "actual": 1 },
+				{ "label": "Black or African American", "pct": 0, "actual": 1 },
+				{ "label": "Middle Eastern / North African", "pct": 0, "actual": 0 }
 			]
 		}
 	]

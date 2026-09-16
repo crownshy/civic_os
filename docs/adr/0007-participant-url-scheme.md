@@ -1,5 +1,9 @@
 # The participant URL is `<place>/<org>/conversations/<campaign-slug>`
 
+> **Partly superseded by [ADR 0011](0011-the-place-leaves-the-hostname.md).** The
+> Place is no longer a subdomain, and the last segment is the whole Conversation
+> slug. The `/<org>/conversations/` shape and the rest of this record stand.
+
 The participant URL mirrors comhairle's own:
 
     <place>.bloomproject.us/<org>/conversations/<campaign-slug>

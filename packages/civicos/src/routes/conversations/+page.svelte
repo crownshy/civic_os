@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { AppShell } from '$lib/components/layout';
 	import { Button } from '$lib/components/ui';
-	import CampaignCard from './CampaignCard.svelte';
+	import CampaignCard from '$lib/components/ui/CampaignCard.svelte';
 
 	const { data } = $props();
 
