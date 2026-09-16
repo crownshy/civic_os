@@ -35,10 +35,8 @@ const handler: RequestHandler = async ({ request, params, cookies }) => {
 		headers.set('x-real-ip', forwardedFor.split(',')[0].trim());
 	}
 
-	if (env.COMHAIRLE_API_KEY) {
-		headers.set('Authorization', `Bearer ${env.COMHAIRLE_API_KEY}`);
-	}
-
+	// Cookie only, no service key: comhairle reads a bearer token before the
+	// cookie, so a key here would act as its owner rather than as this user.
 	const authToken = cookies.get('auth-token');
 	if (authToken) {
 		headers.set('cookie', `auth-token=${authToken}`);
