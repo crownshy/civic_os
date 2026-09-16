@@ -11,6 +11,7 @@ import {
 } from '@civicos/shared/data/place';
 import { rescopedSlug } from '$lib/config/place';
 import { describeApiFailure } from '$lib/api/describe-failure';
+import { enableDefaultDemographics } from '$lib/api/demographics';
 import { polisConfigFor } from '$lib/polis-step';
 import { COHOST_ROLE, CONVERSATION_RESOURCE } from '$lib/permissions';
 import { participantBase } from '$lib/conversations';
@@ -149,6 +150,13 @@ export const actions: Actions = {
 			}
 			return fail(text);
 		};
+
+		try {
+			await enableDefaultDemographics(api, conversationId);
+		} catch (e) {
+			console.error('Enabling default demographics failed', e);
+			return rollback(`Could not enable default demographics: ${describeApiFailure(e)}`);
+		}
 
 		// 2. The workflow that holds the steps. One active workflow per Campaign
 		//    (CONTEXT.md: a Campaign has exactly one Polis step).

@@ -5,11 +5,6 @@
 	import type { PolisStatementAux } from '$lib/types/aux';
 	import SetupCard from '$lib/components/setup/SetupCard.svelte';
 	import DemographicsCard from '$lib/components/setup/DemographicsCard.svelte';
-	import {
-		readCustomDemographics,
-		readDemographicToggles,
-		type DemographicKey
-	} from '@civicos/shared/data/demographics';
 	import StatusCard from './StatusCard.svelte';
 	import SeedStatementsCard from './SeedStatementsCard.svelte';
 
@@ -65,8 +60,8 @@
 		await invalidate('open-poll:aux');
 	}
 
-	const demographics = $derived(readDemographicToggles(conversation?.metadata));
-	const customDemographics = $derived(readCustomDemographics(conversation?.metadata));
+	const defaultDemographics = $derived(data.defaultDemographics);
+	const customDemographics = $derived(data.customDemographics);
 
 	/**
 	 * One shared setting, not a poll-specific one: #363 moves demographics up to
@@ -84,15 +79,19 @@
 		await invalidate(`campaign:${page.params.slug}`);
 	}
 
-	const setDemographic = (key: DemographicKey, next: boolean) =>
-		patchMetadata({ demographics: { ...demographics, [key]: next } });
-
-	const toggleCustomDemographic = (key: string, next: boolean) =>
-		patchMetadata({
-			customDemographics: customDemographics.map((c) =>
-				c.key === key ? { ...c, enabled: next } : c
-			)
-		});
+	async function toggleCustomDemographic(slug: string, next: boolean) {
+		if (next) {
+			await data.api.CreateConversationDemographics({
+				conversationId: campaign.id,
+				questionSlug: slug
+			});
+		} else {
+			await data.api.DeleteConversationDemographicsByQuestion(undefined, {
+				params: { conversation_id: campaign.id, question_slug: slug }
+			});
+		}
+		await invalidate(`campaign:${page.params.slug}`);
+	}
 </script>
 
 <div class="flex flex-col gap-6 px-8 py-8">
@@ -122,8 +121,8 @@
 	<DemographicsCard
 		title="Demographics Questions"
 		subtitle="Select from your active demographic categories. To add or edit categories, use the Campaign Setup tab."
-		toggles={demographics}
-		onToggle={setDemographic}
+		defaults={defaultDemographics}
+		onToggle={toggleCustomDemographic}
 		custom={customDemographics}
 		onToggleCustom={toggleCustomDemographic}
 	/>

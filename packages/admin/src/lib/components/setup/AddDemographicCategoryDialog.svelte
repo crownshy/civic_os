@@ -5,36 +5,38 @@
 	import SetupField from './SetupField.svelte';
 	import {
 		isKeyTaken,
-		toDemographicKey,
+		toDemographicSlug,
 		type CustomDemographicCategory
 	} from '@civicos/shared/data/demographics';
 
 	interface Props {
 		open: boolean;
+		/** Present when changing an existing category. Its slug remains stable. */
+		category?: CustomDemographicCategory;
 		/** Existing custom categories, for the duplicate-name check. */
 		existing: CustomDemographicCategory[];
 		onSave: (category: CustomDemographicCategory) => Promise<void>;
 	}
 
-	let { open = $bindable(), existing, onSave }: Props = $props();
+	let { open = $bindable(), category, existing, onSave }: Props = $props();
 
-	let name = $state('');
-	let options = $state<string[]>([]);
+	let name = $state(category?.displayName ?? '');
+	let options = $state<string[]>([...(category?.options ?? [])]);
 	/** Index currently open as a text input; -1 when nothing is being edited. */
 	let editing = $state(-1);
 	let draft = $state('');
 	let submitting = $state(false);
 	let error = $state<string | null>(null);
 
-	const key = $derived(toDemographicKey(name));
+	const slug = $derived(category?.slug ?? toDemographicSlug(name));
 
 	// Withheld until they have started, so an untouched dialog is not already scolding.
 	const started = $derived(!!name.trim() || options.length > 0);
 
 	const problem = $derived.by(() => {
 		if (!name.trim()) return 'Give the category a name.';
-		if (!key) return 'The name needs at least one letter or number.';
-		if (isKeyTaken(key, existing)) return 'A category with that name already exists.';
+		if (!slug) return 'The name needs at least one letter or number.';
+		if (!category && isKeyTaken(slug, existing)) return 'A category with that name already exists.';
 		if (options.length < 2) return 'Add at least two options.';
 		if (new Set(options).size !== options.length) return 'Options must be unique.';
 		return null;
@@ -43,8 +45,8 @@
 	// Reset on open, as an event rather than an effect, matching AddCoHostsDialog.
 	function onOpenChange(next: boolean) {
 		if (next) {
-			name = '';
-			options = [];
+			name = category?.displayName ?? '';
+			options = [...(category?.options ?? [])];
 			editing = -1;
 			draft = '';
 			error = null;
@@ -118,7 +120,7 @@
 		submitting = true;
 		error = null;
 		try {
-			await onSave({ key, name: name.trim(), options, enabled: true });
+			await onSave({ slug, displayName: name.trim(), options, enabled: category?.enabled ?? true });
 			open = false;
 		} catch (e) {
 			console.error('Adding a demographic category failed', e);
@@ -135,7 +137,7 @@
 	>
 		<Dialog.Header class="shrink-0">
 			<Dialog.Title class="font-display text-h4 font-semibold md:text-h3">
-				Add New Demographic Category
+				{category ? 'Edit Demographic Category' : 'Add New Demographic Category'}
 			</Dialog.Title>
 			<Dialog.Description class="text-body text-foreground/70">
 				Participants pick one option. Categories added here apply across the whole Campaign.
@@ -269,7 +271,7 @@
 					Cancel
 				</Button>
 				<Button onclick={save} disabled={!!problem || submitting}>
-					{submitting ? 'Saving…' : 'Save category'}
+					{submitting ? 'Saving…' : category ? 'Save changes' : 'Save category'}
 				</Button>
 			</div>
 		</Dialog.Footer>
