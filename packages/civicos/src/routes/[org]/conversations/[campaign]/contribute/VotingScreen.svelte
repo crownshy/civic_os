@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { fly, fade } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import { InfoBar, VoteBar, ReportPanel } from '$lib/components/ui';
 	import type { RegionConfig } from '$lib/config/regions';
+	import StatementPlaceholder from './StatementPlaceholder.svelte';
 
 	interface Props {
 		placeName: string;
@@ -93,18 +94,8 @@
 			>
 		</div>
 		{#if waitingForNext}
-			<!-- Loading skeleton between statements -->
-			<div in:fade={{ duration: 200 }} class="w-full animate-pulse text-left">
-				<div class="flex items-center gap-2">
-					<span class="h-5 w-5 rounded-full bg-card-foreground/20"></span>
-					<span class="h-4 w-32 rounded bg-card-foreground/20"></span>
-				</div>
-				<div class="mt-6 space-y-3">
-					<div class="h-8 w-full rounded bg-card-foreground/10"></div>
-					<div class="h-8 w-4/5 rounded bg-card-foreground/10"></div>
-					<div class="h-8 w-3/5 rounded bg-card-foreground/10"></div>
-				</div>
-			</div>
+			<!-- Loading skeleton between statements, shared with VotingSkeleton -->
+			<StatementPlaceholder fadeIn />
 		{:else}
 			<div
 				class="mt-6 max-h-[60vh] w-full overflow-y-auto text-left"

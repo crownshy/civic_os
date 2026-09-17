@@ -13,7 +13,10 @@
 	});
 </script>
 
-<Story name="Default" args={{ placeName: 'UTAH COUNTY', region: REGIONS.utah }}>
+<Story
+	name="Default"
+	args={{ placeName: 'UTAH COUNTY', question: REGIONS.utah.question, region: REGIONS.utah }}
+>
 	{#snippet template(args)}
 		<div class="h-dvh">
 			<VotingSkeleton {...args} />

@@ -26,6 +26,9 @@
 	const campaign: Campaign = page.data.campaign;
 	const hostCopy = page.data.hostCopy;
 	const placeName = placeNameFor(campaign, region);
+	// The same Key Question /contribute resolves, so the skeleton shown here and
+	// the voting screen it becomes label the statement identically.
+	const question = campaign?.poll?.question || region.question;
 	const contributePath = campaignPath(campaign.slug, page.params.org, 'contribute');
 	// Resolved in the layout load, so a Host's saved questions replace the
 	// `regions.ts` placeholders without this page knowing which it got.
@@ -472,7 +475,7 @@
 {#if leaving}
 	<div class="fixed inset-0 z-50 bg-background" in:fade={{ duration: 120 }}>
 		<AppShell border={false}>
-			<VotingSkeleton {placeName} {region} />
+			<VotingSkeleton {placeName} {question} {region} />
 		</AppShell>
 		<span class="sr-only" role="status">Loading the poll</span>
 	</div>

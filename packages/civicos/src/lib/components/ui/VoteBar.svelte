@@ -54,10 +54,13 @@
 		</Button>
 	</div>
 
-	{#if onReport}
+	<!-- Rendered for the skeleton too: without it the compose bar sits a row
+		higher than on the screen it becomes, and jumps when the statement lands. -->
+	{#if onReport || skeleton}
 		<div class="px-4 pb-3 text-center">
 			<button
 				type="button"
+				disabled={skeleton}
 				onclick={onReport}
 				data-umami-event="report-statement-click"
 				class="font-sans text-sm font-medium text-muted-foreground transition-opacity active:opacity-60"

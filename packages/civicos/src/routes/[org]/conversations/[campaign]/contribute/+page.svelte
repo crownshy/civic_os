@@ -328,7 +328,7 @@
 	{#if screen === 'loading'}
 		<!-- Most returning participants land on voting, and the landing page already
 			showed them this skeleton, so a text splash here would flash in between. -->
-		<VotingSkeleton {placeName} {region} />
+		<VotingSkeleton {placeName} {question} {region} />
 	{:else if screen === 'voting'}
 		{#if polis.currentStatement}
 			<VotingScreen
@@ -346,7 +346,7 @@
 				{region}
 			/>
 		{:else}
-			<VotingSkeleton {placeName} {region} />
+			<VotingSkeleton {placeName} {question} {region} />
 		{/if}
 	{:else if screen === 'compose'}
 		<ComposeScreen

@@ -23,14 +23,16 @@
 	}}
 >
 	{#snippet template(args)}
-		<VotingScreen
-			{...args}
-			question={REGIONS.utah.question}
-			region={REGIONS.utah}
-			onVote={() => {}}
-			onEnd={() => {}}
-			onCompose={() => {}}
-		/>
+		<div class="h-dvh">
+			<VotingScreen
+				{...args}
+				question={REGIONS.utah.question}
+				region={REGIONS.utah}
+				onVote={() => {}}
+				onEnd={() => {}}
+				onCompose={() => {}}
+			/>
+		</div>
 	{/snippet}
 </Story>
 
@@ -44,14 +46,16 @@
 	}}
 >
 	{#snippet template(args)}
-		<VotingScreen
-			{...args}
-			question={REGIONS.utah.question}
-			region={REGIONS.utah}
-			onVote={() => {}}
-			onEnd={() => {}}
-			onCompose={() => {}}
-		/>
+		<div class="h-dvh">
+			<VotingScreen
+				{...args}
+				question={REGIONS.utah.question}
+				region={REGIONS.utah}
+				onVote={() => {}}
+				onEnd={() => {}}
+				onCompose={() => {}}
+			/>
+		</div>
 	{/snippet}
 </Story>
 
@@ -66,13 +70,15 @@
 	}}
 >
 	{#snippet template(args)}
-		<VotingScreen
-			{...args}
-			question={REGIONS.utah.question}
-			region={REGIONS.utah}
-			onVote={() => {}}
-			onEnd={() => {}}
-			onCompose={() => {}}
-		/>
+		<div class="h-dvh">
+			<VotingScreen
+				{...args}
+				question={REGIONS.utah.question}
+				region={REGIONS.utah}
+				onVote={() => {}}
+				onEnd={() => {}}
+				onCompose={() => {}}
+			/>
+		</div>
 	{/snippet}
 </Story>

@@ -11,6 +11,9 @@
 		backLabel?: string;
 		buttonText?: string;
 		onEnd?: () => void;
+		/** Renders END as a disabled placeholder, so a skeleton header is the same
+		 *  shape as the screen it stands in for. */
+		skeleton?: boolean;
 		variant?: 'default' | 'light' | 'dark';
 		class?: string;
 		region: RegionConfig;
@@ -22,6 +25,7 @@
 		backLabel = '← BACK TO VOTING',
 		buttonText = 'ABOUT →',
 		onEnd,
+		skeleton = false,
 		variant = 'default',
 		class: className,
 		region
@@ -80,8 +84,8 @@
 		>
 			{buttonText}
 		</Button>
-		{#if onEnd}
-			<Button variant="destructive" size="xs" onclick={onEnd}>END</Button>
+		{#if onEnd || skeleton}
+			<Button variant="destructive" size="xs" disabled={skeleton} onclick={onEnd}>END</Button>
 		{/if}
 	</div>
 </div>
