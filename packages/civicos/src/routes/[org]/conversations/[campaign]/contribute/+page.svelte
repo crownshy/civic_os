@@ -7,7 +7,6 @@
 	import {
 		PopQuiz,
 		InfoBar,
-		VoteBar,
 		ActionPanel,
 		EmailPanelContent,
 		SharePanelContent,
@@ -29,6 +28,7 @@
 	import type { ParticipantSession } from '$lib/services/participant';
 	import { config } from '$lib/services/api';
 	import VotingScreen from './VotingScreen.svelte';
+	import VotingSkeleton from './VotingSkeleton.svelte';
 	import ComposeScreen from './ComposeScreen.svelte';
 	import DidYouKnowScreen from './DidYouKnowScreen.svelte';
 	import AboutYouScreen from './AboutYouScreen.svelte';
@@ -284,13 +284,9 @@
 
 <AppShell border={false}>
 	{#if screen === 'loading'}
-		<div class="flex h-full flex-col items-center justify-center bg-background">
-			<div class="animate-pulse text-center">
-				<span class="font-mono text-base font-medium text-muted-foreground/60 uppercase"
-					>LOADING...</span
-				>
-			</div>
-		</div>
+		<!-- Most returning participants land on voting, and the landing page already
+			showed them this skeleton, so a text splash here would flash in between. -->
+		<VotingSkeleton {placeName} {region} />
 	{:else if screen === 'voting'}
 		{#if polis.currentStatement}
 			<VotingScreen
@@ -307,28 +303,7 @@
 				{region}
 			/>
 		{:else}
-			<!-- Skeleton that reuses real components so layout stays in sync -->
-			<div class="flex h-full flex-col bg-background">
-				<InfoBar {placeName} {region} />
-
-				<!-- Skeleton statement area -->
-				<div class="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-8">
-					<div class="absolute top-0 left-0 h-[3px] w-full bg-secondary/30"></div>
-					<div class="w-full animate-pulse text-left">
-						<div class="flex items-center gap-2">
-							<span class="h-5 w-5 rounded-full bg-muted-foreground/20"></span>
-							<span class="h-4 w-28 rounded bg-muted-foreground/20"></span>
-						</div>
-						<div class="mt-6 space-y-3">
-							<div class="h-8 w-full rounded bg-muted-foreground/10"></div>
-							<div class="h-8 w-4/5 rounded bg-muted-foreground/10"></div>
-							<div class="h-8 w-3/5 rounded bg-muted-foreground/10"></div>
-						</div>
-					</div>
-				</div>
-
-				<VoteBar skeleton />
-			</div>
+			<VotingSkeleton {placeName} {region} />
 		{/if}
 	{:else if screen === 'compose'}
 		<ComposeScreen

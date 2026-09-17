@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { campaignPath } from '@civicos/shared/data/place';
 	import { fade } from 'svelte/transition';
-	import { goto, invalidate } from '$app/navigation';
+	import { goto, invalidate, preloadCode } from '$app/navigation';
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
@@ -12,17 +12,21 @@
 	import type { ParticipantSession } from '$lib/services/participant';
 	import { getRegionByZipcode } from '$lib/config/regions';
 	import type { RegionConfig } from '$lib/config/regions';
-	import type { Campaign } from '$lib/config/campaign';
+	import { placeNameFor, type Campaign } from '$lib/config/campaign';
 	import { OPEN_POLL_EXPLAINER, FOOTER_LINKS, NAV_SECTIONS } from '$lib/config/landing-copy';
 	import { trackEvent } from '@lukulent/svelte-umami';
 	import { safeHref, sanitizeHostHtml } from '@civicos/shared/sanitize';
 	import { HOST_COPY_PROSE_CLASS, renderHostCopy, toContextSections } from '$lib/config/host-copy';
 	import { listSeparator } from '$lib/utils/list';
+	import { AppShell } from '$lib/components/layout';
 	import JoinSkeleton from './JoinSkeleton.svelte';
+	import VotingSkeleton from './contribute/VotingSkeleton.svelte';
 
 	const region: RegionConfig = page.data.region;
 	const campaign: Campaign = page.data.campaign;
 	const hostCopy = page.data.hostCopy;
+	const placeName = placeNameFor(campaign, region);
+	const contributePath = campaignPath(campaign.slug, page.params.org, 'contribute');
 	// Resolved in the layout load, so a Host's saved questions replace the
 	// `regions.ts` placeholders without this page knowing which it got.
 	const faq = page.data.faq;
@@ -69,7 +73,11 @@
 	// immediately, so there is no resync to miss.
 	let zipCode = $state(page.data.participant?.zipCode || session.zipCode);
 	let hasZip = $derived(!!zipCode.trim());
-	let joining = $state(false);
+	// True from the click until `/contribute` has rendered, across the join
+	// request, the participant invalidation and the navigation itself. Reset only
+	// if we are still on this page afterwards: a failed join, or the gate on
+	// `/contribute` sending us back.
+	let leaving = $state(false);
 	let zipFlash = $state(false);
 	let hasAgreedToTos = $derived(session.hasAgreedToTos);
 	let showHostMessage = $state(false);
@@ -91,6 +99,10 @@
 		}
 		// After the zip param, so the field never renders empty and then fills.
 		hydrated = true;
+		// Polis and the voting screens are the heaviest chunks on the site, and
+		// almost everyone who lands here goes there next. Code only: preloading
+		// data would run the `/contribute` gate before this visitor has joined.
+		void preloadCode(contributePath);
 	});
 
 	function showTermsModal() {
@@ -105,14 +117,18 @@
 	}
 
 	async function handleJoin() {
+		if (leaving) return;
+
 		if (isReturning) {
+			leaving = true;
 			// Every Campaign shares one origin, so someone who joined a different
 			// Campaign arrives here already known and never passes through `join`.
 			// Put them on this Campaign's workflow on the way in. Not awaited: a
 			// missing participation row is a reporting gap, not a reason to hold
 			// CONTINUE back, and the request outlives the client-side navigation.
 			void session.enterCampaign(campaign.id);
-			goto(campaignPath(campaign.slug, page.params.org, `contribute`));
+			await goto(contributePath);
+			leaving = false;
 			return;
 		}
 
@@ -136,20 +152,23 @@
 			return;
 		}
 
-		joining = true;
+		leaving = true;
 		// The Campaign the URL resolved to, not the zip's `regions.ts` entry. For
 		// Utah and Oregon these are the same Conversation (the redirect above
 		// guarantees the zip matches this Campaign); for a Campaign created in
 		// admin only `campaign.id` is right, because its region is the catch-all
 		// and would have put its participants in the USA catch-all poll.
 		const success = await session.join(zipCode.trim(), undefined, campaign.id);
-		joining = false;
-		if (!success) return;
+		if (!success) {
+			leaving = false;
+			return;
+		}
 		trackEvent('SucccesfullSignup');
 		// The root layout resolved "anonymous" before this. Re-run it so the
 		// server side gate on `/contribute` sees the participant that now exists.
 		await invalidate('civicos:participant');
-		goto(campaignPath(campaign.slug, page.params.org, `contribute`));
+		await goto(contributePath);
+		leaving = false;
 	}
 
 	function isValidEmail(value: string): boolean {
@@ -259,7 +278,7 @@
 							<Button
 								variant="primary"
 								fullWidth
-								disabled={joining}
+								disabled={leaving}
 								onclick={() => {
 									if (!hasZip) {
 										zipFlash = true;
@@ -453,16 +472,15 @@
 	</footer>
 </div>
 
-<!-- Loading overlay during join -->
-{#if joining}
-	<div
-		class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background"
-		transition:fade={{ duration: 200 }}
-	>
-		<div
-			class="h-10 w-10 animate-spin rounded-full border-4 border-yellow-950/30 border-t-yellow-950"
-		></div>
-		<span class="mt-4 font-mono text-sm font-medium text-yellow-950/80 uppercase">JOINING…</span>
+<!-- The first frame of `/contribute`, drawn here so it is up on the click
+	rather than after the join and navigation, and so the route swap underneath
+	lands on the same pixels. -->
+{#if leaving}
+	<div class="fixed inset-0 z-50 bg-background" in:fade={{ duration: 120 }}>
+		<AppShell border={false}>
+			<VotingSkeleton {placeName} {region} />
+		</AppShell>
+		<span class="sr-only" role="status">Loading the poll</span>
 	</div>
 {/if}
 
