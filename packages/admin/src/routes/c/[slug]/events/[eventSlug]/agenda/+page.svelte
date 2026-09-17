@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidate } from '$app/navigation';
+	import { invalidate } from '$lib/activity.svelte';
 	import { GripVertical, Pencil, Plus, Trash2, Users } from '@lucide/svelte';
 	import { dndzone, type DndEvent } from 'svelte-dnd-action';
 	import type { EventAgendaItem } from '@crownshy/api-client/api';

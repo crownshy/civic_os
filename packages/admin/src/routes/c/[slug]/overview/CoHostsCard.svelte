@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import { invalidate } from '$app/navigation';
+	import { enhance, invalidate } from '$lib/activity.svelte';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { Trash2 } from '@lucide/svelte';
 	import SetupCard from '$lib/components/setup/SetupCard.svelte';

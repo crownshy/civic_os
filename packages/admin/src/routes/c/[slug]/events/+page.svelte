@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidate } from '$app/navigation';
+	import { invalidate } from '$lib/activity.svelte';
 	import { ChevronRight, Plus, X } from '@lucide/svelte';
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import type { PageData } from './$types';

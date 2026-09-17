@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	import { enhance } from '$lib/activity.svelte';
 	import { Button } from '@civicos/shared/ui/button';
 	import { ArrowUpRight, MessagesSquare } from '@lucide/svelte';
 	import type { AssignableConversation, HostConversation } from './host-conversations';

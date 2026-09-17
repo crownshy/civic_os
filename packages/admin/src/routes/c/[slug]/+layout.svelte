@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page, navigating } from '$app/state';
-	import { invalidate } from '$app/navigation';
+	import { invalidate } from '$lib/activity.svelte';
 	import ConversationTabSkeleton from '$lib/components/skeletons/ConversationTabSkeleton.svelte';
 	import LiveToggle from './LiveToggle.svelte';
 	import { setCampaignLive } from '$lib/api/campaign-live';

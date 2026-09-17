@@ -10,7 +10,7 @@
 	import { Button } from '@civicos/shared/ui/button';
 	import { Spinner } from '@civicos/shared/ui/spinner';
 	import { untrack } from 'svelte';
-	import { invalidate } from '$app/navigation';
+	import { invalidate } from '$lib/activity.svelte';
 	import { RefreshCw } from '@lucide/svelte';
 	import AddSeedStatementsDialog from '$lib/components/seeds/AddSeedStatementsDialog.svelte';
 	import StatementsTable from './StatementsTable.svelte';

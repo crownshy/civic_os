@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import { goto, invalidate } from '$app/navigation';
-	import { enhance } from '$app/forms';
+	import { goto } from '$app/navigation';
+	import { enhance, invalidate } from '$lib/activity.svelte';
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import { superForm, defaults } from 'sveltekit-superforms';

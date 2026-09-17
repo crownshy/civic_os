@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidate } from '$app/navigation';
+	import { invalidate } from '$lib/activity.svelte';
 	import { page } from '$app/state';
 	import { moderateStatementAux, postSeed, syncStatementAux } from '$lib/api/aux';
 	import { setCampaignLive } from '$lib/api/campaign-live';

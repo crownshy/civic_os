@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { goto, invalidate } from '$app/navigation';
+	import { goto } from '$app/navigation';
+	import { invalidate } from '$lib/activity.svelte';
 	import { page } from '$app/state';
 	import * as Dialog from '@civicos/shared/ui/dialog';
 	import { Button } from '@civicos/shared/ui/button';
