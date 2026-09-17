@@ -60,7 +60,7 @@
 				type="button"
 				onclick={onReport}
 				data-umami-event="report-statement-click"
-				class="font-sans text-sm font-medium text-muted-foreground"
+				class="font-sans text-sm font-medium text-muted-foreground transition-opacity active:opacity-60"
 			>
 				Something wrong? <span class="text-destructive underline">Report this statement.</span>
 			</button>
@@ -71,7 +71,7 @@
 	<button
 		onclick={onCompose}
 		data-umami-event="compose-click"
-		class="w-full rounded-t-[40px] bg-primary p-5 text-left"
+		class="w-full touch-manipulation rounded-t-[40px] bg-primary p-5 text-left transition-all hover:bg-primary/95 active:bg-primary/85 active:duration-0"
 	>
 		<div class="flex items-center gap-[15px]">
 			<img

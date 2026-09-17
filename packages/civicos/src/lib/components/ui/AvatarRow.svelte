@@ -17,10 +17,10 @@
 			aria-label="Select avatar"
 			onclick={() => onSelect?.(avatar.id)}
 			class={cn(
-				'h-14 w-14 shrink-0 rounded-full border-4 transition-all',
+				'h-14 w-14 shrink-0 touch-manipulation rounded-full border-4 transition-all active:duration-0',
 				selected === avatar.id
-					? 'scale-110 border-white shadow-lg shadow-white/30'
-					: 'border-transparent'
+					? 'scale-110 border-white shadow-lg shadow-white/30 active:scale-105'
+					: 'border-transparent hover:border-white/40 active:scale-95 active:border-white/60'
 			)}
 			style="background-color: {avatar.color};"
 		>

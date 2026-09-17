@@ -63,9 +63,12 @@
 
 	<!-- Row 3: Compose input-->
 	{#if onCompose}
-		<button onclick={onCompose} class="flex w-full items-center gap-3 pt-3.5 pr-3.75 pb-3 pl-6">
+		<button
+			onclick={onCompose}
+			class="group flex w-full touch-manipulation items-center gap-3 pt-3.5 pr-3.75 pb-3 pl-6"
+		>
 			<div
-				class="flex flex-1 items-center justify-center gap-2.5 overflow-hidden rounded-full bg-primary px-5 py-2"
+				class="flex flex-1 items-center justify-center gap-2.5 overflow-hidden rounded-full bg-primary px-5 py-2 transition-all group-hover:bg-primary/90 group-active:scale-[0.98] group-active:bg-primary/80 group-active:duration-0"
 			>
 				<span class="text-base font-bold text-primary-foreground">
 					Share your own response...

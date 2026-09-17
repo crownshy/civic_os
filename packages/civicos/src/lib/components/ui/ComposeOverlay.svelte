@@ -64,7 +64,7 @@
 	<div class="px-6 pt-4">
 		<button
 			onclick={onShowInstructions}
-			class="font-mono text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
+			class="font-mono text-sm font-medium text-foreground/80 transition-all hover:text-foreground active:text-foreground active:opacity-60"
 		>
 			SHOW INSTRUCTIONS &rarr;
 		</button>

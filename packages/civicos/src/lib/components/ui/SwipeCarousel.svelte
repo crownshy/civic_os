@@ -91,14 +91,15 @@
 			{#each { length: count } as _, i (i)}
 				<button
 					onclick={() => handleDotClick(i)}
-					class="h-2 w-2 rounded-full transition-colors {selectedSlide === i + 1
+					class="h-2 w-2 touch-manipulation rounded-full transition-all active:scale-150 active:duration-0 {selectedSlide ===
+					i + 1
 						? 'bg-muted-foreground'
-						: 'bg-muted-foreground/50'}"
+						: 'bg-muted-foreground/50 hover:bg-muted-foreground/75'}"
 					aria-label="Slide {i + 1}"
 				></button>
 			{/each}
 			<button
-				class="flex items-center justify-center rounded-full bg-muted-foreground p-1.5"
+				class="flex touch-manipulation items-center justify-center rounded-full bg-muted-foreground p-1.5 transition-all hover:bg-muted-foreground/80 active:scale-90 active:bg-muted-foreground/70"
 				onclick={toggleAutoplay}
 			>
 				{#if autoplay}

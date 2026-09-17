@@ -88,10 +88,10 @@
 			{#each tabs as tab, i (tab)}
 				<button
 					onclick={() => handleTabClick(i)}
-					class="shrink-0 font-sans text-2xl leading-7 font-bold whitespace-nowrap transition-opacity {activeTab ===
+					class="shrink-0 touch-manipulation font-sans text-2xl leading-7 font-bold whitespace-nowrap transition-all select-none active:scale-95 active:duration-0 {activeTab ===
 					i
 						? 'text-foreground opacity-100'
-						: 'text-foreground opacity-40'}"
+						: 'text-foreground opacity-40 hover:opacity-70 active:opacity-80'}"
 				>
 					{tab}
 				</button>

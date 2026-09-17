@@ -108,7 +108,7 @@
 				<span>{displayLabel}</span>
 				<button
 					type="button"
-					class="h-4 w-4"
+					class="h-4 w-4 touch-manipulation transition-all hover:opacity-70 active:scale-90 active:opacity-60"
 					onclick={handleRemoveZip}
 					title="Remove selected zipcode"><LucideX class="h-4 w-4" /></button
 				>

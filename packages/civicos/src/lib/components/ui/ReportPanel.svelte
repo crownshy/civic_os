@@ -63,7 +63,7 @@
 					type="button"
 					onclick={close}
 					aria-label="Close"
-					class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-foreground/10 text-card-foreground"
+					class="flex h-9 w-9 shrink-0 touch-manipulation items-center justify-center rounded-full bg-foreground/10 text-card-foreground transition-all hover:bg-foreground/20 active:scale-90 active:bg-foreground/25"
 				>
 					<X class="h-5 w-5" />
 				</button>

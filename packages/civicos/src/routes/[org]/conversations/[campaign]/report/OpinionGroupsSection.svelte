@@ -97,10 +97,10 @@
 					{#each groups as group, gi (group.group_id)}
 						<button
 							onclick={() => selectGroup(gi)}
-							class="flex h-7 w-7 items-center justify-center rounded-full font-mono text-sm font-medium transition-colors {selectedGroup ===
+							class="flex h-7 w-7 touch-manipulation items-center justify-center rounded-full font-mono text-sm font-medium transition-all select-none active:scale-90 active:duration-0 {selectedGroup ===
 							gi
-								? 'bg-foreground text-background'
-								: 'bg-secondary/10 text-foreground'}"
+								? 'bg-foreground text-background hover:bg-foreground/90 active:bg-foreground/80'
+								: 'bg-secondary/10 text-foreground hover:bg-secondary/20 active:bg-secondary/30'}"
 						>
 							{String.fromCharCode(65 + gi)}
 						</button>

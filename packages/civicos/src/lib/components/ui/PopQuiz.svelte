@@ -71,14 +71,14 @@
 				<button
 					onclick={() => selectOption(i)}
 					disabled={answered}
-					class="relative flex h-16 w-full items-center rounded-[20px] px-6 text-left font-sans text-2xl leading-7 font-bold transition-all duration-300
+					class="relative flex h-16 w-full touch-manipulation items-center rounded-[20px] px-6 text-left font-sans text-2xl leading-7 font-bold transition-all duration-300
 						{answered && isCorrect
 						? 'bg-primary text-primary-foreground shadow-[0px_10px_15px_0px_rgba(12,34,95,0.25)]'
 						: isSelected && !isCorrect
 							? 'bg-white/30 text-white'
 							: answered
 								? 'bg-secondary/60 text-white/50'
-								: 'bg-secondary text-white'}
+								: 'bg-secondary text-white hover:bg-secondary/90 active:scale-[0.98] active:bg-secondary/80 active:duration-0'}
 						{answered && isCorrect && showCorrectAnim ? 'correct-glow' : ''}"
 				>
 					{#if answered && isCorrect}

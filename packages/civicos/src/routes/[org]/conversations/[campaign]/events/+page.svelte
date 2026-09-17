@@ -76,10 +76,10 @@
 				{#each filters as f (f.value)}
 					<button
 						onclick={() => (activeFilter = f.value)}
-						class="overflow-hidden rounded-[20px] px-2 py-0.5 font-mono text-sm font-medium transition-colors {activeFilter ===
+						class="touch-manipulation overflow-hidden rounded-[20px] px-2 py-0.5 font-mono text-sm font-medium transition-all select-none active:scale-95 active:duration-0 {activeFilter ===
 						f.value
-							? 'bg-foreground text-white'
-							: 'bg-secondary/10 text-foreground/50'}"
+							? 'bg-foreground text-white hover:bg-foreground/90 active:bg-foreground/80'
+							: 'bg-secondary/10 text-foreground/50 hover:bg-secondary/20 active:bg-secondary/30'}"
 					>
 						{f.label}
 					</button>

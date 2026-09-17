@@ -104,7 +104,7 @@
 			<a
 				href="/conversations"
 				data-umami-event="end-cta-join-click"
-				class="group flex flex-col gap-2 rounded-[30px] bg-card p-6 shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-transform hover:scale-[1.01]"
+				class="group flex touch-manipulation flex-col gap-2 rounded-[30px] bg-card p-6 shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-all hover:scale-[1.01] active:scale-[0.99] active:shadow-[0px_1px_8px_rgba(134,101,73,0.20)] active:duration-0"
 			>
 				<div class="flex items-center gap-2">
 					<span
@@ -124,7 +124,7 @@
 					data-umami-event="end-cta-email-click"
 					onclick={() => (emailPanelOpen = true)}
 					class={[
-						'group flex flex-col gap-2 rounded-[30px] bg-card p-6 text-left shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-all hover:scale-[1.01]',
+						'group flex touch-manipulation flex-col gap-2 rounded-[30px] bg-card p-6 text-left shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-all hover:scale-[1.01] active:scale-[0.99] active:shadow-[0px_1px_8px_rgba(134,101,73,0.20)] active:duration-0',
 						emailDone && 'opacity-60'
 					]}
 				>
@@ -150,7 +150,7 @@
 					type="button"
 					data-umami-event="end-cta-share-click"
 					onclick={() => (sharePanelOpen = true)}
-					class="group flex flex-col gap-2 rounded-[30px] bg-card p-6 text-left shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-all hover:scale-[1.01]"
+					class="group flex touch-manipulation flex-col gap-2 rounded-[30px] bg-card p-6 text-left shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-all hover:scale-[1.01] active:scale-[0.99] active:shadow-[0px_1px_8px_rgba(134,101,73,0.20)] active:duration-0"
 				>
 					<div class="flex items-center gap-2">
 						<span
@@ -174,7 +174,7 @@
 					type="button"
 					data-umami-event="end-cta-review-click"
 					onclick={openReview}
-					class="group flex flex-col gap-2 rounded-[30px] bg-card p-6 text-left shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-all hover:scale-[1.01]"
+					class="group flex touch-manipulation flex-col gap-2 rounded-[30px] bg-card p-6 text-left shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-all hover:scale-[1.01] active:scale-[0.99] active:shadow-[0px_1px_8px_rgba(134,101,73,0.20)] active:duration-0"
 				>
 					<div class="flex items-center gap-2">
 						<span

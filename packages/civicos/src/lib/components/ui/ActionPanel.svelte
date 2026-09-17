@@ -78,7 +78,7 @@
 					type="button"
 					data-umami-event={umamiDismissEvent}
 					onclick={close}
-					class="mt-5 text-center font-sans text-base font-medium text-destructive hover:underline"
+					class="mt-5 text-center font-sans text-base font-medium text-destructive transition-opacity hover:underline active:opacity-60"
 				>
 					{cancelLabel}
 				</button>

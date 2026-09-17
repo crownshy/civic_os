@@ -99,11 +99,11 @@
 			{#each questions as q, qIdx (q.key)}
 				<button
 					onclick={() => openCategory(q.key)}
-					class="relative flex h-16 w-full items-center rounded-[20px] text-left font-sans text-2xl leading-7 font-bold transition-all duration-300 {selectionLabel(
+					class="relative flex h-16 w-full touch-manipulation items-center rounded-[20px] text-left font-sans text-2xl leading-7 font-bold transition-all duration-300 active:scale-[0.98] active:duration-0 {selectionLabel(
 						q
 					)
-						? 'bg-card text-foreground shadow-[0px_5px_15px_0px_rgba(12,34,95,0.13)]'
-						: 'bg-secondary/10 text-foreground/70 hover:bg-secondary/15'}"
+						? 'bg-card text-foreground shadow-[0px_5px_15px_0px_rgba(12,34,95,0.13)] hover:shadow-[0px_5px_20px_0px_rgba(12,34,95,0.18)] active:shadow-none'
+						: 'bg-secondary/10 text-foreground/70 hover:bg-secondary/15 active:bg-secondary/25'}"
 					in:fly={{ y: 15, delay: 400 + qIdx * 80, duration: 400, easing: cubicOut }}
 				>
 					{#if selectionLabel(q)}
@@ -153,7 +153,7 @@
 			{#each dq.options as option, i (option)}
 				<button
 					onclick={() => selectOption(dq.key, i)}
-					class="relative flex h-16 w-full items-center border-b border-foreground/20 px-7 text-left font-sans text-lg leading-5 font-bold transition-colors hover:bg-accent/30 {selections[
+					class="relative flex h-16 w-full touch-manipulation items-center border-b border-foreground/20 px-7 text-left font-sans text-lg leading-5 font-bold transition-colors hover:bg-accent/30 active:bg-accent/60 active:duration-0 {selections[
 						dq.key
 					] === i
 						? 'bg-accent/30 text-foreground'

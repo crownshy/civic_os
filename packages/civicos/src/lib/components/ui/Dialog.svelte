@@ -126,7 +126,7 @@
 			>
 				<button
 					type="button"
-					class="absolute top-12 right-12 rounded-full bg-destructive/15 p-2"
+					class="absolute top-12 right-12 touch-manipulation rounded-full bg-destructive/15 p-2 transition-all hover:bg-destructive/25 active:scale-90 active:bg-destructive/30"
 					onclick={handleClose}><X class="text-destructive" /></button
 				>
 				<div

@@ -17,7 +17,11 @@
 		<span class="text-primary">{meta}</span>
 		{#if onDelete}
 			<span class="text-primary"> | </span>
-			<button onclick={onDelete} class="text-destructive uppercase">DELETE</button>
+			<button
+				onclick={onDelete}
+				class="text-destructive uppercase transition-opacity hover:underline active:opacity-60"
+				>DELETE</button
+			>
 		{/if}
 	</p>
 </div>

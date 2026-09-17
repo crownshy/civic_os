@@ -69,7 +69,10 @@
 			<span class="font-mono text-sm font-medium text-muted-foreground">BRIDGING THRESHOLD</span>
 			<div class="flex items-center gap-1.5">
 				{#each thresholds as threshold (threshold)}
-					<button onclick={() => (activeThreshold = threshold)} class="transition-colors">
+					<button
+						onclick={() => (activeThreshold = threshold)}
+						class="touch-manipulation transition-all select-none hover:opacity-80 active:scale-95 active:opacity-70 active:duration-0"
+					>
 						<Badge variant={activeThreshold === threshold ? 'dark' : 'soft'} size="md">
 							{threshold}%
 						</Badge>

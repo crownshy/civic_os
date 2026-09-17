@@ -108,10 +108,10 @@
 				onclick={() => handleClick(section.id)}
 				{@attach pillRef(section.id)}
 				class={[
-					'shrink-0 rounded-[20px] px-2.5 py-[3px] font-mono text-sm font-medium whitespace-nowrap transition-colors',
+					'shrink-0 touch-manipulation rounded-[20px] px-2.5 py-[3px] font-mono text-sm font-medium whitespace-nowrap transition-all select-none active:scale-95 active:duration-0',
 					isActive
-						? 'bg-primary text-primary-foreground'
-						: 'bg-primary/10 text-primary hover:bg-primary/20'
+						? 'bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/80'
+						: 'bg-primary/10 text-primary hover:bg-primary/20 active:bg-primary/30'
 				].join(' ')}
 			>
 				{section.label}
