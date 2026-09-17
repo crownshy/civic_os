@@ -32,19 +32,30 @@
 		...restProps
 	}: Props = $props();
 
+	// `transition-all` rather than `transition-colors` so the press scale and the
+	// shadow drop animate too. `active:duration-0` lands the pressed state on
+	// touch-down; without it the tap is over before the 150ms fade finishes.
 	const base =
-		'inline-flex items-center justify-center rounded-full font-mono font-medium transition-colors';
+		'inline-flex touch-manipulation items-center justify-center rounded-full font-mono font-medium transition-all select-none active:scale-[0.97] active:duration-0';
 
+	// Every variant needs an `active:` state, not just a hover one: a phone never
+	// enters hover, so a tap on a hover-only button gives no feedback at all until
+	// the next screen paints. Filled variants also drop their shadow on press,
+	// which reads as the button going down into the surface.
 	const variants: Record<Variant, string> = {
-		primary: 'bg-primary text-primary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]',
-		secondary: 'bg-secondary text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)]',
-		destructive: 'bg-destructive text-destructive-foreground ',
-		pill: 'text-primary [background-color:color-mix(in_srgb,var(--primary)_20%,white)]',
-		soft: 'bg-secondary/10 text-secondary hover:bg-secondary/20',
-		ghost: 'bg-transparent text-white/70',
+		primary:
+			'bg-primary text-primary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)] hover:bg-primary/90 active:bg-primary/80 active:shadow-none',
+		secondary:
+			'bg-secondary text-secondary-foreground shadow-[0px_4px_8.2px_0px_rgba(0,0,0,0.25)] hover:bg-secondary/90 active:bg-secondary/80 active:shadow-none',
+		destructive:
+			'bg-destructive text-destructive-foreground hover:bg-destructive/90 active:bg-destructive/80',
+		pill: 'text-primary [background-color:color-mix(in_srgb,var(--primary)_20%,white)] hover:[background-color:color-mix(in_srgb,var(--primary)_30%,white)] active:[background-color:color-mix(in_srgb,var(--primary)_40%,white)]',
+		soft: 'bg-secondary/10 text-secondary hover:bg-secondary/20 active:bg-secondary/30',
+		ghost: 'bg-transparent text-white/70 hover:bg-white/10 hover:text-white active:bg-white/20',
 		gradient:
-			'bg-white/10 shadow-[inset_2px_4px_4px_0px_rgba(0,0,0,0.20)] outline outline-2 outline-foreground/20',
-		outline: 'bg-transparent text-secondary border-4 border-secondary'
+			'bg-white/10 shadow-[inset_2px_4px_4px_0px_rgba(0,0,0,0.20)] outline outline-2 outline-foreground/20 hover:bg-white/20 active:bg-white/25',
+		outline:
+			'bg-transparent text-secondary border-4 border-secondary hover:bg-secondary/10 active:bg-secondary/20'
 	};
 
 	const disabledVariants: Record<Variant, string> = {
@@ -71,7 +82,7 @@
 			disabled ? disabledVariants[variant] : variants[variant],
 			sizes[size],
 			fullWidth && 'w-full',
-			disabled && 'cursor-not-allowed',
+			disabled && 'cursor-not-allowed active:scale-100',
 			className
 		)
 	);
