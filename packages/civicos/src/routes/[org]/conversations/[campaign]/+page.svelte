@@ -230,13 +230,7 @@
 					{campaign.place.name.toUpperCase()}
 				</div>
 			{/if}
-			<button
-				type="button"
-				onclick={() => (showAboutMessage = true)}
-				class="rounded-[20px] bg-primary/10 px-2 py-0.5 font-mono text-sm font-medium text-primary hover:bg-primary/20"
-			>
-				ABOUT→
-			</button>
+			<Button variant="pill" size="xs" onclick={() => (showAboutMessage = true)}>ABOUT→</Button>
 		</header>
 
 		<!-- Hero -->

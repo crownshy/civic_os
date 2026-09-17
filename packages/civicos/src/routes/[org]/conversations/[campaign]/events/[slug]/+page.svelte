@@ -165,12 +165,15 @@
 					</p> -->
 
 					{#if isRegistered}
-						<button
-							class="w-full rounded-full bg-secondary/20 px-7 py-3.5 font-mono text-lg font-medium text-foreground"
+						<Button
+							variant="soft"
+							size="lg"
+							fullWidth
 							disabled
+							class="bg-secondary/20 text-foreground opacity-100"
 						>
 							ALREADY REGISTERED <span class="text-2xl">✓</span>
-						</button>
+						</Button>
 					{:else}
 						<Button
 							variant="primary"

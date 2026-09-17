@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { AppShell } from '$lib/components/layout';
+	import { Button } from '$lib/components/ui';
 	import HeroSection from './HeroSection.svelte';
 	import CommonGroundSection from './CommonGroundSection.svelte';
 	import DemographicsSection from './DemographicsSection.svelte';
@@ -112,12 +113,7 @@
 					Check the server terminal for [Report] logs.
 				</p>
 			</div>
-			<button
-				onclick={() => location.reload()}
-				class="mt-4 rounded-full bg-primary px-6 py-2 font-mono text-sm text-primary-foreground"
-			>
-				RETRY
-			</button>
+			<Button size="sm" class="mt-4" onclick={() => location.reload()}>RETRY</Button>
 		</div>
 	{:else}
 		<!-- Report content -->
