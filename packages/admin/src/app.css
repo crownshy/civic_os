@@ -180,6 +180,21 @@
 	--success-foreground: #ffffff;
 }
 
+/* Touch affordances. `manipulation` drops the 300ms wait a browser holds for a
+   possible double-tap-to-zoom, so a tap fires on lift. The tap highlight is the
+   grey box iOS paints over a tapped element; every control here now has its own
+   pressed state, so the default would sit on top of the one we drew. */
+button,
+a,
+summary,
+label,
+[role='button'],
+[role='tab'],
+[role='option'] {
+	-webkit-tap-highlight-color: transparent;
+	touch-action: manipulation;
+}
+
 /* Card shadow matching wireframe spec */
 .shadow-card {
 	box-shadow: 0px 5px 15px 0px rgba(12, 34, 95, 0.13);
