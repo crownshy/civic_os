@@ -9,6 +9,7 @@
 	} from '$lib/api/aux';
 	import { Button } from '@civicos/shared/ui/button';
 	import { Spinner } from '@civicos/shared/ui/spinner';
+	import { untrack } from 'svelte';
 	import { invalidate } from '$app/navigation';
 	import { RefreshCw } from '@lucide/svelte';
 	import AddSeedStatementsDialog from '$lib/components/seeds/AddSeedStatementsDialog.svelte';
@@ -32,29 +33,41 @@
 
 	// --- Sync from Polis ---
 	// Submissions don't appear in moderation until this runs: the aux rows are
-	// synced, not created live.
-	let syncing = $state(false);
+	// synced, not created live. Keyed by step so switching conversations
+	// mid-sync still syncs the new one.
+	let syncingStep = $state<string | null>(null);
+	const syncing = $derived(syncingStep !== null && syncingStep === stepId);
 
-	async function syncFromPolis() {
-		if (!stepId || syncing) return;
-		syncing = true;
-		notice = null;
+	async function syncFromPolis({ quiet = false } = {}) {
+		const id = stepId;
+		if (!id || syncingStep === id) return;
+		syncingStep = id;
+		if (!quiet) notice = null;
 		try {
-			const res = await syncStatementAux(data.api, stepId);
+			const res = await syncStatementAux(data.api, id);
 			const skipped = res.skipped_invalid_xid ? ` (${res.skipped_invalid_xid} skipped)` : '';
-			notice = {
-				text: `Synced ${plural(res.synced, 'statement')} from Polis${skipped}.`,
-				error: false
-			};
+			if (!quiet || skipped) {
+				notice = {
+					text: `Synced ${plural(res.synced, 'statement')} from Polis${skipped}.`,
+					error: false
+				};
+			}
 			// Spinner stays up through the reload so the button does not flicker.
 			await invalidate('open-poll:aux');
 		} catch (e) {
 			console.error('syncStatementAux failed', e);
 			notice = { text: 'Could not sync statements from Polis.', error: true };
 		} finally {
-			syncing = false;
+			if (syncingStep === id) syncingStep = null;
 		}
 	}
+
+	// Sync on open and on conversation switch. Not in `load`: every accept/reject
+	// invalidates the aux data, which would re-run the sync against Polis each click.
+	$effect(() => {
+		if (!stepId) return;
+		untrack(() => syncFromPolis({ quiet: true }));
+	});
 
 	// --- Seeds ---
 	// Comhairle posts to Polis server-side, so no Polis credentials in the browser.
@@ -219,7 +232,7 @@
 		<div class="flex shrink-0 flex-wrap items-center gap-2">
 			<Button
 				variant="secondary"
-				onclick={syncFromPolis}
+				onclick={() => syncFromPolis()}
 				disabled={syncing || !stepId}
 				title="Pull the latest submitted statements from Polis"
 			>
