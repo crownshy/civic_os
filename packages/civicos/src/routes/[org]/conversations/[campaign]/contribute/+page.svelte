@@ -61,6 +61,15 @@
 	const polisUrl = campaign?.poll?.polisUrl || config.polisUrl;
 	const question = campaign?.poll?.question || zipRegion.question;
 
+	// The step a submitted statement's aux row is filed under. Taken from whichever
+	// source picked `polisId`, so a Campaign whose mirror predates this field never
+	// files its statements under the `regions.ts` poll's step.
+	const polisWorkflowStepId = campaign?.poll?.polisId
+		? campaign.poll.workflowStepId
+		: zipRegion.polisId
+			? zipRegion.polis_workflow_step_id
+			: undefined;
+
 	// The geography the chrome labels itself with. The Campaign's Place, not the
 	// zip's region: the URL says which Campaign this is (#423).
 	const placeName = placeNameFor(campaign, region);
@@ -272,8 +281,41 @@
 		screen = 'voting';
 	}
 
-	function handleCompose(text: string, anonymous: boolean) {
-		polis.submitStatement(text);
+	async function handleCompose(text: string, anonymous: boolean) {
+		const visibleTid = polis.currentStatement?.tid;
+		const submitted = await polis.submitStatement(text);
+		if (submitted) await createStatementAux(submitted, text, visibleTid);
+	}
+
+	/**
+	 * File the statement in comhairle's `statement_aux` table, which is what admin
+	 * moderation lists; Polis alone does not put it there. Same call comhairle's own
+	 * embed makes. A failure only delays the row until admin's "Sync from Polis",
+	 * so it is logged and the participant carries on.
+	 */
+	async function createStatementAux(
+		statement: { tid: number; pid: number },
+		text: string,
+		visibleTid: number | undefined
+	) {
+		if (!polisWorkflowStepId) {
+			console.warn('[contribute] No Polis workflow step; statement waits for a sync');
+			return;
+		}
+		try {
+			await page.data.api.PolisCreateStatementAux({
+				workflow_step_id: polisWorkflowStepId,
+				zid: statement.pid,
+				polis_conversation_id: polisId,
+				polis_statement_id: statement.tid,
+				statement_text: text,
+				is_seed: false,
+				themes: [],
+				visible_statement_when_submitted: visibleTid?.toString() ?? null
+			});
+		} catch (e) {
+			console.error('[contribute] Failed to create statement aux:', e);
+		}
 	}
 
 	function handleBackToVoting() {

@@ -96,45 +96,45 @@ export default class PolisApi {
 			.finally(() => (this._loading = false));
 	}
 
-	submitStatement(statement: string) {
-		// if (this.pid === undefined) {
-		// 	console.warn('[PolisApi] Cannot submit statement before voting (no pid yet)');
-		// 	this._error = 'Vote on at least one statement before adding your own.';
-		// 	return;
-		// }
+	/**
+	 * Resolves to the new statement's `tid` and the author's `pid`, or null when
+	 * Polis refused it or did not report a `tid`. The caller needs both to create
+	 * the `statement_aux` row admin moderation lists.
+	 */
+	async submitStatement(statement: string): Promise<{ tid: number; pid: number } | null> {
 		this._loading = true;
 		this._error = undefined;
 
 		const authType = this.pid ? { pid: this.pid } : { xid: this.userId };
 
-		fetch(`${this.baseUrl}/api/v3/comments`, {
-			method: 'POST',
-			credentials: 'include',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				agid: 1,
-				conversation_id: this.polisId,
-				txt: statement,
-				vote: -1,
-				is_seed: false,
-				...authType
-			})
-		})
-			.then((r) => {
-				if (!r.ok) throw new Error(`submitStatement failed: ${r.status}`);
-				return r.json();
-			})
-			.then((data) => {
-				if (data.currentPid) {
-					console.log('Setting pid ', data.currentPid);
-					this.pid = data.currentPid;
-				}
-			})
-			.catch((err) => {
-				console.error('[PolisApi] Error submitting statement:', err);
-				this._error = err.message;
-			})
-			.finally(() => (this._loading = false));
+		try {
+			const r = await fetch(`${this.baseUrl}/api/v3/comments`, {
+				method: 'POST',
+				credentials: 'include',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					agid: 1,
+					conversation_id: this.polisId,
+					txt: statement,
+					vote: -1,
+					is_seed: false,
+					...authType
+				})
+			});
+			if (!r.ok) throw new Error(`submitStatement failed: ${r.status}`);
+			const data = await r.json();
+			if (typeof data.currentPid === 'number') {
+				this.pid = data.currentPid;
+			}
+			if (typeof data.tid !== 'number') return null;
+			return { tid: data.tid, pid: this.pid ?? 0 };
+		} catch (err) {
+			console.error('[PolisApi] Error submitting statement:', err);
+			this._error = err instanceof Error ? err.message : String(err);
+			return null;
+		} finally {
+			this._loading = false;
+		}
 	}
 
 	submitVote(vote: 'agree' | 'disagree' | 'pass') {

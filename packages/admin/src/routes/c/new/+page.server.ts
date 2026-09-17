@@ -22,8 +22,8 @@ import type { Actions, PageServerLoad } from './$types';
 
 type Api = ReturnType<typeof ApiClientFactory>;
 
-/** The half of a created workflow step `polisConfigFor` reads. */
-type StepLike = { toolConfig?: unknown; previewToolConfig?: unknown };
+/** The half of a created workflow step `pollIdentity` reads. */
+type StepLike = { id: string; toolConfig?: unknown; previewToolConfig?: unknown };
 
 /** Polis defaults for a fresh poll, matching comhairle's own Setup screen. */
 const REQUIRED_VOTES = 10;
@@ -293,10 +293,11 @@ export const actions: Actions = {
  */
 function pollIdentity(step: StepLike | null, keyQuestion: string): CampaignPoll | null {
 	const polis = polisConfigFor(step);
-	if (!polis) return null;
+	if (!step || !polis) return null;
 
 	return {
 		polisId: polis.pollId,
+		workflowStepId: step.id,
 		...(polis.serverUrl ? { polisUrl: polis.serverUrl } : {}),
 		...(keyQuestion ? { question: keyQuestion } : {})
 	};

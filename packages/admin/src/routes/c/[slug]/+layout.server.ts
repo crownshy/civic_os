@@ -168,6 +168,7 @@ export const load: LayoutServerLoad = async ({ params, parent, cookies, url, dep
 			? {
 					...readPoll(conversation?.metadata),
 					polisId: polisStep.polisId,
+					workflowStepId: polisStep.id,
 					...(polisStep.polisUrl ? { polisUrl: polisStep.polisUrl } : {}),
 					...(polisStep.topic ? { question: polisStep.topic } : {})
 				}

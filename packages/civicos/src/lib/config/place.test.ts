@@ -146,13 +146,15 @@ describe('readPoll', () => {
 				poll: {
 					polisId: '2y2akzkmbb',
 					polisUrl: 'https://polis.comhairle.scot',
-					question: 'How can Utahns…'
+					question: 'How can Utahns…',
+					workflowStepId: '68425b0d-21e9-4f36-8c13-229dab4508bc'
 				}
 			})
 		).toEqual({
 			polisId: '2y2akzkmbb',
 			polisUrl: 'https://polis.comhairle.scot',
-			question: 'How can Utahns…'
+			question: 'How can Utahns…',
+			workflowStepId: '68425b0d-21e9-4f36-8c13-229dab4508bc'
 		});
 	});
 
@@ -189,7 +191,9 @@ describe('readPoll', () => {
 	});
 
 	it('drops malformed optional fields rather than the whole poll', () => {
-		expect(readPoll({ poll: { polisId: 'abc', polisUrl: 42, question: null } })).toEqual({
+		expect(
+			readPoll({ poll: { polisId: 'abc', polisUrl: 42, question: null, workflowStepId: ' ' } })
+		).toEqual({
 			polisId: 'abc'
 		});
 	});
