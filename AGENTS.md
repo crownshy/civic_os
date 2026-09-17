@@ -126,9 +126,11 @@ focused PR; do not let them silently grow:
 - `sveltekit-superforms` + `formsnap` are installed and the shared `ui/form` primitives
   exist, but app forms do not use them yet. Migrate forms onto superforms as you touch
   them.
-- `admin` and `civicos` have lint configured but neither passes yet: `admin` has 73 files failing
-  `prettier --check` and 52 eslint errors. `civicos` is clean on `prettier` and down to 37
-  eslint errors, all of them decisions rather than cleanups: 14 `no-at-html-tags` (#409),
+- `admin` and `civicos` have lint configured but neither passes yet. `admin` is nearly
+  there: 4 files failing `prettier --check` (`demographics.ts`, `EditGoalsModal.svelte`,
+  and the two participants files) and 2 eslint errors, both `no-unused-vars`. `civicos` is
+  clean on `prettier` and down to 36 eslint errors, all of them decisions rather than
+  cleanups: 14 `no-at-html-tags` (#409),
   14 `no-navigation-without-resolve`, one `no-explicit-any`, and 8 `no-unused-vars` that
   are each the visible half of a filed bug (#410, #411, #412, #413), a dead county map
   #423 will want, or a countdown whose markup is commented out. Read the reason before
