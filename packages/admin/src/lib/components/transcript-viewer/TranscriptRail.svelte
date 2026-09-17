@@ -144,7 +144,7 @@
 			bind:this={track}
 			onpointerdown={seekFromPointer}
 			aria-label="Seek"
-			class="relative mt-2 flex h-3 w-full cursor-pointer items-center"
+			class="relative mt-2 flex h-3 w-full cursor-pointer touch-none items-center"
 		>
 			<div class="h-0.5 w-full rounded-full bg-border"></div>
 			<div

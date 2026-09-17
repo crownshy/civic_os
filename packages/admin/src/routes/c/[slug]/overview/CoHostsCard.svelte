@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '@civicos/shared/ui/button';
 	import { enhance, invalidate } from '$lib/activity.svelte';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { Trash2 } from '@lucide/svelte';
@@ -103,14 +104,16 @@
 							<form method="POST" action="?/removeCohost" use:enhance={removeCohost}>
 								<input type="hidden" name="convId" value={convId} />
 								<input type="hidden" name="orgId" value={host.id} />
-								<button
+								<Button
+									variant="ghost"
+									size="icon-sm"
 									type="submit"
 									title="Remove co-host"
 									aria-label={`Remove ${host.name}`}
-									class="rounded-md p-1 text-muted-foreground hover:text-destructive"
+									class="text-muted-foreground hover:text-destructive"
 								>
 									<Trash2 class="size-4" />
-								</button>
+								</Button>
 							</form>
 						{/if}
 					</div>

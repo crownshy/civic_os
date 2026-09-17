@@ -112,7 +112,7 @@
 					type="button"
 					onclick={() => applyRemove(t)}
 					aria-label={`Remove theme ${t}`}
-					class="hidden leading-none text-neutral-900/40 group-hover/chip:inline hover:text-destructive"
+					class="hidden touch-manipulation leading-none text-neutral-900/40 transition-all group-hover/chip:inline hover:text-destructive active:scale-90 active:text-destructive/70 active:duration-0"
 				>
 					×
 				</button>
