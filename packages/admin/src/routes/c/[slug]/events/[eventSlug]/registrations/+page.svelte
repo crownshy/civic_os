@@ -81,10 +81,10 @@
 				<button
 					type="button"
 					onclick={() => (activeFilter = f)}
-					class={`rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl px-3 py-1.5 text-caption ${
+					class={`touch-manipulation rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl px-3 py-1.5 text-caption transition-all select-none active:scale-95 active:duration-0 ${
 						activeFilter === f
-							? 'bg-primary/10 text-foreground'
-							: 'bg-muted-foreground/10 text-foreground'
+							? 'bg-primary/10 text-foreground hover:bg-primary/20 active:bg-primary/25'
+							: 'bg-muted-foreground/10 text-foreground hover:bg-muted-foreground/20 active:bg-muted-foreground/25'
 					}`}
 				>
 					{f} · {counts[f]}
@@ -143,7 +143,10 @@
 						{row.status}
 					</span>
 				</div>
-				<button type="button" class="justify-self-end text-muted-foreground">
+				<button
+					type="button"
+					class="touch-manipulation justify-self-end text-muted-foreground transition-all hover:text-foreground active:scale-90 active:text-foreground/60 active:duration-0"
+				>
 					<MoreHorizontal class="size-4" />
 				</button>
 			</div>

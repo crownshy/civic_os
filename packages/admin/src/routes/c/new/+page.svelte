@@ -233,7 +233,7 @@
 											type="button"
 											onclick={() => removeCohost(host.id)}
 											aria-label={`Remove ${host.name}`}
-											class="rounded-full p-0.5 text-muted-foreground hover:text-destructive"
+											class="touch-manipulation rounded-full p-0.5 text-muted-foreground transition-all hover:text-destructive active:scale-90 active:text-destructive/70 active:duration-0"
 										>
 											<X class="size-3.5" />
 										</button>

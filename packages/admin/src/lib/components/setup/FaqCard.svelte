@@ -95,7 +95,7 @@
 							onclick={() => move(i, -1)}
 							disabled={i === 0 || !!pending}
 							aria-label={`Move "${entry.question}" up`}
-							class="cursor-pointer text-foreground hover:text-primary disabled:cursor-not-allowed disabled:opacity-25"
+							class="cursor-pointer touch-manipulation text-foreground transition-all hover:text-primary active:scale-90 active:text-primary/70 active:duration-0 disabled:cursor-not-allowed disabled:opacity-25 disabled:active:scale-100"
 						>
 							<ArrowUp class="size-4" />
 						</button>
@@ -104,7 +104,7 @@
 							onclick={() => move(i, 1)}
 							disabled={i === entries.length - 1 || !!pending}
 							aria-label={`Move "${entry.question}" down`}
-							class="cursor-pointer text-foreground hover:text-primary disabled:cursor-not-allowed disabled:opacity-25"
+							class="cursor-pointer touch-manipulation text-foreground transition-all hover:text-primary active:scale-90 active:text-primary/70 active:duration-0 disabled:cursor-not-allowed disabled:opacity-25 disabled:active:scale-100"
 						>
 							<ArrowDown class="size-4" />
 						</button>
@@ -113,7 +113,7 @@
 							onclick={() => (editing = i)}
 							disabled={!!pending}
 							aria-label={`Edit "${entry.question}"`}
-							class="cursor-pointer text-primary disabled:cursor-not-allowed disabled:opacity-40"
+							class="cursor-pointer touch-manipulation text-primary transition-all hover:text-primary/80 active:scale-90 active:text-primary/70 active:duration-0 disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100"
 						>
 							<Pencil class="size-4" />
 						</button>
@@ -123,7 +123,7 @@
 							disabled={!!pending}
 							aria-label={`Delete "${entry.question}"`}
 							title="Delete this question"
-							class="cursor-pointer p-1 text-muted-foreground hover:text-destructive disabled:cursor-not-allowed disabled:opacity-40"
+							class="cursor-pointer touch-manipulation p-1 text-muted-foreground transition-all hover:text-destructive active:scale-90 active:text-destructive/70 active:duration-0 disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100"
 						>
 							<Trash2 class="size-4" />
 						</button>
@@ -136,7 +136,7 @@
 			type="button"
 			onclick={() => (editing = -1)}
 			disabled={!!pending}
-			class="flex w-full cursor-pointer items-center gap-1 border-t border-border px-2 py-4 text-body font-bold text-primary disabled:cursor-not-allowed disabled:opacity-50"
+			class="flex w-full cursor-pointer items-center gap-1 border-t border-border px-2 py-4 text-body font-bold text-primary transition-colors hover:bg-muted/40 active:bg-foreground/10 active:duration-0 disabled:cursor-not-allowed disabled:opacity-50"
 		>
 			{pending ? 'Saving…' : 'Add New…'}
 		</button>

@@ -127,7 +127,7 @@
 				type="button"
 				onclick={togglePlay}
 				aria-label={isPlaying ? 'Pause' : 'Play'}
-				class="flex size-6 shrink-0 items-center justify-center text-primary"
+				class="flex size-6 shrink-0 touch-manipulation items-center justify-center text-primary transition-all hover:text-primary/80 active:scale-90 active:text-primary/70 active:duration-0"
 			>
 				{#if isPlaying}
 					<Pause class="size-4 fill-current" />
@@ -166,7 +166,7 @@
 				type="button"
 				onclick={() => seekTo(event.start_time)}
 				use:scrollToActive={isActive}
-				class={`flex w-full cursor-pointer flex-col items-start gap-[5px] px-5 py-6 text-left transition-colors hover:bg-primary/10 ${isActive ? 'bg-muted' : ''}`}
+				class={`flex w-full cursor-pointer flex-col items-start gap-[5px] px-5 py-6 text-left transition-colors hover:bg-primary/10 active:bg-primary/20 active:duration-0 ${isActive ? 'bg-muted' : ''}`}
 			>
 				<span
 					class={`text-caption leading-4 font-medium uppercase ${speakerColor(event.speaker_id)}`}

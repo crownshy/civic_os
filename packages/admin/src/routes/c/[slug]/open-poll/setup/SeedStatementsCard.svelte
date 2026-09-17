@@ -87,7 +87,7 @@
 						disabled={!canEdit || pending[row.id]}
 						title="Remove this statement from rotation"
 						aria-label={`Remove statement: ${row.statement_text}`}
-						class="cursor-pointer p-1 text-primary disabled:cursor-not-allowed disabled:opacity-40"
+						class="cursor-pointer touch-manipulation p-1 text-primary transition-all hover:text-primary/80 active:scale-90 active:text-primary/70 active:duration-0 disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100"
 					>
 						<X class="size-4" />
 					</button>
@@ -106,7 +106,7 @@
 						type="button"
 						onclick={open}
 						{disabled}
-						class="inline-flex cursor-pointer items-center gap-1 text-body font-semibold text-primary disabled:cursor-not-allowed disabled:opacity-40"
+						class="inline-flex cursor-pointer items-center gap-1 text-body font-semibold text-primary transition-opacity hover:opacity-80 active:opacity-60 disabled:cursor-not-allowed disabled:opacity-40"
 					>
 						<Plus class="size-4" />
 						Add New…
@@ -121,7 +121,7 @@
 					type="button"
 					onclick={() => (showRemoved = !showRemoved)}
 					aria-expanded={showRemoved}
-					class="w-full cursor-pointer text-left text-caption font-semibold text-muted-foreground uppercase hover:text-foreground"
+					class="w-full cursor-pointer text-left text-caption font-semibold text-muted-foreground uppercase transition-colors hover:text-foreground active:text-foreground/60"
 				>
 					{showRemoved ? 'Hide' : 'Show'} removed statements ({removed.length})
 				</button>
@@ -140,7 +140,7 @@
 									type="button"
 									onclick={() => setStatus(row, 'accept')}
 									disabled={!canEdit || pending[row.id]}
-									class="cursor-pointer text-body text-primary underline disabled:cursor-not-allowed disabled:opacity-40"
+									class="cursor-pointer text-body text-primary underline transition-opacity hover:opacity-80 active:opacity-60 disabled:cursor-not-allowed disabled:opacity-40"
 								>
 									Reinstate
 								</button>

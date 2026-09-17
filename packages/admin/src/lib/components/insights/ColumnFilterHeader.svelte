@@ -28,7 +28,7 @@
 
 <Popover.Root>
 	<Popover.Trigger
-		class={`flex w-full cursor-pointer items-center gap-1 font-ui text-caption font-semibold whitespace-nowrap text-foreground uppercase transition-colors hover:text-foreground/70 ${justify[align]}`}
+		class={`flex w-full cursor-pointer items-center gap-1 font-ui text-caption font-semibold whitespace-nowrap text-foreground uppercase transition-all select-none hover:text-foreground/70 active:scale-95 active:text-foreground/50 active:duration-0 ${justify[align]}`}
 	>
 		{label}
 		<ChevronDown class="size-3 shrink-0" />
@@ -40,7 +40,7 @@
 		<button
 			type="button"
 			onclick={toggle}
-			class="flex h-10 w-full cursor-pointer items-center justify-between border-b border-black/10 px-[9px] text-left transition-colors hover:bg-muted/50"
+			class="flex h-10 w-full cursor-pointer items-center justify-between border-b border-black/10 px-[9px] text-left transition-colors hover:bg-muted/50 active:bg-foreground/10 active:duration-0"
 		>
 			<span class="font-sans text-caption font-medium text-neutral-900">{optionLabel}</span>
 			{#if checked}<Check class="size-4 shrink-0 text-primary" />{/if}

@@ -18,7 +18,7 @@
 				{s.label}{#if s.action}
 					(<button
 						type="button"
-						class="cursor-pointer text-primary underline"
+						class="cursor-pointer text-primary underline transition-opacity hover:opacity-80 active:opacity-60"
 						onclick={s.action.onclick}>{s.action.label}</button
 					>){/if}
 			</div>

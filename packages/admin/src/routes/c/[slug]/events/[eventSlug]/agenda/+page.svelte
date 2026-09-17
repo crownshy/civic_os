@@ -217,7 +217,7 @@
 			<button
 				type="button"
 				onclick={resetToDefault}
-				class="rounded-full px-3 py-1.5 text-caption text-destructive/50 hover:text-destructive"
+				class="touch-manipulation rounded-full px-3 py-1.5 text-caption text-destructive/50 transition-all select-none hover:bg-destructive/10 hover:text-destructive active:scale-95 active:bg-destructive/20 active:text-destructive active:duration-0"
 			>
 				reset to default
 			</button>
@@ -268,7 +268,7 @@
 					<div class="flex items-center gap-2.5">
 						<button
 							type="button"
-							class="cursor-grab text-muted-foreground hover:text-foreground active:cursor-grabbing"
+							class="cursor-grab touch-none text-muted-foreground transition-colors hover:text-foreground active:cursor-grabbing active:text-foreground"
 							aria-label="Drag to reorder"
 						>
 							<GripVertical class="size-4" />
@@ -316,7 +316,7 @@
 						<button
 							type="button"
 							onclick={() => removeAt(i)}
-							class="text-muted-foreground hover:text-destructive"
+							class="touch-manipulation text-muted-foreground transition-all hover:text-destructive active:scale-90 active:text-destructive/70 active:duration-0"
 							title="Delete"
 						>
 							<Trash2 class="size-4" />

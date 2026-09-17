@@ -148,7 +148,7 @@
 				<button
 					type="button"
 					onclick={() => (expanded = !expanded)}
-					class="col-span-full flex cursor-pointer items-center justify-center gap-2 bg-muted/40 py-5 text-body font-normal text-foreground/70 transition-colors hover:bg-muted hover:text-foreground"
+					class="col-span-full flex cursor-pointer items-center justify-center gap-2 bg-muted/40 py-5 text-body font-normal text-foreground/70 transition-colors hover:bg-muted hover:text-foreground active:bg-foreground/10 active:text-foreground active:duration-0"
 				>
 					{expanded ? 'Show fewer statements' : `See all ${total} statements`}
 					<ChevronDown
@@ -161,7 +161,7 @@
 				<button
 					type="button"
 					onclick={() => (showLowQuality = !showLowQuality)}
-					class="col-span-full flex cursor-pointer items-center justify-center gap-2 bg-yellow-400/5 py-5 text-body text-yellow-600 transition-colors hover:bg-yellow-400/10"
+					class="col-span-full flex cursor-pointer items-center justify-center gap-2 bg-yellow-400/5 py-5 text-body text-yellow-600 transition-colors hover:bg-yellow-400/10 active:bg-yellow-400/20 active:duration-0"
 				>
 					{showLowQuality
 						? 'Hide low data quality statements'

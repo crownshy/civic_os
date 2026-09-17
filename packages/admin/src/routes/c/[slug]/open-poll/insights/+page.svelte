@@ -310,7 +310,7 @@
 						<button
 							type="button"
 							onclick={() => (showAllThemes = !showAllThemes)}
-							class="flex w-full items-center justify-center gap-2 py-4 text-section text-foreground/70 transition-colors hover:text-foreground"
+							class="flex w-full touch-manipulation items-center justify-center gap-2 py-4 text-section text-foreground/70 transition-colors hover:bg-muted/40 hover:text-foreground active:bg-foreground/10 active:duration-0"
 						>
 							{showAllThemes ? 'Show fewer themes' : `See all ${themes.length} themes`}
 							<ChevronDown

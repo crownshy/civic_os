@@ -209,7 +209,7 @@
 											onclick={() => move(i, -1)}
 											disabled={i === 0}
 											aria-label={`Move ${option} up`}
-											class="cursor-pointer text-foreground hover:text-primary disabled:cursor-not-allowed disabled:opacity-25"
+											class="cursor-pointer touch-manipulation text-foreground transition-all hover:text-primary active:scale-90 active:text-primary/70 active:duration-0 disabled:cursor-not-allowed disabled:opacity-25 disabled:active:scale-100"
 										>
 											<ArrowUp class="size-4" />
 										</button>
@@ -218,7 +218,7 @@
 											onclick={() => move(i, 1)}
 											disabled={i === options.length - 1}
 											aria-label={`Move ${option} down`}
-											class="cursor-pointer text-foreground hover:text-primary disabled:cursor-not-allowed disabled:opacity-25"
+											class="cursor-pointer touch-manipulation text-foreground transition-all hover:text-primary active:scale-90 active:text-primary/70 active:duration-0 disabled:cursor-not-allowed disabled:opacity-25 disabled:active:scale-100"
 										>
 											<ArrowDown class="size-4" />
 										</button>
@@ -226,7 +226,7 @@
 											type="button"
 											onclick={() => startEdit(i)}
 											aria-label={`Edit ${option}`}
-											class="cursor-pointer text-primary"
+											class="cursor-pointer touch-manipulation text-primary transition-all hover:text-primary/80 active:scale-90 active:text-primary/70 active:duration-0"
 										>
 											<Pencil class="size-4" />
 										</button>
@@ -234,7 +234,7 @@
 											type="button"
 											onclick={() => remove(i)}
 											aria-label={`Remove ${option}`}
-											class="cursor-pointer text-primary"
+											class="cursor-pointer touch-manipulation text-primary transition-all hover:text-primary/80 active:scale-90 active:text-primary/70 active:duration-0"
 										>
 											<X class="size-4" />
 										</button>
@@ -247,7 +247,7 @@
 							type="button"
 							onclick={startAdd}
 							disabled={editing >= 0}
-							class="w-full cursor-pointer py-4 text-left text-body font-semibold text-primary disabled:cursor-not-allowed disabled:opacity-50"
+							class="w-full cursor-pointer py-4 text-left text-body font-semibold text-primary transition-opacity hover:opacity-80 active:opacity-60 disabled:cursor-not-allowed disabled:opacity-50"
 						>
 							Add New…
 						</button>

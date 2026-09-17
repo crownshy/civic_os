@@ -78,7 +78,7 @@
 				type="button"
 				onclick={toggle}
 				disabled={busy}
-				class="cursor-pointer text-body text-primary underline disabled:cursor-not-allowed disabled:opacity-60"
+				class="cursor-pointer text-body text-primary underline transition-opacity hover:opacity-80 active:opacity-60 disabled:cursor-not-allowed disabled:opacity-60"
 			>
 				{#if busy}
 					Saving…

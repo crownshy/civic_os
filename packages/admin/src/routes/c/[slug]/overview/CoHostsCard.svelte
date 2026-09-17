@@ -123,7 +123,7 @@
 				<button
 					type="button"
 					onclick={onAddNew}
-					class="px-2 py-4 text-body font-bold text-primary hover:underline"
+					class="px-2 py-4 text-body font-bold text-primary transition-opacity hover:underline active:opacity-60"
 				>
 					Add New…
 				</button>

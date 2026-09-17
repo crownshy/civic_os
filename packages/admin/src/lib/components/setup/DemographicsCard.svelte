@@ -114,7 +114,7 @@
 					editingCategory = undefined;
 					addOpen = true;
 				}}
-				class="col-span-full flex w-full cursor-pointer items-center gap-1 border-t border-border px-2 py-4 text-body font-bold text-primary"
+				class="col-span-full flex w-full cursor-pointer items-center gap-1 border-t border-border px-2 py-4 text-body font-bold text-primary transition-colors hover:bg-muted/40 active:bg-foreground/10 active:duration-0"
 			>
 				Add New…
 			</button>

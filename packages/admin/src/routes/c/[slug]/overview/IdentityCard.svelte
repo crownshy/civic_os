@@ -125,7 +125,7 @@
 						disabled={!onSelectColorScheme || !!pending}
 						onclick={() => select(option.id)}
 						style={`background-color: ${option.primary}`}
-						class="size-12 rounded-[10px] border border-stone-300 transition-transform hover:scale-105 disabled:cursor-not-allowed {colorSchemeId ===
+						class="size-12 touch-manipulation rounded-[10px] border border-stone-300 transition-transform hover:scale-105 active:scale-95 active:duration-0 disabled:cursor-not-allowed disabled:active:scale-100 {colorSchemeId ===
 						option.id
 							? 'ring-2 ring-primary ring-offset-2 ring-offset-background'
 							: ''} {pending === option.id ? 'animate-pulse' : ''}"

@@ -124,7 +124,7 @@
 		<button
 			type="button"
 			onclick={toggleOpen}
-			class="inline-flex items-center rounded-[3px] bg-primary/10 px-[5px] py-0.5 font-sans text-body font-medium text-primary hover:bg-primary/20"
+			class="inline-flex items-center rounded-[3px] bg-primary/10 px-[5px] py-0.5 font-sans text-body font-medium text-primary transition-all select-none hover:bg-primary/20 active:scale-95 active:bg-primary/30 active:duration-0"
 		>
 			Add new+
 		</button>
@@ -142,7 +142,7 @@
 				<button
 					type="button"
 					onclick={() => applyToggle(t)}
-					class="flex w-full items-center justify-between border-b border-black/10 px-2.5 py-1.5 text-left text-caption last:border-b-0 hover:bg-muted/60"
+					class="flex w-full items-center justify-between border-b border-black/10 px-2.5 py-1.5 text-left text-caption transition-colors last:border-b-0 hover:bg-muted/60 active:bg-foreground/10 active:duration-0"
 				>
 					<span>#{t}</span>
 					{#if checked}
@@ -162,7 +162,7 @@
 					type="button"
 					onclick={applyAdd}
 					disabled={!newDraft.trim()}
-					class="rounded bg-primary px-1.5 py-1 text-caption font-medium text-primary-foreground disabled:opacity-40"
+					class="rounded bg-primary px-1.5 py-1 text-caption font-medium text-primary-foreground transition-all select-none hover:bg-primary/90 active:scale-95 active:bg-primary/80 active:duration-0 disabled:opacity-40 disabled:active:scale-100"
 				>
 					Add
 				</button>

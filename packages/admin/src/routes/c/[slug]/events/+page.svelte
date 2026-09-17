@@ -235,7 +235,7 @@
 						showForm = false;
 						resetForm();
 					}}
-					class="text-muted-foreground hover:text-foreground"
+					class="touch-manipulation text-muted-foreground transition-all hover:text-foreground active:scale-90 active:text-foreground/60 active:duration-0"
 					aria-label="Close"
 				>
 					<X class="size-4" />
@@ -362,7 +362,7 @@
 						showForm = false;
 						resetForm();
 					}}
-					class="rounded-full px-3 py-1.5 text-caption text-muted-foreground hover:text-foreground"
+					class="touch-manipulation rounded-full px-3 py-1.5 text-caption text-muted-foreground transition-all select-none hover:bg-muted hover:text-foreground active:scale-95 active:bg-foreground/10 active:duration-0"
 				>
 					cancel
 				</button>

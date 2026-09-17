@@ -22,9 +22,7 @@
 </script>
 
 <div
-	class="col-span-full grid grid-cols-subgrid items-center gap-4 px-2 py-5 {on
-		? ''
-		: 'opacity-50'}"
+	class="col-span-full grid grid-cols-subgrid items-center gap-4 px-2 py-5 {on ? '' : 'opacity-50'}"
 >
 	<div class="text-body font-bold">{name}</div>
 	<div>
@@ -41,7 +39,7 @@
 				{disabled}
 				aria-label={`Edit ${name}`}
 				title="Edit this category"
-				class="cursor-pointer p-1 text-muted-foreground hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
+				class="cursor-pointer touch-manipulation p-1 text-muted-foreground transition-all hover:text-primary active:scale-90 active:text-primary/70 active:duration-0 disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100"
 			>
 				<Pencil class="size-4" />
 			</button>
@@ -53,7 +51,7 @@
 				{disabled}
 				aria-label={`Delete ${name}`}
 				title="Delete this category"
-				class="cursor-pointer p-1 text-muted-foreground hover:text-destructive disabled:cursor-not-allowed disabled:opacity-40"
+				class="cursor-pointer touch-manipulation p-1 text-muted-foreground transition-all hover:text-destructive active:scale-90 active:text-destructive/70 active:duration-0 disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100"
 			>
 				<Trash2 class="size-4" />
 			</button>
@@ -65,9 +63,9 @@
 			aria-label={`Toggle ${name}`}
 			{disabled}
 			onclick={onToggle}
-			class="relative h-5 w-9 shrink-0 cursor-pointer rounded-full transition-colors disabled:cursor-not-allowed {on
-				? 'bg-primary'
-				: 'bg-muted-foreground/30'}"
+			class="relative h-5 w-9 shrink-0 cursor-pointer touch-manipulation rounded-full transition-all select-none active:scale-95 active:duration-0 disabled:cursor-not-allowed disabled:active:scale-100 {on
+				? 'bg-primary hover:bg-primary/90 active:bg-primary/80'
+				: 'bg-muted-foreground/30 hover:bg-muted-foreground/45 active:bg-muted-foreground/55'}"
 		>
 			<span
 				class="absolute top-1 size-3 rounded-full bg-white transition-all {on

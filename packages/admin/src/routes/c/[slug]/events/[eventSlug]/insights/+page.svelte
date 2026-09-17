@@ -47,7 +47,7 @@
 					</div>
 					<button
 						type="button"
-						class="size-8 rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl border border-foreground/20 text-caption"
+						class="size-8 touch-manipulation rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl border border-foreground/20 text-caption transition-all select-none hover:bg-muted active:scale-90 active:bg-foreground/10 active:duration-0"
 						aria-label="open report"
 					>
 						⛓

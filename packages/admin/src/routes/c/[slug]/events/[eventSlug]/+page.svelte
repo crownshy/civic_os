@@ -324,7 +324,7 @@
 							type="button"
 							aria-label="Open date picker"
 							onclick={() => dateEl?.showPicker?.()}
-							class="cursor-pointer text-foreground"
+							class="cursor-pointer touch-manipulation text-foreground transition-all hover:text-primary active:scale-90 active:opacity-60 active:duration-0"
 						>
 							<Calendar class="size-5" />
 						</button>
@@ -345,7 +345,7 @@
 							type="button"
 							aria-label="Open start time picker"
 							onclick={() => startEl?.showPicker?.()}
-							class="cursor-pointer text-foreground"
+							class="cursor-pointer touch-manipulation text-foreground transition-all hover:text-primary active:scale-90 active:opacity-60 active:duration-0"
 						>
 							<Clock class="size-5" />
 						</button>
@@ -366,7 +366,7 @@
 							type="button"
 							aria-label="Open end time picker"
 							onclick={() => endEl?.showPicker?.()}
-							class="cursor-pointer text-foreground"
+							class="cursor-pointer touch-manipulation text-foreground transition-all hover:text-primary active:scale-90 active:opacity-60 active:duration-0"
 						>
 							<Clock class="size-5" />
 						</button>
@@ -388,7 +388,7 @@
 					type="button"
 					onclick={() => (tzOpen = !tzOpen)}
 					aria-expanded={tzOpen}
-					class="cursor-pointer font-semibold text-primary italic hover:underline"
+					class="cursor-pointer font-semibold text-primary italic transition-opacity hover:underline active:opacity-60"
 				>
 					Change time zone
 				</button>

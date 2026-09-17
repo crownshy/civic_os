@@ -48,7 +48,7 @@
 		type="button"
 		onclick={toggle}
 		disabled={busy}
-		class="shrink-0 cursor-pointer px-2 py-0.5 text-caption font-medium text-primary underline disabled:cursor-not-allowed disabled:opacity-60"
+		class="shrink-0 cursor-pointer px-2 py-0.5 text-caption font-medium text-primary underline transition-opacity hover:opacity-80 active:opacity-60 disabled:cursor-not-allowed disabled:opacity-60"
 	>
 		{#if busy}
 			Saving…

@@ -71,7 +71,7 @@
 			type="button"
 			onclick={downloadTranscript}
 			disabled={busy !== null}
-			class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-body font-medium text-foreground hover:bg-muted disabled:opacity-50"
+			class="flex w-full touch-manipulation items-center gap-2.5 rounded-lg px-3 py-2.5 text-body font-medium text-foreground transition-colors hover:bg-muted active:bg-foreground/10 active:duration-0 disabled:opacity-50"
 		>
 			<FileText class="size-4 text-primary" />
 			{busy === 'transcript' ? 'Preparing…' : 'Transcript'}
@@ -80,7 +80,7 @@
 			type="button"
 			onclick={downloadReport}
 			disabled={busy !== null}
-			class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-body font-medium text-foreground hover:bg-muted disabled:opacity-50"
+			class="flex w-full touch-manipulation items-center gap-2.5 rounded-lg px-3 py-2.5 text-body font-medium text-foreground transition-colors hover:bg-muted active:bg-foreground/10 active:duration-0 disabled:opacity-50"
 		>
 			<FileBarChart2 class="size-4 text-primary" />
 			{busy === 'report' ? 'Preparing…' : 'Report'}

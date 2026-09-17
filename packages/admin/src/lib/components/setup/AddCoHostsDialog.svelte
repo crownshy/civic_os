@@ -100,7 +100,7 @@
 								<button
 									type="button"
 									onclick={() => toggle(o.id)}
-									class="flex min-w-0 items-center gap-2 text-left font-bold text-primary hover:underline"
+									class="flex min-w-0 items-center gap-2 text-left font-bold text-primary transition-opacity hover:underline active:opacity-60"
 								>
 									<X class="size-4 shrink-0" />
 									<span class="truncate">{o.name}</span>
@@ -141,7 +141,7 @@
 							<button
 								type="button"
 								onclick={() => toggle(o.id)}
-								class="grid w-full grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)] items-center gap-4 px-2 py-3 text-left text-body hover:bg-muted/40"
+								class="grid w-full grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)] items-center gap-4 px-2 py-3 text-left text-body transition-colors hover:bg-muted/40 active:bg-foreground/10 active:duration-0"
 							>
 								<span class="flex min-w-0 items-center gap-2 font-bold">
 									<span

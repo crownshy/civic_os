@@ -26,7 +26,7 @@
 	role="switch"
 	aria-checked={checked}
 	onclick={toggle}
-	class="inline-flex cursor-pointer items-center justify-between gap-3 rounded-[10px] border border-border bg-card px-3 py-2 text-caption font-medium shadow-sm transition-colors hover:bg-muted/50"
+	class="inline-flex cursor-pointer items-center justify-between gap-3 rounded-[10px] border border-border bg-card px-3 py-2 text-caption font-medium shadow-sm transition-all select-none hover:bg-muted/50 active:scale-[0.97] active:bg-foreground/10 active:shadow-none active:duration-0"
 >
 	<span class="text-foreground">{label}</span>
 	<span

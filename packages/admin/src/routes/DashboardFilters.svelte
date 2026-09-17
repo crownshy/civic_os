@@ -47,7 +47,7 @@
 				type="button"
 				onclick={() => (search = '')}
 				aria-label="Clear search"
-				class="absolute top-1/2 right-2 -translate-y-1/2 rounded-full p-0.5 text-muted-foreground transition-colors hover:text-foreground"
+				class="absolute top-1/2 right-2 -translate-y-1/2 touch-manipulation rounded-full p-0.5 text-muted-foreground transition-all hover:text-foreground active:scale-90 active:opacity-60 active:duration-0"
 			>
 				<X class="size-4" />
 			</button>
