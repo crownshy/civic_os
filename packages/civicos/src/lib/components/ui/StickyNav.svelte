@@ -110,8 +110,8 @@
 				class={[
 					'shrink-0 rounded-[20px] px-2.5 py-[3px] font-mono text-sm font-medium whitespace-nowrap transition-colors',
 					isActive
-						? 'bg-yellow-950 text-white'
-						: 'bg-yellow-600/10 text-stone-500 hover:bg-yellow-600/20'
+						? 'bg-primary text-primary-foreground'
+						: 'bg-primary/10 text-primary hover:bg-primary/20'
 				].join(' ')}
 			>
 				{section.label}

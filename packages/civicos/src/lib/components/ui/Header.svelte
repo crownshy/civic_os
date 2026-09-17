@@ -24,17 +24,16 @@
 </script>
 
 <header
-	class="shrink-0 overflow-hidden rounded-br-[20px] rounded-bl-[20px] border-b border-secondary bg-[#FFEDD3] {className}"
+	class="shrink-0 overflow-hidden rounded-br-[20px] rounded-bl-[20px] border-b border-secondary bg-background {className}"
 >
 	<!-- Row 1: County name + ABOUT pill or YOU dot -->
 	{#if about && region}
 		<InfoBar {region} {placeName} />
 	{:else}
 		<div class="flex items-center justify-between pt-3.75 pr-3.75 pl-6">
-			<span class="font-mono text-sm font-medium text-foreground/70">{placeName.toUpperCase()}</span
-			>
+			<span class="font-mono text-sm font-medium text-primary">{placeName.toUpperCase()}</span>
 			<span class="flex items-center gap-2">
-				<span class="h-3 w-3 rounded-full border border-foreground/20 bg-secondary"></span>
+				<span class="h-3 w-3 rounded-full border border-foreground/20 bg-primary"></span>
 				<span class="font-mono text-sm font-medium text-foreground/80">YOU</span>
 			</span>
 		</div>
@@ -66,9 +65,9 @@
 	{#if onCompose}
 		<button onclick={onCompose} class="flex w-full items-center gap-3 pt-3.5 pr-3.75 pb-3 pl-6">
 			<div
-				class="flex flex-1 items-center justify-center gap-2.5 overflow-hidden rounded-full bg-foreground px-5 py-2"
+				class="flex flex-1 items-center justify-center gap-2.5 overflow-hidden rounded-full bg-primary px-5 py-2"
 			>
-				<span class="text-base font-bold text-secondary-foreground">
+				<span class="text-base font-bold text-primary-foreground">
 					Share your own response...
 				</span>
 			</div>

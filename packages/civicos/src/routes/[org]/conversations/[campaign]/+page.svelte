@@ -233,7 +233,7 @@
 			<button
 				type="button"
 				onclick={() => (showAboutMessage = true)}
-				class="rounded-[20px] bg-yellow-600/10 px-2 py-0.5 font-mono text-sm font-medium text-stone-500 hover:bg-yellow-600/20"
+				class="rounded-[20px] bg-primary/10 px-2 py-0.5 font-mono text-sm font-medium text-primary hover:bg-primary/20"
 			>
 				ABOUT→
 			</button>

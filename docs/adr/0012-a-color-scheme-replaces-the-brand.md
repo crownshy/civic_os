@@ -41,10 +41,9 @@ validation went too.
   white, `--secondary` is dark green instead of `#a6722e`, and `--ring` is the
   primary. The shared copy in `packages/shared` was left alone because admin
   reads `--secondary` from it.
-- The landing pill, title and place label, and the voting compose strip, now read
-  `--primary`. Other civicos surfaces still hardcode colours the mocks give to the
-  accent (`bg-[#FFEDD3]` on `Header`, `bg-yellow-950` in `StickyNav`), and do not
-  follow a scheme yet.
+- The landing pill, title, place label and ABOUT pill, the voting compose strip,
+  `Header` and `StickyNav` read `--primary`. `Header` sits on `--background`
+  instead of its old cream `#FFEDD3`.
 - Slate and Plum hexes were read off screenshots, not Figma. Correct them in
   `COLOR_SCHEMES` when the Figma values are in hand.
 - The report's hero and consensus gradients (ADR 0010) are still BLOOM green in
