@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '@civicos/shared/ui/button';
 	import { invalidate } from '$lib/activity.svelte';
 	import { GripVertical, Pencil, Plus, Trash2, Users } from '@lucide/svelte';
 	import { dndzone, type DndEvent } from 'svelte-dnd-action';
@@ -221,20 +222,12 @@
 			>
 				reset to default
 			</button>
-			<button
-				type="button"
-				onclick={addBreakout}
-				class="inline-flex items-center gap-1 rounded-full border border-foreground/20 px-3 py-1.5 text-caption text-foreground"
-			>
+			<Button variant="outline" size="sm" onclick={addBreakout}>
 				<Users class="size-3" /> add breakout
-			</button>
-			<button
-				type="button"
-				onclick={addBasic}
-				class="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-caption text-primary-foreground"
-			>
+			</Button>
+			<Button size="sm" onclick={addBasic}>
 				<Plus class="size-3" /> add item
-			</button>
+			</Button>
 		</div>
 	</div>
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '@civicos/shared/ui/button';
 	import { invalidate } from '$lib/activity.svelte';
 	import { ChevronRight, Plus, X } from '@lucide/svelte';
 	import Card from '@civicos/shared/ui/Card.svelte';
@@ -207,13 +208,9 @@
 					{mode}
 				</button>
 			{/each}
-			<button
-				type="button"
-				onclick={() => (showForm = !showForm)}
-				class="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-caption text-primary-foreground"
-			>
+			<Button size="sm" onclick={() => (showForm = !showForm)}>
 				<Plus class="size-3" /> new event
-			</button>
+			</Button>
 		</div>
 	</div>
 
@@ -366,13 +363,9 @@
 				>
 					cancel
 				</button>
-				<button
-					type="submit"
-					disabled={creating}
-					class="rounded-full bg-primary px-3 py-1.5 text-caption text-primary-foreground disabled:opacity-50"
-				>
+				<Button size="sm" type="submit" disabled={creating}>
 					{creating ? 'creating…' : 'create event'}
-				</button>
+				</Button>
 			</div>
 		</form>
 	{/if}

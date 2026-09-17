@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '@civicos/shared/ui/button';
 	import { MoreHorizontal, Plus, Search } from '@lucide/svelte';
 
 	// Mock attendees — Phase 3 swaps for /attendances endpoint
@@ -103,12 +104,9 @@
 					class="w-44 bg-transparent text-body outline-none"
 				/>
 			</div>
-			<button
-				type="button"
-				class="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-caption text-primary-foreground"
-			>
+			<Button size="sm">
 				<Plus class="size-3" /> add by email
-			</button>
+			</Button>
 		</div>
 	</div>
 

@@ -14,6 +14,7 @@
 	import { afterNavigate } from '$app/navigation';
 	import { findByRouteSlug, type ConversationStatus } from '$lib/conversations';
 	import { resolve } from '$app/paths';
+	import { Button } from '@civicos/shared/ui/button';
 	import NavigationProgress from '$lib/components/NavigationProgress.svelte';
 	import ConversationSkeleton from '$lib/components/skeletons/ConversationSkeleton.svelte';
 
@@ -115,39 +116,42 @@
 
 				<!-- Collapse toggle (md+) -->
 				{#if !collapsed || mobileOpen}
-					<button
-						type="button"
+					<Button
+						variant="ghost"
+						size="icon-sm"
 						aria-label="Collapse sidebar"
-						class="hidden rounded-md p-1.5 hover:bg-muted/50 md:inline-flex"
+						class="hidden md:inline-flex"
 						onclick={() => (collapsed = true)}
 					>
 						<PanelLeftClose class="size-4" />
-					</button>
+					</Button>
 				{/if}
 
 				<!-- Close drawer (mobile) -->
 				{#if mobileOpen}
-					<button
-						type="button"
+					<Button
+						variant="ghost"
+						size="icon-sm"
 						aria-label="Close sidebar"
-						class="rounded-md p-1.5 hover:bg-muted/50 md:hidden"
+						class="md:hidden"
 						onclick={() => (mobileOpen = false)}
 					>
 						<X class="size-4" />
-					</button>
+					</Button>
 				{/if}
 			</div>
 
 			<!-- Expand button shown only when collapsed on md+ -->
 			{#if collapsed && !mobileOpen}
-				<button
-					type="button"
+				<Button
+					variant="ghost"
+					size="icon-sm"
 					aria-label="Expand sidebar"
-					class="mx-auto mt-2 hidden rounded-md p-1.5 hover:bg-muted/50 md:inline-flex"
+					class="mx-auto mt-2 hidden md:inline-flex"
 					onclick={() => (collapsed = false)}
 				>
 					<PanelLeftOpen class="size-4" />
-				</button>
+				</Button>
 			{/if}
 
 			<nav class="shrink-0 py-2.5">
@@ -247,14 +251,15 @@
 				{#if !collapsed || mobileOpen}
 					<span class="flex-1 text-caption font-medium">Admin</span>
 					<form method="POST" action="/logout">
-						<button
+						<Button
+							variant="ghost"
+							size="icon-sm"
 							type="submit"
 							title="Sign out"
 							aria-label="Sign out"
-							class="rounded-md p-1.5 hover:bg-muted/50"
 						>
 							<LogOut class="size-4" />
-						</button>
+						</Button>
 					</form>
 				{/if}
 			</div>
@@ -263,14 +268,14 @@
 		<main class="flex min-w-0 flex-1 flex-col overflow-hidden">
 			<!-- Mobile top bar with hamburger -->
 			<div class="flex h-12 items-center gap-2 border-b border-border px-3 md:hidden">
-				<button
-					type="button"
+				<Button
+					variant="ghost"
+					size="icon-sm"
 					aria-label="Open sidebar"
-					class="rounded-md p-1.5 hover:bg-muted/50"
 					onclick={() => (mobileOpen = true)}
 				>
 					<Menu class="size-5" />
-				</button>
+				</Button>
 				<span class="text-body font-bold">CivicOS</span>
 			</div>
 
