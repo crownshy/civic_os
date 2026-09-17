@@ -173,25 +173,22 @@ else
   info "  ! setting place failed (HTTP $PLACE_STATUS) — civicos will fall back to regions.ts"
 fi
 
-# --- Brand -------------------------------------------------------------------
-# Off by default: seeding a Brand changes what the seeded Campaign looks like,
-# and most local work wants the deployment default. `SEED_BRAND=1 ./scripts/seed-dev.sh`
-# writes a Host layer, which is the one civicos cannot read at its source
-# (/organizations is 401 anonymously) and so has to be mirrored onto the
-# Conversation. Leaving `metadata.brand` unset is deliberate: it is the layer the
-# admin Brand card writes, so you can watch a Campaign override its Host.
-if [ "${SEED_BRAND:-}" = "1" ]; then
-  info "Step 2.6: Setting host brand..."
-  BRAND_STATUS=$(curl -s -o /dev/null -w '%{http_code}' -X PATCH \
+# --- Color Scheme ------------------------------------------------------------
+# Off by default so local work sees the Green default.
+# `SEED_COLOR_SCHEME=slate ./scripts/seed-dev.sh` picks one; ids are in
+# packages/shared/src/data/color-scheme.ts.
+if [ -n "${SEED_COLOR_SCHEME:-}" ]; then
+  info "Step 2.6: Setting color scheme..."
+  SCHEME_STATUS=$(curl -s -o /dev/null -w '%{http_code}' -X PATCH \
     "$BACKEND_URL/conversation/$CONVERSATION_ID/metadata" \
     -H "Content-Type: application/json" \
     -H "$AUTH_HEADER" \
-    -d '{"hostBrand":{"tokens":{"background":"#f4f1ea","primary":"#1f4b6e","primaryForeground":"#ffffff","accent":"#dbe7f0","accentForeground":"#1f4b6e","radius":"0.75rem"},"css":null}}')
+    -d "{\"colorScheme\":\"$SEED_COLOR_SCHEME\"}")
 
-  if echo "$BRAND_STATUS" | grep -qE '^2[0-9][0-9]$'; then
-    ok "host brand: slate blue on bone"
+  if echo "$SCHEME_STATUS" | grep -qE '^2[0-9][0-9]$'; then
+    ok "color scheme: $SEED_COLOR_SCHEME"
   else
-    info "  ! setting host brand failed (HTTP $BRAND_STATUS)"
+    info "  ! setting color scheme failed (HTTP $SCHEME_STATUS)"
   fi
 fi
 

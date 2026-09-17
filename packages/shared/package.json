@@ -12,7 +12,7 @@
 		"./data/demographics": "./src/data/demographics.ts",
 		"./data/faq": "./src/data/faq.ts",
 		"./data/participant-asks": "./src/data/participant-asks.ts",
-		"./data/brand": "./src/data/brand.ts",
+		"./data/color-scheme": "./src/data/color-scheme.ts",
 		"./data/place": "./src/data/place.ts",
 		"./data/regions": "./src/data/regions.ts",
 		"./data/zipcodes": "./src/data/zipcodes.ts",

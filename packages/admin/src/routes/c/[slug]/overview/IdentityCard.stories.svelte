@@ -27,11 +27,9 @@
      collapsing the row. civicos 404s this one (ADR 0007). -->
 <Story name="No places" args={{ places: [] }} />
 
-<!-- The swatch row reads its selection from the Campaign's stored Brand, so this
-     is what a Campaign on the blue scheme looks like. With no `presetId` (every
-     other story here) nothing is ringed, which is the honest rendering of a
-     Campaign nobody has picked a scheme for. -->
-<Story name="Color scheme chosen" args={{ presetId: 'blue' }} />
+<!-- With no `colorSchemeId` (every other story here) nothing is ringed, which is
+     the honest rendering of a Campaign nobody has picked a scheme for. -->
+<Story name="Color scheme chosen" args={{ colorSchemeId: 'slate' }} />
 
 <!--
 	The state the app actually ships: Setup passes a snippet per editable field.

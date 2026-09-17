@@ -214,7 +214,7 @@
 		<!-- Header chip row — bypasses AppShell. See docs/adr/0001-landing-bypasses-appshell.md -->
 		<header class="flex items-center justify-between px-6 pt-4 pb-2">
 			{#if campaign.place}
-				<div class="flex items-center gap-2 font-mono text-sm font-medium text-stone-500 uppercase">
+				<div class="flex items-center gap-2 font-mono text-sm font-medium text-primary uppercase">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="14"
@@ -248,13 +248,13 @@
 			<div class="flex flex-col items-center md:flex-1 md:justify-center">
 				<div class="flex justify-center">
 					<span
-						class="rounded-[30px] bg-yellow-950 px-3.5 py-2 font-mono text-sm font-medium text-white"
+						class="rounded-[30px] bg-primary px-3.5 py-2 font-mono text-sm font-medium text-primary-foreground"
 					>
 						OPEN POLL
 					</span>
 				</div>
 				<h1
-					class="mt-3 text-center font-display text-5xl leading-[1.05] font-medium tracking-display md:text-6xl"
+					class="mt-3 text-center font-display text-5xl leading-[1.05] font-medium tracking-display text-primary md:text-6xl"
 				>
 					{campaign.title}
 				</h1>

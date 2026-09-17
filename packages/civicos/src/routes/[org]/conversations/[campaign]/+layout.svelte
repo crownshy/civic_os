@@ -1,36 +1,21 @@
 <script lang="ts">
-	import { brandCss, isEmptyBrand } from '@civicos/shared/data/brand';
+	import { colorSchemeCss } from '@civicos/shared/data/color-scheme';
 
 	let { data, children } = $props();
 
-	// The whole `<style>` element is built as a string, not written as markup.
-	// Svelte compiles a real `<style>` element as the component's own stylesheet,
-	// so `<style>{@html css}</style>` ships the literal text `{@html css}` to the
-	// browser and the expression never runs.
-	//
-	// Emitted here rather than in `load`, on ADR 0005's reasoning: `brandCss`
-	// re-validates every value before it writes a declaration, so a Brand that
-	// reached the page some other way still cannot carry anything but a
-	// variable. That is also what makes this `{@html}` safe: no value can hold a
-	// `<`, so nothing can close the tag early.
-	const brandStyle = $derived.by(() => {
-		if (isEmptyBrand(data.brand)) return '';
-		const css = brandCss(data.brand);
-
-		return css ? `<style>${css}</style>` : '';
-	});
+	// Built as a string because Svelte compiles a literal `<style>` element as the
+	// component's own stylesheet and never evaluates an expression inside it. Safe
+	// under {@html}: every value comes from the shared constant, not from metadata.
+	const schemeStyle = $derived(
+		data.colorScheme ? `<style>${colorSchemeCss(data.colorScheme)}</style>` : ''
+	);
 </script>
 
-<!--
-	`:root:root`, in the head. Doubled because `theme.css` emits its own unlayered
-	`:root` block *after* this one in the document, so equal specificity would
-	lose on source order. Head rather than a wrapper element because dialogs and
-	overlays portal to `document.body`.
--->
+<!-- In the head rather than on a wrapper, because dialogs portal to `document.body`. -->
 <svelte:head>
-	{#if brandStyle}
+	{#if schemeStyle}
 		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-		{@html brandStyle}
+		{@html schemeStyle}
 	{/if}
 </svelte:head>
 

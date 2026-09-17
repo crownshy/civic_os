@@ -13,7 +13,6 @@
 		"lint": "pnpm --filter civic-os --filter @civicos/admin --filter @civicos/report lint",
 		"format": "pnpm --filter civic-os --filter @civicos/admin --filter @civicos/report format",
 		"test": "pnpm --filter civic-os --filter @civicos/admin --filter @civicos/report exec vitest run",
-		"prototype:brands": "node --experimental-strip-types --no-warnings prototypes/campaign-brands/tui.ts",
 		"prototype:places": "node --experimental-strip-types --no-warnings prototypes/campaign-places/tui.ts"
 	}
 }

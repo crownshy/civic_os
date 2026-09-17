@@ -71,7 +71,7 @@
 	<button
 		onclick={onCompose}
 		data-umami-event="compose-click"
-		class="w-full rounded-t-[40px] [background-color:color-mix(in_srgb,var(--secondary)_55%,black)] p-5 text-left"
+		class="w-full rounded-t-[40px] bg-primary p-5 text-left"
 	>
 		<div class="flex items-center gap-[15px]">
 			<img
