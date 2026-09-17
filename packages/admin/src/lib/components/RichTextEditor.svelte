@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import { Editor } from '@tiptap/core';
-	import StarterKit from '@tiptap/starter-kit';
+	import type { Editor } from '@tiptap/core';
 	import {
 		Bold,
 		Heading2,
@@ -82,7 +81,32 @@
 		onChange(html);
 	}
 
+	// Tiptap and ProseMirror are loaded on mount rather than imported statically:
+	// bundled into the page they were over 300KB of the overview route's JS, all of
+	// it preloaded on every full-page load, for an editor that only runs in the
+	// browser anyway.
 	function mount(node: HTMLElement) {
+		let destroyed = false;
+		let teardown: (() => void) | undefined;
+
+		Promise.all([import('@tiptap/core'), import('@tiptap/starter-kit')]).then(
+			([{ Editor }, { default: StarterKit }]) => {
+				if (destroyed) return;
+				teardown = create(node, Editor, StarterKit);
+			}
+		);
+
+		return () => {
+			destroyed = true;
+			teardown?.();
+		};
+	}
+
+	function create(
+		node: HTMLElement,
+		Editor: typeof import('@tiptap/core').Editor,
+		StarterKit: typeof import('@tiptap/starter-kit').default
+	) {
 		// Every prop read here is untracked: the attachment must set the editor up
 		// once, not tear it down and rebuild it on each keystroke.
 		const initial = untrack(() => toRichTextHtml(value));
@@ -292,5 +316,5 @@
 		)}
 	</div>
 
-	<div {@attach mount}></div>
+	<div class="min-h-32" {@attach mount}></div>
 </div>
