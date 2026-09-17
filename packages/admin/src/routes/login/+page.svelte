@@ -1,15 +1,37 @@
 <script lang="ts">
 	import '../../app.css';
+	import { untrack } from 'svelte';
 	import { page } from '$app/state';
+	import { superForm } from 'sveltekit-superforms';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
+	import * as Form from '@civicos/shared/ui/form';
+	import { Input } from '@civicos/shared/ui/input';
+	import { Button } from '@civicos/shared/ui/button';
+	import { Spinner } from '@civicos/shared/ui/spinner';
+	import { Eye, EyeOff } from '@lucide/svelte';
+	import { loginSchema } from './login-schema';
 
-	let { form } = $props();
+	let { data } = $props();
+
+	const form = superForm(
+		untrack(() => data.form),
+		{ validators: zod4Client(loginSchema) }
+	);
+	const { form: formData, enhance, submitting, message } = form;
+
+	let showPassword = $state(false);
 
 	const denied = $derived(page.url.searchParams.get('denied') === '1');
+
+	const labelClass = 'text-caption font-medium tracking-wider text-muted-foreground uppercase';
+	const inputClass = 'h-10 rounded-md bg-background px-3 text-body md:text-body';
 </script>
 
 <div class="flex min-h-screen items-center justify-center bg-background p-6 text-foreground">
 	<form
 		method="POST"
+		use:enhance
+		aria-busy={$submitting}
 		class="w-full max-w-sm space-y-4 rounded-lg border border-border bg-card p-6 shadow-sm"
 	>
 		<div class="flex items-center gap-2.5">
@@ -19,50 +41,65 @@
 			<span class="text-body font-bold">CivicOS Admin</span>
 		</div>
 
-		<div class="space-y-1.5">
-			<label
-				for="email"
-				class="text-caption font-medium tracking-wider text-muted-foreground uppercase">Email</label
-			>
-			<input
-				id="email"
-				name="email"
-				type="email"
-				autocomplete="email"
-				required
-				value={form?.email ?? ''}
-				class="w-full rounded-md border border-border bg-background px-3 py-2 text-body focus:ring-2 focus:ring-primary focus:outline-none"
-			/>
-		</div>
+		<Form.Field {form} name="email" class="space-y-1.5">
+			<Form.Control>
+				{#snippet children({ props })}
+					<Form.Label class={labelClass}>Email</Form.Label>
+					<Input
+						{...props}
+						type="email"
+						autocomplete="email"
+						bind:value={$formData.email}
+						class={inputClass}
+					/>
+				{/snippet}
+			</Form.Control>
+			<Form.FieldErrors class="text-caption text-destructive" />
+		</Form.Field>
 
-		<div class="space-y-1.5">
-			<label
-				for="password"
-				class="text-caption font-medium tracking-wider text-muted-foreground uppercase"
-				>Password</label
-			>
-			<input
-				id="password"
-				name="password"
-				type="password"
-				autocomplete="current-password"
-				required
-				class="w-full rounded-md border border-border bg-background px-3 py-2 text-body focus:ring-2 focus:ring-primary focus:outline-none"
-			/>
-		</div>
+		<Form.Field {form} name="password" class="space-y-1.5">
+			<Form.Control>
+				{#snippet children({ props })}
+					<Form.Label class={labelClass}>Password</Form.Label>
+					<div class="relative">
+						<Input
+							{...props}
+							type={showPassword ? 'text' : 'password'}
+							autocomplete="current-password"
+							bind:value={$formData.password}
+							class="{inputClass} pr-11"
+						/>
+						<Button
+							type="button"
+							variant="ghost"
+							size="icon-sm"
+							class="absolute top-1/2 right-1 -translate-y-1/2 text-muted-foreground"
+							aria-label={showPassword ? 'Hide password' : 'Show password'}
+							aria-pressed={showPassword}
+							onclick={() => (showPassword = !showPassword)}
+						>
+							{#if showPassword}<EyeOff />{:else}<Eye />{/if}
+						</Button>
+					</div>
+				{/snippet}
+			</Form.Control>
+			<Form.FieldErrors class="text-caption text-destructive" />
+		</Form.Field>
 
-		{#if denied}
+		{#if denied && !$message}
 			<p class="text-body text-destructive">That account doesn't have admin access.</p>
 		{/if}
-		{#if form?.error}
-			<p class="text-body text-destructive">{form.error}</p>
+		{#if $message}
+			<p class="text-body text-destructive" role="alert">{$message}</p>
 		{/if}
 
-		<button
-			type="submit"
-			class="w-full rounded-md bg-primary px-3 py-2 text-body font-medium text-primary-foreground hover:bg-primary/90"
-		>
-			Sign in
-		</button>
+		<Button type="submit" disabled={$submitting} class="h-10 w-full rounded-md text-body">
+			{#if $submitting}
+				<Spinner />
+				Signing in…
+			{:else}
+				Sign in
+			{/if}
+		</Button>
 	</form>
 </div>

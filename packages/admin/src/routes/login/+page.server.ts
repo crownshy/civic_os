@@ -1,16 +1,22 @@
-import { fail, redirect, type Actions } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
+import { superValidate, message } from 'sveltekit-superforms';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import { createBackendClient } from '$lib/server/backend-client';
 import { forwardAuthCookie, setCookiesOf } from '$lib/server/auth-cookie';
+import { loginSchema } from './login-schema';
+import type { Actions, PageServerLoad } from './$types';
+
+export const load: PageServerLoad = async () => {
+	return { form: await superValidate(zod4(loginSchema)) };
+};
 
 export const actions: Actions = {
 	default: async ({ request, cookies }) => {
-		const data = await request.formData();
-		const email = String(data.get('email') ?? '').trim();
-		const password = String(data.get('password') ?? '');
-
-		if (!email || !password) {
-			return fail(400, { email, error: 'Email and password are required.' });
-		}
+		const form = await superValidate(request, zod4(loginSchema));
+		const { email, password } = form.data;
+		// Never echo the password back to the page.
+		form.data.password = '';
+		if (!form.valid) return fail(400, { form });
 
 		const api = createBackendClient();
 
@@ -30,7 +36,7 @@ export const actions: Actions = {
 			// the interceptor above already holds the cookie. Only a rejected login,
 			// or a request that never landed, is a real failure.
 			if (!setCookies.length) {
-				return fail(401, { email, error: 'Invalid email or password.' });
+				return message(form, 'Invalid email or password.', { status: 401 });
 			}
 		}
 
