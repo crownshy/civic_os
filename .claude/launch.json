@@ -31,6 +31,16 @@
 			],
 			"port": 5173,
 			"autoPort": true
+		},
+		{
+			"name": "civicos-storybook",
+			"runtimeExecutable": "pnpm",
+			"runtimeArgs": [
+				"--filter",
+				"civic-os",
+				"storybook"
+			],
+			"port": 6006
 		}
 	]
 }
