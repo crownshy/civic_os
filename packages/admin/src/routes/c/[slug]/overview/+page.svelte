@@ -208,7 +208,18 @@
 		if (key === 'keyQuestion') {
 			const stepId = campaign.polisWorkflowStepId;
 			if (!stepId) return 'This Campaign has no Polis poll to write the question to.';
-			return () => data.api.PolisUpdateConfig({ workflow_step_id: stepId, topic: content });
+			// Mirrored into `metadata.poll` as well: comhairle never reports the topic
+			// back, so without the copy the field reloads empty and civicos never
+			// sees the question.
+			return async () => {
+				await data.api.PolisUpdateConfig({ workflow_step_id: stepId, topic: content });
+				const poll = campaign.pollIdentity;
+				if (!poll) return;
+				await data.api.PatchConversationMetadata(
+					{ poll: { ...poll, question: content } },
+					{ params: { conversation_id: campaign.id } }
+				);
+			};
 		}
 
 		// Missing on a non-admin session, or when the conversation didn't resolve

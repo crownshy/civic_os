@@ -152,9 +152,12 @@ export const load: LayoutServerLoad = async ({ params, parent, cookies, url, dep
 		// already has live votes and strand them on the old poll.
 		pollLaunched: polisStep ? polisStep.launched : null,
 		// The Key Question is the Polis conversation's `topic`, edited on Setup
-		// through PolisUpdateConfig. A legacy region's hardcoded `question` is
-		// only the fallback now, for Campaigns whose Polis step did not resolve.
-		keyQuestion: polisStep?.topic ?? region?.question ?? '',
+		// through PolisUpdateConfig. Comhairle accepts a topic but does not report
+		// it back on the step, so the copy mirrored into `metadata.poll` is what
+		// actually survives a reload. A legacy region's hardcoded `question` is
+		// the last resort.
+		keyQuestion:
+			polisStep?.topic ?? readPoll(conversation?.metadata)?.question ?? region?.question ?? '',
 		// What a mirror writes to `metadata.poll`, merged over what is already
 		// stored. `PatchConversationMetadata` replaces this key wholesale and
 		// comhairle reports no `topic` back on either tool config, so an object
