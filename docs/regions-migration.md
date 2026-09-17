@@ -124,6 +124,6 @@ the copy fields above and none of them is landing-page prose:
 - Whether the Open Poll ending message stays a separate field or merges into
   Basic Information. The table keeps it separate, which is what #398 built.
 
-Related: ADR 0003 (freeze scope), ADR 0004 (admin conversation resolution),
+Related: ADR 0004 (admin conversation resolution),
 ADR 0006 (Place on metadata), ADR 0007 (URL scheme), #349, #351, #398, #366,
 #414.

@@ -87,6 +87,11 @@ verify only the app you happened to have open.
 `shared/ui/button` is not on that list: `civicos` has its own `Button`, so shared's
 is still admin-only.
 
+Host-configurable definitions belong in `packages/shared/src/data/`, next to
+`place.ts`, for the same reason: `admin` writes the configuration and `civicos`
+renders it, so both have to read one list. `demographics.ts` and
+`participant-asks.ts` live there.
+
 ## Migration order (civicos → shared) — PARKED; one PR each, verify visually
 
 1. **✅ Token hygiene (done).** Semantic roles only; no hardcoded hex or

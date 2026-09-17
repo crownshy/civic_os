@@ -139,7 +139,7 @@ Before hand-rolling UI or a helper, check what already exists in
 - Primitives (Button, Dialog, Input, Label, Badge, Card, Popover, Accordion, Command,
   Slider, ToggleGroup, Progress, Spinner, form) live in `@civicos/shared/ui/**`, built on
   **shadcn-svelte** over **`bits-ui`**. Do not re-roll one. If a primitive needs a new
-  variant, extend the shared one (subject to the frozen-file rules in
+  variant, extend the shared one (checking both apps, per
   [docs/component-strategy.md](docs/component-strategy.md)), do not fork it into an app.
 - Class merging goes through `cn()` from `@civicos/shared/utils` (re-exported as
   `$lib/utils` in civicos). Never concatenate class strings by hand.
@@ -247,8 +247,8 @@ Before hand-rolling UI or a helper, check what already exists in
 - Use the **flat shadcn design tokens** (`bg-card`, `text-muted-foreground`, ...). Shared
   components reference **only semantic role tokens** (`--primary`, `--destructive`,
   `--muted`, `--border`, `--ring`, `--radius`), never a hex or an app-private token name.
-  Colors differ per app, structure does not. The token model and the frozen-shared-file
-  list are in [docs/component-strategy.md](docs/component-strategy.md).
+  Colors differ per app, structure does not. The token model and the list of primitives
+  both apps import are in [docs/component-strategy.md](docs/component-strategy.md).
 
 ### Motion and reduced motion
 

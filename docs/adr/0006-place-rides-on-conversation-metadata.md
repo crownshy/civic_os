@@ -75,6 +75,6 @@ slug on the Region, and an anonymous read for both. Until then, treat
 `metadata.place` as the contract; `scripts/seed-dev.sh` writes it for local
 development.
 
-Related: ADR 0003 (freeze scope), ADR 0004 (admin conversation resolution),
+Related: ADR 0004 (admin conversation resolution),
 `docs/regions-migration.md`, #349 (URL scheme), #351 (Places provisioned by
 BLOOM).

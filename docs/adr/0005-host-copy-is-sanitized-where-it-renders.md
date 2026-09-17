@@ -64,17 +64,6 @@ sanitizer would have masked that; rendering the anchors as markup fixes it. The
 Oxford-comma logic those two call sites shared now lives in
 `packages/civicos/src/lib/utils/list.ts`.
 
-## How this sits with the civicos freeze
-
-ADR 0003 scoped the freeze to shared component markup and carved out `civicos`
-data loading. This change is neither: it alters what `civicos` components
-render. The carve-out extends to security fixes at existing render sites,
-on the same reasoning as 0003. The freeze exists so shared primitives are not
-restyled underneath `civicos` while the migration is parked, and none of
-`Card`, `Badge`, `Link`, `MonoLabel`, `input`, `popover`, `form`, `carousel`,
-`command` or `spinner` is touched here. The parked migration in
-`component-strategy.md` is unaffected.
-
 ## Consequences
 
 - #414 inherits a settled tag list. Its remaining work is the block container,

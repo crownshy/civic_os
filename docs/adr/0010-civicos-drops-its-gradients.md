@@ -47,19 +47,6 @@ Two did not fit the rule and were judged: `VoteBar`'s white-to-grey bevel became
 `bg-white`, and `HeroSection`'s `.bubble`, which faded from 18% white to nothing,
 became a flat 12%.
 
-## How this sits with the freeze
-
-ADR 0003 freezes "any change to a `civicos` component's visual design" and ADR
-0009 restates it as "token-driven only", with the test being whether a Host with
-everything switched on sees the screen they saw before. **This change fails that
-test on purpose.** It is a redesign, not configuration, and it was asked for
-directly rather than derived from a Host switch.
-
-The freeze is not lifted. It still covers the shared primitives ADR 0003 lists,
-none of which is touched here: this is `civicos`'s own `lib/components/ui` and its
-route-local components. The migration parked in `docs/component-strategy.md` is
-unaffected.
-
 ## Consequences
 
 - `GradientCard` is `PanelCard`. Its whole reason for existing was a gradient
@@ -85,5 +72,4 @@ unaffected.
 - `Header` kept its exact colour: `from-[#FFEDD3] to-[#FFEDD3]/40` was one hex
   fading to itself, so flattening it to `bg-[#FFEDD3]` only removes the fade.
 
-Related: #428 (Brand), ADR 0003 (freeze scope), ADR 0009 (what the freeze
-protects).
+Related: #428 (Brand), ADR 0013 (the civicos freeze is lifted).

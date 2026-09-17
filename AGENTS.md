@@ -34,8 +34,8 @@ generic primitives. The full rules for what to share vs keep separate are in
 - **[STYLE_GUIDE.md](STYLE_GUIDE.md)** how we build the frontend: general principles plus
   the full Svelte/SvelteKit working agreement (data fetching, forms, styling, runes).
 - **[docs/component-strategy.md](docs/component-strategy.md)** what belongs in `shared`
-  vs each app, the token model, and which shared files are frozen because `civicos`
-  imports them.
+  vs each app, the token model, and which shared files both apps import, so a change
+  to one has to be checked in both.
 - **[CONTEXT.md](CONTEXT.md)** domain language (Region, County, Conversation, goal
   metrics). Use these terms exactly; they are load bearing.
 - **[docs/adr/](docs/adr)** architectural decisions and their rationale. Check here

@@ -1,17 +1,15 @@
 # The civicos freeze is lifted
 
 `civicos` components can be changed like any other code in this repo. The rule
-that only token-driven changes were allowed is gone, and with it ADRs
-[0003](0003-civicos-freeze-covers-components-not-data.md) and
-[0009](0009-host-switches-may-change-civicos-rendering.md), which existed only to
-carve exceptions out of it.
+that only token-driven changes were allowed is gone, and so are ADRs 0003 and
+0009, which existed only to carve exceptions out of it.
 
 ## Why this needed writing down
 
 The freeze was written when nobody was working in `civicos` and the worry was a
 shared primitive being restyled underneath it unnoticed. That stopped being the
 situation. Of the last twenty commits on `stage`, 23 file changes are in
-`packages/civicos`, and three ADRs in a row have had to argue their way past the
+`packages/civicos`, and three ADRs in a row had to argue their way past the
 freeze before doing ordinary work:
 
 - 0003 carved out data loading, because the freeze read as "civicos may fetch a
@@ -25,10 +23,10 @@ freeze before doing ordinary work:
 Four carve-outs is not a constraint, it is a tax. Each one cost a round of
 argument to reach a conclusion nobody disagreed with.
 
-The change that prompted this is smaller than any of them. `civicos` buttons have
-no pressed state, so on a phone a tap produces no feedback until the next screen
-paints. Fixing that is a visual change to a `civicos` component, which the freeze
-forbids outright.
+The change that prompted this is smaller than any of them. `civicos` buttons had
+no pressed state, so on a phone a tap produced no feedback until the next screen
+painted. Fixing that is a visual change to a `civicos` component, which the
+freeze forbade outright.
 
 ## What was actually worth protecting
 
@@ -36,8 +34,8 @@ One thing, and it survives: the shared files that `civicos` imports. `Card`,
 `Badge`, `Link`, `MonoLabel`, `input`, `popover`, `form`, `carousel`, `command`
 and `spinner` render in both apps, so a change to one of them lands in `admin`
 and `civicos` at once and it is easy to check only the app you had open. That
-rule moves to `docs/component-strategy.md` as a check-both-apps requirement,
-which is what it always meant.
+rule now lives in `docs/component-strategy.md` as a check-both-apps
+requirement, which is what it always meant.
 
 ## Decision
 
@@ -50,10 +48,13 @@ which is what it always meant.
 
 ## Consequences
 
-- 0003 and 0009 are superseded. Both files keep a banner pointing here so the
-  links from `component-strategy.md`, `regions-migration.md`, 0005, 0006 and 0010
-  still land somewhere that explains itself.
-- 0005 is unaffected. Sanitizing Host copy at the render site was correct on its
-  own merits and did not depend on the freeze.
+- 0003 and 0009 are deleted rather than left as tombstones. Both were arguments
+  about the boundary of a rule that no longer exists, and neither held anything
+  else. 0005 and 0010 each lose the section that argued past the freeze; the
+  rest of both ADRs is unaffected, because sanitizing Host copy and flattening
+  the gradients were correct on their own merits.
+- 0009's one surviving fact moves to `component-strategy.md`: the definitions a
+  Host configures live in `packages/shared/src/data/`, so `admin` and `civicos`
+  read one list.
 - The parked migration's guardrails still hold: shared components reference role
   tokens only, and a new shared primitive has to render in both apps.
