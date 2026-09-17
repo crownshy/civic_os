@@ -1,5 +1,29 @@
 import {type ClassValue, clsx} from 'clsx';
-import {twMerge} from 'tailwind-merge';
+import {extendTailwindMerge} from 'tailwind-merge';
+
+// Custom `--text-*` sizes from admin's app.css. Unregistered, tailwind-merge reads
+// `text-body` as a colour and keeps a primitive's `md:text-sm` next to it.
+const twMerge = extendTailwindMerge({
+	extend: {
+		theme: {
+			text: [
+				'h1',
+				'h2',
+				'h3',
+				'h4',
+				'body-lg',
+				'body',
+				'paragraph',
+				'caption',
+				'label',
+				'stat',
+				'hero',
+				'section',
+				'display'
+			]
+		}
+	}
+});
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
