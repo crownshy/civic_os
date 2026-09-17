@@ -1,5 +1,9 @@
 # The civicos freeze covers components, not data
 
+> **Superseded by [ADR 0013](0013-the-civicos-freeze-is-lifted.md).** The freeze
+> this ADR carves an exception out of no longer exists; `civicos` components are
+> editable. Kept for the history, and because other docs link here.
+
 `docs/component-strategy.md` says "do not modify `civicos` at all" while the
 civicos-onto-shared migration sits parked. That constraint is scoped to **shared
 component markup**. It does not prevent `civicos` from reading its own

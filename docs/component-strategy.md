@@ -69,26 +69,23 @@ Generic, behavior-driven, theme-agnostic primitives:
   `DonutChart`, `VoteBar`, `EmojiCircle`, `GradientCard`, `QuoteText`,
   `PopQuiz`, `ComposeOverlay`, `ReportPanel`, `Header`, `StickyNav`, `AlertBanner`
 
-## ⚠️ Constraint: civicos stays frozen
+## Changing shared primitives: check both apps
 
-**Decision (current):** do not modify `civicos` at all. That means the
-"move civicos onto shared" migration below is **PARKED** — steps 2–4 are the
-plan *if we ever opt in*, not work to do now. Until then:
+`civicos` is editable like anything else here. The freeze that used to sit in this
+section is lifted; see
+[ADR 0013](adr/0013-the-civicos-freeze-is-lifted.md).
 
-> **Scope.** Read literally this blocks milestones 12 and 13, so two ADRs narrow
-> it: [0003](adr/0003-civicos-freeze-covers-components-not-data.md) carves out
-> `civicos` data loading, and
-> [0005](adr/0005-host-copy-is-sanitized-where-it-renders.md) carves out security
-> fixes at existing render sites. What stays frozen is the shared primitives
-> listed below and the parked migration.
+What survives it is one check. These shared files are imported by **both** apps,
+so a change to any of them lands in `admin` and `civicos` at once:
 
-- The safe cleanup (token hygiene + admin's Button) is **already done**.
-- `shared/ui/button` is effectively **admin-only** — change it freely.
-- These shared files **are imported by civicos** — treat as frozen; only make
-  token-driven changes (which can't cross apps) and never alter their markup
-  without checking civicos too:
-  `Card` · `Badge` · `Link` · `MonoLabel` · `input` · `popover` · `form` ·
-  `carousel` · `command` · `spinner`
+`Card` · `Badge` · `Link` · `MonoLabel` · `input` · `popover` · `form` ·
+`carousel` · `command` · `spinner`
+
+Change them freely, but render both apps before you call it done. It is easy to
+verify only the app you happened to have open.
+
+`shared/ui/button` is not on that list: `civicos` has its own `Button`, so shared's
+is still admin-only.
 
 ## Migration order (civicos → shared) — PARKED; one PR each, verify visually
 

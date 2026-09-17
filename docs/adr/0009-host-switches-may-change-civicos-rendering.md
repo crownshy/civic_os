@@ -1,5 +1,9 @@
 # A Host switch may change what civicos renders
 
+> **Superseded by [ADR 0013](0013-the-civicos-freeze-is-lifted.md).** The freeze
+> this ADR carves an exception out of no longer exists; `civicos` components are
+> editable. Kept for the history, and because other docs link here.
+
 [ADR 0003](0003-civicos-freeze-covers-components-not-data.md) freezes "any change
 to `civicos` components that alters their rendering" and unfreezes `civicos` data
 loading. Read literally, that lets civicos **fetch** a Host's configuration and
