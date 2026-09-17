@@ -11,15 +11,15 @@
 </script>
 
 {#if tab === 'open-poll'}
-	<!-- Open Poll redirects to /participants and mounts its own sub-tab layout;
-	     sketch the sub-tab strip + participants content it lands on. -->
+	<!-- Open Poll redirects to /setup and mounts its own sub-tab layout;
+	     sketch the sub-tab strip + setup content it lands on. -->
 	<nav class="flex items-center gap-6 border-b border-border px-5 py-3 font-ui" aria-hidden="true">
-		{#each Array(3), i (i)}
+		{#each Array(4), i (i)}
 			<Skeleton class="h-4 w-24" />
 		{/each}
 	</nav>
 	<div class="flex-1 overflow-y-auto">
-		<OpenPollSkeleton tab="/participants" />
+		<OpenPollSkeleton tab="/setup" />
 	</div>
 {:else if tab === 'events'}
 	<EventsSkeleton />

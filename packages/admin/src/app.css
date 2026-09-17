@@ -145,6 +145,22 @@
 	--color-host: #3b82f6; /* host / "You" author badge (blue-500) */
 }
 
+/* Indeterminate navigation bar (NavigationProgress). The delay keeps it off
+   screen for navigations that resolve almost at once, so fast clicks do not
+   flash it. `backwards` holds the off-screen start frame during that delay. */
+@theme {
+	--animate-nav-progress: nav-progress 1.1s ease-in-out 150ms infinite backwards;
+
+	@keyframes nav-progress {
+		from {
+			transform: translateX(-100%);
+		}
+		to {
+			transform: translateX(350%);
+		}
+	}
+}
+
 /* Figma redesign: neutral admin surface. Scoped to the admin package only —
    the public civicos app keeps its warm cream brand (theme.css). Overrides
    come after the theme.css @import above, so these win for light mode. */

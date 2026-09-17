@@ -10,16 +10,21 @@
 		LogOut,
 		Building2
 	} from '@lucide/svelte';
-	import { page } from '$app/state';
+	import { page, navigating } from '$app/state';
 	import { afterNavigate } from '$app/navigation';
-	import type { ConversationStatus } from '$lib/conversations';
+	import { findByRouteSlug, type ConversationStatus } from '$lib/conversations';
 	import { resolve } from '$app/paths';
+	import NavigationProgress from '$lib/components/NavigationProgress.svelte';
+	import ConversationSkeleton from '$lib/components/skeletons/ConversationSkeleton.svelte';
 
 	let { children, data } = $props();
 
 	const isLogin = $derived(page.url.pathname === '/login');
 	const canCreateHost = $derived(data?.canCreateHost ?? false);
-	const onHosts = $derived(page.url.pathname.startsWith('/sysadmin/hosts'));
+	// Nav highlights follow the destination while it loads, so a click registers
+	// at once rather than after every `load` on the next page has resolved.
+	const activePath = $derived(navigating.to?.url.pathname ?? page.url.pathname);
+	const onHosts = $derived(activePath.startsWith('/sysadmin/hosts'));
 
 	// Sidebar UI state.
 	// `collapsed` toggles icon-rail vs full sidebar on md+.
@@ -37,14 +42,37 @@
 		complete: 'bg-muted-foreground/30'
 	};
 
-	const onDashboard = $derived(page.url.pathname === '/');
-	const currentSlug = $derived(page.params.slug);
+	const onDashboard = $derived(activePath === '/');
+
+	// The Conversation a link or back/forward is taking us to, when it is a
+	// different one. `goto` is left out on purpose: Setup follows a slug rename
+	// with `goto`, and swapping in a skeleton there would tear down the editor.
+	const pendingSlug = $derived.by(() => {
+		const to = navigating.to;
+		if (!to || navigating.type === 'goto' || !to.route.id?.startsWith('/c/[slug]')) return null;
+		const slug = to.params?.slug;
+		return slug && slug !== page.params.slug ? slug : null;
+	});
+	const currentSlug = $derived(pendingSlug ?? page.params.slug);
+
+	// The /c/[slug] load makes several backend calls before anything renders, so
+	// without this the previous Conversation sits on screen looking frozen.
+	const pendingConversation = $derived(
+		pendingSlug
+			? {
+					title: findByRouteSlug(conversations, pendingSlug)?.title ?? null,
+					tab: navigating.to?.url.pathname.split('/')[3] || 'overview'
+				}
+			: null
+	);
 
 	// Close drawer when route changes
 	afterNavigate(() => {
 		mobileOpen = false;
 	});
 </script>
+
+<NavigationProgress />
 
 {#if isLogin}
 	{@render children?.()}
@@ -246,7 +274,11 @@
 				<span class="text-body font-bold">CivicOS</span>
 			</div>
 
-			{@render children?.()}
+			{#if pendingConversation}
+				<ConversationSkeleton title={pendingConversation.title} tab={pendingConversation.tab} />
+			{:else}
+				{@render children?.()}
+			{/if}
 		</main>
 	</div>
 {/if}

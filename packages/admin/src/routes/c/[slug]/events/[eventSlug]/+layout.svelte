@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/state';
+	import { page, navigating } from '$app/state';
 	import * as Popover from '@civicos/shared/ui/popover';
 	import { ChevronDown } from '@lucide/svelte';
 	import { resolve } from '$app/paths';
@@ -27,12 +27,31 @@
 	const eventId = $derived(page.params.eventSlug ?? '');
 	const eventBase = $derived(`/c/${campaignSlug}/events/${eventId}`);
 
-	const activeSubTab = $derived(
-		subTabs.find((t) =>
-			t.href === ''
-				? page.url.pathname === eventBase
-				: page.url.pathname.startsWith(eventBase + t.href)
-		)?.href ?? ''
+	// Where we are headed while the next page loads, so the switcher label and
+	// the sub-tab highlight move on click instead of after GetEvent resolves.
+	const pendingEventId = $derived(
+		navigating.to?.route.id?.startsWith('/c/[slug]/events/[eventSlug]')
+			? (navigating.to.params?.eventSlug ?? null)
+			: null
+	);
+	const activeEventId = $derived(pendingEventId ?? eventId);
+	const activeEvent = $derived(events.find((ev) => ev.id === activeEventId) ?? event);
+	const activePath = $derived(
+		pendingEventId ? (navigating.to?.url.pathname ?? page.url.pathname) : page.url.pathname
+	);
+	const activeBase = $derived(`/c/${campaignSlug}/events/${activeEventId}`);
+
+	const subTabFor = (pathname: string, base: string) =>
+		subTabs.find((t) => (t.href === '' ? pathname === base : pathname.startsWith(base + t.href)))
+			?.href ?? '';
+	const committedSubTab = $derived(subTabFor(page.url.pathname, eventBase));
+	const activeSubTab = $derived(subTabFor(activePath, activeBase));
+
+	// Keep the old content up (the sub-pages have no skeletons of their own) but
+	// dim it, so a slow switch does not read as the page ignoring the click. Only
+	// for a change of event or sub-tab: opening a recording has its own spinner.
+	const loading = $derived(
+		pendingEventId !== null && (pendingEventId !== eventId || activeSubTab !== committedSubTab)
 	);
 
 	// The sub-page segment currently open (e.g. "/recordings"), so switching events
@@ -57,7 +76,7 @@
 		<Popover.Trigger
 			class="flex cursor-pointer items-center gap-3 bg-primary px-4 py-2.5 text-body font-medium text-primary-foreground outline-none"
 		>
-			{event ? eventLabel(event) : 'Select event'}
+			{activeEvent ? eventLabel(activeEvent) : 'Select event'}
 			<ChevronDown class="size-4" />
 		</Popover.Trigger>
 		<Popover.Content
@@ -66,7 +85,7 @@
 			class="w-72 overflow-hidden rounded-xl border border-muted-foreground/20 p-1 shadow-lg"
 		>
 			{#each events as ev (ev.id)}
-				{@const active = ev.id === page.params.eventSlug}
+				{@const active = ev.id === activeEventId}
 				<!-- The base is resolved; `subSuffix` is the sub-path carried over from the
 				     current route so switching events keeps you on the same tab. -->
 				<!-- eslint-disable svelte/no-navigation-without-resolve -->
@@ -101,7 +120,13 @@
 	<div class="flex min-h-0 flex-1 flex-col">
 		<!-- The scroller owns the padding so its scrollbar sits in the gutter rather
 		     than over the content. -->
-		<div class="min-h-0 flex-1 overflow-y-auto px-8 py-8 [scrollbar-gutter:stable]">
+		<div
+			class={[
+				'min-h-0 flex-1 [scrollbar-gutter:stable] overflow-y-auto px-8 py-8 transition-opacity',
+				loading && 'pointer-events-none opacity-50'
+			]}
+			aria-busy={loading}
+		>
 			{@render children?.()}
 		</div>
 	</div>

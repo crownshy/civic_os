@@ -12,30 +12,31 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 
 	const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
 
-	const allOrgs = await api
-		.ListOrganizations({ queries: { limit: 200 } })
-		.then((r) => r.records)
-		.catch((e) => {
-			console.warn('ListOrganizations failed', e);
-			return [];
-		});
+	const [allOrgs, cohostOrgIds] = await Promise.all([
+		api
+			.ListOrganizations({ queries: { limit: 200 } })
+			.then((r) => r.records)
+			.catch((e) => {
+				console.warn('ListOrganizations failed', e);
+				return [];
+			}),
+		// Co-host org ids = organizations granted the co-host role on this Conversation.
+		api
+			.ListResourcePermissions({
+				params: { resource_type: CONVERSATION_RESOURCE, resource_id: convId },
+				queries: { limit: 200 }
+			})
+			.then((r) =>
+				r.records
+					.filter((p) => p.organization_id && p.role_name === COHOST_ROLE)
+					.map((p) => p.organization_id as string)
+			)
+			.catch((e) => {
+				console.warn('ListResourcePermissions failed', e);
+				return [] as string[];
+			})
+	]);
 	const orgById = new Map(allOrgs.map((o) => [o.id, o]));
-
-	// Co-host org ids = organizations granted the co-host role on this Conversation.
-	const cohostOrgIds = await api
-		.ListResourcePermissions({
-			params: { resource_type: CONVERSATION_RESOURCE, resource_id: convId },
-			queries: { limit: 200 }
-		})
-		.then((r) =>
-			r.records
-				.filter((p) => p.organization_id && p.role_name === COHOST_ROLE)
-				.map((p) => p.organization_id as string)
-		)
-		.catch((e) => {
-			console.warn('ListResourcePermissions failed', e);
-			return [] as string[];
-		});
 
 	const owningOrgId =
 		(conversation as { organizationId?: string | null } | null)?.organizationId ?? null;
