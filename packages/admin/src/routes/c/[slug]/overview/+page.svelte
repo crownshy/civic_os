@@ -10,6 +10,8 @@
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import { Button } from '@civicos/shared/ui/button';
 	import * as Dialog from '@civicos/shared/ui/dialog';
+	import { Input } from '@civicos/shared/ui/input';
+	import { Label } from '@civicos/shared/ui/label';
 	import { Trash2 } from '@lucide/svelte';
 	import IdentityCard from './IdentityCard.svelte';
 	import CoHostsCard from './CoHostsCard.svelte';
@@ -552,9 +554,13 @@
 	let deleteOpen = $state(false);
 	let deleting = $state(false);
 	let deleteError = $state<string | null>(null);
+	// Typing the slug is a guard, not form input: nothing is submitted, so this
+	// stays plain state rather than a superform.
+	let deleteConfirm = $state('');
+	const deleteConfirmed = $derived(deleteConfirm.trim() === slug);
 
 	async function deleteConversation() {
-		if (deleting) return;
+		if (deleting || !deleteConfirmed) return;
 		deleting = true;
 		deleteError = null;
 		try {
@@ -802,6 +808,7 @@
 					variant="destructive-outline"
 					onclick={() => {
 						deleteError = null;
+						deleteConfirm = '';
 						deleteOpen = true;
 					}}
 				>
@@ -822,6 +829,18 @@
 				and participant data. This cannot be undone.
 			</Dialog.Description>
 		</Dialog.Header>
+		<div class="space-y-2">
+			<Label for="delete-confirm" class="text-body">
+				Type <span class="font-mono font-semibold">{slug}</span> to confirm.
+			</Label>
+			<Input
+				id="delete-confirm"
+				bind:value={deleteConfirm}
+				autocomplete="off"
+				spellcheck={false}
+				disabled={deleting}
+			/>
+		</div>
 		{#if deleteError}
 			<p class="text-body text-destructive" role="alert">{deleteError}</p>
 		{/if}
@@ -829,7 +848,11 @@
 			<Button variant="secondary" onclick={() => (deleteOpen = false)} disabled={deleting}>
 				cancel
 			</Button>
-			<Button variant="destructive" onclick={deleteConversation} disabled={deleting}>
+			<Button
+				variant="destructive"
+				onclick={deleteConversation}
+				disabled={deleting || !deleteConfirmed}
+			>
 				{deleting ? 'deleting…' : 'delete conversation'}
 			</Button>
 		</Dialog.Footer>
