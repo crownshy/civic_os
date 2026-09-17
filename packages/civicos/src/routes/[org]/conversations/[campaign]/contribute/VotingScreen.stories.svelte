@@ -25,6 +25,7 @@
 	{#snippet template(args)}
 		<VotingScreen
 			{...args}
+			question={REGIONS.utah.question}
 			region={REGIONS.utah}
 			onVote={() => {}}
 			onEnd={() => {}}
@@ -45,6 +46,7 @@
 	{#snippet template(args)}
 		<VotingScreen
 			{...args}
+			question={REGIONS.utah.question}
 			region={REGIONS.utah}
 			onVote={() => {}}
 			onEnd={() => {}}
@@ -66,6 +68,7 @@
 	{#snippet template(args)}
 		<VotingScreen
 			{...args}
+			question={REGIONS.utah.question}
 			region={REGIONS.utah}
 			onVote={() => {}}
 			onEnd={() => {}}

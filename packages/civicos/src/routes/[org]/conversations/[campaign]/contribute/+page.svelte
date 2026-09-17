@@ -333,6 +333,7 @@
 		{#if polis.currentStatement}
 			<VotingScreen
 				{placeName}
+				{question}
 				statementText={polis.currentStatement.txt}
 				statementId={polis.currentStatement.tid}
 				remaining={displayedRemaining}

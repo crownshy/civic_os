@@ -6,6 +6,8 @@
 
 	interface Props {
 		placeName: string;
+		/** The Campaign's Key Question, shown above each statement. */
+		question: string;
 		statementText: string;
 		statementId: number;
 		/** Statements left in the current batch — drives the progress bar (cycles 0…BATCH_SIZE). */
@@ -25,6 +27,7 @@
 
 	let {
 		placeName,
+		question,
 		statementText,
 		statementId,
 		remaining,
@@ -83,7 +86,7 @@
 		</div>
 		<div class="absolute top-[3px] left-0 flex w-full items-start justify-between px-4 py-2">
 			<span class="pr-4 font-mono text-sm font-medium text-muted-foreground/70 uppercase"
-				>{region.heroHeader}</span
+				>{question}</span
 			>
 			<span class="shrink-0 font-mono text-sm font-medium text-muted-foreground/70 uppercase"
 				>{topRightCount} LEFT</span
