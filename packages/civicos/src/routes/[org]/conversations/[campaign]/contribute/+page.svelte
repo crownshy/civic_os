@@ -428,7 +428,8 @@
 	umamiDismissEvent="checkpoint-panel-dismiss-share"
 >
 	<SharePanelContent
-		{region}
+		shareUrl={page.data.shareUrl}
+		title={campaign.title}
 		umamiTextEvent="checkpoint-share-text"
 		umamiEmailEvent="checkpoint-share-email"
 		umamiLinkEvent="checkpoint-share-link"

@@ -7,6 +7,7 @@ import {
 	legacyRegionForSlug,
 	regionForCampaign,
 	resolveCampaign,
+	shareUrlFor,
 	type CampaignConversation
 } from '$lib/config/campaign';
 import { resolveParticipation } from '$lib/config/participation';
@@ -91,6 +92,9 @@ export const load: LayoutServerLoad = async ({ params, url, depends }) => {
 	return {
 		region,
 		campaign,
+		// Derived from this request, not from `regions.ts`: a stored `shareUrl`
+		// pointed every admin-created Campaign at the USA catch-all.
+		shareUrl: shareUrlFor(campaign, url),
 		hostCopy: resolveHostCopy(conversation, region),
 		// The Host's own questions when they have written any, the `regions.ts`
 		// placeholders until then.

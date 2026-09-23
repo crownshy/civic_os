@@ -24,6 +24,7 @@ import {
 	readCoHosts,
 	readOrg,
 	readPoll,
+	participantUrl,
 	type CampaignCoHost,
 	type CampaignOrg,
 	type CampaignPoll
@@ -197,6 +198,26 @@ export function resolveCampaign(
 		source: 'conversation',
 		isLegacyRegion
 	};
+}
+
+/**
+ * The public address of this Campaign, for a share sheet or a copied link.
+ *
+ * Derived from the request rather than stored. `regions.ts` used to carry a
+ * `shareUrl` string per region, which meant every Campaign created in admin
+ * shared `all.bloomproject.us`, the USA catch-all, instead of itself.
+ *
+ * The `<org>` segment is decorative and `participantUrl` fills in a placeholder
+ * when the Host is unknown, so this is a working link even for a Campaign whose
+ * `metadata.org` was never mirrored.
+ */
+export function shareUrlFor(campaign: Campaign, url: URL): string {
+	return participantUrl(
+		campaign.slug,
+		campaign.org?.slug ?? '',
+		url.host,
+		url.protocol.replace(':', '')
+	);
 }
 
 /**

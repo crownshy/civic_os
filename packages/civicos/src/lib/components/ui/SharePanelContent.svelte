@@ -2,10 +2,12 @@
 	import { onDestroy } from 'svelte';
 	import { Mail, MessageSquare, Link as LinkIcon, Check } from 'lucide-svelte';
 	import { session } from '$lib/services/session.svelte';
-	import type { RegionConfig } from '$lib/config/regions';
 
 	interface Props {
-		region: RegionConfig;
+		/** This Campaign's public address, derived from the request in `load`. */
+		shareUrl: string;
+		/** The Campaign's title, which is what the share copy is about. */
+		title: string;
 		umamiTextEvent?: string;
 		umamiEmailEvent?: string;
 		umamiLinkEvent?: string;
@@ -13,12 +15,13 @@
 		onComplete?: () => void;
 	}
 
-	let { region, umamiTextEvent, umamiEmailEvent, umamiLinkEvent, onComplete }: Props = $props();
+	let { shareUrl, title, umamiTextEvent, umamiEmailEvent, umamiLinkEvent, onComplete }: Props =
+		$props();
 
-	const subject = $derived(`Have your say about AI in ${region.stateName}`);
-	const body = $derived(
-		`I just shared what I think about how ${region.demonym} should approach AI. Add your voice: ${region.shareUrl}`
-	);
+	// Phrased from the Campaign rather than from a region's state name and
+	// demonym, which named the USA catch-all on every Campaign created in admin.
+	const subject = $derived(`Have your say: ${title}`);
+	const body = $derived(`I just shared what I think about ${title}. Add your voice: ${shareUrl}`);
 
 	let linkCopied = $state(false);
 	let copyTimer: ReturnType<typeof setTimeout> | undefined;
@@ -40,7 +43,7 @@
 
 	async function copyLink() {
 		try {
-			await navigator.clipboard.writeText(region.shareUrl);
+			await navigator.clipboard.writeText(shareUrl);
 		} catch {
 			/* clipboard may be blocked; intent was clear */
 		}

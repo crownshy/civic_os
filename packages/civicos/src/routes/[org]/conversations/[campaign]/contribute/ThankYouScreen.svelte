@@ -248,7 +248,8 @@
 	umamiDismissEvent="end-panel-dismiss-share"
 >
 	<SharePanelContent
-		{region}
+		shareUrl={page.data.shareUrl}
+		title={page.data.campaign.title}
 		umamiTextEvent="end-share-text"
 		umamiEmailEvent="end-share-email"
 		umamiLinkEvent="end-share-link"

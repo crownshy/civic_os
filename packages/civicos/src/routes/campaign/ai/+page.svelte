@@ -20,8 +20,12 @@
 		return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 	}
 
-	const emailHref = `mailto:?subject=${encodeURIComponent('Make your voice heard on the impact of AI. I did!')}&body=${encodeURIComponent(`Hi ___, I just filled out this short poll about managing AI impact in ${region.stateName} — it was fast, and it actually made me think. Since this stuff is going to affect all of us, I figured you might want to share your perspective too. Here's the link: ${region.shareUrl}`)}`;
-	const smsHref = `sms:?body=${encodeURIComponent(`I just did this quick poll about managing AI in ${region.stateName}. It only took a couple of minutes — thought you might want to weigh in too. ${region.shareUrl}`)}`;
+	// This page is not under `[campaign]`, so `page.data.region` is always the
+	// catch-all and there is no Campaign to derive an address from. The site root
+	// is the closest honest link until #425 decides this page's future.
+	const shareUrl = page.url.origin;
+	const emailHref = `mailto:?subject=${encodeURIComponent('Make your voice heard on the impact of AI. I did!')}&body=${encodeURIComponent(`Hi ___, I just filled out this short poll about managing AI impact in ${region.stateName} - it was fast, and it actually made me think. Since this stuff is going to affect all of us, I figured you might want to share your perspective too. Here's the link: ${shareUrl}`)}`;
+	const smsHref = `sms:?body=${encodeURIComponent(`I just did this quick poll about managing AI in ${region.stateName}. It only took a couple of minutes, thought you might want to weigh in too. ${shareUrl}`)}`;
 
 	async function handleSignUp() {
 		emailError = '';
