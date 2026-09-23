@@ -10,7 +10,7 @@ import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 import { browserTestAliases } from './env-alias';
 
 const dirname =
-    typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
+	typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 
 // Resolve Chromium path for NixOS environments, defaulting to undefined for standard OSs
 const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
@@ -18,102 +18,102 @@ const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 // Fix api-client ESM resolution: dist/client.js imports './api' without .js extension
 function fixApiClientPlugin() {
-    return {
-        name: 'fix-api-client-esm',
-        enforce: 'pre' as const,
-        resolveId(source: string, importer: string | undefined) {
-            if (
-                source === './api' &&
-                importer &&
-                importer.includes('@crownshy/api-client') &&
-                importer.endsWith('client.js')
-            ) {
-                return importer.replace('client.js', 'api.js');
-            }
-        }
-    };
+	return {
+		name: 'fix-api-client-esm',
+		enforce: 'pre' as const,
+		resolveId(source: string, importer: string | undefined) {
+			if (
+				source === './api' &&
+				importer &&
+				importer.includes('@crownshy/api-client') &&
+				importer.endsWith('client.js')
+			) {
+				return importer.replace('client.js', 'api.js');
+			}
+		}
+	};
 }
 
 export default defineConfig({
-    plugins: [
-        fixApiClientPlugin(),
-        tailwindcss(),
-        sveltekit(),
-        devtoolsJson(),
-        paraglideVitePlugin({
-            project: './project.inlang',
-            outdir: './src/lib/paraglide'
-        })
-    ],
-    ssr: {
-        external: ['isomorphic-dompurify']
-    },
-    server: {
-        allowedHosts: ['.localhost'],
-        fs: {
-            allow: ['..']
-        }
-    },
-    test: {
-        expect: {
-            requireAssertions: true
-        },
-        projects: [
-            {
-                extends: './vite.config.ts',
-                resolve: { alias: browserTestAliases },
-                test: {
-                    name: 'client',
-                    browser: {
-                        enabled: true,
-                        provider: playwright({
-                            launchOptions: executablePath ? { executablePath } : {}
-                        }),
-                        instances: [
-                            {
-                                browser: 'chromium',
-                                headless: true
-                            }
-                        ]
-                    },
-                    include: ['src/**/*.svelte.{test,spec}.{js,ts}'],
-                    exclude: ['src/lib/server/**']
-                }
-            },
-            {
-                extends: './vite.config.ts',
-                test: {
-                    name: 'server',
-                    environment: 'node',
-                    include: ['src/**/*.{test,spec}.{js,ts}'],
-                    exclude: ['src/**/*.svelte.{test,spec}.{js,ts}']
-                }
-            },
-            {
-                extends: true,
-                plugins: [
-                    storybookTest({
-                        configDir: path.join(dirname, '.storybook')
-                    })
-                ],
-                resolve: { alias: browserTestAliases },
-                test: {
-                    name: 'storybook',
-                    browser: {
-                        enabled: true,
-                        headless: true,
-                        provider: playwright({
-                            launchOptions: executablePath ? { executablePath } : {}
-                        }),
-                        instances: [
-                            {
-                                browser: 'chromium'
-                            }
-                        ]
-                    },
-                    setupFiles: ['.storybook/vitest.setup.ts']
-                }
-            }
-        ]
-    }
+	plugins: [
+		fixApiClientPlugin(),
+		tailwindcss(),
+		sveltekit(),
+		devtoolsJson(),
+		paraglideVitePlugin({
+			project: './project.inlang',
+			outdir: './src/lib/paraglide'
+		})
+	],
+	ssr: {
+		external: ['isomorphic-dompurify']
+	},
+	server: {
+		allowedHosts: ['.localhost'],
+		fs: {
+			allow: ['..']
+		}
+	},
+	test: {
+		expect: {
+			requireAssertions: true
+		},
+		projects: [
+			{
+				extends: './vite.config.ts',
+				resolve: { alias: browserTestAliases },
+				test: {
+					name: 'client',
+					browser: {
+						enabled: true,
+						provider: playwright({
+							launchOptions: executablePath ? { executablePath } : {}
+						}),
+						instances: [
+							{
+								browser: 'chromium',
+								headless: true
+							}
+						]
+					},
+					include: ['src/**/*.svelte.{test,spec}.{js,ts}'],
+					exclude: ['src/lib/server/**']
+				}
+			},
+			{
+				extends: './vite.config.ts',
+				test: {
+					name: 'server',
+					environment: 'node',
+					include: ['src/**/*.{test,spec}.{js,ts}'],
+					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}']
+				}
+			},
+			{
+				extends: true,
+				plugins: [
+					storybookTest({
+						configDir: path.join(dirname, '.storybook')
+					})
+				],
+				resolve: { alias: browserTestAliases },
+				test: {
+					name: 'storybook',
+					browser: {
+						enabled: true,
+						headless: true,
+						provider: playwright({
+							launchOptions: executablePath ? { executablePath } : {}
+						}),
+						instances: [
+							{
+								browser: 'chromium'
+							}
+						]
+					},
+					setupFiles: ['.storybook/vitest.setup.ts']
+				}
+			}
+		]
+	}
 });

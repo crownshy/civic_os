@@ -18,11 +18,13 @@ declare global {
 	interface ImportMeta {
 		readonly env: ImportMetaEnv;
 	}
-}
 
-// Custom element declarations for web components
-interface HTMLElementTagNameMap {
-	'add-to-calendar-button': HTMLElement;
+	// Custom element declarations for web components. Inside `declare global`
+	// because `export {}` below makes this file a module, so a top-level
+	// interface would merge with nothing (#412).
+	interface HTMLElementTagNameMap {
+		'add-to-calendar-button': HTMLElement;
+	}
 }
 
 export {};

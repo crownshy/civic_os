@@ -19,6 +19,7 @@ export default defineConfig(
 	js.configs.recommended,
 	...ts.configs.recommended,
 	...svelte.configs.recommended,
+	...storybook.configs['flat/recommended'],
 	prettier,
 	...svelte.configs.prettier,
 	{

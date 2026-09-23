@@ -10,6 +10,10 @@ bun.lockb
 build/
 storybook-static/
 
+# Test artifacts
+test-results/
+playwright-report/
+
 # Generated
 src/lib/paraglide/
 project.inlang/
