@@ -804,8 +804,8 @@
 		     One switch per ask, governing both surfaces civicos shows it on: the
 		     mid-poll checkpoint screen and the end-page CTA card. They already
 		     share a completion flag per ask, so they are one ask shown twice.
-		     Stored alongside demographics in conversation.metadata; civicos still
-		     hardcodes both lists, so this does not change the poll yet (#398). -->
+		     Stored alongside demographics in conversation.metadata, and obeyed by
+		     civicos since #426. -->
 		<ParticipantAsksCard
 			title="Participant Asks"
 			subtitle="What we ask participants for besides their votes. Each one shows up while they vote and again on the thank-you page. Turn off any you don't want to ask for."

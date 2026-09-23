@@ -141,16 +141,33 @@ Cleaned up in the same pass, all of it unreachable code found on the way:
 
 ### Milestone B: an editor for every field civicos already reads
 
-- [ ] `thankYouMessage` has no editor anywhere in admin. civicos reads it at
-      `host-copy.ts:49` and the Open Poll end screen renders it, so today a
-      Host can only get `region.whatsNext`. #366 closed covering `description`
-      only.
-- [ ] `Conversation.callToAction` exists on the model and nothing reads or
-      writes it. Claim it or drop it.
-- [ ] Event host name and URL come from the Conversation's organization rather
-      than `region.hostName` / `region.hostUrl`.
-- [ ] A Host switch for `conversationsActive`, or derive it from whether any
-      event is open for registration.
+Done.
+
+- [x] `thankYouMessage` has an editor: Setup > Context for Participants > What
+      Happens Next. It joins the debounced superform alongside Title and
+      Description. It is a nullable TextContent reference like `faqs`, so an
+      unset one has no record to write against and the first save creates it,
+      which `writeTextContent` now does for both.
+- [x] Event host name and URL come from `metadata.org`, which gained a `url`.
+      `mirrorHosts` writes it on every grant, revoke and Campaign creation, so
+      a Campaign mirrored before the field existed picks it up rather than
+      waiting to be recreated. A Campaign with no Host, or a Host with no site,
+      drops the clause instead of crediting somebody else.
+- [x] `conversationsActive` is derived from whether the Campaign has any
+      events, and the field is deleted. It was declared on `RegionConfig` and
+      set by no region, so it read as true everywhere and the Coming Soon
+      branch on the events page could never render. A Host opens registration
+      by creating events, which is the same decision without a second switch.
+- [x] `Conversation.callToAction` stays unclaimed, deliberately. Nothing in
+      either app reads or writes it, and no participant surface wants it.
+      Building an editor would ship the mirror image of the problem this
+      milestone exists to fix: a field a Host can fill in that nobody ever
+      sees. Claim it when a surface needs it.
+
+Cleaned up in the same pass:
+
+- [x] `getEventFullDescription` deleted. Its only mention was a comment, and it
+      takes the `ConversationEvent` shape `regions.ts` stopped storing.
 
 ### Milestone C: the fallback itself goes
 
@@ -188,8 +205,8 @@ value is derived, or the copy becomes hardcoded UI text.
 | `polisId`                 | string                | ~15                | **Done**                                 | `metadata.poll.polisId`, see ADR 0004                                        |
 | `conversationId`          | UUID                  | 36                 | **Move**                                 | The Conversation this Campaign is                                            |
 | `inviteId`                | UUID                  | 36                 | **Move**                                 | Invite record for this Campaign                                              |
-| `hostName`                | string                | ~50                | **Keep** on the Host                     | Resolved from `Conversation.organizationId` in admin already                 |
-| `hostUrl`                 | url                   |                    | **Keep** on the Host                     |                                                                              |
+| `hostName`                | string                | ~50                | **Done** on the Host                     | `metadata.org.name`                                                          |
+| `hostUrl`                 | url                   |                    | **Done** on the Host                     | `metadata.org.url`                                                           |
 | `zipPrefixes`             | string[]              |                    | Undecided                                | Scopes the zip typeahead and the county rollup                               |
 | `heroHeader`              | string                | ~60                | **Done** as Title                        | `Conversation.title`                                                         |
 | `heroBlurb`               | string                | ~250               | **Done**                                 | Deleted. `HERO_BLURB` in `landing-copy.ts`                                   |
@@ -200,7 +217,7 @@ value is derived, or the copy becomes hardcoded UI text.
 | `aboutConversation`       | string[]              | ~400 each          | **Done**                                 | Deleted. The dialog renders `Conversation.description`                       |
 | `campaignPageDescription` | string                | ~300               | **Remove**                               |                                                                              |
 | `campaignPageHosts`       | string, HTML          | ~300               | **Remove**                               | Generated from the CoHosts list                                              |
-| `whatsNext`               | string                | ~300               | **Keep** as the Open Poll ending message | `Conversation.thankYouMessage`, still without an editor                      |
+| `whatsNext`               | string                | ~300               | **Done** as the Open Poll ending message | `Conversation.thankYouMessage`, editable on Setup                            |
 | `goDeeper`                | string, HTML          | ~300               | **Done**                                 | Deleted                                                                      |
 | `faq`                     | shared constant       |                    | **Done** as `Conversation.faqs`          | One rich-text field, `h2` per question, parsed by `@civicos/shared/data/faq` |
 | `endCtaJoinDescription`   | string                | ~100               | **Done**                                 | `END_CTA_COPY` in `landing-copy.ts`                                          |
@@ -208,15 +225,16 @@ value is derived, or the copy becomes hardcoded UI text.
 | `polis_workflow_step_id`  | UUID                  | 36                 | **Done**                                 | `metadata.poll.workflowStepId`. Legacy regions only, now                     |
 | `shareUrl`                | url                   | ~50                | **Done**, derived                        | `participantUrl()` off the request. Field deleted                            |
 | `events`                  | `ConversationEvent[]` |                    | **Done**                                 | `GET /conversation/:id/events`. Field deleted                                |
-| `conversationsActive`     | boolean               |                    | Undecided                                | Whether live conversations are open for registration                         |
+| `conversationsActive`     | boolean               |                    | **Done**                                 | Derived from the Campaign's events. Field deleted                            |
 | `phaseLabels`             | `{phase1,2,3}`        |                    | **Remove**                               | Only `/campaign/ai` reads them                                               |
 | `fullHosts`               | string                |                    | **Done**                                 | Deleted                                                                      |
 
 ## What has to happen before a field can go
 
 1. A backend field to hold it, or a rule that derives it.
-2. An editor in admin, otherwise the field ships dead. `thankYouMessage` and
-   `callToAction` are both in this state today.
+2. An editor in admin, otherwise the field ships dead. Nothing is in that state
+   now; `callToAction` is the inverse, a field with no reader, and stays
+   unclaimed until a surface wants it.
 3. The live Utah and Oregon values saved into their Conversation records. Until
    that is done by hand, removing the `regions.ts` entry removes the copy from
    a live site.
@@ -226,7 +244,8 @@ value is derived, or the copy becomes hardcoded UI text.
 
 - `zipPrefixes` has no disposition. It does two unrelated jobs (typeahead
   scoping and the county rollup) and probably wants splitting before it moves.
-- `Conversation.callToAction` exists and nothing uses it.
+- `Conversation.callToAction` still has no reader and no writer. Milestone B
+  left it alone on purpose rather than giving a Host a field nobody sees.
 - Whether the Open Poll ending message stays a separate field or merges into
   Basic Information. The table keeps it separate, which is what #398 built.
 - Whether "A Message from Your Hosts" and "About This Conversation" are two
