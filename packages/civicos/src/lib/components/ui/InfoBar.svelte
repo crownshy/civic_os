@@ -1,5 +1,7 @@
 <script lang="ts">
 	import Button from './Button.svelte';
+	import { page } from '$app/state';
+	import { campaignPath } from '@civicos/shared/data/place';
 	import { cn } from '$lib/utils';
 
 	interface Props {
@@ -25,6 +27,14 @@
 		variant = 'default',
 		class: className
 	}: Props = $props();
+
+	// The Campaign's own homepage, which carries the Host's Context copy, their
+	// FAQ and who is hosting. This used to be a fixed link to `/campaign/ai`, a
+	// page outside the `[campaign]` route that always rendered the USA catch-all,
+	// so ABOUT took a participant from their Campaign to a marketing page about
+	// somebody else's. Every screen this bar appears on is under `[campaign]`,
+	// so the params are always there.
+	const aboutHref = $derived(campaignPath(page.params.campaign, page.params.org));
 
 	const variantStyles = {
 		default: '',
@@ -72,7 +82,7 @@
 		<Button
 			variant={variant === 'light' ? 'ghost' : 'soft'}
 			size="xs"
-			href="/campaign/ai"
+			href={aboutHref}
 			class={variant === 'light' ? 'bg-white/10 text-white/80' : ''}
 		>
 			{buttonText}
