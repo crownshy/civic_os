@@ -46,6 +46,7 @@
 				     need separating. `last-child:mb-0` is what keeps the single-paragraph
 				     case (every answer today) rendering exactly as it did. -->
 				<div class="pb-4 [&_a]:text-destructive [&_a]:underline [&_p]:mb-4 [&_p:last-child]:mb-0">
+					<!-- eslint-disable-next-line svelte/no-at-html-tags -- host copy, sanitized on the way out (#409) -->
 					{@html sanitizeHostHtml(item.answer)}
 				</div>
 			</AccordionPrimitive.Content>

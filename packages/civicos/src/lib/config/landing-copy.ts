@@ -1,3 +1,5 @@
+import { campaignPath } from '@civicos/shared/data/place';
+
 /**
  * Shared landing-page copy and structure.
  *
@@ -48,8 +50,25 @@ export interface FooterLink {
 	external?: boolean;
 }
 
-export const FOOTER_LINKS: FooterLink[] = [
-	{ label: 'Take the Open Poll', href: '/contribute' },
+/**
+ * Footer links for a Campaign's own pages.
+ *
+ * The Open Poll link has to be built per Campaign: there is no top-level
+ * `/contribute` any more, only `/<org>/conversations/<campaign>/contribute`, so
+ * the old fixed path 404'd on every Campaign. `/conversations` stays absolute,
+ * because that one is the cross-Campaign directory rather than this Campaign's.
+ */
+export function footerLinks(
+	campaignSlug: string | undefined,
+	orgSlug: string | undefined
+): FooterLink[] {
+	return [
+		{ label: 'Take the Open Poll', href: campaignPath(campaignSlug, orgSlug, 'contribute') },
+		...FOOTER_LINKS
+	];
+}
+
+const FOOTER_LINKS: FooterLink[] = [
 	{ label: 'Join a Community Conversation', href: '/conversations' },
 	{ label: 'About BLOOM Project', href: 'https://www.bloom-project.org/', external: true },
 	{

@@ -89,6 +89,7 @@
 </script>
 
 {#if href && !disabled}
+	<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- `href` belongs to the caller and may be external; callers resolve their own internal paths -->
 	<a {href} class={classes}>
 		{@render children()}
 	</a>

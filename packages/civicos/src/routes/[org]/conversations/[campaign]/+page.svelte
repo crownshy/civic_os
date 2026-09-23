@@ -2,6 +2,7 @@
 	import { campaignPath } from '@civicos/shared/data/place';
 	import { fade } from 'svelte/transition';
 	import { goto, invalidate, preloadCode } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
@@ -16,7 +17,7 @@
 	import {
 		HERO_BLURB,
 		OPEN_POLL_EXPLAINER,
-		FOOTER_LINKS,
+		footerLinks,
 		NAV_SECTIONS
 	} from '$lib/config/landing-copy';
 	import { trackEvent } from '@lukulent/svelte-umami';
@@ -34,7 +35,12 @@
 	// The same Key Question /contribute resolves, so the skeleton shown here and
 	// the voting screen it becomes label the statement identically.
 	const question = campaign?.poll?.question || region.question;
-	const contributePath = campaignPath(campaign.slug, page.params.org, 'contribute');
+	// `page.params` is typed app-wide, so the segments this route matched on read
+	// as optional; reaching this component means both are present.
+	const contributePath = resolve('/[org]/conversations/[campaign]/contribute', {
+		org: page.params.org!,
+		campaign: campaign.slug
+	});
 	// The organizations to credit, from `metadata.cohosts` where admin mirrored
 	// the grants. Empty for a Campaign with none, rather than the catch-all's
 	// `partners`, which credited The Bloom Project on everybody's Campaign.
@@ -309,6 +315,7 @@
 				<div class="mt-10 flex flex-col items-center gap-3 md:mt-6">
 					<span class="font-display text-base font-medium opacity-80 md:text-lg">Hosted by</span>
 					<div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-4 text-center">
+						<!-- eslint-disable svelte/no-navigation-without-resolve -- a co-host's own site, external -->
 						{#each cohosts as cohost (cohost.name)}
 							{#if cohost.logo}
 								<a href={safeHref(cohost.url)} target="_blank" rel="noopener noreferrer">
@@ -331,6 +338,7 @@
 								<span class="font-sans text-sm font-medium md:text-base">{cohost.name}</span>
 							{/if}
 						{/each}
+						<!-- eslint-enable svelte/no-navigation-without-resolve -->
 					</div>
 				</div>
 			{/if}
@@ -345,6 +353,7 @@
 		<section id={section.id} class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
 			<h2 class="font-display text-2xl font-medium md:text-3xl">{section.heading}</h2>
 			<div class="mt-6 opacity-80 {HOST_COPY_PROSE_CLASS}">
+				<!-- eslint-disable-next-line svelte/no-at-html-tags -- `toContextSections` sanitizes (#409) -->
 				{@html section.html}
 			</div>
 		</section>
@@ -369,6 +378,7 @@
 			<h2 class="font-display text-2xl font-medium md:text-3xl">Your Hosts</h2>
 			<!-- The anchors are markup rather than an HTML string so a co-host's
 				name and url are never interpolated into one. -->
+			<!-- eslint-disable svelte/no-navigation-without-resolve -- co-host sites are external; the anchor opens mid-sentence, so no line disable fits -->
 			<p class="mt-6 font-sans text-base leading-6 font-medium opacity-80 md:text-lg">
 				This Open Poll is hosted by {#each cohosts as cohost, i (cohost.name)}{#if cohost.url}<a
 							href={safeHref(cohost.url)}
@@ -377,6 +387,7 @@
 							class="text-destructive underline">{cohost.name}</a
 						>{:else}{cohost.name}{/if}{listSeparator(i, cohosts.length)}{/each}.
 			</p>
+			<!-- eslint-enable svelte/no-navigation-without-resolve -->
 		</section>
 	{/if}
 
@@ -387,6 +398,7 @@
 		<section id="whats-next" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
 			<h2 class="font-display text-2xl font-medium md:text-3xl">What's Next?</h2>
 			<div class="mt-6 opacity-80 [&_a]:font-bold {HOST_COPY_PROSE_CLASS}">
+				<!-- eslint-disable-next-line svelte/no-at-html-tags -- `renderHostCopy` sanitizes (#409) -->
 				{@html renderHostCopy(hostCopy.whatsNext)}
 			</div>
 		</section>
@@ -459,7 +471,8 @@
 	<!-- Footer -->
 	<footer class="bg-primary px-8 py-12">
 		<ul class="mx-auto flex max-w-4xl flex-col gap-1.5">
-			{#each FOOTER_LINKS as link (link.label)}
+			<!-- eslint-disable svelte/no-navigation-without-resolve -- mixed list: external URLs plus a path from `campaignPath` -->
+			{#each footerLinks(campaign.slug, page.params.org) as link (link.label)}
 				<li>
 					<a
 						href={link.href}
@@ -471,6 +484,7 @@
 					</a>
 				</li>
 			{/each}
+			<!-- eslint-enable svelte/no-navigation-without-resolve -->
 		</ul>
 	</footer>
 </div>
@@ -492,6 +506,7 @@
 	which described The Bloom Project on every Campaign created in admin. -->
 <Dialog bind:open={showAboutMessage} title="About This Conversation" buttonText="GOT IT">
 	<div class="px-7 pt-6 {HOST_COPY_PROSE_CLASS}">
+		<!-- eslint-disable-next-line svelte/no-at-html-tags -- `renderHostCopy` sanitizes (#409) -->
 		{@html renderHostCopy(hostCopy.context)}
 	</div>
 </Dialog>
