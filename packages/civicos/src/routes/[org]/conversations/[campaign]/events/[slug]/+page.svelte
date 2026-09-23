@@ -9,14 +9,7 @@
 	import { formatDurationLabel } from '$lib/config/regions';
 	import { placeNameFor } from '$lib/config/campaign';
 	import { formatTimeDuration } from '$lib/utils/dates.js';
-	import {
-		differenceInDays,
-		differenceInHours,
-		differenceInMinutes,
-		addHours,
-		isBefore,
-		format
-	} from 'date-fns';
+	import { addHours, isBefore, format } from 'date-fns';
 	import { onMount, onDestroy } from 'svelte';
 	import { invalidate } from '$app/navigation';
 	import { session } from '$lib/services/session.svelte';
@@ -37,9 +30,6 @@
 	let startTime = $derived(eventTimeFormatter.format(eventStartDate));
 	let endTime = $derived(eventTimeFormatter.format(eventEndDate));
 
-	let daysLeft = $state(0);
-	let hoursLeft = $state(0);
-	let minutesLeft = $state(0);
 	let isPast = $state(false);
 	let interval: ReturnType<typeof setInterval> | null = null;
 	let showForm = $state(false);
@@ -67,26 +57,16 @@
 		eventEndDate
 	);
 
-	function updateCountdown() {
+	function updateIsPast() {
 		if (!event) return;
-		const now = new Date();
 		const target = new Date(event.startTime);
-		isPast = isBefore(addHours(target, 2), now); // past if >2h after start
-		if (isPast || isBefore(target, now)) {
-			daysLeft = 0;
-			hoursLeft = 0;
-			minutesLeft = 0;
-			return;
-		}
-		daysLeft = differenceInDays(target, now);
-		hoursLeft = differenceInHours(target, now) % 24;
-		minutesLeft = differenceInMinutes(target, now) % 60;
+		isPast = isBefore(addHours(target, 2), new Date()); // past if >2h after start
 	}
 
 	onMount(() => {
 		if (!event) return;
-		updateCountdown();
-		interval = setInterval(updateCountdown, 60000);
+		updateIsPast();
+		interval = setInterval(updateIsPast, 60000);
 	});
 
 	onMount(() => {
@@ -140,6 +120,7 @@
 				</p>
 
 				<!-- Description -->
+				<!-- eslint-disable svelte/no-navigation-without-resolve -- the Host's own site is external; the anchor opens mid-sentence, so no line disable fits -->
 				<p class="mt-4 text-center font-sans text-base leading-6 font-medium text-foreground">
 					Join your neighbors {locationLabel} for a conversation about AI's impact on our lives.{#if org}
 						Hosted by
@@ -151,23 +132,10 @@
 							>{:else}{org.name}{/if}.
 					{/if}
 				</p>
+				<!-- eslint-enable svelte/no-navigation-without-resolve -->
 
 				<!-- CTA -->
 				<div class="mt-5 w-full">
-					<!-- <p class="mb-3 text-center text-base font-medium text-foreground">
-						{#if isPast}
-							Event has passed.
-						{:else if daysLeft > 0}
-							Event starts in {daysLeft} {daysLeft === 1 ? 'day' : 'days'}
-						{:else if hoursLeft > 0}
-							Event starts in {hoursLeft}h {minutesLeft}m
-						{:else if minutesLeft > 0}
-							Event starts in {minutesLeft} {minutesLeft === 1 ? 'min' : 'mins'}
-						{:else}
-							HAPPENING NOW
-						{/if}
-					</p> -->
-
 					{#if isRegistered}
 						<Button
 							variant="soft"
