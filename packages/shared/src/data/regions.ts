@@ -13,7 +13,6 @@
 
 // Pure region data, no SvelteKit env coupling.
 import type { ConversationEvent } from '../types/conversation-event';
-
 /** A coalition partner / host organization shown on the landing page. */
 export interface Partner {
 	name: string;
@@ -50,39 +49,22 @@ export interface RegionConfig {
 	zipPrefixes: string[];
 	/** Landing page hero h1 ("AI & Our Communities") */
 	heroHeader: string;
-	/** Landing page hero blurb under the h1 ("Share your thoughts with 300+ others in..."). HTML allowed. */
-	heroBlurb: string;
 	/** Paragraphs for the landing page "Context" section. HTML allowed. */
 	contextParagraphs: string[];
-	/** Narrative blurb for the landing page "Your Hosts" section. HTML allowed. Written to be carousel-agnostic. */
-	hostsBlurb: string;
 	/** All coalition orgs (host + partners) for this region. Rendered as a text list today; logo carousel later. */
 	partners: Partner[];
-	/** Host message paragraphs (for the "A Message from Your Hosts" dialog) */
-	hostMessage: string[];
-	/** Appears in the aboutConversation dialog */
-	aboutConversation: string[];
 	/** Appears on `/campaigns/ai` */
 	campaignPageDescription: string;
 	/** Appears on `/campaigns/ai` */
 	campaignPageHosts: string;
 	/** ending Content */
 	whatsNext: string;
-	goDeeper: string;
 	/** Per-region FAQ. Seeded with DEFAULT_FAQ placeholders; host orgs author their own. */
 	faq: FaqEntry[];
-	/** End-page CTA card descriptions. Only region-flavored cards live here; email + review are hardcoded. */
-	endCtaJoinDescription: string;
-	endCtaShareDescription: string;
-	fullHosts?: string;
-	/** Upcoming conversation events for this region */
-	events: ConversationEvent[];
 	/** Whether live conversations are open for registration. Defaults to true when omitted. */
 	conversationsActive?: boolean;
 	/** Date labels for the three campaign phases */
 	phaseLabels?: { phase1: string; phase2: string; phase3: string };
-	/** Public share URL for this region (e.g. "utah.bloomproject.us") */
-	shareUrl: string;
 }
 
 /**
@@ -130,33 +112,16 @@ export const REGIONS: Record<string, RegionConfig> = {
 		hostUrl: 'https://bloomproject.us',
 		zipPrefixes: [],
 		heroHeader: 'AI and the Future of Our Communities',
-		heroBlurb:
-			'Share your thoughts with other test subjects making sense of this topic together. <a href="#context">Learn more \u2192</a>',
 		contextParagraphs: [
 			'This is a testing environment for the landing page redesign \u2014 placeholder copy.',
 			'Use this region to validate UI changes without affecting any real conversation.'
 		],
-		hostsBlurb: 'This conversation is hosted by Bloom Testing.',
 		partners: [{ name: 'Bloom Testing', url: 'https://bloomproject.us' }],
-		hostMessage: [
-			'This is a testing version of the site to check things are working and to play with new features with play',
-			'This is mostly just to see if things work',
-			'This is not a live conversation'
-		],
-		aboutConversation: [
-			'This conversation is about how Utah can prepare for the growing impact of AI in so many aspects of our lives (work and the economy, education, wellbeing, information quality, government services, etc).',
-			'It is hosted by Utah Common Ground, a collaboration of diverse nonpartisan organizations across Utah. You can find out more about them at utahcommonground.org.'
-		],
 		campaignPageDescription: '',
 		campaignPageHosts: '',
 		whatsNext: 'Nothing',
-		goDeeper: 'Nothing',
-		endCtaJoinDescription: 'Conversations with neighbors are taking place in-person and online.',
-		endCtaShareDescription: 'Anyone in your community is welcome to participate.',
 		polis_workflow_step_id: '68425b0d-21e9-4f36-8c13-229dab4508bc',
-		faq: DEFAULT_FAQ,
-		shareUrl: 'https://testing.bloomproject.us',
-		events: []
+		faq: DEFAULT_FAQ
 	},
 	utah: {
 		slug: 'utah',
@@ -170,13 +135,9 @@ export const REGIONS: Record<string, RegionConfig> = {
 		hostUrl: 'https://www.utahcommonground.org/home',
 		zipPrefixes: ['84'],
 		heroHeader: 'AI and the Future of Our Communities',
-		heroBlurb:
-			'Share your thoughts with 400+ Utah residents who are shaping the impact of artificial intelligence together. <a href="#context">Learn more \u2192</a>',
 		contextParagraphs: [
 			'AI is reshaping work, school, government services, and daily life across Utah \u2014 and Utahns have a choice in how we respond. This is a place for us to weigh in.'
 		],
-		hostsBlurb:
-			'This conversation is hosted by <a href="https://www.utahcommonground.org/home">Utah Common Ground</a>, and supported by many other committed organizations, individuals, and partners across Utah.',
 		partners: [
 			{ name: 'Utah Common Ground', url: 'https://www.utahcommonground.org/home' },
 			{ name: 'AEGIX Institute', url: 'https://www.aegixinstitute.org/' },
@@ -188,146 +149,15 @@ export const REGIONS: Record<string, RegionConfig> = {
 				url: 'https://www.mormonwomenforethicalgovernment.org/'
 			}
 		],
-		hostMessage: [
-			'This space is hosted by <a href="https://www.utahcommonground.org/home" target="_blank" rel="noopener noreferrer">Utah Common Ground</a>, a coalition of nonprofit organizations from around the state, including Utah State University Center for Anticipatory Intelligence, the AI Ethics and Governance Institute, Engage Forum, Braver Angels and Mormon Women for Ethical Government. We came together to help citizens come together across political differences to identify issues of local concern, consider possible solutions, and take the necessary steps to achieve meaningful, measurable change.',
-			'We invite all Utahns to share what matters most to them about the future of AI and its impact on communities across the state. Over several weeks, this process will surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding.',
-			'After this period of broad public input, a representative group of approximately 30 to 50 residents from three counties (Cache, Salt Lake, and Utah Counties) will be invited to convene in person in August and September 2026 for a Solutions Forum.'
-		],
-		aboutConversation: [
-			'This conversation is about how Utah can prepare for the growing impact of AI in so many aspects of our lives (work and the economy, education, wellbeing, information quality, government services, etc).',
-			'            It is hosted by Utah Common Ground, a collaboration of diverse nonpartisan organizations across Utah. You can find out more about them at utahcommonground.org.'
-		],
 		campaignPageDescription:
 			'This Assembly is about making sure Utahns have a real say in how artificial intelligence shapes our lives —ensuring that all Utahns can benefit from new technologies while mitigating risks to families, schools, and communities.',
 		campaignPageHosts:
 			'Hosted by Utah Common Ground, a project led by a coalition of organizations, including <a href="https://www.aegixinstitute.org/">AEGIX</a>, <a href="https://braverangels.org/">Braver Angels</a>, <a href="https://www.usu.edu/cai/">Center for Anticipatory Intelligence</a>, <a href="https://www.engageforum.org/">Engage Forum</a>, and <a href="https://www.mormonwomenforethicalgovernment.org/">Mormon Women for Ethical Government</a>.',
 		whatsNext:
 			'<a href="https://www.utahcommonground.org/get-involved">Sign up↗</a> for live conversations about this topic, taking place both online and in-person across Salt Lake, Utah, and Cache counties. These conversations will be an opportunity to connect with your neighbors and develop shared values around AI\'s influence on the people we care about.',
-		goDeeper:
-			'The ultimate goal of this campaign is to surface common ground that lets Utahns take action from the local to state levels and beyond. If you are interested in getting involved in a deeper way, let us know at <a href="mailto:hello@bloom-project.org">hello@bloom-project.org</a>.',
-		endCtaJoinDescription:
-			'Conversations with neighbors in Utah are taking place in-person and online.',
-		endCtaShareDescription: 'Anyone in Utah is welcome to participate.',
 
 		polis_workflow_step_id: '9d1041f9-fda6-4597-b4b0-c1260e4b7268',
 		faq: DEFAULT_FAQ,
-		shareUrl: 'https://utah.bloomproject.us',
-		events: [
-			{
-				slug: 'may-02-springville',
-				title: 'AI & Springville',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Springville, UT',
-				venueName: 'Springville Library',
-				address: '45 S Main St, Springville, UT 84663',
-				time: '1:30PM',
-				endTime: '3:00PM',
-				date: '2026-05-02T13:00:00-06:00',
-				duration: '1.5 hours',
-				format: 'in-person',
-				description: 'Join us for small group conversations about AI for Utah Common Ground!',
-				fullDescription:
-					'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
-			},
-			{
-				slug: 'may-05-online',
-				title: 'AI & Our Communities',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Online',
-				venueName: 'Online',
-				address: 'Video link sent upon registration',
-				time: '12:00PM',
-				endTime: '1:00PM',
-				date: '2026-05-05T12:00:00-06:00',
-				duration: '1 hour',
-				format: 'online',
-				description: 'Join us for small group conversations about AI for Utah Common Ground!',
-				fullDescription:
-					'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
-			},
-			{
-				slug: 'may-07-online',
-				title: 'AI & Our Communities',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Online',
-				venueName: 'Online',
-				address: 'Video link sent upon registration',
-				time: '7:00PM',
-				endTime: '8:00PM',
-				date: '2026-05-07T19:00:00-06:00',
-				duration: '1 hour',
-				format: 'online',
-				description:
-					'Join us for virtual small group conversations about AI for Utah Common Ground!',
-				fullDescription:
-					'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
-			},
-			{
-				slug: 'may-09-kearns',
-				title: 'AI & Kearns',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Kearns, UT',
-				venueName: 'Kearns Library',
-				address: '4015 S 4400 W, Kearns, UT 84118',
-				time: '12:00PM',
-				endTime: '1:30PM',
-				date: '2026-05-09T12:00:00-06:00',
-				duration: '1.5 hours',
-				format: 'in-person',
-				description: 'Join us for small group conversations about AI for Utah Common Ground!',
-				fullDescription:
-					'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
-			},
-			{
-				slug: 'may-12-online',
-				title: 'AI & Our Communities',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Online',
-				venueName: 'Online',
-				address: 'Video link sent upon registration',
-				time: '12:00PM',
-				endTime: '1:00PM',
-				date: '2026-05-12T12:00:00-06:00',
-				duration: '1 hour',
-				format: 'online',
-				description: 'Join us for small group conversations about AI for Utah Common Ground!',
-				fullDescription:
-					'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
-			},
-			{
-				slug: 'may-14-online',
-				title: 'AI & Our Communities',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Online',
-				venueName: 'Online',
-				address: 'Video link sent upon registration',
-				time: '7:00PM',
-				endTime: '8:00PM',
-				date: '2026-05-14T19:00:00-06:00',
-				duration: '1 hour',
-				format: 'online',
-				description:
-					'Join us for virtual small group conversations about AI for Utah Common Ground!',
-				fullDescription:
-					'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
-			},
-			{
-				slug: 'may-16-logan',
-				title: 'AI & Logan',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Logan, UT',
-				venueName: 'Logan Library',
-				address: '255 N Main St, Logan, UT 84321',
-				time: '3:30PM',
-				endTime: '5:00PM',
-				date: '2026-05-16T15:30:00-06:00',
-				duration: '1.5 hours',
-				format: 'in-person',
-				description: 'Join us for small group conversations about AI for Utah Common Ground!',
-				fullDescription:
-					'Utah Common Ground invites Utahns to share what matters most to them on the impact of AI on their communities. Participation is open to anyone. These small-group conversations are hosted by local partners and will take place both online and in person. The discussion will be guided by a facilitator, who will help the group surface concerns, tensions, and opportunities for deeper discussion, as well as areas where additional information could help promote understanding and analysis.'
-			}
-		],
 		phaseLabels: { phase1: 'APRIL 2026', phase2: 'MAY 2026', phase3: 'SEPTEMBER 2026' }
 	},
 	oregon: {
@@ -342,171 +172,23 @@ export const REGIONS: Record<string, RegionConfig> = {
 		hostUrl: 'https://cocap.us/',
 		zipPrefixes: ['97'],
 		heroHeader: 'AI & Our Communities',
-		heroBlurb:
-			'Share your thoughts with <strong>300+ Central Oregon residents</strong> who are shaping the impact of artificial intelligence together. <a href="#context">Learn more →</a>',
 		contextParagraphs: [
 			'AI is reshaping Central Oregon — and we have a choice in how we respond. This is a place for us to weigh in.',
 			'The 2026 Community Solutions Assembly on AI asks how Central Oregon can ensure the benefits of AI are widely shared and its risks responsibly managed in our communities. It starts with an Open Poll you can access today; this only takes a few minutes and it shapes everything that follows.'
 		],
-		hostsBlurb:
-			'This conversation is hosted by the <a href="https://cocap.us/">Central Oregon Civic Action Project</a>, and supported by many other committed organizations, individuals, and partners throughout Central Oregon.',
 		partners: [
 			{ name: 'Central Oregon Civic Action Project', url: 'https://cocap.us/' },
 			{ name: 'Central Oregon Intergovernmental Council', url: 'https://www.coic.org/' },
 			{ name: 'Central Oregon Community College', url: 'https://cocc.edu/' },
 			{ name: 'Citizens4Community', url: 'https://citizens4community.com/' }
 		],
-		hostMessage: [
-			`
-		  <p>YOUR HOSTS:</p>
-		  <ul>
-			<li>
-			  Central Oregon Civic Action Project 	  
-			</li>
-			<li>
-			  Citizens for Community 
-			</li>
-			<li>
-			  Central Oregon Intergovernmental Council
-			</li>
-			<li>
-			  Central Oregon Community College
-			</li>
-		  </ul>
-		  `,
-			'First, thank you for being here and for caring about the future of our region.',
-			'AI is already reshaping Central Oregon — bringing real promise alongside real concerns. Many see new economic opportunities, better tools for innovation, and new ways to tackle longstanding challenges. Others worry about jobs, education, mental health, water and natural resources, and access to trustworthy information. Both are true, and both matter.',
-			'Central Oregonians should have a say in changes that shape their lives. This poll is a first step — a way to understand where our community stands, find common ground, and build toward solutions together.',
-			'Central Oregon Civic Action Project believes people should have a say in the changes that shape their lives. This Open Poll is a first step — a way to understand where our community stands, find common ground, and build toward solutions together.',
-			'This conversation is open to all Central Oregon residents, regardless of background or belief. It only takes a few minutes. We hope you\u2019ll add your voice — and pass it on.',
-			`Questions? Reach Josh at <a href="mailto:josh@cocap.us">josh@cocap.us</a>.`
-		],
-		aboutConversation: [
-			"This Open Poll is hosted by the <a href='http://cocap.us'>Central Oregon Civic Action Project</a> — a coalition of community organizations from across the region.",
-			"Central Oregon is navigating big questions about AI and how it's shaping our communities. This is a space for residents to share what matters most — what you're hopeful about, what concerns you, and what you think our region needs.",
-			'There are no right answers here. This poll is a first step toward understanding where Central Oregonians stand, finding common ground, and building toward solutions together.',
-			'<strong>OPEN POLL (now) → LIVE CONVERSATIONS (May/June) → SOLUTIONS FORUM (Fall)</strong>',
-			'<strong>Step 1: This Poll</strong>',
-			'Share your views now. Your responses help surface what we agree on, where we differ, and what questions deserve deeper conversation.',
-			'<strong>Step 2: Live Conversations (May/June)</strong>',
-			'Small group discussions — in person and online — open to anyone in the region. A chance to hear from neighbors, think out loud, and go deeper than a poll allows.',
-			'<strong>Solutions Forum (Fall 2026)</strong>',
-			'A representative group of 30–50 residents will come together to deliberate on what this process surfaced — and work toward recommendations with broad, cross-party support.',
-			"Questions or want to get involved? Reach us at <a href='mailto:info@cocap.us'>info@cocap.us</a>."
-		],
 		campaignPageDescription:
 			'This Assembly is about making sure Central Oregonians have a real say in how artificial intelligence shapes our lives — who it benefits, who gets left behind, and what we can do about it at every level, from families and schools to city and state policy.',
 		campaignPageHosts: '',
 		whatsNext:
 			'<a href="/conversations?utm_source=whatsNext">Join us</a> in May and June for small group conversations taking place in Deschutes, Jefferson, and Crook counties — both in-person and online. They\'ll build on the themes and common ground that emerge from this poll. Share your email above to stay in the loop, or visit <a href="https://cocap.us" target="_blank">cocap.us</a> to learn more.',
-		goDeeper:
-			'This process is ultimately about finding common ground and turning it into action that benefits Central Oregon communities. If you\'d like to get more involved, reach out to us at <a href="mailto:info@cocap.us">info@cocap.us</a>.',
-		endCtaJoinDescription:
-			'Conversations with neighbors in Central Oregon are taking place in-person and online.',
-		endCtaShareDescription: 'Anyone in Central Oregon is welcome to participate.',
 		polis_workflow_step_id: '8299fec7-a543-419f-8692-f68652648a0b',
-		shareUrl: 'https://oregon.bloomproject.us',
 		faq: DEFAULT_FAQ,
-		events: [
-			{
-				slug: 'may-30-sisters',
-				title: 'Sisters Community Conversation on AI',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Sisters, OR',
-				venueName: 'The Hub by Citizens4Community',
-				address: '291 E. Main Avenue, Sisters, OR 97759',
-				time: '10:00AM',
-				endTime: '11:30AM',
-				date: '2026-05-30T10:00:00-07:00',
-				duration: '1.5 hours',
-				format: 'in-person',
-				description: 'Join us for small group conversations about AI in Central Oregon!'
-			},
-			{
-				slug: 'may-30-prineville',
-				title: 'Prineville Community Conversation on AI',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Prineville, OR',
-				venueName: 'Broughton Room, Crook County Library',
-				address: '175 NW Meadow Lakes Drive, Prineville, OR 97754',
-				time: '1:00PM',
-				endTime: '2:30PM',
-				date: '2026-05-30T13:00:00-07:00',
-				duration: '1.5 hours',
-				format: 'in-person',
-				description: 'Join us for small group conversations about AI in Central Oregon!'
-			},
-			{
-				slug: 'jun-04-central-oregon-online',
-				title: 'Central Oregon Community Conversation on AI – Online #1',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Online',
-				venueName: 'Online',
-				address: 'Video link sent upon registration',
-				time: '7:00PM',
-				endTime: '8:00PM',
-				date: '2026-06-04T19:00:00-07:00',
-				duration: '1 hour',
-				format: 'online',
-				description: 'Join us for small group conversations about AI in Central Oregon!'
-			},
-			{
-				slug: 'jun-06-bend',
-				title: 'Bend Community Conversation on AI',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Bend, OR',
-				venueName: 'Haven Coworking',
-				address: '1001 SW Disk Drive, Suite 250, Bend, OR 97702',
-				time: '1:00PM',
-				endTime: '2:30PM',
-				date: '2026-06-06T13:00:00-07:00',
-				duration: '1.5 hours',
-				format: 'in-person',
-				description: 'Join us for small group conversations about AI in Central Oregon!'
-			},
-			{
-				slug: 'jun-06-madras',
-				title: 'Madras Community Conversation on AI',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Madras, OR',
-				venueName: 'Jefferson County Public Health – Conference Room',
-				address: '500 NE A Street, Madras, OR 97741',
-				time: '1:00PM',
-				endTime: '2:30PM',
-				date: '2026-06-06T13:00:00-07:00',
-				duration: '1.5 hours',
-				format: 'in-person',
-				description: 'Join us for small group conversations about AI in Central Oregon!'
-			},
-			{
-				slug: 'jun-09-central-oregon-online',
-				title: 'Central Oregon Community Conversation on AI – Online #2',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Online',
-				venueName: 'Online',
-				address: 'Video link sent upon registration',
-				time: '12:00PM',
-				endTime: '1:00PM',
-				date: '2026-06-09T12:00:00-07:00',
-				duration: '1 hour',
-				format: 'online',
-				description: 'Join us for small group conversations about AI in Central Oregon!'
-			},
-			{
-				slug: 'jun-13-redmond',
-				title: 'Redmond Community Conversation on AI',
-				topic: 'COMMUNITY CONVERSATION',
-				location: 'Redmond, OR',
-				venueName: 'NeighborImpact Boardroom',
-				address: '2303 SW First Street, Redmond, OR',
-				time: '1:00PM',
-				endTime: '2:30PM',
-				date: '2026-06-13T13:00:00-07:00',
-				duration: '1.5 hours',
-				format: 'in-person',
-				description: 'Join us for small group conversations about AI in Central Oregon!'
-			}
-		],
 		phaseLabels: { phase1: 'APRIL 2026', phase2: 'MAY 2026', phase3: 'SEPTEMBER 2026' }
 	}
 };
@@ -524,75 +206,17 @@ export const GENERIC_REGION: RegionConfig = {
 	hostUrl: 'https://bloom-project.org/',
 	zipPrefixes: [],
 	heroHeader: 'AI and the Future of Our Communities',
-	heroBlurb:
-		'Share your thoughts with others across America who are weighing in on how AI is changing our country. <a href="#context">Learn more →</a>',
 	contextParagraphs: [
 		"People across America are weighing in on how AI is changing our country — and what we should do about it. Now it's your turn.",
 		'Your responses, combined with everyone else\u2019s, will help surface what Americans have in common, where we differ, and what we might tackle together. Results will be published publicly so anyone can see where people stand.'
 	],
-	hostsBlurb:
-		'This Open Poll is hosted by <a href="https://www.bloom-project.org/">The Bloom Project</a>, a civic technology initiative that uses deliberative polling to surface where the American public actually stands on complex issues.',
 	partners: [{ name: 'The Bloom Project', url: 'https://www.bloom-project.org/' }],
-	hostMessage: [
-		'First, thank you for being here and for caring about the future of our country.',
-		'AI is already reshaping American life — bringing real promise alongside real concerns. Many see new economic opportunities, better tools for healthcare and education, and new ways to tackle longstanding challenges. Others worry about jobs, privacy, democracy, and access to truthful information. Both are true, and both matter.',
-		'Americans should have a say in changes that shape their lives. This poll is a way to understand where our country stands and to put that picture in front of the public, policymakers, and the companies building these tools.',
-		'This conversation is open to all U.S. residents, regardless of background or belief. It only takes a few minutes. We hope you’ll add your voice — and pass it on.',
-		"Questions? Reach us at <a href='mailto:hello@bloom-project.org'>hello@bloom-project.org</a>."
-	],
-	aboutConversation: [
-		'This Open Poll is hosted by The Bloom Project, a civic technology initiative that uses deliberative polling to surface where the American public actually stands on complex issues.',
-		'America is navigating big questions about AI and how it’s shaping our lives. This is a space for residents to share what matters most — what you’re hopeful about, what concerns you, and what you think our country needs.',
-		'There are no right answers here. This poll is designed to reveal where Americans agree, where we differ, and what the genuine fault lines are — in a format that anyone can understand.',
-		'Results will be published publicly when the conversation closes.',
-		"Questions or want to get involved? Reach us at <a href='mailto:hello@bloom-project.org'>hello@bloom-project.org</a>."
-	],
 	campaignPageDescription: '',
 	campaignPageHosts: '',
 	whatsNext:
 		'When this conversation closes, Bloom will publish the results publicly — showing where Americans agree, where we differ, and what the opinion landscape looks like across different groups. We’ll share a link when it’s ready.',
-	goDeeper:
-		"If you’d like to host this conversation in your own community, reach out at <a href='mailto:hello@bloom-project.org'>hello@bloom-project.org</a> or visit <a href='https://www.bloom-project.org'>https://www.bloom-project.org</a>.",
-	endCtaJoinDescription: 'Community conversations are taking place in-person and online.',
-	endCtaShareDescription: 'Anyone is welcome to participate.',
 	polis_workflow_step_id: 'f553a7b9-b3ac-4159-b88d-198f609b110c',
-	shareUrl: 'https://all.bloomproject.us',
-	faq: DEFAULT_FAQ,
-	events: [
-		{
-			slug: 'may-18-springville',
-			title: 'May 18 (In-Person) Conversation',
-			topic: 'AI & OUR COMMUNITIES',
-			location: 'Generic Location',
-			time: '1:00PM',
-			date: '2026-05-18T13:00:00-06:00',
-			format: 'in-person',
-			description:
-				'Join us for an in-person conversation about AI and its impact on our communities. Share your perspective, listen to your neighbors, and help shape actionable next steps.'
-		},
-		{
-			slug: 'may-24-provo',
-			title: 'May 24 (In-Person) Conversation',
-			topic: 'AI & OUR COMMUNITIES',
-			location: 'Generic Location',
-			time: '10:00AM',
-			date: '2026-05-24T10:00:00-06:00',
-			format: 'in-person',
-			description:
-				'A morning conversation about how AI is shaping our communities. Come ready to listen, share, and find common ground with fellow residents.'
-		},
-		{
-			slug: 'jun-01-online',
-			title: 'June 1 (Online) Conversation',
-			topic: 'AI & OUR COMMUNITIES',
-			location: 'Online (Zoom)',
-			time: '6:00PM',
-			date: '2026-06-01T18:00:00-06:00',
-			format: 'online',
-			description:
-				"Can't make it in person? Join this virtual conversation from anywhere. Same great discussion, from the comfort of your home."
-		}
-	]
+	faq: DEFAULT_FAQ
 };
 
 // ---------------------------------------------------------------------------
