@@ -6,9 +6,17 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 
 	const { campaign, region } = await parent();
 	const conversationId = campaign.id;
-	// Still read from `regions.ts` rather than resolved from the Campaign's
-	// workflow steps the way admin does it. See #401.
-	const workflowStepId = region.polis_workflow_step_id;
+
+	// The Campaign's own step, mirrored into `metadata.poll` when admin published
+	// it, because the Polis workflow step is 401 anonymously.
+	//
+	// `regions.ts` stays behind it only for a legacy region, where the region IS
+	// the Campaign. It used to be the only source, which handed every Campaign
+	// created in admin the USA catch-all's step and rendered the catch-all's
+	// report under that Host's name. See #401.
+	const workflowStepId =
+		campaign.poll?.workflowStepId ??
+		(campaign.isLegacyRegion ? region.polis_workflow_step_id : undefined);
 
 	const empty = (error: string) => {
 		console.warn('[Report]', error);
@@ -19,7 +27,7 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 		return empty(`No Conversation resolved for "${campaign.slug}"`);
 	}
 	if (!workflowStepId) {
-		return empty(`No Polis workflow step configured for region "${region.slug}"`);
+		return empty(`No Polis workflow step on Campaign "${campaign.slug}"`);
 	}
 
 	const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
