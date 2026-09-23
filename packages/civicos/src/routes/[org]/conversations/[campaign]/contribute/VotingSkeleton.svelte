@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { InfoBar, VoteBar } from '$lib/components/ui';
-	import type { RegionConfig } from '$lib/config/regions';
 	import StatementPlaceholder from './StatementPlaceholder.svelte';
 
 	// Stands in for VotingScreen until Polis has a statement. Built from the real
@@ -11,15 +10,11 @@
 	//
 	// The Key Question is known before Polis answers, so it renders for real
 	// rather than as a bar; only the statement and the remaining count wait.
-	let {
-		placeName,
-		question,
-		region
-	}: { placeName: string; question: string; region: RegionConfig } = $props();
+	let { placeName, question }: { placeName: string; question: string } = $props();
 </script>
 
 <div class="flex h-full flex-col bg-background" aria-busy="true">
-	<InfoBar {placeName} {region} skeleton />
+	<InfoBar {placeName} skeleton />
 
 	<div class="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-10">
 		<div class="absolute top-0 left-0 h-[3px] w-full bg-secondary/30"></div>

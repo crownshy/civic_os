@@ -120,7 +120,7 @@
 			class="flex h-full flex-col overflow-y-auto scroll-smooth bg-background"
 			bind:this={scrollContainer}
 		>
-			<InfoBar {placeName} {region} onBack={() => history.back()} backLabel="← BACK" />
+			<InfoBar {placeName} onBack={() => history.back()} backLabel="← BACK" />
 
 			<!-- Header -->
 			<div class="flex flex-col items-center px-6 pt-6 pb-0 md:px-12">

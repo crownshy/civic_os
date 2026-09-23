@@ -78,7 +78,7 @@
 </script>
 
 <div class="flex h-full flex-col bg-background">
-	<InfoBar {placeName} {region} {onEnd} />
+	<InfoBar {placeName} {onEnd} />
 
 	<!-- Statement content, centered on the page surface -->
 	<div class="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-10">

@@ -1,7 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import CheckpointScreen from './CheckpointScreen.svelte';
-	import { REGIONS } from '$lib/config/regions';
 
 	const { Story } = defineMeta({
 		title: 'Screens/CheckpointScreen',
@@ -12,7 +11,6 @@
 
 	const baseArgs = {
 		placeName: 'UTAH COUNTY',
-		region: REGIONS.utah,
 		remaining: 25,
 		onPrimary: () => {},
 		onKeepGoing: () => {},

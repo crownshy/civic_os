@@ -2,7 +2,6 @@
 	import { onDestroy } from 'svelte';
 	import { cn } from '$lib/utils';
 	import Button from './Button.svelte';
-	import type { RegionConfig } from '$lib/config/regions';
 	import InfoBar from './InfoBar.svelte';
 
 	interface Props {
@@ -11,7 +10,6 @@
 		onSubmit?: (text: string, anonymous: boolean) => void;
 		onBack?: () => void;
 		onShowInstructions?: () => void;
-		region: RegionConfig;
 		class?: string;
 	}
 
@@ -21,7 +19,6 @@
 		onSubmit,
 		onBack,
 		onShowInstructions,
-		region,
 		class: className
 	}: Props = $props();
 
@@ -51,7 +48,7 @@
 
 <div class={cn('relative flex h-dvh flex-col bg-background', className)}>
 	<!-- Header -->
-	<InfoBar {region} {placeName} />
+	<InfoBar {placeName} />
 
 	<!-- Question -->
 	<div class="px-5 pt-4">

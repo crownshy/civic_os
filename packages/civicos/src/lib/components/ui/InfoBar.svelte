@@ -1,9 +1,6 @@
 <script lang="ts">
-	import Dialog from './Dialog.svelte';
 	import Button from './Button.svelte';
 	import { cn } from '$lib/utils';
-	import { sanitizeHostHtml } from '@civicos/shared/sanitize';
-	import type { RegionConfig } from '$lib/config/regions';
 
 	interface Props {
 		placeName: string;
@@ -16,7 +13,6 @@
 		skeleton?: boolean;
 		variant?: 'default' | 'light' | 'dark';
 		class?: string;
-		region: RegionConfig;
 	}
 
 	let {
@@ -27,11 +23,8 @@
 		onEnd,
 		skeleton = false,
 		variant = 'default',
-		class: className,
-		region
+		class: className
 	}: Props = $props();
-
-	let showAbout = $state(false);
 
 	const variantStyles = {
 		default: '',
@@ -89,21 +82,3 @@
 		{/if}
 	</div>
 </div>
-
-<Dialog bind:open={showAbout} title="About this Conversation">
-	<div class="px-7 pt-6">
-		{#each region.aboutConversation as para, index (index)}
-			{#if index == 0}
-				<p class="font-sans text-lg leading-7 font-medium [&_a]:text-destructive [&_a]:underline">
-					{@html sanitizeHostHtml(para)}
-				</p>
-			{:else}
-				<p
-					class="mt-4 font-sans text-lg leading-7 font-medium [&_a]:text-destructive [&_a]:underline"
-				>
-					{@html sanitizeHostHtml(para)}
-				</p>
-			{/if}
-		{/each}
-	</div>
-</Dialog>

@@ -481,7 +481,7 @@
 {#if leaving}
 	<div class="fixed inset-0 z-50 bg-background" in:fade={{ duration: 120 }}>
 		<AppShell border={false}>
-			<VotingSkeleton {placeName} {question} {region} />
+			<VotingSkeleton {placeName} {question} />
 		</AppShell>
 		<span class="sr-only" role="status">Loading the poll</span>
 	</div>

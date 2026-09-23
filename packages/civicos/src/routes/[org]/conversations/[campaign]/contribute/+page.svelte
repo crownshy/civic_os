@@ -328,7 +328,7 @@
 	{#if screen === 'loading'}
 		<!-- Most returning participants land on voting, and the landing page already
 			showed them this skeleton, so a text splash here would flash in between. -->
-		<VotingSkeleton {placeName} {question} {region} />
+		<VotingSkeleton {placeName} {question} />
 	{:else if screen === 'voting'}
 		{#if polis.currentStatement}
 			<VotingScreen
@@ -346,7 +346,7 @@
 				{region}
 			/>
 		{:else}
-			<VotingSkeleton {placeName} {question} {region} />
+			<VotingSkeleton {placeName} {question} />
 		{/if}
 	{:else if screen === 'compose'}
 		<ComposeScreen
@@ -361,11 +361,9 @@
 				session.markComposeInstructionsSeen();
 				screen = 'voting';
 			}}
-			{region}
 		/>
 	{:else if screen === 'pause'}
 		<CheckpointScreen
-			{region}
 			{placeName}
 			variant={currentVariant}
 			remaining={polis.remaining}
@@ -374,17 +372,11 @@
 			onEnd={handleEnd}
 		/>
 	{:else if screen === 'about-you'}
-		<AboutYouScreen
-			{region}
-			{placeName}
-			questions={aboutYouQuestions}
-			onDone={handleDemographicsDone}
-		/>
+		<AboutYouScreen {placeName} questions={aboutYouQuestions} onDone={handleDemographicsDone} />
 	{:else if screen === 'thank-you'}
 		<ThankYouScreen
 			{placeName}
 			onBackToVoting={handleBackToVoting}
-			{region}
 			whatsNext={page.data.hostCopy.whatsNext}
 			asks={participation.asks}
 			conversationId={campaign.id}
@@ -398,11 +390,11 @@
 			class="flex h-full flex-col bg-background"
 			in:fly={{ x: 40, duration: 400, easing: cubicOut }}
 		>
-			<InfoBar {region} {placeName} />
+			<InfoBar {placeName} />
 			<PopQuiz quiz={currentQuiz} onContinue={resumeVoting} onSkip={resumeVoting} />
 		</div>
 	{:else if screen === 'nice-job'}
-		<CheckpointScreen {region} {placeName} onPrimary={handleEnd} onKeepGoing={resumeVoting} />
+		<CheckpointScreen {placeName} onPrimary={handleEnd} onKeepGoing={resumeVoting} />
 	{/if}
 </AppShell>
 

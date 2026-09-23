@@ -2,13 +2,11 @@
 	import { scale } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import { InfoBar, Button, EmojiCircle } from '$lib/components/ui';
-	import type { RegionConfig } from '$lib/config/regions';
 
 	export type CheckpointVariant = 'contribute' | 'email' | 'feedback' | 'share';
 
 	interface Props {
 		placeName: string;
-		region: RegionConfig;
 		variant?: CheckpointVariant;
 		remaining?: number;
 		onPrimary: () => void;
@@ -18,7 +16,6 @@
 
 	let {
 		placeName,
-		region,
 		variant = 'contribute',
 		remaining,
 		onPrimary,
@@ -60,7 +57,7 @@
 	class="flex h-full flex-col bg-background"
 	in:scale={{ start: 0.9, duration: 500, easing: cubicOut }}
 >
-	<InfoBar {region} {placeName} {onEnd} />
+	<InfoBar {placeName} {onEnd} />
 
 	<div class="flex flex-1 flex-col items-center justify-center overflow-y-auto px-8">
 		<EmojiCircle emoji={c.emoji} size="lg" />

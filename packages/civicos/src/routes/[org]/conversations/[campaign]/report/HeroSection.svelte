@@ -1,26 +1,23 @@
 <script lang="ts">
 	import InfoBar from '$lib/components/ui/InfoBar.svelte';
 	import Badge from '@civicos/shared/ui/Badge.svelte';
-	import type { RegionConfig } from '$lib/config/regions';
 
 	interface Props {
 		title: string;
 		/** Name in the chrome: the Campaign's Place, uppercased by the caller. */
 		regionName: string;
-		/** InfoBar's "about" panel reads its copy off this. */
-		region: RegionConfig;
 		phase: string;
 		description: string;
 	}
 
-	let { title, regionName, region, phase, description }: Props = $props();
+	let { title, regionName, phase, description }: Props = $props();
 </script>
 
 <section
 	class="relative min-h-dvh flex-col overflow-hidden"
 	style="background: var(--gradient-hero);"
 >
-	<InfoBar placeName={regionName} {region} variant="light" buttonText="LEARN MORE →" />
+	<InfoBar placeName={regionName} variant="light" buttonText="LEARN MORE →" />
 
 	<div class="mt-16 px-8">
 		<Badge variant="dark" size="lg" class="px-7">{phase}</Badge>

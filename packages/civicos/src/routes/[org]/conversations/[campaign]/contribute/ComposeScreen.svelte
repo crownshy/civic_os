@@ -2,7 +2,6 @@
 	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import { ComposeOverlay, Dialog, Link } from '$lib/components/ui';
-	import type { RegionConfig } from '$lib/config/regions';
 
 	interface Props {
 		question: string;
@@ -10,10 +9,9 @@
 		firstVisit?: boolean;
 		onSubmit: (text: string, anonymous: boolean) => void;
 		onBack: () => void;
-		region: RegionConfig;
 	}
 
-	let { question, placeName, firstVisit = false, onSubmit, onBack, region }: Props = $props();
+	let { question, placeName, firstVisit = false, onSubmit, onBack }: Props = $props();
 
 	let showInstructions = $state(false);
 
@@ -29,7 +27,6 @@
 		{onSubmit}
 		{onBack}
 		onShowInstructions={() => (showInstructions = true)}
-		{region}
 	/>
 
 	<Dialog

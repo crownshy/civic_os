@@ -52,7 +52,7 @@
 
 <AppShell>
 	<div class="flex h-full flex-col overflow-y-auto bg-background">
-		<InfoBar {placeName} {region} />
+		<InfoBar {placeName} />
 
 		<!-- Header -->
 		<div class="flex flex-col items-center px-6 pt-6 pb-0 md:px-12">

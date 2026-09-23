@@ -4,7 +4,6 @@
 	import type { AboutYouQuestion, DemographicKey } from '$lib/config/participation';
 	import { InfoBar, Button, Dialog, Link } from '$lib/components/ui';
 	import { Check, Plus } from 'lucide-svelte';
-	import type { RegionConfig } from '$lib/config/regions';
 
 	interface Props {
 		placeName: string;
@@ -14,11 +13,10 @@
 		 * one off in admin is the only thing that removes it.
 		 */
 		questions: AboutYouQuestion[];
-		region: RegionConfig;
 		onDone: (demographics?: Partial<Record<DemographicKey, string>>) => void;
 	}
 
-	let { placeName, questions, onDone, region }: Props = $props();
+	let { placeName, questions, onDone }: Props = $props();
 
 	let openDialog = $state<DemographicKey | null>(null);
 	let dialogOpen = $derived(openDialog !== null);
@@ -55,7 +53,7 @@
 </script>
 
 <div class="flex h-full flex-col bg-background">
-	<InfoBar {region} {placeName} />
+	<InfoBar {placeName} />
 
 	<div class="flex flex-1 flex-col overflow-y-auto px-6 pt-8">
 		<span

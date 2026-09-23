@@ -1,7 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import ThankYouScreen from './ThankYouScreen.svelte';
-	import { REGIONS } from '$lib/config/regions';
 	import { session } from '$lib/services/session.svelte';
 	import { DEFAULT_ASK_TOGGLES } from '$lib/config/participation';
 
@@ -29,7 +28,7 @@
 	beforeEach={setState(false, false, false)}
 >
 	{#snippet template(args)}
-		<ThankYouScreen {...args} region={REGIONS.utah} />
+		<ThankYouScreen {...args} />
 	{/snippet}
 </Story>
 
@@ -39,7 +38,7 @@
 	beforeEach={setState(true, false, false)}
 >
 	{#snippet template(args)}
-		<ThankYouScreen {...args} region={REGIONS.utah} />
+		<ThankYouScreen {...args} />
 	{/snippet}
 </Story>
 
@@ -49,7 +48,7 @@
 	beforeEach={setState(true, true, true)}
 >
 	{#snippet template(args)}
-		<ThankYouScreen {...args} region={REGIONS.utah} />
+		<ThankYouScreen {...args} />
 	{/snippet}
 </Story>
 
@@ -63,7 +62,7 @@
 	beforeEach={setState(false, false, false)}
 >
 	{#snippet template(args)}
-		<ThankYouScreen {...args} region={REGIONS.utah} />
+		<ThankYouScreen {...args} />
 	{/snippet}
 </Story>
 
@@ -77,7 +76,7 @@
 	beforeEach={setState(false, false, false)}
 >
 	{#snippet template(args)}
-		<ThankYouScreen {...args} region={REGIONS.utah} />
+		<ThankYouScreen {...args} />
 	{/snippet}
 </Story>
 
@@ -87,6 +86,6 @@
 	beforeEach={setState(false, false, false)}
 >
 	{#snippet template(args)}
-		<ThankYouScreen {...args} region={REGIONS.oregon} />
+		<ThankYouScreen {...args} />
 	{/snippet}
 </Story>

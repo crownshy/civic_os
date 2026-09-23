@@ -126,7 +126,6 @@
 				<HeroSection
 					title={heroTitle}
 					regionName={heroRegion}
-					{region}
 					phase={heroPhase}
 					description={heroDescription}
 				/>

@@ -1,10 +1,8 @@
 <script lang="ts">
-	import type { RegionConfig } from '$lib/config/regions';
 	import InfoBar from './InfoBar.svelte';
 
 	interface Props {
 		placeName: string;
-		region?: RegionConfig;
 		question?: string;
 		marquee?: boolean;
 		onCompose?: () => void;
@@ -14,7 +12,6 @@
 
 	let {
 		placeName,
-		region,
 		question,
 		marquee = false,
 		onCompose,
@@ -27,8 +24,8 @@
 	class="shrink-0 overflow-hidden rounded-br-[20px] rounded-bl-[20px] border-b border-secondary bg-background {className}"
 >
 	<!-- Row 1: County name + ABOUT pill or YOU dot -->
-	{#if about && region}
-		<InfoBar {region} {placeName} />
+	{#if about}
+		<InfoBar {placeName} />
 	{:else}
 		<div class="flex items-center justify-between pt-3.75 pr-3.75 pl-6">
 			<span class="font-mono text-sm font-medium text-primary">{placeName.toUpperCase()}</span>

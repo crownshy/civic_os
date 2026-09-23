@@ -1,7 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import AboutYouScreen from './AboutYouScreen.svelte';
-	import { REGIONS } from '$lib/config/regions';
 	import { DEFAULT_TOGGLES, aboutYouQuestionsFor } from '$lib/config/participation';
 
 	const { Story } = defineMeta({
@@ -25,7 +24,7 @@
 
 <Story name="Every category on" args={{ placeName: 'UTAH COUNTY', questions: allCategories }}>
 	{#snippet template(args)}
-		<AboutYouScreen {...args} region={REGIONS.utah} onDone={() => {}} />
+		<AboutYouScreen {...args} onDone={() => {}} />
 	{/snippet}
 </Story>
 
@@ -34,6 +33,6 @@
 	args={{ placeName: 'UTAH COUNTY', questions: twoCategories }}
 >
 	{#snippet template(args)}
-		<AboutYouScreen {...args} region={REGIONS.utah} onDone={() => {}} />
+		<AboutYouScreen {...args} onDone={() => {}} />
 	{/snippet}
 </Story>

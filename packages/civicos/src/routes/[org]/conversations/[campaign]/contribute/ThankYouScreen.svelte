@@ -16,7 +16,6 @@
 	import { END_CTA_COPY } from '$lib/config/landing-copy';
 	import { HOST_COPY_PROSE_CLASS, renderHostCopy } from '$lib/config/host-copy';
 	import type { AskToggles } from '$lib/config/participation';
-	import type { RegionConfig } from '$lib/config/regions';
 
 	// TODO(post-#216): import from '$lib/config/landing-copy' once branch 216 lands.
 	const FOOTER_LINKS: { label: string; href: string; external?: boolean }[] = [
@@ -43,7 +42,6 @@
 
 	interface Props {
 		placeName: string;
-		region: RegionConfig;
 		/** Host-configured copy, already resolved against the region defaults. */
 		whatsNext: string;
 		/**
@@ -61,7 +59,7 @@
 		onBackToVoting?: () => void;
 	}
 
-	let { placeName, onBackToVoting, region, whatsNext, asks, conversationId }: Props = $props();
+	let { placeName, onBackToVoting, whatsNext, asks, conversationId }: Props = $props();
 
 	let emailPanelOpen = $state(false);
 	let sharePanelOpen = $state(false);
@@ -84,7 +82,7 @@
 	in:scale={{ start: 0.9, duration: 500, easing: cubicOut }}
 >
 	<div class="flex flex-1 flex-col overflow-y-auto">
-		<InfoBar {region} {placeName} onBack={onBackToVoting} />
+		<InfoBar {placeName} onBack={onBackToVoting} />
 
 		<!-- Hero -->
 		<div class="flex flex-col items-center px-8 pt-14">

@@ -27,7 +27,6 @@
 			<VotingScreen
 				{...args}
 				question={REGIONS.utah.question}
-				region={REGIONS.utah}
 				onVote={() => {}}
 				onEnd={() => {}}
 				onCompose={() => {}}
@@ -50,7 +49,6 @@
 			<VotingScreen
 				{...args}
 				question={REGIONS.utah.question}
-				region={REGIONS.utah}
 				onVote={() => {}}
 				onEnd={() => {}}
 				onCompose={() => {}}
@@ -74,7 +72,6 @@
 			<VotingScreen
 				{...args}
 				question={REGIONS.utah.question}
-				region={REGIONS.utah}
 				onVote={() => {}}
 				onEnd={() => {}}
 				onCompose={() => {}}
