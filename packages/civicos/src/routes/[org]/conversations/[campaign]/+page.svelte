@@ -52,6 +52,7 @@
 		if (section.id === 'context') return contextSections.map(({ id, label }) => ({ id, label }));
 		if (section.id === 'faq' && faq.length === 0) return [];
 		if (section.id === 'your-host' && cohosts.length === 0) return [];
+		if (section.id === 'whats-next' && !hostCopy.whatsNext) return [];
 		return [section];
 	});
 	// Who the server says this is, resolved from the cookie in the root layout.
@@ -380,12 +381,16 @@
 	{/if}
 
 	<!-- What's Next? -->
-	<section id="whats-next" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
-		<h2 class="font-display text-2xl font-medium md:text-3xl">What's Next?</h2>
-		<div class="mt-6 opacity-80 [&_a]:font-bold {HOST_COPY_PROSE_CLASS}">
-			{@html renderHostCopy(hostCopy.whatsNext)}
-		</div>
-	</section>
+	<!-- Dropped when the Host has written nothing, rather than standing in the
+		catch-all's ending message. -->
+	{#if hostCopy.whatsNext}
+		<section id="whats-next" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
+			<h2 class="font-display text-2xl font-medium md:text-3xl">What's Next?</h2>
+			<div class="mt-6 opacity-80 [&_a]:font-bold {HOST_COPY_PROSE_CLASS}">
+				{@html renderHostCopy(hostCopy.whatsNext)}
+			</div>
+		</section>
+	{/if}
 
 	<!-- FAQ, hidden when empty -->
 	{#if faq.length > 0}

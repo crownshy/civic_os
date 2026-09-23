@@ -15,7 +15,13 @@ import type { RegionConfig } from './regions';
  * Both fall back to `regions.ts` so Utah and Oregon render exactly what they
  * render today until a Host saves something. That makes `regions.ts` the
  * default layer rather than the source of truth; it cannot be deleted until
- * every live region has been migrated by hand. See ADR 0003.
+ * every live region has been migrated by hand.
+ *
+ * `region` is null for every Campaign that a region does not *is*. It used to
+ * be whichever region stood behind the Campaign, which for anything created in
+ * admin is the USA catch-all, so a Host who had not written their Context yet
+ * got The Bloom Project's description of itself (#425). Empty is the honest
+ * answer: the landing page drops a section it has no copy for.
  *
  * The two shapes do not match on the way in. `Conversation.description` is one
  * HTML blob (or legacy plain text), while `contextParagraphs` is one paragraph
@@ -38,16 +44,16 @@ export interface ConversationCopy {
 
 export function resolveHostCopy(
 	conversation: ConversationCopy | null | undefined,
-	region: RegionConfig
+	region: RegionConfig | null
 ): HostCopy {
 	return {
 		context: firstNonEmpty(
 			conversation?.description && toBlockHtml(conversation.description),
-			paragraphsToHtml(region.contextParagraphs)
+			region && paragraphsToHtml(region.contextParagraphs)
 		),
 		whatsNext: firstNonEmpty(
 			conversation?.thankYouMessage && toBlockHtml(conversation.thankYouMessage),
-			toBlockHtml(region.whatsNext)
+			region && toBlockHtml(region.whatsNext)
 		)
 	};
 }
@@ -68,13 +74,18 @@ export function renderHostCopy(html: string): string {
  * `readFaqs` already returns block HTML for an answer, because that is how the
  * field is stored. A `regions.ts` answer is a bare sentence or one paragraph of
  * inline markup, so it goes through `toBlockHtml` to arrive in the same shape.
+ *
+ * `region` is null unless the region IS the Campaign, so a Host who has not
+ * written any questions gets no accordion rather than the seed placeholders,
+ * which read as real answers about a conversation that is not theirs.
  */
 export function resolveFaq(
 	conversation: ConversationCopy | null | undefined,
-	region: RegionConfig
+	region: RegionConfig | null
 ): FaqEntry[] {
 	const stored = readFaqs(conversation?.faqs);
 	if (stored.length > 0) return stored;
+	if (!region) return [];
 
 	return region.faq.map((entry) => ({
 		question: entry.question,

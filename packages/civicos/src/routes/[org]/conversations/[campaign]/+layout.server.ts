@@ -89,16 +89,22 @@ export const load: LayoutServerLoad = async ({ params, url, depends }) => {
 	const region = regionForCampaign(conversation?.id, slug);
 	const campaign = resolveCampaign(conversation, region);
 
+	// The region supplies copy only where it IS the Campaign. Behind anything
+	// created in admin sits the USA catch-all, whose Context and FAQ describe The
+	// Bloom Project, so a Host who has not written theirs yet would publish
+	// somebody else's (#425).
+	const legacyDefaults = campaign.isLegacyRegion ? region : null;
+
 	return {
 		region,
 		campaign,
 		// Derived from this request, not from `regions.ts`: a stored `shareUrl`
 		// pointed every admin-created Campaign at the USA catch-all.
 		shareUrl: shareUrlFor(campaign, url),
-		hostCopy: resolveHostCopy(conversation, region),
-		// The Host's own questions when they have written any, the `regions.ts`
-		// placeholders until then.
-		faq: resolveFaq(conversation, region),
+		hostCopy: resolveHostCopy(conversation, legacyDefaults),
+		// The Host's own questions when they have written any, and for Utah and
+		// Oregon the `regions.ts` placeholders until then.
+		faq: resolveFaq(conversation, legacyDefaults),
 		// Which demographics and which asks the Host left switched on. Falling
 		// back to all-on when the Conversation is unreachable keeps a legacy
 		// region asking what it always asked.

@@ -43,6 +43,27 @@ describe('resolveHostCopy', () => {
 		expect(copy.context).toBe('<p>First line.</p><p>Second line.</p>');
 	});
 
+	it('is empty for a Campaign no region is, rather than the catch-all copy', () => {
+		// The bug this closes: `regionForCampaign` hands every Campaign created in
+		// admin the USA catch-all, so a Host who had not written their Context yet
+		// published The Bloom Project's description of itself (#425). The landing
+		// page drops a section it has no copy for.
+		const copy = resolveHostCopy(null, null);
+
+		expect(copy.context).toBe('');
+		expect(copy.whatsNext).toBe('');
+	});
+
+	it('still prefers the Conversation when there is no region behind it', () => {
+		const copy = resolveHostCopy(
+			{ description: '<p>Host wrote this.</p>', thankYouMessage: '<p>And this.</p>' },
+			null
+		);
+
+		expect(copy.context).toBe('<p>Host wrote this.</p>');
+		expect(copy.whatsNext).toBe('<p>And this.</p>');
+	});
+
 	it('resolves the two fields independently', () => {
 		const copy = resolveHostCopy({ description: '<p>Only context.</p>' }, oregon);
 
@@ -87,6 +108,20 @@ describe('resolveFaq', () => {
 		for (const faqs of ['', '   ', null, undefined]) {
 			expect(resolveFaq({ faqs }, oregon)).toHaveLength(oregon.faq.length);
 		}
+	});
+
+	it('offers no accordion for a Campaign no region is', () => {
+		// The seed placeholders read as real answers, so showing them on somebody
+		// else's Campaign answers questions about a conversation that is not theirs.
+		expect(resolveFaq(null, null)).toEqual([]);
+		expect(resolveFaq({ faqs: '' }, null)).toEqual([]);
+	});
+
+	it('still reads a Host list when there is no region behind it', () => {
+		const entries = resolveFaq({ faqs: '<h2>Who can take part?</h2><p>Anyone local.</p>' }, null);
+
+		expect(entries).toHaveLength(1);
+		expect(entries[0].question).toBe('Who can take part?');
 	});
 });
 
