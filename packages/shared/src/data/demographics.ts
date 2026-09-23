@@ -19,62 +19,63 @@ export const DEMOGRAPHIC_KEYS = ['age', 'ethnicity', 'gender', 'politicalParty']
 /** Question definitions seeded by comhairle's first-class demographics migrations. */
 export const DEFAULT_DEMOGRAPHIC_QUESTIONS = [
 	{
-		"slug": "age",
-		"displayName": "Age",
-		"responseType": "number" as const,
-		"bucketConfig": {
-			"type": "string" as const,
-			"options": [
-				{ "value": "Under 18", "label": "Under 18" },
-				{ "value": "18-24", "label": "18-24" },
-				{ "value": "25-34", "label": "25-34" }, 
-				{ "value": "35-44", "label": "35-44" },
-				{ "value": "45-54", "label": "45-54" },
-				{ "value": "55-64", "label": "55-64" },
-				{ "value": "Above 65", "label": "Above 65" }
+		slug: 'age',
+		displayName: 'Age',
+		responseType: 'number' as const,
+		bucketConfig: {
+			type: 'string' as const,
+			options: [
+				{ value: 'Under 18', label: 'Under 18' },
+				{ value: '18-24', label: '18-24' },
+				{ value: '25-34', label: '25-34' },
+				{ value: '35-44', label: '35-44' },
+				{ value: '45-54', label: '45-54' },
+				{ value: '55-64', label: '55-64' },
+				{ value: 'Above 65', label: 'Above 65' }
 			]
 		}
 	},
 	{
-		"slug": "ethnicity",
-		"displayName": "Ethnicity",
-		"responseType": "string" as const,
-		"bucketConfig": {
-			"type": "string" as const,
-			"options": [
-				{ "value": "Black / African American", "label": "Black / African American" },
-				{ "value": "Asian American / Pacific Islander", "label": "Asian American / Pacific Islander" },
-				{ "value": "Middle Eastern / North African", "label": "Middle Eastern / North African" },
-				{ "value": "White", "label": "White" }, { "value": "Hispanic", "label": "Hispanic" }
+		slug: 'ethnicity',
+		displayName: 'Ethnicity',
+		responseType: 'string' as const,
+		bucketConfig: {
+			type: 'string' as const,
+			options: [
+				{ value: 'Black / African American', label: 'Black / African American' },
+				{ value: 'Asian American / Pacific Islander', label: 'Asian American / Pacific Islander' },
+				{ value: 'Middle Eastern / North African', label: 'Middle Eastern / North African' },
+				{ value: 'White', label: 'White' },
+				{ value: 'Hispanic', label: 'Hispanic' }
 			]
 		}
 	},
 	{
-		"slug": "gender",
-		"displayName": "Gender",
-		"responseType": "string" as const,
-		"bucketConfig": {
-			"type": "string" as const,
-			"options": [
-				{ "value": "Male", "label": "Male" },
-				{ "value": "Female", "label": "Female" },
-				{ "value": "Nonbinary", "label": "Nonbinary" },
-				{ "value": "Other", "label": "Other" }
+		slug: 'gender',
+		displayName: 'Gender',
+		responseType: 'string' as const,
+		bucketConfig: {
+			type: 'string' as const,
+			options: [
+				{ value: 'Male', label: 'Male' },
+				{ value: 'Female', label: 'Female' },
+				{ value: 'Nonbinary', label: 'Nonbinary' },
+				{ value: 'Other', label: 'Other' }
 			]
 		}
 	},
 	{
-		"slug": "political_party",
-		"displayName": "Political Party",
-		"responseType": "string" as const,
-		"bucketConfig": {
-			"type": "string" as const,
-			"options": [
-				{ "value": "Progressive", "label": "Progressive" },
-				{ "value": "Liberal", "label": "Liberal" },
-				{ "value": "Moderate", "label": "Moderate" },
-				{ "value": "Conservative", "label": "Conservative" },
-				{ "value": "Other", "label": "Other" }
+		slug: 'political_party',
+		displayName: 'Political Party',
+		responseType: 'string' as const,
+		bucketConfig: {
+			type: 'string' as const,
+			options: [
+				{ value: 'Progressive', label: 'Progressive' },
+				{ value: 'Liberal', label: 'Liberal' },
+				{ value: 'Moderate', label: 'Moderate' },
+				{ value: 'Conservative', label: 'Conservative' },
+				{ value: 'Other', label: 'Other' }
 			]
 		}
 	}
@@ -218,14 +219,14 @@ export function demographicsFromBackend(
 	const enabledSlugs = new Set(relationships.map((relationship) => relationship.questionSlug));
 
 	return questions.map((question) => ({
-			slug: question.slug,
-			displayName: question.displayName,
-			options:
-				question.bucketConfig?.type === 'string'
-					? question.bucketConfig.options.map((option) => option.label)
-					: (question.bucketConfig?.buckets.map((bucket) => bucket.label) ?? []),
-			enabled: enabledSlugs.has(question.slug)
-		}));
+		slug: question.slug,
+		displayName: question.displayName,
+		options:
+			question.bucketConfig?.type === 'string'
+				? question.bucketConfig.options.map((option) => option.label)
+				: (question.bucketConfig?.buckets.map((bucket) => bucket.label) ?? []),
+		enabled: enabledSlugs.has(question.slug)
+	}));
 }
 
 /** Return only Host-authored questions, excluding comhairle's seeded defaults. */

@@ -10,8 +10,8 @@
 		"dev:report": "pnpm --filter @civicos/report dev",
 		"build": "pnpm -r build",
 		"check": "pnpm -r check",
-		"lint": "pnpm --filter civic-os --filter @civicos/admin --filter @civicos/report lint",
-		"format": "pnpm --filter civic-os --filter @civicos/admin --filter @civicos/report format",
+		"lint": "pnpm --filter @civicos/shared --filter civic-os --filter @civicos/admin --filter @civicos/report lint",
+		"format": "pnpm --filter @civicos/shared --filter civic-os --filter @civicos/admin --filter @civicos/report format",
 		"test": "pnpm --filter civic-os --filter @civicos/admin --filter @civicos/report exec vitest run",
 		"prototype:places": "node --experimental-strip-types --no-warnings prototypes/campaign-places/tui.ts"
 	}
