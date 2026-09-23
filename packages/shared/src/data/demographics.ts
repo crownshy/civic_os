@@ -246,3 +246,79 @@ export function isKeyTaken(slug: string, existing: CustomDemographicCategory[]):
 		existing.some((category) => category.slug === slug)
 	);
 }
+
+/**
+ * One answer bucket in a participation report, and how many participants gave
+ * it. `value` is absent or null for the ones who skipped the question, which is
+ * why every caller supplies its own "Not Provided" label.
+ */
+export interface DemographicCategoryCount {
+	value?: string | null;
+	count: number;
+}
+
+/** The per-question breakdowns `GetConversationWorkflowParticipationReport` returns. */
+export interface ParticipationDemographics {
+	totalParticipants: number;
+	ageRanges: DemographicCategoryCount[];
+	ethnicity: DemographicCategoryCount[];
+	gender: DemographicCategoryCount[];
+	politicalParty: DemographicCategoryCount[];
+	/** Zip code to participant count, before any roll-up. */
+	zipcodeCounts: Record<string, number>;
+}
+
+const PARTICIPATION_CATEGORY_KEYS = [
+	'ageRanges',
+	'ethnicity',
+	'gender',
+	'politicalParty'
+] as const satisfies readonly (keyof ParticipationDemographics)[];
+
+function readCategoryCounts(value: unknown): DemographicCategoryCount[] {
+	if (!Array.isArray(value)) return [];
+
+	return value.filter(
+		(entry): entry is DemographicCategoryCount =>
+			!!entry &&
+			typeof entry === 'object' &&
+			typeof (entry as { count?: unknown }).count === 'number'
+	);
+}
+
+function readZipcodeCounts(value: unknown): Record<string, number> {
+	if (!value || typeof value !== 'object') return {};
+
+	return Object.fromEntries(
+		Object.entries(value as Record<string, unknown>).filter(
+			(entry): entry is [string, number] => typeof entry[1] === 'number'
+		)
+	);
+}
+
+/**
+ * The participation report, shaped.
+ *
+ * The backend sends each breakdown as a top-level key, but the generated
+ * `DemographicReport` schema declares only `categories` and `totalParticipants`
+ * and lets the rest through `.passthrough()`. Everything a caller actually
+ * reads therefore arrives as `unknown`. Narrowing here rather than casting at
+ * each read keeps one description of the shape, and means a backend that stops
+ * sending a key renders an empty section instead of throwing.
+ */
+export function readParticipationDemographics(report: unknown): ParticipationDemographics {
+	const bag = report && typeof report === 'object' ? (report as Record<string, unknown>) : {};
+	const totalParticipants = bag.totalParticipants;
+
+	return {
+		totalParticipants: typeof totalParticipants === 'number' ? totalParticipants : 0,
+		...PARTICIPATION_CATEGORY_KEYS.reduce(
+			(acc, key) => {
+				acc[key] = readCategoryCounts(bag[key]);
+				return acc;
+			},
+			{} as Record<(typeof PARTICIPATION_CATEGORY_KEYS)[number], DemographicCategoryCount[]>
+		),
+		zipcodeCounts: readZipcodeCounts(bag.zipcodeCounts)
+	};
+}

@@ -2,7 +2,7 @@ import { fail, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { createApiClient } from '$lib/api/client';
 import { describeApiFailure } from '$lib/api/describe-failure';
-import type { DemographicReport, RecruitmentTargetDto } from '@crownshy/api-client/api';
+import type { RecruitmentTargetDto } from '@crownshy/api-client/api';
 import {
 	emptyGoals,
 	METRIC_BUCKETS,
@@ -10,6 +10,10 @@ import {
 	type GoalMetric,
 	type RegionGoals
 } from '$lib/config/representation-goals';
+import {
+	readParticipationDemographics,
+	type ParticipationDemographics
+} from '@civicos/shared/data/demographics';
 import { rollUpByCounty } from '@civicos/shared/data/zipcodes';
 import { statesForZipCounts } from '@civicos/shared/data/zip-states';
 
@@ -25,17 +29,6 @@ const METRIC_NAMES: GoalMetric[] = [
 /** HTTP status of a failed api-client call, absent when it never reached the server. */
 function statusOf(e: unknown): number | undefined {
 	return (e as { response?: { status?: number } })?.response?.status;
-}
-
-/**
- * `DemographicReport.zipcodeCounts` is generated as `z.record(z.number().int())`,
- * but zod 4 wants `z.record(key, value)`, so the single-argument call loses the
- * key type and TS infers `Record<number, unknown>`. The runtime shape is zip
- * code to participant count, which is what both rollups take. Drop this once
- * the api-client regenerates against zod 4.
- */
-function zipCounts(report: DemographicReport): Record<string, number> {
-	return (report.zipcodeCounts ?? {}) as Record<string, number>;
 }
 
 function targetsToGoals(targets: RecruitmentTargetDto[]): RegionGoals {
@@ -65,7 +58,7 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 	const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
 	const conversationId = campaign.id;
 
-	let demographics: DemographicReport | null = null;
+	let demographics: ParticipationDemographics | null = null;
 	let goals: RegionGoals = emptyGoals();
 	let workflowId: string | null = null;
 	let error: string | null = null;
@@ -126,8 +119,8 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 				)
 			]);
 
-			demographics = report;
-			const zips = zipCounts(report);
+			demographics = readParticipationDemographics(report);
+			const zips = demographics.zipcodeCounts;
 			countyCounts = rollUpByCounty(zips);
 			mapStates = statesForZipCounts(zips);
 			if (targets) goals = targetsToGoals(targets);
