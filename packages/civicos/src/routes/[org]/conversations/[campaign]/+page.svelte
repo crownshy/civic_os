@@ -275,12 +275,7 @@
 					>
 					{#if joinStateSettled}
 						<div class="mt-1.5 flex w-full flex-col items-center" in:fade={{ duration: 150 }}>
-							<ZipInput
-								bind:value={zipCode}
-								disabled={isReturning}
-								bind:flash={zipFlash}
-								regionPrefixes={region.zipPrefixes}
-							/>
+							<ZipInput bind:value={zipCode} disabled={isReturning} bind:flash={zipFlash} />
 							<Button
 								variant="primary"
 								fullWidth

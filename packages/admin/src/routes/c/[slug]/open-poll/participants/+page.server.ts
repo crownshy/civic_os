@@ -10,7 +10,7 @@ import {
 	type GoalMetric,
 	type RegionGoals
 } from '$lib/config/representation-goals';
-import { countiesForPrefixes, rollUpByCounty } from '@civicos/shared/data/zipcodes';
+import { rollUpByCounty } from '@civicos/shared/data/zipcodes';
 import { statesForZipCounts } from '@civicos/shared/data/zip-states';
 
 const METRIC_NAMES: GoalMetric[] = [
@@ -70,18 +70,20 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 	let workflowId: string | null = null;
 	let error: string | null = null;
 
-	// Zip counts roll up into counties (scoped to this region's zip prefixes so
-	// cross-state county names never collide). Empty for regions with no prefixes.
+	// Zip counts roll up into counties, unscoped: the counties are whichever ones
+	// participants actually came from. This used to be filtered by the region's
+	// `zipPrefixes`, which meant every Campaign created in admin had no prefixes
+	// and so an empty Geography section. Places are still being worked out
+	// (#404, #405), so scoping waits for something that can express it rather
+	// than for a second list a Host has to keep in step with their Place.
 	let countyCounts: Record<string, number> = {};
-	// The county universe for goal-setting; empty for the generic/all region.
-	const regionCounties = countiesForPrefixes(campaign.zipPrefixes);
 	// USPS state codes the choropleth needs, derived from where participants
-	// actually live (scoped like the county rollup). Empty ⇒ no map to draw.
+	// actually live. Empty means no map to draw.
 	let mapStates: string[] = [];
 	let customDemographicResults: {
 		slug: string;
 		displayName: string;
-		rows: { label: string; count: number, goal?: number }[];
+		rows: { label: string; count: number; goal?: number }[];
 	}[] = [];
 
 	try {
@@ -126,8 +128,8 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 
 			demographics = report;
 			const zips = zipCounts(report);
-			countyCounts = rollUpByCounty(zips, campaign.zipPrefixes);
-			mapStates = statesForZipCounts(zips, campaign.zipPrefixes);
+			countyCounts = rollUpByCounty(zips);
+			mapStates = statesForZipCounts(zips);
 			if (targets) goals = targetsToGoals(targets);
 
 			customDemographicResults = customResponses.map(({ question, responses }) => {
@@ -159,7 +161,6 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 		demographics,
 		goals,
 		countyCounts,
-		regionCounties,
 		mapStates,
 		customDemographicResults,
 		workflowId,

@@ -175,12 +175,7 @@ export const load: LayoutServerLoad = async ({ params, parent, cookies, url, dep
 					...(polisStep.polisUrl ? { polisUrl: polisStep.polisUrl } : {}),
 					...(polisStep.topic ? { question: polisStep.topic } : {})
 				}
-			: readPoll(conversation?.metadata),
-		// Still sourced from `regions.ts`, because the Conversation model has
-		// nowhere to put them yet: the public participant URL and the zip
-		// prefixes that scope the participants county rollup. Campaigns without a
-		// region entry render without them (#401).
-		zipPrefixes: region?.zipPrefixes ?? []
+			: readPoll(conversation?.metadata)
 	};
 
 	return { campaign, conversation, textContent, defaultDemographics, customDemographics };

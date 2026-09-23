@@ -12,7 +12,6 @@
 		value: string;
 		placeholder?: string;
 		disabled?: boolean;
-		regionPrefixes?: string[];
 		flash?: boolean;
 	}
 
@@ -20,7 +19,6 @@
 		value = $bindable(),
 		placeholder = 'Enter your home zip code...',
 		disabled = false,
-		regionPrefixes = [],
 		flash = $bindable(false)
 	}: Props = $props();
 
@@ -50,12 +48,10 @@
 
 	const filtered = $derived.by(() => {
 		const q = searchValue.trim();
-		if (!q) {
-			if (regionPrefixes.length > 0) {
-				return ZIPCODES.filter((e) => regionPrefixes.some((p) => e.zip.startsWith(p))).slice(0, 6);
-			}
-			return [];
-		}
+		// Nothing until they type. This used to pre-fill six suggestions from the
+		// region's `zipPrefixes`, which only Utah and Oregon had, so every other
+		// Campaign already behaved this way.
+		if (!q) return [];
 		return ZIPCODES.filter((e) => e.zip.startsWith(q)).slice(0, 6);
 	});
 

@@ -59,7 +59,6 @@
 	// participants ∪ counties with a goal set, so under-recruited (0-count) counties
 	// still surface. "Other / Unknown" is pinned last; everything else by count desc.
 	const countyCounts = $derived(data.countyCounts ?? {});
-	const regionCounties = $derived(data.regionCounties ?? []);
 	const countyGoals = $derived(goals.county ?? {});
 
 	const geographyRows = $derived.by(() => {
@@ -78,14 +77,14 @@
 			});
 	});
 
-	// Buckets offered in the Modify Goals modal. Real regions use their full county
-	// list; the generic region (no prefixes) falls back to counties in play.
-	const countyBuckets = $derived.by(() => {
-		if (regionCounties.length) return regionCounties;
-		return [...new Set([...Object.keys(countyCounts), ...Object.keys(countyGoals)])]
+	// Buckets offered in the Modify Goals modal: the counties in play, meaning
+	// those with participants or with a goal already set. This used to prefer a
+	// region's full county list, which no Campaign created in admin had.
+	const countyBuckets = $derived.by(() =>
+		[...new Set([...Object.keys(countyCounts), ...Object.keys(countyGoals)])]
 			.filter((n) => n !== OTHER_COUNTY_LABEL)
-			.sort();
-	});
+			.sort()
+	);
 
 	const totalEthnicity = $derived(ethnicityRows.reduce((s, r) => s + r.count, 0));
 	const totalGender = $derived(genderRows.reduce((s, r) => s + r.count, 0));
@@ -301,7 +300,9 @@
 					<DemographicTable
 						title={question.displayName}
 						rows={question.rows.filter((row) => row.count > 0 || row.goal !== undefined)}
-						total={question.rows.filter((row) => row.count > 0 || row.goal !== undefined).reduce((sum, row) => sum + row.count, 0)}
+						total={question.rows
+							.filter((row) => row.count > 0 || row.goal !== undefined)
+							.reduce((sum, row) => sum + row.count, 0)}
 						participantCount={totalParticipants}
 						onModifyGoals={() =>
 							openModal(
