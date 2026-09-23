@@ -40,6 +40,7 @@
 
 	const title = $derived(campaign.title);
 	const description = $derived(conversation?.description ?? '');
+	const thankYouMessage = $derived(conversation?.thankYouMessage ?? '');
 	const slug = $derived(conversation?.slug ?? campaign.slug);
 	// Host portion of the public URL (strip protocol + any path). Empty when the
 	// Campaign has no participant link, see `shareUrlBlocker`.
@@ -60,12 +61,13 @@
 	// One SPA superform, three destinations, because no two of these fields live
 	// in the same place on the backend:
 	//
-	//   title, description  TextContentId (UUID) references, not text columns, so
-	//                       edits go through CreateOrUpdateTextTranslation against
+	//   title, description, TextContentId (UUID) references, not text columns, so
+	//   thankYouMessage     edits go through CreateOrUpdateTextTranslation against
 	//                       each field's text_content_id in the conversation's
 	//                       primary_locale (resolved in +layout.server.ts as
 	//                       data.textContent). UpdateConversation 422s on plain
-	//                       strings here. See #391.
+	//                       strings here. See #391. thankYouMessage is nullable,
+	//                       so its first save creates the record.
 	//   keyQuestion         the `topic` of the Polis conversation behind this
 	//                       Campaign's Polis workflow step, via PolisUpdateConfig.
 	//   slug                a real Conversation column, via UpdateConversation.
@@ -73,8 +75,8 @@
 	// The first three auto-save on a debounce and only write the fields that
 	// actually changed, then a scoped invalidate refreshes the public-facing
 	// strings. Slug is the exception and commits on blur; see `saveSlug`.
-	type DebouncedField = 'title' | 'description' | 'keyQuestion';
-	const DEBOUNCED_FIELDS = ['title', 'description', 'keyQuestion'] as const;
+	type DebouncedField = 'title' | 'description' | 'thankYouMessage' | 'keyQuestion';
+	const DEBOUNCED_FIELDS = ['title', 'description', 'thankYouMessage', 'keyQuestion'] as const;
 	type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 	// Everything the status line speaks for. `place` is not a form field, but it
 	// shares the indicator, so it shares the bookkeeping.
@@ -86,6 +88,7 @@
 	const FIELD_LABELS: Record<StatusField, string> = {
 		title: 'Title',
 		description: 'Description',
+		thankYouMessage: 'What Happens Next',
 		keyQuestion: 'Key Question',
 		slug: 'Slug',
 		place: 'Place'
@@ -113,6 +116,7 @@
 	const initialFields = untrack(() => ({
 		title: data.conversation?.title ?? data.campaign.title,
 		description: data.conversation?.description ?? '',
+		thankYouMessage: data.conversation?.thankYouMessage ?? '',
 		slug: data.conversation?.slug ?? data.campaign.slug,
 		keyQuestion: data.campaign.keyQuestion
 	}));
@@ -219,6 +223,9 @@
 			};
 		}
 
+		// Nullable, so there may be no record yet and the write has to make one.
+		if (key === 'thankYouMessage') return () => writeTextContent('thankYouMessage', content);
+
 		// Missing on a non-admin session, or when the conversation didn't resolve
 		// against this backend.
 		const target = data.textContent[key];
@@ -228,6 +235,40 @@
 				{ content },
 				{ params: { text_content_id: target.id, locale: target.locale } }
 			);
+	}
+
+	/**
+	 * Write one of the nullable TextContent fields, creating the record on the
+	 * first save.
+	 *
+	 * `faqs` and `thankYouMessage` are nullable on the Conversation, and an unset
+	 * one has no TextContent at all rather than an empty one, so
+	 * `translations.X` comes back null and `data.textContent.X` with it. Hence
+	 * create-then-link. `UpdateConversation` takes the TextContent *id* here, not
+	 * prose, and 422s on a plain string the same way title and description do
+	 * (#391), which is why the link step sends `created.id`.
+	 */
+	async function writeTextContent(field: 'faqs' | 'thankYouMessage', content: string) {
+		const target = data.textContent[field];
+		if (target) {
+			await data.api.CreateOrUpdateTextTranslation(
+				{ content },
+				{ params: { text_content_id: target.id, locale: target.locale } }
+			);
+			return;
+		}
+
+		const created = await data.api.CreateTextContent({
+			content,
+			// The stored value is markup regardless of the answers being plain text,
+			// and `rich` is what `description` uses for the same reason.
+			format: 'rich',
+			primary_locale: conversation?.primaryLocale ?? 'en'
+		});
+		await data.api.UpdateConversation(
+			{ [field]: created.id },
+			{ params: { conversation_id: campaign.id } }
+		);
 	}
 
 	/**
@@ -378,39 +419,9 @@
 	// `@civicos/shared/data/faq` because civicos parses what this writes.
 	const faqs = $derived(readFaqs(conversation?.faqs));
 
-	/**
-	 * Write the whole list. Two calls the first time, one after that.
-	 *
-	 * `faqs` is nullable and an unset one has no TextContent at all, so there is
-	 * nothing to translate against until one exists: `translations.faqs` comes
-	 * back null and `data.textContent.faqs` with it. Hence create-then-link on
-	 * the first save. `UpdateConversation` takes the TextContent *id* here, not
-	 * prose, and 422s on a plain string the same way title and description do
-	 * (#391), which is why the link step sends `created.id`.
-	 */
+	/** Write the whole list, as one h2-per-question blob. */
 	async function saveFaqs(next: FaqEntry[]) {
-		const content = toFaqsHtml(next);
-		const target = data.textContent.faqs;
-
-		if (target) {
-			await data.api.CreateOrUpdateTextTranslation(
-				{ content },
-				{ params: { text_content_id: target.id, locale: target.locale } }
-			);
-		} else {
-			const created = await data.api.CreateTextContent({
-				content,
-				// The stored value is markup regardless of answers being plain text,
-				// and `rich` is what `description` uses for the same reason.
-				format: 'rich',
-				primary_locale: conversation?.primaryLocale ?? 'en'
-			});
-			await data.api.UpdateConversation(
-				{ faqs: created.id },
-				{ params: { conversation_id: campaign.id } }
-			);
-		}
-
+		await writeTextContent('faqs', toFaqsHtml(next));
 		await invalidate(`campaign:${page.params.slug}`);
 	}
 
@@ -662,6 +673,26 @@
 	</div>
 {/snippet}
 
+{#snippet thankYouMessageField()}
+	<Form.Field {form} name="thankYouMessage">
+		<Form.Control>
+			{#snippet children({ props })}
+				<RichTextEditor
+					value={$formData.thankYouMessage}
+					onChange={(html) => ($formData.thankYouMessage = html)}
+					attributes={{
+						id: props.id,
+						'aria-describedby': props['aria-describedby'],
+						'aria-invalid': props['aria-invalid'],
+						'aria-required': props['aria-required']
+					}}
+				/>
+			{/snippet}
+		</Form.Control>
+		<Form.FieldErrors class="mt-1 text-caption text-destructive" />
+	</Form.Field>
+{/snippet}
+
 {#snippet descriptionField()}
 	<Form.Field {form} name="description">
 		<Form.Control>
@@ -783,7 +814,7 @@
 		/>
 
 		<!-- ===== Context for Participants ===== -->
-		<ContextCard {description} {descriptionField} />
+		<ContextCard {description} {descriptionField} {thankYouMessage} {thankYouMessageField} />
 
 		<!-- ===== FAQ =====
 		     Its own card rather than a section inside ContextCard: it writes to a

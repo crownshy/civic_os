@@ -16,10 +16,15 @@ import { RESERVED_ROUTE_SLUGS } from '$lib/conversations';
  * `keyQuestion` is not a Conversation field at all: it is the `topic` of the
  * Polis conversation behind this Campaign's Polis workflow step, written with
  * PolisUpdateConfig.
+ *
+ * `thankYouMessage` is a TextContent reference too, but a nullable one, so a
+ * Campaign that has never had one saved has no record to write against and the
+ * first save creates it. See `writeTextContent`.
  */
 export const setupSchema = z.object({
 	title: z.string().min(1, 'Title is required'),
 	description: z.string(),
+	thankYouMessage: z.string(),
 	slug: z
 		.string()
 		.min(1, 'Slug is required')

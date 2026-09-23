@@ -13,9 +13,17 @@
 		description: string;
 		/** When provided, replaces the read-only description with an editable field. */
 		descriptionField?: Snippet;
+		/**
+		 * What participants are told happens after the poll closes
+		 * (Conversation.thankYouMessage). Rendered on the Campaign homepage under
+		 * What's Next, and again on the Open Poll's end screen.
+		 */
+		thankYouMessage: string;
+		/** When provided, replaces the read-only message with an editable field. */
+		thankYouMessageField?: Snippet;
 	}
 
-	let { description, descriptionField }: Props = $props();
+	let { description, descriptionField, thankYouMessage, thankYouMessageField }: Props = $props();
 </script>
 
 <SetupCard
@@ -28,6 +36,15 @@
 		{:else}
 			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 			<div class={RICH_TEXT_PROSE_CLASS}>{@html toRichTextHtml(description)}</div>
+		{/if}
+	</SetupField>
+
+	<SetupField label="What Happens Next" class="mt-6">
+		{#if thankYouMessageField}
+			{@render thankYouMessageField()}
+		{:else}
+			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+			<div class={RICH_TEXT_PROSE_CLASS}>{@html toRichTextHtml(thankYouMessage)}</div>
 		{/if}
 	</SetupField>
 

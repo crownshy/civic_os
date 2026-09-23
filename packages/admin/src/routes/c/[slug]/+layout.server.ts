@@ -107,16 +107,19 @@ export const load: LayoutServerLoad = async ({ params, parent, cookies, url, dep
 					title?: TxField;
 					description?: TxField;
 					faqs?: TxField;
+					thankYouMessage?: TxField;
 				})
 			: null;
-	// `faqs` is nullable on the Conversation, and an unset one has no TextContent
-	// at all rather than an empty one: `translations.faqs` comes back null, so this
-	// resolves to null and the first save has to create the record before it can
-	// write to it. See `saveFaqs` on Setup.
+	// `faqs` and `thankYouMessage` are both nullable on the Conversation, and an
+	// unset one has no TextContent at all rather than an empty one:
+	// `translations.X` comes back null, so this resolves to null and the first
+	// save has to create the record before it can write to it. See
+	// `writeTextContent` on Setup.
 	const textContent = {
 		title: fieldTarget(tx?.title),
 		description: fieldTarget(tx?.description),
-		faqs: fieldTarget(tx?.faqs)
+		faqs: fieldTarget(tx?.faqs),
+		thankYouMessage: fieldTarget(tx?.thankYouMessage)
 	};
 
 	const campaign = {
