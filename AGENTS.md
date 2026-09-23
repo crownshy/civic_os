@@ -129,11 +129,10 @@ focused PR; do not let them silently grow:
 - `admin` and `civicos` have lint configured but neither passes yet. `admin` is nearly
   there: 4 files failing `prettier --check` (`demographics.ts`, `EditGoalsModal.svelte`,
   and the two participants files) and 2 eslint errors, both `no-unused-vars`. `civicos` is
-  clean on `prettier` and down to 36 eslint errors, all of them decisions rather than
-  cleanups: 14 `no-at-html-tags` (#409),
-  14 `no-navigation-without-resolve`, one `no-explicit-any`, and 8 `no-unused-vars` that
-  are each the visible half of a filed bug (#410, #411, #412, #413), a dead county map
-  #423 will want, or a countdown whose markup is commented out. Read the reason before
+  clean on `prettier` and down to 27 eslint errors, all of them decisions rather than
+  cleanups: 14 `no-navigation-without-resolve`, 6 `no-at-html-tags` (#409), and 7
+  `no-unused-vars` that are each the visible half of a filed bug (#410, #411, #412,
+  #413) or a countdown whose markup is commented out. Read the reason before
   deleting the symptom. Pay them down in focused PRs rather than mixing fixes into
   feature work.
 - `load` functions do not call `depends()` for explicit invalidation keys. Add them when
