@@ -71,22 +71,6 @@
 	const defaultDemographics = $derived(data.defaultDemographics);
 	const customDemographics = $derived(data.customDemographics);
 
-	/**
-	 * One shared setting, not a poll-specific one: #363 moves demographics up to
-	 * the Campaign so they are collected consistently across every Engagement, so
-	 * this writes the same key the Campaign Setup card reads.
-	 *
-	 * The whole object goes on every write. PatchConversationMetadata merges at
-	 * the top level only and replaces nested objects wholesale, so sending a
-	 * single key would drop the other three.
-	 */
-	async function patchMetadata(patch: Record<string, unknown>) {
-		await data.api.PatchConversationMetadata(patch, {
-			params: { conversation_id: campaign.id }
-		});
-		await invalidate(`campaign:${page.params.slug}`);
-	}
-
 	async function toggleCustomDemographic(slug: string, next: boolean) {
 		if (next) {
 			await data.api.CreateConversationDemographics({

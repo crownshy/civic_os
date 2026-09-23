@@ -21,10 +21,7 @@
 	import ParticipantAsksCard from '$lib/components/setup/ParticipantAsksCard.svelte';
 	import { readColorScheme } from '@civicos/shared/data/color-scheme';
 	import { readFaqs, toFaqsHtml, type FaqEntry } from '@civicos/shared/data/faq';
-	import {
-		readDemographicToggles,
-		type CustomDemographicCategory
-	} from '@civicos/shared/data/demographics';
+	import type { CustomDemographicCategory } from '@civicos/shared/data/demographics';
 	import { readAskToggles, type AskKey } from '@civicos/shared/data/participant-asks';
 	import { placeFromName, rescopedSlug, toPlaceSlug } from '$lib/config/place';
 	import { RESERVED_ROUTE_SLUGS, routeSlugFor } from '$lib/conversations';
@@ -351,7 +348,6 @@
 				? `Couldn't save ${failedFields.map((k) => FIELD_LABELS[k]).join(' and ')}`
 				: statusLabel[saveStatus]
 	);
-	const enabledDemographics = $derived(readDemographicToggles(conversation?.metadata));
 	const defaultDemographics = $derived(data.defaultDemographics);
 	const customDemographics = $derived(data.customDemographics);
 
