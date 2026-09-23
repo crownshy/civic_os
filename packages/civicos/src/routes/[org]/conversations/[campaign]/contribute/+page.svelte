@@ -36,12 +36,10 @@
 	// The Campaign's `regions.ts` defaults, picked by the Campaign in the layout load
 	const region: RegionConfig = page.data.region;
 
-	// The participant the server resolved from the cookie, so the zip renders on
-	// the first paint. The cached session sits behind it for a load that could
-	// not reach the backend, and is still the only source of `pid` and vote
-	// progress, which the backend does not store.
+	// The participant the server resolved from the cookie. The cached session sits
+	// behind it for a load that could not reach the backend, and is still the only
+	// source of `pid` and vote progress, which the backend does not store.
 	const participant: ParticipantSession | null = page.data.participant;
-	const zipCode = participant?.zipCode || session.zipCode;
 
 	const campaign = page.data.campaign;
 
@@ -143,8 +141,6 @@
 	);
 	// Variant currently displayed on the pause screen. Set when entering 'pause'.
 	let currentVariant = $state<CheckpointVariant>('contribute');
-	// Tracks when user explicitly pressed END in this session — prevents thank-you→voting loop
-	let userEndedVoting = $state(false);
 
 	// Checkpoint action panels (also reused on the end-page ThankYouScreen)
 	let emailPanelOpen = $state(false);
@@ -233,7 +229,6 @@
 
 	/** Transition to the ending sequence: demographics → email → thank-you */
 	function goToEndFlow() {
-		userEndedVoting = true;
 		// No categories left on means no screen, not an empty one.
 		if (session.demographicsCompleted || aboutYouQuestions.length === 0) {
 			screen = 'thank-you';
@@ -265,7 +260,7 @@
 		screen = 'voting';
 	}
 
-	async function handleCompose(text: string, anonymous: boolean) {
+	async function handleCompose(text: string) {
 		const visibleTid = polis.currentStatement?.tid;
 		const submitted = await polis.submitStatement(text);
 		if (submitted) await createStatementAux(submitted, text, visibleTid);
@@ -302,8 +297,10 @@
 		}
 	}
 
+	// Only reachable while Polis still has a statement to show: the end screen
+	// withholds this handler otherwise, so the effect above cannot bounce the
+	// participant straight back to the thank-you screen (#411).
 	function handleBackToVoting() {
-		userEndedVoting = false;
 		screen = 'voting';
 	}
 </script>
@@ -337,9 +334,9 @@
 			{question}
 			{placeName}
 			firstVisit={!session.hasSeenComposeInstructions}
-			onSubmit={(text, anon) => {
+			onSubmit={(text) => {
 				session.markComposeInstructionsSeen();
-				handleCompose(text, anon);
+				handleCompose(text);
 			}}
 			onBack={() => {
 				session.markComposeInstructionsSeen();
@@ -360,7 +357,7 @@
 	{:else if screen === 'thank-you'}
 		<ThankYouScreen
 			{placeName}
-			onBackToVoting={handleBackToVoting}
+			onBackToVoting={polis.currentStatement ? handleBackToVoting : undefined}
 			whatsNext={page.data.hostCopy.whatsNext}
 			asks={participation.asks}
 			conversationId={campaign.id}

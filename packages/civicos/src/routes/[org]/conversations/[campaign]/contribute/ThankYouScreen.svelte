@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { campaignPath } from '@civicos/shared/data/place';
+	import { resolve } from '$app/paths';
 	import { scale } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import {
@@ -100,7 +101,7 @@
 		<!-- CTA cards -->
 		<div class="mx-auto mt-6 grid w-full max-w-4xl grid-cols-1 gap-3.5 px-7 md:grid-cols-2">
 			<a
-				href="/conversations"
+				href={resolve('/conversations')}
 				data-umami-event="end-cta-join-click"
 				class="group flex touch-manipulation flex-col gap-2 rounded-[30px] bg-card p-6 shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-all hover:scale-[1.01] active:scale-[0.99] active:shadow-[0px_1px_8px_rgba(134,101,73,0.20)] active:duration-0"
 			>
@@ -198,6 +199,7 @@
 				What comes next?
 			</h2>
 			<div class="mt-2 text-foreground [&_a]:font-bold {HOST_COPY_PROSE_CLASS}">
+				<!-- eslint-disable-next-line svelte/no-at-html-tags -- `renderHostCopy` sanitizes (#409) -->
 				{@html renderHostCopy(whatsNext)}
 			</div>
 		</div>
@@ -205,6 +207,7 @@
 		<!-- Footer (mirrors landing page on branch 216; dedupe once that branch merges) -->
 		<footer class="bg-primary px-8 py-12">
 			<ul class="mx-auto flex max-w-4xl flex-col gap-1.5">
+				<!-- eslint-disable svelte/no-navigation-without-resolve -- mixed list: external URLs plus paths from `campaignPath` -->
 				{#each FOOTER_LINKS as link (link.label)}
 					<li>
 						<a
@@ -217,6 +220,7 @@
 						</a>
 					</li>
 				{/each}
+				<!-- eslint-enable svelte/no-navigation-without-resolve -->
 			</ul>
 		</footer>
 	</div>

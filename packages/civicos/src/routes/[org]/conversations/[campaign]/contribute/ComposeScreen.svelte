@@ -7,7 +7,7 @@
 		question: string;
 		placeName: string;
 		firstVisit?: boolean;
-		onSubmit: (text: string, anonymous: boolean) => void;
+		onSubmit: (text: string) => void;
 		onBack: () => void;
 	}
 

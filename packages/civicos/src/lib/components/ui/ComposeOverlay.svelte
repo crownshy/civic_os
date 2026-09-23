@@ -7,7 +7,7 @@
 	interface Props {
 		question: string;
 		placeName: string;
-		onSubmit?: (text: string, anonymous: boolean) => void;
+		onSubmit?: (text: string) => void;
 		onBack?: () => void;
 		onShowInstructions?: () => void;
 		class?: string;
@@ -23,7 +23,6 @@
 	}: Props = $props();
 
 	let text = $state('');
-	let anonymous = $state(true);
 	let submitted = $state(false);
 	let submitTimer: ReturnType<typeof setTimeout>;
 	const maxChars = 240;
@@ -34,7 +33,7 @@
 	function handleSubmit() {
 		if (!canSubmit) return;
 		submitted = true;
-		onSubmit?.(text, anonymous);
+		onSubmit?.(text);
 		// Show SUBMITTED! for 2s then auto-navigate back
 		submitTimer = setTimeout(() => {
 			onBack?.();
