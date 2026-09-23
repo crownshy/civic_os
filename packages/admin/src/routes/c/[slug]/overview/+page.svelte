@@ -713,7 +713,12 @@
 		<!-- ===== Co-Hosts ===== -->
 		<!-- Live co-hosts; "Add New…" opens the org picker and grants the
 		     co-host role on this Conversation (#362). -->
-		<CoHostsCard {cohosts} convId={data.convId} onAddNew={() => (addCohostsOpen = true)} />
+		<CoHostsCard
+			{cohosts}
+			convId={data.convId}
+			owningOrgId={data.owningOrgId}
+			onAddNew={() => (addCohostsOpen = true)}
+		/>
 		<AddCoHostsDialog
 			bind:open={addCohostsOpen}
 			pickerOrgs={data.pickerOrgs}
@@ -738,6 +743,7 @@
 					}}
 				>
 					<input type="hidden" name="convId" value={data.convId} />
+					<input type="hidden" name="owningOrgId" value={data.owningOrgId ?? ''} />
 					{#each selected as id (id)}
 						<input type="hidden" name="orgIds" value={id} />
 					{/each}

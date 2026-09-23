@@ -254,6 +254,54 @@ export function campaignPath(
 	return `/${org}/conversations/${campaign}${tail.join('')}`;
 }
 
+/**
+ * The organizations a Campaign is hosted by, mirrored onto the Conversation
+ * metadata for the participant app.
+ *
+ * Same reason as the poll and the Host: a co-host is a permission grant, and
+ * resolving one into a name means `ListResourcePermissions` plus
+ * `ListOrganizations`, both of which are 401 anonymously. Admin already has
+ * both, so it writes the display list here whenever the grants change.
+ *
+ * The owning Host leads the list. This is a rendering convenience, not an
+ * authority on who may edit the Campaign; the grants themselves are.
+ */
+export interface CampaignCoHost {
+	name: string;
+	/** The organization's public site, when it has one. */
+	url?: string;
+	/** Logo, for when the carousel lands. Absent renders a linked name. */
+	logo?: string;
+}
+
+/** Key this rides under inside the Conversation's `metadata` jsonb. */
+export const COHOSTS_METADATA_KEY = 'cohosts';
+
+/**
+ * Read the co-host list out of a Conversation's metadata. Same contract as
+ * `readPlace`: a malformed value reads as absent, and an entry with no name is
+ * dropped rather than rendering a blank link.
+ */
+export function readCoHosts(metadata: unknown): CampaignCoHost[] {
+	if (typeof metadata !== 'object' || metadata === null) return [];
+
+	const value = (metadata as Record<string, unknown>)[COHOSTS_METADATA_KEY];
+	if (!Array.isArray(value)) return [];
+
+	return value.flatMap((entry) => {
+		if (typeof entry !== 'object' || entry === null) return [];
+
+		const { name, url, logo } = entry as Record<string, unknown>;
+		if (typeof name !== 'string' || name.trim() === '') return [];
+
+		const cohost: CampaignCoHost = { name: name.trim() };
+		if (typeof url === 'string' && url.trim() !== '') cohost.url = url.trim();
+		if (typeof logo === 'string' && logo.trim() !== '') cohost.logo = logo.trim();
+
+		return [cohost];
+	});
+}
+
 /** A Place's page, `/<place-slug>`. Empty for a blank slug. */
 export function placePath(placeSlug: string | undefined): string {
 	const place = (placeSlug ?? '').trim();

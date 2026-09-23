@@ -30,6 +30,10 @@
 	// the voting screen it becomes label the statement identically.
 	const question = campaign?.poll?.question || region.question;
 	const contributePath = campaignPath(campaign.slug, page.params.org, 'contribute');
+	// The organizations to credit, from `metadata.cohosts` where admin mirrored
+	// the grants. Empty for a Campaign with none, rather than the catch-all's
+	// `partners`, which credited The Bloom Project on everybody's Campaign.
+	const cohosts = campaign.cohosts;
 	// Resolved in the layout load, so a Host's saved questions replace the
 	// `regions.ts` placeholders without this page knowing which it got.
 	const faq = page.data.faq;
@@ -42,6 +46,7 @@
 	const navSections = NAV_SECTIONS.flatMap((section) => {
 		if (section.id === 'context') return contextSections.map(({ id, label }) => ({ id, label }));
 		if (section.id === 'faq' && faq.length === 0) return [];
+		if (section.id === 'your-host' && cohosts.length === 0) return [];
 		return [section];
 	});
 	// Who the server says this is, resolved from the cookie in the root layout.
@@ -298,30 +303,32 @@
 				</div>
 			</div>
 
-			<!-- Hosted by strip — below the centered block, still above the fold on desktop -->
-			<!-- Partner logos deferred. Renders linked names until logo URLs land on RegionConfig.partners[].logo. -->
-			{#if region.partners.length > 0}
+			<!-- Hosted by strip, below the centered block and still above the fold on desktop. -->
+			<!-- Logos deferred. Renders linked names until logo URLs reach `metadata.cohosts`. -->
+			{#if cohosts.length > 0}
 				<div class="mt-10 flex flex-col items-center gap-3 md:mt-6">
 					<span class="font-display text-base font-medium opacity-80 md:text-lg">Hosted by</span>
 					<div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-4 text-center">
-						{#each region.partners as partner (partner.url)}
-							{#if partner.logo}
-								<a href={partner.url} target="_blank" rel="noopener noreferrer">
+						{#each cohosts as cohost (cohost.name)}
+							{#if cohost.logo}
+								<a href={safeHref(cohost.url)} target="_blank" rel="noopener noreferrer">
 									<img
-										src={partner.logo}
-										alt={partner.name}
+										src={cohost.logo}
+										alt={cohost.name}
 										class="h-8 max-w-[120px] object-contain"
 									/>
 								</a>
-							{:else}
+							{:else if cohost.url}
 								<a
-									href={partner.url}
+									href={safeHref(cohost.url)}
 									target="_blank"
 									rel="noopener noreferrer"
 									class="font-sans text-sm font-medium underline md:text-base"
 								>
-									{partner.name}
+									{cohost.name}
 								</a>
+							{:else}
+								<span class="font-sans text-sm font-medium md:text-base">{cohost.name}</span>
 							{/if}
 						{/each}
 					</div>
@@ -355,28 +362,23 @@
 		</div>
 	</section>
 
-	<!-- Your Hosts -->
-	<section id="your-host" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
-		<h2 class="font-display text-2xl font-medium md:text-3xl">Your Hosts</h2>
-		<p
-			class="mt-6 font-sans text-base leading-6 font-medium opacity-80 [&_a]:text-destructive [&_a]:underline"
-		>
-			{@html sanitizeHostHtml(region.hostsBlurb)}
-		</p>
-		<!-- Linked partner names; fallback for the Your Hosts section while the
-			logo carousel is deferred. The anchors are markup rather than an HTML
-			string so a Partner's name and url are never interpolated. -->
-		{#if region.partners.length > 0}
-			<p class="mt-4 font-sans text-sm leading-6 font-medium opacity-70 md:text-base">
-				Your local hosts: {#each region.partners as partner, i (partner.url)}<a
-						href={safeHref(partner.url)}
-						target="_blank"
-						rel="noopener noreferrer"
-						class="underline">{partner.name}</a
-					>{listSeparator(i, region.partners.length)}{/each}.
+	<!-- Your Hosts. Dropped when a Campaign credits nobody, rather than
+		standing in the catch-all's hosts. -->
+	{#if cohosts.length > 0}
+		<section id="your-host" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">
+			<h2 class="font-display text-2xl font-medium md:text-3xl">Your Hosts</h2>
+			<!-- The anchors are markup rather than an HTML string so a co-host's
+				name and url are never interpolated into one. -->
+			<p class="mt-6 font-sans text-base leading-6 font-medium opacity-80 md:text-lg">
+				This Open Poll is hosted by {#each cohosts as cohost, i (cohost.name)}{#if cohost.url}<a
+							href={safeHref(cohost.url)}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="text-destructive underline">{cohost.name}</a
+						>{:else}{cohost.name}{/if}{listSeparator(i, cohosts.length)}{/each}.
 			</p>
-		{/if}
-	</section>
+		</section>
+	{/if}
 
 	<!-- What's Next? -->
 	<section id="whats-next" class="mx-auto max-w-4xl scroll-mt-24 px-8 py-5">

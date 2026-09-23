@@ -1,6 +1,7 @@
 import { fail } from '@sveltejs/kit';
 import { createApiClient } from '$lib/api/client';
 import { COHOST_ROLE, CONVERSATION_RESOURCE } from '$lib/permissions';
+import { mirrorCoHosts } from '$lib/cohost-mirror';
 import type { Actions, PageServerLoad } from './$types';
 
 type PickerOrg = { id: string; name: string; website?: string | null; email?: string | null };
@@ -72,13 +73,14 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 		email: o.contactEmail
 	}));
 
-	return { convId, cohosts, pickerOrgs, excludeIds };
+	return { convId, owningOrgId, cohosts, pickerOrgs, excludeIds };
 };
 
 export const actions: Actions = {
 	grantCohosts: async ({ request, cookies, url }) => {
 		const fd = await request.formData();
 		const convId = String(fd.get('convId') ?? '');
+		const owningOrgId = String(fd.get('owningOrgId') ?? '') || null;
 		const orgIds = fd.getAll('orgIds').map(String).filter(Boolean);
 		if (!convId || orgIds.length === 0) return fail(400, { error: 'Select at least one host.' });
 
@@ -98,12 +100,17 @@ export const actions: Actions = {
 		}
 
 		if (failures.length) return fail(400, { error: `Could not add ${failures.length} host(s).` });
+
+		// civicos renders the "Hosted by" strip from this mirror, not from the
+		// grants, which it cannot read.
+		await mirrorCoHosts(api, convId, owningOrgId);
 		return { added: orgIds.length };
 	},
 
 	removeCohost: async ({ request, cookies, url }) => {
 		const fd = await request.formData();
 		const convId = String(fd.get('convId') ?? '');
+		const owningOrgId = String(fd.get('owningOrgId') ?? '') || null;
 		const orgId = String(fd.get('orgId') ?? '');
 		if (!convId || !orgId) return fail(400, { error: 'Missing host.' });
 
@@ -113,6 +120,7 @@ export const actions: Actions = {
 				params: { resource_type: CONVERSATION_RESOURCE, resource_id: convId },
 				queries: { organization_id: orgId, role_name: COHOST_ROLE }
 			});
+			await mirrorCoHosts(api, convId, owningOrgId);
 			return { removed: true };
 		} catch (e) {
 			console.error(`RevokePermission failed for ${orgId}`, e);

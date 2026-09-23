@@ -26,9 +26,11 @@
 		onAddNew?: () => void;
 		/** Conversation id; when set, co-host rows (not the owning host) get a Remove action. */
 		convId?: string;
+		/** The owning Host, posted back so the action can rebuild the mirror in order. */
+		owningOrgId?: string | null;
 	}
 
-	let { cohosts, onAddNew, convId }: Props = $props();
+	let { cohosts, onAddNew, convId, owningOrgId = null }: Props = $props();
 
 	const stripProtocol = (url: string) => url.replace(/^https?:\/\//, '').replace(/\/$/, '');
 
@@ -103,6 +105,7 @@
 						{#if convId && host.id && !host.isOwner}
 							<form method="POST" action="?/removeCohost" use:enhance={removeCohost}>
 								<input type="hidden" name="convId" value={convId} />
+								<input type="hidden" name="owningOrgId" value={owningOrgId ?? ''} />
 								<input type="hidden" name="orgId" value={host.id} />
 								<Button
 									variant="ghost"

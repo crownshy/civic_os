@@ -14,6 +14,7 @@ import { describeApiFailure } from '$lib/api/describe-failure';
 import { enableDefaultDemographics } from '$lib/api/demographics';
 import { polisConfigFor } from '$lib/polis-step';
 import { COHOST_ROLE, CONVERSATION_RESOURCE } from '$lib/permissions';
+import { mirrorCoHosts } from '$lib/cohost-mirror';
 import { participantBase } from '$lib/conversations';
 import type { PickerOrg } from '$lib/components/setup/AddCoHostsDialog.svelte';
 import type { UserOrganizationAccess } from '@crownshy/api-client/api';
@@ -250,12 +251,14 @@ export const actions: Actions = {
 			}
 		}
 
-		// 6. Mirror the two things the participant app cannot read for itself.
+		// 6. Mirror the three things the participant app cannot read for itself.
 		//    A Campaign is reachable at `<base>/<org>/conversations/<slug>` from the
 		//    moment it exists (a Place only lists it on a Place page), so
 		//    what that link needs belongs on the public payload now rather than at
 		//    publish time: `metadata.org` because `/organizations` is 401 to the
-		//    participant app, `metadata.poll` because the Polis step is too.
+		//    participant app, `metadata.poll` because the Polis step is too, and
+		//    `metadata.cohosts` because a co-host is a permission grant and
+		//    `ListResourcePermissions` is 401 there as well.
 		//
 		//    Failing here costs a Campaign that renders but sends participants to
 		//    whichever poll `regions.ts` guesses, so it is logged, not rolled back.
@@ -272,6 +275,10 @@ export const actions: Actions = {
 				console.error('Mirroring poll / host / place into metadata failed', e);
 			}
 		}
+
+		// Separate from the patch above because it reads the grants back rather
+		// than the form, so the list is whatever step 5 actually managed to grant.
+		await mirrorCoHosts(api, conversationId, hostId);
 
 		redirect(303, `/c/${conversationSlug}/overview`);
 	}

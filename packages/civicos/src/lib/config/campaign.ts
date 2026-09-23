@@ -20,7 +20,14 @@ import {
 	toPlaceSlug,
 	type Place
 } from './place';
-import { readOrg, readPoll, type CampaignOrg, type CampaignPoll } from '@civicos/shared/data/place';
+import {
+	readCoHosts,
+	readOrg,
+	readPoll,
+	type CampaignCoHost,
+	type CampaignOrg,
+	type CampaignPoll
+} from '@civicos/shared/data/place';
 import { firstNonEmpty } from '$lib/utils/text';
 
 /** The fields of a Conversation a Campaign identity is built from. */
@@ -54,6 +61,15 @@ export interface Campaign {
 	 * pretty address, not a broken one.
 	 */
 	org: CampaignOrg | null;
+	/**
+	 * The organizations to credit on the landing page, from
+	 * `metadata.cohosts` where admin mirrored them.
+	 *
+	 * Empty rather than the catch-all's `partners` for a Campaign with none:
+	 * `regions.ts` only stands in where the region IS the Campaign, otherwise
+	 * every Campaign created in admin credits The Bloom Project.
+	 */
+	cohosts: CampaignCoHost[];
 	/**
 	 * Whether a stored Conversation backed this, or only `regions.ts` did.
 	 * `region` means the backend was unreachable or had no such Campaign.
@@ -123,6 +139,23 @@ export function regionForCampaign(
 	);
 }
 
+/**
+ * A legacy region's `partners` array in the co-host shape. Utah and Oregon
+ * predate co-host grants, so their credits are still checked in.
+ */
+function partnersAsCoHosts(region: RegionConfig): CampaignCoHost[] {
+	return region.partners.map((partner) => ({
+		name: partner.name,
+		url: partner.url,
+		...(partner.logo ? { logo: partner.logo } : {})
+	}));
+}
+
+/** The first list with anything in it. All-or-nothing, like `resolveFaq`. */
+function firstNonEmptyList<T>(...lists: T[][]): T[] {
+	return lists.find((list) => list.length > 0) ?? [];
+}
+
 /** Merge the stored Conversation over the region defaults. */
 export function resolveCampaign(
 	conversation: CampaignConversation | null | undefined,
@@ -137,11 +170,16 @@ export function resolveCampaign(
 			place: placeFromRegion(region),
 			poll: null,
 			org: region.hostName ? { slug: toPlaceSlug(region.hostName), name: region.hostName } : null,
+			// Reached only when the region IS the Campaign, so its partners are its
+			// co-hosts.
+			cohosts: partnersAsCoHosts(region),
 			source: 'region',
 			// Reached only by falling back to the region, so the region is it.
 			isLegacyRegion: true
 		};
 	}
+
+	const isLegacyRegion = isLegacyRegionConversation(conversation.id);
 
 	return {
 		id: conversation.id,
@@ -152,8 +190,12 @@ export function resolveCampaign(
 		org:
 			readOrg(conversation.metadata) ??
 			(region.hostName ? { slug: toPlaceSlug(region.hostName), name: region.hostName } : null),
+		cohosts: firstNonEmptyList(
+			readCoHosts(conversation.metadata),
+			isLegacyRegion ? partnersAsCoHosts(region) : []
+		),
 		source: 'conversation',
-		isLegacyRegion: isLegacyRegionConversation(conversation.id)
+		isLegacyRegion
 	};
 }
 

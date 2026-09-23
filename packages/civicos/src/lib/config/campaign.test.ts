@@ -83,6 +83,9 @@ describe('resolveCampaign', () => {
 			place: { slug: 'dundee', name: 'Dundee, Scotland' },
 			poll: null,
 			org: { slug: toPlaceSlug(oregon.hostName), name: oregon.hostName },
+			// Not Oregon's partners: the region only supplies its defaults here, it
+			// is not this Campaign.
+			cohosts: [],
 			source: 'conversation',
 			isLegacyRegion: false
 		});
@@ -96,9 +99,28 @@ describe('resolveCampaign', () => {
 			poll: null,
 			org: { slug: toPlaceSlug(oregon.hostName), name: oregon.hostName },
 			place: { slug: oregon.slug, name: oregon.stateName },
+			cohosts: oregon.partners.map((p) => ({ name: p.name, url: p.url })),
 			source: 'region',
 			isLegacyRegion: true
 		});
+	});
+
+	it('reads co-hosts from the metadata admin mirrored them into', () => {
+		const campaign = resolveCampaign(
+			{
+				...stored,
+				metadata: { cohosts: [{ name: 'Dundee Civic Trust', url: 'https://example.org' }] }
+			},
+			oregon
+		);
+
+		expect(campaign.cohosts).toEqual([{ name: 'Dundee Civic Trust', url: 'https://example.org' }]);
+	});
+
+	it('credits nobody rather than the catch-all when a Campaign has no co-hosts', () => {
+		// The bug this replaced: a Campaign created in admin rendered "Hosted by
+		// The Bloom Project" because the catch-all's partners were the only source.
+		expect(resolveCampaign({ ...stored, metadata: {} }, GENERIC_REGION).cohosts).toEqual([]);
 	});
 
 	it('has no place when the conversation does not say and no region owns it', () => {
