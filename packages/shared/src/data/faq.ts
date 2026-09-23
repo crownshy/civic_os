@@ -9,7 +9,7 @@
  *
  * That encoding is the whole reason this module exists. Both apps go through it
  * so the surface that writes the format and the surface that renders it cannot
- * disagree about it, the same contract `place.ts` draws for a Place (ADR 0003).
+ * disagree about it, the same contract `place.ts` draws for a Place (ADR 0006).
  *
  * An `FaqEntry` is storage-shaped: `answer` is block HTML, which is what the
  * accordion renders. `faqAnswerToText` / `faqAnswerToHtml` convert at the one

@@ -52,55 +52,48 @@ Utah still renders from `regions.ts` rather than going dark.
 `PUBLIC_CAMPAIGN_SLUG` says which Campaign the root `/` redirects to on a
 deployment that has no legacy subdomain. It takes no part in resolution.
 
-## The gap: what a new Campaign still gets from regions.ts
+## What a Campaign created in admin still gets from regions.ts
 
-Audited against HEAD. "What a new Campaign shows" is the `GENERIC_REGION`
-value, because that is the fallback every admin-created Campaign lands on.
+Nothing a participant can see. Every surface that used to render
+`GENERIC_REGION` now renders the Host's own value, a fixed string, or nothing
+at all.
 
-### Blocks internal testing
+What is left is last-resort identity, reached only when a Conversation field is
+empty, and never copy:
 
-None. Milestone A closed every entry that was here. What follows is what is
-left.
+| Surface                           | Read site                        | Field                                   | When it is reached                                            |
+| --------------------------------- | -------------------------------- | --------------------------------------- | ------------------------------------------------------------- |
+| Campaign title                    | `campaign.ts:169,188`            | `heroHeader`                            | `Conversation.title` is empty, which the Setup schema forbids |
+| Key question                      | `[campaign]/+page.svelte:36`     | `question`                              | `metadata.poll.question` is missing                           |
+| `<org>` URL segment               | `campaign.ts:173,193`            | `hostName`                              | `metadata.org` was never mirrored. Decorative either way      |
+| Place chip                        | `campaign.ts:244`, `place.ts:32` | `stateName`, `slug`                     | The Campaign has no `metadata.place`                          |
+| Report data                       | `report/+page.server.ts:19`      | `polis_workflow_step_id`                | Legacy regions only, gated on `isLegacyRegion`                |
+| Voting poll                       | `contribute/+page.svelte:58`     | `polisId`                               | Legacy regions only, gated on `isLegacyRegion`                |
+| Landing Context, What's Next, FAQ | `host-copy.ts`                   | `contextParagraphs`, `whatsNext`, `faq` | Legacy regions only, gated on `isLegacyRegion`                |
+| Hosted by, Your Hosts             | `campaign.ts:148`                | `partners`                              | Legacy regions only, gated on `isLegacyRegion`                |
 
-### Wrong but survivable
-
-| Surface                       | Read site                             | Field                               | Effect                                                                                                                           |
-| ----------------------------- | ------------------------------------- | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| Voting poll selection         | `contribute/+page.svelte:60,69`       | `polisId`, `polis_workflow_step_id` | Only when `metadata.poll` is missing. A Utah zip then routes the participant into Utah's Polis on someone else's Campaign (#422) |
-| Event calendar invite         | `EventCalendarInviteButton.svelte:66` | `hostName`, `hostUrl`               | "Hosted by Bloom Project. Visit bloom-project.org" in the .ics                                                                   |
-| Event detail footer           | `events/[slug]/+page.svelte:144,147`  | `hostName`, `hostUrl`               | Same, as a link                                                                                                                  |
-| Events page registration gate | `events/+page.svelte:18`              | `conversationsActive`               | No Host switch; always on for a new Campaign                                                                                     |
-| Zip typeahead                 | `[campaign]/+page.svelte:273`         | `zipPrefixes`                       | Empty, so the field suggests nothing until the participant types. Not validation                                                 |
-| Campaign title fallback       | `campaign.ts:135,149`                 | `heroHeader`                        | Only reached when `Conversation.title` is empty                                                                                  |
-| Key question fallback         | `[campaign]/+page.svelte:31`          | `question`                          | Only reached when `metadata.poll.question` is missing                                                                            |
-| Org segment fallback          | `campaign.ts:139,154`                 | `hostName`                          | Decorative URL segment                                                                                                           |
-| Place fallback                | `campaign.ts:181`, `place.ts:32`      | `stateName`, `slug`                 | Only for a Campaign with no `metadata.place`                                                                                     |
+The four `isLegacyRegion` rows are Utah's and Oregon's live copy. They go when
+those two Campaigns have their values saved into their own records, which is
+the one step left.
 
 ## Hardcoded outside regions.ts
 
-- **`/campaign/ai`** reads `page.data.region`, which outside `[campaign]` is
-  always `GENERIC_REGION` from the root layout. So the whole page, including
-  its three phase labels, its Utah-only "get involved" link at line 203, and
-  its email signup against `region.conversationId`, renders the catch-all no
-  matter who opens it. Decide whether this page has a future before spending
-  anything on it.
 - **`packages/civicos/src/lib/data/mock.ts`** feeds `popQuizQuestions` to the
   contribute flow and carries Utah copy. It only reaches the `pop-quiz` and
   `did-you-know` screens, both marked "unused in conference flow", so this is
-  dead weight rather than a live leak.
-- **`DidYouKnowScreen.svelte:38`** hardcodes "4 in 5 teenagers in Utah are
-  chatting with AI friends online". Same dead screen.
+  dead weight rather than a live leak. `DidYouKnowScreen.svelte` hardcodes a
+  Utah statistic on the same dead screen.
 - **`PROMPTS` in `participation.ts`** phrases each demographic question. Admin
   owns the category and its options but not the wording. Deliberate for now.
-- **The four `DEFAULT_FAQ` placeholders** in `regions.ts` are what a Host sees
-  until they author their own, and they read as real answers rather than as
-  placeholders.
-- **`PUBLIC_POLIS_URL`, `PUBLIC_POLIS_ID`, `PUBLIC_CONVERSATION_ID`** in
-  `services/api.ts` are a deployment-wide last resort under the zip fallback
-  (#421).
+- **The four `DEFAULT_FAQ` placeholders** in `regions.ts` read as real answers
+  rather than as placeholders. Only Utah and Oregon can reach them now.
+- **`PUBLIC_POLIS_URL`** in `services/api.ts` names the Polis server for the
+  deployment. Kept deliberately: it is not a property of any one Campaign, and
+  `metadata.poll.polisUrl` overrides it per Campaign.
 - **Landing section headings** ("What is an \"Open Poll\"?", "Your Hosts",
-  "What's Next?", "Stay in touch.") and the privacy block at lines 520-555 are
-  fixed UI copy. Intentional, per the Remove dispositions below.
+  "What's Next?", "Stay in touch."), `HERO_BLURB`, `END_CTA_COPY` and the
+  privacy block are fixed UI copy. Intentional, per the Remove dispositions
+  below.
 - **`@civicos/report`** is the Central Oregon report, hardcoded end to end,
   deployed separately. Out of scope here.
 
@@ -171,24 +164,59 @@ Cleaned up in the same pass:
 
 ### Milestone C: the fallback itself goes
 
-- [ ] Voting stops resolving a Polis conversation from the zip code (#422).
-- [ ] Retire the `PUBLIC_*` deployment-wide Polis and Conversation fallbacks
-      (#421).
-- [ ] Decide `zipPrefixes`. It scopes the typeahead and the county rollup and
-      has no disposition.
-- [ ] Decide `/campaign/ai`: delete, or move it under `[campaign]` so it reads
-      a real Campaign.
+Everything except the hand migration, which is the last step and needs a human.
+
+- [x] Voting resolves its Polis conversation from the Campaign, falling back to
+      `regions.ts` only for a legacy region (#422). A Utah zip used to put a
+      participant in Utah's poll whichever Campaign they had opened.
+- [x] `PUBLIC_CONVERSATION_ID` and `PUBLIC_POLIS_ID` retired (#421). Both named
+      one record for a whole deployment, from before a Campaign was a stored
+      thing. `PUBLIC_POLIS_URL` stays: it names the Polis server, which is a
+      property of the deployment rather than of a Campaign, and
+      `metadata.poll.polisUrl` overrides it per Campaign.
+- [x] `zipPrefixes` decided: nothing scopes by it any more. Admin's county
+      rollup, county list and map are derived from the zips participants
+      actually entered, which is what every Campaign created in admin needed
+      (they all had no prefixes, so their Geography section was blank), and the
+      landing page's zip typeahead waits for the participant to type. Places
+      are still being worked out (#404, #405), so a scope waits for something
+      that can express one. The field survives only for `getRegionByZipcode`,
+      which is only how the landing page redirects a Utah zip opened on Oregon.
+- [x] `/campaign/ai` deleted. It sat outside `[campaign]`, so it always
+      rendered the catch-all: "AMERICANS Speak", a Utah-only get-involved link
+      and three hardcoded phase labels, whoever was hosting. InfoBar's ABOUT
+      button, which is on every voting, events and report screen, now goes to
+      the Campaign's own homepage, which carries the Host's Context, their FAQ
+      and who hosts it. That retired `demonym`, `campaignPageDescription`,
+      `campaignPageHosts`, `phaseLabels` and `hostUrl`.
+- [x] `GENERIC_REGION` no longer supplies copy to a Campaign it is not.
+      `resolveHostCopy` and `resolveFaq` take the region only where it IS the
+      Campaign, so a Host who has not written their Context or FAQ gets no
+      section rather than The Bloom Project's description of itself (#425). The
+      landing page drops What's Next and its nav pill on the same rule.
 - [ ] Save Utah's and Oregon's live values into their Conversation records by
-      hand.
-- [ ] Retire `GENERIC_REGION` (#425), then delete `regions.ts`.
+      hand. **This is the remaining blocker.**
+- [ ] Delete `GENERIC_REGION` and `regions.ts` once that is done.
+
+What `RegionConfig` still carries, and why, now that it is 13 fields rather
+than 30:
+
+| Still there                                         | Why it cannot go yet                                                |
+| --------------------------------------------------- | ------------------------------------------------------------------- |
+| `slug`, `conversationId`                            | Resolve `/utah` and `/oregon` to the Campaign they always were      |
+| `zipPrefixes`                                       | `getRegionByZipcode`, for the landing page's legacy zip redirect    |
+| `polisId`, `polis_workflow_step_id`                 | The poll and report for Utah and Oregon                             |
+| `hostName`, `stateName`                             | The `<org>` segment and the Place chip for the two legacy regions   |
+| `question`, `heroHeader`                            | Last-resort identity when a Conversation field is empty             |
+| `contextParagraphs`, `whatsNext`, `faq`, `partners` | Utah's and Oregon's live copy, until it is saved into their records |
 
 ### Cleanup, any time
 
-- [ ] Delete `RegionConfig.events`, `RegionConfig.fullHosts`, and
-      `packages/civicos/src/lib/data/utah-counties.ts`.
-- [ ] Four source files cite ADR 0003, which was deleted: `host-copy.ts:18`,
-      `campaign.ts:8`, `participation.ts:9`, `shared/src/data/faq.ts:12`.
+- [x] `RegionConfig.events`, `RegionConfig.fullHosts` and `utah-counties.ts`
+      deleted in Milestone A.
+- [x] The three remaining citations of the deleted ADR 0003 repointed.
 - [ ] Rewrite `DEFAULT_FAQ` so a Host and a reviewer can tell it is seed copy.
+      Lower stakes now that only Utah and Oregon can ever see it.
 
 ## Field dispositions
 
@@ -200,14 +228,14 @@ value is derived, or the copy becomes hardcoded UI text.
 | ------------------------- | --------------------- | ------------------ | ---------------------------------------- | ---------------------------------------------------------------------------- |
 | `slug`                    | string                | ~20, URL-safe      | **Done**                                 | `Conversation.slug`                                                          |
 | `stateName`               | string                | ~30                | **Done** as Place                        | `metadata.place.name`, see ADR 0006                                          |
-| `demonym`                 | string                | ~20                | **Remove**                               | "Utahns". Survives only in copy that is itself being removed                 |
+| `demonym`                 | string                | ~20                | **Done**                                 | Deleted with `/campaign/ai`                                                  |
 | `question`                | string                | ~150               | **Done** as Key Question                 | The Polis step's `topic`, mirrored to `metadata.poll.question`               |
-| `polisId`                 | string                | ~15                | **Done**                                 | `metadata.poll.polisId`, see ADR 0004                                        |
+| `polisId`                 | string                | ~15                | **Done**                                 | `metadata.poll.polisId`. Legacy regions only, now                            |
 | `conversationId`          | UUID                  | 36                 | **Move**                                 | The Conversation this Campaign is                                            |
 | `inviteId`                | UUID                  | 36                 | **Move**                                 | Invite record for this Campaign                                              |
 | `hostName`                | string                | ~50                | **Done** on the Host                     | `metadata.org.name`                                                          |
-| `hostUrl`                 | url                   |                    | **Done** on the Host                     | `metadata.org.url`                                                           |
-| `zipPrefixes`             | string[]              |                    | Undecided                                | Scopes the zip typeahead and the county rollup                               |
+| `hostUrl`                 | url                   |                    | **Done** on the Host                     | `metadata.org.url`. Field deleted                                            |
+| `zipPrefixes`             | string[]              |                    | **Done**                                 | Nothing scopes by it; survives only for `getRegionByZipcode`                 |
 | `heroHeader`              | string                | ~60                | **Done** as Title                        | `Conversation.title`                                                         |
 | `heroBlurb`               | string                | ~250               | **Done**                                 | Deleted. `HERO_BLURB` in `landing-copy.ts`                                   |
 | `contextParagraphs`       | string[]              | ~500 each          | **Remove**                               | Superseded by the single rich-text Basic Description                         |
@@ -215,8 +243,8 @@ value is derived, or the copy becomes hardcoded UI text.
 | `partners`                | `{name, url}[]`       | name ~50, url ~100 | **Done** as CoHosts                      | `metadata.cohosts`. `partners` survives only as the legacy-region fallback   |
 | `hostMessage`             | rich text             | ~600 each          | **Done**                                 | Deleted with its unreachable dialog                                          |
 | `aboutConversation`       | string[]              | ~400 each          | **Done**                                 | Deleted. The dialog renders `Conversation.description`                       |
-| `campaignPageDescription` | string                | ~300               | **Remove**                               |                                                                              |
-| `campaignPageHosts`       | string, HTML          | ~300               | **Remove**                               | Generated from the CoHosts list                                              |
+| `campaignPageDescription` | string                | ~300               | **Done**                                 | Deleted with `/campaign/ai`                                                  |
+| `campaignPageHosts`       | string, HTML          | ~300               | **Done**                                 | Deleted with `/campaign/ai`                                                  |
 | `whatsNext`               | string                | ~300               | **Done** as the Open Poll ending message | `Conversation.thankYouMessage`, editable on Setup                            |
 | `goDeeper`                | string, HTML          | ~300               | **Done**                                 | Deleted                                                                      |
 | `faq`                     | shared constant       |                    | **Done** as `Conversation.faqs`          | One rich-text field, `h2` per question, parsed by `@civicos/shared/data/faq` |
@@ -226,7 +254,7 @@ value is derived, or the copy becomes hardcoded UI text.
 | `shareUrl`                | url                   | ~50                | **Done**, derived                        | `participantUrl()` off the request. Field deleted                            |
 | `events`                  | `ConversationEvent[]` |                    | **Done**                                 | `GET /conversation/:id/events`. Field deleted                                |
 | `conversationsActive`     | boolean               |                    | **Done**                                 | Derived from the Campaign's events. Field deleted                            |
-| `phaseLabels`             | `{phase1,2,3}`        |                    | **Remove**                               | Only `/campaign/ai` reads them                                               |
+| `phaseLabels`             | `{phase1,2,3}`        |                    | **Done**                                 | Deleted with `/campaign/ai`                                                  |
 | `fullHosts`               | string                |                    | **Done**                                 | Deleted                                                                      |
 
 ## What has to happen before a field can go

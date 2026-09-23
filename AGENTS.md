@@ -22,7 +22,7 @@ This is a **pnpm workspace**; there is no backend code here. Layout (`packages/*
   primitives (`ui/**`), design tokens (`styles/theme.css`), region/zip data, and
   `cn()` + shared types under `utils.ts`.
 - `packages/report/` (package `@civicos/report`) the standalone public report, deployed
-  separately to `report.bloomproject.us`. 
+  separately to `report.bloomproject.us`.
 
 The two apps intentionally diverge at the theme and domain-component layer while sharing
 generic primitives. The full rules for what to share vs keep separate are in
@@ -127,12 +127,12 @@ focused PR; do not let them silently grow:
   exist, but app forms do not use them yet. Migrate forms onto superforms as you touch
   them.
 - `admin` and `civicos` have lint configured but neither passes yet. `admin` is nearly
-  there: 4 files failing `prettier --check` (`demographics.ts`, `EditGoalsModal.svelte`,
-  and the two participants files) and 2 eslint errors, both `no-unused-vars`. `civicos` is
-  clean on `prettier` and down to 27 eslint errors, all of them decisions rather than
-  cleanups: 14 `no-navigation-without-resolve`, 6 `no-at-html-tags` (#409), and 7
-  `no-unused-vars` that are each the visible half of a filed bug (#410, #411, #412,
-  #413) or a countdown whose markup is commented out. Read the reason before
+  there: 2 files failing `prettier --check` (`demographics.ts` and
+  `EditGoalsModal.svelte`) and 2 eslint errors, both `no-unused-vars`. `civicos` is
+  clean on `prettier` and down to 25 eslint errors, all of them decisions rather than
+  cleanups: 12 `no-navigation-without-resolve`, 8 `no-unused-vars` that are each the
+  visible half of a filed bug (#410, #411, #412, #413) or a countdown whose markup
+  is commented out, and 5 `no-at-html-tags` (#409). Read the reason before
   deleting the symptom. Pay them down in focused PRs rather than mixing fixes into
   feature work.
 - `load` functions do not call `depends()` for explicit invalidation keys. Add them when

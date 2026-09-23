@@ -5,7 +5,7 @@
  * `RegionConfig`, and that config carried a hardcoded `conversationId`. A
  * Campaign is now the stored Conversation, and the region entry is demoted to
  * the default layer behind it, the same way Host copy already resolves
- * (see `host-copy.ts` and ADR 0003).
+ * (see `host-copy.ts`).
  *
  * The URL is `/<org>/conversations/<conversation-slug>`: the last segment names
  * the Conversation, and nothing about the hostname is read (ADR 0011).

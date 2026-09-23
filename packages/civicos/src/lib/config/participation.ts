@@ -6,7 +6,7 @@
  * Conversation's `metadata`. The definitions and the readers are
  * `@civicos/shared/data/demographics` and `.../participant-asks`, shared so the
  * app that writes a switch and the app that obeys it cannot drift; this file is
- * the single civicos read site, the way `place.ts` is for a Place (ADR 0003).
+ * the single civicos read site, the way `place.ts` is for a Place (ADR 0006).
  *
  * A Conversation with no metadata reads as all on, so a Campaign nobody has
  * configured behaves exactly as the poll did before any of this existed.
