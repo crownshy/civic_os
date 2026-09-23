@@ -13,9 +13,15 @@
 	import { addHours, isBefore } from 'date-fns';
 
 	const { data } = $props();
-	const { events, region, campaign, eventDateFormatter, eventTimeFormatter } = data;
+	const { events, campaign, eventDateFormatter, eventTimeFormatter } = data;
 
-	const conversationsActive = region.conversationsActive !== false;
+	// Whether there is anything to register for. Derived from this Campaign's own
+	// events rather than a flag: `RegionConfig.conversationsActive` was declared
+	// and set by no region, so it read as true everywhere and the Coming Soon
+	// branch below could never render. A Host opens registration by creating
+	// events in admin, which is the same decision without a second switch to keep
+	// in step with it.
+	const conversationsActive = $derived(events.length > 0);
 
 	// Where this Campaign runs, from the Campaign rather than from the region the
 	// subdomain matched (#423).

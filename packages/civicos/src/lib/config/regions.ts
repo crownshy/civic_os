@@ -17,7 +17,6 @@ export {
 	GENERIC_REGION,
 	getRegionByZipcode,
 	extractSubdomain,
-	getEventFullDescription,
 	formatDurationLabel
 } from '@civicos/shared/data/regions';
 

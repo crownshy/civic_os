@@ -12,7 +12,7 @@
  */
 
 // Pure region data, no SvelteKit env coupling.
-import type { ConversationEvent } from '../types/conversation-event';
+
 /** A coalition partner / host organization shown on the landing page. */
 export interface Partner {
 	name: string;
@@ -61,8 +61,6 @@ export interface RegionConfig {
 	whatsNext: string;
 	/** Per-region FAQ. Seeded with DEFAULT_FAQ placeholders; host orgs author their own. */
 	faq: FaqEntry[];
-	/** Whether live conversations are open for registration. Defaults to true when omitted. */
-	conversationsActive?: boolean;
 	/** Date labels for the three campaign phases */
 	phaseLabels?: { phase1: string; phase2: string; phase3: string };
 }
@@ -222,14 +220,6 @@ export const GENERIC_REGION: RegionConfig = {
 // ---------------------------------------------------------------------------
 // Lookup helpers
 // ---------------------------------------------------------------------------
-
-/** Generates a full event description from its format, duration, and location. */
-export function getEventFullDescription(event: ConversationEvent, stateName: string): string {
-	const locationLabel = event.format === 'online' ? stateName : event.location.split(',')[0];
-	const duration = event.duration ?? (event.format === 'online' ? '1 hour' : '1.5 hours');
-	const onlineAdj = event.format === 'online' ? 'online ' : '';
-	return `This is a ${duration} ${onlineAdj}conversation with your neighbors in ${locationLabel} about AI. We'll take the time to make sense of the issue, and discuss what we believe we can do to make sure AI benefits our communities.`;
-}
 
 export function formatDurationLabel(hours: number, minutes: number) {
 	const hoursQualifier = hours > 1 ? 'hours' : 'hour';
