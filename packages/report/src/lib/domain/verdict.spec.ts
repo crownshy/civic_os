@@ -3,7 +3,6 @@ import {
 	CONSENSUS_OVER_AGREE,
 	CONSENSUS_UNDER_AGREE,
 	DIFFERENCE_OVER_GAP,
-	tierColorFor,
 	verdictFor
 } from './verdict';
 import type { Vote } from './types';
