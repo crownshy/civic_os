@@ -324,6 +324,12 @@ export interface CampaignOrg {
 	/** URL segment, a slugified display name. Decorative, see `participantUrl`. */
 	slug: string;
 	name: string;
+	/**
+	 * The Host's public site, when it has one. Credited on an event page and in
+	 * the calendar invite, which used to read `regions.ts`'s `hostUrl` and so
+	 * pointed at The Bloom Project on every Campaign created in admin.
+	 */
+	url?: string;
 }
 
 /** Key this rides under inside the Conversation's `metadata` jsonb. */
@@ -336,12 +342,15 @@ export function readOrg(metadata: unknown): CampaignOrg | null {
 	const value = (metadata as Record<string, unknown>)[ORG_METADATA_KEY];
 	if (typeof value !== 'object' || value === null) return null;
 
-	const { slug, name } = value as Record<string, unknown>;
+	const { slug, name, url } = value as Record<string, unknown>;
 	if (typeof name !== 'string' || name.trim() === '') return null;
 
 	// The slug is derivable from the name, so a missing one is not fatal.
 	const derived = typeof slug === 'string' && slug.trim() !== '' ? slug.trim() : toPlaceSlug(name);
 	if (!derived) return null;
 
-	return { slug: derived, name: name.trim() };
+	const org: CampaignOrg = { slug: derived, name: name.trim() };
+	if (typeof url === 'string' && url.trim() !== '') org.url = url.trim();
+
+	return org;
 }

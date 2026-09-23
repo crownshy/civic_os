@@ -1,5 +1,6 @@
 /**
- * Mirror a Campaign's co-host list into `Conversation.metadata.cohosts`.
+ * Mirror who hosts a Campaign into its `Conversation.metadata`: the owning Host
+ * under `org`, and the full credit list under `cohosts`.
  *
  * A co-host is a permission grant. Turning one into a name to render means
  * `ListResourcePermissions` plus `ListOrganizations`, and both are 401 to the
@@ -18,7 +19,7 @@
  */
 
 import { COHOST_ROLE, CONVERSATION_RESOURCE } from '$lib/permissions';
-import type { CampaignCoHost } from '@civicos/shared/data/place';
+import { toPlaceSlug, type CampaignCoHost, type CampaignOrg } from '@civicos/shared/data/place';
 
 type Api = {
 	ListOrganizations: (args: { queries: { limit: number } }) => Promise<{
@@ -35,13 +36,17 @@ type Api = {
 };
 
 /**
- * Rebuild the list from the grants and write it.
+ * Rebuild both from the grants and write them in one patch.
  *
  * `owningOrgId` leads the list when it is known, because the Host that owns the
  * Campaign is the first name a participant should read. It also holds a
  * `content_editor` grant of its own, so it would otherwise appear twice.
+ *
+ * `org` is rewritten here as well as at creation, so a Campaign whose mirror
+ * predates `CampaignOrg.url` picks the url up the next time its co-hosts
+ * change, rather than only when it is recreated.
  */
-export async function mirrorCoHosts(
+export async function mirrorHosts(
 	api: Api,
 	conversationId: string,
 	owningOrgId: string | null
@@ -74,11 +79,21 @@ export async function mirrorCoHosts(
 			return [entry];
 		});
 
+		const owner = owningOrgId ? orgById.get(owningOrgId) : undefined;
+		const org: CampaignOrg | null =
+			owner?.name?.trim() && toPlaceSlug(owner.name)
+				? {
+						slug: toPlaceSlug(owner.name),
+						name: owner.name.trim(),
+						...(owner.externalUrl?.trim() ? { url: owner.externalUrl.trim() } : {})
+					}
+				: null;
+
 		await api.PatchConversationMetadata(
-			{ cohosts },
+			{ cohosts, ...(org ? { org } : {}) },
 			{ params: { conversation_id: conversationId } }
 		);
 	} catch (e) {
-		console.error('Mirroring co-hosts into metadata failed', e);
+		console.error('Mirroring hosts into metadata failed', e);
 	}
 }

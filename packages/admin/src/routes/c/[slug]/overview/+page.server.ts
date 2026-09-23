@@ -1,7 +1,7 @@
 import { fail } from '@sveltejs/kit';
 import { createApiClient } from '$lib/api/client';
 import { COHOST_ROLE, CONVERSATION_RESOURCE } from '$lib/permissions';
-import { mirrorCoHosts } from '$lib/cohost-mirror';
+import { mirrorHosts } from '$lib/cohost-mirror';
 import type { Actions, PageServerLoad } from './$types';
 
 type PickerOrg = { id: string; name: string; website?: string | null; email?: string | null };
@@ -103,7 +103,7 @@ export const actions: Actions = {
 
 		// civicos renders the "Hosted by" strip from this mirror, not from the
 		// grants, which it cannot read.
-		await mirrorCoHosts(api, convId, owningOrgId);
+		await mirrorHosts(api, convId, owningOrgId);
 		return { added: orgIds.length };
 	},
 
@@ -120,7 +120,7 @@ export const actions: Actions = {
 				params: { resource_type: CONVERSATION_RESOURCE, resource_id: convId },
 				queries: { organization_id: orgId, role_name: COHOST_ROLE }
 			});
-			await mirrorCoHosts(api, convId, owningOrgId);
+			await mirrorHosts(api, convId, owningOrgId);
 			return { removed: true };
 		} catch (e) {
 			console.error(`RevokePermission failed for ${orgId}`, e);

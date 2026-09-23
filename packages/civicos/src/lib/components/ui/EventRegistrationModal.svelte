@@ -10,7 +10,7 @@
 	import { Spinner } from '@civicos/shared/ui/spinner';
 	import ThankYouMessage from './ThankYouMessage.svelte';
 	import EventCalendarInviteButton from './EventCalendarInviteButton.svelte';
-	import type { RegionConfig } from '$lib/config/regions';
+	import type { CampaignOrg } from '@civicos/shared/data/place';
 	import { defaults, superForm } from 'sveltekit-superforms';
 	import { zod4, zod4Client } from 'sveltekit-superforms/adapters';
 	import otpUserSignupSchema from './OtpUserSignupSchema';
@@ -22,17 +22,18 @@
 		event: LocalizedEventDto;
 		/**
 		 * The Campaign's Conversation. The event belongs to it, so the attendance
-		 * does too. The `region` below is for the calendar invite's copy and is not
+		 * does too. The `org` below is for the calendar invite's copy and is not
 		 * an answer to which Conversation this is.
 		 */
 		conversationId: string;
-		region: RegionConfig;
+		/** The Campaign's Host, credited in the calendar invite. */
+		org: CampaignOrg | null;
 		api: ApiClient;
 		/** Fired once the attendance is filed, so the page can reflect it. */
 		onRegistered?: () => void;
 	};
 
-	let { open, event, conversationId, region, api, onRegistered }: Props = $props();
+	let { open, event, conversationId, org, api, onRegistered }: Props = $props();
 
 	const formattedDate = $derived(event ? format(new Date(event.startTime), 'EEEE, MMMM d') : '');
 
@@ -149,7 +150,7 @@
 	{#snippet footer()}
 		{#if status === 'success'}
 			<div class="flex w-full items-center justify-between gap-4 px-7">
-				<EventCalendarInviteButton {event} {region} popupDirection="up" />
+				<EventCalendarInviteButton {event} {org} popupDirection="up" />
 				<Button class="w-full" href={campaignPath(page.params.campaign, page.params.org)}
 					>GO TO POLL</Button
 				>

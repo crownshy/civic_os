@@ -1,15 +1,16 @@
 <script lang="ts">
-	import type { RegionConfig } from '$lib/config/regions';
+	import type { CampaignOrg } from '@civicos/shared/data/place';
 	import type { LocalizedEventDto } from '@crownshy/api-client/api';
 	import { onMount } from 'svelte';
 
 	type Props = {
 		event: LocalizedEventDto;
-		region: RegionConfig;
+		/** The Campaign's Host, credited in the invite. Null when it has none. */
+		org: CampaignOrg | null;
 		popupDirection?: 'up' | 'down';
 	};
 
-	let { event, region, popupDirection = 'down' }: Props = $props();
+	let { event, org, popupDirection = 'down' }: Props = $props();
 
 	let ref = $state<HTMLSpanElement | null>(null);
 
@@ -56,16 +57,18 @@
 		return offsets[tzMatch[1]] ?? 'currentBrowser';
 	});
 
-	// `description` is a required string on `LocalizedEventDto`, so the old
-	// `?? getEventFullDescription(event, ...)` fallback could not fire. It would
-	// also have thrown if it had: that helper reads `event.location` as a string
-	// and matches `format` against `'in-person'`, and the DTO has an object and
-	// `'in_person'`. It is for the `regions.ts` events.
-	const description = $derived(
-		event
-			? `${event.description}\n\nHosted by ${region.hostName}. Visit ${region.hostUrl} for more details.`
-			: ''
+	// The Host comes off the Campaign, not `regions.ts`, which credited The Bloom
+	// Project on every Campaign created in admin. A Campaign with no Host, or one
+	// whose Host has no site, gets the shorter sentence rather than a dangling
+	// "Visit ." or somebody else's name.
+	const credit = $derived(
+		!org
+			? ''
+			: org.url
+				? `\n\nHosted by ${org.name}. Visit ${org.url} for more details.`
+				: `\n\nHosted by ${org.name}.`
 	);
+	const description = $derived(event ? `${event.description}${credit}` : '');
 </script>
 
 <span class="w-full" bind:this={ref}>

@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { campaignPath } from '@civicos/shared/data/place';
+	import { safeHref } from '@civicos/shared/sanitize';
 	import { page } from '$app/state';
 	import { AppShell } from '$lib/components/layout';
 	import { Button, InfoBar } from '$lib/components/ui';
 	import EventCalendarInviteButton from '$lib/components/ui/EventCalendarInviteButton.svelte';
 	import EventRegistrationModal from '$lib/components/ui/EventRegistrationModal.svelte';
-	import { formatDurationLabel, type RegionConfig } from '$lib/config/regions';
+	import { formatDurationLabel } from '$lib/config/regions';
 	import { placeNameFor } from '$lib/config/campaign';
 	import { formatTimeDuration } from '$lib/utils/dates.js';
 	import {
@@ -20,14 +21,16 @@
 	import { invalidate } from '$app/navigation';
 	import { session } from '$lib/services/session.svelte';
 
-	const region: RegionConfig = page.data.region;
-
 	const { data } = $props();
 	const { event, eventDateFormatter, eventTimeFormatter } = data;
 
 	// Where this Campaign runs, from the Campaign rather than from the region the
 	// subdomain matched (#423).
-	const placeName = $derived(placeNameFor(data.campaign, region));
+	const placeName = $derived(placeNameFor(data.campaign, page.data.region));
+	// Who hosts it, from the Campaign's own `metadata.org`. This used to be
+	// `regions.ts`'s hostName and hostUrl, which credited The Bloom Project on
+	// every Campaign created in admin.
+	const org = $derived(data.campaign.org);
 
 	const eventStartDate = $derived(new Date(event.startTime));
 	const eventEndDate = $derived(new Date(event.endTime));
@@ -138,14 +141,15 @@
 
 				<!-- Description -->
 				<p class="mt-4 text-center font-sans text-base leading-6 font-medium text-foreground">
-					Join your neighbors {locationLabel} for a conversation about AI's impact on our lives. Hosted
-					by
-					<a
-						href={region.hostUrl}
-						target="_blank"
-						rel="noopener noreferrer"
-						class="text-destructive">{region.hostName}</a
-					>.
+					Join your neighbors {locationLabel} for a conversation about AI's impact on our lives.{#if org}
+						Hosted by
+						{#if org.url}<a
+								href={safeHref(org.url)}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="text-destructive">{org.name}</a
+							>{:else}{org.name}{/if}.
+					{/if}
 				</p>
 
 				<!-- CTA -->
@@ -191,7 +195,7 @@
 
 					{#if !isPast}
 						<div class="mt-3 flex justify-center">
-							<EventCalendarInviteButton {event} {region} />
+							<EventCalendarInviteButton {event} {org} />
 						</div>
 					{/if}
 				</div>
@@ -320,7 +324,7 @@
 			open={showForm}
 			{event}
 			conversationId={data.campaign.id}
-			{region}
+			{org}
 			api={data.api}
 			{onRegistered}
 		/>

@@ -2,26 +2,18 @@ import { redirect } from '@sveltejs/kit';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { createApiClient } from '$lib/api/client';
-import type { createApiClient as ApiClientFactory } from '@crownshy/api-client/client';
-import {
-	placeFromName,
-	toPlaceSlug,
-	type CampaignOrg,
-	type CampaignPoll
-} from '@civicos/shared/data/place';
+import { placeFromName, type CampaignPoll } from '@civicos/shared/data/place';
 import { rescopedSlug } from '$lib/config/place';
 import { describeApiFailure } from '$lib/api/describe-failure';
 import { enableDefaultDemographics } from '$lib/api/demographics';
 import { polisConfigFor } from '$lib/polis-step';
 import { COHOST_ROLE, CONVERSATION_RESOURCE } from '$lib/permissions';
-import { mirrorCoHosts } from '$lib/cohost-mirror';
+import { mirrorHosts } from '$lib/cohost-mirror';
 import { participantBase } from '$lib/conversations';
 import type { PickerOrg } from '$lib/components/setup/AddCoHostsDialog.svelte';
 import type { UserOrganizationAccess } from '@crownshy/api-client/api';
 import { createConversationSchema } from './create-conversation-schema';
 import type { Actions, PageServerLoad } from './$types';
-
-type Api = ReturnType<typeof ApiClientFactory>;
 
 /** The half of a created workflow step `pollIdentity` reads. */
 type StepLike = { id: string; toolConfig?: unknown; previewToolConfig?: unknown };
@@ -258,27 +250,29 @@ export const actions: Actions = {
 		//    publish time: `metadata.org` because `/organizations` is 401 to the
 		//    participant app, `metadata.poll` because the Polis step is too, and
 		//    `metadata.cohosts` because a co-host is a permission grant and
-		//    `ListResourcePermissions` is 401 there as well.
+		//    `ListResourcePermissions` is 401 there as well. `org` and `cohosts`
+		//    are both written by `mirrorHosts` just below.
 		//
 		//    Failing here costs a Campaign that renders but sends participants to
 		//    whichever poll `regions.ts` guesses, so it is logged, not rolled back.
 		//    Going live mirrors the poll again, so a failure here is recoverable.
 		const poll = pollIdentity(polisStep, keyQuestion);
-		const org = await hostOrg(api, hostId);
-		if (poll || org || place) {
+		if (poll || place) {
 			try {
 				await api.PatchConversationMetadata(
-					{ ...(poll ? { poll } : {}), ...(org ? { org } : {}), ...(place ? { place } : {}) },
+					{ ...(poll ? { poll } : {}), ...(place ? { place } : {}) },
 					{ params: { conversation_id: conversationId } }
 				);
 			} catch (e) {
-				console.error('Mirroring poll / host / place into metadata failed', e);
+				console.error('Mirroring poll / place into metadata failed', e);
 			}
 		}
 
 		// Separate from the patch above because it reads the grants back rather
-		// than the form, so the list is whatever step 5 actually managed to grant.
-		await mirrorCoHosts(api, conversationId, hostId);
+		// than the form, so the list is whatever step 5 actually managed to
+		// grant. It writes `org` as well, which is why that is not in the patch
+		// above: both come off the same organization lookup.
+		await mirrorHosts(api, conversationId, hostId);
 
 		redirect(303, `/c/${conversationSlug}/overview`);
 	}
@@ -308,18 +302,4 @@ function pollIdentity(step: StepLike | null, keyQuestion: string): CampaignPoll 
 		...(polis.serverUrl ? { polisUrl: polis.serverUrl } : {}),
 		...(keyQuestion ? { question: keyQuestion } : {})
 	};
-}
-
-/** The owning Host, reduced to the `<org>` URL segment and its display name. */
-async function hostOrg(api: Api, hostId: string): Promise<CampaignOrg | null> {
-	if (!hostId) return null;
-
-	try {
-		const { name } = await api.GetOrganization({ params: { organization_id: hostId } });
-		const slug = toPlaceSlug(name ?? '');
-		return slug ? { slug, name } : null;
-	} catch (e) {
-		console.warn('GetOrganization failed while mirroring the Host', e);
-		return null;
-	}
 }

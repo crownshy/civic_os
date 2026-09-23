@@ -8,6 +8,7 @@ import {
 	readPlace,
 	readPoll
 } from './place';
+import { readCoHosts, readOrg } from '@civicos/shared/data/place';
 import type { RegionConfig } from './regions';
 
 const oregon = REGIONS.oregon as RegionConfig;
@@ -196,5 +197,53 @@ describe('readPoll', () => {
 		).toEqual({
 			polisId: 'abc'
 		});
+	});
+});
+
+describe('readOrg', () => {
+	it('carries the Host site when the mirror recorded one', () => {
+		expect(readOrg({ org: { slug: 'cocap', name: 'COCAP', url: 'https://cocap.us/' } })).toEqual({
+			slug: 'cocap',
+			name: 'COCAP',
+			url: 'https://cocap.us/'
+		});
+	});
+
+	it('leaves the url off rather than empty when the Host has no site', () => {
+		// Every Campaign mirrored before CampaignOrg.url existed reads this way,
+		// and the event pages drop the "Visit ..." clause instead of printing a
+		// dangling one.
+		expect(readOrg({ org: { slug: 'cocap', name: 'COCAP' } })).toEqual({
+			slug: 'cocap',
+			name: 'COCAP'
+		});
+		expect(readOrg({ org: { slug: 'cocap', name: 'COCAP', url: '  ' } })).toEqual({
+			slug: 'cocap',
+			name: 'COCAP'
+		});
+	});
+});
+
+describe('readCoHosts', () => {
+	it('reads the list admin mirrored, in the order it wrote it', () => {
+		expect(
+			readCoHosts({
+				cohosts: [{ name: 'COCAP', url: 'https://cocap.us/' }, { name: 'Citizens4Community' }]
+			})
+		).toEqual([{ name: 'COCAP', url: 'https://cocap.us/' }, { name: 'Citizens4Community' }]);
+	});
+
+	it('is empty for a Campaign nobody has mirrored', () => {
+		// Not the catch-all's partners: that is what credited The Bloom Project on
+		// every Campaign created in admin.
+		for (const metadata of [null, {}, { cohosts: null }, { cohosts: 'COCAP' }]) {
+			expect(readCoHosts(metadata)).toEqual([]);
+		}
+	});
+
+	it('drops an entry with no name rather than rendering a blank link', () => {
+		expect(readCoHosts({ cohosts: [{ url: 'https://example.org' }, { name: '  ' }, 7] })).toEqual(
+			[]
+		);
 	});
 });
