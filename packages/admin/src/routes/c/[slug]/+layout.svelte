@@ -38,6 +38,32 @@
 	} as const;
 	const blocker = $derived(blockerCopy[campaign.shareUrlBlocker ?? 'slug']);
 
+	// Repairing the mirror, not writing anything new: `pollIdentity` is built from
+	// the Polis step admin can read and merged over what is stored, so this can
+	// only ever add the poll id civicos was missing.
+	let repairing = $state(false);
+	let repairError = $state<string | null>(null);
+
+	async function repairPollMirror() {
+		const poll = campaign.pollIdentity;
+		if (!poll || repairing) return;
+
+		repairing = true;
+		repairError = null;
+		try {
+			await data.api.PatchConversationMetadata(
+				{ poll },
+				{ params: { conversation_id: campaign.id } }
+			);
+			await invalidate(`campaign:${page.params.slug}`);
+		} catch (e) {
+			console.error('Repairing the poll mirror failed', e);
+			repairError = e instanceof Error ? e.message : 'Could not write the mirror.';
+		} finally {
+			repairing = false;
+		}
+	}
+
 	const setLive = (next: boolean) =>
 		setCampaignLive({
 			api: data.api,
@@ -126,6 +152,33 @@
 			>
 				{blocker.text}
 			</a>
+		{/if}
+
+		<!-- Participants read `metadata.poll`, never the step, so a Campaign can
+		     look complete here and still serve a poll that cannot load. Said out
+		     loud, next to the link it breaks. -->
+		{#if campaign.pollBlocker === 'mirror'}
+			<button
+				type="button"
+				onclick={repairPollMirror}
+				disabled={repairing}
+				title={repairError ??
+					'This Campaign has a Polis poll, but participants cannot see which one: the copy they read was never written. Click to write it.'}
+				class="shrink-0 px-2 py-0.5 text-caption font-medium text-destructive underline"
+			>
+				{repairing
+					? 'Fixing…'
+					: repairError
+						? 'Could not fix poll link'
+						: 'Poll not visible to participants'}
+			</button>
+		{:else if campaign.pollBlocker === 'step'}
+			<span
+				class="shrink-0 px-2 py-0.5 text-caption font-medium text-destructive"
+				title="This Campaign has no Polis poll, so there is nothing for participants to vote in. It was not created here."
+			>
+				No poll
+			</span>
 		{/if}
 	</div>
 </header>

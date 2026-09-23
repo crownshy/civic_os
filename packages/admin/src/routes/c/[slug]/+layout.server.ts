@@ -175,7 +175,28 @@ export const load: LayoutServerLoad = async ({ params, parent, cookies, url, dep
 					...(polisStep.polisUrl ? { polisUrl: polisStep.polisUrl } : {}),
 					...(polisStep.topic ? { question: polisStep.topic } : {})
 				}
-			: readPoll(conversation?.metadata)
+			: readPoll(conversation?.metadata),
+		/**
+		 * Why participants cannot reach this Campaign's poll, or null when they
+		 * can.
+		 *
+		 * `metadata.poll.polisId` is the only copy of the poll id civicos can
+		 * read, because the Polis workflow step is 401 anonymously. So a Campaign
+		 * can hold a perfectly good step and still serve a poll that never loads,
+		 * and nothing about the step says so.
+		 *
+		 * `mirror` is that case, and it is repairable from the header: creation
+		 * writes the mirror but only logs a failure, and a step comhairle has not
+		 * finished provisioning reports no poll id to mirror in the first place.
+		 *
+		 * `step` means there is no Polis step either. Creation rolls that back, so
+		 * it only reaches a Campaign made outside admin.
+		 */
+		pollBlocker: readPoll(conversation?.metadata)?.polisId
+			? null
+			: polisStep?.polisId
+				? ('mirror' as const)
+				: ('step' as const)
 	};
 
 	return { campaign, conversation, textContent, defaultDemographics, customDemographics };

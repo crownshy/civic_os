@@ -220,6 +220,57 @@ export function shareUrlFor(campaign: Campaign, url: URL): string {
 	);
 }
 
+/** The poll a Campaign's Open Poll runs on, once something has named one. */
+export interface ResolvedPoll {
+	polisId: string;
+	/** Polis server, when this Campaign overrides the deployment default. */
+	polisUrl?: string;
+	/** The Key Question. Empty when nothing has recorded one. */
+	question: string;
+	/** The step a submitted statement's `statement_aux` row is filed under. */
+	workflowStepId?: string;
+}
+
+/**
+ * Which Polis conversation this Campaign's poll is, or null when nothing names
+ * one.
+ *
+ * `metadata.poll` is the only copy civicos can read, because the Polis workflow
+ * step is 401 anonymously, so admin mirrors it on creation and on going live.
+ * `regions.ts` stands behind that only for a legacy region, where the region IS
+ * the Campaign.
+ *
+ * **Null is an answer, not a reason to guess.** This used to fall through to
+ * the participant's zip code and then to a deployment-wide `PUBLIC_POLIS_ID`,
+ * neither of which can name the Campaign in the URL, so both could only put
+ * someone into a poll belonging to a different Campaign (#422, #421). The
+ * caller is expected to refuse rather than serve a poll that is not this one.
+ */
+export function pollFor(
+	campaign: Pick<Campaign, 'poll' | 'isLegacyRegion'>,
+	region: RegionConfig
+): ResolvedPoll | null {
+	const stored = campaign.poll;
+	if (stored?.polisId) {
+		return {
+			polisId: stored.polisId,
+			...(stored.polisUrl ? { polisUrl: stored.polisUrl } : {}),
+			question: stored.question ?? '',
+			...(stored.workflowStepId ? { workflowStepId: stored.workflowStepId } : {})
+		};
+	}
+
+	if (campaign.isLegacyRegion && region.polisId) {
+		return {
+			polisId: region.polisId,
+			question: region.question,
+			workflowStepId: region.polis_workflow_step_id
+		};
+	}
+
+	return null;
+}
+
 /**
  * The geography to label participant chrome with.
  *

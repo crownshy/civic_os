@@ -134,6 +134,22 @@ tracking the consequences of two (their issue 799, on vote-progress gating keyed
 by poll id rather than step). If that becomes real, the assumption breaks here
 first.
 
+**A Campaign is servable only once its poll is mirrored.** Having the step is not
+the same as being able to serve it. `GET /conversation/:id/workflow_step` is 401
+to the anonymous participant app, so civicos never reads the step: it reads
+`metadata.poll.polisId`, which admin writes on creation and again on going live.
+A Campaign with a working step and no mirror is reachable, renders its homepage,
+and cannot be voted in.
+
+Neither write is guaranteed. Creation logs a mirror failure rather than rolling
+back, and a step comhairle has not finished provisioning reports no poll id to
+mirror at all. So the invariant is stated and checked rather than assumed: admin
+shows `campaign.pollBlocker` in the Campaign header with a one-click repair, and
+civicos answers 503 from `/contribute` instead of opening a poll that is not
+this Campaign's. `pollFor` in `campaign.ts` is the single place the poll
+resolves, so the guard and the voting screen cannot disagree about whether there
+is one.
+
 ### Host
 An **Organization** that stewards Campaigns in its community. Modeled in comhairle
 as `Organization` (`name`, `description`, `mission`, `contact_email`, `external_url`,

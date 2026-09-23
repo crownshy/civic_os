@@ -4,6 +4,7 @@ import {
 	campaignCandidates,
 	legacyRegionForSlug,
 	placeNameFor,
+	pollFor,
 	regionForCampaign,
 	resolveCampaign
 } from './campaign';
@@ -232,5 +233,54 @@ describe('placeNameFor', () => {
 	it('never answers a hardcoded state for a Campaign it cannot place', () => {
 		expect(placeNameFor(null, GENERIC_REGION)).toBe(GENERIC_REGION.stateName);
 		expect(placeNameFor(undefined, GENERIC_REGION)).not.toBe('Utah');
+	});
+});
+
+describe('pollFor', () => {
+	const mirrored = {
+		...stored,
+		metadata: {
+			poll: { polisId: '2y2akzkmbb', question: 'Key question?', workflowStepId: 'step-1' }
+		}
+	};
+
+	it('takes the poll admin mirrored into the metadata', () => {
+		const campaign = resolveCampaign(mirrored, GENERIC_REGION);
+
+		expect(pollFor(campaign, GENERIC_REGION)).toEqual({
+			polisId: '2y2akzkmbb',
+			question: 'Key question?',
+			workflowStepId: 'step-1'
+		});
+	});
+
+	it('refuses to guess for a Campaign whose poll was never mirrored', () => {
+		// The Polis step is 401 anonymously, so an unmirrored Campaign has nothing
+		// naming its poll. This used to fall through to the participant's zip code
+		// and then to PUBLIC_POLIS_ID, which could only open a different
+		// Campaign's poll (#422, #421). `/contribute` answers 503 on this.
+		const campaign = resolveCampaign({ ...stored, metadata: {} }, GENERIC_REGION);
+
+		expect(pollFor(campaign, GENERIC_REGION)).toBeNull();
+	});
+
+	it('falls back to the region only where the region IS the Campaign', () => {
+		const legacy = resolveCampaign(null, oregon);
+
+		expect(pollFor(legacy, oregon)).toEqual({
+			polisId: oregon.polisId,
+			question: oregon.question,
+			workflowStepId: oregon.polis_workflow_step_id
+		});
+	});
+
+	it('prefers the mirror over the region for a legacy Campaign', () => {
+		// Utah and Oregon have both. The stored value is the one admin maintains.
+		const campaign = resolveCampaign(
+			{ id: oregon.conversationId, title: 'Oregon', metadata: { poll: { polisId: 'stored-id' } } },
+			oregon
+		);
+
+		expect(pollFor(campaign, oregon)?.polisId).toBe('stored-id');
 	});
 });

@@ -20,7 +20,7 @@
 		type DemographicKey,
 		type Participation
 	} from '$lib/config/participation';
-	import { placeNameFor } from '$lib/config/campaign';
+	import { placeNameFor, pollFor } from '$lib/config/campaign';
 	import type { RegionConfig } from '$lib/config/regions';
 	import PolisApi from '$lib/services/polis-api.svelte';
 	import { session } from '$lib/services/session.svelte';
@@ -45,29 +45,14 @@
 
 	const campaign = page.data.campaign;
 
-	// Which Polis conversation this poll is.
-	//
-	// The Campaign says: admin mirrors the Polis step's `poll_id` into
-	// `metadata.poll` because the step itself is 401 anonymously. That is what
-	// lets a Campaign created in admin be served at all.
-	//
-	// `regions.ts` stands behind it only for a legacy region, where the region IS
-	// the Campaign. This used to be keyed by the participant's zip code, which
-	// meant a Utah zip put someone in Utah's poll whichever Campaign they had
-	// opened (#422), and behind that sat a deployment-wide `PUBLIC_POLIS_ID` that
-	// would have sent them somewhere else again (#421). Neither can name the
-	// Campaign in the URL, so neither is an answer to which poll this is.
-	const fallback = campaign.isLegacyRegion ? region : null;
-	const polisId = campaign?.poll?.polisId || fallback?.polisId || '';
-	const polisUrl = campaign?.poll?.polisUrl || undefined;
-	const question = campaign?.poll?.question || fallback?.question || '';
-
-	// The step a submitted statement's aux row is filed under. Taken from whichever
-	// source picked `polisId`, so a Campaign whose mirror predates this field never
-	// files its statements under the `regions.ts` poll's step.
-	const polisWorkflowStepId = campaign?.poll?.polisId
-		? campaign.poll.workflowStepId
-		: (fallback?.polis_workflow_step_id ?? undefined);
+	// Which Polis conversation this poll is, resolved by `pollFor` so this and the
+	// `load` that refuses to render without one cannot disagree. Non-null here:
+	// the load has already answered 503 otherwise.
+	const poll = pollFor(campaign, region)!;
+	const polisId = poll.polisId;
+	const polisUrl = poll.polisUrl;
+	const question = poll.question;
+	const polisWorkflowStepId = poll.workflowStepId;
 
 	// The geography the chrome labels itself with. The Campaign's Place, not the
 	// zip's region: the URL says which Campaign this is (#423).
