@@ -238,6 +238,15 @@
 	}
 
 	/**
+	 * What each nullable text field is called in the `UpdateConversation` body,
+	 * which is snake_case even though the Conversation reads back camelCase.
+	 */
+	const LINK_KEYS = {
+		faqs: 'faqs',
+		thankYouMessage: 'thank_you_message'
+	} as const;
+
+	/**
 	 * Write one of the nullable TextContent fields, creating the record on the
 	 * first save.
 	 *
@@ -247,6 +256,11 @@
 	 * create-then-link. `UpdateConversation` takes the TextContent *id* here, not
 	 * prose, and 422s on a plain string the same way title and description do
 	 * (#391), which is why the link step sends `created.id`.
+	 *
+	 * The link step keys by `LINK_KEYS`, not by the field name. That request's
+	 * body is snake_case while the Conversation it comes back on is camelCase,
+	 * and `faqs` is the one field spelled the same either way, so sending the
+	 * field name worked for `faqs` and 422'd for `thankYouMessage`.
 	 */
 	async function writeTextContent(field: 'faqs' | 'thankYouMessage', content: string) {
 		const target = data.textContent[field];
@@ -266,7 +280,7 @@
 			primary_locale: conversation?.primaryLocale ?? 'en'
 		});
 		await data.api.UpdateConversation(
-			{ [field]: created.id },
+			{ [LINK_KEYS[field]]: created.id },
 			{ params: { conversation_id: campaign.id } }
 		);
 	}
