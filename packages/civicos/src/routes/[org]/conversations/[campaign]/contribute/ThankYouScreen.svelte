@@ -13,7 +13,7 @@
 	import { page } from '$app/state';
 	import { session } from '$lib/services/session.svelte';
 	import { ArrowRight, Check } from 'lucide-svelte';
-	import { sanitizeHostHtml } from '@civicos/shared/sanitize';
+	import { END_CTA_COPY } from '$lib/config/landing-copy';
 	import { HOST_COPY_PROSE_CLASS, renderHostCopy } from '$lib/config/host-copy';
 	import type { AskToggles } from '$lib/config/participation';
 	import type { RegionConfig } from '$lib/config/regions';
@@ -114,7 +114,7 @@
 					<ArrowRight class="size-5 text-destructive opacity-80" />
 				</div>
 				<p class="font-sans text-sm leading-4 font-medium text-secondary/80">
-					{region.endCtaJoinDescription}
+					{END_CTA_COPY.join}
 				</p>
 			</a>
 
@@ -164,7 +164,7 @@
 						{/if}
 					</div>
 					<p class="font-sans text-sm leading-4 font-medium text-secondary/80">
-						{region.endCtaShareDescription}
+						{END_CTA_COPY.share}
 					</p>
 				</button>
 			{/if}
@@ -201,7 +201,6 @@
 			</h2>
 			<div class="mt-2 text-foreground [&_a]:font-bold {HOST_COPY_PROSE_CLASS}">
 				{@html renderHostCopy(whatsNext)}
-				<p class="mt-4">{@html sanitizeHostHtml(region.goDeeper)}</p>
 			</div>
 		</div>
 

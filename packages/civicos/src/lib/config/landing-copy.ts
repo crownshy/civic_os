@@ -63,3 +63,27 @@ export const FOOTER_LINKS: FooterLink[] = [
 		external: true
 	}
 ];
+
+/**
+ * Subtitles on the end page's CTA cards.
+ *
+ * Fixed, not per-Campaign. These were `regions.ts`'s `endCtaJoinDescription`
+ * and `endCtaShareDescription`, which meant a Campaign created in admin got the
+ * USA catch-all's wording and no Host could change it anyway. Both describe the
+ * mechanic rather than the place, so there is nothing to configure.
+ */
+export const END_CTA_COPY = {
+	join: 'Community conversations are taking place in person and online.',
+	share: 'Anyone in your community is welcome to participate.'
+} as const;
+
+/**
+ * The line under the hero title.
+ *
+ * Fixed, not per-Campaign. It was `regions.ts`'s `heroBlurb`, which named a
+ * state and a demonym, so every Campaign created in admin invited people to
+ * weigh in on how AI is changing America. The Campaign title above it already
+ * says what this is; this says what a participant is being asked to do.
+ */
+export const HERO_BLURB =
+	'Share your thoughts with others in your community who are weighing in on this question.';

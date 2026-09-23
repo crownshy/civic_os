@@ -13,9 +13,14 @@
 	import { getRegionByZipcode } from '$lib/config/regions';
 	import type { RegionConfig } from '$lib/config/regions';
 	import { placeNameFor, type Campaign } from '$lib/config/campaign';
-	import { OPEN_POLL_EXPLAINER, FOOTER_LINKS, NAV_SECTIONS } from '$lib/config/landing-copy';
+	import {
+		HERO_BLURB,
+		OPEN_POLL_EXPLAINER,
+		FOOTER_LINKS,
+		NAV_SECTIONS
+	} from '$lib/config/landing-copy';
 	import { trackEvent } from '@lukulent/svelte-umami';
-	import { safeHref, sanitizeHostHtml } from '@civicos/shared/sanitize';
+	import { safeHref } from '@civicos/shared/sanitize';
 	import { HOST_COPY_PROSE_CLASS, renderHostCopy, toContextSections } from '$lib/config/host-copy';
 	import { listSeparator } from '$lib/utils/list';
 	import { AppShell } from '$lib/components/layout';
@@ -88,7 +93,6 @@
 	let leaving = $state(false);
 	let zipFlash = $state(false);
 	let hasAgreedToTos = $derived(session.hasAgreedToTos);
-	let showHostMessage = $state(false);
 	let showAboutMessage = $state(false);
 	let showTermsMessage = $state(false);
 
@@ -263,7 +267,7 @@
 				<p
 					class="mt-6 text-center font-sans text-base leading-5 font-medium md:text-lg md:leading-6 [&_a]:text-destructive"
 				>
-					{@html sanitizeHostHtml(region.heroBlurb)}
+					{HERO_BLURB} <a href="#{contextSections[0]?.id ?? 'how-it-works'}">Learn more →</a>
 				</p>
 
 				<div class="mt-10 flex w-full max-w-sm flex-col items-center">
@@ -483,28 +487,12 @@
 	</div>
 {/if}
 
-<!-- Dialogs preserved from previous /landing -->
-<Dialog bind:open={showHostMessage} title="A Message from Your Hosts" buttonText="GO BACK">
-	<div class="px-7 pt-6">
-		{#each region.hostMessage as paragraph, i (i)}
-			<p
-				class="mt-4 font-sans text-lg leading-7 font-medium first:mt-0 [&_a]:text-destructive [&_a]:underline [&_ul]:list-inside [&_ul]:list-disc"
-			>
-				{@html sanitizeHostHtml(paragraph)}
-			</p>
-		{/each}
-	</div>
-</Dialog>
-
+<!-- The Host's own Context copy, the same `Conversation.description` the
+	sections above render. It used to be `regions.ts`'s `aboutConversation`,
+	which described The Bloom Project on every Campaign created in admin. -->
 <Dialog bind:open={showAboutMessage} title="About This Conversation" buttonText="GOT IT">
-	<div class="px-7 pt-6">
-		{#each region.aboutConversation as paragraph, i (i)}
-			<p
-				class="mt-4 font-sans text-lg leading-7 font-medium first:mt-0 [&_a]:text-destructive [&_a]:underline"
-			>
-				{@html sanitizeHostHtml(paragraph)}
-			</p>
-		{/each}
+	<div class="px-7 pt-6 {HOST_COPY_PROSE_CLASS}">
+		{@html renderHostCopy(hostCopy.context)}
 	</div>
 </Dialog>
 
