@@ -1,6 +1,5 @@
 import type { ApiClient } from '@crownshy/api-client/api';
 import type { ParticipantSession } from './participant';
-import { config } from './api';
 import {
 	clearCampaigns,
 	loadAccount,
@@ -46,11 +45,14 @@ class Session {
 	registeredEventIds = $state<string[]>([]);
 
 	/**
-	 * Which Campaign the fields above that belong to a poll are currently
-	 * about. Seeded from the env for the single-Conversation deployments that
-	 * predate stored Campaigns, then set from the route by `useCampaign`.
+	 * Which Campaign the fields above that belong to a poll are currently about.
+	 *
+	 * Empty until `useCampaign` is called from the `[campaign]` layout load,
+	 * which runs before any component below it. It used to be seeded from
+	 * `PUBLIC_CONVERSATION_ID`, for deployments that served one Conversation and
+	 * predate the URL naming it (#421).
 	 */
-	#conversationId = $state(config.conversationId);
+	#conversationId = $state('');
 
 	#api: ApiClient | null = null;
 
