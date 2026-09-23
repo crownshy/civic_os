@@ -59,9 +59,10 @@ Run per-package from `packages/<name>`, or use the root scripts:
   tsconfig `exclude` does not stop TS diagnosing an imported file. It goes when
   api-client is regenerated against zod 4. Anything above two is yours.
 - `pnpm --filter civic-os lint` / `pnpm --filter @civicos/admin lint` prettier check +
-  eslint. `pnpm run lint` runs all three. `civicos` and `admin` are currently red against
-  a backlog of pre-existing violations (see Follow-ups below), so read the diff, not just
-  the exit code. `@civicos/report` is green and should stay that way.
+  eslint. `pnpm run lint` runs all four, `@civicos/shared` included. All four are green;
+  keep them that way. Where a rule is suppressed the disable comment carries the reason
+  (external URLs the `resolve()` rule cannot vet, `{@html}` that `sanitizeHostHtml`
+  already cleaned), so read that before adding another one.
 - `pnpm --filter civic-os test:unit` / `pnpm --filter @civicos/admin test:unit` Vitest.
   `pnpm --filter @civicos/report test:e2e` runs the report's Playwright suite (port 4174);
   it is the only package with e2e, and it does not run in CI.
@@ -126,14 +127,10 @@ focused PR; do not let them silently grow:
 - `sveltekit-superforms` + `formsnap` are installed and the shared `ui/form` primitives
   exist, but app forms do not use them yet. Migrate forms onto superforms as you touch
   them.
-- `admin` and `civicos` have lint configured but neither passes yet. `admin` is nearly
-  there: 2 files failing `prettier --check` (`demographics.ts` and
-  `EditGoalsModal.svelte`) and 2 eslint errors, both `no-unused-vars`. `civicos` is
-  clean on `prettier` and down to 25 eslint errors, all of them decisions rather than
-  cleanups: 12 `no-navigation-without-resolve`, 8 `no-unused-vars` that are each the
-  visible half of a filed bug (#410, #411, #412, #413) or a countdown whose markup
-  is commented out, and 5 `no-at-html-tags` (#409). Read the reason before
-  deleting the symptom. Pay them down in focused PRs rather than mixing fixes into
-  feature work.
+- `admin` has four `svelte-check` errors in
+  `routes/c/[slug]/open-poll/participants/+page.svelte`, where `conversation.metadata`
+  reaches a typed parameter as `unknown`. They are not lint errors and they predate the
+  lint cleanup, so `admin`'s `check` floor is six (those four plus the two api-client
+  ones), not two.
 - `load` functions do not call `depends()` for explicit invalidation keys. Add them when
   you touch a `load` that needs targeted invalidation.
