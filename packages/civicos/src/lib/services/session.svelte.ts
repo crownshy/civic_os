@@ -413,6 +413,25 @@ class Session {
 			await this.api.UpsertUserProfile(body);
 			return true;
 		} catch (e) {
+			// Comhairle 404s the first profile write a user ever makes, with
+			// `demographics_question not found`, and commits the profile row
+			// anyway. The byte-identical request then returns 200, because the
+			// update path does not resolve the question the create path trips
+			// over. Repro: POST /auth/signup_guest, then the same PUT twice.
+			//
+			// Retried rather than reported, because `join` throws on a false here
+			// and every participant's first join would be told their zip failed.
+			// Delete this once comhairle stops 404ing the create path.
+			if (httpStatusOf(e) === 404) {
+				try {
+					await this.api.UpsertUserProfile(body);
+					return true;
+				} catch (retried) {
+					console.error('[Session] Failed to save profile, after a retry:', retried);
+					return false;
+				}
+			}
+
 			console.error('[Session] Failed to save profile:', e);
 			return false;
 		}
