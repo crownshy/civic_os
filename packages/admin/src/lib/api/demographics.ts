@@ -1,5 +1,9 @@
 import type { createApiClient } from '@crownshy/api-client/client';
-import { DEFAULT_DEMOGRAPHIC_QUESTIONS } from '@civicos/shared/data/demographics';
+import {
+	DEFAULT_DEMOGRAPHIC_QUESTIONS,
+	hasBucketOptions,
+	type DemographicQuestionData
+} from '@civicos/shared/data/demographics';
 
 type Api = ReturnType<typeof createApiClient>;
 
@@ -16,7 +20,50 @@ export async function ensureDefaultDemographicQuestions(api: Api) {
 		missing.map((question) => api.CreateDemographicsQuestion(question))
 	);
 
-	return [...questions, ...created];
+	return restoreDefaultOptions(api, [...questions, ...created]);
+}
+
+/**
+ * Put the answer options back on a seeded default that came back without any.
+ *
+ * Only `age` arrives from comhairle's migrations carrying a `bucketConfig`, so
+ * Setup listed Ethnicity, Gender and Political Party with an empty Options
+ * column. The options are not admin's to invent: they are the list civicos
+ * offers on About You, and `DEFAULT_DEMOGRAPHIC_QUESTIONS` is the checked-in
+ * copy of exactly that list, which is why writing it back is a repair and not
+ * a policy decision.
+ *
+ * The write is best effort and the local options are returned either way. A
+ * card showing no options is the bug being fixed here, and a PATCH that did not
+ * land is no reason to keep showing one.
+ */
+async function restoreDefaultOptions(
+	api: Api,
+	questions: DemographicQuestionData[]
+): Promise<DemographicQuestionData[]> {
+	const repairs = DEFAULT_DEMOGRAPHIC_QUESTIONS.filter((seed) =>
+		questions.some((question) => question.slug === seed.slug && !hasBucketOptions(question))
+	);
+	if (repairs.length === 0) return questions;
+
+	await Promise.all(
+		repairs.map((seed) =>
+			api
+				.UpdateDemographicsQuestion(
+					{ bucketConfig: seed.bucketConfig },
+					{ params: { question_slug: seed.slug } }
+				)
+				.catch((e) => {
+					console.warn(`Could not restore options on "${seed.slug}"`, e);
+				})
+		)
+	);
+
+	const bySlug = new Map(repairs.map((seed) => [seed.slug, seed.bucketConfig]));
+
+	return questions.map((question) =>
+		bySlug.has(question.slug) ? { ...question, bucketConfig: bySlug.get(question.slug) } : question
+	);
 }
 
 /** Enable every available migration default for a newly created Conversation. */

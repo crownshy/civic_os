@@ -31,7 +31,7 @@ export const DEFAULT_DEMOGRAPHIC_QUESTIONS = [
 				{ value: '35-44', label: '35-44' },
 				{ value: '45-54', label: '45-54' },
 				{ value: '55-64', label: '55-64' },
-				{ value: 'Above 65', label: 'Above 65' }
+				{ value: '65+', label: '65+' }
 			]
 		}
 	},
@@ -85,6 +85,16 @@ export const DEFAULT_DEMOGRAPHIC_SLUGS = DEFAULT_DEMOGRAPHIC_QUESTIONS.map(
 	(question) => question.slug
 );
 
+/**
+ * Question slugs a Host does not own, and so may not edit, remove or reuse.
+ *
+ * The four defaults, plus `zipcode`. Comhairle seeds that one alongside them,
+ * but civicos collects the zip at join rather than on About You, so a switch
+ * over it on Setup governs nothing, and the Remove button beside it deletes the
+ * question every participant's zip is filed against.
+ */
+export const RESERVED_DEMOGRAPHIC_SLUGS = [...DEFAULT_DEMOGRAPHIC_SLUGS, 'zipcode'];
+
 export type DemographicKey = (typeof DEMOGRAPHIC_KEYS)[number];
 
 export type DemographicToggles = Record<DemographicKey, boolean>;
@@ -106,9 +116,17 @@ export interface DemographicCategory {
  * two lists drifted apart in the first place: a renamed bucket that missed the
  * map saved `undefined` for everyone in it (#426).
  *
- * Bucket midpoints, except `Above 65`, which is open-ended and has none: 70
- * is a stand-in, and skews younger than the 74 / 85 the two old top buckets
+ * Bucket midpoints, except `65+`, which is open-ended and has none: 70 is a
+ * stand-in, and skews younger than the 74 / 85 the two old top buckets
  * carried. Rows saved before this change keep their old numbers.
+ *
+ * The labels are comhairle's, not ours. It buckets `age` itself for the
+ * participation report, so its `65+` is what admin's representation goals key
+ * off and what the report prints; civicos saying `Above 65` on About You meant
+ * the same bucket had two names depending on which screen you were looking at.
+ * Renaming is safe because the label and the number it stores are one row: the
+ * pairing is what #426 put here so a rename cannot leave a bucket saving
+ * `undefined`.
  */
 const AGE_BUCKETS = [
 	{ label: 'Under 18', age: 16 },
@@ -117,7 +135,7 @@ const AGE_BUCKETS = [
 	{ label: '35-44', age: 39 },
 	{ label: '45-54', age: 49 },
 	{ label: '55-64', age: 59 },
-	{ label: 'Above 65', age: 70 }
+	{ label: '65+', age: 70 }
 ] as const;
 
 /** The number to store for a picked age bucket, or undefined for any other label. */
@@ -197,6 +215,28 @@ export interface DemographicQuestionData {
 		| null;
 }
 
+/**
+ * The answer options a question offers, or an empty list when it carries none.
+ *
+ * A question with no `bucketConfig` is not a malformed one: comhairle only
+ * bucket-configures `age`, so the other seeded defaults arrive bare and admin
+ * restores them. Reading the two shapes in one place keeps that repair and the
+ * Setup card agreeing on what "has no options" means.
+ */
+export function bucketOptions(question: DemographicQuestionData): string[] {
+	const config = question.bucketConfig;
+	if (!config) return [];
+
+	return config.type === 'string'
+		? config.options.map((option) => option.label)
+		: config.buckets.map((bucket) => bucket.label);
+}
+
+/** Whether a question offers anything to pick from. */
+export function hasBucketOptions(question: DemographicQuestionData): boolean {
+	return bucketOptions(question).length > 0;
+}
+
 /** The generated API fields that enable a question for a Conversation. */
 export interface ConversationDemographicData {
 	conversationId: string;
@@ -221,10 +261,7 @@ export function demographicsFromBackend(
 	return questions.map((question) => ({
 		slug: question.slug,
 		displayName: question.displayName,
-		options:
-			question.bucketConfig?.type === 'string'
-				? question.bucketConfig.options.map((option) => option.label)
-				: (question.bucketConfig?.buckets.map((bucket) => bucket.label) ?? []),
+		options: bucketOptions(question),
 		enabled: enabledSlugs.has(question.slug)
 	}));
 }
@@ -235,14 +272,14 @@ export function customDemographicsFromBackend(
 	relationships: ConversationDemographicData[]
 ): CustomDemographicCategory[] {
 	return demographicsFromBackend(questions, relationships).filter(
-		(question) => !(DEFAULT_DEMOGRAPHIC_SLUGS as readonly string[]).includes(question.slug)
+		(question) => !(RESERVED_DEMOGRAPHIC_SLUGS as readonly string[]).includes(question.slug)
 	);
 }
 
 /** Reserved keys a new category cannot collide with. */
 export function isKeyTaken(slug: string, existing: CustomDemographicCategory[]): boolean {
 	return (
-		(DEFAULT_DEMOGRAPHIC_SLUGS as readonly string[]).includes(slug) ||
+		(RESERVED_DEMOGRAPHIC_SLUGS as readonly string[]).includes(slug) ||
 		existing.some((category) => category.slug === slug)
 	);
 }

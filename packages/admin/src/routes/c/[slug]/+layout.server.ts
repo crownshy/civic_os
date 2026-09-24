@@ -7,6 +7,7 @@ import { hasLivePoll, polisConfigFor } from '$lib/polis-step';
 import { ensureDefaultDemographicQuestions } from '$lib/api/demographics';
 import {
 	DEFAULT_DEMOGRAPHIC_SLUGS,
+	RESERVED_DEMOGRAPHIC_SLUGS,
 	demographicsFromBackend
 } from '@civicos/shared/data/demographics';
 import { readPoll } from '@civicos/shared/data/place';
@@ -89,8 +90,10 @@ export const load: LayoutServerLoad = async ({ params, parent, cookies, url, dep
 	const defaultDemographics = demographicCategories.filter((question) =>
 		(DEFAULT_DEMOGRAPHIC_SLUGS as readonly string[]).includes(question.slug)
 	);
+	// Reserved, not default: `zipcode` is seeded like a category but collected at
+	// join, so it is neither a Host switch nor theirs to delete.
 	const customDemographics = demographicCategories.filter(
-		(question) => !(DEFAULT_DEMOGRAPHIC_SLUGS as readonly string[]).includes(question.slug)
+		(question) => !(RESERVED_DEMOGRAPHIC_SLUGS as readonly string[]).includes(question.slug)
 	);
 
 	// Pull out the { id, locale } we POST title/description edits against. Null
