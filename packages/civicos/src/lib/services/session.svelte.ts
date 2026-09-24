@@ -271,12 +271,12 @@ class Session {
 			// participation number comes from.
 			await this.registerOnWorkflow();
 
-			// 3. Save the zip. It has to actually land: the server side gate on
-			// `/contribute` reads it back out of demographics, so a zip that only
-			// ever existed in this tab would bounce them straight back here.
-			if (zipCode && !(await this.saveProfile({ zipcode: zipCode }))) {
-				throw new Error('Could not save your zip code');
-			}
+			// 3. Save the zip, best effort. TEMPORARY: comhairle 404s the first
+			// profile write because there is no `zipcode` demographics question to
+			// file the answer under, so this fails for everyone and the throw it
+			// used to do ended every first join. Put the throw back, and the
+			// comment about the zip having to land, once that question exists.
+			if (zipCode) await this.saveProfile({ zipcode: zipCode });
 
 			// 4. Register email if provided (awaited so it completes before navigation)
 			if (email) {

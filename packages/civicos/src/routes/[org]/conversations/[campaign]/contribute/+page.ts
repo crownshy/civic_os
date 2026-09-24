@@ -19,7 +19,11 @@ import type { PageLoad } from './$types';
 export const load: PageLoad = async ({ params, parent }) => {
 	const { participant, participantResolved, campaign, region } = await parent();
 
-	if (participantResolved && !participant?.zipCode) {
+	// TEMPORARY: joining is the gate, not the stored zip. The zip cannot persist
+	// while comhairle has no `zipcode` demographics question, so reading it back
+	// bounced every participant off this page and into a loop with the landing
+	// page. Restore `!participant?.zipCode` once that question exists.
+	if (participantResolved && !participant) {
 		redirect(307, campaignPath(params.campaign, params.org));
 	}
 
