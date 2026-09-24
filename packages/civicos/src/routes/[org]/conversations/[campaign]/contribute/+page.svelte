@@ -305,7 +305,9 @@
 	}
 </script>
 
-<AppShell border={false}>
+<!-- The end screen is a page rather than a card: the landing page it mirrors runs
+	its footer edge to edge, so the shell lets go of its width for that one screen. -->
+<AppShell border={false} class={screen === 'thank-you' ? 'max-w-none' : undefined}>
 	{#if screen === 'loading'}
 		<!-- Most returning participants land on voting, and the landing page already
 			showed them this skeleton, so a text splash here would flash in between. -->
