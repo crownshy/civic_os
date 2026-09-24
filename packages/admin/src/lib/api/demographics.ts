@@ -7,8 +7,14 @@ import {
 
 type Api = ReturnType<typeof createApiClient>;
 
+/** What reading and repairing the question definitions needs. */
+type QuestionsApi = Pick<
+	Api,
+	'GetDemographicsQuestions' | 'CreateDemographicsQuestion' | 'UpdateDemographicsQuestion'
+>;
+
 /** Return all questions after recreating any missing migration defaults. */
-export async function ensureDefaultDemographicQuestions(api: Api) {
+export async function ensureDefaultDemographicQuestions(api: QuestionsApi) {
 	const questions = await api
 		.GetDemographicsQuestions({ queries: { limit: 200 } })
 		.then((result) => result.records);
@@ -38,7 +44,7 @@ export async function ensureDefaultDemographicQuestions(api: Api) {
  * land is no reason to keep showing one.
  */
 async function restoreDefaultOptions(
-	api: Api,
+	api: QuestionsApi,
 	questions: DemographicQuestionData[]
 ): Promise<DemographicQuestionData[]> {
 	const repairs = DEFAULT_DEMOGRAPHIC_QUESTIONS.filter((seed) =>
