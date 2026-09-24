@@ -390,17 +390,24 @@ class Session {
 		consented?: boolean;
 		politicalParty?: string;
 	}): Promise<boolean> {
+		// Only the fields this call has a value for. `UpsertUserProfileRequest` is
+		// fully optional and the upsert merges, so an omitted field keeps what is
+		// stored. Sending an explicit null does not clear it either, and comhairle
+		// resolves a demographics question for every key in the body, so a null
+		// for an unanswered category 404s the whole request with
+		// `demographics_question not found` and joining fails on the zip.
+		//
+		// The zip rides on every call regardless: the About You screen sends
+		// demographics and no zip, and the server side gate on `/contribute`
+		// reads the stored zip back.
+		const zipcode = data.zipcode || this.zipCode;
 		const body = {
-			// The upsert replaces the whole profile, so an omitted field is a
-			// delete. The About You screen sends demographics and no zip, and the
-			// server side gate on `/contribute` reads the stored zip, so dropping
-			// it here would lock the participant out of voting.
-			zipcode: data.zipcode || this.zipCode || null,
-			age: data.age ?? null,
-			ethnicity: data.ethnicity ?? null,
-			gender: data.gender ?? null,
 			consented: data.consented ?? true,
-			politicalParty: data.politicalParty ?? null
+			...(zipcode ? { zipcode } : {}),
+			...(data.age !== undefined ? { age: data.age } : {}),
+			...(data.ethnicity ? { ethnicity: data.ethnicity } : {}),
+			...(data.gender ? { gender: data.gender } : {}),
+			...(data.politicalParty ? { politicalParty: data.politicalParty } : {})
 		};
 		try {
 			await this.api.UpsertUserProfile(body);
