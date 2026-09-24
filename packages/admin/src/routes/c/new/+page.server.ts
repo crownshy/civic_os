@@ -1,15 +1,15 @@
 import { redirect } from '@sveltejs/kit';
-import { superValidate, message } from 'sveltekit-superforms';
+import { superValidate, message, setError } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { createApiClient } from '$lib/api/client';
 import { placeFromName, type CampaignPoll } from '@civicos/shared/data/place';
 import { rescopedSlug } from '$lib/config/place';
-import { describeApiFailure } from '$lib/api/describe-failure';
+import { apiStatus, describeApiFailure } from '$lib/api/describe-failure';
 import { enableDefaultDemographics } from '$lib/api/demographics';
 import { polisConfigFor } from '$lib/polis-step';
 import { COHOST_ROLE, CONVERSATION_RESOURCE } from '$lib/permissions';
 import { mirrorHosts } from '$lib/cohost-mirror';
-import { participantBase } from '$lib/conversations';
+import { participantBase, slugTakenMessage } from '$lib/conversations';
 import type { PickerOrg } from '$lib/components/setup/AddCoHostsDialog.svelte';
 import type { UserOrganizationAccess } from '@crownshy/api-client/api';
 import { createConversationSchema } from './create-conversation-schema';
@@ -122,6 +122,17 @@ export const actions: Actions = {
 			});
 			conversationId = conversation.id;
 		} catch (e) {
+			// Comhairle uniques the slug, not the title, and answers 409 when it is
+			// taken. The Host typed a title and let the slug follow it, so the fix is
+			// on the slug field: say so there rather than reporting a status.
+			if (apiStatus(e) === 409) {
+				return setError(
+					form,
+					'slug',
+					slugTakenMessage(conversationSlug, conversationSlug === slug ? undefined : place?.name),
+					{ status: 400 }
+				);
+			}
 			console.error('CreateConversation failed', e);
 			return fail(`Could not create the conversation: ${describeApiFailure(e)}`);
 		}

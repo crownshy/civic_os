@@ -1,4 +1,17 @@
 /**
+ * The HTTP status a failed api-client call came back with, when it got that far.
+ *
+ * Undefined for the failures that never reached a status: a schema mismatch, a
+ * network error. Callers that special-case one status (409 on a taken slug) need
+ * to tell those apart from "some other status", which a truthiness check does
+ * not.
+ */
+export function apiStatus(error: unknown): number | undefined {
+	const status = (error as { response?: { status?: number } })?.response?.status;
+	return typeof status === 'number' ? status : undefined;
+}
+
+/**
  * Turn a failed api-client call into one sentence safe to show in the UI.
  *
  * A failure here is almost always one of two things, and they need opposite
@@ -12,13 +25,12 @@
  */
 export function describeApiFailure(error: unknown): string {
 	const err = error as {
-		response?: { status?: number };
 		cause?: { issues?: unknown[] };
 		issues?: unknown[];
 		code?: string;
 	};
 
-	const status = err?.response?.status;
+	const status = apiStatus(error);
 	if (typeof status === 'number') {
 		if (status === 401 || status === 403) {
 			return `the server rejected the request (${status}). Your session may have expired, or this account lacks access.`;

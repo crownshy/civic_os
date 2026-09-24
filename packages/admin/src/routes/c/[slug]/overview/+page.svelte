@@ -24,11 +24,11 @@
 	import type { CustomDemographicCategory } from '@civicos/shared/data/demographics';
 	import { readAskToggles, type AskKey } from '@civicos/shared/data/participant-asks';
 	import { placeFromName, rescopedSlug, toPlaceSlug } from '$lib/config/place';
-	import { RESERVED_ROUTE_SLUGS, routeSlugFor } from '$lib/conversations';
+	import { RESERVED_ROUTE_SLUGS, routeSlugFor, slugTakenMessage } from '$lib/conversations';
 	import ContextCard from './ContextCard.svelte';
 	import RichTextEditor from '$lib/components/RichTextEditor.svelte';
 	import { setupSchema } from './setup-schema';
-	import { describeApiFailure } from '$lib/api/describe-failure';
+	import { apiStatus, describeApiFailure } from '$lib/api/describe-failure';
 
 	let { data } = $props();
 
@@ -312,7 +312,12 @@
 			);
 		} catch (e) {
 			console.error('Failed to save slug', e);
-			$errors.slug = [`Could not save the slug: ${describeApiFailure(e)}`];
+			// Slugs are unique across every Conversation, including the ones this
+			// Host cannot see, so a 409 is a name clash and not a permission problem.
+			$errors.slug =
+				apiStatus(e) === 409
+					? [slugTakenMessage(next)]
+					: [`Could not save the slug: ${describeApiFailure(e)}`];
 			settle(['slug'], ['slug']);
 			return;
 		}
@@ -517,7 +522,15 @@
 			placeError = place && !poll ? 'Published, but this Campaign has no Polis poll yet.' : null;
 		} catch (e) {
 			console.error('Failed to save the place', e);
-			placeError = `Could not save: ${describeApiFailure(e)}`;
+			// A 409 is the rescope, not the Place: a Place lives in metadata and
+			// cannot clash, the slug it scopes can. The Place is already stored by
+			// then, so say what did not follow rather than "could not save".
+			placeError =
+				apiStatus(e) === 409
+					? `The Place was saved, but the slug could not follow it. ${slugTakenMessage(
+							rescopedSlug(saved.slug, previousPlaceSlug, place?.slug ?? '')
+						)}`
+					: `Could not save: ${describeApiFailure(e)}`;
 			settle(['place'], ['place']);
 		}
 	}

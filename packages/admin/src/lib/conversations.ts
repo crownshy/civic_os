@@ -27,6 +27,25 @@ import { env } from '$env/dynamic/public';
  */
 export const RESERVED_ROUTE_SLUGS = ['new'] as const;
 
+/**
+ * What to show when comhairle refuses a slug as already taken (409 from
+ * CreateConversation or from a Setup rename).
+ *
+ * Titles are not unique, so a second Campaign named the same thing does not
+ * collide on its name: the create form derives the slug from the title, and the
+ * slug is what comhairle uniques, across every Conversation including the ones
+ * this Host cannot see. A raw "the server responded 409" sends people looking
+ * for a permission problem instead of typing a different slug.
+ *
+ * `scopedTo` is the Place name when the conflicting slug is not the one that was
+ * typed. The create form and Setup both scope the slug to the Place (ADR 0007),
+ * so the slug that collided can be one the Host never saw.
+ */
+export function slugTakenMessage(slug: string, scopedTo?: string): string {
+	const scope = scopedTo ? ` (this slug scoped to ${scopedTo})` : '';
+	return `Another conversation already uses "${slug}"${scope}. Pick a different one.`;
+}
+
 /** Anything with an id and an optional backend slug can be routed. */
 type RoutableConversation = Pick<LocalizedConversationDto, 'id'> & { slug?: string | null };
 
