@@ -14,7 +14,8 @@ export interface EventRegistration {
 	conversationId: string;
 	eventId: string;
 	email: string;
-	username: string;
+	/** What the participant typed. The only field comhairle can keep it in is the username. */
+	name: string;
 }
 
 /**
@@ -25,14 +26,26 @@ export interface EventRegistration {
  */
 export async function registerForEvent(
 	api: EventRegistrationApi,
-	{ conversationId, eventId, email, username }: EventRegistration
+	{ conversationId, eventId, email, name }: EventRegistration
 ): Promise<void> {
+	// Their name is the username, because `UserDto` has nowhere else to put it
+	// and the Host needs something to read on a registration list. Asking for a
+	// username instead is what this flow used to do, and it made a participant
+	// answer for comhairle's account model.
 	try {
-		await api.SignupOtp({ email, username });
+		await api.SignupOtp({ email, username: name });
 	} catch (e) {
-		// 409 is comhairle saying the account already exists, which is the state
-		// the attendance needs. Anything else means there is nobody to register.
 		if (httpStatusOf(e) !== 409) throw e;
+
+		// A 409 is either the account this attendance needs already existing, or
+		// somebody else having taken that username, which two people called Jane
+		// Smith will manage between them. Retry under the email, which is unique
+		// by construction, so only the first case survives to be swallowed.
+		try {
+			await api.SignupOtp({ email, username: email });
+		} catch (retry) {
+			if (httpStatusOf(retry) !== 409) throw retry;
+		}
 	}
 
 	await api.CreateEventAttendance(

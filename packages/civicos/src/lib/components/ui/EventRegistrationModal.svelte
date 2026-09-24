@@ -13,7 +13,7 @@
 	import type { CampaignOrg } from '@civicos/shared/data/place';
 	import { defaults, superForm } from 'sveltekit-superforms';
 	import { zod4, zod4Client } from 'sveltekit-superforms/adapters';
-	import otpUserSignupSchema from './OtpUserSignupSchema';
+	import eventRegistrationSchema from './EventRegistrationSchema';
 	import type { ApiClient, LocalizedEventDto } from '@crownshy/api-client/api';
 	import { registerForEvent, registrationErrorMessage } from '$lib/services/event-registration';
 
@@ -37,8 +37,8 @@
 
 	const formattedDate = $derived(event ? format(new Date(event.startTime), 'EEEE, MMMM d') : '');
 
-	const form = superForm(defaults(zod4(otpUserSignupSchema)), {
-		validators: zod4Client(otpUserSignupSchema),
+	const form = superForm(defaults(zod4(eventRegistrationSchema)), {
+		validators: zod4Client(eventRegistrationSchema),
 		taintedMessage: false,
 		onSubmit: handleSubmit
 	});
@@ -52,12 +52,12 @@
 	async function handleSubmit() {
 		let result = await validateForm({ update: true });
 		if (result.valid) {
-			let { email, username } = result.data;
+			let { email, name } = result.data;
 
 			try {
 				status = 'loading';
 
-				await registerForEvent(api, { conversationId, eventId: event.id, email, username });
+				await registerForEvent(api, { conversationId, eventId: event.id, email, name });
 
 				status = 'success';
 				onRegistered?.();
@@ -103,21 +103,22 @@
 			use:enhance
 			method="POST"
 		>
-			<Form.Field {form} name="username">
+			<Form.Field {form} name="name">
 				<Form.Control>
 					{#snippet children({ props })}
 						<div class="flex flex-col gap-2">
 							<span class="relative">
 								<Input
-									bind:value={$formData.username}
+									bind:value={$formData.name}
 									class="h-auto rounded-3xl py-6 pl-14 text-2xl md:text-2xl"
-									placeholder="Username"
+									placeholder="Full name"
+									autocomplete="name"
 									{...props}
 								/>
 								<User class="absolute top-1/2 left-5 -translate-y-1/2" />
 							</span>
-							{#if $errors.username}
-								<p class="text-red-500">{$errors.username}</p>
+							{#if $errors.name}
+								<p class="text-red-500">{$errors.name}</p>
 							{/if}
 						</div>
 					{/snippet}
@@ -133,6 +134,7 @@
 									bind:value={$formData.email}
 									class="h-auto rounded-3xl py-6 pl-14 text-2xl md:text-2xl"
 									placeholder="Email address"
+									autocomplete="email"
 									{...props}
 								/>
 								<Mail class="absolute top-1/2 left-5 -translate-y-1/2" />

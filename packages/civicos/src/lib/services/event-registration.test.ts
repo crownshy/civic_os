@@ -25,11 +25,20 @@ function fakeApi(overrides: { SignupOtp?: () => Promise<UserDto> } = {}) {
 	};
 }
 
+/** A signup that rejects with each status in turn, then succeeds. */
+function signupRejecting(...statuses: number[]) {
+	let call = 0;
+	return () => {
+		const status = statuses[call++];
+		return status ? Promise.reject(httpError(status)) : Promise.resolve(USER);
+	};
+}
+
 const details = {
 	conversationId: CAMPAIGN,
 	eventId: EVENT,
 	email: 'someone@example.com',
-	username: 'someone'
+	name: 'Jane Smith'
 };
 
 describe('registerForEvent', () => {
@@ -51,15 +60,34 @@ describe('registerForEvent', () => {
 
 		expect(api.SignupOtp).toHaveBeenCalledWith({
 			email: 'someone@example.com',
-			username: 'someone'
+			username: 'Jane Smith'
 		});
 	});
 
-	it('treats a 409 from signup as the account already existing', async () => {
-		const api = fakeApi({ SignupOtp: () => Promise.reject(httpError(409)) });
+	it('retries under the email when the name is taken as a username', async () => {
+		const api = fakeApi({ SignupOtp: signupRejecting(409) });
+
+		await registerForEvent(api, details);
+
+		expect(api.SignupOtp).toHaveBeenNthCalledWith(2, {
+			email: 'someone@example.com',
+			username: 'someone@example.com'
+		});
+		expect(api.CreateEventAttendance).toHaveBeenCalled();
+	});
+
+	it('treats a 409 on the retry as the account already existing', async () => {
+		const api = fakeApi({ SignupOtp: signupRejecting(409, 409) });
 
 		await expect(registerForEvent(api, details)).resolves.toBeUndefined();
 		expect(api.CreateEventAttendance).toHaveBeenCalled();
+	});
+
+	it('does not file an attendance when the retry fails for any other reason', async () => {
+		const api = fakeApi({ SignupOtp: signupRejecting(409, 500) });
+
+		await expect(registerForEvent(api, details)).rejects.toThrow();
+		expect(api.CreateEventAttendance).not.toHaveBeenCalled();
 	});
 
 	it('does not file an attendance when signup fails for any other reason', async () => {
