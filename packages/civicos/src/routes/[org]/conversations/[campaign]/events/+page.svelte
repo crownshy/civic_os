@@ -56,21 +56,25 @@
 	}
 </script>
 
-<AppShell>
+<!-- No card and no width cap: the list is laid out like the landing page, with
+	the bar at the viewport edges and the content centered under it. -->
+<AppShell border={false} class="max-w-none">
 	<div class="flex h-full flex-col overflow-y-auto bg-background">
 		<InfoBar {placeName} />
 
 		<!-- Header -->
-		<div class="flex flex-col items-center px-6 pt-6 pb-0 md:px-12">
+		<div class="mx-auto flex w-full max-w-4xl flex-col items-center px-6 pt-6 pb-0 md:pt-10">
 			<div class="overflow-hidden rounded-full bg-foreground px-3.5 py-1">
 				<span class="font-mono text-sm font-medium text-white">AI &amp; OUR COMMUNITIES</span>
 			</div>
 			<h1
-				class="mt-3 text-center font-display text-5xl leading-[2.75rem] font-medium tracking-display text-foreground"
+				class="mt-3 text-center font-display text-5xl leading-[2.75rem] font-medium tracking-display text-foreground md:text-6xl md:leading-[1.05]"
 			>
 				Conversations in {placeName}
 			</h1>
-			<p class="mt-4 text-center font-sans text-base leading-5 font-medium text-foreground">
+			<p
+				class="mt-4 text-center font-sans text-base leading-5 font-medium text-foreground md:text-lg md:leading-6"
+			>
 				Join other residents in a 60-90 minute conversation about artificial intelligence and what
 				it means for communities throughout {placeName}.
 			</p>
@@ -78,7 +82,7 @@
 
 		{#if conversationsActive}
 			<!-- Filter Pills -->
-			<div class="flex items-center justify-center gap-2.5 px-6 pt-4 pb-2 md:px-12">
+			<div class="flex items-center justify-center gap-2.5 px-6 pt-4 pb-2 md:pt-6">
 				{#each filters as f (f.value)}
 					<button
 						onclick={() => (activeFilter = f.value)}
@@ -92,8 +96,10 @@
 				{/each}
 			</div>
 
-			<!-- Conversation Cards -->
-			<div class="flex flex-col gap-4 px-7 pt-4 pb-8 md:px-12">
+			<!-- Conversation Cards. Two across on desktop; a lone card takes the row. -->
+			<div
+				class="mx-auto grid w-full max-w-4xl grid-cols-1 gap-4 px-7 pt-4 pb-8 md:grid-cols-2 md:px-6 md:pt-6"
+			>
 				{#each filteredEvents as event, i (event.id)}
 					<a
 						href={resolve('/[org]/conversations/[campaign]/events/[slug]', {
@@ -101,7 +107,7 @@
 							campaign: page.params.campaign!,
 							slug: event.id
 						})}
-						class="block transition-transform active:scale-[0.98]"
+						class="block transition-transform active:scale-[0.98] md:only:col-span-2"
 						in:fly={{ y: 30, duration: 350, delay: i * 80, easing: backOut }}
 						out:fade={{ duration: 200 }}
 						animate:flip={{ duration: 300, easing: cubicOut }}

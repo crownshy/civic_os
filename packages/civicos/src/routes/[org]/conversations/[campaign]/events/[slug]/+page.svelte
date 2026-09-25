@@ -98,7 +98,8 @@
 </script>
 
 {#if event}
-	<AppShell>
+	<!-- No card and no width cap, matching the list this came from. -->
+	<AppShell border={false} class="max-w-none">
 		<div
 			class="flex h-full flex-col overflow-y-auto scroll-smooth bg-background"
 			bind:this={scrollContainer}
@@ -106,10 +107,10 @@
 			<InfoBar {placeName} onBack={() => history.back()} backLabel="← BACK" />
 
 			<!-- Header -->
-			<div class="flex flex-col items-center px-6 pt-6 pb-0 md:px-12">
+			<div class="mx-auto flex w-full max-w-4xl flex-col items-center px-6 pt-6 pb-0 md:pt-10">
 				<!-- Title -->
 				<h1
-					class="text-center font-display text-4xl leading-8 font-medium tracking-display text-foreground"
+					class="text-center font-display text-4xl leading-8 font-medium tracking-display text-foreground md:text-5xl md:leading-[1.05]"
 				>
 					{event.name}
 				</h1>
@@ -121,7 +122,9 @@
 
 				<!-- Description -->
 				<!-- eslint-disable svelte/no-navigation-without-resolve -- the Host's own site is external; the anchor opens mid-sentence, so no line disable fits -->
-				<p class="mt-4 text-center font-sans text-base leading-6 font-medium text-foreground">
+				<p
+					class="mt-4 text-center font-sans text-base leading-6 font-medium text-foreground md:text-lg md:leading-7"
+				>
 					Join your neighbors {locationLabel} for a conversation about AI's impact on our lives.{#if org}
 						Hosted by
 						{#if org.url}<a
@@ -134,8 +137,8 @@
 				</p>
 				<!-- eslint-enable svelte/no-navigation-without-resolve -->
 
-				<!-- CTA -->
-				<div class="mt-5 w-full">
+				<!-- CTA. Full width on a phone, the landing form's width on desktop. -->
+				<div class="mt-5 w-full md:max-w-sm">
 					{#if isRegistered}
 						<Button
 							variant="soft"
@@ -172,9 +175,9 @@
 				<div class="mt-6 h-px w-full bg-[rgba(134,101,73,0.20)]"></div>
 			</div>
 
-			<!-- Sticky nav pills -->
+			<!-- Sticky nav pills. Only where the sections stack: on desktop both are in view. -->
 			<div
-				class="sticky top-0 z-10 flex w-full items-center justify-center gap-2.5 bg-transparent px-6 py-3 md:px-12"
+				class="sticky top-0 z-10 flex w-full items-center justify-center gap-2.5 bg-transparent px-6 py-3 md:hidden"
 			>
 				<a
 					href="#details"
@@ -196,8 +199,10 @@
 				</a>
 			</div>
 
-			<!-- Content sections -->
-			<div class="flex flex-col gap-8 px-6 pt-4 pb-10 md:px-12">
+			<!-- Content sections. Side by side on desktop. -->
+			<div
+				class="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6 pt-4 pb-10 md:grid md:grid-cols-2 md:items-start md:gap-10 md:pt-8"
+			>
 				<!-- Details section -->
 				<section id="details" class="scroll-mt-12">
 					<div
@@ -298,7 +303,7 @@
 		/>
 	</AppShell>
 {:else}
-	<AppShell>
+	<AppShell border={false} class="max-w-none">
 		<div class="flex h-full flex-col items-center justify-center bg-background px-6">
 			<h1 class="font-display text-2xl font-medium tracking-display text-foreground">
 				Conversation not found
