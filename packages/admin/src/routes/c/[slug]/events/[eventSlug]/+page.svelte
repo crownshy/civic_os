@@ -2,7 +2,6 @@
 	import { untrack } from 'svelte';
 	import { beforeNavigate, goto } from '$app/navigation';
 	import { invalidate } from '$lib/activity.svelte';
-	import { page } from '$app/state';
 	import * as Dialog from '@civicos/shared/ui/dialog';
 	import { Button } from '@civicos/shared/ui/button';
 	import { Input } from '@civicos/shared/ui/input';
@@ -175,7 +174,11 @@
 	let endEl = $state<HTMLInputElement | null>(null);
 
 	const isInPerson = $derived(form.meet_mode === 'in_person');
-	const rsvpLink = $derived(event ? `civicos.app/c/${page.params.slug}/e/${event.id}` : '');
+	// The public Campaign address plus civicos' event route. Empty when the
+	// Campaign has no address yet (no participant apex, or no slug).
+	const rsvpLink = $derived(
+		event && campaign.shareUrl ? `${campaign.shareUrl}/events/${event.id}` : ''
+	);
 	// CivicOS Online meets on the RSVP page; Zoom / Other Online has nowhere to send
 	// people until a custom link is entered.
 	const missingCustomLink = $derived(
@@ -541,14 +544,20 @@
 			<div class="space-y-3">
 				<Label class={LABEL}>Web address</Label>
 				<div class="flex items-center gap-3 rounded-lg border border-input bg-muted/40 px-4 py-5">
-					<div class="min-w-0 flex-1 truncate text-body-lg font-semibold">{rsvpLink}</div>
-					<Button variant="outline" size="sm" onclick={() => copyLink(rsvpLink)}>
-						{#if copied}
-							<Check class="size-3.5" /> copied
-						{:else}
-							<Copy class="size-3.5" /> copy
-						{/if}
-					</Button>
+					{#if rsvpLink}
+						<div class="min-w-0 flex-1 truncate text-body-lg font-semibold">{rsvpLink}</div>
+						<Button variant="outline" size="sm" onclick={() => copyLink(rsvpLink)}>
+							{#if copied}
+								<Check class="size-3.5" /> copied
+							{:else}
+								<Copy class="size-3.5" /> copy
+							{/if}
+						</Button>
+					{:else}
+						<div class="flex-1 text-body text-muted-foreground">
+							This Campaign has no public address yet.
+						</div>
+					{/if}
 				</div>
 				<p class="text-body italic">
 					CivicOS hosts this one, so participants meet on the RSVP page. This link will only be sent
