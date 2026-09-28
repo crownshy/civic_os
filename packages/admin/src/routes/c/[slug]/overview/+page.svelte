@@ -16,6 +16,7 @@
 	import { Trash2 } from '@lucide/svelte';
 	import IdentityCard from './IdentityCard.svelte';
 	import CoHostsCard from './CoHostsCard.svelte';
+	import { noticeFrom } from './cohost-notice';
 	import AddCoHostsDialog from '$lib/components/setup/AddCoHostsDialog.svelte';
 	import DemographicsCard from '$lib/components/setup/DemographicsCard.svelte';
 	import FaqCard from '$lib/components/setup/FaqCard.svelte';
@@ -23,7 +24,11 @@
 	import { readColorScheme } from '@civicos/shared/data/color-scheme';
 	import { readFaqs, toFaqsHtml, type FaqEntry } from '@civicos/shared/data/faq';
 	import type { CustomDemographicCategory } from '@civicos/shared/data/demographics';
-	import { readAskToggles, type AskKey } from '@civicos/shared/data/participant-asks';
+	import {
+		readAskToggles,
+		type AskKey,
+		type AskToggles
+	} from '@civicos/shared/data/participant-asks';
 	import { placeFromName, rescopedSlug, toPlaceSlug } from '$lib/config/place';
 	import { RESERVED_ROUTE_SLUGS, routeSlugFor, slugTakenMessage } from '$lib/conversations';
 	import ContextCard from './ContextCard.svelte';
@@ -55,6 +60,14 @@
 	const cohosts = $derived(data.cohosts);
 	let addCohostsOpen = $state(false);
 	let grantingCohosts = $state(false);
+	// Seeded from Create Campaign, which cannot show this itself: it redirects
+	// here the moment the Campaign exists.
+	let cohostNotice = $state<string | null>(
+		untrack(() => page.url.searchParams.get('cohosts')) === 'failed'
+			? 'Not every co-host could be added when this Campaign was created. Check the list and add any that are missing.'
+			: null
+	);
+	const orgName = (id: string) => data.pickerOrgs.find((o) => o.id === id)?.name ?? '';
 
 	// --- Editable fields -------------------------------------------------------
 	// One SPA superform, three destinations, because no two of these fields live
@@ -415,9 +428,10 @@
 	const customDemographics = $derived(data.customDemographics);
 
 	/**
-	 * INTERIM STORAGE (#363/#364). Demographics config has no backend table yet,
-	 * so it lives in `conversation.metadata` until comhairle promotes it to a
-	 * real entity model.
+	 * INTERIM STORAGE (#363/#364). Participant asks, the colour scheme and the
+	 * Place have no backend fields yet, so they live in `conversation.metadata`
+	 * until comhairle promotes them. Demographics moved to real
+	 * ConversationDemographics links (#441).
 	 *
 	 * Each write sends its whole key. PatchConversationMetadata merges only at the
 	 * top level and replaces nested values wholesale, so a partial object drops
@@ -498,7 +512,7 @@
 		await invalidate(`campaign:${page.params.slug}`);
 	}
 
-	// Same interim metadata storage as demographics, same whole-key write.
+	// Same interim metadata storage as the colour scheme, same whole-key write.
 	const asks = $derived(readAskToggles(conversation?.metadata));
 
 	// --- Color Scheme ----------------------------------------------------------
@@ -507,8 +521,23 @@
 
 	const selectColorScheme = (id: string) => patchMetadata({ colorScheme: id });
 
-	const setAsk = (key: AskKey, next: boolean) =>
-		patchMetadata({ participantAsks: { ...asks, [key]: next } });
+	// Built from the last object sent, not from `asks`, which only catches up after
+	// the invalidate: a second toggle inside that window sent a stale object and
+	// undid the first. Queued so the writes land in the order they were made.
+	let sentAsks: AskToggles | null = null;
+	let asksQueue: Promise<void> = Promise.resolve();
+
+	function setAsk(key: AskKey, next: boolean) {
+		const all = { ...(sentAsks ?? asks), [key]: next };
+		sentAsks = all;
+		const write = asksQueue.then(() => patchMetadata({ participantAsks: all }));
+		asksQueue = write
+			.catch(() => {})
+			.then(() => {
+				if (sentAsks === all) sentAsks = null;
+			});
+		return write;
+	}
 
 	// --- Place -----------------------------------------------------------------
 	// A fourth destination, and the reason it sits outside the superform above:
@@ -831,7 +860,12 @@
 			{cohosts}
 			convId={data.convId}
 			owningOrgId={data.owningOrgId}
-			onAddNew={() => (addCohostsOpen = true)}
+			onAddNew={() => {
+				cohostNotice = null;
+				addCohostsOpen = true;
+			}}
+			notice={cohostNotice}
+			onNotice={(text) => (cohostNotice = text)}
 		/>
 		<AddCoHostsDialog
 			bind:open={addCohostsOpen}
@@ -848,10 +882,13 @@
 							// The overview load declares `cohosts:${convId}`; refresh that rather
 							// than letting update() invalidate every load on the page.
 							await update({ invalidateAll: false });
-							if (result.type === 'success') {
-								await invalidate(`cohosts:${data.convId}`);
-								addCohostsOpen = false;
-							}
+							cohostNotice = noticeFrom(result);
+							// A partial failure still granted some, so the list has changed too.
+							const changed =
+								result.type === 'success' ||
+								(result.type === 'failure' && result.data?.changed === true);
+							if (changed) await invalidate(`cohosts:${data.convId}`);
+							if (result.type === 'success') addCohostsOpen = false;
 							grantingCohosts = false;
 						};
 					}}
@@ -860,7 +897,11 @@
 					<input type="hidden" name="owningOrgId" value={data.owningOrgId ?? ''} />
 					{#each selected as id (id)}
 						<input type="hidden" name="orgIds" value={id} />
+						<input type="hidden" name="orgNames" value={orgName(id)} />
 					{/each}
+					{#if cohostNotice && addCohostsOpen}
+						<p class="mb-2 text-caption text-destructive" role="alert">{cohostNotice}</p>
+					{/if}
 					<Button type="submit" disabled={selected.length === 0 || grantingCohosts}>
 						{grantingCohosts
 							? 'Adding…'

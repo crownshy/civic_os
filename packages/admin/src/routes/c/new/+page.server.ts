@@ -93,6 +93,21 @@ export const actions: Actions = {
 		// on its own Setup page the moment we redirected to it.
 		if (!hostId) return fail('Choose the Host that will own this conversation.');
 
+		// The Host picker only offers the caller's own Hosts, but the post is the
+		// caller's to write, so check it against the same list rather than trust it.
+		const ownHostIds = await api
+			.GetUserOrganizations()
+			.then((res) =>
+				res.organizations.filter((o) => o.canUpdate || o.isAssociated).map((o) => o.organization.id)
+			)
+			.catch((e) => {
+				console.warn('GetUserOrganizations failed', e);
+				return [] as string[];
+			});
+		if (!ownHostIds.includes(hostId)) {
+			return fail('You can only create a Campaign for a Host you manage or belong to.');
+		}
+
 		// The Place, and the Conversation slug it scopes. A Campaign runs in many
 		// Places and each pair is its own Conversation, so the Conversations are
 		// slugged `<campaign>-<place>` (ADR 0007); the Host types a Campaign slug
@@ -237,6 +252,7 @@ export const actions: Actions = {
 		//    creator either way, and the Co-Hosts card on Overview is where a
 		//    missing Host gets re-added.
 		const grantees = [hostId, ...cohostIds.filter((id) => id && id !== hostId)];
+		let grantFailed = false;
 		for (const organization_id of grantees) {
 			try {
 				await api.GrantPermission(
@@ -252,6 +268,7 @@ export const actions: Actions = {
 				);
 			} catch (e) {
 				console.error(`GrantPermission failed for ${organization_id}`, e);
+				grantFailed = true;
 			}
 		}
 
@@ -284,9 +301,11 @@ export const actions: Actions = {
 		// than the form, so the list is whatever step 5 actually managed to
 		// grant. It writes `org` as well, which is why that is not in the patch
 		// above: both come off the same organization lookup.
-		await mirrorHosts(api, conversationId, hostId);
+		const mirrored = await mirrorHosts(api, conversationId, hostId);
 
-		redirect(303, `/c/${conversationSlug}/overview`);
+		// Setup's Co-Hosts card says so, since this page is gone by then.
+		const warn = grantFailed || !mirrored ? '?cohosts=failed' : '';
+		redirect(303, `/c/${conversationSlug}/overview${warn}`);
 	}
 };
 

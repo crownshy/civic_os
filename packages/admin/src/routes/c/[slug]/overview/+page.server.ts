@@ -4,6 +4,16 @@ import { COHOST_ROLE, CONVERSATION_RESOURCE } from '$lib/permissions';
 import { mirrorHosts } from '$lib/cohost-mirror';
 import type { Actions, PageServerLoad } from './$types';
 
+const STALE_PUBLIC_PAGE =
+	'Saved, but the public Campaign page did not update. Add or remove a co-host to try again.';
+
+/** "A", "A and B", "A, B and C". */
+function listOf(names: string[]): string {
+	return names.length < 2
+		? (names[0] ?? '')
+		: `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`;
+}
+
 type PickerOrg = { id: string; name: string; website?: string | null; email?: string | null };
 
 export const load: PageServerLoad = async ({ parent, cookies, url, depends }) => {
@@ -82,29 +92,41 @@ export const actions: Actions = {
 		const convId = String(fd.get('convId') ?? '');
 		const owningOrgId = String(fd.get('owningOrgId') ?? '') || null;
 		const orgIds = fd.getAll('orgIds').map(String).filter(Boolean);
+		const orgNames = fd.getAll('orgNames').map(String);
 		if (!convId || orgIds.length === 0) return fail(400, { error: 'Select at least one host.' });
 
 		const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
+		const nameOf = (i: number) => orgNames[i] || 'a host';
 
-		const failures: string[] = [];
-		for (const organization_id of orgIds) {
+		const added: string[] = [];
+		const failed: string[] = [];
+		for (const [i, organization_id] of orgIds.entries()) {
 			try {
 				await api.GrantPermission(
 					{ organization_id, role_name: COHOST_ROLE, grant_reason: 'Co-host added via admin' },
 					{ params: { resource_type: CONVERSATION_RESOURCE, resource_id: convId } }
 				);
+				added.push(nameOf(i));
 			} catch (e) {
 				console.error(`GrantPermission failed for ${organization_id}`, e);
-				failures.push(organization_id);
+				failed.push(nameOf(i));
 			}
 		}
 
-		if (failures.length) return fail(400, { error: `Could not add ${failures.length} host(s).` });
-
 		// civicos renders the "Hosted by" strip from this mirror, not from the
-		// grants, which it cannot read.
-		await mirrorHosts(api, convId, owningOrgId);
-		return { added: orgIds.length };
+		// grants, which it cannot read. Mirrored whenever anything was granted, not
+		// only when everything was: the grants that did land are live either way.
+		const mirrored = added.length === 0 || (await mirrorHosts(api, convId, owningOrgId));
+
+		if (failed.length) {
+			const also = added.length ? ` Added ${listOf(added)}.` : '';
+			return fail(400, {
+				error: `Could not add ${listOf(failed)}.${also}`,
+				changed: added.length > 0
+			});
+		}
+		if (!mirrored) return { added: added.length, warning: STALE_PUBLIC_PAGE };
+		return { added: added.length };
 	},
 
 	removeCohost: async ({ request, cookies, url }) => {
@@ -120,8 +142,8 @@ export const actions: Actions = {
 				params: { resource_type: CONVERSATION_RESOURCE, resource_id: convId },
 				queries: { organization_id: orgId, role_name: COHOST_ROLE }
 			});
-			await mirrorHosts(api, convId, owningOrgId);
-			return { removed: true };
+			const mirrored = await mirrorHosts(api, convId, owningOrgId);
+			return mirrored ? { removed: true } : { removed: true, warning: STALE_PUBLIC_PAGE };
 		} catch (e) {
 			console.error(`RevokePermission failed for ${orgId}`, e);
 			return fail(400, { error: 'Could not remove co-host.' });

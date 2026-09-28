@@ -4,6 +4,7 @@
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { Trash2 } from '@lucide/svelte';
 	import SetupCard from '$lib/components/setup/SetupCard.svelte';
+	import { noticeFrom } from './cohost-notice';
 
 	export interface CoHost {
 		/** Organization id (used to revoke the co-host grant). */
@@ -28,9 +29,12 @@
 		convId?: string;
 		/** The owning Host, posted back so the action can rebuild the mirror in order. */
 		owningOrgId?: string | null;
+		/** A failed or half-finished co-host change, shown under the list. */
+		notice?: string | null;
+		onNotice?: (text: string | null) => void;
 	}
 
-	let { cohosts, onAddNew, convId, owningOrgId = null }: Props = $props();
+	let { cohosts, onAddNew, convId, owningOrgId = null, notice = null, onNotice }: Props = $props();
 
 	const stripProtocol = (url: string) => url.replace(/^https?:\/\//, '').replace(/\/$/, '');
 
@@ -38,9 +42,10 @@
 	// taking enhance's default, which invalidates every load on the page.
 	const removeCohost: SubmitFunction =
 		() =>
-		async ({ update }) => {
+		async ({ update, result }) => {
 			await update({ invalidateAll: false });
 			await invalidate(`cohosts:${convId}`);
+			onNotice?.(noticeFrom(result));
 		};
 
 	// 3 content columns + a trailing action column (kept in the header too so rows
@@ -123,6 +128,10 @@
 				</div>
 			{/each}
 		</div>
+
+		{#if notice}
+			<p class="px-2 py-3 text-caption text-destructive" role="alert">{notice}</p>
+		{/if}
 
 		{#if onAddNew}
 			<div class="border-t border-border">

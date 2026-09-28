@@ -45,12 +45,15 @@ type Api = {
  * `org` is rewritten here as well as at creation, so a Campaign whose mirror
  * predates `CampaignOrg.url` picks the url up the next time its co-hosts
  * change, rather than only when it is recreated.
+ *
+ * Resolves false when the write failed, so the caller can say the public page
+ * is stale instead of reporting a clean save.
  */
 export async function mirrorHosts(
 	api: Api,
 	conversationId: string,
 	owningOrgId: string | null
-): Promise<void> {
+): Promise<boolean> {
 	try {
 		const [orgs, permissions] = await Promise.all([
 			api.ListOrganizations({ queries: { limit: 200 } }),
@@ -93,7 +96,9 @@ export async function mirrorHosts(
 			{ cohosts, ...(org ? { org } : {}) },
 			{ params: { conversation_id: conversationId } }
 		);
+		return true;
 	} catch (e) {
 		console.error('Mirroring hosts into metadata failed', e);
+		return false;
 	}
 }
