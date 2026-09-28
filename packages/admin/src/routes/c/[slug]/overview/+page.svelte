@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import { goto } from '$app/navigation';
+	import { beforeNavigate, goto } from '$app/navigation';
 	import { enhance, invalidate } from '$lib/activity.svelte';
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
@@ -129,11 +129,41 @@
 			// with it.
 			if (event.paths.length === 1 && event.paths[0] === 'slug') return;
 			clearTimeout(debounce);
-			saveStatus = 'idle';
-			debounce = setTimeout(save, 700);
+			// A standing failure stays on screen until a save clears it, not until
+			// the next keystroke.
+			if (!failedFields.length) saveStatus = 'idle';
+			debounce = setTimeout(flush, 700);
 		}
 	});
 	const { form: formData, errors, validate } = form;
+
+	// Saves run one at a time. Two overlapping writes to the same translation can
+	// land out of order, and the older text wins.
+	let queue: Promise<void> = Promise.resolve();
+
+	/** Run a pending debounced save now, behind any save already in flight. */
+	function flush() {
+		clearTimeout(debounce);
+		debounce = undefined;
+		// A throw that escapes `save` must not wedge every later save behind it.
+		queue = queue.then(save).catch((e) => {
+			console.error('Autosave failed', e);
+			saveStatus = 'error';
+		});
+		return queue;
+	}
+
+	const hasUnsaved = () => DEBOUNCED_FIELDS.some((key) => $formData[key] !== saved[key]);
+
+	// Closing the tab cannot wait for a request, so ask first. An in-app
+	// navigation can: the queued save carries its own values and slug.
+	beforeNavigate(({ willUnload, cancel }) => {
+		if (willUnload) {
+			if (debounce !== undefined || saveStatus === 'saving') cancel();
+			return;
+		}
+		if (debounce !== undefined) flush();
+	});
 
 	async function save() {
 		// Only the fields whose value actually changed since the last save.
@@ -150,27 +180,36 @@
 		// wrong place. Say so on the field itself: a bare "Couldn't save" cannot
 		// distinguish a Campaign that has no Polis poll from one whose save the
 		// backend refused.
-		const attempts = changed.map((key) => ({ key, to: writerFor(key, $formData[key]) }));
+		// Snapshot what is sent. The Host can keep typing while the request is out,
+		// and recording the live value as saved would drop that newer text.
+		const attempts = changed.map((key) => {
+			const value = $formData[key];
+			return { key, value, to: writerFor(key, value) };
+		});
 		for (const a of attempts) if (typeof a.to === 'string') $errors[a.key] = [a.to];
 
 		const dropped = attempts.filter((a) => typeof a.to === 'string').map((a) => a.key);
 		const writes = attempts.filter(
-			(a): a is { key: DebouncedField; to: () => Promise<unknown> } => typeof a.to === 'function'
+			(a): a is { key: DebouncedField; value: string; to: () => Promise<unknown> } =>
+				typeof a.to === 'function'
 		);
 		if (writes.length === 0) {
 			settle(changed, dropped);
 			return;
 		}
 
+		// Read now: a save flushed by navigation finishes after `page` has moved on.
+		const campaignSlug = page.params.slug;
 		saveStatus = 'saving';
 		try {
 			await Promise.all(writes.map((w) => w.to()));
 			for (const w of writes) {
-				saved[w.key] = $formData[w.key];
+				saved[w.key] = w.value;
 				$errors[w.key] = undefined;
 			}
-			settle(changed, dropped);
-			await invalidate(`campaign:${page.params.slug}`);
+			// Text typed during the request is not saved yet; its own debounce is.
+			settle(changed, dropped, hasUnsaved() ? 'idle' : 'saved');
+			await invalidate(`campaign:${campaignSlug}`);
 		} catch (e) {
 			console.error('Failed to save setup fields', e);
 			const reason = describeApiFailure(e);

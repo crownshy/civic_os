@@ -127,7 +127,12 @@
 			]}
 			aria-busy={loading}
 		>
-			{@render children?.()}
+			<!-- Keyed so switching events remounts the page. Its form is a working
+			     copy of one event; kept alive, it would save the old event's values
+			     onto the new one. -->
+			{#key eventId}
+				{@render children?.()}
+			{/key}
 		</div>
 	</div>
 {/if}

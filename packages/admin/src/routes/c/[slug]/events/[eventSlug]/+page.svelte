@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { untrack } from 'svelte';
+	import { beforeNavigate, goto } from '$app/navigation';
 	import { invalidate } from '$lib/activity.svelte';
 	import { page } from '$app/state';
 	import * as Dialog from '@civicos/shared/ui/dialog';
@@ -127,7 +128,9 @@
 				location: emptyLocation()
 			};
 		}
-		const tz = BROWSER_TZ;
+		// The event's own zone, so an editor elsewhere does not re-zone it on save.
+		const stored = e.defaultTimeZone;
+		const tz = typeof stored === 'string' && stored ? stored : BROWSER_TZ;
 		const start = isoToWallClock(e.startTime, tz);
 		const end = isoToWallClock(e.endTime, tz);
 		const loc = e.location ?? null;
@@ -154,10 +157,14 @@
 		};
 	}
 
-	let form = $state<Form>(buildForm(null));
-	let loaded = false;
-	let saving = $state(false);
-	let error = $state<string | null>(null);
+	// A one-time working copy: the layout remounts this page per event, and
+	// re-reading `event` would reset the form after every save's invalidate.
+	let form = $state<Form>(untrack(() => buildForm(event)));
+	// Keyed by what failed, so a later success on another field cannot hide it.
+	let failures = $state<Record<string, string>>({});
+	const error = $derived(Object.values(failures)[0] ?? null);
+	let pending = $state(0);
+	const saving = $derived(pending > 0);
 	let savedTick = $state(0);
 	let deleting = $state(false);
 	let deleteOpen = $state(false);
@@ -166,12 +173,6 @@
 	let dateEl = $state<HTMLInputElement | null>(null);
 	let startEl = $state<HTMLInputElement | null>(null);
 	let endEl = $state<HTMLInputElement | null>(null);
-
-	$effect(() => {
-		if (loaded || !event) return;
-		form = buildForm(event);
-		loaded = true;
-	});
 
 	const isInPerson = $derived(form.meet_mode === 'in_person');
 	const rsvpLink = $derived(event ? `civicos.app/c/${page.params.slug}/e/${event.id}` : '');
@@ -189,36 +190,76 @@
 
 	type Patch = Record<string, unknown>;
 
-	async function save(patch: Patch) {
-		if (!event) return;
-		saving = true;
-		error = null;
-		try {
-			await api.UpdateEvent(patch, {
-				params: { conversation_id: campaign.id, event_id: event.id }
-			});
-			await invalidate(`events:detail:${event.id}`);
-			savedTick++;
-		} catch (e) {
-			console.error('UpdateEvent failed', e);
-			error = 'Save failed.';
-		} finally {
-			saving = false;
-		}
+	// Saves run one at a time so an older write cannot land after a newer one.
+	let queue: Promise<void> = Promise.resolve();
+
+	function save(field: string, patch: Patch) {
+		// Captured now: by the time a queued save runs, the switcher may have moved on.
+		const target = event;
+		const conversationId = campaign.id;
+		if (!target) return;
+		pending++;
+		queue = queue.then(async () => {
+			try {
+				await api.UpdateEvent(patch, {
+					params: { conversation_id: conversationId, event_id: target.id }
+				});
+				delete failures[field];
+				await invalidate(`events:detail:${target.id}`);
+				savedTick++;
+			} catch (e) {
+				console.error('UpdateEvent failed', e);
+				failures[field] = 'Save failed.';
+			} finally {
+				pending--;
+			}
+		});
 	}
+
+	// Location is left out: an incomplete address is deliberately never saved.
+	const BLUR_SAVED = [
+		'name',
+		'description',
+		'custom_event_link',
+		'start_date',
+		'start_time',
+		'end_time',
+		'capacity',
+		'signup_mode',
+		'time_zone'
+	] as const;
+
+	// Fields save on blur, and closing the tab never blurs, so ask first. An
+	// in-app link blurs the field before it navigates, which saves it.
+	beforeNavigate(({ willUnload, cancel }) => {
+		if (!willUnload || !event) return;
+		const stored = buildForm(event);
+		const unsaved = BLUR_SAVED.some((key) => form[key].trim() !== stored[key].trim());
+		if (saving || unsaved) cancel();
+	});
 
 	function setMeetMode(next: MeetMode) {
 		form.meet_mode = next;
 		const patch: Patch = { format: next === 'in_person' ? 'in_person' : 'online' };
 		// Only the third mode carries a custom link; the others fall back to the RSVP page.
 		if (next !== 'external_online') patch.custom_event_link = null;
-		save(patch);
+		save('meetMode', patch);
 	}
 
 	function saveCustomLink() {
 		const link = form.custom_event_link.trim();
 		if (link === (event?.customEventLink ?? '')) return;
-		save({ custom_event_link: link || null });
+		save('link', { custom_event_link: link || null });
+	}
+
+	function saveName() {
+		const name = form.name.trim();
+		if (!event || name === event.name) return;
+		if (!name) {
+			failures.name = 'The event needs a name.';
+			return;
+		}
+		save('name', { name });
 	}
 
 	function locationPatch(): LocationForm | null {
@@ -236,21 +277,34 @@
 	}
 
 	function saveTimes() {
-		if (!form.start_date || !form.start_time || !form.end_time) return;
+		if (!event || !form.start_date || !form.start_time || !form.end_time) return;
 		const start_time = zonedToISO(form.start_date, form.start_time, form.time_zone);
 		const end_time = zonedToISO(form.start_date, form.end_time, form.time_zone);
-		save({ start_time, end_time, default_time_zone: form.time_zone });
+		if (Date.parse(end_time) <= Date.parse(start_time)) {
+			failures.times = 'The end time must be after the start time.';
+			return;
+		}
+		delete failures.times;
+		// Compared as instants: the backend's ISO spelling need not match ours.
+		const unchanged =
+			Date.parse(start_time) === Date.parse(event.startTime) &&
+			Date.parse(end_time) === Date.parse(event.endTime) &&
+			form.time_zone === event.defaultTimeZone;
+		if (unchanged) return;
+		save('times', { start_time, end_time, default_time_zone: form.time_zone });
 	}
 
 	function saveLocation() {
 		const loc = locationPatch();
 		if (!loc) return;
-		save({ location: loc });
+		save('location', { location: loc });
 	}
 
 	function saveCapacity() {
 		const n = Number(form.capacity);
-		save({ capacity: Number.isFinite(n) && n > 0 ? Math.floor(n) : null });
+		const capacity = Number.isFinite(n) && n > 0 ? Math.floor(n) : null;
+		if (capacity === (event?.capacity ?? null)) return;
+		save('capacity', { capacity });
 	}
 
 	async function doDelete() {
@@ -266,7 +320,7 @@
 			await goto(resolve(`/c/${campaign.slug}/events`), { invalidate: ['events:list'] });
 		} catch (e) {
 			console.error('DeleteEvent failed', e);
-			error = 'Delete failed.';
+			failures.delete = 'Delete failed.';
 			deleting = false;
 		}
 	}
@@ -309,7 +363,7 @@
 		<input
 			aria-label="Event name"
 			bind:value={form.name}
-			onblur={() => form.name.trim() !== event.name && save({ name: form.name.trim() })}
+			onblur={saveName}
 			class="w-full bg-transparent text-h3 font-bold outline-none md:text-h2"
 		/>
 
@@ -537,7 +591,7 @@
 				bind:value={form.description}
 				onblur={() =>
 					form.description.trim() !== event.description &&
-					save({ description: form.description.trim() })}
+					save('description', { description: form.description.trim() })}
 				rows="5"
 				placeholder="Description of the event..."
 				class="w-full rounded-lg border border-input bg-background px-4 py-4 text-body-lg leading-relaxed outline-none focus-visible:border-ring"
@@ -563,7 +617,7 @@
 				<select
 					id="ev-sign"
 					bind:value={form.signup_mode}
-					onchange={() => save({ signup_mode: form.signup_mode })}
+					onchange={() => save('signup', { signup_mode: form.signup_mode })}
 					class="h-14 w-full rounded-lg border border-input bg-background px-4 text-body-lg font-semibold outline-none focus-visible:border-ring"
 				>
 					<option value="open">Open</option>
