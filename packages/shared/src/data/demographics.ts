@@ -284,6 +284,44 @@ export function isKeyTaken(slug: string, existing: CustomDemographicCategory[]):
 	);
 }
 
+/** Tidy an option label as typed: trimmed, with inner runs of whitespace collapsed. */
+export function cleanOptionLabel(label: string): string {
+	return label.trim().replace(/\s+/g, ' ');
+}
+
+// Participants and the report treat `Yes` and `yes` as one answer split in two,
+// so options compare case- and spacing-blind.
+function optionKey(label: string): string {
+	return cleanOptionLabel(label).toLowerCase();
+}
+
+/**
+ * The option `label` would repeat, or undefined when it is new. `skip` is the
+ * index being edited, so a row never collides with itself.
+ */
+export function findRepeatedOption(
+	label: string,
+	options: readonly string[],
+	skip = -1
+): string | undefined {
+	const key = optionKey(label);
+	if (!key) return undefined;
+	return options.find((option, i) => i !== skip && optionKey(option) === key);
+}
+
+/** Indexes of options that repeat an earlier one, e.g. in a category saved before this check. */
+export function repeatedOptionIndexes(options: readonly string[]): Set<number> {
+	const seen = new Set<string>();
+	const repeats = new Set<number>();
+	options.forEach((option, i) => {
+		const key = optionKey(option);
+		if (!key) return;
+		if (seen.has(key)) repeats.add(i);
+		seen.add(key);
+	});
+	return repeats;
+}
+
 /**
  * One answer bucket in a participation report, and how many participants gave
  * it. `value` is absent or null for the ones who skipped the question, which is

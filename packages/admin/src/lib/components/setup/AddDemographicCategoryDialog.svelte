@@ -4,7 +4,10 @@
 	import { Button } from '@civicos/shared/ui/button';
 	import SetupField from './SetupField.svelte';
 	import {
+		cleanOptionLabel,
+		findRepeatedOption,
 		isKeyTaken,
+		repeatedOptionIndexes,
 		toDemographicSlug,
 		type CustomDemographicCategory
 	} from '@civicos/shared/data/demographics';
@@ -30,6 +33,12 @@
 
 	const slug = $derived(category?.slug ?? toDemographicSlug(name));
 
+	/** The option the open editor's text already matches, flagged as they type. */
+	const draftRepeats = $derived(
+		editing >= 0 ? findRepeatedOption(draft, options, editing) : undefined
+	);
+	const repeats = $derived(repeatedOptionIndexes(options));
+
 	// Withheld until they have started, so an untouched dialog is not already scolding.
 	const started = $derived(!!name.trim() || options.length > 0);
 
@@ -37,8 +46,9 @@
 		if (!name.trim()) return 'Give the category a name.';
 		if (!slug) return 'The name needs at least one letter or number.';
 		if (!category && isKeyTaken(slug, existing)) return 'A category with that name already exists.';
+		if (draftRepeats) return 'Change or discard the repeated option.';
 		if (options.length < 2) return 'Add at least two options.';
-		if (new Set(options).size !== options.length) return 'Options must be unique.';
+		if (repeats.size > 0) return 'Options must be unique.';
 		return null;
 	});
 
@@ -73,23 +83,27 @@
 		draft = options[i];
 	}
 
-	/** Commit the open editor. An empty value drops the row rather than keeping a blank. */
-	function commit() {
-		if (editing < 0) return;
-		const value = draft.trim();
+	/**
+	 * Commit the open editor. An empty value drops the row rather than keeping a blank;
+	 * a repeat keeps the editor open with its warning. Returns whether the row closed.
+	 */
+	function commit(): boolean {
+		if (editing < 0) return true;
+		if (draftRepeats) return false;
+		const value = cleanOptionLabel(draft);
 		options = value
 			? options.map((o, i) => (i === editing ? value : o))
 			: options.filter((_, i) => i !== editing);
 		editing = -1;
 		draft = '';
+		return true;
 	}
 
 	// Enter opens the next row so a list can be typed in one run. Enter on a blank
 	// row is the "done" gesture: commit() drops it and nothing reopens.
 	function commitAndContinue() {
 		const hadValue = !!draft.trim();
-		commit();
-		if (hadValue) startAdd();
+		if (commit() && hadValue) startAdd();
 	}
 
 	function cancelEdit() {
@@ -177,6 +191,7 @@
 											{@attach takeFocus}
 											aria-label={`Option ${i + 1}`}
 											aria-describedby="option-editor-hint"
+											aria-invalid={!!draftRepeats}
 											onkeydown={(e) => {
 												if (e.key === 'Enter') {
 													e.preventDefault();
@@ -193,16 +208,28 @@
 												// `editing` has already moved on.
 												if (editing === i) commit();
 											}}
-											class="w-full rounded-[10px] border border-input bg-background px-3 py-2 text-body font-semibold focus:ring-2 focus:ring-ring focus:outline-none"
+											class="w-full rounded-[10px] border border-input bg-background px-3 py-2 text-body font-semibold focus:ring-2 focus:ring-ring focus:outline-none aria-invalid:border-destructive"
 										/>
-										<p id="option-editor-hint" class="mt-1.5 text-caption text-foreground/60">
-											<kbd class="font-ui font-semibold">Enter</kbd> saves and opens the next
-											option.
-											<kbd class="font-ui font-semibold">Esc</kbd> discards it.
-										</p>
+										{#if draftRepeats}
+											<p id="option-editor-hint" class="mt-1.5 text-caption text-destructive">
+												Already an option as “{draftRepeats}”.
+												<kbd class="font-ui font-semibold">Esc</kbd> discards it.
+											</p>
+										{:else}
+											<p id="option-editor-hint" class="mt-1.5 text-caption text-foreground/60">
+												<kbd class="font-ui font-semibold">Enter</kbd> saves and opens the next
+												option.
+												<kbd class="font-ui font-semibold">Esc</kbd> discards it.
+											</p>
+										{/if}
 									</div>
 								{:else}
-									<span class="min-w-0 flex-1 text-body font-semibold">{option}</span>
+									<div class="min-w-0 flex-1">
+										<span class="text-body font-semibold">{option}</span>
+										{#if repeats.has(i)}
+											<p class="mt-0.5 text-caption text-destructive">Repeats an option above.</p>
+										{/if}
+									</div>
 									<div class="flex shrink-0 items-center gap-3">
 										<button
 											type="button"
