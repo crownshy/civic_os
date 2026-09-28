@@ -20,3 +20,16 @@ export const RICH_TEXT_PROSE_CLASS = [
 	'[&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2',
 	'[&_strong]:font-semibold'
 ].join(' ');
+
+/**
+ * What a link typed into the editor should point at. Hosts type `example.org`,
+ * which a browser reads as a path relative to the page, so on civicos it
+ * pointed at `/…/conversations/example.org`. A bare domain gets `https://`, a
+ * bare address `mailto:`. A scheme, an anchor or a path is left as typed.
+ */
+export function normalizeLinkHref(input: string): string {
+	const href = input.trim();
+	if (href === '' || /^[a-z][a-z0-9+.-]*:/i.test(href) || /^[#/?]/.test(href)) return href;
+	if (/^[^\s@/]+@[^\s@/]+\.[^\s@/]+$/.test(href)) return `mailto:${href}`;
+	return `https://${href.replace(/^\/\//, '')}`;
+}

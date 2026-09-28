@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isHtml, shortDescriptionFrom, toRichTextHtml } from './rich-text';
+import { isHtml, normalizeLinkHref, shortDescriptionFrom, toRichTextHtml } from './rich-text';
 
 describe('toRichTextHtml', () => {
 	it('passes HTML through untouched', () => {
@@ -53,5 +53,33 @@ describe('shortDescriptionFrom', () => {
 	it('is empty for an empty description', () => {
 		expect(shortDescriptionFrom('')).toBe('');
 		expect(shortDescriptionFrom('<p></p>')).toBe('');
+	});
+});
+
+describe('normalizeLinkHref', () => {
+	it('adds https to a bare domain', () => {
+		expect(normalizeLinkHref(' example.org/about ')).toBe('https://example.org/about');
+		expect(normalizeLinkHref('www.example.org')).toBe('https://www.example.org');
+	});
+
+	it('turns a bare address into mailto', () => {
+		expect(normalizeLinkHref('hello@example.org')).toBe('mailto:hello@example.org');
+	});
+
+	it('leaves schemes, anchors and paths alone', () => {
+		for (const href of [
+			'https://a.org',
+			'http://a.org',
+			'mailto:a@b.org',
+			'tel:+15551234',
+			'#faq',
+			'/report'
+		]) {
+			expect(normalizeLinkHref(href)).toBe(href);
+		}
+	});
+
+	it('is empty for an empty input, which unsets the link', () => {
+		expect(normalizeLinkHref('  ')).toBe('');
 	});
 });

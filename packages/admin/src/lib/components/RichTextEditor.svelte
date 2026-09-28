@@ -20,7 +20,7 @@
 	import { Button } from '@civicos/shared/ui/button';
 	import { Input } from '@civicos/shared/ui/input';
 	import * as Popover from '@civicos/shared/ui/popover';
-	import { RICH_TEXT_PROSE_CLASS, toRichTextHtml } from '$lib/utils/rich-text';
+	import { RICH_TEXT_PROSE_CLASS, normalizeLinkHref, toRichTextHtml } from '$lib/utils/rich-text';
 
 	interface Props {
 		/** Contents as HTML. Legacy plain text is normalized on the way in. */
@@ -174,7 +174,7 @@
 		const chain = editor?.chain().focus().extendMarkRange('link');
 		if (!chain) return;
 
-		const href = linkHref.trim();
+		const href = normalizeLinkHref(linkHref);
 		if (href === '') chain.unsetLink().run();
 		else chain.setLink({ href }).run();
 		linkOpen = false;
