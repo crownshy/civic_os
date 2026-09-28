@@ -24,8 +24,8 @@ const PUBLIC_PREFIXES = ['/api/auth/', '/_app/', '/favicon'];
  * instead of this user, and a stale key would 401 every admin back to login.
  *
  * 200 → user is an admin. 401 → no/expired session, or logged in but not admin
- * (comhairle answers both with 401). 403 → forbidden, though `/regions` does
- * not return it today.
+ * (comhairle answers both with 401, so `CurrentUser` tells them apart). 403 →
+ * forbidden, though `/regions` does not return it today.
  *
  * Only the status decides, never the body, so a reply that arrives but fails
  * schema validation still counts as admin: drift between the generated client
@@ -53,7 +53,19 @@ async function probeAdmin(authToken: string): Promise<'admin' | 'unauthorized' |
 		const status = err.response?.status;
 		if (status === undefined) throw e;
 		if (status === 403) return 'forbidden';
-		return 'unauthorized';
+		// comhairle answers "not an admin" with the same 401 as "not logged in".
+		// A Host member is the first case (#442), and bouncing them to a blank
+		// login page reads as a broken password, so ask who they are.
+		return (await isSignedIn(api)) ? 'forbidden' : 'unauthorized';
+	}
+}
+
+async function isSignedIn(api: ReturnType<typeof createBackendClient>): Promise<boolean> {
+	try {
+		await api.CurrentUser();
+		return true;
+	} catch {
+		return false;
 	}
 }
 
