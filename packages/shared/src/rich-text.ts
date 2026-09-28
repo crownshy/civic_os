@@ -174,3 +174,18 @@ export function splitAtHeadings(html: string): RichTextSection[] {
 
 	return sections;
 }
+
+/**
+ * A Campaign's `shortDescription`: the first paragraph of its description, as
+ * plain text. Directory and Place cards print it unclamped, so the whole body,
+ * headings and all, was too much; the first paragraph is the Host's own lead.
+ * Takes the description as stored, plain text or block HTML.
+ */
+export function shortDescriptionFrom(description: string): string {
+	const html = isHtml(description) ? description : plainTextToParagraphs(description);
+	for (const section of splitAtHeadings(html)) {
+		const lead = blockHtmlToPlainText(section.html).split('\n\n')[0].trim();
+		if (lead) return lead;
+	}
+	return '';
+}

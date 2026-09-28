@@ -1,6 +1,6 @@
 // The shape helpers moved to @civicos/shared so civicos can render the same
 // field. Re-exported here for the existing `$lib/utils/rich-text` imports.
-export { isHtml, toRichTextHtml } from '@civicos/shared/rich-text';
+export { isHtml, shortDescriptionFrom, toRichTextHtml } from '@civicos/shared/rich-text';
 
 /**
  * Prose styling for rich-text output. The editor's contenteditable is owned by

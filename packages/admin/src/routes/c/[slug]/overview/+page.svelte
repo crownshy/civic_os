@@ -27,6 +27,7 @@
 	import { RESERVED_ROUTE_SLUGS, routeSlugFor, slugTakenMessage } from '$lib/conversations';
 	import ContextCard from './ContextCard.svelte';
 	import RichTextEditor from '$lib/components/RichTextEditor.svelte';
+	import { shortDescriptionFrom } from '$lib/utils/rich-text';
 	import { setupSchema } from './setup-schema';
 	import { apiStatus, describeApiFailure } from '$lib/api/describe-failure';
 
@@ -266,11 +267,28 @@
 		// against this backend.
 		const target = data.textContent[key];
 		if (!target) return `No translation record for "${key}" on this Campaign.`;
-		return () =>
+		const write = () =>
 			data.api.CreateOrUpdateTextTranslation(
 				{ content },
 				{ params: { text_content_id: target.id, locale: target.locale } }
 			);
+		if (key !== 'description') return write;
+
+		// The directory and Place cards print `shortDescription`, which was only
+		// ever written at creation, so edits here never reached them (#444). It
+		// follows the description's lead. Best effort: the description itself
+		// saved, and a stale card is no reason to report that it did not.
+		return async () => {
+			await write();
+			const short = data.textContent.shortDescription;
+			if (!short) return;
+			await data.api
+				.CreateOrUpdateTextTranslation(
+					{ content: shortDescriptionFrom(content) },
+					{ params: { text_content_id: short.id, locale: short.locale } }
+				)
+				.catch((e) => console.warn('Could not update the short description', e));
+		};
 	}
 
 	/**

@@ -28,39 +28,46 @@
 	import JoinSkeleton from './JoinSkeleton.svelte';
 	import VotingSkeleton from './contribute/VotingSkeleton.svelte';
 
-	const region: RegionConfig = page.data.region;
-	const campaign: Campaign = page.data.campaign;
-	const hostCopy = page.data.hostCopy;
-	const placeName = placeNameFor(campaign, region);
+	// Derived, not captured: a client-side move to another Campaign, or an
+	// `invalidate('civicos:conversation')` after a Host edit, keeps this component
+	// and only swaps `page.data` under it.
+	const region: RegionConfig = $derived(page.data.region);
+	const campaign: Campaign = $derived(page.data.campaign);
+	const hostCopy = $derived(page.data.hostCopy);
+	const placeName = $derived(placeNameFor(campaign, region));
 	// The same Key Question /contribute resolves, so the skeleton shown here and
 	// the voting screen it becomes label the statement identically.
-	const question = campaign?.poll?.question || region.question;
+	const question = $derived(campaign?.poll?.question || region.question);
 	// `page.params` is typed app-wide, so the segments this route matched on read
 	// as optional; reaching this component means both are present.
-	const contributePath = resolve('/[org]/conversations/[campaign]/contribute', {
-		org: page.params.org!,
-		campaign: campaign.slug
-	});
+	const contributePath = $derived(
+		resolve('/[org]/conversations/[campaign]/contribute', {
+			org: page.params.org!,
+			campaign: campaign.slug
+		})
+	);
 	// The organizations to credit, from `metadata.cohosts` where admin mirrored
 	// the grants. Empty for a Campaign with none, rather than the catch-all's
 	// `partners`, which credited The Bloom Project on everybody's Campaign.
-	const cohosts = campaign.cohosts;
+	const cohosts = $derived(campaign.cohosts);
 	// Resolved in the layout load, so a Host's saved questions replace the
 	// `regions.ts` placeholders without this page knowing which it got.
-	const faq = page.data.faq;
+	const faq = $derived(page.data.faq);
 	// The Host's Context copy, cut at its headings so each one gets its own
 	// section and its own nav pill. A description with no headings comes back as
 	// the single Context section this page rendered before.
-	const contextSections = toContextSections(hostCopy.context);
+	const contextSections = $derived(toContextSections(hostCopy.context));
 	// `context` in NAV_SECTIONS is a placeholder for those pills; FAQ drops out
 	// when there are no questions, matching the section below.
-	const navSections = NAV_SECTIONS.flatMap((section) => {
-		if (section.id === 'context') return contextSections.map(({ id, label }) => ({ id, label }));
-		if (section.id === 'faq' && faq.length === 0) return [];
-		if (section.id === 'your-host' && cohosts.length === 0) return [];
-		if (section.id === 'whats-next' && !hostCopy.whatsNext) return [];
-		return [section];
-	});
+	const navSections = $derived.by(() =>
+		NAV_SECTIONS.flatMap((section) => {
+			if (section.id === 'context') return contextSections.map(({ id, label }) => ({ id, label }));
+			if (section.id === 'faq' && faq.length === 0) return [];
+			if (section.id === 'your-host' && cohosts.length === 0) return [];
+			if (section.id === 'whats-next' && !hostCopy.whatsNext) return [];
+			return [section];
+		})
+	);
 	// Who the server says this is, resolved from the cookie in the root layout.
 	// A returning participant gets CONTINUE on the first paint instead of after
 	// hydration. Only a zip counts: an email-only signup has an account but has

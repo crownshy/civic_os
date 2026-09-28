@@ -109,6 +109,7 @@ export const load: LayoutServerLoad = async ({ params, parent, cookies, url, dep
 			? (conversation.translations as {
 					title?: TxField;
 					description?: TxField;
+					shortDescription?: TxField;
 					faqs?: TxField;
 					thankYouMessage?: TxField;
 				})
@@ -121,6 +122,7 @@ export const load: LayoutServerLoad = async ({ params, parent, cookies, url, dep
 	const textContent = {
 		title: fieldTarget(tx?.title),
 		description: fieldTarget(tx?.description),
+		shortDescription: fieldTarget(tx?.shortDescription),
 		faqs: fieldTarget(tx?.faqs),
 		thankYouMessage: fieldTarget(tx?.thankYouMessage)
 	};

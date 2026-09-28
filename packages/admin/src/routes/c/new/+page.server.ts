@@ -9,6 +9,7 @@ import { enableDefaultDemographics } from '$lib/api/demographics';
 import { polisConfigFor } from '$lib/polis-step';
 import { COHOST_ROLE, CONVERSATION_RESOURCE } from '$lib/permissions';
 import { mirrorHosts } from '$lib/cohost-mirror';
+import { shortDescriptionFrom } from '$lib/utils/rich-text';
 import { participantBase, slugTakenMessage } from '$lib/conversations';
 import type { PickerOrg } from '$lib/components/setup/AddCoHostsDialog.svelte';
 import type { UserOrganizationAccess } from '@crownshy/api-client/api';
@@ -113,7 +114,7 @@ export const actions: Actions = {
 				title,
 				slug: conversationSlug,
 				description,
-				short_description: description,
+				short_description: shortDescriptionFrom(description),
 				primary_locale: 'en',
 				supported_languages: ['en'],
 				is_live: false,
