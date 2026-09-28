@@ -323,7 +323,7 @@
 					<span class="font-display text-base font-medium opacity-80 md:text-lg">Hosted by</span>
 					<div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-4 text-center">
 						<!-- eslint-disable svelte/no-navigation-without-resolve -- a co-host's own site, external -->
-						{#each cohosts as cohost (cohost.name)}
+						{#each cohosts as cohost, i (i)}
 							{#if cohost.logo}
 								<a href={safeHref(cohost.url)} target="_blank" rel="noopener noreferrer">
 									<img
@@ -387,7 +387,7 @@
 				name and url are never interpolated into one. -->
 			<!-- eslint-disable svelte/no-navigation-without-resolve -- co-host sites are external; the anchor opens mid-sentence, so no line disable fits -->
 			<p class="mt-6 font-sans text-base leading-6 font-medium opacity-80 md:text-lg">
-				This Open Poll is hosted by {#each cohosts as cohost, i (cohost.name)}{#if cohost.url}<a
+				This Open Poll is hosted by {#each cohosts as cohost, i (i)}{#if cohost.url}<a
 							href={safeHref(cohost.url)}
 							target="_blank"
 							rel="noopener noreferrer"
