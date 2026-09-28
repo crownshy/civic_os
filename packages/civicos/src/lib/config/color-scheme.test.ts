@@ -65,3 +65,22 @@ describe('DEFAULT_COLOR_SCHEME', () => {
 		expect(declared('--secondary')).toBe(DEFAULT_COLOR_SCHEME.secondary);
 	});
 });
+
+/** WCAG contrast of a hex colour against white. */
+function contrastWithWhite(hex: string): number {
+	const channel = (i: number) => {
+		const c = parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16) / 255;
+		return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+	};
+	const luminance = 0.2126 * channel(0) + 0.7152 * channel(1) + 0.0722 * channel(2);
+	return 1.05 / (luminance + 0.05);
+}
+
+describe('COLOR_SCHEMES contrast', () => {
+	// White text sits on `primary` (buttons, chips, footer) and `secondary` is
+	// text on white, so both have to clear WCAG AA for body text.
+	it.each(COLOR_SCHEMES)('$label clears 4.5:1 against white', (scheme) => {
+		expect(contrastWithWhite(scheme.primary)).toBeGreaterThanOrEqual(4.5);
+		expect(contrastWithWhite(scheme.secondary)).toBeGreaterThanOrEqual(4.5);
+	});
+});

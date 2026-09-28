@@ -17,7 +17,10 @@
 export interface ColorScheme {
 	id: string;
 	label: string;
-	/** Solid fills: buttons, chips, the compose strip, the footer. White sits on it. */
+	/**
+	 * Solid fills: buttons, chips, the compose strip, the footer. White text sits
+	 * on it, so it has to clear 4.5:1 against white too.
+	 */
 	primary: string;
 	/**
 	 * The same hue, darker. Mostly text and thin fills in civicos (progress bar,
@@ -35,7 +38,8 @@ export const COLOR_SCHEME_METADATA_KEY = 'colorScheme';
  *
  * Slate and Plum are read off the design screenshots rather than Figma, so treat
  * their hexes as provisional. The last five are the Tailwind 600/700 swatches the
- * Setup card offered before, with their 800 as the secondary.
+ * Setup card offered before, with their 800 as the secondary. Teal is the 700:
+ * its 600 carried white text at 3.7:1, under the 4.5 every `primary` must clear.
  */
 export const COLOR_SCHEMES: readonly ColorScheme[] = [
 	{ id: 'green', label: 'Green', primary: '#406b43', secondary: '#345136' },
@@ -45,7 +49,7 @@ export const COLOR_SCHEMES: readonly ColorScheme[] = [
 	{ id: 'blue', label: 'Blue', primary: '#2563eb', secondary: '#1e40af' },
 	{ id: 'purple', label: 'Purple', primary: '#9333ea', secondary: '#6b21a8' },
 	{ id: 'pink', label: 'Pink', primary: '#db2777', secondary: '#9d174d' },
-	{ id: 'teal', label: 'Teal', primary: '#0891b2', secondary: '#155e75' }
+	{ id: 'teal', label: 'Teal', primary: '#0e7490', secondary: '#155e75' }
 ];
 
 export const DEFAULT_COLOR_SCHEME = COLOR_SCHEMES[0];
