@@ -23,6 +23,8 @@
 		onVote: (type: 'agree' | 'disagree' | 'pass') => void;
 		onEnd: () => void;
 		onCompose: () => void;
+		/** False when the Host turned off "Add a Statement". */
+		showCompose?: boolean;
 		region: RegionConfig;
 	}
 
@@ -38,6 +40,7 @@
 		onVote,
 		onEnd,
 		onCompose,
+		showCompose = true,
 		region
 	}: Props = $props();
 
@@ -123,6 +126,7 @@
 		onSkip={() => doVote('pass')}
 		onReport={() => (reportOpen = true)}
 		{onCompose}
+		{showCompose}
 	/>
 
 	<ReportPanel bind:open={reportOpen} {statementId} {statementText} {region} />

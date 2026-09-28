@@ -336,6 +336,7 @@
 				onVote={handleVote}
 				onEnd={handleEnd}
 				onCompose={() => (screen = 'compose')}
+				showCompose={participation.asks.contribute}
 				{region}
 			/>
 		{:else}

@@ -9,6 +9,8 @@
 		onDisagree?: () => void;
 		onSkip?: () => void;
 		onCompose?: () => void;
+		/** The Host's "Add a Statement" ask. Off means no compose strip at all. */
+		showCompose?: boolean;
 		onReport?: () => void;
 		disabled?: boolean;
 		skeleton?: boolean;
@@ -20,6 +22,7 @@
 		onDisagree,
 		onSkip,
 		onCompose,
+		showCompose = true,
 		onReport,
 		disabled = false,
 		skeleton = false,
@@ -71,25 +74,27 @@
 	{/if}
 
 	<!-- Compose area -->
-	<button
-		onclick={onCompose}
-		data-umami-event="compose-click"
-		class="w-full touch-manipulation rounded-t-[40px] bg-primary p-5 text-left transition-all hover:bg-primary/95 active:bg-primary/85 active:duration-0"
-	>
-		<div class="flex items-center gap-[15px]">
-			<img
-				src={smiley}
-				alt=""
-				class="h-[50px] w-[50px] shrink-0 rounded-full shadow-[0px_4px_10px_0px_rgba(83,42,14,0.25)]"
-			/>
-			<div
-				class="flex flex-1 items-center justify-between rounded-full bg-card px-5 py-4 shadow-[0px_4px_10px_0px_rgba(83,42,14,0.25),inset_0_0_0_2px_rgba(255,255,255,0.4)]"
-			>
-				<span class="truncate font-sans text-xl font-bold text-card-foreground"
-					>Share your perspective...</span
+	{#if showCompose}
+		<button
+			onclick={onCompose}
+			data-umami-event="compose-click"
+			class="w-full touch-manipulation rounded-t-[40px] bg-primary p-5 text-left transition-all hover:bg-primary/95 active:bg-primary/85 active:duration-0"
+		>
+			<div class="flex items-center gap-[15px]">
+				<img
+					src={smiley}
+					alt=""
+					class="h-[50px] w-[50px] shrink-0 rounded-full shadow-[0px_4px_10px_0px_rgba(83,42,14,0.25)]"
+				/>
+				<div
+					class="flex flex-1 items-center justify-between rounded-full bg-card px-5 py-4 shadow-[0px_4px_10px_0px_rgba(83,42,14,0.25),inset_0_0_0_2px_rgba(255,255,255,0.4)]"
 				>
-				<ArrowRight class="h-[30px] w-[30px] shrink-0 text-card-foreground" />
+					<span class="truncate font-sans text-xl font-bold text-card-foreground"
+						>Share your perspective...</span
+					>
+					<ArrowRight class="h-[30px] w-[30px] shrink-0 text-card-foreground" />
+				</div>
 			</div>
-		</div>
-	</button>
+		</button>
+	{/if}
 </div>
