@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { TEXT_LIMITS } from '@civicos/shared/data/text-limits';
 	import { Button } from '@civicos/shared/ui/button';
 	import { invalidate } from '$lib/activity.svelte';
 	import { ChevronRight, Plus, X } from '@lucide/svelte';
@@ -245,6 +246,7 @@
 					id="ev-name"
 					type="text"
 					bind:value={form.name}
+					maxlength={TEXT_LIMITS.eventName}
 					required
 					class="w-full rounded-lg border border-foreground/20 bg-muted/30 px-3 py-2 text-body outline-none"
 					placeholder="Community listening session"
@@ -258,6 +260,7 @@
 				<textarea
 					id="ev-desc"
 					bind:value={form.description}
+					maxlength={TEXT_LIMITS.eventDescription}
 					required
 					rows="3"
 					class="w-full rounded-lg border border-foreground/20 bg-muted/30 px-3 py-2 text-body outline-none"

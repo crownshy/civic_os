@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { TEXT_LIMITS } from '@civicos/shared/data/text-limits';
 	import { untrack } from 'svelte';
 	import { beforeNavigate, goto } from '$app/navigation';
 	import { invalidate } from '$lib/activity.svelte';
@@ -366,6 +367,7 @@
 		<input
 			aria-label="Event name"
 			bind:value={form.name}
+			maxlength={TEXT_LIMITS.eventName}
 			onblur={saveName}
 			class="w-full bg-transparent text-h3 font-bold outline-none md:text-h2"
 		/>
@@ -598,6 +600,7 @@
 			<textarea
 				id="ev-desc"
 				bind:value={form.description}
+				maxlength={TEXT_LIMITS.eventDescription}
 				onblur={() =>
 					form.description.trim() !== event.description &&
 					save('description', { description: form.description.trim() })}

@@ -3,6 +3,7 @@
 	import * as Dialog from '@civicos/shared/ui/dialog';
 	import { Button } from '@civicos/shared/ui/button';
 	import SetupField from './SetupField.svelte';
+	import { TEXT_LIMITS } from '@civicos/shared/data/text-limits';
 	import {
 		cleanOptionLabel,
 		findRepeatedOption,
@@ -48,6 +49,8 @@
 		if (!category && isKeyTaken(slug, existing)) return 'A category with that name already exists.';
 		if (draftRepeats) return 'Change or discard the repeated option.';
 		if (options.length < 2) return 'Add at least two options.';
+		if (options.length > TEXT_LIMITS.demographicOptionCount)
+			return `Keep it to ${TEXT_LIMITS.demographicOptionCount} options or fewer.`;
 		if (repeats.size > 0) return 'Options must be unique.';
 		return null;
 	});
@@ -72,7 +75,10 @@
 		node.parentElement?.scrollIntoView({ block: 'nearest' });
 	}
 
+	const full = $derived(options.length >= TEXT_LIMITS.demographicOptionCount);
+
 	function startAdd() {
+		if (full) return;
 		options = [...options, ''];
 		editing = options.length - 1;
 		draft = '';
@@ -163,6 +169,7 @@
 				<SetupField label="Category name">
 					<input
 						bind:value={name}
+						maxlength={TEXT_LIMITS.demographicName}
 						{@attach takeFocus}
 						placeholder="e.g. Education Level"
 						onkeydown={(e) => {
@@ -188,6 +195,7 @@
 									<div class="min-w-0 flex-1">
 										<input
 											bind:value={draft}
+											maxlength={TEXT_LIMITS.demographicOption}
 											{@attach takeFocus}
 											aria-label={`Option ${i + 1}`}
 											aria-describedby="option-editor-hint"
@@ -273,7 +281,7 @@
 						<button
 							type="button"
 							onclick={startAdd}
-							disabled={editing >= 0}
+							disabled={editing >= 0 || full}
 							class="w-full cursor-pointer py-4 text-left text-body font-semibold text-primary transition-opacity hover:opacity-80 active:opacity-60 disabled:cursor-not-allowed disabled:opacity-50"
 						>
 							Add New…

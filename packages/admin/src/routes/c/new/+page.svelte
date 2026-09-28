@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { TEXT_LIMITS } from '@civicos/shared/data/text-limits';
 	import { untrack } from 'svelte';
 	import { superForm } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
@@ -122,6 +123,7 @@
 							<input
 								{...props}
 								bind:value={$formData.title}
+								maxlength={TEXT_LIMITS.campaignTitle}
 								oninput={onTitleInput}
 								class={inputClass}
 							/>
@@ -183,7 +185,12 @@
 								What participants are asked to deliberate on. This becomes the Polis conversation's
 								topic.
 							</p>
-							<textarea {...props} bind:value={$formData.keyQuestion} rows="2" class={inputClass}
+							<textarea
+								{...props}
+								bind:value={$formData.keyQuestion}
+								maxlength={TEXT_LIMITS.keyQuestion}
+								rows="2"
+								class={inputClass}
 							></textarea>
 						{/snippet}
 					</Form.Control>
@@ -275,7 +282,12 @@
 							<p class="mb-1 text-caption text-muted-foreground">
 								This appears on the homepage for this conversation. You can add it later.
 							</p>
-							<textarea {...props} bind:value={$formData.description} rows="4" class={inputClass}
+							<textarea
+								{...props}
+								bind:value={$formData.description}
+								maxlength={TEXT_LIMITS.description}
+								rows="4"
+								class={inputClass}
 							></textarea>
 						{/snippet}
 					</Form.Control>

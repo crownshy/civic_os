@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { RESERVED_ROUTE_SLUGS } from '$lib/conversations';
+import { TEXT_LIMITS, tooLong } from '@civicos/shared/data/text-limits';
 
 /**
  * Create-Campaign form.
@@ -15,14 +16,22 @@ import { RESERVED_ROUTE_SLUGS } from '$lib/conversations';
  * poll is provisioned at create time and `tool_setup` requires a topic.
  */
 export const createConversationSchema = z.object({
-	title: z.string().trim().min(1, 'Title is required'),
+	title: z
+		.string()
+		.trim()
+		.min(1, 'Title is required')
+		.max(TEXT_LIMITS.campaignTitle, tooLong('campaignTitle')),
 	slug: z
 		.string()
 		.trim()
 		.min(1, 'Slug is required')
 		.regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Lowercase letters, numbers and single hyphens only')
 		.refine((s) => !RESERVED_ROUTE_SLUGS.includes(s as never), 'That slug is reserved'),
-	keyQuestion: z.string().trim().min(1, 'Key question is required'),
+	keyQuestion: z
+		.string()
+		.trim()
+		.min(1, 'Key question is required')
+		.max(TEXT_LIMITS.keyQuestion, tooLong('keyQuestion')),
 	/**
 	 * Where the Campaign runs, collected here so it has a Place from the start
 	 * rather than only once someone visits Setup. Optional: a Campaign with no
@@ -34,7 +43,7 @@ export const createConversationSchema = z.object({
 	 * applies on a Place change.
 	 */
 	placeName: z.string().trim().default(''),
-	description: z.string().trim().default(''),
+	description: z.string().trim().max(TEXT_LIMITS.description, tooLong('description')).default(''),
 	/**
 	 * Owning Host. Preselected in `load` from the Host the creator belongs to;
 	 * empty only when they belong to none, which the action refuses.

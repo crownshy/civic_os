@@ -247,6 +247,7 @@
 				disabled={!stepId}
 				onPost={postOneSeed}
 				onPosted={syncAfterSeeding}
+				existing={statements.map((s) => s.statement_text)}
 				onDone={(n) => (notice = { text: `Added ${plural(n, 'seed statement')}.`, error: false })}
 			/>
 		</div>

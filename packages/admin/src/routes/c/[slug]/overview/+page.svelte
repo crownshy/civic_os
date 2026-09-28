@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { TEXT_LIMITS } from '@civicos/shared/data/text-limits';
 	import { untrack } from 'svelte';
 	import { beforeNavigate, goto } from '$app/navigation';
 	import { enhance, invalidate } from '$lib/activity.svelte';
@@ -677,6 +678,7 @@
 				<input
 					{...props}
 					bind:value={$formData.title}
+					maxlength={TEXT_LIMITS.campaignTitle}
 					class="font-display w-full rounded-[10px] border border-stone-300 bg-transparent px-3 py-2 text-body-lg font-semibold focus:border-primary focus:outline-none"
 				/>
 			{/snippet}
@@ -719,6 +721,7 @@
 				<textarea
 					{...props}
 					bind:value={$formData.keyQuestion}
+					maxlength={TEXT_LIMITS.keyQuestion}
 					rows="2"
 					class="field-sizing-content w-full resize-none rounded-[10px] border border-stone-300 bg-transparent px-3 py-2 text-body focus:border-primary focus:outline-none"
 				></textarea>

@@ -17,6 +17,7 @@
 		"./data/faq": "./src/data/faq.ts",
 		"./data/participant-asks": "./src/data/participant-asks.ts",
 		"./data/color-scheme": "./src/data/color-scheme.ts",
+		"./data/text-limits": "./src/data/text-limits.ts",
 		"./data/place": "./src/data/place.ts",
 		"./data/regions": "./src/data/regions.ts",
 		"./data/zipcodes": "./src/data/zipcodes.ts",

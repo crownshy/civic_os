@@ -1,6 +1,14 @@
 import { z } from 'zod';
 
 import { RESERVED_ROUTE_SLUGS } from '$lib/conversations';
+import { TEXT_LIMITS, tooLong } from '@civicos/shared/data/text-limits';
+import { blockHtmlToPlainText } from '@civicos/shared/rich-text';
+
+/** A rich-text field, capped on the text a reader sees rather than its markup. */
+const richText = (field: 'description' | 'thankYouMessage') =>
+	z
+		.string()
+		.refine((html) => blockHtmlToPlainText(html).length <= TEXT_LIMITS[field], tooLong(field));
 
 /**
  * Editable Setup fields.
@@ -22,15 +30,23 @@ import { RESERVED_ROUTE_SLUGS } from '$lib/conversations';
  * first save creates it. See `writeTextContent`.
  */
 export const setupSchema = z.object({
-	title: z.string().min(1, 'Title is required'),
-	description: z.string(),
-	thankYouMessage: z.string(),
+	title: z
+		.string()
+		.trim()
+		.min(1, 'Title is required')
+		.max(TEXT_LIMITS.campaignTitle, tooLong('campaignTitle')),
+	description: richText('description'),
+	thankYouMessage: richText('thankYouMessage'),
 	slug: z
 		.string()
 		.min(1, 'Slug is required')
 		.regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Lowercase letters, numbers and single hyphens only')
 		.refine((s) => !RESERVED_ROUTE_SLUGS.includes(s as never), 'That slug is reserved'),
-	keyQuestion: z.string().min(1, 'Key question is required')
+	keyQuestion: z
+		.string()
+		.trim()
+		.min(1, 'Key question is required')
+		.max(TEXT_LIMITS.keyQuestion, tooLong('keyQuestion'))
 });
 
 export type SetupSchema = typeof setupSchema;

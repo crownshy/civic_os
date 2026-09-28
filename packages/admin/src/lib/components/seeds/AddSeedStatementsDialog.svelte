@@ -4,7 +4,8 @@
 	import { Spinner } from '@civicos/shared/ui/spinner';
 	import { Plus, Upload } from '@lucide/svelte';
 	import type { Snippet } from 'svelte';
-	import { parseSeedCsv } from './seed-csv';
+	import { TEXT_LIMITS } from '@civicos/shared/data/text-limits';
+	import { parseSeedCsv, seedProblem } from './seed-csv';
 
 	interface Props {
 		/** Post one statement to Polis. Called once per statement, in order. */
@@ -16,9 +17,11 @@
 		disabled?: boolean;
 		/** Replaces the default button, for surfaces with their own add affordance. */
 		trigger?: Snippet<[{ open: () => void; disabled: boolean }]>;
+		/** Statements already in the poll, so a repeat is refused before it posts. */
+		existing?: string[];
 	}
 
-	let { onPost, onPosted, onDone, disabled = false, trigger }: Props = $props();
+	let { onPost, onPosted, onDone, disabled = false, trigger, existing = [] }: Props = $props();
 
 	let open = $state(false);
 	let draft = $state('');
@@ -67,6 +70,8 @@
 		error = null;
 		try {
 			const list = await texts();
+			const problem = seedProblem(list, existing);
+			if (problem) throw new Error(problem);
 			await postSeeds(list);
 			draft = '';
 			open = false;
@@ -147,6 +152,7 @@
 				id="seed-text"
 				bind:value={draft}
 				rows="3"
+				maxlength={TEXT_LIMITS.statement}
 				placeholder="Write a seed statement…"
 				disabled={busy}
 				class="w-full rounded-[10px] border border-input bg-background px-3 py-2 text-body focus:ring-2 focus:ring-ring focus:outline-none disabled:opacity-50"

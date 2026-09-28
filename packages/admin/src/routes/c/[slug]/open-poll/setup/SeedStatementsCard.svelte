@@ -100,7 +100,12 @@
 		{/each}
 
 		<div class="border-t border-border px-3.5 py-4">
-			<AddSeedStatementsDialog {onPost} {onPosted} disabled={!canEdit}>
+			<AddSeedStatementsDialog
+				{onPost}
+				{onPosted}
+				disabled={!canEdit}
+				existing={statements.map((s) => s.statement_text)}
+			>
 				{#snippet trigger({ open, disabled })}
 					<button
 						type="button"

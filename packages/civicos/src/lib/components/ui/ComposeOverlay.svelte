@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { TEXT_LIMITS } from '@civicos/shared/data/text-limits';
 	import { onDestroy } from 'svelte';
 	import { cn } from '$lib/utils';
 	import Button from './Button.svelte';
@@ -25,7 +26,8 @@
 	let text = $state('');
 	let submitted = $state(false);
 	let submitTimer: ReturnType<typeof setTimeout>;
-	const maxChars = 240;
+	// Shared with admin's seed statements, so a seed reads like any other statement.
+	const maxChars = TEXT_LIMITS.statement;
 	const charCount = $derived(text.length);
 	const overLimit = $derived(charCount > maxChars);
 	const canSubmit = $derived(charCount > 0 && charCount <= maxChars && !submitted);

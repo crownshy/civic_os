@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { TEXT_LIMITS } from '@civicos/shared/data/text-limits';
 	import { untrack } from 'svelte';
 	import { superForm } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
@@ -73,7 +74,12 @@
 							class="text-label font-semibold tracking-wider text-muted-foreground uppercase"
 							>Organization name</Form.Label
 						>
-						<input {...props} bind:value={$formData.name} class={inputClass} />
+						<input
+							{...props}
+							bind:value={$formData.name}
+							maxlength={TEXT_LIMITS.hostName}
+							class={inputClass}
+						/>
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors class="mt-1 text-caption text-destructive" />
@@ -188,7 +194,12 @@
 						<p class="mb-1 text-caption text-muted-foreground">
 							This appears on the homepage for this Host.
 						</p>
-						<textarea {...props} bind:value={$formData.description} rows="4" class={inputClass}
+						<textarea
+							{...props}
+							bind:value={$formData.description}
+							maxlength={TEXT_LIMITS.hostDescription}
+							rows="4"
+							class={inputClass}
 						></textarea>
 					{/snippet}
 				</Form.Control>

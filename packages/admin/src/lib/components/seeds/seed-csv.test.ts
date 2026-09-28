@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseSeedCsv } from './seed-csv';
+import { parseSeedCsv, seedProblem } from './seed-csv';
 
 describe('parseSeedCsv', () => {
 	it('reads one statement per line and skips blanks', () => {
@@ -26,5 +26,28 @@ describe('parseSeedCsv', () => {
 
 	it('returns nothing for a header-only file', () => {
 		expect(parseSeedCsv('statements\n')).toEqual([]);
+	});
+});
+
+describe('seedProblem', () => {
+	const long = 'x'.repeat(241);
+
+	it('passes a clean batch', () => {
+		expect(seedProblem(['Parks need lights', 'Buses should run later'])).toBeNull();
+	});
+
+	it('names the statements that are too long', () => {
+		expect(seedProblem(['ok', long, 'fine', long])).toMatch(/^Statements 2, 4 are over 240/);
+		expect(seedProblem([long])).toMatch(/^This statement is over 240/);
+	});
+
+	it('refuses a statement already in the poll, whatever its case or spacing', () => {
+		expect(seedProblem(['parks  need lights'], ['Parks need lights'])).toMatch(
+			/^This statement is already in the poll/
+		);
+	});
+
+	it('refuses a repeat inside the same batch', () => {
+		expect(seedProblem(['A', 'B', 'a'])).toMatch(/^Statement 3 is already/);
 	});
 });

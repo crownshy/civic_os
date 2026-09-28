@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { TEXT_LIMITS, tooLong } from '@civicos/shared/data/text-limits';
 
 /**
  * Create-Host form. Maps onto CreateOrganization (name, description, mission,
@@ -8,8 +9,16 @@ import { z } from 'zod';
  * own page after creation, not here. See #382, CONTEXT.md.
  */
 export const createHostSchema = z.object({
-	name: z.string().trim().min(1, 'Organization name is required'),
-	description: z.string().trim().min(1, 'A basic description is required'),
+	name: z
+		.string()
+		.trim()
+		.min(1, 'Organization name is required')
+		.max(TEXT_LIMITS.hostName, tooLong('hostName')),
+	description: z
+		.string()
+		.trim()
+		.min(1, 'A basic description is required')
+		.max(TEXT_LIMITS.hostDescription, tooLong('hostDescription')),
 	// Bare website (no protocol); the action prefixes https:// -> external_url.
 	website: z.string().trim().default(''),
 	contactEmail: z.union([z.literal(''), z.email('Enter a valid contact email')]).default(''),
