@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
-	import type { AboutYouQuestion, DemographicKey } from '$lib/config/participation';
+	import type { AboutYouQuestion } from '$lib/config/participation';
 	import { InfoBar, Button, Dialog, Link } from '$lib/components/ui';
 	import { Check, Plus } from 'lucide-svelte';
 
@@ -13,17 +13,18 @@
 		 * one off in admin is the only thing that removes it.
 		 */
 		questions: AboutYouQuestion[];
-		onDone: (demographics?: Partial<Record<DemographicKey, string>>) => void;
+		/** Picked option values, keyed by question slug. */
+		onDone: (answers?: Record<string, string>) => void;
 	}
 
 	let { placeName, questions, onDone }: Props = $props();
 
-	let openDialog = $state<DemographicKey | null>(null);
+	let openDialog = $state<string | null>(null);
 	let dialogOpen = $derived(openDialog !== null);
 	// One option per category: every category admin defines is single-select.
-	let selections = $state<Partial<Record<DemographicKey, number>>>({});
+	let selections = $state<Record<string, number>>({});
 
-	function openCategory(key: DemographicKey) {
+	function openCategory(key: string) {
 		openDialog = key;
 	}
 
@@ -31,20 +32,21 @@
 		openDialog = null;
 	}
 
-	function selectOption(key: DemographicKey, idx: number) {
+	function selectOption(key: string, idx: number) {
 		selections = { ...selections, [key]: idx };
 	}
 
 	function selectionLabel(q: AboutYouQuestion): string {
 		const idx = selections[q.key];
-		return idx === undefined ? '' : q.options[idx];
+		return idx === undefined ? '' : (q.options[idx]?.label ?? '');
 	}
 
-	function collectDemographics(): Partial<Record<DemographicKey, string>> {
-		const result: Partial<Record<DemographicKey, string>> = {};
+	function collectAnswers(): Record<string, string> {
+		const result: Record<string, string> = {};
 		for (const q of questions) {
-			const label = selectionLabel(q);
-			if (label) result[q.key] = label;
+			const idx = selections[q.key];
+			const option = idx === undefined ? undefined : q.options[idx];
+			if (option) result[q.key] = option.value;
 		}
 		return result;
 	}
@@ -129,9 +131,7 @@
 	</div>
 
 	<div class="flex shrink-0 items-center gap-3.5 px-7 py-8">
-		<Button variant="primary" fullWidth onclick={() => onDone(collectDemographics())}>
-			CONTINUE
-		</Button>
+		<Button variant="primary" fullWidth onclick={() => onDone(collectAnswers())}>CONTINUE</Button>
 	</div>
 </div>
 
@@ -148,7 +148,7 @@
 		}}
 	>
 		<div class="mt-6">
-			{#each dq.options as option, i (option)}
+			{#each dq.options as option, i (option.value)}
 				<button
 					onclick={() => selectOption(dq.key, i)}
 					class="relative flex h-16 w-full touch-manipulation items-center border-b border-foreground/20 px-7 text-left font-sans text-lg leading-5 font-bold transition-colors hover:bg-accent/30 active:bg-accent/60 active:duration-0 {selections[
@@ -157,7 +157,7 @@
 						? 'bg-accent/30 text-foreground'
 						: 'text-foreground/70'}"
 				>
-					<span class="flex-1">{option}</span>
+					<span class="flex-1">{option.label}</span>
 					{#if selections[dq.key] === i}
 						<span
 							class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-foreground"

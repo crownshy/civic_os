@@ -14,10 +14,9 @@
 	} from '$lib/components/ui';
 	import { popQuizQuestions } from '$lib/data/mock';
 	import {
-		aboutYouQuestionsFor,
 		ageBucketToNumber,
 		askedVariants,
-		type DemographicKey,
+		type AboutYouQuestion,
 		type Participation
 	} from '$lib/config/participation';
 	import { placeNameFor, pollFor } from '$lib/config/campaign';
@@ -56,12 +55,14 @@
 	// zip's region: the URL says which Campaign this is (#423).
 	const placeName = placeNameFor(campaign, region);
 
-	// What this Host asks participants for, resolved from the Conversation's
-	// metadata in the layout load. Both sets default to all-on, so a Campaign
-	// nobody has configured runs the poll it always ran. Derived, not captured,
-	// so an `invalidate('civicos:conversation')` after a Host edit reaches here.
+	// Which asks this Host makes, resolved from the Conversation's metadata in the
+	// layout load. All on by default, so a Campaign nobody has configured runs the
+	// poll it always ran. Derived, not captured, so an
+	// `invalidate('civicos:conversation')` after a Host edit reaches here.
 	const participation: Participation = $derived(page.data.participation);
-	const aboutYouQuestions = $derived(aboutYouQuestionsFor(participation.demographics));
+	// The demographics the Host switched on in admin, resolved in this page's
+	// load from the Campaign's ConversationDemographics links (#441).
+	const aboutYouQuestions: AboutYouQuestion[] = $derived(page.data.aboutYouQuestions);
 
 	// Use the participant's user ID for the Polis xid (falls back to random if not yet joined)
 	const userId =
@@ -241,15 +242,24 @@
 		goToEndFlow();
 	}
 
-	async function handleDemographicsDone(demographics?: Partial<Record<DemographicKey, string>>) {
-		// Save demographics to backend profile (awaited so it completes before navigation)
-		if (demographics) {
-			await session.saveProfile({
-				age: demographics.age ? ageBucketToNumber(demographics.age) : undefined,
-				ethnicity: demographics.ethnicity || undefined,
-				gender: demographics.gender || undefined,
-				politicalParty: demographics.politicalParty || undefined
-			});
+	async function handleDemographicsDone(answers?: Record<string, string>) {
+		// Awaited so the answers land before the screen moves on. Built-ins go on
+		// the profile, which the participation report reads; a Host's own
+		// categories are filed as demographics responses.
+		if (answers) {
+			const profile: Parameters<typeof session.saveProfile>[0] = {};
+			const custom: [string, string][] = [];
+			for (const question of aboutYouQuestions) {
+				const value = answers[question.key];
+				if (!value) continue;
+				if (question.profileField === 'age') profile.age = ageBucketToNumber(value);
+				else if (question.profileField) profile[question.profileField] = value;
+				else custom.push([question.key, value]);
+			}
+			await Promise.all([
+				session.saveProfile(profile),
+				...custom.map(([slug, value]) => session.saveDemographicResponse(slug, value))
+			]);
 		}
 
 		session.markDemographicsCompleted();

@@ -418,6 +418,38 @@ class Session {
 		}
 	}
 
+	/**
+	 * File an answer to a Host's own About You category (#441). The four
+	 * built-ins go through `saveProfile`; comhairle has no profile column for
+	 * anything else. An answer already on file, from a retry or a second pass,
+	 * is a 409 on create, so that one is updated instead.
+	 */
+	async saveDemographicResponse(questionSlug: string, value: string): Promise<boolean> {
+		const userId = this.userId;
+		if (!userId) return false;
+
+		try {
+			await this.api.CreateDemographicsResponse({ questionSlug, userId, value });
+			return true;
+		} catch (e) {
+			if (httpStatusOf(e) !== 409) {
+				console.error(`[Session] Failed to save "${questionSlug}":`, e);
+				return false;
+			}
+		}
+
+		try {
+			await this.api.UpdateDemographicsResponse(
+				{ value },
+				{ params: { question_slug: questionSlug, user_id: userId } }
+			);
+			return true;
+		} catch (e) {
+			console.error(`[Session] Failed to update "${questionSlug}":`, e);
+			return false;
+		}
+	}
+
 	async setStepProgress(
 		workflowId: string,
 		workflowStepId: string,
