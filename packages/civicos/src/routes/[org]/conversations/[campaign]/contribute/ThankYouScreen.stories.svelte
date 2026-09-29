@@ -15,7 +15,7 @@
 
 	function setState(email: boolean, share: boolean, review: boolean) {
 		return () => {
-			session.emailProvided = email;
+			session.emailRegistered = email;
 			session.endCtaShareCompleted = share;
 			session.endCtaReviewCompleted = review;
 		};

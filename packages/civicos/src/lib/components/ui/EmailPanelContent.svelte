@@ -43,9 +43,12 @@
 			return;
 		}
 		submitting = true;
-		await session.registerEmail(trimmed, conversationId);
-		session.emailProvided = true;
+		const ok = await session.registerEmail(trimmed, conversationId);
 		submitting = false;
+		if (!ok) {
+			error = "We couldn't sign you up. Please try again.";
+			return;
+		}
 		// Brief success beat so the panel doesn't slam shut on the user.
 		justSubmitted = true;
 		clearTimeout(completeTimer);

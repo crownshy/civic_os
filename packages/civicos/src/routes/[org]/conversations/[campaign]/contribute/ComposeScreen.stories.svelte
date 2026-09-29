@@ -20,6 +20,6 @@
 	}}
 >
 	{#snippet template(args)}
-		<ComposeScreen {...args} onSubmit={() => {}} onBack={() => {}} />
+		<ComposeScreen {...args} onSubmit={async () => true} onBack={() => {}} />
 	{/snippet}
 </Story>

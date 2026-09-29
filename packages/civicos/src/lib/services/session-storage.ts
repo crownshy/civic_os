@@ -37,6 +37,8 @@ export interface CampaignRecord {
 	hasSeenPause: boolean;
 	endCtaShareCompleted: boolean;
 	endCtaReviewCompleted: boolean;
+	/** This Campaign signed this browser's email up for updates. */
+	emailRegistered: boolean;
 	/**
 	 * Events of this Campaign this browser has registered for. A cache in front
 	 * of the attendance list, which is the actual record (#420): it covers the
@@ -77,6 +79,7 @@ export function emptyCampaign(): CampaignRecord {
 		hasSeenPause: false,
 		endCtaShareCompleted: false,
 		endCtaReviewCompleted: false,
+		emailRegistered: false,
 		registeredEventIds: []
 	};
 }
@@ -157,6 +160,7 @@ function toCampaign(raw: Record<string, unknown>): CampaignRecord {
 		hasSeenPause: asBoolean(raw.hasSeenPause),
 		endCtaShareCompleted: asBoolean(raw.endCtaShareCompleted),
 		endCtaReviewCompleted: asBoolean(raw.endCtaReviewCompleted),
+		emailRegistered: asBoolean(raw.emailRegistered),
 		registeredEventIds: asStringList(raw.registeredEventIds)
 	};
 }

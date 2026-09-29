@@ -219,13 +219,17 @@
 		// A returning participant only needs the signup. Everyone else gets a
 		// minimal session (no zip) first, because the signup is a call as this
 		// user. Either way the Campaign is this page's, not a remembered one.
-		if (session.hasSession) {
-			await session.registerEmail(trimmed, campaign.id);
-		} else {
-			await session.join('', trimmed, campaign.id);
+		let ok = true;
+		if (!session.hasSession) {
+			ok = await session.join('', undefined, campaign.id);
 			await invalidate('civicos:participant');
 		}
+		if (ok) ok = await session.registerEmail(trimmed, campaign.id);
 		emailSubmitting = false;
+		if (!ok) {
+			emailError = "We couldn't sign you up. Please try again.";
+			return;
+		}
 		emailSuccess = true;
 	}
 </script>

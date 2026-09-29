@@ -29,7 +29,10 @@ export interface User {
  */
 class Session {
 	user = $state<User | null>(null);
-	emailProvided = $state(false);
+	/** The account has an email on it, from the server. Counts for every Campaign. */
+	#accountEmail = $state(false);
+	/** This Campaign signed the participant up for updates. */
+	emailRegistered = $state(false);
 	zipCode = $state('');
 	pid = $state<number | undefined>(undefined);
 	demographicsCompleted = $state(false);
@@ -75,7 +78,7 @@ class Session {
 		if (account.userId) {
 			this.user = { id: account.userId, authType: 'guest', emailVerified: false };
 		}
-		this.emailProvided = account.emailProvided;
+		this.#accountEmail = account.emailProvided;
 		this.zipCode = account.zipCode;
 		this.demographicsCompleted = account.demographicsCompleted;
 		this.hasAgreedToTos = account.hasAgreedToTos;
@@ -103,13 +106,14 @@ class Session {
 		this.hasSeenPause = record.hasSeenPause;
 		this.endCtaShareCompleted = record.endCtaShareCompleted;
 		this.endCtaReviewCompleted = record.endCtaReviewCompleted;
+		this.emailRegistered = record.emailRegistered;
 		this.registeredEventIds = record.registeredEventIds;
 	}
 
 	private persistAccount() {
 		saveAccount({
 			userId: this.user?.id,
-			emailProvided: this.emailProvided,
+			emailProvided: this.#accountEmail,
 			zipCode: this.zipCode,
 			demographicsCompleted: this.demographicsCompleted,
 			hasAgreedToTos: this.hasAgreedToTos,
@@ -124,6 +128,7 @@ class Session {
 			hasSeenPause: this.hasSeenPause,
 			endCtaShareCompleted: this.endCtaShareCompleted,
 			endCtaReviewCompleted: this.endCtaReviewCompleted,
+			emailRegistered: this.emailRegistered,
 			registeredEventIds: this.registeredEventIds
 		});
 	}
@@ -133,11 +138,12 @@ class Session {
 	 * cookie. Called once from the root layout, before any page reads a flag.
 	 *
 	 * The server is the authority on identity: when it says nobody is signed in,
-	 * a cache naming someone is stale and goes. It is not the authority on the
-	 * two flags below, which it can turn on but never off. Leaving every About
-	 * You field blank stores no demographics, and `RegisterEmailForUpdates` does
-	 * not write `user.email`, so a `false` from the server means "no record of
-	 * it", not "it did not happen".
+	 * a cache naming someone is stale and goes. It is the authority on whether
+	 * the account has an email, which is all that flag means now that each
+	 * Campaign remembers its own signup. It is not the authority on
+	 * `demographicsCompleted`, which it can turn on but never off: leaving every
+	 * About You field blank stores no demographics, so a `false` from the server
+	 * means "no record of it", not "it did not happen".
 	 */
 	hydrate(participant: ParticipantSession | null, resolved: boolean) {
 		// An unreachable backend is not an answer. Keep what we have.
@@ -155,7 +161,7 @@ class Session {
 			emailVerified: participant.emailVerified
 		};
 		if (participant.zipCode) this.zipCode = participant.zipCode;
-		this.emailProvided ||= participant.emailProvided;
+		this.#accountEmail = participant.emailProvided;
 		this.demographicsCompleted ||= participant.demographicsCompleted;
 		this.persistAccount();
 	}
@@ -175,7 +181,8 @@ class Session {
 	private forget() {
 		this.user = null;
 		this.zipCode = '';
-		this.emailProvided = false;
+		this.#accountEmail = false;
+		this.emailRegistered = false;
 		this.demographicsCompleted = false;
 		this.pid = undefined;
 		this.totalVotes = 0;
@@ -189,6 +196,11 @@ class Session {
 
 	get conversationId() {
 		return this.#conversationId;
+	}
+
+	/** Whether to skip asking for an email on this Campaign. */
+	get emailProvided() {
+		return this.#accountEmail || this.emailRegistered;
 	}
 
 	get userId() {
@@ -354,11 +366,12 @@ class Session {
 	 * `this.conversationId`, which names whichever Campaign was loaded last and
 	 * not necessarily the one the participant is looking at. `/campaign/ai` sits
 	 * outside the `[campaign]` route and never points it anywhere at all.
+	 *
+	 * Only a signup that went through is remembered, and only for that Campaign,
+	 * so a failure asks again and signing up on one Campaign does not skip
+	 * another's ask.
 	 */
 	async registerEmail(email: string, conversationId: string): Promise<boolean> {
-		this.emailProvided = true;
-		this.persistAccount();
-
 		if (!conversationId || !email) {
 			console.warn('[Session] registerEmail skipped: missing conversationId or email');
 			return false;
@@ -375,11 +388,21 @@ class Session {
 					params: { conversation_id: conversationId }
 				}
 			);
+			this.#markEmailRegistered(conversationId);
 			return true;
 		} catch (e) {
 			console.error('[Session] Failed to register email:', e);
 			return false;
 		}
+	}
+
+	#markEmailRegistered(conversationId: string) {
+		if (conversationId === this.#conversationId) {
+			this.emailRegistered = true;
+			this.persistCampaign();
+			return;
+		}
+		saveCampaign(conversationId, { ...loadCampaign(conversationId), emailRegistered: true });
 	}
 
 	async saveProfile(data: {
