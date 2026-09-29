@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { untrack } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import { page } from '$app/state';
 	import { AppShell } from '$lib/components/layout';
 	import {
+		Button,
 		PopQuiz,
 		InfoBar,
 		ActionPanel,
@@ -68,8 +69,16 @@
 	const userId =
 		participant?.userId ?? session.userId ?? `bloom-anon-${Math.random().toString(36).slice(2, 8)}`;
 
-	// Pass persisted pid so returning users only see unvoted statements
+	// Pass persisted pid so returning users only see unvoted statements. Started
+	// on mount rather than here, so server rendering never calls Polis.
 	let polis = new PolisApi(userId, polisId, 'en', polisUrl, session.pid);
+	onMount(() => {
+		polis.start();
+	});
+
+	// Polis could not give us a first statement, so there is nothing to vote on
+	// and the skeleton would otherwise wait forever.
+	const pollUnreachable = $derived(!!polis.error && !polis.loading && !polis.currentStatement);
 
 	// Sync pid back to session whenever Polis assigns/updates it
 	$effect(() => {
@@ -197,8 +206,10 @@
 		}
 	});
 
-	function handleVote(type: 'agree' | 'disagree' | 'pass') {
-		polis.submitVote(type);
+	async function handleVote(type: 'agree' | 'disagree' | 'pass') {
+		// Only a vote Polis recorded counts toward the batch. A failed one leaves
+		// the statement up with an error under it.
+		if (!(await polis.submitVote(type))) return;
 		totalVotes++;
 		votesInRound++;
 
@@ -270,10 +281,17 @@
 		screen = 'voting';
 	}
 
-	async function handleCompose(text: string) {
+	/** Resolves to whether Polis took the statement, so the compose screen can say so. */
+	async function handleCompose(text: string): Promise<boolean> {
 		const visibleTid = polis.currentStatement?.tid;
-		const submitted = await polis.submitStatement(text);
+		let submitted: Awaited<ReturnType<PolisApi['submitStatement']>>;
+		try {
+			submitted = await polis.submitStatement(text);
+		} catch {
+			return false;
+		}
 		if (submitted) await createStatementAux(submitted, text, visibleTid);
+		return true;
 	}
 
 	/**
@@ -318,7 +336,17 @@
 <!-- The end screen is a page rather than a card: the landing page it mirrors runs
 	its footer edge to edge, so the shell lets go of its width for that one screen. -->
 <AppShell border={false} class={screen === 'thank-you' ? 'max-w-none' : undefined}>
-	{#if screen === 'loading'}
+	{#if pollUnreachable && (screen === 'loading' || screen === 'voting')}
+		<div class="flex h-full flex-col bg-background">
+			<InfoBar {placeName} />
+			<div class="flex flex-1 flex-col items-center justify-center gap-6 px-10 text-center">
+				<p role="alert" class="font-sans text-base font-medium text-foreground">
+					We couldn't load the poll. Check your connection and try again.
+				</p>
+				<Button variant="primary" onclick={() => polis.fetchNextStatement()}>TRY AGAIN</Button>
+			</div>
+		</div>
+	{:else if screen === 'loading'}
 		<!-- Most returning participants land on voting, and the landing page already
 			showed them this skeleton, so a text splash here would flash in between. -->
 		<VotingSkeleton {placeName} {question} />
@@ -333,6 +361,7 @@
 				total={displayedTotal}
 				realRemaining={polis.remaining}
 				loading={polis.loading}
+				error={polis.error}
 				onVote={handleVote}
 				onEnd={handleEnd}
 				onCompose={() => (screen = 'compose')}
@@ -349,7 +378,7 @@
 			firstVisit={!session.hasSeenComposeInstructions}
 			onSubmit={(text) => {
 				session.markComposeInstructionsSeen();
-				handleCompose(text);
+				return handleCompose(text);
 			}}
 			onBack={() => {
 				session.markComposeInstructionsSeen();

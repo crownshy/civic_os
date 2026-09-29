@@ -43,20 +43,34 @@ export default class PolisApi {
 		this.lang = lang;
 		this.baseUrl = baseUrl;
 		if (initialPid !== undefined) this.pid = initialPid;
-		this.tryToGetPidForXid();
+	}
+
+	/**
+	 * Resolve this participant's pid, then fetch the first statement. In that
+	 * order so a returning participant with no stored pid (new device, cleared
+	 * storage) is filtered by `not_voted_by_pid` from the first statement on.
+	 * Browser only: the component that owns this calls it on mount.
+	 */
+	async start() {
+		if (this.pid === undefined) await this.tryToGetPidForXid();
 		this.fetchNextStatement();
 	}
 
-	tryToGetPidForXid() {
-		fetch(
-			`${this.baseUrl}/api/v3/participationInit?conversation_id=${this.polisId}&xid=${this.userId}`
-		)
-			.then((r) => r.json())
-			.then((data) => {
-				if (data.ptpt?.pid) {
-					this.pid = data.ptpt.pid;
-				}
-			});
+	async tryToGetPidForXid() {
+		try {
+			const r = await fetch(
+				`${this.baseUrl}/api/v3/participationInit?conversation_id=${this.polisId}&xid=${this.userId}`
+			);
+			if (!r.ok) throw new Error(`participationInit failed: ${r.status}`);
+			const data = await r.json();
+			if (typeof data.ptpt?.pid === 'number') {
+				this.pid = data.ptpt.pid;
+			}
+		} catch (err) {
+			// Not fatal: the first vote returns a pid anyway. Until then the next
+			// statement is picked without the already-voted filter.
+			console.error('[PolisApi] Failed to look up pid:', err);
+		}
 	}
 
 	fetchNextStatement() {
@@ -98,8 +112,9 @@ export default class PolisApi {
 
 	/**
 	 * Resolves to the new statement's `tid` and the author's `pid`, or null when
-	 * Polis refused it or did not report a `tid`. The caller needs both to create
-	 * the `statement_aux` row admin moderation lists.
+	 * Polis took it but did not report a `tid`. The caller needs both to create
+	 * the `statement_aux` row admin moderation lists. Throws when Polis refused
+	 * it, so a failure cannot pass for a statement that went in.
 	 */
 	async submitStatement(statement: string): Promise<{ tid: number; pid: number } | null> {
 		this._loading = true;
@@ -130,17 +145,20 @@ export default class PolisApi {
 			return { tid: data.tid, pid: this.pid ?? 0 };
 		} catch (err) {
 			console.error('[PolisApi] Error submitting statement:', err);
-			this._error = err instanceof Error ? err.message : String(err);
-			return null;
+			throw err;
 		} finally {
 			this._loading = false;
 		}
 	}
 
-	submitVote(vote: 'agree' | 'disagree' | 'pass') {
+	/**
+	 * Resolves to whether Polis recorded the vote. On failure the current
+	 * statement stays up, so the participant can vote on it again.
+	 */
+	async submitVote(vote: 'agree' | 'disagree' | 'pass'): Promise<boolean> {
 		if (!this.currentStatement) {
 			console.error('[PolisApi] No current statement to vote on');
-			return;
+			return false;
 		}
 
 		const votedTid = this.currentStatement.tid;
@@ -151,31 +169,35 @@ export default class PolisApi {
 
 		const authType = this.pid ? { pid: this.pid } : { xid: this.userId };
 
-		fetch(`${this.baseUrl}/api/v3/votes`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			credentials: 'include',
-			body: JSON.stringify({
-				agid: 1,
-				conversation_id: this.polisId,
-				tid: votedTid,
-				vote: voteValue,
-				high_priority: false,
-				lang: this.lang,
-				...authType
-			})
-		})
-			.then((r) => {
-				if (!r.ok) throw new Error(`submitVote failed: ${r.status}`);
-				return r.json();
-			})
-			.then((data) => {
-				if (typeof data.currentPid === 'number') {
-					this.pid = data.currentPid;
-					this.fetchNextStatement();
-				}
-			})
-			.catch((e) => console.log('Error with vote ', e));
+		try {
+			const r = await fetch(`${this.baseUrl}/api/v3/votes`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				credentials: 'include',
+				body: JSON.stringify({
+					agid: 1,
+					conversation_id: this.polisId,
+					tid: votedTid,
+					vote: voteValue,
+					high_priority: false,
+					lang: this.lang,
+					...authType
+				})
+			});
+			if (!r.ok) throw new Error(`submitVote failed: ${r.status}`);
+			const data = await r.json();
+			if (typeof data.currentPid === 'number') {
+				this.pid = data.currentPid;
+			}
+		} catch (err) {
+			console.error('[PolisApi] Failed to submit vote:', err);
+			this._error = err instanceof Error ? err.message : String(err);
+			this._loading = false;
+			return false;
+		}
+
+		this.fetchNextStatement();
+		return true;
 	}
 
 	get currentStatement() {

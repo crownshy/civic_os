@@ -75,6 +75,23 @@ describe('campaign records', () => {
 		expect(loadCampaign(OREGON).registeredEventIds).toEqual([]);
 	});
 
+	it('keeps an email signup with the Campaign it was made on', () => {
+		saveCampaign(UTAH, { ...emptyCampaign(), emailRegistered: true });
+
+		expect(loadCampaign(UTAH).emailRegistered).toBe(true);
+		expect(loadCampaign(OREGON).emailRegistered).toBe(false);
+	});
+
+	it('reads a record from before email signups were per Campaign as no signup', () => {
+		saveCampaign(UTAH, emptyCampaign());
+		const { emailRegistered: _, ...older } = JSON.parse(
+			store.getItem(`civic-os-campaign:${UTAH}`)!
+		);
+		store.setItem(`civic-os-campaign:${UTAH}`, JSON.stringify(older));
+
+		expect(loadCampaign(UTAH).emailRegistered).toBe(false);
+	});
+
 	it('reads a malformed registration list as no registrations', () => {
 		saveCampaign(UTAH, emptyCampaign());
 		const stored = JSON.parse(store.getItem(`civic-os-campaign:${UTAH}`)!);

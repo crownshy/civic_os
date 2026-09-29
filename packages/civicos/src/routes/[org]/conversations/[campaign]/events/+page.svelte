@@ -46,12 +46,13 @@
 
 	let email = $state('');
 	let submitting = $state(false);
+	let signUpFailed = $state(false);
 
 	async function handleSignUp() {
 		const trimmed = email.trim();
 		if (!trimmed) return;
 		submitting = true;
-		await session.registerEmail(trimmed, campaign.id);
+		signUpFailed = !(await session.registerEmail(trimmed, campaign.id));
 		submitting = false;
 	}
 </script>
@@ -157,6 +158,11 @@
 									class="ml-2.5 h-8 flex-1 rounded-none border-0 bg-transparent font-sans text-lg font-medium text-muted-foreground shadow-none placeholder:text-muted-foreground/50 focus-visible:ring-0"
 								/>
 							</form>
+							{#if signUpFailed}
+								<p role="alert" class="px-2 font-sans text-base text-destructive">
+									We couldn't sign you up. Please try again.
+								</p>
+							{/if}
 							<Button
 								variant="primary"
 								fullWidth

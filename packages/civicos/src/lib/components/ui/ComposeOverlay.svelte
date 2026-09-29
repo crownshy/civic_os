@@ -8,7 +8,8 @@
 	interface Props {
 		question: string;
 		placeName: string;
-		onSubmit?: (text: string) => void;
+		/** Resolves to false when the statement did not go in, so the text stays for a retry. */
+		onSubmit?: (text: string) => Promise<boolean> | boolean | void;
 		onBack?: () => void;
 		onShowInstructions?: () => void;
 		class?: string;
@@ -25,17 +26,26 @@
 
 	let text = $state('');
 	let submitted = $state(false);
+	let sending = $state(false);
+	let failed = $state(false);
 	let submitTimer: ReturnType<typeof setTimeout>;
 	// Shared with admin's seed statements, so a seed reads like any other statement.
 	const maxChars = TEXT_LIMITS.statement;
 	const charCount = $derived(text.length);
 	const overLimit = $derived(charCount > maxChars);
-	const canSubmit = $derived(charCount > 0 && charCount <= maxChars && !submitted);
+	const canSubmit = $derived(charCount > 0 && charCount <= maxChars && !submitted && !sending);
 
-	function handleSubmit() {
+	async function handleSubmit() {
 		if (!canSubmit) return;
+		sending = true;
+		failed = false;
+		const ok = (await onSubmit?.(text)) !== false;
+		sending = false;
+		if (!ok) {
+			failed = true;
+			return;
+		}
 		submitted = true;
-		onSubmit?.(text);
 		// Show SUBMITTED! for 2s then auto-navigate back
 		submitTimer = setTimeout(() => {
 			onBack?.();
@@ -83,7 +93,8 @@
 				bind:value={text}
 				placeholder="Type here – what do you think?"
 				maxlength={maxChars + 10}
-				disabled={submitted}
+				disabled={submitted || sending}
+				oninput={() => (failed = false)}
 				onkeydown={(e) => {
 					if (e.key === 'Enter' && !e.shiftKey) {
 						e.preventDefault();
@@ -104,6 +115,12 @@
 			</div>
 		</div>
 
+		{#if failed}
+			<p role="alert" class="px-2 pt-4 font-sans text-base font-medium text-destructive">
+				Your statement didn't go through. Please try again.
+			</p>
+		{/if}
+
 		<!-- Buttons -->
 		<div class="flex gap-3 pt-8 pb-4">
 			<Button variant="destructive" data-umami-event="compose-back" class="flex-1" onclick={onBack}>
@@ -119,7 +136,7 @@
 					class="flex-1"
 					disabled={!canSubmit}
 				>
-					SUBMIT
+					{sending ? 'SENDING…' : 'SUBMIT'}
 				</Button>
 			{/if}
 		</div>

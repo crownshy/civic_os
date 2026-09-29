@@ -7,7 +7,8 @@
 		question: string;
 		placeName: string;
 		firstVisit?: boolean;
-		onSubmit: (text: string) => void;
+		/** Resolves to whether the statement went in. */
+		onSubmit: (text: string) => Promise<boolean>;
 		onBack: () => void;
 	}
 

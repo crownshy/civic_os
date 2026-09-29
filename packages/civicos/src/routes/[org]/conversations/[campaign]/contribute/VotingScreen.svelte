@@ -20,6 +20,8 @@
 		 *  the actual pool. Falls back to `remaining` when omitted (older callers). */
 		realRemaining?: number;
 		loading?: boolean;
+		/** Set when the last vote, or fetching the next statement, failed. */
+		error?: string;
 		onVote: (type: 'agree' | 'disagree' | 'pass') => void;
 		onEnd: () => void;
 		onCompose: () => void;
@@ -37,6 +39,7 @@
 		total,
 		realRemaining,
 		loading = false,
+		error,
 		onVote,
 		onEnd,
 		onCompose,
@@ -116,6 +119,11 @@
 					&ldquo;{statementText}&rdquo;
 				</p>
 			</div>
+		{/if}
+		{#if error && !waitingForNext}
+			<p role="alert" class="mt-6 font-sans text-base font-medium text-destructive">
+				That didn't go through. Please try again.
+			</p>
 		{/if}
 	</div>
 
