@@ -16,6 +16,13 @@
 	</div>
 {/snippet}
 
+<!-- CharCount: a right-aligned caption under the Title and Key Question inputs. -->
+{#snippet charCount()}
+	<div class="mt-1 flex h-5 items-center justify-end">
+		<Skeleton class="h-3.5 w-14" />
+	</div>
+{/snippet}
+
 <!-- SetupCard's header: an H3-scale title over an optional body-copy subtitle. -->
 {#snippet cardHeader(titleWidth: string, subtitleWidth: string)}
 	<header class="flex flex-col gap-2 px-8 pt-8">
@@ -62,14 +69,32 @@
 		<!-- ===== Identity ===== -->
 		<Card class="rounded-[20px] shadow-card">
 			<div class="flex flex-col gap-6 px-8 py-8">
-				{@render field('w-10', 'h-7 w-2/3')}
-
-				<div class="flex flex-wrap gap-x-12 gap-y-6">
-					{@render field('w-10', 'h-9 w-64')}
-					{@render field('w-16', 'h-9 w-48')}
+				<div class="min-w-0 space-y-1.5">
+					<Skeleton class="h-3.5 w-10" />
+					<Skeleton class="h-10.5 w-full rounded-[10px]" />
+					{@render charCount()}
 				</div>
 
-				{@render field('w-24', 'h-5 w-3/4')}
+				<div class="flex flex-wrap gap-x-12 gap-y-6">
+					<div class="min-w-0 space-y-1.5">
+						<Skeleton class="h-3.5 w-10" />
+						<div class="flex items-center gap-1.5">
+							<Skeleton class="h-4 w-44" />
+							<Skeleton class="h-9.5 w-48 rounded-[10px]" />
+						</div>
+					</div>
+					<div class="min-w-0 space-y-1.5">
+						<Skeleton class="h-3.5 w-16" />
+						<Skeleton class="h-9.5 w-40 rounded-[10px]" />
+						<Skeleton class="h-3.5 w-56" />
+					</div>
+				</div>
+
+				<div class="min-w-0 space-y-1.5">
+					<Skeleton class="h-3.5 w-24" />
+					<Skeleton class="h-10.5 w-full rounded-[10px]" />
+					{@render charCount()}
+				</div>
 
 				<div class="space-y-1.5">
 					<Skeleton class="h-3.5 w-24" />
