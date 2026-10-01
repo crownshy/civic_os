@@ -197,9 +197,12 @@
 		// backend refused.
 		// Snapshot what is sent. The Host can keep typing while the request is out,
 		// and recording the live value as saved would drop that newer text.
+		// What is written is trimmed; the field keeps what was typed, so a space at
+		// the end of a half-typed title survives the autosave (#458).
 		const attempts = changed.map((key) => {
 			const value = $formData[key];
-			return { key, value, to: writerFor(key, value) };
+			const content = key === 'title' || key === 'keyQuestion' ? value.trim() : value;
+			return { key, value, to: writerFor(key, content) };
 		});
 		for (const a of attempts) if (typeof a.to === 'string') $errors[a.key] = [a.to];
 

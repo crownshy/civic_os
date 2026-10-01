@@ -29,12 +29,18 @@ const richText = (field: 'description' | 'thankYouMessage') =>
  * Campaign that has never had one saved has no record to write against and the
  * first save creates it. See `writeTextContent`.
  */
+/**
+ * Required text that is checked, not rewritten. Superforms writes the parsed
+ * value back into the field while you type, so `.trim()` here would strip a
+ * space the moment it was typed (#458). The save trims instead.
+ */
+const requiredText = (message: string) => z.string().refine((s) => s.trim().length > 0, message);
+
 export const setupSchema = z.object({
-	title: z
-		.string()
-		.trim()
-		.min(1, 'Title is required')
-		.max(TEXT_LIMITS.campaignTitle, tooLong('campaignTitle')),
+	title: requiredText('Title is required').refine(
+		(s) => s.trim().length <= TEXT_LIMITS.campaignTitle,
+		tooLong('campaignTitle')
+	),
 	description: richText('description'),
 	thankYouMessage: richText('thankYouMessage'),
 	slug: z
@@ -42,11 +48,10 @@ export const setupSchema = z.object({
 		.min(1, 'Slug is required')
 		.regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Lowercase letters, numbers and single hyphens only')
 		.refine((s) => !RESERVED_ROUTE_SLUGS.includes(s as never), 'That slug is reserved'),
-	keyQuestion: z
-		.string()
-		.trim()
-		.min(1, 'Key question is required')
-		.max(TEXT_LIMITS.keyQuestion, tooLong('keyQuestion'))
+	keyQuestion: requiredText('Key question is required').refine(
+		(s) => s.trim().length <= TEXT_LIMITS.keyQuestion,
+		tooLong('keyQuestion')
+	)
 });
 
 export type SetupSchema = typeof setupSchema;
