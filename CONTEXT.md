@@ -2,58 +2,103 @@
 
 
 ### Region
-A geographic deployment scope (e.g. Utah, Oregon) with its own subdomain
-(`utah.bloomproject.us`), zip-code prefixes, and a coalition of hosting Organizations.
+A geographic deployment scope owned by comhairle (`RegionDto`: `id`, `name`,
+`description`, `region_type` of `custom | official`, `official_id?`, `metadata?`),
+reachable via the client's Region CRUD (`ListRegions`, `CreateRegion`,
+`GetRegion`, ...). It is the model behind a **Place**.
 
-Comhairle **now has a Region table** (`RegionDto`: `id`, `name`, `description`,
-`region_type` of `custom | official`, `official_id?`), reachable via the client's
-Region CRUD (`ListRegions`, `CreateRegion`, `GetRegion`, …). An Organization's
-`regions: Uuid[]` references these ids. The comhairle Region does **not** carry
-zip prefixes or subdomain — those still live in the static TS map in
-`packages/shared/src/data/regions.ts`. So a Region today = comhairle row (identity,
-name) + static overlay (zips, subdomain). This supersedes the old
-"[Open problem #1](#open-problem-1--regionconversationhost-data-model)" claim that
-no Region table exists.
+A Region **has many Areas**, and an Area may belong to many Regions:
+`GetRegionAreaLinks`, `SetRegionAreaLinks`, `AddRegionAreaLink`,
+`RemoveRegionAreaLink` on `/regions/:id/areas`. This many-to-many is already in
+the API and the frontend does not use any of it yet.
+
+Three things still block a Region from backing a Place directly (ADR 0006):
+it has **no URL-safe slug**, **nothing links a Conversation to it**, and
+`/regions` and `/region_areas` are **401 to an anonymous caller**, which is
+every participant. So a Place still rides on `Conversation.metadata`.
+
+_Note_: `RegionDto.name` and `.description` come through the generated client
+typed `z.string().uuid()`. That is a localisation reference leaking into the
+OpenAPI spec, not the real shape. Do not build on those types until the spec is
+fixed.
+
+_Avoid_: using "Region" in product copy. The user-facing word is **Place**.
 
 ### Place
-Product-facing name for a **Region** (the term used in host/admin UI, e.g. the
-`PLACE(S)` field on a Host). Same comhairle `Region` model behind it. A Host is
-registered to one or more Places, which (per #351) scope where it may run
-Campaigns. `Place ↔ Region` mirrors `Campaign ↔ Conversation` and
-`Host ↔ Organization`: product word ↔ comhairle model.
+**A name for discovery, covering one or more Areas.** "Utah", "Central Oregon",
+"Tayside". A Place is how a participant finds something: `/<place-slug>` is a
+page listing what is running across that Place's Areas. It is not where a
+Campaign runs; that is the Area.
 
-**A Place is a page**, `/<place-slug>`, listing the open Campaigns whose Place
-has that slug (ADR 0011). It used to be the subdomain. Optional: a Campaign with
-no Place is listed only in the `/conversations` directory. It is not a record: it
-rides on `Conversation.metadata.place` as `{ slug, name }` (ADR 0006), so nothing
-enumerates Places and two Campaigns in the same Place duplicate the name. The
-Host types a **name** on Setup and the slug is derived from it.
+`Place -> Areas` is many-to-many in both directions. A Place covers several
+Areas, and one Area can sit under several Places (Deschutes County is in both
+"Oregon" and "Central Oregon"). Modelled in comhairle as `Region` plus the
+`region_areas` links.
 
-**A Campaign has exactly one Place** (ADR 0008). Campaigns and Places are
-many-to-many in principle, and each Place would get its own poll, but nothing in
-comhairle supports that and the propagation and ownership rules are unanswered.
-Until then one Campaign, one Place, one poll. Utah and Oregon are two Campaigns,
-not one Campaign in two Places.
+**A Place is derived, not assigned.** A Campaign is attached to Areas; the Place
+pages it appears on are whichever Places cover any of those Areas. So a Campaign
+spanning Areas in two Places is listed on both, and nobody has to pick one.
+
+**Not yet true in the code.** What ships today is one Place per Campaign, stored
+as `{ slug, name }` on `Conversation.metadata.place`, with no Areas anywhere
+(ADR 0006, ADR 0008). The model above is the agreed direction, waiting on a
+Conversation-to-Area link in comhairle. See the Place & Area tab of the team doc
+for the interim mock.
+
+### Area
+**The actual geography a Campaign runs in.** A Campaign is attached to one or
+more Areas, and that attachment is what makes it real in a location. Where a
+**Place** is a name people browse by, an Area is a place on the ground.
+
+Finer-grained than a zip code is the intent. The exact unit and representation
+are **not settled**: comhairle's `RegionAreaDto` is `{ id, createdAt, zipPrefix }`
+today, which is coarser than a zip, not finer. Treat the current DTO as a
+placeholder for the concept, not as the concept.
+
+**The consequence nobody has solved yet.** A participant only ever gives us a
+**zip code** (at JOIN, saved to their profile). If an Area is finer than a zip,
+then a zip cannot resolve to one Area, only to the set of Areas it touches, and
+that set can span several Campaigns. Every "forward them by zip" idea runs into
+this. It is an open question, not a decided design.
+
+**Term collision, beware.** The Insights dashboard already has **Area of
+Consensus**, **Area of Difference** and **Area of Uncertainty**, which are
+classifications of a *statement* and have nothing to do with geography. When
+"Area" appears unqualified in this glossary it means the geographic unit. The
+Insights senses are always spelled out in full. Whether one of the two should be
+renamed is open.
 
 ### County
-The geographic unit that the participants **Geography** table groups by (rows are
+The geographic unit the participants **Geography** table groups by (rows are
 counties, not zip codes). Derived by rolling a respondent's zip code up to its
-county via the national zip→county lookup (`ZIP_LOOKUP` in
-`packages/civicos/src/lib/data/zipcodes.ts`). A County is also a **goal bucket** —
+county via the national zip-to-county lookup (`ZIP_LOOKUP` in
+`packages/civicos/src/lib/data/zipcodes.ts`). A County is also a **goal bucket**:
 Geography is a recruitment-target metric named `county`, so each county carries a
 target ("floor") and a "to goal" percentage, exactly like the demographic tables.
-A region's county set is scoped by that region's `zipPrefixes` (Oregon `97` →
-Oregon counties, Utah `84` → Utah counties).
-_Avoid_: Subregion (a distinct, finer concept — see below), Zip code.
-_Note_: `getCountyFromZip()` in `session.svelte.ts` is a **misnomer** — it returns
+
+A county's set is scoped today by the legacy region's `zipPrefixes` (Oregon `97`,
+Utah `84`). Under the Place/Area model that scoping is the Campaign's **Areas**,
+which is also what would finally give a Campaign created in admin a county set at
+all; it currently has none, because only Utah and Oregon have `zipPrefixes`.
+
+**A County is not an Area.** County is a reporting bucket we roll up to, fixed by
+a national lookup. An Area is what a Campaign is attached to, chosen by a Host.
+They may often coincide and they are not the same thing.
+
+_Avoid_: Subregion (see below), Zip code.
+_Note_: `getCountyFromZip()` in `session.svelte.ts` is a **misnomer**: it returns
 the region's `stateName`, not a county. Real county resolution is
 `ZIP_LOOKUP.get(zip).county`.
 
 ### Subregion
-A named community *finer* than a County (e.g. Bend, Redmond, Sisters — all in
-Deschutes County), used in the source recruitment spreadsheets. **Not modeled in
-the app**: the participants Geography table deliberately shows Counties, not
-Subregions. Recorded here only to keep the two from being conflated.
+A named community *finer* than a County (Bend, Redmond, Sisters, all in Deschutes
+County), used in the source recruitment spreadsheets.
+
+**This is probably what an Area is.** The concept was recorded here as
+deliberately not modelled, on the grounds that the Geography table shows Counties.
+"Finer than a zip code" is the same granularity Subregion describes, so if Area
+lands at that level, Subregion is its retired alias rather than a separate idea.
+Confirm before using both words in one sentence.
 
 ### Geography (participants table)
 The first card on the participants page. Groups respondents by **County** with
@@ -113,12 +158,22 @@ Product-facing name for a **Conversation** (the word participants and hosts see;
 comhairle model. `Campaign ↔ Conversation` mirrors `Host ↔ Organization` and
 `Place ↔ Region`.
 
-**A Campaign has exactly one Place, and exactly one poll** (ADR 0008). The
-Conversation behind it is slugged `<campaign>-<place>` (`ai-utah`), derived
-automatically when the Place is saved. The participant URL is
-`/<org>/conversations/<conversation-slug>` on one host (ADR 0007, ADR 0011); the
-`<org>` segment is decorative, so a Campaign has a participant site from the
-moment it is created.
+**A Campaign is attached to one or more Areas, and has exactly one poll.** The
+Areas are where it actually runs; the **Places** it is listed under are derived
+from them. One poll across all of a Campaign's Areas, not one poll per Area.
+
+**What ships today is narrower**: exactly one Place, no Areas at all (ADR 0008).
+That ADR is the accurate description of the code and is now out of step with the
+agreed model above; it needs superseding rather than quiet contradiction. Utah
+and Oregon are two Campaigns under the shipped rule, and would be one Campaign
+over two Areas under the new one.
+
+The Conversation behind a Campaign is slugged `<campaign>-<place>` (`ai-utah`),
+derived automatically when the Place is saved. Under the Area model a derived
+Place cannot supply that suffix, so the slug scheme is an open question (ADR
+0007). The participant URL is `/<org>/conversations/<conversation-slug>` on one
+host (ADR 0007, ADR 0011); the `<org>` segment is decorative, so a Campaign has a
+participant site from the moment it is created.
 
 **A Campaign has exactly one Polis step.** comhairle's model is more general: a
 Conversation runs a workflow of many steps (`polis`, `learn`, `heyform`,
@@ -397,6 +452,14 @@ client-side **upload** retry is offered.
 ---
 
 ## Open problem #1 — Region/Conversation/Host data model
+
+> **Partly answered by the Place/Area model.** Buckets A and C below assume a
+> Place is a single value on a Conversation. The agreed direction is a Campaign
+> attached to **Areas**, with Places derived from them, which moves `zipPrefixes`
+> out of the static map and into the Area records comhairle already has
+> (`region_areas`). The missing piece is a Conversation-to-Area link. See the
+> Area and Place entries above, and the team doc's Place & Area tab.
+
 
 The current `RegionConfig` shape in `packages/shared/src/data/regions.ts` mixes
 four concerns. Bucketing each field against what comhairle already stores:
