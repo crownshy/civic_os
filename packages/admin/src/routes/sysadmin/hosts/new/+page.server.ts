@@ -2,7 +2,7 @@ import { redirect } from '@sveltejs/kit';
 import { createApiClient } from '$lib/api/client';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
-import { createHostSchema } from './create-host-schema';
+import { hostDetailsSchema, toExternalUrl } from '$lib/hosts/host-details-schema';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ cookies, url, depends }) => {
@@ -18,13 +18,13 @@ export const load: PageServerLoad = async ({ cookies, url, depends }) => {
 		console.warn('ListRegions failed', e);
 	}
 
-	const form = await superValidate(zod4(createHostSchema));
+	const form = await superValidate(zod4(hostDetailsSchema));
 	return { form, regions };
 };
 
 export const actions: Actions = {
 	default: async ({ request, cookies, url }) => {
-		const form = await superValidate(request, zod4(createHostSchema));
+		const form = await superValidate(request, zod4(hostDetailsSchema));
 		if (!form.valid) return message(form, { kind: 'error', text: 'Please fix the errors below.' });
 
 		const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
@@ -32,14 +32,7 @@ export const actions: Actions = {
 		const { contactEmail, orgType, regionIds } = form.data;
 		const name = form.data.name.trim();
 		const description = form.data.description.trim();
-		const website = form.data.website.trim();
-
-		// Bare website -> external_url; add https:// when the user omitted a protocol.
-		const externalUrl = website
-			? /^https?:\/\//.test(website)
-				? website
-				: `https://${website}`
-			: undefined;
+		const externalUrl = toExternalUrl(form.data.website) || undefined;
 
 		try {
 			// mission is required by the API but absent from the design; send a

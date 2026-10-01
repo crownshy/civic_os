@@ -6,8 +6,10 @@
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import * as Form from '@civicos/shared/ui/form';
 	import { Button } from '@civicos/shared/ui/button';
-	import { ArrowLeft, CheckCircle2, AlertCircle, ShieldCheck } from '@lucide/svelte';
+	import { ArrowLeft, CheckCircle2, AlertCircle, Pencil, ShieldCheck } from '@lucide/svelte';
 	import { addMemberSchema, type AddMemberMessage } from './member-schema';
+	import HostDetailsFields from '$lib/components/hosts/HostDetailsFields.svelte';
+	import { hostDetailsSchema, type HostDetailsMessage } from '$lib/hosts/host-details-schema';
 	import ConversationsCard from './ConversationsCard.svelte';
 	import { resolve } from '$app/paths';
 
@@ -25,6 +27,32 @@
 	);
 	const { form: formData, enhance: addEnhance, submitting, message } = form;
 	const msg = $derived($message as AddMemberMessage | undefined);
+
+	let editing = $state(false);
+	const detailsForm = superForm(
+		untrack(() => data.detailsForm),
+		{
+			dataType: 'json',
+			validators: zod4Client(hostDetailsSchema),
+			resetForm: false,
+			onUpdated({ form }) {
+				if (form.valid && (form.message as HostDetailsMessage | undefined)?.kind === 'ok') {
+					editing = false;
+				}
+			}
+		}
+	);
+	const {
+		enhance: detailsEnhance,
+		submitting: savingDetails,
+		message: detailsMessage
+	} = detailsForm;
+	const detailsMsg = $derived($detailsMessage as HostDetailsMessage | undefined);
+
+	function cancelEdit() {
+		detailsForm.reset();
+		editing = false;
+	}
 
 	// Error from the small role/remove actions (SvelteKit fail()).
 	const actionError = $derived((page.form as { error?: string } | null)?.error);
@@ -49,7 +77,15 @@
 			Hosts
 		</a>
 
-		<h1 class="mb-1 text-section font-bold">{org.name}</h1>
+		<div class="mb-1 flex items-start justify-between gap-4">
+			<h1 class="text-h4 font-bold md:text-h3">{org.name}</h1>
+			{#if !editing}
+				<Button variant="outline" size="sm" onclick={() => (editing = true)}>
+					<Pencil class="size-4" />
+					Edit details
+				</Button>
+			{/if}
+		</div>
 		<div class="mb-8 flex flex-wrap gap-x-4 gap-y-1 text-body text-muted-foreground">
 			{#if org.externalUrl}
 				<a
@@ -73,6 +109,34 @@
 				<span>{org.places.join(', ')}</span>
 			{/if}
 		</div>
+		{#if org.description && !editing}
+			<p class="-mt-4 mb-8 text-body whitespace-pre-line">{org.description}</p>
+		{/if}
+
+		{#if editing}
+			<form
+				method="POST"
+				action="?/updateHost"
+				use:detailsEnhance
+				class="mb-8 flex flex-col gap-6 rounded-xl border border-border p-5"
+			>
+				{#if detailsMsg?.kind === 'error'}
+					<div
+						class="flex items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-body text-destructive"
+					>
+						<AlertCircle class="size-4 shrink-0" />
+						<span>{detailsMsg.text}</span>
+					</div>
+				{/if}
+				<HostDetailsFields form={detailsForm} regions={data.regions} />
+				<div class="flex items-center gap-3">
+					<Button type="submit" disabled={$savingDetails}>
+						{$savingDetails ? 'Saving…' : 'Save details'}
+					</Button>
+					<Button type="button" variant="outline" onclick={cancelEdit}>Cancel</Button>
+				</div>
+			</form>
+		{/if}
 
 		<!-- ===== Campaigns ===== -->
 		<div class="mb-6">

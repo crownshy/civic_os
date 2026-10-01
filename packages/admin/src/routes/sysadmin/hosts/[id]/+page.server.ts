@@ -3,6 +3,7 @@ import { createApiClient } from '$lib/api/client';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { addMemberSchema } from './member-schema';
+import { hostDetailsSchema, toExternalUrl, toWebsite } from '$lib/hosts/host-details-schema';
 import { COHOST_ROLE, CONVERSATION_RESOURCE } from '$lib/permissions';
 import { routeSlugFor, statusFor } from '$lib/conversations';
 import type { AssignableConversation, HostConversation } from './host-conversations';
@@ -115,6 +116,15 @@ export const load: PageServerLoad = async ({ params, cookies, url, depends }) =>
 	const regionNames = new Map(regions.map((r) => [r.id, r.name]));
 	const places = org.regions.map((id) => regionNames.get(id) ?? id);
 
+	const details = {
+		name: org.name,
+		description: org.description,
+		website: toWebsite(org.externalUrl),
+		contactEmail: org.contactEmail ?? '',
+		orgType: org.orgType,
+		regionIds: org.regions
+	};
+
 	return {
 		org: {
 			id: org.id,
@@ -128,11 +138,52 @@ export const load: PageServerLoad = async ({ params, cookies, url, depends }) =>
 		conversations: conversations.attached,
 		assignableConversations: conversations.assignable,
 		currentUserId: me?.id ?? null,
-		form: await superValidate(zod4(addMemberSchema))
+		form: await superValidate(zod4(addMemberSchema)),
+		regions: regions.map((r) => ({ id: r.id, name: r.name })),
+		detailsForm: await superValidate(details, zod4(hostDetailsSchema), {
+			id: 'host-details',
+			errors: false
+		})
 	};
 };
 
 export const actions: Actions = {
+	/**
+	 * Edit the Host's own details (#450).
+	 *
+	 * Checked against a local comhairle: description goes as plain text (the
+	 * backend writes it to the Host's translation record), and an optional field
+	 * is cleared with an empty string, because a null is dropped from the update
+	 * and leaves the old value standing. Hence every field is always sent.
+	 */
+	updateHost: async ({ request, params, cookies, url }) => {
+		const form = await superValidate(request, zod4(hostDetailsSchema), { id: 'host-details' });
+		if (!form.valid) return message(form, { kind: 'error', text: 'Please fix the errors below.' });
+
+		const { contactEmail, orgType, regionIds } = form.data;
+		try {
+			await client(url, cookies).UpdateOrganization(
+				{
+					name: form.data.name.trim(),
+					description: form.data.description.trim(),
+					external_url: toExternalUrl(form.data.website),
+					contact_email: contactEmail,
+					org_type: orgType,
+					regions: regionIds
+				},
+				{ params: { organization_id: params.id } }
+			);
+		} catch (e) {
+			console.error('UpdateOrganization failed', e);
+			return message(
+				form,
+				{ kind: 'error', text: 'Could not save the Host details.' },
+				{ status: 400 }
+			);
+		}
+		return message(form, { kind: 'ok', text: 'Saved.' });
+	},
+
 	addMember: async ({ request, params, cookies, url }) => {
 		const form = await superValidate(request, zod4(addMemberSchema));
 		if (!form.valid)

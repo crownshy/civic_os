@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { createHostSchema } from './create-host-schema';
+import { hostDetailsSchema, toExternalUrl, toWebsite } from './host-details-schema';
 
 const parse = (fields: Record<string, unknown>) =>
-	createHostSchema.safeParse({ name: 'Dundee Civic Trust', ...fields });
+	hostDetailsSchema.safeParse({ name: 'Dundee Civic Trust', ...fields });
 
-describe('createHostSchema', () => {
+describe('hostDetailsSchema', () => {
 	it('creates a Host with no description (#475)', () => {
 		expect(parse({}).success).toBe(true);
 		expect(parse({ description: '' }).success).toBe(true);
@@ -21,5 +21,22 @@ describe('createHostSchema', () => {
 		const result = parse({ name: 'Dundee ', description: 'We run ' });
 		expect(result.success && result.data.name).toBe('Dundee ');
 		expect(result.success && result.data.description).toBe('We run ');
+	});
+});
+
+describe('toExternalUrl / toWebsite', () => {
+	it('adds https:// only when no protocol was typed', () => {
+		expect(toExternalUrl(' dundee.org ')).toBe('https://dundee.org');
+		expect(toExternalUrl('http://dundee.org')).toBe('http://dundee.org');
+	});
+
+	// The backend ignores null on update; an empty string is what clears it (#450).
+	it('sends an empty website as an empty string', () => {
+		expect(toExternalUrl('  ')).toBe('');
+	});
+
+	it('round-trips through the form', () => {
+		expect(toWebsite(toExternalUrl('dundee.org/about'))).toBe('dundee.org/about');
+		expect(toWebsite(null)).toBe('');
 	});
 });
