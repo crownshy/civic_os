@@ -228,6 +228,8 @@
 			// Text typed during the request is not saved yet; its own debounce is.
 			settle(changed, dropped, hasUnsaved() ? 'idle' : 'saved');
 			await invalidate(`campaign:${campaignSlug}`);
+			// The sidebar lists Campaigns by title from the root layout (#459).
+			if (writes.some((w) => w.key === 'title')) await invalidate('app:conversations');
 		} catch (e) {
 			console.error('Failed to save setup fields', e);
 			const reason = describeApiFailure(e);
