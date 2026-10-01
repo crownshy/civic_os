@@ -86,12 +86,14 @@
 <div class="flex h-full flex-col bg-background">
 	<InfoBar {placeName} {onEnd} />
 
-	<!-- Statement content, centered on the page surface -->
-	<div class="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-10">
-		<div class="absolute top-0 left-0 h-[3px] w-full bg-secondary/30">
+	<!-- The question row is in flow so the statement centers in the space below
+		it. Positioned absolutely, it took no room and a long statement slid
+		under it (#494). -->
+	<div class="flex min-h-0 flex-1 flex-col overflow-hidden">
+		<div class="h-[3px] w-full shrink-0 bg-secondary/30">
 			<div class="h-full bg-secondary transition-all duration-300" style="width: {progress}%"></div>
 		</div>
-		<div class="absolute top-[3px] left-0 flex w-full items-start justify-between px-4 py-2">
+		<div class="flex w-full shrink-0 items-start justify-between px-4 py-2">
 			<span class="pr-4 font-mono text-sm font-medium text-muted-foreground/70 uppercase"
 				>{question}</span
 			>
@@ -99,27 +101,29 @@
 				>{topRightCount} LEFT</span
 			>
 		</div>
-		{#if waitingForNext}
-			<!-- Loading skeleton between statements, shared with VotingSkeleton -->
-			<StatementPlaceholder fadeIn />
-		{:else}
-			<div
-				class="mt-6 max-h-[60vh] w-full overflow-y-auto text-left"
-				in:fly={{ y: 20, duration: 500, easing: cubicOut }}
-			>
-				<!-- Attribution 
+		<div class="flex min-h-0 flex-1 flex-col items-center justify-center px-10">
+			{#if waitingForNext}
+				<!-- Loading skeleton between statements, shared with VotingSkeleton -->
+				<StatementPlaceholder fadeIn />
+			{:else}
+				<div
+					class="mt-6 min-h-0 w-full overflow-y-auto text-left"
+					in:fly={{ y: 20, duration: 500, easing: cubicOut }}
+				>
+					<!-- Attribution 
 				<div class="flex items-center gap-2">
 					<span class="font-mono text-sm font-medium text-muted-foreground">SOMEONE SAYS... </span>
 				</div>
 				-->
-				<!-- Quote -->
-				<p
-					class="mt-6 font-display text-3xl leading-tight font-medium tracking-display text-muted-foreground"
-				>
-					&ldquo;{statementText}&rdquo;
-				</p>
-			</div>
-		{/if}
+					<!-- Quote -->
+					<p
+						class="mt-6 font-display text-3xl leading-tight font-medium tracking-display text-muted-foreground"
+					>
+						&ldquo;{statementText}&rdquo;
+					</p>
+				</div>
+			{/if}
+		</div>
 	</div>
 
 	<!-- Between the statement and the vote buttons, outside the statement area, so

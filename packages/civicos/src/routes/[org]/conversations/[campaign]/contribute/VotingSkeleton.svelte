@@ -16,15 +16,17 @@
 <div class="flex h-full flex-col bg-background" aria-busy="true">
 	<InfoBar {placeName} skeleton />
 
-	<div class="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-10">
-		<div class="absolute top-0 left-0 h-[3px] w-full bg-secondary/30"></div>
-		<div class="absolute top-[3px] left-0 flex w-full items-start justify-between px-4 py-2">
+	<div class="flex min-h-0 flex-1 flex-col overflow-hidden">
+		<div class="h-[3px] w-full shrink-0 bg-secondary/30"></div>
+		<div class="flex w-full shrink-0 items-start justify-between px-4 py-2">
 			<span class="pr-4 font-mono text-sm font-medium text-muted-foreground/70 uppercase"
 				>{question}</span
 			>
 			<span class="h-5 w-16 shrink-0 animate-pulse rounded bg-muted-foreground/20"></span>
 		</div>
-		<StatementPlaceholder />
+		<div class="flex min-h-0 flex-1 flex-col items-center justify-center px-10">
+			<StatementPlaceholder />
+		</div>
 	</div>
 
 	<VoteBar skeleton />
