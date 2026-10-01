@@ -1,4 +1,5 @@
 <script lang="ts">
+	import CharCount from '$lib/components/CharCount.svelte';
 	import { ArrowUp, ArrowDown, Pencil, X } from '@lucide/svelte';
 	import * as Dialog from '@civicos/shared/ui/dialog';
 	import { Button } from '@civicos/shared/ui/button';
@@ -180,6 +181,7 @@
 						}}
 						class="w-full rounded-[10px] border border-input bg-background px-4 py-4 text-body-lg font-semibold focus:ring-2 focus:ring-ring focus:outline-none"
 					/>
+					<CharCount count={name.length} limit={TEXT_LIMITS.demographicName} class="mt-1" />
 				</SetupField>
 
 				<div>
@@ -217,6 +219,11 @@
 												if (editing === i) commit();
 											}}
 											class="w-full rounded-[10px] border border-input bg-background px-3 py-2 text-body font-semibold focus:ring-2 focus:ring-ring focus:outline-none aria-invalid:border-destructive"
+										/>
+										<CharCount
+											count={draft.length}
+											limit={TEXT_LIMITS.demographicOption}
+											class="mt-1"
 										/>
 										{#if draftRepeats}
 											<p id="option-editor-hint" class="mt-1.5 text-caption text-destructive">

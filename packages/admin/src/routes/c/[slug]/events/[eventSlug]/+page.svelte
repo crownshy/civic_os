@@ -1,4 +1,5 @@
 <script lang="ts">
+	import CharCount from '$lib/components/CharCount.svelte';
 	import { TEXT_LIMITS } from '@civicos/shared/data/text-limits';
 	import { untrack } from 'svelte';
 	import { beforeNavigate, goto } from '$app/navigation';
@@ -347,6 +348,7 @@
 			onblur={saveName}
 			class="w-full bg-transparent text-h3 font-bold outline-none md:text-h2"
 		/>
+		<CharCount count={form.name.length} limit={TEXT_LIMITS.eventName} />
 
 		<div class="border-t border-border"></div>
 
@@ -586,6 +588,11 @@
 				placeholder="Description of the event..."
 				class="w-full rounded-lg border border-input bg-background px-4 py-4 text-body-lg leading-relaxed outline-none focus-visible:border-ring"
 			></textarea>
+			<CharCount
+				count={form.description.length}
+				limit={TEXT_LIMITS.eventDescription}
+				class="mt-1"
+			/>
 		</div>
 
 		<div class="border-t border-border"></div>

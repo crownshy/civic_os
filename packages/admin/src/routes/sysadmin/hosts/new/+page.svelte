@@ -1,4 +1,5 @@
 <script lang="ts">
+	import CharCount from '$lib/components/CharCount.svelte';
 	import { TEXT_LIMITS } from '@civicos/shared/data/text-limits';
 	import { untrack } from 'svelte';
 	import { superForm } from 'sveltekit-superforms';
@@ -82,6 +83,7 @@
 						/>
 					{/snippet}
 				</Form.Control>
+				<CharCount count={$formData.name.length} limit={TEXT_LIMITS.hostName} class="mt-1" />
 				<Form.FieldErrors class="mt-1 text-caption text-destructive" />
 			</Form.Field>
 
@@ -203,6 +205,11 @@
 						></textarea>
 					{/snippet}
 				</Form.Control>
+				<CharCount
+					count={$formData.description.length}
+					limit={TEXT_LIMITS.hostDescription}
+					class="mt-1"
+				/>
 				<Form.FieldErrors class="mt-1 text-caption text-destructive" />
 			</Form.Field>
 

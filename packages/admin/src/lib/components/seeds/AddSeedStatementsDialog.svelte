@@ -1,4 +1,5 @@
 <script lang="ts">
+	import CharCount from '$lib/components/CharCount.svelte';
 	import * as Dialog from '@civicos/shared/ui/dialog';
 	import { Button } from '@civicos/shared/ui/button';
 	import { Spinner } from '@civicos/shared/ui/spinner';
@@ -152,11 +153,13 @@
 				id="seed-text"
 				bind:value={draft}
 				rows="3"
-				maxlength={TEXT_LIMITS.statement}
 				placeholder="Write a seed statement…"
 				disabled={busy}
 				class="w-full rounded-[10px] border border-input bg-background px-3 py-2 text-body focus:ring-2 focus:ring-ring focus:outline-none disabled:opacity-50"
 			></textarea>
+			<!-- No maxlength: a paste cut short at 240 lost its tail without a word.
+			     Counted trimmed, as seedProblem measures it. -->
+			<CharCount count={draft.trim().length} limit={TEXT_LIMITS.statement} />
 
 			<div class="flex flex-wrap items-center gap-2 text-caption text-muted-foreground">
 				<span>or</span>
@@ -187,7 +190,10 @@
 
 		<Dialog.Footer>
 			<Button variant="secondary" onclick={() => (open = false)} disabled={busy}>Cancel</Button>
-			<Button onclick={addSingle} disabled={!draft.trim() || busy}>
+			<Button
+				onclick={addSingle}
+				disabled={!draft.trim() || draft.trim().length > TEXT_LIMITS.statement || busy}
+			>
 				{mode === 'single' ? 'Posting…' : 'Post seed'}
 			</Button>
 		</Dialog.Footer>

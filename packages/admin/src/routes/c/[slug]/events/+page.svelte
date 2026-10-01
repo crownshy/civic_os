@@ -1,4 +1,5 @@
 <script lang="ts">
+	import CharCount from '$lib/components/CharCount.svelte';
 	import { TEXT_LIMITS } from '@civicos/shared/data/text-limits';
 	import { Button } from '@civicos/shared/ui/button';
 	import { invalidate } from '$lib/activity.svelte';
@@ -229,6 +230,7 @@
 					class="w-full rounded-lg border border-foreground/20 bg-muted/30 px-3 py-2 text-body outline-none"
 					placeholder="Community listening session"
 				/>
+				<CharCount count={form.name.length} limit={TEXT_LIMITS.eventName} />
 			</div>
 
 			<div class="space-y-1">
@@ -244,6 +246,7 @@
 					class="w-full rounded-lg border border-foreground/20 bg-muted/30 px-3 py-2 text-body outline-none"
 					placeholder="What's this gathering about?"
 				></textarea>
+				<CharCount count={form.description.length} limit={TEXT_LIMITS.eventDescription} />
 			</div>
 
 			<div class="flex flex-wrap gap-3">

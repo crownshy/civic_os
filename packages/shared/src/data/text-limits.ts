@@ -25,5 +25,5 @@ export const TEXT_LIMITS = {
 } as const;
 
 export function tooLong(field: keyof typeof TEXT_LIMITS): string {
-	return `Keep this under ${TEXT_LIMITS[field]} characters.`;
+	return `Keep this to ${TEXT_LIMITS[field]} characters or fewer.`;
 }

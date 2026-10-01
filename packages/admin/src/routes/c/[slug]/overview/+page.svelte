@@ -1,4 +1,5 @@
 <script lang="ts">
+	import CharCount from '$lib/components/CharCount.svelte';
 	import { TEXT_LIMITS } from '@civicos/shared/data/text-limits';
 	import { untrack } from 'svelte';
 	import { beforeNavigate, goto } from '$app/navigation';
@@ -34,6 +35,7 @@
 	import ContextCard from './ContextCard.svelte';
 	import RichTextEditor from '$lib/components/RichTextEditor.svelte';
 	import { shortDescriptionFrom } from '$lib/utils/rich-text';
+	import { blockHtmlToPlainText } from '@civicos/shared/rich-text';
 	import { setupSchema } from './setup-schema';
 	import { apiStatus, describeApiFailure } from '$lib/api/describe-failure';
 
@@ -717,6 +719,7 @@
 				/>
 			{/snippet}
 		</Form.Control>
+		<CharCount count={$formData.title.length} limit={TEXT_LIMITS.campaignTitle} class="mt-1" />
 		<Form.FieldErrors class="mt-1 text-caption text-destructive" />
 	</Form.Field>
 {/snippet}
@@ -761,6 +764,7 @@
 				></textarea>
 			{/snippet}
 		</Form.Control>
+		<CharCount count={$formData.keyQuestion.length} limit={TEXT_LIMITS.keyQuestion} class="mt-1" />
 		<Form.FieldErrors class="mt-1 text-caption text-destructive" />
 	</Form.Field>
 {/snippet}
@@ -806,6 +810,11 @@
 				/>
 			{/snippet}
 		</Form.Control>
+		<CharCount
+			count={blockHtmlToPlainText($formData.thankYouMessage).length}
+			limit={TEXT_LIMITS.thankYouMessage}
+			class="mt-1"
+		/>
 		<Form.FieldErrors class="mt-1 text-caption text-destructive" />
 	</Form.Field>
 {/snippet}
@@ -828,6 +837,11 @@
 				/>
 			{/snippet}
 		</Form.Control>
+		<CharCount
+			count={blockHtmlToPlainText($formData.description).length}
+			limit={TEXT_LIMITS.description}
+			class="mt-1"
+		/>
 		<Form.FieldErrors class="mt-1 text-caption text-destructive" />
 	</Form.Field>
 {/snippet}
