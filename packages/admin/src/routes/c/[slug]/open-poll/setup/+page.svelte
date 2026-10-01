@@ -4,7 +4,6 @@
 	import { moderateStatementAux, postSeed, syncStatementAux } from '$lib/api/aux';
 	import { setCampaignLive } from '$lib/api/campaign-live';
 	import type { PolisStatementAux } from '$lib/types/aux';
-	import SetupCard from '$lib/components/setup/SetupCard.svelte';
 	import DemographicsCard from '$lib/components/setup/DemographicsCard.svelte';
 	import StatusCard from './StatusCard.svelte';
 	import SeedStatementsCard from './SeedStatementsCard.svelte';
@@ -95,13 +94,6 @@
 		votes={data.votes}
 		onToggle={setLive}
 	/>
-
-	<SetupCard
-		title="Context for Participants"
-		subtitle="Shown on the homepage for this conversation."
-	>
-		<p class="text-body text-muted-foreground">Coming next.</p>
-	</SetupCard>
 
 	<SeedStatementsCard
 		statements={data.aux}

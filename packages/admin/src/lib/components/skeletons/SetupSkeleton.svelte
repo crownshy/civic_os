@@ -7,7 +7,7 @@
 </script>
 
 <div class="flex flex-col gap-6 px-8 py-8" aria-hidden="true">
-	{#each Array(4), i (i)}
+	{#each Array(3), i (i)}
 		<Card class="rounded-[20px] shadow-card">
 			<div class="flex flex-col gap-6 px-8 py-8">
 				<div class="flex flex-col gap-2">
