@@ -125,7 +125,8 @@
 				<p
 					class="mt-4 text-center font-sans text-base leading-6 font-medium text-foreground md:text-lg md:leading-7"
 				>
-					Join your neighbors {locationLabel} for a conversation about AI's impact on our lives.{#if org}
+					{data.campaign.shortDescription}
+					Join your neighbors {locationLabel} for this conversation.{#if org}
 						Hosted by
 						{#if org.url}<a
 								href={safeHref(org.url)}

@@ -36,6 +36,7 @@ export interface CampaignConversation {
 	id: string;
 	slug?: string | null;
 	title: string;
+	shortDescription?: string | null;
 	metadata?: unknown;
 }
 
@@ -45,6 +46,12 @@ export interface Campaign {
 	/** Backend slug. The `<conversation-slug>` segment of the URL. */
 	slug: string;
 	title: string;
+	/**
+	 * One plain-text line about what this Campaign is, which admin derives from
+	 * the description. Empty when there is none, so the page leaves the line out
+	 * rather than describing somebody else's topic.
+	 */
+	shortDescription: string;
 	/**
 	 * Where this Campaign runs. Null when it does not say and no legacy region
 	 * claims it, which leaves it off every Place page (ADR 0011).
@@ -167,6 +174,7 @@ export function resolveCampaign(
 			id: region.conversationId,
 			slug: region.slug,
 			title: region.heroHeader,
+			shortDescription: '',
 			// Reached only when the slug names this region, so it is the Place.
 			place: placeFromRegion(region),
 			poll: null,
@@ -186,6 +194,7 @@ export function resolveCampaign(
 		id: conversation.id,
 		slug: firstNonEmpty(conversation.slug, region.slug),
 		title: firstNonEmpty(conversation.title, region.heroHeader),
+		shortDescription: conversation.shortDescription?.trim() ?? '',
 		place: placeForConversation(conversation.id, conversation.metadata),
 		poll: readPoll(conversation.metadata),
 		org:

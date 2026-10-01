@@ -17,6 +17,7 @@ const stored = {
 	id: 'c0ffee00-0000-4000-8000-000000000000',
 	slug: 'ai-in-dundee',
 	title: 'AI and the Future of Dundee',
+	shortDescription: '  What should Dundee ask of AI?  ',
 	metadata: { place: { slug: 'dundee', name: 'Dundee, Scotland' } }
 };
 
@@ -81,6 +82,7 @@ describe('resolveCampaign', () => {
 			id: stored.id,
 			slug: 'ai-in-dundee',
 			title: 'AI and the Future of Dundee',
+			shortDescription: 'What should Dundee ask of AI?',
 			place: { slug: 'dundee', name: 'Dundee, Scotland' },
 			poll: null,
 			org: { slug: toPlaceSlug(oregon.hostName), name: oregon.hostName },
@@ -97,6 +99,7 @@ describe('resolveCampaign', () => {
 			id: oregon.conversationId,
 			slug: oregon.slug,
 			title: oregon.heroHeader,
+			shortDescription: '',
 			poll: null,
 			org: { slug: toPlaceSlug(oregon.hostName), name: oregon.hostName },
 			place: { slug: oregon.slug, name: oregon.stateName },

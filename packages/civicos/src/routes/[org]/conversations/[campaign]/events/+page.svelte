@@ -65,20 +65,21 @@
 
 		<!-- Header -->
 		<div class="mx-auto flex w-full max-w-4xl flex-col items-center px-6 pt-6 pb-0 md:pt-10">
-			<div class="overflow-hidden rounded-full bg-foreground px-3.5 py-1">
-				<span class="font-mono text-sm font-medium text-white">AI &amp; OUR COMMUNITIES</span>
+			<div class="overflow-hidden rounded-full bg-foreground px-3.5 py-1 text-center">
+				<span class="font-mono text-sm font-medium text-white uppercase">{campaign.title}</span>
 			</div>
 			<h1
 				class="mt-3 text-center font-display text-5xl leading-[2.75rem] font-medium tracking-display text-foreground md:text-6xl md:leading-[1.05]"
 			>
 				Conversations in {placeName}
 			</h1>
-			<p
-				class="mt-4 text-center font-sans text-base leading-5 font-medium text-foreground md:text-lg md:leading-6"
-			>
-				Join other residents in a 60-90 minute conversation about artificial intelligence and what
-				it means for communities throughout {placeName}.
-			</p>
+			{#if campaign.shortDescription}
+				<p
+					class="mt-4 text-center font-sans text-base leading-5 font-medium text-foreground md:text-lg md:leading-6"
+				>
+					{campaign.shortDescription}
+				</p>
+			{/if}
 		</div>
 
 		{#if conversationsActive}
