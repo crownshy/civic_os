@@ -6,6 +6,7 @@
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import type { PageData } from './$types';
 	import { resolve } from '$app/paths';
+	import { earliestStart, PAST_START_MESSAGE, zonedToISO } from '$lib/utils/event-time';
 
 	let { data }: { data: PageData } = $props();
 
@@ -33,6 +34,8 @@
 		time_zone: BROWSER_TZ
 	});
 
+	const earliest = $derived(earliestStart(form.time_zone, form.start_date));
+
 	function resetForm() {
 		form = {
 			name: '',
@@ -45,35 +48,6 @@
 			time_zone: BROWSER_TZ
 		};
 		formError = null;
-	}
-
-	// Convert a wall-clock date+time interpreted in `tz` to a UTC ISO instant.
-	function zonedToISO(date: string, time: string, tz: string): string {
-		const ms = Date.parse(`${date}T${time}:00Z`); // wall-clock as if UTC
-		const parts = Object.fromEntries(
-			new Intl.DateTimeFormat('en-US', {
-				timeZone: tz,
-				year: 'numeric',
-				month: '2-digit',
-				day: '2-digit',
-				hour: '2-digit',
-				minute: '2-digit',
-				second: '2-digit',
-				hour12: false
-			})
-				.formatToParts(new Date(ms))
-				.map((p) => [p.type, p.value])
-		);
-		const tzAsMs = Date.UTC(
-			Number(parts.year),
-			Number(parts.month) - 1,
-			Number(parts.day),
-			parts.hour === '24' ? 0 : Number(parts.hour),
-			Number(parts.minute),
-			Number(parts.second)
-		);
-		const offset = tzAsMs - ms;
-		return new Date(ms - offset).toISOString();
 	}
 
 	async function submitForm(e: Event) {
@@ -102,6 +76,10 @@
 
 		const startISO = zonedToISO(start_date, start_time, time_zone);
 		const endISO = zonedToISO(start_date, end_time, time_zone);
+		if (Date.parse(startISO) < Date.now()) {
+			formError = PAST_START_MESSAGE;
+			return;
+		}
 
 		// The generated request type is deep-readonly, so capacity has to go in the
 		// literal rather than being assigned after the fact.
@@ -276,6 +254,7 @@
 						id="ev-date"
 						type="date"
 						bind:value={form.start_date}
+						min={earliest.date}
 						required
 						class="w-full rounded-lg border border-foreground/20 bg-muted/30 px-3 py-2 text-body outline-none"
 					/>
@@ -288,6 +267,7 @@
 						id="ev-start"
 						type="time"
 						bind:value={form.start_time}
+						min={earliest.time}
 						required
 						class="w-full rounded-lg border border-foreground/20 bg-muted/30 px-3 py-2 text-body outline-none"
 					/>

@@ -10,6 +10,12 @@
 	import * as ToggleGroup from '@civicos/shared/ui/toggle-group';
 	import { Calendar, Check, Clock, Copy, MapPin, Monitor, Trash2, Video } from '@lucide/svelte';
 	import { resolve } from '$app/paths';
+	import {
+		earliestStart,
+		isoToWallClock,
+		PAST_START_MESSAGE,
+		zonedToISO
+	} from '$lib/utils/event-time';
 
 	let { data } = $props();
 
@@ -59,45 +65,6 @@
 		postal_code: '',
 		country_code: ''
 	});
-
-	function tzPartsAt(ms: number, tz: string) {
-		return Object.fromEntries(
-			new Intl.DateTimeFormat('en-US', {
-				timeZone: tz,
-				year: 'numeric',
-				month: '2-digit',
-				day: '2-digit',
-				hour: '2-digit',
-				minute: '2-digit',
-				second: '2-digit',
-				hour12: false
-			})
-				.formatToParts(new Date(ms))
-				.map((p) => [p.type, p.value])
-		);
-	}
-
-	function isoToWallClock(iso: string, tz: string): { date: string; time: string } {
-		const ms = Date.parse(iso);
-		const p = tzPartsAt(ms, tz);
-		const hour = p.hour === '24' ? '00' : p.hour;
-		return { date: `${p.year}-${p.month}-${p.day}`, time: `${hour}:${p.minute}` };
-	}
-
-	function zonedToISO(date: string, time: string, tz: string): string {
-		const ms = Date.parse(`${date}T${time}:00Z`);
-		const p = tzPartsAt(ms, tz);
-		const tzAsMs = Date.UTC(
-			Number(p.year),
-			Number(p.month) - 1,
-			Number(p.day),
-			p.hour === '24' ? 0 : Number(p.hour),
-			Number(p.minute),
-			Number(p.second)
-		);
-		const offset = tzAsMs - ms;
-		return new Date(ms - offset).toISOString();
-	}
 
 	function tzLabel(tz: string): string {
 		return (
@@ -280,6 +247,11 @@
 		return l;
 	}
 
+	// Past dates are greyed out only while the event is still ahead: an event
+	// that already happened keeps its own date valid (#468).
+	const isUpcoming = $derived(!event || Date.parse(event.startTime) > Date.now());
+	const earliest = $derived(earliestStart(form.time_zone, form.start_date));
+
 	function saveTimes() {
 		if (!event || !form.start_date || !form.start_time || !form.end_time) return;
 		const start_time = zonedToISO(form.start_date, form.start_time, form.time_zone);
@@ -295,6 +267,10 @@
 			Date.parse(end_time) === Date.parse(event.endTime) &&
 			form.time_zone === event.defaultTimeZone;
 		if (unchanged) return;
+		if (Date.parse(start_time) < Date.now()) {
+			failures.times = PAST_START_MESSAGE;
+			return;
+		}
 		save('times', { start_time, end_time, default_time_zone: form.time_zone });
 	}
 
@@ -392,6 +368,7 @@
 							type="date"
 							bind:this={dateEl}
 							bind:value={form.start_date}
+							min={isUpcoming ? earliest.date : undefined}
 							onblur={saveTimes}
 							class={NATIVE}
 						/>
@@ -413,6 +390,7 @@
 							type="time"
 							bind:this={startEl}
 							bind:value={form.start_time}
+							min={isUpcoming ? earliest.time : undefined}
 							onblur={saveTimes}
 							class={NATIVE}
 						/>
