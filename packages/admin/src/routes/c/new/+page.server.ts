@@ -84,7 +84,12 @@ export const actions: Actions = {
 		if (!form.valid) return message(form, { kind: 'error', text: 'Please fix the errors below.' });
 
 		const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
-		const { title, slug, keyQuestion, placeName, description, hostId, cohostIds } = form.data;
+		const { slug, hostId, cohostIds } = form.data;
+		// Trimmed here rather than in the schema; see `limitedText`.
+		const title = form.data.title.trim();
+		const keyQuestion = form.data.keyQuestion.trim();
+		const placeName = form.data.placeName.trim();
+		const description = form.data.description.trim();
 
 		const fail = (text: string) => message(form, { kind: 'error', text }, { status: 400 });
 
