@@ -5,8 +5,9 @@
 	import { Input } from '@civicos/shared/ui/input';
 	import { Label } from '@civicos/shared/ui/label';
 	import * as ToggleGroup from '@civicos/shared/ui/toggle-group';
-	import { Calendar, Check, Clock, Copy, MapPin, Monitor, Video } from '@lucide/svelte';
-	import { earliestStart } from '$lib/utils/event-time';
+	import { Calendar, Check, Copy, MapPin, Monitor, Video } from '@lucide/svelte';
+	import { earliestStart, formatWallDate } from '$lib/utils/event-time';
+	import TimeSelect from './TimeSelect.svelte';
 	import { BROWSER_TZ, type EventField, type EventForm, type MeetMode } from './event-form';
 
 	type Props = {
@@ -33,8 +34,6 @@
 
 	let tzOpen = $state(false);
 	let dateEl = $state<HTMLInputElement | null>(null);
-	let startEl = $state<HTMLInputElement | null>(null);
-	let endEl = $state<HTMLInputElement | null>(null);
 
 	const earliest = $derived(earliestStart(form.time_zone, form.start_date));
 	// Zoom / Other Online has nowhere to send people until a link is entered.
@@ -67,11 +66,6 @@
 	const LABEL = 'text-caption font-bold tracking-tight uppercase';
 	const FIELD =
 		'flex h-14 items-center gap-3 rounded-lg border border-input bg-background px-4 focus-within:border-ring';
-	// The lucide glyph replaces the native picker button, so the input keeps none of its own.
-	const NATIVE =
-		'w-full bg-transparent text-body-lg font-semibold outline-none [&::-webkit-calendar-picker-indicator]:hidden';
-	const PICKER_BUTTON =
-		'cursor-pointer touch-manipulation text-foreground transition-all hover:text-primary active:scale-90 active:opacity-60 active:duration-0';
 </script>
 
 <div class="space-y-8">
@@ -93,68 +87,51 @@
 		<div class="grid grid-cols-1 gap-6 md:grid-cols-[1fr_auto_auto]">
 			<div class="space-y-2">
 				<Label for="ev-date" class={LABEL}>Date</Label>
-				<div class={FIELD}>
+				<div class="relative">
 					<button
-						type="button"
-						aria-label="Open date picker"
-						onclick={() => dateEl?.showPicker?.()}
-						class={PICKER_BUTTON}
-					>
-						<Calendar class="size-5" />
-					</button>
-					<input
 						id="ev-date"
+						type="button"
+						onclick={() => dateEl?.showPicker?.()}
+						class={`${FIELD} w-full cursor-pointer touch-manipulation text-left text-body-lg font-semibold transition-colors hover:border-ring`}
+					>
+						<Calendar class="size-5 shrink-0" />
+						<span class={form.start_date ? '' : 'text-muted-foreground'}>
+							{form.start_date ? formatWallDate(form.start_date) : 'Pick a date'}
+						</span>
+					</button>
+					<!-- Holds the value and anchors the native calendar under the button; never typed into (#483). -->
+					<input
 						type="date"
+						tabindex="-1"
+						aria-hidden="true"
 						bind:this={dateEl}
 						bind:value={form.start_date}
 						min={limitToFuture ? earliest.date : undefined}
-						onblur={() => oncommit?.('times')}
-						class={NATIVE}
+						onchange={() => oncommit?.('times')}
+						class="pointer-events-none absolute inset-0 opacity-0"
 					/>
 				</div>
 			</div>
 			<div class="space-y-2">
 				<Label for="ev-start" class={LABEL}>Start time</Label>
-				<div class={`${FIELD} md:w-56`}>
-					<button
-						type="button"
-						aria-label="Open start time picker"
-						onclick={() => startEl?.showPicker?.()}
-						class={PICKER_BUTTON}
-					>
-						<Clock class="size-5" />
-					</button>
-					<input
-						id="ev-start"
-						type="time"
-						bind:this={startEl}
-						bind:value={form.start_time}
-						min={limitToFuture ? earliest.time : undefined}
-						onblur={() => oncommit?.('times')}
-						class={NATIVE}
-					/>
-				</div>
+				<TimeSelect
+					id="ev-start"
+					label="Start time"
+					bind:value={form.start_time}
+					min={limitToFuture ? earliest.time : undefined}
+					onpick={() => oncommit?.('times')}
+					class="md:w-56"
+				/>
 			</div>
 			<div class="space-y-2">
 				<Label for="ev-end" class={LABEL}>End time</Label>
-				<div class={`${FIELD} md:w-56`}>
-					<button
-						type="button"
-						aria-label="Open end time picker"
-						onclick={() => endEl?.showPicker?.()}
-						class={PICKER_BUTTON}
-					>
-						<Clock class="size-5" />
-					</button>
-					<input
-						id="ev-end"
-						type="time"
-						bind:this={endEl}
-						bind:value={form.end_time}
-						onblur={() => oncommit?.('times')}
-						class={NATIVE}
-					/>
-				</div>
+				<TimeSelect
+					id="ev-end"
+					label="End time"
+					bind:value={form.end_time}
+					onpick={() => oncommit?.('times')}
+					class="md:w-56"
+				/>
 			</div>
 		</div>
 
