@@ -32,8 +32,9 @@
 	function displayUrl(url?: string | null): string {
 		return url ? url.replace(/^https?:\/\//, '').replace(/\/$/, '') : '';
 	}
+	// By email: comhairle generates the username, and it reads as noise (#477).
 	function label(m: { username?: string | null; email?: string | null }): string {
-		return m.username || m.email || 'Unknown user';
+		return m.email || m.username || 'Unknown user';
 	}
 </script>
 
@@ -108,9 +109,6 @@
 						<li class="flex items-center gap-3 border-b border-border px-5 py-3 last:border-b-0">
 							<div class="min-w-0 flex-1">
 								<span class="text-body font-semibold">{label(m)}</span>
-								{#if m.username && m.email}
-									<span class="text-caption text-muted-foreground"> · {m.email}</span>
-								{/if}
 								{#if isSelf}
 									<span class="text-caption text-muted-foreground"> · you</span>
 								{/if}
