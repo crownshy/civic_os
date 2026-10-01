@@ -1,6 +1,7 @@
 import { createApiClient } from '$lib/api/client';
 import { toSummary, type ConversationSummary } from '$lib/conversations';
 import { describeApiFailure } from '$lib/api/describe-failure';
+import { toViewer } from '$lib/viewer';
 import type { LayoutServerLoad } from './$types';
 
 /** Every Campaign the caller may see, unfiltered. */
@@ -34,6 +35,9 @@ function bySidebarOrder(a: ConversationSummary, b: ConversationSummary) {
  * GetUserRoles — that handler is currently a stub that never reports SuperAdmin.
  * Distinct from the binary `isAdmin` gate in hooks.server.ts. See docs/adr/0002.
  *
+ * `viewer` names the signed-in user and their role for the sidebar footer
+ * (#453), from the same GetUserOrganizations response plus CurrentUser.
+ *
  * `conversations` is loaded here rather than per-page because the sidebar, the
  * dashboard, and the /c/[slug] access check all read the same list (#397).
  * GetPermittedConversations is the backend's own answer to "what may this user
@@ -44,7 +48,13 @@ export const load: LayoutServerLoad = async ({ cookies, url, depends }) => {
 
 	const authToken = cookies.get('auth-token');
 	if (!authToken)
-		return { authToken, canCreateHost: false, conversations: [], conversationsError: null };
+		return {
+			authToken,
+			canCreateHost: false,
+			viewer: null,
+			conversations: [],
+			conversationsError: null
+		};
 
 	const api = createApiClient(`${url.origin}/api`, authToken, 'server');
 
@@ -57,14 +67,15 @@ export const load: LayoutServerLoad = async ({ cookies, url, depends }) => {
 	 */
 	let conversationsError: string | null = null;
 
-	const [canCreateHost, conversations] = await Promise.all([
-		api
-			.GetUserOrganizations()
-			.then((res) => res.canCreateOrganization)
-			.catch((e) => {
-				console.warn('GetUserOrganizations failed', e);
-				return false;
-			}),
+	const [orgs, user, conversations] = await Promise.all([
+		api.GetUserOrganizations().catch((e) => {
+			console.warn('GetUserOrganizations failed', e);
+			return null;
+		}),
+		api.CurrentUser().catch((e) => {
+			console.warn('CurrentUser failed', e);
+			return null;
+		}),
 		api
 			.GetPermittedConversations({ queries: PERMITTED_QUERIES })
 			.then((res) => res.records.map(toSummary).sort(bySidebarOrder))
@@ -75,5 +86,11 @@ export const load: LayoutServerLoad = async ({ cookies, url, depends }) => {
 			})
 	]);
 
-	return { authToken, canCreateHost, conversations, conversationsError };
+	return {
+		authToken,
+		canCreateHost: orgs?.canCreateOrganization ?? false,
+		viewer: toViewer(user, orgs),
+		conversations,
+		conversationsError
+	};
 };

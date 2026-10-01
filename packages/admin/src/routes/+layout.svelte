@@ -22,6 +22,10 @@
 
 	const isLogin = $derived(page.url.pathname === '/login');
 	const canCreateHost = $derived(data?.canCreateHost ?? false);
+	const viewer = $derived(data?.viewer ?? null);
+	const viewerLabel = $derived(
+		viewer ? [viewer.name, viewer.role].filter(Boolean).join(', ') : 'Signed in'
+	);
 	// Nav highlights follow the destination while it loads, so a click registers
 	// at once rather than after every `load` on the next page has resolved.
 	const activePath = $derived(navigating.to?.url.pathname ?? page.url.pathname);
@@ -246,10 +250,19 @@
 				].join(' ')}
 			>
 				<div
-					class="size-7 shrink-0 rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl bg-foreground"
-				></div>
+					title={viewerLabel}
+					aria-hidden="true"
+					class="grid size-7 shrink-0 place-items-center rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl bg-foreground text-caption font-semibold text-background uppercase"
+				>
+					{viewer?.name.charAt(0) ?? ''}
+				</div>
 				{#if !collapsed || mobileOpen}
-					<span class="flex-1 text-caption font-medium">Admin</span>
+					<div class="min-w-0 flex-1" title={viewerLabel}>
+						<div class="truncate text-caption font-medium">{viewer?.name ?? 'Signed in'}</div>
+						{#if viewer?.role}
+							<div class="truncate text-label text-muted-foreground">{viewer.role}</div>
+						{/if}
+					</div>
 					<form method="POST" action="/logout">
 						<Button
 							variant="ghost"
