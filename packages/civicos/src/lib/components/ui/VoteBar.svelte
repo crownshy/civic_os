@@ -48,10 +48,13 @@
 		>
 			<span>DISAGREE</span>
 		</Button>
+		<!-- Soft, one shade deeper than the variant so it holds its weight next to
+			the filled AGREE and DISAGREE. -->
 		<Button
 			{disabled}
+			variant="soft"
 			onclick={onSkip}
-			class="h-auto min-w-0 flex-1 rounded-[30px] bg-secondary/20 px-5 py-4 text-secondary shadow-none disabled:cursor-not-allowed disabled:opacity-50"
+			class="h-auto min-w-0 flex-1 rounded-[30px] bg-secondary/20 px-5 py-4 hover:bg-secondary/30 active:bg-secondary/40 disabled:cursor-not-allowed disabled:opacity-50"
 		>
 			<span>UNSURE</span>
 		</Button>
