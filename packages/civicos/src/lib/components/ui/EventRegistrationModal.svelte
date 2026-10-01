@@ -153,9 +153,7 @@
 		{#if status === 'success'}
 			<div class="flex w-full items-center justify-between gap-4 px-7">
 				<EventCalendarInviteButton {event} {org} popupDirection="up" />
-				<Button class="w-full" href={campaignPath(page.params.campaign, page.params.org)}
-					>GO TO POLL</Button
-				>
+				<Button class="w-full" href={campaignPath(page.params.campaign)}>GO TO POLL</Button>
 			</div>
 		{:else}
 			<Button onclick={() => formRef?.requestSubmit()} class="w-full" disabled={!$formData.email}

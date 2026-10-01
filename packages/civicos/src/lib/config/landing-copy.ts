@@ -1,4 +1,4 @@
-import { campaignPath } from '@civicos/shared/data/place';
+import { CAMPAIGN_PAGES, campaignPath } from '@civicos/shared/data/place';
 
 /**
  * Shared landing-page copy and structure.
@@ -53,17 +53,14 @@ export interface FooterLink {
 /**
  * Footer links for a Campaign's own pages.
  *
- * The Open Poll link has to be built per Campaign: there is no top-level
- * `/contribute` any more, only `/<org>/conversations/<campaign>/contribute`, so
- * the old fixed path 404'd on every Campaign. `/conversations` stays absolute,
- * because that one is the cross-Campaign directory rather than this Campaign's.
+ * The Open Poll link has to be built per Campaign: each one's poll is
+ * `/<campaign>/poll`, so a fixed path would 404 on every Campaign.
+ * `/conversations` stays absolute, because that one is the cross-Campaign
+ * directory rather than this Campaign's.
  */
-export function footerLinks(
-	campaignSlug: string | undefined,
-	orgSlug: string | undefined
-): FooterLink[] {
+export function footerLinks(campaignSlug: string | undefined): FooterLink[] {
 	return [
-		{ label: 'Take the Open Poll', href: campaignPath(campaignSlug, orgSlug, 'contribute') },
+		{ label: 'Take the Open Poll', href: campaignPath(campaignSlug, CAMPAIGN_PAGES.poll) },
 		...FOOTER_LINKS
 	];
 }

@@ -1,10 +1,11 @@
 import { createApiClient } from '@crownshy/api-client/client';
+import { requireCampaign } from '../require-campaign';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ parent, cookies, url, depends }) => {
+export const load: PageServerLoad = async ({ parent, params, cookies, url, depends }) => {
 	depends('report:data');
 
-	const { campaign, region } = await parent();
+	const { campaign, region } = requireCampaign(await parent(), params.campaign);
 	const conversationId = campaign.id;
 
 	// The Campaign's own step, mirrored into `metadata.poll` when admin published

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { campaignPath } from '@civicos/shared/data/place';
+	import { CAMPAIGN_PAGES, campaignPath } from '@civicos/shared/data/place';
 	import { safeHref } from '@civicos/shared/sanitize';
 	import { page } from '$app/state';
 	import { AppShell } from '$lib/components/layout';
@@ -312,7 +312,7 @@
 			<Button
 				variant="primary"
 				size="md"
-				href={campaignPath(page.params.campaign, page.params.org, `events`)}
+				href={campaignPath(page.params.campaign, CAMPAIGN_PAGES.events)}
 				class="mt-6"
 			>
 				← BACK TO CONVERSATIONS

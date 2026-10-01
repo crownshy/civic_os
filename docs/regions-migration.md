@@ -18,7 +18,7 @@ inferred one. Treat it as the spec.
 | Participant surface                       | Backend field                                            | Where admin edits it             |
 | ----------------------------------------- | -------------------------------------------------------- | -------------------------------- |
 | Landing `<h1>` and page title             | `Conversation.title`                                     | Setup > Identity                 |
-| The `/<org>/conversations/<slug>` address | `Conversation.slug`                                      | Setup > Identity                 |
+| The `/<slug>` address                     | `Conversation.slug`                                      | Setup > Identity                 |
 | Landing "Context" sections and nav pills  | `Conversation.description`                               | Setup > Context for Participants |
 | Voting question                           | Polis step `topic`, mirrored to `metadata.poll.question` | Setup > Identity > Key Question  |
 | Landing FAQ accordion                     | `Conversation.faqs`                                      | Setup > FAQ                      |
@@ -36,7 +36,7 @@ and Oregon render what they rendered before until a Host saves something.
 ### How the Conversation is found
 
 Nothing about the hostname picks a Campaign (ADR 0011). The URL is
-`/<org>/conversations/<conversation-slug>` and the last segment names it.
+`/<conversation-slug>` and that segment names it (ADR 0014).
 `campaignCandidates()` turns that slug into an ordered list and takes the first
 that resolves against `GET /conversation/:idOrSlug`, which accepts either form:
 
@@ -65,10 +65,9 @@ empty, and never copy:
 | --------------------------------- | -------------------------------- | --------------------------------------- | ------------------------------------------------------------- |
 | Campaign title                    | `campaign.ts:169,188`            | `heroHeader`                            | `Conversation.title` is empty, which the Setup schema forbids |
 | Key question                      | `[campaign]/+page.svelte:36`     | `question`                              | `metadata.poll.question` is missing                           |
-| `<org>` URL segment               | `campaign.ts:173,193`            | `hostName`                              | `metadata.org` was never mirrored. Decorative either way      |
 | Place chip                        | `campaign.ts:244`, `place.ts:32` | `stateName`, `slug`                     | The Campaign has no `metadata.place`                          |
 | Report data                       | `report/+page.server.ts:19`      | `polis_workflow_step_id`                | Legacy regions only, gated on `isLegacyRegion`                |
-| Voting poll                       | `contribute/+page.svelte:58`     | `polisId`                               | Legacy regions only, gated on `isLegacyRegion`                |
+| Voting poll                       | `poll/+page.svelte:58`           | `polisId`                               | Legacy regions only, gated on `isLegacyRegion`                |
 | Landing Context, What's Next, FAQ | `host-copy.ts`                   | `contextParagraphs`, `whatsNext`, `faq` | Legacy regions only, gated on `isLegacyRegion`                |
 | Hosted by, Your Hosts             | `campaign.ts:148`                | `partners`                              | Legacy regions only, gated on `isLegacyRegion`                |
 
@@ -206,7 +205,7 @@ than 30:
 | `slug`, `conversationId`                            | Resolve `/utah` and `/oregon` to the Campaign they always were      |
 | `zipPrefixes`                                       | `getRegionByZipcode`, for the landing page's legacy zip redirect    |
 | `polisId`, `polis_workflow_step_id`                 | The poll and report for Utah and Oregon                             |
-| `hostName`, `stateName`                             | The `<org>` segment and the Place chip for the two legacy regions   |
+| `hostName`, `stateName`                             | The Host credit and the Place chip for the two legacy regions       |
 | `question`, `heroHeader`                            | Last-resort identity when a Conversation field is empty             |
 | `contextParagraphs`, `whatsNext`, `faq`, `partners` | Utah's and Oregon's live copy, until it is saved into their records |
 

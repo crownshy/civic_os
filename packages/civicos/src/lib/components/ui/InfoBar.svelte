@@ -34,7 +34,7 @@
 	// so ABOUT took a participant from their Campaign to a marketing page about
 	// somebody else's. Every screen this bar appears on is under `[campaign]`,
 	// so the params are always there.
-	const aboutHref = $derived(campaignPath(page.params.campaign, page.params.org));
+	const aboutHref = $derived(campaignPath(page.params.campaign));
 
 	const variantStyles = {
 		default: '',

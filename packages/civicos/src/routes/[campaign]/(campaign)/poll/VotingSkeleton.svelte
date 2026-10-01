@@ -5,7 +5,7 @@
 	// Stands in for VotingScreen until Polis has a statement. Built from the real
 	// InfoBar, VoteBar and statement placeholder so the layout cannot drift from
 	// the screen it becomes. The landing page shows it the moment someone joins,
-	// so the skeleton is on screen before `/contribute` is, and the route change
+	// so the skeleton is on screen before `/poll` is, and the route change
 	// underneath is invisible.
 	//
 	// The Key Question is known before Polis answers, so it renders for real

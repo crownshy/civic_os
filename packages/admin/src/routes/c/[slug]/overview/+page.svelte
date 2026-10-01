@@ -634,9 +634,8 @@
 	 *
 	 * A Campaign runs in many Places and each pair is its own Conversation, so
 	 * those Conversations are slugged `<campaign>-<place>`: that is what keeps
-	 * `/<org>/conversations/ai-utah` and `.../ai-oregon` two addresses
-	 * (ADR 0011). The Host never types it. They name a Place, and the slug
-	 * follows. The slug is the public URL, so a link shared before a Place edit
+	 * `/ai-utah` and `/ai-oregon` two addresses (ADR 0014). The Host never types
+	 * it. They name a Place, and the slug follows. The slug is the public URL, so a link shared before a Place edit
 	 * stops resolving after it.
 	 *
 	 * The old Place's suffix is stripped before the new one is applied, so moving

@@ -26,7 +26,7 @@
 	import { listSeparator } from '$lib/utils/list';
 	import { AppShell } from '$lib/components/layout';
 	import JoinSkeleton from './JoinSkeleton.svelte';
-	import VotingSkeleton from './contribute/VotingSkeleton.svelte';
+	import VotingSkeleton from './(campaign)/poll/VotingSkeleton.svelte';
 
 	// Derived, not captured: a client-side move to another Campaign, or an
 	// `invalidate('civicos:conversation')` after a Host edit, keeps this component
@@ -35,17 +35,10 @@
 	const campaign: Campaign = $derived(page.data.campaign);
 	const hostCopy = $derived(page.data.hostCopy);
 	const placeName = $derived(placeNameFor(campaign, region));
-	// The same Key Question /contribute resolves, so the skeleton shown here and
+	// The same Key Question the poll resolves, so the skeleton shown here and
 	// the voting screen it becomes label the statement identically.
 	const question = $derived(campaign?.poll?.question || region.question);
-	// `page.params` is typed app-wide, so the segments this route matched on read
-	// as optional; reaching this component means both are present.
-	const contributePath = $derived(
-		resolve('/[org]/conversations/[campaign]/contribute', {
-			org: page.params.org!,
-			campaign: campaign.slug
-		})
-	);
+	const pollPath = $derived(resolve('/[campaign]/(campaign)/poll', { campaign: campaign.slug }));
 	// The organizations to credit, from `metadata.cohosts` where admin mirrored
 	// the grants. Empty for a Campaign with none, rather than the catch-all's
 	// `partners`, which credited The Bloom Project on everybody's Campaign.
@@ -73,7 +66,7 @@
 	// hydration. Only a zip counts: an email-only signup has an account but has
 	// never told us where they are, so it is not a session to continue.
 	//
-	// This has to agree with the gate on `/contribute`, which reads the server
+	// This has to agree with the gate on the poll, which reads the server
 	// answer and nothing else. Anything CONTINUE lets through that the gate then
 	// turns away is a redirect straight back to this page, and on a client side
 	// navigation that is silent: the button appears dead. So the cached session
@@ -91,7 +84,7 @@
 	let hydrated = $state(false);
 	const joinStateSettled = $derived(isReturning || hydrated);
 
-	// --- Join (zip → /contribute) state ---
+	// --- Join (zip → the poll) state ---
 	// Seeded from the server answer, then owned by the field. Deliberately not a
 	// writable `$derived`: it is bound into ZipInput's `$bindable`, and the local
 	// value there does not survive an unrelated re-render such as the terms
@@ -100,10 +93,10 @@
 	// immediately, so there is no resync to miss.
 	let zipCode = $state(page.data.participant?.zipCode || session.zipCode);
 	let hasZip = $derived(!!zipCode.trim());
-	// True from the click until `/contribute` has rendered, across the join
+	// True from the click until the poll has rendered, across the join
 	// request, the participant invalidation and the navigation itself. Reset only
 	// if we are still on this page afterwards: a failed join, or the gate on
-	// `/contribute` sending us back.
+	// the poll sending us back.
 	let leaving = $state(false);
 	let zipFlash = $state(false);
 	let hasAgreedToTos = $derived(session.hasAgreedToTos);
@@ -127,8 +120,8 @@
 		hydrated = true;
 		// Polis and the voting screens are the heaviest chunks on the site, and
 		// almost everyone who lands here goes there next. Code only: preloading
-		// data would run the `/contribute` gate before this visitor has joined.
-		void preloadCode(contributePath);
+		// data would run the the poll gate before this visitor has joined.
+		void preloadCode(pollPath);
 	});
 
 	function showTermsModal() {
@@ -153,7 +146,7 @@
 			// missing participation row is a reporting gap, not a reason to hold
 			// CONTINUE back, and the request outlives the client-side navigation.
 			void session.enterCampaign(campaign.id);
-			await goto(contributePath);
+			await goto(pollPath);
 			leaving = false;
 			return;
 		}
@@ -173,7 +166,7 @@
 			// A full load on this host rather than `goto`: the zip is read back in
 			// `onMount`, which a client-side navigation between two Campaigns does
 			// not re-run, because it reuses this component.
-			const target = campaignPath(zipRegion.slug, zipRegion.hostName);
+			const target = campaignPath(zipRegion.slug);
 			window.location.href = `${target}?zip_code=${encodeURIComponent(zipCode.trim())}`;
 			return;
 		}
@@ -191,9 +184,9 @@
 		}
 		trackEvent('SucccesfullSignup');
 		// The root layout resolved "anonymous" before this. Re-run it so the
-		// server side gate on `/contribute` sees the participant that now exists.
+		// server side gate on the poll sees the participant that now exists.
 		await invalidate('civicos:participant');
-		await goto(contributePath);
+		await goto(pollPath);
 		leaving = false;
 	}
 
@@ -483,7 +476,7 @@
 	<footer class="bg-primary px-8 py-12">
 		<ul class="mx-auto flex max-w-4xl flex-col gap-1.5">
 			<!-- eslint-disable svelte/no-navigation-without-resolve -- mixed list: external URLs plus a path from `campaignPath` -->
-			{#each footerLinks(campaign.slug, page.params.org) as link (link.label)}
+			{#each footerLinks(campaign.slug) as link (link.label)}
 				<li>
 					<a
 						href={link.href}
@@ -500,7 +493,7 @@
 	</footer>
 </div>
 
-<!-- The first frame of `/contribute`, drawn here so it is up on the click
+<!-- The first frame of the poll, drawn here so it is up on the click
 	rather than after the join and navigation, and so the route swap underneath
 	lands on the same pixels. -->
 {#if leaving}

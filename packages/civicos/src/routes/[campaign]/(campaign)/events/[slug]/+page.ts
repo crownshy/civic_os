@@ -1,4 +1,4 @@
-import { campaignPath } from '@civicos/shared/data/place';
+import { CAMPAIGN_PAGES, campaignPath } from '@civicos/shared/data/place';
 import { redirect } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 
@@ -17,6 +17,6 @@ export const load: PageLoad = async ({ parent, params, data }) => {
 	} catch (e) {
 		console.error(e);
 
-		redirect(302, campaignPath(params.campaign, params.org, `events`));
+		redirect(302, campaignPath(params.campaign, CAMPAIGN_PAGES.events));
 	}
 };

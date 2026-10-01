@@ -15,11 +15,10 @@
 	// copy of it, and only stands in when the conversation did not resolve.
 	const isLive = $derived(conversation ? conversation.isLive : campaign.status === 'live');
 
-	// Where participants actually land:
-	// `<base>/<org>/conversations/<conversation-slug>`. Derived in `toSummary`
-	// rather than read out of `regions.ts`, so every Campaign has one from the
-	// moment it is created; publishing it to a Place lists it on that Place's
-	// page, it does not give it its first address (ADR 0011).
+	// Where participants actually land: `<base>/<conversation-slug>`. Derived in
+	// `toSummary` rather than read out of `regions.ts`, so every Campaign has one
+	// from the moment it is created; publishing it to a Place lists it on that
+	// Place's page, it does not give it its first address (ADR 0014).
 	const publicUrl = $derived(campaign.shareUrl?.replace(/\/$/, '') ?? '');
 
 	// Only reached when there is genuinely no address to link to. Which of the two

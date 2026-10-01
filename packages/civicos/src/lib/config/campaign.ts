@@ -7,8 +7,8 @@
  * the default layer behind it, the same way Host copy already resolves
  * (see `host-copy.ts`).
  *
- * The URL is `/<org>/conversations/<conversation-slug>`: the last segment names
- * the Conversation, and nothing about the hostname is read (ADR 0011).
+ * The URL is `/<conversation-slug>`: the segment names the Conversation, and
+ * nothing about the hostname is read (ADR 0014).
  */
 
 import { GENERIC_REGION, REGIONS, type RegionConfig } from './regions';
@@ -63,11 +63,7 @@ export interface Campaign {
 	 * poll id exists: the Polis workflow step is 401 anonymously.
 	 */
 	poll: CampaignPoll | null;
-	/**
-	 * The Host, for the `<org>` segment of the URL. Null falls back to a
-	 * placeholder: the segment is decorative, so an unknown Host costs a less
-	 * pretty address, not a broken one.
-	 */
+	/** The Host, credited on event pages and in the calendar invite. */
 	org: CampaignOrg | null;
 	/**
 	 * The organizations to credit on the landing page, from
@@ -215,18 +211,9 @@ export function resolveCampaign(
  * Derived from the request rather than stored. `regions.ts` used to carry a
  * `shareUrl` string per region, which meant every Campaign created in admin
  * shared `all.bloomproject.us`, the USA catch-all, instead of itself.
- *
- * The `<org>` segment is decorative and `participantUrl` fills in a placeholder
- * when the Host is unknown, so this is a working link even for a Campaign whose
- * `metadata.org` was never mirrored.
  */
 export function shareUrlFor(campaign: Campaign, url: URL): string {
-	return participantUrl(
-		campaign.slug,
-		campaign.org?.slug ?? '',
-		url.host,
-		url.protocol.replace(':', '')
-	);
+	return participantUrl(campaign.slug, url.host, url.protocol.replace(':', ''));
 }
 
 /** The poll a Campaign's Open Poll runs on, once something has named one. */

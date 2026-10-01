@@ -1,5 +1,10 @@
 # The Place leaves the hostname
 
+> **URL shape superseded by [ADR 0014](0014-the-campaign-moves-to-the-root.md).**
+> Campaigns are now at `/<conversation-slug>` with no `<org>/conversations/`
+> prefix. The Place staying out of the hostname, and the rest of this record,
+> stand.
+
 A Place is no longer a subdomain. Every Campaign is served from one host at
 
     /<org>/conversations/<conversation-slug>

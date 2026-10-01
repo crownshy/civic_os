@@ -421,7 +421,7 @@ class Session {
 		// `demographics_question not found` and joining fails on the zip.
 		//
 		// The zip rides on every call regardless: the About You screen sends
-		// demographics and no zip, and the server side gate on `/contribute`
+		// demographics and no zip, and the server side gate on `/poll`
 		// reads the stored zip back.
 		const zipcode = data.zipcode || this.zipCode;
 		const body = {

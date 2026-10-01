@@ -278,10 +278,9 @@ export const actions: Actions = {
 		}
 
 		// 6. Mirror the three things the participant app cannot read for itself.
-		//    A Campaign is reachable at `<base>/<org>/conversations/<slug>` from the
-		//    moment it exists (a Place only lists it on a Place page), so
-		//    what that link needs belongs on the public payload now rather than at
-		//    publish time: `metadata.org` because `/organizations` is 401 to the
+		//    A Campaign is reachable at `<base>/<slug>` from the moment it exists
+		//    (a Place only lists it on a Place page), so what its page needs
+		//    belongs on the public payload now rather than at publish time: `metadata.org` because `/organizations` is 401 to the
 		//    participant app, `metadata.poll` because the Polis step is too, and
 		//    `metadata.cohosts` because a co-host is a permission grant and
 		//    `ListResourcePermissions` is 401 there as well. `org` and `cohosts`

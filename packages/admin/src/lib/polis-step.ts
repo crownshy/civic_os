@@ -85,7 +85,7 @@ function readPolisConfig(config: unknown): PolisStepConfig | null {
  * Comhairle reports `server_url` as a bare host (`polis.comhairle.scot`), and
  * civicos builds its Polis request URLs by concatenation. Mirrored as-is, the
  * embed asks the participant app's own origin for
- * `/<org>/conversations/<slug>/polis.comhairle.scot/api/v3/...` and gets a 404,
+ * `/<slug>/polis.comhairle.scot/api/v3/...` and gets a 404,
  * because a scheme-less string is a relative path. So the scheme goes on here,
  * where the value enters our side of the wire, rather than at each use.
  */

@@ -36,7 +36,7 @@ See `src/lib/services/session.svelte.ts`. Cookie is httpOnly, set by backend thr
 
 ## Regions + Polis redirect
 
-The URL picks the Campaign: `/<org>/conversations/<conversation-slug>`. Nothing is read from the hostname (ADR 0011). A Place's Campaigns are listed at `/<place-slug>`.
+The URL picks the Campaign: `/<conversation-slug>`, with the poll at `/<conversation-slug>/poll`. Nothing is read from the hostname (ADR 0011). A slug no Campaign has is a Place, whose Campaigns are listed at `/<place-slug>` (ADR 0014).
 
 1. **Campaign** → page chrome (host name, slides, question), with `regions.ts` defaults behind it: the region that owns the Conversation, else `all` (generic). Logic: `regionForCampaign` in `src/lib/config/campaign.ts`.
 2. **Zipcode at JOIN** → which Polis you vote on, for the legacy Utah, Oregon and catch-all Campaigns only. `84xxx → utah`, `97xxx → oregon`, else generic. If zip-region ≠ the Campaign's region, the browser goes to that region's Campaign before registering.
@@ -95,9 +95,10 @@ Undo: `pnpm unlink --global @crownshy/api-client && pnpm install`.
 src/
 ├── routes/
 │   ├── api/[...path]/+server.ts    proxy → comhairle
-│   ├── landing/                    region landing + zip redirect
-│   ├── contribute/                 polis voting
-│   └── about-you/ profile/ learn/ report/ deliberation/ campaign/
+│   ├── conversations/              directory of live Campaigns
+│   ├── [campaign]/                 Campaign page, or Place listing
+│   │   └── (campaign)/             poll/ events/ report/
+│   └── [org]/conversations/…       308 from the old URLs
 └── lib/
     ├── config/regions.ts           region ids + copy (hardcoded for now)
     ├── services/

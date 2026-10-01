@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { campaignPath } from '@civicos/shared/data/place';
+	import { CAMPAIGN_PAGES, campaignPath } from '@civicos/shared/data/place';
 	import { resolve } from '$app/paths';
 	import { scale } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
@@ -22,11 +22,11 @@
 	const FOOTER_LINKS: { label: string; href: string; external?: boolean }[] = [
 		{
 			label: 'Take the Open Poll',
-			href: campaignPath(page.params.campaign, page.params.org, 'contribute')
+			href: campaignPath(page.params.campaign, CAMPAIGN_PAGES.poll)
 		},
 		{
 			label: 'Join a Community Conversation',
-			href: campaignPath(page.params.campaign, page.params.org, 'events')
+			href: campaignPath(page.params.campaign, CAMPAIGN_PAGES.events)
 		},
 		{ label: 'About BLOOM Project', href: 'https://www.bloom-project.org/', external: true },
 		{

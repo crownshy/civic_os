@@ -26,7 +26,7 @@ export interface ParticipantSession {
  * `resolved: false` is deliberately not the same as an absent participant: a
  * backend that is down must not read as "nobody is signed in", because callers
  * act on that by clearing the cached session and bouncing people off
- * `/contribute`.
+ * `/poll`.
  */
 export interface ParticipantResolution {
 	participant: ParticipantSession | null;

@@ -1,8 +1,10 @@
 # The participant URL is `<place>/<org>/conversations/<campaign-slug>`
 
-> **Partly superseded by [ADR 0011](0011-the-place-leaves-the-hostname.md).** The
-> Place is no longer a subdomain, and the last segment is the whole Conversation
-> slug. The `/<org>/conversations/` shape and the rest of this record stand.
+> **Superseded by [ADR 0011](0011-the-place-leaves-the-hostname.md) and
+> [ADR 0014](0014-the-campaign-moves-to-the-root.md).** The Place is no longer a
+> subdomain, and a Campaign is now `/<conversation-slug>` with no
+> `/<org>/conversations/` prefix. Kept for the reasoning behind the original
+> shape.
 
 The participant URL mirrors comhairle's own:
 

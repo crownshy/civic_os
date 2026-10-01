@@ -9,12 +9,12 @@
  *
  * Built from `GET /conversation`, which is the only list endpoint the anonymous
  * app can reach and already returns only live Campaigns. It also returns
- * `metadata`, where the Place and the Host are mirrored: the Place is what files
- * a row under a Place page, and the Host fills the `<org>` segment of its link.
+ * `metadata`, where the Place is mirrored: that is what files a row under a
+ * Place page.
  */
 
 import type { ApiClient } from '@crownshy/api-client/api';
-import { campaignPath, readOrg, type Place } from '@civicos/shared/data/place';
+import { campaignPath, type Place } from '@civicos/shared/data/place';
 import { placeForConversation } from './place';
 
 /** The fields of a listed Conversation a directory entry is built from. */
@@ -65,7 +65,7 @@ function toEntry(conversation: DirectoryConversation): DirectoryEntry | null {
 
 	// The whole Conversation slug, Place suffix included: `ai-utah` is what
 	// resolves, and without a subdomain there is nothing else to narrow `ai` by.
-	const href = campaignPath(slug, readOrg(conversation.metadata)?.slug);
+	const href = campaignPath(slug);
 	if (!href) return null;
 
 	return {

@@ -1,6 +1,6 @@
 /**
  * A Place: the geography a Campaign runs in, and the page at `/<place-slug>`
- * that lists the Campaigns running there (ADR 0011).
+ * that lists the Campaigns running there (ADR 0014).
  *
  * A Place has no backend table, so it rides on `Conversation.metadata.place`.
  * ADR 0006 has the full reasoning and the way out; the short version is that
@@ -89,10 +89,10 @@ export function placeFromName(name: string): Place | null {
  * Conversations need distinct slugs while the Campaign keeps one name. The
  * Place is appended to make them distinct: `ai` in `utah` is `ai-utah`.
  *
- * The suffix is part of the public URL, `/<org>/conversations/ai-utah`. That is
- * what lets `GET /conversation/:idOrSlug` resolve the pair from the path alone,
- * with no campaign entity, no metadata read and nothing taken from the hostname
- * (ADR 0011).
+ * The suffix is part of the public URL, `/ai-utah`. That is what lets
+ * `GET /conversation/:idOrSlug` resolve the pair from the path alone, with no
+ * campaign entity, no metadata read and nothing taken from the hostname
+ * (ADR 0014).
  *
  * DERIVE FORWARD, NEVER PARSE BACK. `ai-central-oregon` is `ai` in
  * `central-oregon` or `ai-central` in `oregon`, and nothing in the string says
@@ -191,34 +191,16 @@ export function readPoll(metadata: unknown): CampaignPoll | null {
 }
 
 /**
- * Where participants go for one Campaign.
+ * Where participants go for one Campaign: `<base>/<conversation-slug>`.
  *
- * `<base>/<org>/conversations/<conversation-slug>`, mirroring comhairle's own
- * URLs. This is the single definition of that path; admin renders share links
+ * This is the single definition of that address; admin renders share links
  * from it and civicos routes to match, so a scheme change is a change here and
- * at the civicos route directory, and nowhere else.
+ * at the civicos `[campaign]` route directory, and nowhere else.
  *
- * **The `<org>` segment is decorative.** civicos resolves a Campaign from the
- * slug alone and ignores it: an Organization has no URL-safe identifier (the DTO
- * carries `id` and a display `name`, nothing else), and `/organizations` is 401
- * to the anonymous participant app, so there is nothing to validate against.
- * Slugifying a display name is therefore the only option, and a Host rename
- * changes it. That is survivable precisely *because* it is ignored: a link
- * shared with a stale org name still resolves. Do not "fix" this into a checked
- * segment without an org slug on the backend, or every link already in the wild
- * breaks.
- *
- * **No Place in the hostname.** A Place used to be a subdomain, which cost a
- * certificate and a Polis allowlist entry per Place. The Conversation slug
- * already carries the Place (`ai-utah`), so one host serves every Campaign and
- * a Place is a page at `placePath()` instead (ADR 0011).
+ * Neither the Host nor the Place is in it (ADR 0014). The Conversation slug is
+ * unique and already carries the Place (`ai-utah`), so it is the whole address.
  */
-export function participantUrl(
-	conversationSlug: string,
-	orgSlug: string,
-	base: string,
-	protocol = 'https'
-): string {
+export function participantUrl(conversationSlug: string, base: string, protocol = 'https'): string {
 	const host = base
 		.trim()
 		.replace(/^https?:\/\//, '')
@@ -229,30 +211,31 @@ export function participantUrl(
 	// worse than one that opens plainly.
 	const scheme = /^localhost([:/]|$)/.test(host) || host.endsWith('.localhost') ? 'http' : protocol;
 
-	return `${scheme}://${host}${campaignPath(conversationSlug, orgSlug)}`;
+	return `${scheme}://${host}${campaignPath(conversationSlug)}`;
 }
 
-/** Fallback `<org>` segment for a Campaign whose Host is not known. */
-export const UNKNOWN_ORG_SLUG = 'host';
-
 /**
- * The path part, `/<org>/conversations/<conversation-slug>`. Internal links
+ * The path part, `/<conversation-slug>`, plus any page under it. Internal links
  * build from this rather than interpolating the shape by hand, so the route
  * directory and every link in the app move together.
  */
-export function campaignPath(
-	campaignSlug: string | undefined,
-	orgSlug: string | undefined,
-	...rest: string[]
-): string {
+export function campaignPath(campaignSlug: string | undefined, ...rest: string[]): string {
 	const campaign = (campaignSlug ?? '').trim();
 	if (!campaign) return '';
 
-	const org = toPlaceSlug(orgSlug ?? '') || UNKNOWN_ORG_SLUG;
 	const tail = rest.filter((part) => part && part.trim() !== '').map((part) => `/${part.trim()}`);
 
-	return `/${org}/conversations/${campaign}${tail.join('')}`;
+	return `/${campaign}${tail.join('')}`;
 }
+
+/** The pages under a Campaign, for `campaignPath(slug, CAMPAIGN_PAGES.poll)`. */
+export const CAMPAIGN_PAGES = { poll: 'poll', events: 'events', report: 'report' } as const;
+
+/**
+ * Root-level paths civicos already serves. A Campaign or Place slugged one of
+ * these would be shadowed by the static route, so admin refuses them.
+ */
+export const PARTICIPANT_RESERVED_SLUGS = ['api', 'conversations'] as const;
 
 /**
  * The organizations a Campaign is hosted by, mirrored onto the Conversation
@@ -314,14 +297,17 @@ export function placePath(placeSlug: string | undefined): string {
  *
  * Same reason as the poll: the public payload carries `organizationId` and
  * nothing else, and `/organizations` is 401 anonymously, so the participant app
- * cannot turn that id into the `<org>` segment of its own URL. Admin resolves
- * the Host already and mirrors it on publish.
+ * cannot turn that id into a name to credit. Admin resolves the Host already
+ * and mirrors it on publish.
  *
- * Only the URL needs this. It is not an authority on who owns the Campaign;
+ * It is not an authority on who owns the Campaign;
  * `Conversation.organizationId` is.
  */
 export interface CampaignOrg {
-	/** URL segment, a slugified display name. Decorative, see `participantUrl`. */
+	/**
+	 * A slugified display name. It was the `<org>` URL segment until the Host
+	 * left the URL (ADR 0014), and nothing reads it now.
+	 */
 	slug: string;
 	name: string;
 	/**

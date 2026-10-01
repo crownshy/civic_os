@@ -261,7 +261,7 @@ describe('pollFor', () => {
 		// The Polis step is 401 anonymously, so an unmirrored Campaign has nothing
 		// naming its poll. This used to fall through to the participant's zip code
 		// and then to PUBLIC_POLIS_ID, which could only open a different
-		// Campaign's poll (#422, #421). `/contribute` answers 503 on this.
+		// Campaign's poll (#422, #421). `/poll` answers 503 on this.
 		const campaign = resolveCampaign({ ...stored, metadata: {} }, GENERIC_REGION);
 
 		expect(pollFor(campaign, GENERIC_REGION)).toBeNull();

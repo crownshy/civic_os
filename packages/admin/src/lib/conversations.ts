@@ -17,15 +17,20 @@
 
 import type { LocalizedConversationDto } from '@crownshy/api-client/api';
 import { REGIONS, type RegionConfig } from '@civicos/shared/data/regions';
-import { participantUrl, readOrg, readPlace, type Place } from '@civicos/shared/data/place';
+import {
+	PARTICIPANT_RESERVED_SLUGS,
+	participantUrl,
+	readPlace,
+	type Place
+} from '@civicos/shared/data/place';
 import { env } from '$env/dynamic/public';
 
 /**
- * Slugs the `/c/**` routes already use for something else. A Campaign carrying
- * one would be shadowed by the static route and unreachable, so both the create
- * form and the Setup rename reject them.
+ * Slugs a static route already uses, in admin's `/c/**` or at the root of the
+ * participant app. A Campaign carrying one would be shadowed by that route and
+ * unreachable, so both the create form and the Setup rename reject them.
  */
-export const RESERVED_ROUTE_SLUGS = ['new'] as const;
+export const RESERVED_ROUTE_SLUGS = ['new', ...PARTICIPANT_RESERVED_SLUGS] as const;
 
 /**
  * What to show when comhairle refuses a slug as already taken (409 from
@@ -129,12 +134,7 @@ export function toSummary(conversation: LocalizedConversationDto): ConversationS
 	// every Campaign has one from creation. A legacy region's hardcoded `shareUrl`
 	// no longer wins: it names a Place subdomain, and nothing reads the Place from
 	// the hostname any more (ADR 0011).
-	const org = readOrg(conversation.metadata);
-	const shareUrl = participantUrl(
-		conversation.slug || region?.slug || '',
-		org?.slug ?? region?.hostName ?? '',
-		participantBase()
-	);
+	const shareUrl = participantUrl(conversation.slug || region?.slug || '', participantBase());
 
 	return {
 		id: conversation.id,

@@ -124,7 +124,7 @@ Friends**. Each Ask surfaces on two screens, and the Host has one switch that
 governs both:
 
 1. Mid-poll, as a `CheckpointScreen` variant, shown at every tenth vote
-   (`packages/civicos/src/routes/contribute/+page.svelte`).
+   (`packages/civicos/src/routes/[campaign]/(campaign)/poll/+page.svelte`).
 2. On the end page, as a `ThankYouScreen` CTA card.
 
 The two surfaces already share one completion flag per Ask
@@ -171,9 +171,8 @@ over two Areas under the new one.
 The Conversation behind a Campaign is slugged `<campaign>-<place>` (`ai-utah`),
 derived automatically when the Place is saved. Under the Area model a derived
 Place cannot supply that suffix, so the slug scheme is an open question (ADR
-0007). The participant URL is `/<org>/conversations/<conversation-slug>` on one
-host (ADR 0007, ADR 0011); the `<org>` segment is decorative, so a Campaign has a
-participant site from the moment it is created.
+0007). The participant URL is `/<conversation-slug>` on one host (ADR 0014), so
+a Campaign has a participant site from the moment it is created.
 
 **A Campaign has exactly one Polis step.** comhairle's model is more general: a
 Conversation runs a workflow of many steps (`polis`, `learn`, `heyform`,
@@ -200,7 +199,7 @@ Neither write is guaranteed. Creation logs a mirror failure rather than rolling
 back, and a step comhairle has not finished provisioning reports no poll id to
 mirror at all. So the invariant is stated and checked rather than assumed: admin
 shows `campaign.pollBlocker` in the Campaign header with a one-click repair, and
-civicos answers 503 from `/contribute` instead of opening a poll that is not
+civicos answers 503 from `/poll` instead of opening a poll that is not
 this Campaign's. `pollFor` in `campaign.ts` is the single place the poll
 resolves, so the guard and the voting screen cannot disagree about whether there
 is one.
@@ -288,13 +287,14 @@ Campaigns whose Polis step does not resolve.
 ### Participant site
 Where participants actually go:
 
-    <host>/<org>/conversations/<conversation-slug>
+    <host>/<conversation-slug>
 
 `civicos` resolves the Campaign from the **slug** alone; nothing about the
-hostname is read (ADR 0011). The `<org>` segment is decorative, ignored on
-resolution (ADR 0007). The poll is `/contribute` under that path, and live
-events are `/events/<event-slug>`. A Place's Campaigns are listed at
-`/<place-slug>`.
+hostname is read (ADR 0011). The poll is `/poll` under that path, live events
+are `/events/<event-slug>`, and the report is `/report`. A Place's Campaigns are
+listed at `/<place-slug>`, which is the same one-segment route: a slug that names
+a Campaign is the Campaign, and only otherwise a Place (ADR 0014). Old
+`/<org>/conversations/<slug>` links redirect.
 
 Three things the admin surfaces have to respect:
 
@@ -305,7 +305,7 @@ Three things the admin surfaces have to respect:
   `@civicos/shared/data/place` is the only thing that builds it. Admin no longer
   prefers a legacy region's `shareUrl`, which names a Place subdomain.
 - **`is_live` does not gate the participant app.** `civicos` never reads it, and
-  `/contribute` talks to Polis directly, bypassing comhairle. Today the flag only
+  `/poll` talks to Polis directly, bypassing comhairle. Today the flag only
   drives the admin badge, so a "draft" Campaign that has been published to a
   Place is publicly reachable and votable.
 

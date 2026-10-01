@@ -17,10 +17,10 @@ import type { PageLoad } from './$types';
  */
 export const load: PageLoad = ({ url }) => {
 	const legacy = legacyRegionForSlug(extractSubdomain(url.hostname));
-	if (legacy) redirect(307, campaignPath(legacy.slug, legacy.hostName));
+	if (legacy) redirect(307, campaignPath(legacy.slug));
 
 	const configured = env.PUBLIC_CAMPAIGN_SLUG?.trim();
-	if (configured) redirect(307, campaignPath(configured, ''));
+	if (configured) redirect(307, campaignPath(configured));
 
 	redirect(307, '/conversations');
 };

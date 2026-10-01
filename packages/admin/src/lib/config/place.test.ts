@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { REGIONS, type RegionConfig } from '@civicos/shared/data/regions';
 import { placeForCampaign, placeFromName, rescopedSlug, toPlaceSlug } from './place';
-import { campaignPath, participantUrl, placePath } from '@civicos/shared/data/place';
+import {
+	CAMPAIGN_PAGES,
+	campaignPath,
+	participantUrl,
+	placePath
+} from '@civicos/shared/data/place';
 
 const oregon = REGIONS.oregon as RegionConfig;
 
@@ -102,42 +107,31 @@ describe('rescopedSlug', () => {
 });
 
 describe('participantUrl', () => {
-	it('builds the ADR 0011 address: org, conversations, conversation slug', () => {
-		expect(participantUrl('ai-utah', 'Utah Common Ground', 'bloomproject.us')).toBe(
-			'https://bloomproject.us/utah-common-ground/conversations/ai-utah'
-		);
+	it('builds the ADR 0014 address: the conversation slug off the root', () => {
+		expect(participantUrl('ai-utah', 'bloomproject.us')).toBe('https://bloomproject.us/ai-utah');
 	});
 
 	it('serves every Campaign from the configured host, with no Place label', () => {
 		// The Place is already in the Conversation slug. A subdomain per Place
 		// needed a certificate and a Polis allowlist entry each.
-		expect(new URL(participantUrl('ai-utah', 'Bloom', 'stage.bloomproject.us')).host).toBe(
+		expect(new URL(participantUrl('ai-utah', 'stage.bloomproject.us')).host).toBe(
 			'stage.bloomproject.us'
 		);
 	});
 
-	it('falls back to a placeholder org rather than dropping the segment', () => {
-		// The segment is decorative but structural: the route expects it.
-		expect(participantUrl('ai-utah', '', 'bloomproject.us')).toBe(
-			'https://bloomproject.us/host/conversations/ai-utah'
-		);
-	});
-
 	it('drops to http on localhost, where there is no TLS', () => {
-		expect(participantUrl('ai-dundee', 'Bloom', 'localhost:5173')).toBe(
-			'http://localhost:5173/bloom/conversations/ai-dundee'
-		);
+		expect(participantUrl('ai-dundee', 'localhost:5173')).toBe('http://localhost:5173/ai-dundee');
 	});
 
 	it('tolerates a base pasted with a scheme or trailing slash', () => {
-		expect(participantUrl('ai-utah', 'Bloom', 'https://bloomproject.us/')).toBe(
-			'https://bloomproject.us/bloom/conversations/ai-utah'
+		expect(participantUrl('ai-utah', 'https://bloomproject.us/')).toBe(
+			'https://bloomproject.us/ai-utah'
 		);
 	});
 
 	it('is empty rather than broken without a slug or a host', () => {
-		expect(participantUrl('', 'Bloom', 'bloomproject.us')).toBe('');
-		expect(participantUrl('ai-utah', 'Bloom', '')).toBe('');
+		expect(participantUrl('', 'bloomproject.us')).toBe('');
+		expect(participantUrl('ai-utah', '')).toBe('');
 	});
 });
 
@@ -154,16 +148,16 @@ describe('placePath', () => {
 
 describe('campaignPath', () => {
 	it('is the path half of the same rule', () => {
-		expect(campaignPath('ai', 'Utah Common Ground')).toBe('/utah-common-ground/conversations/ai');
+		expect(campaignPath('ai-utah')).toBe('/ai-utah');
 	});
 
-	it('appends sub-routes', () => {
-		expect(campaignPath('ai', 'Bloom', 'contribute')).toBe('/bloom/conversations/ai/contribute');
-		expect(campaignPath('ai', 'Bloom', 'events/42')).toBe('/bloom/conversations/ai/events/42');
+	it('appends the pages under a Campaign', () => {
+		expect(campaignPath('ai', CAMPAIGN_PAGES.poll)).toBe('/ai/poll');
+		expect(campaignPath('ai', CAMPAIGN_PAGES.events, '42')).toBe('/ai/events/42');
 	});
 
 	it('tolerates the undefined params a component sees', () => {
-		expect(campaignPath('ai', undefined)).toBe('/host/conversations/ai');
-		expect(campaignPath(undefined, 'Bloom')).toBe('');
+		expect(campaignPath(undefined)).toBe('');
+		expect(campaignPath('ai', '')).toBe('/ai');
 	});
 });

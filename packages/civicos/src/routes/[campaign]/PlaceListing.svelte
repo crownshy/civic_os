@@ -2,11 +2,11 @@
 	import { AppShell } from '$lib/components/layout';
 	import { Button } from '$lib/components/ui';
 	import CampaignCard from '$lib/components/ui/CampaignCard.svelte';
+	import type { DirectoryEntry } from '$lib/config/directory';
 
-	let { data } = $props();
-
-	const placeName = $derived(data.placeName);
-	const campaigns = $derived(data.campaigns);
+	// A Place's page: the Campaigns running there (ADR 0014). A Place is not a
+	// record (ADR 0006), so this is the directory filtered to its slug.
+	let { placeName, campaigns }: { placeName: string; campaigns: DirectoryEntry[] } = $props();
 </script>
 
 <svelte:head>
@@ -32,15 +32,9 @@
 		</div>
 
 		<div class="flex flex-col gap-3 px-6 py-8 md:px-12">
-			{#if campaigns === null}
-				<p class="text-center font-sans text-base leading-6 font-medium text-foreground/70">
-					We cannot reach the list of conversations right now. Try again in a moment.
-				</p>
-			{:else}
-				{#each campaigns as campaign (campaign.id)}
-					<CampaignCard {campaign} />
-				{/each}
-			{/if}
+			{#each campaigns as campaign (campaign.id)}
+				<CampaignCard {campaign} />
+			{/each}
 		</div>
 
 		<div class="mt-auto flex justify-center px-6 pt-2 pb-10 md:px-12">

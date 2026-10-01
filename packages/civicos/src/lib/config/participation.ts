@@ -4,7 +4,7 @@
  *
  * Both are Host switches set on Setup in admin. The asks are stored on the
  * Conversation's `metadata`. The demographics are comhairle's
- * ConversationDemographics links, read by `/contribute`'s load and turned into
+ * ConversationDemographics links, read by `/poll`'s load and turned into
  * questions by `aboutYouQuestionsFromBackend` (#441). The old
  * `metadata.demographics` switches admin no longer writes are only the fallback
  * for when those links cannot be read.

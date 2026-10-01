@@ -45,7 +45,7 @@ async function aboutYouQuestionsForCampaign(
  * Voting needs a zip code. It no longer picks the Polis conversation, which the
  * Campaign names (#422), but it is still the only geography a participant ever
  * gives us, and joining is what files their participation. So a shared
- * `/contribute` link cannot be an entrance. Anyone without a session is sent to the Campaign's landing
+ * poll link cannot be an entrance. Anyone without a session is sent to the Campaign's landing
  * page, which is where the zip is asked for.
  *
  * The participant comes from the root layout's server `load`, so on a cold load
@@ -65,7 +65,7 @@ export const load: PageLoad = async ({ params, parent, depends }) => {
 	// bounced every participant off this page and into a loop with the landing
 	// page. Restore `!participant?.zipCode` once that question exists.
 	if (participantResolved && !participant) {
-		redirect(307, campaignPath(params.campaign, params.org));
+		redirect(307, campaignPath(params.campaign));
 	}
 
 	// A Campaign whose poll nothing names cannot be voted in. That used to fall

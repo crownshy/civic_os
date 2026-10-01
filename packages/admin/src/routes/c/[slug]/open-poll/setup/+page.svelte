@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { CAMPAIGN_PAGES } from '@civicos/shared/data/place';
 	import { invalidate } from '$lib/activity.svelte';
 	import { page } from '$app/state';
 	import { moderateStatementAux, postSeed, syncStatementAux } from '$lib/api/aux';
@@ -16,12 +17,11 @@
 	// Same fallback the header badge uses when the conversation didn't resolve.
 	const isLive = $derived(conversation ? conversation.isLive : campaign.status === 'live');
 
-	// The poll lives at /contribute, not /poll: civicos has no `/poll` route, so
-	// the old link 404'd. Empty for Campaigns with no legacy region entry, which
-	// have no participant site at all yet.
+	// Empty when there is no participant site to link to (no slug, or no
+	// participant base configured).
 	const pollUrl = $derived(
 		campaign.shareUrl
-			? `${campaign.shareUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}/contribute`
+			? `${campaign.shareUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}/${CAMPAIGN_PAGES.poll}`
 			: ''
 	);
 
