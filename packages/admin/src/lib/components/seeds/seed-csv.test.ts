@@ -1,3 +1,4 @@
+import { toOneLine } from '@civicos/shared/data/text-limits';
 import { describe, it, expect } from 'vitest';
 import { parseSeedCsv, seedProblem } from './seed-csv';
 
@@ -49,5 +50,13 @@ describe('seedProblem', () => {
 
 	it('refuses a repeat inside the same batch', () => {
 		expect(seedProblem(['A', 'B', 'a'])).toMatch(/^Statement 3 is already/);
+	});
+});
+
+describe('toOneLine', () => {
+	it('turns any run of line breaks into one space', () => {
+		expect(toOneLine('Fund the buses.\nAnd the trains.')).toBe('Fund the buses. And the trains.');
+		expect(toOneLine('First  \r\n\r\n  second')).toBe('First second');
+		expect(toOneLine('Already one line')).toBe('Already one line');
 	});
 });

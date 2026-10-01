@@ -27,3 +27,11 @@ export const TEXT_LIMITS = {
 export function tooLong(field: keyof typeof TEXT_LIMITS): string {
 	return `Keep this to ${TEXT_LIMITS[field]} characters or fewer.`;
 }
+
+/**
+ * A statement is one line, the way Polis shows it, so a line break typed or
+ * pasted into one becomes a single space (#465).
+ */
+export function toOneLine(text: string): string {
+	return text.replace(/\s*[\r\n]+\s*/g, ' ');
+}

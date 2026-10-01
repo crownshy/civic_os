@@ -5,7 +5,7 @@
 	import { Spinner } from '@civicos/shared/ui/spinner';
 	import { Plus, Upload } from '@lucide/svelte';
 	import type { Snippet } from 'svelte';
-	import { TEXT_LIMITS } from '@civicos/shared/data/text-limits';
+	import { TEXT_LIMITS, toOneLine } from '@civicos/shared/data/text-limits';
 	import { parseSeedCsv, seedProblem } from './seed-csv';
 
 	interface Props {
@@ -152,6 +152,13 @@
 			<textarea
 				id="seed-text"
 				bind:value={draft}
+				oninput={() => {
+					if (/[\r\n]/.test(draft)) draft = toOneLine(draft);
+				}}
+				onkeydown={(e) => {
+					// Seeds are statements, and statements are one line (#465).
+					if (e.key === 'Enter') e.preventDefault();
+				}}
 				rows="3"
 				placeholder="Write a seed statement…"
 				disabled={busy}

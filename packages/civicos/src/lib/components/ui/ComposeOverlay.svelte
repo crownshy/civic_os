@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { TEXT_LIMITS } from '@civicos/shared/data/text-limits';
+	import { TEXT_LIMITS, toOneLine } from '@civicos/shared/data/text-limits';
 	import { onDestroy } from 'svelte';
 	import { cn } from '$lib/utils';
 	import Button from './Button.svelte';
@@ -97,11 +97,16 @@
 				bind:value={text}
 				placeholder="Type here – what do you think?"
 				disabled={submitted || sending}
-				oninput={() => (failed = false)}
+				oninput={() => {
+					failed = false;
+					// A pasted line break; Enter itself never gets this far.
+					if (/[\r\n]/.test(text)) text = toOneLine(text);
+				}}
 				onkeydown={(e) => {
-					if (e.key === 'Enter' && !e.shiftKey) {
+					// Statements are one line (#465): Enter submits, Shift+Enter does nothing.
+					if (e.key === 'Enter') {
 						e.preventDefault();
-						handleSubmit();
+						if (!e.shiftKey) handleSubmit();
 					}
 				}}
 				class="flex-1 resize-none appearance-none border-0 bg-transparent p-6 font-sans text-2xl leading-7 font-medium text-card-foreground outline-none placeholder:text-card-foreground/70 focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:outline-none"
