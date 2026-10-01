@@ -40,20 +40,20 @@
 </script>
 
 <SetupCard {title} {subtitle}>
-	<div class="font-ui">
+	<div class="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)_auto] font-ui">
 		{#if error}
-			<p class="mb-3 text-body text-destructive">{error}</p>
+			<p class="col-span-full mb-3 text-body text-destructive">{error}</p>
 		{/if}
 
 		<div
-			class="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)_auto] gap-4 px-2 pb-2 text-caption font-semibold text-muted-foreground uppercase"
+			class="col-span-full grid grid-cols-subgrid gap-4 px-2 pb-2 text-caption font-semibold text-muted-foreground uppercase"
 		>
 			<div>Ask</div>
 			<div>What participants see</div>
 			<div class="text-right">Status</div>
 		</div>
 
-		<div class="divide-y divide-border">
+		<div class="col-span-full grid grid-cols-subgrid divide-y divide-border">
 			{#each PARTICIPANT_ASKS as ask (ask.key)}
 				{@const on = toggles[ask.key]}
 				<ToggleRow

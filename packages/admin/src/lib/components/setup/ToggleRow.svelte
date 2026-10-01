@@ -22,7 +22,7 @@
 </script>
 
 <div
-	class="col-span-full grid grid-cols-subgrid items-center gap-4 px-2 py-5 {on ? '' : 'opacity-50'}"
+	class="col-span-full grid grid-cols-subgrid items-start gap-4 px-2 py-4 {on ? '' : 'opacity-50'}"
 >
 	<div class="text-body font-bold">{name}</div>
 	<div>
@@ -31,7 +31,7 @@
 			<div class="mt-1 text-body text-muted-foreground">{note}</div>
 		{/if}
 	</div>
-	<div class="flex items-center justify-end gap-3">
+	<div class="flex h-6 items-center justify-end gap-3">
 		{#if onEdit}
 			<button
 				type="button"
