@@ -56,11 +56,14 @@
 				</thead>
 				<tbody>
 					{#each data.organizations as org (org.id)}
-						<tr class="border-b border-border last:border-b-0 hover:bg-muted/30">
+						<!-- The name link stretches over the whole row (#451), so the row is one
+							real link: cmd-click and middle-click work and the keyboard sees one
+							stop. The website and email links sit above it and keep their own. -->
+						<tr class="relative border-b border-border last:border-b-0 hover:bg-muted/30">
 							<td class="px-4 py-3 text-body font-semibold">
 								<a
 									href={resolve('/sysadmin/hosts/[id]', { id: org.id })}
-									class="underline-offset-2 hover:text-primary hover:underline"
+									class="underline-offset-2 after:absolute after:inset-0 hover:text-primary hover:underline"
 								>
 									{org.name}
 								</a>
@@ -71,7 +74,7 @@
 										href={org.externalUrl}
 										target="_blank"
 										rel="noreferrer"
-										class="text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+										class="relative z-10 text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
 									>
 										{displayUrl(org.externalUrl)}
 									</a>
@@ -81,7 +84,7 @@
 								{#if org.contactEmail}
 									<a
 										href={`mailto:${org.contactEmail}`}
-										class="text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+										class="relative z-10 text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
 									>
 										{org.contactEmail}
 									</a>
