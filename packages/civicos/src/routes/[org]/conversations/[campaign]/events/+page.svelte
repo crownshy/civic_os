@@ -2,7 +2,7 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { AppShell } from '$lib/components/layout';
-	import { InfoBar, ConversationEventCard, Button } from '$lib/components/ui';
+	import { InfoBar, ConversationEventCard, Button, AlertBanner } from '$lib/components/ui';
 	import { Input } from '@civicos/shared/ui/input';
 	import { session } from '$lib/services/session.svelte';
 	import { placeNameFor } from '$lib/config/campaign';
@@ -160,9 +160,7 @@
 								/>
 							</form>
 							{#if signUpFailed}
-								<p role="alert" class="px-2 font-sans text-base text-destructive">
-									We couldn't sign you up. Please try again.
-								</p>
+								<AlertBanner message="We couldn't sign you up. Please try again." />
 							{/if}
 							<Button
 								variant="primary"

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { fly } from 'svelte/transition';
+	import { fly, slide } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
-	import { InfoBar, VoteBar, ReportPanel } from '$lib/components/ui';
+	import { InfoBar, VoteBar, ReportPanel, AlertBanner } from '$lib/components/ui';
 	import type { RegionConfig } from '$lib/config/regions';
 	import StatementPlaceholder from './StatementPlaceholder.svelte';
 
@@ -120,12 +120,15 @@
 				</p>
 			</div>
 		{/if}
-		{#if error && !waitingForNext}
-			<p role="alert" class="mt-6 font-sans text-base font-medium text-destructive">
-				That didn't go through. Please try again.
-			</p>
-		{/if}
 	</div>
+
+	<!-- Between the statement and the vote buttons, outside the statement area, so
+		it reads as a status rather than part of the quote and never covers it. -->
+	{#if error && !waitingForNext}
+		<div class="px-6 pt-3" transition:slide={{ duration: 200, easing: cubicOut }}>
+			<AlertBanner message="That didn't go through. Please try again." />
+		</div>
+	{/if}
 
 	<VoteBar
 		{disabled}

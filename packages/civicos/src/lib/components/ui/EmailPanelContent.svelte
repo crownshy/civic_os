@@ -4,6 +4,7 @@
 	import { Mail, Check } from 'lucide-svelte';
 	import { session } from '$lib/services/session.svelte';
 	import Button from './Button.svelte';
+	import AlertBanner from './AlertBanner.svelte';
 	import { Input } from '@civicos/shared/ui/input';
 
 	interface Props {
@@ -20,6 +21,7 @@
 	let submitting = $state(false);
 	let justSubmitted = $state(false);
 	let error = $state('');
+	let failed = $state(false);
 	let completeTimer: ReturnType<typeof setTimeout> | undefined;
 
 	// Show the "already on the list" confirmation only when the panel was opened *before*
@@ -33,6 +35,7 @@
 
 	async function handleSubmit() {
 		error = '';
+		failed = false;
 		const trimmed = email.trim();
 		if (!trimmed) {
 			error = 'Please enter an email address';
@@ -46,7 +49,7 @@
 		const ok = await session.registerEmail(trimmed, conversationId);
 		submitting = false;
 		if (!ok) {
-			error = "We couldn't sign you up. Please try again.";
+			failed = true;
 			return;
 		}
 		// Brief success beat so the panel doesn't slam shut on the user.
@@ -96,6 +99,9 @@
 		</div>
 		{#if error}
 			<p class="-mt-1 px-2 font-sans text-sm text-destructive">{error}</p>
+		{/if}
+		{#if failed}
+			<AlertBanner message="We couldn't sign you up. Please try again." />
 		{/if}
 		<Button
 			variant="primary"

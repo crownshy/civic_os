@@ -2,7 +2,7 @@
 	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import type { AboutYouQuestion } from '$lib/config/participation';
-	import { InfoBar, Button, Dialog, Link } from '$lib/components/ui';
+	import { InfoBar, Button, Dialog, Link, AlertBanner } from '$lib/components/ui';
 	import { Check, Plus } from 'lucide-svelte';
 
 	interface Props {
@@ -145,9 +145,7 @@
 
 	<div class="flex shrink-0 flex-col gap-3 px-7 py-8">
 		{#if failed}
-			<p role="alert" class="text-center font-sans text-base font-medium text-destructive">
-				Your answers didn't save. Please try again.
-			</p>
+			<AlertBanner message="Your answers didn't save. Please try again." />
 		{/if}
 		<Button variant="primary" fullWidth disabled={saving} onclick={handleContinue}>
 			{saving ? 'SAVING...' : 'CONTINUE'}

@@ -4,6 +4,7 @@
 	import { cn } from '$lib/utils';
 	import Button from './Button.svelte';
 	import InfoBar from './InfoBar.svelte';
+	import AlertBanner from './AlertBanner.svelte';
 
 	interface Props {
 		question: string;
@@ -116,9 +117,7 @@
 		</div>
 
 		{#if failed}
-			<p role="alert" class="px-2 pt-4 font-sans text-base font-medium text-destructive">
-				Your statement didn't go through. Please try again.
-			</p>
+			<AlertBanner class="mt-4" message="Your statement didn't go through. Please try again." />
 		{/if}
 
 		<!-- Buttons -->
