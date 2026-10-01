@@ -253,7 +253,8 @@
 		goToEndFlow();
 	}
 
-	async function handleDemographicsDone(answers?: Record<string, string>) {
+	/** Resolves to whether every answer saved; on false the screen stays put to retry. */
+	async function handleDemographicsDone(answers?: Record<string, string>): Promise<boolean> {
 		// Awaited so the answers land before the screen moves on. Built-ins go on
 		// the profile, which the participation report reads; a Host's own
 		// categories are filed as demographics responses.
@@ -267,14 +268,16 @@
 				else if (question.profileField) profile[question.profileField] = value;
 				else custom.push([question.key, value]);
 			}
-			await Promise.all([
+			const saved = await Promise.all([
 				session.saveProfile(profile),
 				...custom.map(([slug, value]) => session.saveDemographicResponse(slug, value))
 			]);
+			if (saved.includes(false)) return false;
 		}
 
 		session.markDemographicsCompleted();
 		screen = 'thank-you';
+		return true;
 	}
 
 	function resumeVoting() {

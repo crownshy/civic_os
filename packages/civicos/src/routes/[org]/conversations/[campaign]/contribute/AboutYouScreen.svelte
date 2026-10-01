@@ -13,11 +13,24 @@
 		 * one off in admin is the only thing that removes it.
 		 */
 		questions: AboutYouQuestion[];
-		/** Picked option values, keyed by question slug. */
-		onDone: (answers?: Record<string, string>) => void;
+		/**
+		 * Picked option values, keyed by question slug. Resolves to whether they
+		 * saved, so the screen can hold CONTINUE while it waits and say so if not.
+		 */
+		onDone: (answers?: Record<string, string>) => Promise<boolean>;
 	}
 
 	let { placeName, questions, onDone }: Props = $props();
+
+	let saving = $state(false);
+	let failed = $state(false);
+
+	async function handleContinue() {
+		saving = true;
+		failed = false;
+		failed = !(await onDone(collectAnswers()));
+		saving = false;
+	}
 
 	let openDialog = $state<string | null>(null);
 	let dialogOpen = $derived(openDialog !== null);
@@ -130,8 +143,15 @@
 		</div>
 	</div>
 
-	<div class="flex shrink-0 items-center gap-3.5 px-7 py-8">
-		<Button variant="primary" fullWidth onclick={() => onDone(collectAnswers())}>CONTINUE</Button>
+	<div class="flex shrink-0 flex-col gap-3 px-7 py-8">
+		{#if failed}
+			<p role="alert" class="text-center font-sans text-base font-medium text-destructive">
+				Your answers didn't save. Please try again.
+			</p>
+		{/if}
+		<Button variant="primary" fullWidth disabled={saving} onclick={handleContinue}>
+			{saving ? 'SAVING...' : 'CONTINUE'}
+		</Button>
 	</div>
 </div>
 

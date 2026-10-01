@@ -45,7 +45,7 @@
 
 <Story name="Every category on" args={{ placeName: 'UTAH COUNTY', questions: allCategories }}>
 	{#snippet template(args)}
-		<AboutYouScreen {...args} onDone={() => {}} />
+		<AboutYouScreen {...args} onDone={async () => true} />
 	{/snippet}
 </Story>
 
@@ -54,12 +54,12 @@
 	args={{ placeName: 'UTAH COUNTY', questions: twoCategories }}
 >
 	{#snippet template(args)}
-		<AboutYouScreen {...args} onDone={() => {}} />
+		<AboutYouScreen {...args} onDone={async () => true} />
 	{/snippet}
 </Story>
 
 <Story name="With a Host's own category" args={{ placeName: 'UTAH COUNTY', questions: withCustom }}>
 	{#snippet template(args)}
-		<AboutYouScreen {...args} onDone={() => {}} />
+		<AboutYouScreen {...args} onDone={async () => true} />
 	{/snippet}
 </Story>
