@@ -1,22 +1,23 @@
 <script lang="ts">
-	import CharCount from '$lib/components/CharCount.svelte';
-	import { TEXT_LIMITS } from '@civicos/shared/data/text-limits';
 	import { untrack } from 'svelte';
 	import { beforeNavigate, goto } from '$app/navigation';
 	import { invalidate } from '$lib/activity.svelte';
 	import * as Dialog from '@civicos/shared/ui/dialog';
 	import { Button } from '@civicos/shared/ui/button';
-	import { Input } from '@civicos/shared/ui/input';
-	import { Label } from '@civicos/shared/ui/label';
-	import * as ToggleGroup from '@civicos/shared/ui/toggle-group';
-	import { Calendar, Check, Clock, Copy, MapPin, Monitor, Trash2, Video } from '@lucide/svelte';
+	import { Check, Trash2 } from '@lucide/svelte';
 	import { resolve } from '$app/paths';
+	import { isoToWallClock, PAST_START_MESSAGE, zonedToISO } from '$lib/utils/event-time';
+	import EventFields from '../EventFields.svelte';
 	import {
-		earliestStart,
-		isoToWallClock,
-		PAST_START_MESSAGE,
-		zonedToISO
-	} from '$lib/utils/event-time';
+		BROWSER_TZ,
+		completeLocation,
+		emptyEventForm,
+		emptyLocation,
+		parseCapacity,
+		type EventField,
+		type EventForm,
+		type MeetMode
+	} from '../event-form';
 
 	let { data } = $props();
 
@@ -24,78 +25,13 @@
 	const campaign = $derived(data.campaign);
 	const api = $derived(data.api);
 
-	const BROWSER_TZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
-	const TIMEZONES: string[] =
-		typeof Intl.supportedValuesOf === 'function'
-			? Intl.supportedValuesOf('timeZone')
-			: [BROWSER_TZ];
-
-	type LocationForm = {
-		venue_name: string;
-		address_line_1: string;
-		address_line_2: string;
-		city: string;
-		state_province: string;
-		postal_code: string;
-		country_code: string;
-	};
-
-	/** The API has two formats; `online` splits by whether a custom link is set. */
-	type MeetMode = 'in_person' | 'civicos_online' | 'external_online';
-
-	type Form = {
-		name: string;
-		description: string;
-		meet_mode: MeetMode;
-		custom_event_link: string;
-		start_date: string;
-		start_time: string;
-		end_time: string;
-		capacity: string;
-		signup_mode: 'open' | 'invite';
-		time_zone: string;
-		location: LocationForm;
-	};
-
-	const emptyLocation = (): LocationForm => ({
-		venue_name: '',
-		address_line_1: '',
-		address_line_2: '',
-		city: '',
-		state_province: '',
-		postal_code: '',
-		country_code: ''
-	});
-
-	function tzLabel(tz: string): string {
-		return (
-			new Intl.DateTimeFormat('en-US', { timeZone: tz, timeZoneName: 'long' })
-				.formatToParts(new Date())
-				.find((p) => p.type === 'timeZoneName')?.value ?? tz
-		);
-	}
-
 	function meetModeOf(e: NonNullable<typeof event>): MeetMode {
 		if (e.format === 'in_person') return 'in_person';
 		return e.customEventLink ? 'external_online' : 'civicos_online';
 	}
 
-	function buildForm(e: typeof event): Form {
-		if (!e) {
-			return {
-				name: '',
-				description: '',
-				meet_mode: 'in_person',
-				custom_event_link: '',
-				start_date: '',
-				start_time: '',
-				end_time: '',
-				capacity: '',
-				signup_mode: 'open',
-				time_zone: BROWSER_TZ,
-				location: emptyLocation()
-			};
-		}
+	function buildForm(e: typeof event): EventForm {
+		if (!e) return emptyEventForm();
 		// The event's own zone, so an editor elsewhere does not re-zone it on save.
 		const stored = e.defaultTimeZone;
 		const tz = typeof stored === 'string' && stored ? stored : BROWSER_TZ;
@@ -110,24 +46,26 @@
 			start_date: start.date,
 			start_time: start.time,
 			end_time: end.time,
-			capacity: e.capacity != null ? String(e.capacity) : '',
-			signup_mode: (e.signupMode as Form['signup_mode']) ?? 'open',
+			capacity: e.capacity ?? null,
+			signup_mode: (e.signupMode as EventForm['signup_mode']) ?? 'open',
 			time_zone: tz,
-			location: {
-				venue_name: loc?.venue_name ?? '',
-				address_line_1: loc?.address_line_1 ?? '',
-				address_line_2: loc?.address_line_2 ?? '',
-				city: loc?.city ?? '',
-				state_province: loc?.state_province ?? '',
-				postal_code: loc?.postal_code ?? '',
-				country_code: loc?.country_code ?? ''
-			}
+			location: loc
+				? {
+						venue_name: loc.venue_name ?? '',
+						address_line_1: loc.address_line_1 ?? '',
+						address_line_2: loc.address_line_2 ?? '',
+						city: loc.city ?? '',
+						state_province: loc.state_province ?? '',
+						postal_code: loc.postal_code ?? '',
+						country_code: loc.country_code ?? ''
+					}
+				: emptyLocation()
 		};
 	}
 
 	// A one-time working copy: the layout remounts this page per event, and
 	// re-reading `event` would reset the form after every save's invalidate.
-	let form = $state<Form>(untrack(() => buildForm(event)));
+	let form = $state<EventForm>(untrack(() => buildForm(event)));
 	// Keyed by what failed, so a later success on another field cannot hide it.
 	let failures = $state<Record<string, string>>({});
 	const error = $derived(Object.values(failures)[0] ?? null);
@@ -136,29 +74,12 @@
 	let savedTick = $state(0);
 	let deleting = $state(false);
 	let deleteOpen = $state(false);
-	let tzOpen = $state(false);
 
-	let dateEl = $state<HTMLInputElement | null>(null);
-	let startEl = $state<HTMLInputElement | null>(null);
-	let endEl = $state<HTMLInputElement | null>(null);
-
-	const isInPerson = $derived(form.meet_mode === 'in_person');
 	// The public Campaign address plus civicos' event route. Empty when the
 	// Campaign has no address yet (no participant apex, or no slug).
 	const rsvpLink = $derived(
 		event && campaign.shareUrl ? `${campaign.shareUrl}/events/${event.id}` : ''
 	);
-	// CivicOS Online meets on the RSVP page; Zoom / Other Online has nowhere to send
-	// people until a custom link is entered.
-	const missingCustomLink = $derived(
-		form.meet_mode === 'external_online' && !form.custom_event_link.trim()
-	);
-
-	const meetModes = [
-		{ value: 'in_person', label: 'In Person', icon: MapPin },
-		{ value: 'civicos_online', label: 'CivicOS Online', icon: Video },
-		{ value: 'external_online', label: 'Zoom / Other Online', icon: Monitor }
-	] as const;
 
 	type Patch = Record<string, unknown>;
 
@@ -206,15 +127,15 @@
 	beforeNavigate(({ willUnload, cancel }) => {
 		if (!willUnload || !event) return;
 		const stored = buildForm(event);
-		const unsaved = BLUR_SAVED.some((key) => form[key].trim() !== stored[key].trim());
+		const text = (v: string | number | null) => String(v ?? '').trim();
+		const unsaved = BLUR_SAVED.some((key) => text(form[key]) !== text(stored[key]));
 		if (saving || unsaved) cancel();
 	});
 
-	function setMeetMode(next: MeetMode) {
-		form.meet_mode = next;
-		const patch: Patch = { format: next === 'in_person' ? 'in_person' : 'online' };
+	function saveMeetMode() {
+		const patch: Patch = { format: form.meet_mode === 'in_person' ? 'in_person' : 'online' };
 		// Only the third mode carries a custom link; the others fall back to the RSVP page.
-		if (next !== 'external_online') patch.custom_event_link = null;
+		if (form.meet_mode !== 'external_online') patch.custom_event_link = null;
 		save('meetMode', patch);
 	}
 
@@ -231,27 +152,9 @@
 			failures.name = 'The event needs a name.';
 			return;
 		}
+		delete failures.name;
 		save('name', { name });
 	}
-
-	function locationPatch(): LocationForm | null {
-		const l = form.location;
-		const required = [
-			l.venue_name,
-			l.address_line_1,
-			l.city,
-			l.state_province,
-			l.postal_code,
-			l.country_code
-		];
-		if (required.some((v) => !v.trim())) return null;
-		return l;
-	}
-
-	// Past dates are greyed out only while the event is still ahead: an event
-	// that already happened keeps its own date valid (#468).
-	const isUpcoming = $derived(!event || Date.parse(event.startTime) > Date.now());
-	const earliest = $derived(earliestStart(form.time_zone, form.start_date));
 
 	function saveTimes() {
 		if (!event || !form.start_date || !form.start_time || !form.end_time) return;
@@ -276,17 +179,37 @@
 	}
 
 	function saveLocation() {
-		const loc = locationPatch();
+		const loc = completeLocation(form.location);
 		if (!loc) return;
 		save('location', { location: loc });
 	}
 
 	function saveCapacity() {
-		const n = Number(form.capacity);
-		const capacity = Number.isFinite(n) && n > 0 ? Math.floor(n) : null;
+		const capacity = parseCapacity(form.capacity);
 		if (capacity === (event?.capacity ?? null)) return;
 		save('capacity', { capacity });
 	}
+
+	function saveDescription() {
+		const description = form.description.trim();
+		if (!event || description === event.description) return;
+		save('description', { description });
+	}
+
+	const savers: Record<EventField, () => void> = {
+		name: saveName,
+		times: saveTimes,
+		meetMode: saveMeetMode,
+		link: saveCustomLink,
+		location: saveLocation,
+		description: saveDescription,
+		capacity: saveCapacity,
+		signup: () => save('signup', { signup_mode: form.signup_mode })
+	};
+
+	// Past dates are greyed out only while the event is still ahead: an event
+	// that already happened keeps its own date valid (#468).
+	const isUpcoming = $derived(!event || Date.parse(event.startTime) > Date.now());
 
 	async function doDelete() {
 		if (!event || deleting) return;
@@ -306,22 +229,7 @@
 		}
 	}
 
-	let copied = $state(false);
-	let copyTimer: ReturnType<typeof setTimeout> | null = null;
-	function copyLink(link: string) {
-		if (!link) return;
-		navigator.clipboard?.writeText(link);
-		copied = true;
-		if (copyTimer) clearTimeout(copyTimer);
-		copyTimer = setTimeout(() => (copied = false), 1500);
-	}
-
 	const LABEL = 'text-caption font-bold tracking-tight uppercase';
-	const FIELD =
-		'flex h-14 items-center gap-3 rounded-lg border border-input bg-background px-4 focus-within:border-ring';
-	// The lucide glyph replaces the native picker button, so the input keeps none of its own.
-	const NATIVE =
-		'w-full bg-transparent text-body-lg font-semibold outline-none [&::-webkit-calendar-picker-indicator]:hidden';
 </script>
 
 {#if event}
@@ -341,287 +249,12 @@
 			{/if}
 		</div>
 
-		<input
-			aria-label="Event name"
-			bind:value={form.name}
-			maxlength={TEXT_LIMITS.eventName}
-			onblur={saveName}
-			class="w-full bg-transparent text-h3 font-bold outline-none md:text-h2"
+		<EventFields
+			bind:form
+			{rsvpLink}
+			limitToFuture={isUpcoming}
+			oncommit={(field) => savers[field]()}
 		/>
-		<CharCount count={form.name.length} limit={TEXT_LIMITS.eventName} />
-
-		<div class="border-t border-border"></div>
-
-		<div class="space-y-3">
-			<div class="grid grid-cols-1 gap-6 md:grid-cols-[1fr_auto_auto]">
-				<div class="space-y-2">
-					<Label for="ev-date" class={LABEL}>Date</Label>
-					<div class={FIELD}>
-						<button
-							type="button"
-							aria-label="Open date picker"
-							onclick={() => dateEl?.showPicker?.()}
-							class="cursor-pointer touch-manipulation text-foreground transition-all hover:text-primary active:scale-90 active:opacity-60 active:duration-0"
-						>
-							<Calendar class="size-5" />
-						</button>
-						<input
-							id="ev-date"
-							type="date"
-							bind:this={dateEl}
-							bind:value={form.start_date}
-							min={isUpcoming ? earliest.date : undefined}
-							onblur={saveTimes}
-							class={NATIVE}
-						/>
-					</div>
-				</div>
-				<div class="space-y-2">
-					<Label for="ev-start" class={LABEL}>Start time</Label>
-					<div class={`${FIELD} md:w-56`}>
-						<button
-							type="button"
-							aria-label="Open start time picker"
-							onclick={() => startEl?.showPicker?.()}
-							class="cursor-pointer touch-manipulation text-foreground transition-all hover:text-primary active:scale-90 active:opacity-60 active:duration-0"
-						>
-							<Clock class="size-5" />
-						</button>
-						<input
-							id="ev-start"
-							type="time"
-							bind:this={startEl}
-							bind:value={form.start_time}
-							min={isUpcoming ? earliest.time : undefined}
-							onblur={saveTimes}
-							class={NATIVE}
-						/>
-					</div>
-				</div>
-				<div class="space-y-2">
-					<Label for="ev-end" class={LABEL}>End time</Label>
-					<div class={`${FIELD} md:w-56`}>
-						<button
-							type="button"
-							aria-label="Open end time picker"
-							onclick={() => endEl?.showPicker?.()}
-							class="cursor-pointer touch-manipulation text-foreground transition-all hover:text-primary active:scale-90 active:opacity-60 active:duration-0"
-						>
-							<Clock class="size-5" />
-						</button>
-						<input
-							id="ev-end"
-							type="time"
-							bind:this={endEl}
-							bind:value={form.end_time}
-							onblur={saveTimes}
-							class={NATIVE}
-						/>
-					</div>
-				</div>
-			</div>
-
-			<p class="text-body font-semibold italic">
-				All times in {tzLabel(form.time_zone)}.
-				<button
-					type="button"
-					onclick={() => (tzOpen = !tzOpen)}
-					aria-expanded={tzOpen}
-					class="cursor-pointer font-semibold text-primary italic transition-opacity hover:underline active:opacity-60"
-				>
-					Change time zone
-				</button>
-			</p>
-
-			{#if tzOpen}
-				<select
-					aria-label="Time zone"
-					bind:value={form.time_zone}
-					onchange={saveTimes}
-					class="h-12 w-full max-w-md rounded-lg border border-input bg-background px-4 text-body outline-none focus-visible:border-ring"
-				>
-					{#each TIMEZONES as tz (tz)}
-						<option value={tz}>{tz}</option>
-					{/each}
-				</select>
-			{/if}
-		</div>
-
-		<div class="border-t border-border"></div>
-
-		<div class="space-y-3">
-			<Label class={LABEL}>How will you meet?</Label>
-			<ToggleGroup.Root
-				type="single"
-				value={form.meet_mode}
-				onValueChange={(v) => v && setMeetMode(v as MeetMode)}
-				aria-label="How will you meet?"
-				class="grid w-full grid-cols-1 gap-5 rounded-none border-0 bg-transparent p-0 shadow-none md:grid-cols-3"
-			>
-				{#each meetModes as mode (mode.value)}
-					{@const Icon = mode.icon}
-					<ToggleGroup.Item
-						value={mode.value}
-						class="h-[76px] w-full justify-center rounded-lg border border-input bg-background text-body-lg font-semibold text-foreground data-[state=on]:border-primary data-[state=on]:bg-primary/5 data-[state=on]:text-primary data-[state=on]:shadow-none [&_svg]:size-5"
-					>
-						<Icon />
-						{mode.label}
-					</ToggleGroup.Item>
-				{/each}
-			</ToggleGroup.Root>
-		</div>
-
-		{#if isInPerson}
-			<div class="space-y-3">
-				<Label class={LABEL}>Location</Label>
-				<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-					<Input
-						bind:value={form.location.venue_name}
-						onblur={saveLocation}
-						placeholder="Venue name"
-						class="h-14 bg-background px-4 text-body-lg"
-					/>
-					<Input
-						bind:value={form.location.address_line_1}
-						onblur={saveLocation}
-						placeholder="Address line 1"
-						class="h-14 bg-background px-4 text-body-lg"
-					/>
-					<Input
-						bind:value={form.location.address_line_2}
-						onblur={saveLocation}
-						placeholder="Address line 2 (optional)"
-						class="h-14 bg-background px-4 text-body-lg"
-					/>
-					<Input
-						bind:value={form.location.city}
-						onblur={saveLocation}
-						placeholder="City"
-						class="h-14 bg-background px-4 text-body-lg"
-					/>
-					<Input
-						bind:value={form.location.state_province}
-						onblur={saveLocation}
-						placeholder="State / province"
-						class="h-14 bg-background px-4 text-body-lg"
-					/>
-					<Input
-						bind:value={form.location.postal_code}
-						onblur={saveLocation}
-						placeholder="Postal code"
-						class="h-14 bg-background px-4 text-body-lg"
-					/>
-					<Input
-						bind:value={form.location.country_code}
-						onblur={saveLocation}
-						placeholder="Country code (e.g. US)"
-						class="h-14 bg-background px-4 text-body-lg"
-					/>
-				</div>
-				<p class="text-body italic">
-					All required address fields must be filled before location saves.
-				</p>
-			</div>
-		{:else if form.meet_mode === 'civicos_online'}
-			<div class="space-y-3">
-				<Label class={LABEL}>Web address</Label>
-				<div class="flex items-center gap-3 rounded-lg border border-input bg-muted/40 px-4 py-5">
-					{#if rsvpLink}
-						<div class="min-w-0 flex-1 truncate text-body-lg font-semibold">{rsvpLink}</div>
-						<Button variant="outline" size="sm" onclick={() => copyLink(rsvpLink)}>
-							{#if copied}
-								<Check class="size-3.5" /> copied
-							{:else}
-								<Copy class="size-3.5" /> copy
-							{/if}
-						</Button>
-					{:else}
-						<div class="flex-1 text-body text-muted-foreground">
-							This Campaign has no public address yet.
-						</div>
-					{/if}
-				</div>
-				<p class="text-body italic">
-					CivicOS hosts this one, so participants meet on the RSVP page. This link will only be sent
-					to participants once they have registered.
-				</p>
-			</div>
-		{:else}
-			<div class="space-y-3">
-				<Label for="ev-link" class={LABEL}>Web address</Label>
-				<div class="flex items-center gap-3">
-					<Input
-						id="ev-link"
-						type="url"
-						required
-						aria-invalid={missingCustomLink}
-						bind:value={form.custom_event_link}
-						onblur={saveCustomLink}
-						placeholder="https://"
-						class="h-[76px] bg-background px-4 text-body-lg font-semibold"
-					/>
-				</div>
-
-				{#if missingCustomLink}
-					<p class="text-body text-destructive">
-						Add the meeting link participants should join. Without it they have nowhere to go.
-					</p>
-				{/if}
-				<p class="text-body italic">
-					This link will only be sent to participants once they have registered.
-				</p>
-			</div>
-		{/if}
-
-		<div class="border-t border-border"></div>
-
-		<div class="space-y-3">
-			<Label for="ev-desc" class={LABEL}>Additional context</Label>
-			<textarea
-				id="ev-desc"
-				bind:value={form.description}
-				maxlength={TEXT_LIMITS.eventDescription}
-				onblur={() =>
-					form.description.trim() !== event.description &&
-					save('description', { description: form.description.trim() })}
-				rows="5"
-				placeholder="Description of the event..."
-				class="w-full rounded-lg border border-input bg-background px-4 py-4 text-body-lg leading-relaxed outline-none focus-visible:border-ring"
-			></textarea>
-			<CharCount
-				count={form.description.length}
-				limit={TEXT_LIMITS.eventDescription}
-				class="mt-1"
-			/>
-		</div>
-
-		<div class="border-t border-border"></div>
-
-		<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-			<div class="space-y-3">
-				<Label for="ev-cap" class={LABEL}>Capacity</Label>
-				<Input
-					id="ev-cap"
-					type="number"
-					min="2"
-					bind:value={form.capacity}
-					onblur={saveCapacity}
-					class="h-14 bg-background px-4 text-body-lg font-semibold"
-				/>
-			</div>
-			<div class="space-y-3">
-				<Label for="ev-sign" class={LABEL}>Signup mode</Label>
-				<select
-					id="ev-sign"
-					bind:value={form.signup_mode}
-					onchange={() => save('signup', { signup_mode: form.signup_mode })}
-					class="h-14 w-full rounded-lg border border-input bg-background px-4 text-body-lg font-semibold outline-none focus-visible:border-ring"
-				>
-					<option value="open">Open</option>
-					<option value="invite">Invite only</option>
-				</select>
-			</div>
-		</div>
 
 		<div class="border-t border-border"></div>
 
