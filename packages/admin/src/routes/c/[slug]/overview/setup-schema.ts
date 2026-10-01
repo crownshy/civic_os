@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { RESERVED_ROUTE_SLUGS } from '$lib/conversations';
 import { TEXT_LIMITS, tooLong } from '@civicos/shared/data/text-limits';
 import { blockHtmlToPlainText } from '@civicos/shared/rich-text';
+import { requiredText } from '$lib/validation/text-fields';
 
 /** A rich-text field, capped on the text a reader sees rather than its markup. */
 const richText = (field: 'description' | 'thankYouMessage') =>
@@ -29,18 +30,8 @@ const richText = (field: 'description' | 'thankYouMessage') =>
  * Campaign that has never had one saved has no record to write against and the
  * first save creates it. See `writeTextContent`.
  */
-/**
- * Required text that is checked, not rewritten. Superforms writes the parsed
- * value back into the field while you type, so `.trim()` here would strip a
- * space the moment it was typed (#458). The save trims instead.
- */
-const requiredText = (message: string) => z.string().refine((s) => s.trim().length > 0, message);
-
 export const setupSchema = z.object({
-	title: requiredText('Title is required').refine(
-		(s) => s.trim().length <= TEXT_LIMITS.campaignTitle,
-		tooLong('campaignTitle')
-	),
+	title: requiredText('campaignTitle', 'Title is required'),
 	description: richText('description'),
 	thankYouMessage: richText('thankYouMessage'),
 	slug: z
@@ -48,10 +39,7 @@ export const setupSchema = z.object({
 		.min(1, 'Slug is required')
 		.regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Lowercase letters, numbers and single hyphens only')
 		.refine((s) => !RESERVED_ROUTE_SLUGS.includes(s as never), 'That slug is reserved'),
-	keyQuestion: requiredText('Key question is required').refine(
-		(s) => s.trim().length <= TEXT_LIMITS.keyQuestion,
-		tooLong('keyQuestion')
-	)
+	keyQuestion: requiredText('keyQuestion', 'Key question is required')
 });
 
 export type SetupSchema = typeof setupSchema;

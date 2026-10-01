@@ -194,7 +194,7 @@
 							>Basic description</Form.Label
 						>
 						<p class="mb-1 text-caption text-muted-foreground">
-							This appears on the homepage for this Host.
+							Optional. The Host can add or change it later.
 						</p>
 						<textarea
 							{...props}

@@ -28,7 +28,11 @@ export const actions: Actions = {
 		if (!form.valid) return message(form, { kind: 'error', text: 'Please fix the errors below.' });
 
 		const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
-		const { name, description, website, contactEmail, orgType, regionIds } = form.data;
+		// Trimmed here rather than in the schema; see `limitedText`.
+		const { contactEmail, orgType, regionIds } = form.data;
+		const name = form.data.name.trim();
+		const description = form.data.description.trim();
+		const website = form.data.website.trim();
 
 		// Bare website -> external_url; add https:// when the user omitted a protocol.
 		const externalUrl = website

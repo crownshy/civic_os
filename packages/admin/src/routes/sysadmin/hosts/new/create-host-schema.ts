@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { TEXT_LIMITS, tooLong } from '@civicos/shared/data/text-limits';
+import { limitedText, requiredText } from '$lib/validation/text-fields';
 
 /**
  * Create-Host form. Maps onto CreateOrganization (name, description, mission,
@@ -9,18 +9,15 @@ import { TEXT_LIMITS, tooLong } from '@civicos/shared/data/text-limits';
  * own page after creation, not here. See #382, CONTEXT.md.
  */
 export const createHostSchema = z.object({
-	name: z
-		.string()
-		.trim()
-		.min(1, 'Organization name is required')
-		.max(TEXT_LIMITS.hostName, tooLong('hostName')),
-	description: z
-		.string()
-		.trim()
-		.min(1, 'A basic description is required')
-		.max(TEXT_LIMITS.hostDescription, tooLong('hostDescription')),
+	// A symbol alone ("-", "?") is not a name anyone can pick out of a list (#492).
+	name: requiredText('hostName', 'Organization name is required').refine(
+		(s) => /[\p{L}\p{N}]/u.test(s),
+		'Use at least one letter or number'
+	),
+	// Optional: a Host can be created first and describe itself later (#475).
+	description: limitedText('hostDescription').default(''),
 	// Bare website (no protocol); the action prefixes https:// -> external_url.
-	website: z.string().trim().default(''),
+	website: z.string().default(''),
 	contactEmail: z.union([z.literal(''), z.email('Enter a valid contact email')]).default(''),
 	orgType: z.enum(['non_profit', 'governmental', 'other']).default('other'),
 	regionIds: z.array(z.string().uuid()).default([])
