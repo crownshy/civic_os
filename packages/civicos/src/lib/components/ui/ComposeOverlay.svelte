@@ -32,7 +32,10 @@
 	let submitTimer: ReturnType<typeof setTimeout>;
 	// Shared with admin's seed statements, so a seed reads like any other statement.
 	const maxChars = TEXT_LIMITS.statement;
-	const charCount = $derived(text.length);
+	// Counted and sent trimmed, like admin's seeds, so spaces alone are not a
+	// statement and trailing ones do not count against the limit.
+	const trimmed = $derived(text.trim());
+	const charCount = $derived(trimmed.length);
 	const overLimit = $derived(charCount > maxChars);
 	const canSubmit = $derived(charCount > 0 && charCount <= maxChars && !submitted && !sending);
 
@@ -40,7 +43,7 @@
 		if (!canSubmit) return;
 		sending = true;
 		failed = false;
-		const ok = (await onSubmit?.(text)) !== false;
+		const ok = (await onSubmit?.(trimmed)) !== false;
 		sending = false;
 		if (!ok) {
 			failed = true;
@@ -93,7 +96,6 @@
 			<textarea
 				bind:value={text}
 				placeholder="Type here – what do you think?"
-				maxlength={maxChars + 10}
 				disabled={submitted || sending}
 				oninput={() => (failed = false)}
 				onkeydown={(e) => {
@@ -111,7 +113,7 @@
 						overLimit ? 'text-destructive' : 'text-card-foreground'
 					)}
 				>
-					{charCount} / {maxChars} CHAR
+					{charCount} / {maxChars} CHAR{#if overLimit}, {charCount - maxChars} OVER{/if}
 				</span>
 			</div>
 		</div>
