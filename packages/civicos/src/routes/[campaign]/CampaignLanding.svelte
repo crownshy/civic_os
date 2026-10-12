@@ -26,6 +26,7 @@
 	import { listSeparator } from '$lib/utils/list';
 	import { AppShell } from '$lib/components/layout';
 	import JoinSkeleton from './JoinSkeleton.svelte';
+	import PollClosedNotice from './PollClosedNotice.svelte';
 	import VotingSkeleton from './(campaign)/poll/VotingSkeleton.svelte';
 
 	// Derived, not captured: a client-side move to another Campaign, or an
@@ -39,6 +40,10 @@
 	// the voting screen it becomes label the statement identically.
 	const question = $derived(campaign?.poll?.question || region.question);
 	const pollPath = $derived(resolve('/[campaign]/(campaign)/poll', { campaign: campaign.slug }));
+	const reportPath = $derived(
+		resolve('/[campaign]/(campaign)/report', { campaign: campaign.slug })
+	);
+	const pollStatus = $derived(page.data.pollStatus);
 	// The organizations to credit, from `metadata.cohosts` where admin mirrored
 	// the grants. Empty for a Campaign with none, rather than the catch-all's
 	// `partners`, which credited The Bloom Project on everybody's Campaign.
@@ -121,7 +126,7 @@
 		// Polis and the voting screens are the heaviest chunks on the site, and
 		// almost everyone who lands here goes there next. Code only: preloading
 		// data would run the the poll gate before this visitor has joined.
-		void preloadCode(pollPath);
+		if (pollStatus === 'live') void preloadCode(pollPath);
 	});
 
 	function showTermsModal() {
@@ -282,33 +287,38 @@
 				</p>
 
 				<div class="mt-10 flex w-full max-w-sm flex-col items-center">
-					<span class="font-display text-base font-medium opacity-80 md:text-lg">Your location</span
-					>
-					{#if joinStateSettled}
-						<div class="mt-1.5 flex w-full flex-col items-center" in:fade={{ duration: 150 }}>
-							<ZipInput bind:value={zipCode} disabled={isReturning} bind:flash={zipFlash} />
-							<Button
-								variant="primary"
-								fullWidth
-								disabled={leaving}
-								onclick={() => {
-									if (!hasZip) {
-										zipFlash = true;
-										return;
-									}
-									if (hasAgreedToTos) handleJoin();
-									else showTermsModal();
-								}}
-								class="mt-4"
-							>
-								{isReturning ? 'CONTINUE' : 'JOIN THE CONVERSATION'}
-							</Button>
-							{#if session.error}
-								<p class="mt-2 px-2 font-sans text-sm text-destructive">{session.error}</p>
-							{/if}
-						</div>
+					{#if pollStatus === 'paused' || pollStatus === 'complete'}
+						<PollClosedNotice status={pollStatus} reportHref={reportPath} />
 					{:else}
-						<JoinSkeleton class="mt-1.5" />
+						<span class="font-display text-base font-medium opacity-80 md:text-lg"
+							>Your location</span
+						>
+						{#if joinStateSettled}
+							<div class="mt-1.5 flex w-full flex-col items-center" in:fade={{ duration: 150 }}>
+								<ZipInput bind:value={zipCode} disabled={isReturning} bind:flash={zipFlash} />
+								<Button
+									variant="primary"
+									fullWidth
+									disabled={leaving}
+									onclick={() => {
+										if (!hasZip) {
+											zipFlash = true;
+											return;
+										}
+										if (hasAgreedToTos) handleJoin();
+										else showTermsModal();
+									}}
+									class="mt-4"
+								>
+									{isReturning ? 'CONTINUE' : 'JOIN THE CONVERSATION'}
+								</Button>
+								{#if session.error}
+									<p class="mt-2 px-2 font-sans text-sm text-destructive">{session.error}</p>
+								{/if}
+							</div>
+						{:else}
+							<JoinSkeleton class="mt-1.5" />
+						{/if}
 					{/if}
 				</div>
 			</div>

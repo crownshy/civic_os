@@ -10,7 +10,7 @@
 			search: '',
 			status: 'all',
 			alphabetical: false,
-			counts: { all: 14, live: 7, draft: 5, complete: 2 }
+			counts: { all: 14, live: 6, paused: 1, draft: 5, complete: 2 }
 		}
 	});
 </script>
@@ -23,4 +23,7 @@
 <Story name="Filtered and sorted" args={{ status: 'draft', alphabetical: true }} />
 
 <!-- Counts go to zero when the account has nothing of that status. -->
-<Story name="Empty account" args={{ counts: { all: 0, live: 0, draft: 0, complete: 0 } }} />
+<Story
+	name="Empty account"
+	args={{ counts: { all: 0, live: 0, paused: 0, draft: 0, complete: 0 } }}
+/>

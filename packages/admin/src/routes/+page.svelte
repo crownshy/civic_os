@@ -8,12 +8,14 @@
 
 	const statusLabel: Record<ConversationStatus, string> = {
 		live: 'Live',
+		paused: 'Paused',
 		draft: 'Draft',
-		complete: 'Closed'
+		complete: 'Done'
 	};
 
 	const statusClass: Record<ConversationStatus, string> = {
 		live: 'bg-success text-success-foreground',
+		paused: 'border border-primary/40 text-primary',
 		draft: 'bg-primary/10 text-primary',
 		complete: 'bg-muted text-muted-foreground'
 	};
@@ -25,6 +27,7 @@
 	const counts = $derived({
 		all: data.conversations.length,
 		live: data.conversations.filter((c) => c.status === 'live').length,
+		paused: data.conversations.filter((c) => c.status === 'paused').length,
 		draft: data.conversations.filter((c) => c.status === 'draft').length,
 		complete: data.conversations.filter((c) => c.status === 'complete').length
 	});

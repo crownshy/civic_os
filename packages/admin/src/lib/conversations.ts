@@ -17,6 +17,7 @@
 
 import type { LocalizedConversationDto } from '@crownshy/api-client/api';
 import { REGIONS, type RegionConfig } from '@civicos/shared/data/regions';
+import { pollStatusFor, type PollStatus } from '@civicos/shared/data/poll-status';
 import {
 	PARTICIPANT_RESERVED_SLUGS,
 	participantUrl,
@@ -54,7 +55,7 @@ export function slugTakenMessage(slug: string, scopedTo?: string): string {
 /** Anything with an id and an optional backend slug can be routed. */
 type RoutableConversation = Pick<LocalizedConversationDto, 'id'> & { slug?: string | null };
 
-export type ConversationStatus = 'live' | 'draft' | 'complete';
+export type ConversationStatus = PollStatus;
 
 /** What the sidebar and dashboard render one card/row from. */
 export type ConversationSummary = {
@@ -111,11 +112,9 @@ export function findByRouteSlug<T extends RoutableConversation>(
 }
 
 export function statusFor(
-	conversation: Pick<LocalizedConversationDto, 'isLive' | 'isComplete'>
+	conversation: Pick<LocalizedConversationDto, 'isLive' | 'isComplete' | 'metadata'>
 ): ConversationStatus {
-	if (conversation.isComplete) return 'complete';
-	if (conversation.isLive) return 'live';
-	return 'draft';
+	return pollStatusFor(conversation);
 }
 
 export function toSummary(conversation: LocalizedConversationDto): ConversationSummary {

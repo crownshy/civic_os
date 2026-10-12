@@ -9,8 +9,9 @@ const PERMITTED_QUERIES = { limit: 200 };
 
 const STATUS_ORDER: Record<ConversationSummary['status'], number> = {
 	live: 0,
-	draft: 1,
-	complete: 2
+	paused: 1,
+	draft: 2,
+	complete: 3
 };
 
 /** Live Campaigns first, then alphabetical, so the sidebar order is stable. */

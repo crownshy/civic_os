@@ -58,11 +58,28 @@ describe('toDirectory', () => {
 			conversation({ id: 'draft', isLive: false }),
 			conversation({ id: 'private', isPublic: false }),
 			conversation({ id: 'invite', isInviteOnly: true }),
-			conversation({ id: 'done', isComplete: true }),
 			conversation({ id: 'unaddressable', slug: null })
 		];
 
 		expect(toDirectory(closed)).toEqual([]);
+	});
+
+	it('keeps a finished or paused poll listed, so its results can be found', () => {
+		const listed = [
+			conversation({ id: 'done', title: 'A finished poll', isComplete: true }),
+			conversation({
+				id: 'paused',
+				title: 'B paused poll',
+				metadata: { place: { slug: 'dundee', name: 'Dundee' }, pollPaused: true }
+			}),
+			conversation({ id: 'live', title: 'C live poll' })
+		];
+
+		expect(toDirectory(listed).map((e) => [e.id, e.status])).toEqual([
+			['paused', 'paused'],
+			['live', 'live'],
+			['done', 'complete']
+		]);
 	});
 
 	it('orders by Place, then title, with the unplaced last', () => {

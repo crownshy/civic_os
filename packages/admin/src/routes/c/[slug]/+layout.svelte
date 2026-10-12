@@ -2,8 +2,9 @@
 	import { page, navigating } from '$app/state';
 	import { invalidate } from '$lib/activity.svelte';
 	import ConversationTabSkeleton from '$lib/components/skeletons/ConversationTabSkeleton.svelte';
-	import LiveToggle from './LiveToggle.svelte';
-	import { setCampaignLive } from '$lib/api/campaign-live';
+	import PollStatusControl from './PollStatusControl.svelte';
+	import { setPollStatus } from '$lib/api/poll-status';
+	import { statusFor } from '$lib/conversations';
 	import { resolve } from '$app/paths';
 
 	let { data, children } = $props();
@@ -11,9 +12,9 @@
 	const campaign = $derived(data.campaign);
 	const conversation = $derived(data.conversation);
 	const title = $derived(campaign.title);
-	// Prefer the Conversation's own flag; `status` is the summary's stale-by-a-load
-	// copy of it, and only stands in when the conversation did not resolve.
-	const isLive = $derived(conversation ? conversation.isLive : campaign.status === 'live');
+	// Prefer the Conversation's own flags; `status` is the summary's stale-by-a-load
+	// copy of them, and only stands in when the conversation did not resolve.
+	const status = $derived(conversation ? statusFor(conversation) : campaign.status);
 
 	// Where participants actually land: `<base>/<conversation-slug>`. Derived in
 	// `toSummary` rather than read out of `regions.ts`, so every Campaign has one
@@ -63,12 +64,13 @@
 		}
 	}
 
-	const setLive = (next: boolean) =>
-		setCampaignLive({
+	const goLive = () =>
+		setPollStatus({
 			api: data.api,
 			conversationId: campaign.id,
-			next,
+			next: 'live',
 			pollLaunched: campaign.pollLaunched,
+			polisWorkflowStepId: campaign.polisWorkflowStepId,
 			reload: async () => {
 				await invalidate(`campaign:${page.params.slug}`);
 				// The sidebar's status dot reads the permitted list, not this page's data.
@@ -114,7 +116,7 @@
 		{title}
 	</h1>
 	<div class="flex w-full min-w-0 items-center gap-1 font-ui xl:w-auto xl:max-w-[33%]">
-		<LiveToggle {isLive} onToggle={setLive} />
+		<PollStatusControl {status} onGoLive={goLive} slug={campaign.slug} />
 		{#if publicUrl}
 			<!-- Absolute participant-app URL on another host, so there is no SvelteKit
 			     route for resolve() to check it against. -->

@@ -12,6 +12,12 @@
 	}
 
 	let { campaign, class: className }: Props = $props();
+
+	// A running poll needs no label; the other two do, or the card reads as one
+	// you can still vote in.
+	const statusLabel = $derived(
+		campaign.status === 'complete' ? 'Done' : campaign.status === 'paused' ? 'Paused' : ''
+	);
 </script>
 
 <a
@@ -22,9 +28,9 @@
 	)}
 >
 	<div class="min-w-0 flex-1 pr-7">
-		{#if campaign.place}
+		{#if campaign.place || statusLabel}
 			<p class="font-mono text-sm font-medium tracking-wide text-primary uppercase">
-				{campaign.place.name}
+				{[campaign.place?.name, statusLabel].filter(Boolean).join(' · ')}
 			</p>
 		{/if}
 

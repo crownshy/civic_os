@@ -15,6 +15,7 @@
 
 import type { ApiClient } from '@crownshy/api-client/api';
 import { campaignPath, type Place } from '@civicos/shared/data/place';
+import { pollStatusFor, type PollStatus } from '@civicos/shared/data/poll-status';
 import { placeForConversation } from './place';
 
 /** The fields of a listed Conversation a directory entry is built from. */
@@ -41,22 +42,20 @@ export interface DirectoryEntry {
 	 * Place left the hostname, so a link needs no host of its own (ADR 0011).
 	 */
 	href: string;
+	/** Live, Paused or Done. A Done poll stays listed so its results can be found (#443). */
+	status: PollStatus;
 }
 
 /**
- * Whether a listed Campaign is one a stranger can join.
+ * Whether a listed Campaign is one a stranger may open. Paused and Done are
+ * listed: the Campaign page stays up for both, and says which it is.
  *
  * `is_live` is filtered by the backend already and ignored as a query param, so
  * it is re-checked here rather than trusted: this function is also what the
  * tests describe the page's promise with.
  */
-function isOpen(conversation: DirectoryConversation): boolean {
-	return (
-		conversation.isLive &&
-		conversation.isPublic &&
-		!conversation.isInviteOnly &&
-		!conversation.isComplete
-	);
+function isListed(conversation: DirectoryConversation): boolean {
+	return conversation.isLive && conversation.isPublic && !conversation.isInviteOnly;
 }
 
 function toEntry(conversation: DirectoryConversation): DirectoryEntry | null {
@@ -73,25 +72,29 @@ function toEntry(conversation: DirectoryConversation): DirectoryEntry | null {
 		title: conversation.title,
 		description: conversation.shortDescription?.trim() ?? '',
 		place: placeForConversation(conversation.id, conversation.metadata),
-		href
+		href,
+		status: pollStatusFor(conversation)
 	};
 }
 
 /**
- * The open Campaigns, addressed and ordered for display. Places first and
+ * The listed Campaigns, addressed and ordered for display. Places first and
  * alphabetically, so a participant scanning for their own town finds it in one
  * pass; the Campaigns with no Place yet sit at the end under one heading.
+ * Within a Place, finished polls go after the ones still running.
  */
 export function toDirectory(conversations: DirectoryConversation[]): DirectoryEntry[] {
 	return conversations
-		.filter(isOpen)
+		.filter(isListed)
 		.map(toEntry)
 		.filter((entry): entry is DirectoryEntry => entry !== null)
 		.sort((a, b) => {
 			if (!a.place !== !b.place) return a.place ? -1 : 1;
 			const byPlace = (a.place?.name ?? '').localeCompare(b.place?.name ?? '');
+			if (byPlace !== 0) return byPlace;
 
-			return byPlace !== 0 ? byPlace : a.title.localeCompare(b.title);
+			const byDone = Number(a.status === 'complete') - Number(b.status === 'complete');
+			return byDone !== 0 ? byDone : a.title.localeCompare(b.title);
 		});
 }
 

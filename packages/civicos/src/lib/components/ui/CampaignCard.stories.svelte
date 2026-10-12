@@ -16,7 +16,8 @@
 		title: 'AI and our communities',
 		description: 'What should artificial intelligence be allowed to do where you live?',
 		place: { slug: 'dundee', name: 'Dundee, Scotland' },
-		href: '/ai-dundee'
+		href: '/ai-dundee',
+		status: 'live' as const
 	};
 </script>
 
@@ -30,3 +31,7 @@
 />
 
 <Story name="No description" args={{ campaign: { ...campaign, description: '' } }} />
+
+<Story name="Paused" args={{ campaign: { ...campaign, status: 'paused' as const } }} />
+
+<Story name="Done" args={{ campaign: { ...campaign, status: 'complete' as const } }} />

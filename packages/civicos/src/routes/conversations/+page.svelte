@@ -26,8 +26,8 @@
 			<p
 				class="mt-4 max-w-md text-center font-sans text-base leading-5 font-medium text-foreground"
 			>
-				Every conversation running right now. Pick the one for your community and tell us what you
-				think.
+				Pick the one for your community and tell us what you think. Finished ones show their
+				results.
 			</p>
 		</div>
 

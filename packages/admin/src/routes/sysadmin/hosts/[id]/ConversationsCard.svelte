@@ -18,6 +18,7 @@
 
 	const STATUS_STYLE: Record<ConversationStatus, string> = {
 		live: 'bg-success/15 text-success',
+		paused: 'bg-primary/10 text-primary',
 		draft: 'bg-muted text-muted-foreground',
 		complete: 'bg-muted text-muted-foreground'
 	};

@@ -304,10 +304,14 @@ Three things the admin surfaces have to respect:
 - **The URL is derived, never stored.** `participantUrl()` in
   `@civicos/shared/data/place` is the only thing that builds it. Admin no longer
   prefers a legacy region's `shareUrl`, which names a Place subdomain.
-- **`is_live` does not gate the participant app.** `civicos` never reads it, and
-  `/poll` talks to Polis directly, bypassing comhairle. Today the flag only
-  drives the admin badge, so a "draft" Campaign that has been published to a
-  Place is publicly reachable and votable.
+- **An Open Poll is Draft, Live, Paused or Done** (#443), read by
+  `pollStatusFor` in `@civicos/shared/data/poll-status`. A draft
+  (`is_live: false`) 404s, because comhairle refuses it anonymously. Paused
+  (`metadata.pollPaused`) and Done (`is_complete`) keep the Campaign page up and
+  swap the join form for a notice; `/poll` redirects to it. Admin also closes
+  the Polis poll for both, because `/poll` votes through Polis directly and
+  comhairle checks neither flag. Once launched, admin never sets `is_live`
+  back to false.
 
 Which poll a participant votes in comes from `metadata.poll`, mirrored by admin
 on publish, because the Polis workflow step is 401 to an anonymous caller. Where

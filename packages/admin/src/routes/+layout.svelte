@@ -43,6 +43,7 @@
 
 	const statusDot: Record<ConversationStatus, string> = {
 		live: 'bg-success',
+		paused: 'bg-primary/50',
 		draft: 'bg-primary',
 		complete: 'bg-muted-foreground/30'
 	};

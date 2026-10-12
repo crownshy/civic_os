@@ -14,7 +14,7 @@ import type { PageLoad } from './$types';
 /**
  * The About You questions the Host switched on for this Campaign in admin,
  * which are comhairle's ConversationDemographics links (#441). Public once the
- * Campaign is live, and only a live Campaign gets this far.
+ * Campaign is live, and only a live, unpaused Campaign gets this far.
  *
  * Two cases fall back to the old metadata switches, which read as all on. A
  * read that fails, because asking too much during an outage beats silently
@@ -58,7 +58,14 @@ export const load: PageLoad = async ({ params, parent, depends }) => {
 	// The key admin's edits already invalidate the Campaign's own data under.
 	depends('civicos:conversation');
 
-	const { participant, participantResolved, campaign, region, api, participation } = await parent();
+	const { participant, participantResolved, campaign, region, api, participation, pollStatus } =
+		await parent();
+
+	// Paused or Done: the landing page says which, and links the results. Polis
+	// refuses the votes as well, but only after someone has started voting.
+	if (pollStatus !== 'live') {
+		redirect(307, campaignPath(params.campaign));
+	}
 
 	// TEMPORARY: joining is the gate, not the stored zip. The zip cannot persist
 	// while comhairle has no `zipcode` demographics question, so reading it back

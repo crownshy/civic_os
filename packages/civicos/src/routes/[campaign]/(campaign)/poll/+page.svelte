@@ -2,6 +2,7 @@
 	import { onMount, untrack } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
+	import { invalidate } from '$app/navigation';
 	import { page } from '$app/state';
 	import { AppShell } from '$lib/components/layout';
 	import {
@@ -209,7 +210,10 @@
 	async function handleVote(type: 'agree' | 'disagree' | 'pass') {
 		// Only a vote Polis recorded counts toward the batch. A failed one leaves
 		// the statement up with an error under it.
-		if (!(await polis.submitVote(type))) return;
+		if (!(await polis.submitVote(type))) {
+			await recheckPollStatus();
+			return;
+		}
 		totalVotes++;
 		votesInRound++;
 
@@ -284,6 +288,16 @@
 		screen = 'voting';
 	}
 
+	/**
+	 * Polis refuses votes once admin pauses or finishes the poll, and the error
+	 * says nothing a participant can act on. Re-running the load lets this page's
+	 * redirect send them to the landing page, which says which it is. While the
+	 * poll is still live this changes nothing and the retry banner stays.
+	 */
+	async function recheckPollStatus() {
+		await invalidate('civicos:conversation');
+	}
+
 	/** Resolves to whether Polis took the statement, so the compose screen can say so. */
 	async function handleCompose(text: string): Promise<boolean> {
 		const visibleTid = polis.currentStatement?.tid;
@@ -291,6 +305,7 @@
 		try {
 			submitted = await polis.submitStatement(text);
 		} catch {
+			await recheckPollStatus();
 			return false;
 		}
 		if (submitted) await createStatementAux(submitted, text, visibleTid);

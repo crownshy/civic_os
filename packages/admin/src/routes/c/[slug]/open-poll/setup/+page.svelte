@@ -3,7 +3,8 @@
 	import { invalidate } from '$lib/activity.svelte';
 	import { page } from '$app/state';
 	import { moderateStatementAux, postSeed, syncStatementAux } from '$lib/api/aux';
-	import { setCampaignLive } from '$lib/api/campaign-live';
+	import { setPollStatus, type PollStatusTarget } from '$lib/api/poll-status';
+	import { statusFor } from '$lib/conversations';
 	import type { PolisStatementAux } from '$lib/types/aux';
 	import DemographicsCard from '$lib/components/setup/DemographicsCard.svelte';
 	import StatusCard from './StatusCard.svelte';
@@ -15,7 +16,7 @@
 	const conversation = $derived(data.conversation);
 
 	// Same fallback the header badge uses when the conversation didn't resolve.
-	const isLive = $derived(conversation ? conversation.isLive : campaign.status === 'live');
+	const status = $derived(conversation ? statusFor(conversation) : campaign.status);
 
 	// Empty when there is no participant site to link to (no slug, or no
 	// participant base configured).
@@ -25,18 +26,13 @@
 			: ''
 	);
 
-	/**
-	 * On/off is a conversation-level switch, not a Polis one. `PolisUpdateConfig`
-	 * can write `is_active`, but no endpoint reads it back, so the card would have
-	 * no state to render. `conversation.isLive` is readable and already drives the
-	 * header badge. See #354.
-	 */
-	const setLive = (next: boolean) =>
-		setCampaignLive({
+	const changeStatus = (next: PollStatusTarget) =>
+		setPollStatus({
 			api: data.api,
 			conversationId: campaign.id,
 			next,
 			pollLaunched: campaign.pollLaunched,
+			polisWorkflowStepId: campaign.polisWorkflowStepId,
 			reload: async () => {
 				await invalidate(`campaign:${page.params.slug}`);
 				await invalidate('app:conversations');
@@ -87,12 +83,12 @@
 
 <div class="flex flex-col gap-6 px-8 py-8">
 	<StatusCard
-		{isLive}
+		{status}
 		{pollUrl}
 		participants={data.participants}
 		statements={data.statements}
 		votes={data.votes}
-		onToggle={setLive}
+		onChange={changeStatus}
 	/>
 
 	<SeedStatementsCard

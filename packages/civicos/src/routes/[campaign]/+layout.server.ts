@@ -12,10 +12,12 @@ import {
 } from '$lib/config/campaign';
 import { resolveParticipation } from '$lib/config/participation';
 import { readColorScheme } from '@civicos/shared/data/color-scheme';
+import { pollStatusFor } from '@civicos/shared/data/poll-status';
 import { inPlace, listDirectory } from '$lib/config/directory';
 import { httpStatusOf } from '$lib/utils/http';
 
-type ResolvedConversation = CampaignConversation & ConversationCopy;
+type ResolvedConversation = CampaignConversation &
+	ConversationCopy & { isLive: boolean; isComplete: boolean };
 
 /**
  * A one-segment URL names a Campaign first and a Place second (ADR 0014).
@@ -132,6 +134,9 @@ export const load: LayoutServerLoad = async ({ params, url, depends }) => {
 		// region asking what it always asked.
 		participation: resolveParticipation(conversation),
 		// Null when the Host never picked one, and `theme.css` (Green) shows through.
-		colorScheme: readColorScheme(conversation?.metadata)
+		colorScheme: readColorScheme(conversation?.metadata),
+		// Live, Paused or Done (#443). A draft never gets here: it 404s above. An
+		// unreachable legacy region reads as live, the same way it keeps its copy.
+		pollStatus: conversation ? pollStatusFor(conversation) : ('live' as const)
 	};
 };

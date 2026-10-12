@@ -24,8 +24,9 @@
 	const filters: { value: StatusFilter; label: string }[] = [
 		{ value: 'all', label: 'All' },
 		{ value: 'live', label: 'Live' },
+		{ value: 'paused', label: 'Paused' },
 		{ value: 'draft', label: 'Draft' },
-		{ value: 'complete', label: 'Closed' }
+		{ value: 'complete', label: 'Done' }
 	];
 </script>
 
