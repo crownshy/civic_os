@@ -47,7 +47,7 @@
 			start_time: start.time,
 			end_time: end.time,
 			capacity: e.capacity ?? null,
-			signup_mode: (e.signupMode as EventForm['signup_mode']) ?? 'open',
+			signup_mode: e.signupMode ?? 'open',
 			time_zone: tz,
 			location: loc
 				? {

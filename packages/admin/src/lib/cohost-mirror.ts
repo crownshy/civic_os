@@ -18,17 +18,28 @@
  * the Host actually asked for.
  */
 
-import { COHOST_ROLE, CONVERSATION_RESOURCE } from '$lib/permissions';
+import { CONVERSATION_RESOURCE, cohostOrgIds } from '$lib/permissions';
 import { toPlaceSlug, type CampaignCoHost, type CampaignOrg } from '@civicos/shared/data/place';
 
 type Api = {
 	ListOrganizations: (args: { queries: { limit: number } }) => Promise<{
-		records: { id: string; name: string; externalUrl?: string | null }[];
+		records: {
+			id: string;
+			name: string;
+			externalUrl?: string | null;
+			userGroupId?: string | null;
+		}[];
 	}>;
 	ListResourcePermissions: (args: {
 		params: { resource_type: string; resource_id: string };
 		queries: { limit: number };
-	}) => Promise<{ records: { organization_id?: string | null; role_name?: string | null }[] }>;
+	}) => Promise<{
+		records: {
+			group_id?: string | null;
+			organization_id?: string | null;
+			role_name?: string | null;
+		}[];
+	}>;
 	PatchConversationMetadata: (
 		body: Record<string, unknown>,
 		options: { params: { conversation_id: string } }
@@ -64,9 +75,7 @@ export async function mirrorHosts(
 		]);
 
 		const orgById = new Map(orgs.records.map((o) => [o.id, o]));
-		const grantedIds = permissions.records
-			.filter((p) => p.organization_id && p.role_name === COHOST_ROLE)
-			.map((p) => p.organization_id as string);
+		const grantedIds = cohostOrgIds(permissions.records, orgs.records);
 
 		const ordered = [
 			...(owningOrgId ? [owningOrgId] : []),

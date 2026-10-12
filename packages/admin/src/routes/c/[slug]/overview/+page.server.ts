@@ -1,6 +1,6 @@
 import { fail } from '@sveltejs/kit';
 import { createApiClient } from '$lib/api/client';
-import { COHOST_ROLE, CONVERSATION_RESOURCE } from '$lib/permissions';
+import { COHOST_ROLE, CONVERSATION_RESOURCE, cohostOrgIds } from '$lib/permissions';
 import { mirrorHosts } from '$lib/cohost-mirror';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -23,7 +23,7 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 
 	const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
 
-	const [allOrgs, cohostOrgIds] = await Promise.all([
+	const [allOrgs, permissions] = await Promise.all([
 		api
 			.ListOrganizations({ queries: { limit: 200 } })
 			.then((r) => r.records)
@@ -31,22 +31,18 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 				console.warn('ListOrganizations failed', e);
 				return [];
 			}),
-		// Co-host org ids = organizations granted the co-host role on this Conversation.
 		api
 			.ListResourcePermissions({
 				params: { resource_type: CONVERSATION_RESOURCE, resource_id: convId },
 				queries: { limit: 200 }
 			})
-			.then((r) =>
-				r.records
-					.filter((p) => p.organization_id && p.role_name === COHOST_ROLE)
-					.map((p) => p.organization_id as string)
-			)
+			.then((r) => r.records)
 			.catch((e) => {
 				console.warn('ListResourcePermissions failed', e);
-				return [] as string[];
+				return [];
 			})
 	]);
+	const grantedOrgIds = cohostOrgIds(permissions, allOrgs);
 	const orgById = new Map(allOrgs.map((o) => [o.id, o]));
 
 	const owningOrgId =
@@ -66,15 +62,15 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 
 	// The owning Host also holds a `content_editor` grant, because ownership alone
 	// does not make a Campaign visible to its own team, so it comes back in
-	// `cohostOrgIds` too. Drop it there and let the owner row win, otherwise the
+	// `grantedOrgIds` too. Drop it there and let the owner row win, otherwise the
 	// Host is listed twice and the keyed each block collides (#393).
 	const cohosts = [
 		...(owningOrgId ? [toCoHost(owningOrgId, true)] : []),
-		...cohostOrgIds.filter((id) => id !== owningOrgId).map((id) => toCoHost(id, false))
+		...grantedOrgIds.filter((id) => id !== owningOrgId).map((id) => toCoHost(id, false))
 	].filter((c): c is NonNullable<typeof c> => c != null);
 
 	// Orgs already attached (owning + co-hosts) are excluded from the picker.
-	const excludeIds = [owningOrgId, ...cohostOrgIds].filter((id): id is string => !!id);
+	const excludeIds = [owningOrgId, ...grantedOrgIds].filter((id): id is string => !!id);
 
 	const pickerOrgs: PickerOrg[] = allOrgs.map((o) => ({
 		id: o.id,

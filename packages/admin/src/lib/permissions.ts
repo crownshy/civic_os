@@ -27,3 +27,31 @@ export const COHOST_ROLE = 'content_editor';
  * for `conversation`.
  */
 export const CONVERSATION_RESOURCE = 'conversation';
+
+type PermissionRow = {
+	group_id?: string | null;
+	organization_id?: string | null;
+	role_name?: string | null;
+};
+
+/**
+ * The Hosts holding a co-host grant on a Conversation, as org ids.
+ *
+ * Comhairle grants to an org's user group and reports the row's `group_id`, so
+ * the org is found through its `userGroupId`. Older backends reported
+ * `organization_id` on the row directly; that is still honoured so this reads
+ * both until every deployment is on the group model.
+ */
+export function cohostOrgIds(
+	permissions: PermissionRow[],
+	orgs: { id: string; userGroupId?: string | null }[]
+): string[] {
+	const orgIdByGroup = new Map(
+		orgs.flatMap((o) => (o.userGroupId ? [[o.userGroupId, o.id] as const] : []))
+	);
+	const ids = permissions
+		.filter((p) => p.role_name === COHOST_ROLE)
+		.map((p) => (p.group_id ? orgIdByGroup.get(p.group_id) : undefined) ?? p.organization_id)
+		.filter((id): id is string => !!id);
+	return [...new Set(ids)];
+}

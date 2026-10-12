@@ -53,7 +53,7 @@ export interface Event {
 	capacity: number | null;
 	currentAttendance: number | null;
 	agenda: AgendaItem[];
-	signupMode: string;
+	signupMode: 'open' | 'invite';
 	videoMeetingId: string | null;
 	defaultTimeZone: string | null;
 	createdAt: string;
