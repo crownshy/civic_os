@@ -23,7 +23,7 @@
 		createdAt: '2026-10-01T00:00:00Z',
 		description: '',
 		agenda: [],
-		signupMode: 'open',
+		signupMode: 'open' as const,
 		startTime: '2026-11-14T20:00:00Z',
 		endTime: '2026-11-14T21:30:00Z'
 	};
