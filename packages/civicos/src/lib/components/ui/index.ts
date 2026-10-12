@@ -24,6 +24,7 @@ export { default as Button } from './Button.svelte';
 export { default as EmojiCircle } from './EmojiCircle.svelte';
 export { default as InfoBar } from './InfoBar.svelte';
 export { default as Dialog } from './Dialog.svelte';
+export { default as AboutDialog } from './AboutDialog.svelte';
 export { default as ActionPanel } from './ActionPanel.svelte';
 export { default as EmailPanelContent } from './EmailPanelContent.svelte';
 export { default as SharePanelContent } from './SharePanelContent.svelte';

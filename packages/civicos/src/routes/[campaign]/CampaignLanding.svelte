@@ -6,7 +6,7 @@
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
-	import { Button, Dialog, ZipInput, Accordion, StickyNav } from '$lib/components/ui';
+	import { AboutDialog, Button, Dialog, ZipInput, Accordion, StickyNav } from '$lib/components/ui';
 	import { Mail } from 'lucide-svelte';
 	import { Input } from '@civicos/shared/ui/input';
 	import { session } from '$lib/services/session.svelte';
@@ -505,15 +505,7 @@
 	</div>
 {/if}
 
-<!-- The Host's own Context copy, the same `Conversation.description` the
-	sections above render. It used to be `regions.ts`'s `aboutConversation`,
-	which described The Bloom Project on every Campaign created in admin. -->
-<Dialog bind:open={showAboutMessage} title="About This Conversation" buttonText="GOT IT">
-	<div class="px-7 pt-6 {HOST_COPY_PROSE_CLASS}">
-		<!-- eslint-disable-next-line svelte/no-at-html-tags -- `renderHostCopy` sanitizes (#409) -->
-		{@html renderHostCopy(hostCopy.context)}
-	</div>
-</Dialog>
+<AboutDialog bind:open={showAboutMessage} {hostCopy} />
 
 <Dialog
 	bind:open={showTermsMessage}
