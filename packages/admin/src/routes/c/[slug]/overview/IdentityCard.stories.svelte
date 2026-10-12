@@ -31,6 +31,16 @@
      the honest rendering of a Campaign nobody has picked a scheme for. -->
 <Story name="Color scheme chosen" args={{ colorSchemeId: 'slate' }} />
 
+<!-- Picking a swatch shows the spinner and "Saving" for a second, then "saved".
+     The stored id never changes here, so the check falls back to Slate after. -->
+<Story
+	name="Color scheme editable"
+	args={{
+		colorSchemeId: 'slate',
+		onSelectColorScheme: () => new Promise<void>((resolve) => setTimeout(resolve, 1000))
+	}}
+/>
+
 <!--
 	The state the app actually ships: Setup passes a snippet per editable field.
 	The inputs here mirror the ones in `+page.svelte`; they are unwired, so this
