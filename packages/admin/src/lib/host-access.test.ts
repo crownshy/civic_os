@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { UserOrganizationsResponse } from '@crownshy/api-client/api';
-import { canManageHost, canViewHost, hostsLink, toHostAccess } from './host-access';
+import { canManageHost, canViewHost, hostsLink, ownableHosts, toHostAccess } from './host-access';
 
 type Access = UserOrganizationsResponse['organizations'][number];
 
@@ -68,5 +68,25 @@ describe('hostsLink', () => {
 			])
 		);
 		expect(hostsLink(access)).toEqual({ label: 'My Hosts' });
+	});
+});
+
+describe('ownableHosts', () => {
+	const everyHost = [
+		{ id: 'a', name: 'A' },
+		{ id: 'b', name: 'B' }
+	];
+
+	it('offers a Super user every Host, even one they belong to none of', () => {
+		expect(ownableHosts(orgs(true, []), everyHost)).toEqual(everyHost);
+	});
+
+	it('offers everyone else the Hosts they belong to or manage', () => {
+		const mine = org('mine', { isAssociated: true, canUpdate: false });
+		const managed = org('managed', { isAssociated: false, canUpdate: true });
+		expect(ownableHosts(orgs(false, [mine, managed, elsewhere]), everyHost)).toEqual([
+			{ id: 'mine', name: 'MINE' },
+			{ id: 'managed', name: 'MANAGED' }
+		]);
 	});
 });

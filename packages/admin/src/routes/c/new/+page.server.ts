@@ -12,7 +12,7 @@ import { mirrorHosts } from '$lib/cohost-mirror';
 import { shortDescriptionFrom } from '$lib/utils/rich-text';
 import { participantBase, slugTakenMessage } from '$lib/conversations';
 import type { PickerOrg } from '$lib/components/setup/AddCoHostsDialog.svelte';
-import type { UserOrganizationAccess } from '@crownshy/api-client/api';
+import { ownableHosts } from '$lib/host-access';
 import { createConversationSchema } from './create-conversation-schema';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -27,43 +27,34 @@ export const load: PageServerLoad = async ({ cookies, url, depends }) => {
 
 	const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
 
+	// Kept apart from an empty list: a failed lookup is not "you belong to no
+	// Host", and saying so sends people asking for access they already have.
+	let hostsError: string | null = null;
+
+	// Every Host on BLOOM, for the Co-Hosts picker. Co-hosting is not limited to
+	// the Hosts the creator belongs to (the point is a coalition), so this is the
+	// same list the Campaign's Co-Hosts card offers after creation.
+	const [orgs, pickerOrgs] = await Promise.all([
+		api.GetUserOrganizations().catch((e) => {
+			console.warn('GetUserOrganizations failed', e);
+			hostsError = describeApiFailure(e);
+			return null;
+		}),
+		listPickerOrgs(api)
+	]);
+
 	// Hosts the caller can create a Campaign under. Ownership matters beyond
 	// labelling: /c/[slug] gates on GetPermittedConversations, and an unowned
 	// Campaign is absent from it, so its own Setup page would 404.
-	const owned = await api
-		.GetUserOrganizations()
-		.then((res) => res.organizations.filter((o) => o.canUpdate || o.isAssociated))
-		.catch((e) => {
-			console.warn('GetUserOrganizations failed', e);
-			return [] as UserOrganizationAccess[];
-		});
-
-	const hosts = owned.map((o) => ({ id: o.organization.id, name: o.organization.name }));
+	const hosts = orgs ? ownableHosts(orgs, pickerOrgs) : [];
 
 	// Default the owner to the Host the creator belongs to. `isAssociated` is
 	// `User.organizationId`, and a Host User belongs to exactly one Host
 	// (CONTEXT.md), so that is the Host they are creating on behalf of; a Super
 	// user who manages several but belongs to none falls back to the first.
 	// Preselected rather than forced: the select still lets them switch.
-	const defaultHostId = owned.find((o) => o.isAssociated)?.organization.id ?? hosts[0]?.id ?? '';
-
-	// Every Host on BLOOM, for the Co-Hosts picker. Co-hosting is not limited to
-	// the Hosts the creator belongs to (the point is a coalition), so this is the
-	// same list the Campaign's Co-Hosts card offers after creation.
-	const pickerOrgs = await api
-		.ListOrganizations({ queries: { limit: 200 } })
-		.then((r) =>
-			r.records.map((o) => ({
-				id: o.id,
-				name: o.name,
-				website: o.externalUrl,
-				email: o.contactEmail
-			}))
-		)
-		.catch((e) => {
-			console.warn('ListOrganizations failed', e);
-			return [] as PickerOrg[];
-		});
+	const associatedId = orgs?.organizations.find((o) => o.isAssociated)?.organization.id;
+	const defaultHostId = hosts.find((h) => h.id === associatedId)?.id ?? hosts[0]?.id ?? '';
 
 	const form = await superValidate(zod4(createConversationSchema));
 	form.data.hostId = defaultHostId;
@@ -75,7 +66,14 @@ export const load: PageServerLoad = async ({ cookies, url, depends }) => {
 		.replace(/^https?:\/\//, '')
 		.replace(/\/+$/, '');
 
-	return { form, hosts, pickerOrgs, baseDomain };
+	return {
+		form,
+		hosts,
+		hostsError,
+		isSuper: orgs?.canCreateOrganization ?? false,
+		pickerOrgs,
+		baseDomain
+	};
 };
 
 export const actions: Actions = {
@@ -100,15 +98,14 @@ export const actions: Actions = {
 
 		// The Host picker only offers the caller's own Hosts, but the post is the
 		// caller's to write, so check it against the same list rather than trust it.
-		const ownHostIds = await api
-			.GetUserOrganizations()
-			.then((res) =>
-				res.organizations.filter((o) => o.canUpdate || o.isAssociated).map((o) => o.organization.id)
-			)
-			.catch((e) => {
+		const [orgs, everyHost] = await Promise.all([
+			api.GetUserOrganizations().catch((e) => {
 				console.warn('GetUserOrganizations failed', e);
-				return [] as string[];
-			});
+				return null;
+			}),
+			listPickerOrgs(api)
+		]);
+		const ownHostIds = orgs ? ownableHosts(orgs, everyHost).map((h) => h.id) : [];
 		if (!ownHostIds.includes(hostId)) {
 			return fail('You can only create a Campaign for a Host you manage or belong to.');
 		}
@@ -312,6 +309,23 @@ export const actions: Actions = {
 		redirect(303, `/c/${conversationSlug}/overview${warn}`);
 	}
 };
+
+function listPickerOrgs(api: ReturnType<typeof createApiClient>): Promise<PickerOrg[]> {
+	return api
+		.ListOrganizations({ queries: { limit: 200 } })
+		.then((r) =>
+			r.records.map((o) => ({
+				id: o.id,
+				name: o.name,
+				website: o.externalUrl,
+				email: o.contactEmail
+			}))
+		)
+		.catch((e) => {
+			console.warn('ListOrganizations failed', e);
+			return [] as PickerOrg[];
+		});
+}
 
 /**
  * The poll identity to mirror, read off the step comhairle just provisioned.

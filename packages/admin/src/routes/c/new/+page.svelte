@@ -102,8 +102,15 @@
 			>
 				<AlertCircle class="size-4 shrink-0 translate-y-1" />
 				<span>
-					You are not a member of any Host, and a conversation needs one to own it. Ask an admin to
-					add you to a Host first.
+					{#if data.hostsError}
+						Could not load the Hosts you can create a conversation for: {data.hostsError}
+					{:else if data.isSuper}
+						There are no Hosts yet, and a conversation needs one to own it.
+						<a href={resolve('/hosts/new')} class="font-semibold underline">Create a Host</a> first.
+					{:else}
+						You are not a member of any Host, and a conversation needs one to own it. Ask an admin
+						to add you to a Host first.
+					{/if}
 				</span>
 			</div>
 		{:else}

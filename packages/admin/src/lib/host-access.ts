@@ -63,3 +63,21 @@ export function hostsLink(access: HostAccess): HostsLink | null {
 	if (rest.length) return { label: 'My Hosts' };
 	return only.isAdmin ? { label: 'My Host', hostId: only.id } : null;
 }
+
+export type HostOption = { id: string; name: string };
+
+/**
+ * The Hosts the caller may make the owner of a new Campaign. A Super user may
+ * pick any Host on BLOOM, so they get `everyHost` (ListOrganizations) rather
+ * than the subset GetUserOrganizations happens to flag, which for a Super user
+ * who belongs to no Host can be empty.
+ */
+export function ownableHosts(
+	orgs: UserOrganizationsResponse,
+	everyHost: HostOption[]
+): HostOption[] {
+	if (orgs.canCreateOrganization) return everyHost;
+	return orgs.organizations
+		.filter((o) => o.canUpdate || o.isAssociated)
+		.map((o) => ({ id: o.organization.id, name: o.organization.name }));
+}
