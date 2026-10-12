@@ -3,6 +3,8 @@
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import SetupField from '$lib/components/setup/SetupField.svelte';
 	import { COLOR_SCHEMES } from '@civicos/shared/data/color-scheme';
+	import { Spinner } from '@civicos/shared/ui/spinner';
+	import CheckIcon from '@lucide/svelte/icons/check';
 
 	interface Props {
 		title: string;
@@ -44,16 +46,27 @@
 	}: Props = $props();
 
 	// The ring is read from the stored scheme, never held locally, so a reload
-	// shows what was saved.
+	// shows what was saved. `pending` only stands in for it until the save lands.
 	let pending = $state<string | null>(null);
+	let saved = $state<string | null>(null);
 	let error = $state<string | null>(null);
+	let savedTimer: ReturnType<typeof setTimeout> | undefined;
+
+	const readOnly = $derived(!onSelectColorScheme);
+	const shownId = $derived(pending ?? colorSchemeId);
+	const pendingLabel = $derived(COLOR_SCHEMES.find((s) => s.id === pending)?.label);
+	const savedLabel = $derived(COLOR_SCHEMES.find((s) => s.id === saved)?.label);
 
 	async function select(id: string) {
-		if (!onSelectColorScheme || pending) return;
+		if (!onSelectColorScheme || pending || id === colorSchemeId) return;
+		clearTimeout(savedTimer);
 		pending = id;
+		saved = null;
 		error = null;
 		try {
 			await onSelectColorScheme(id);
+			saved = id;
+			savedTimer = setTimeout(() => (saved = null), 2500);
 		} catch (e) {
 			console.error('PatchConversationMetadata failed', e);
 			error = e instanceof Error ? e.message : 'Could not save that colour scheme.';
@@ -116,25 +129,65 @@
 		</SetupField>
 
 		<SetupField label="Color Scheme">
-			<div class="flex flex-wrap items-center gap-4">
+			<p class="text-body text-muted-foreground">
+				The accent participants see on buttons, progress, and highlights.
+			</p>
+			<div
+				role="group"
+				aria-label="Color Scheme"
+				aria-busy={!!pending}
+				class="flex flex-wrap gap-x-3 gap-y-4 pt-2"
+			>
 				{#each COLOR_SCHEMES as option (option.id)}
+					{@const selected = shownId === option.id}
 					<button
 						type="button"
-						aria-label={option.label}
-						aria-pressed={colorSchemeId === option.id}
-						disabled={!onSelectColorScheme || !!pending}
+						aria-pressed={selected}
+						disabled={readOnly}
 						onclick={() => select(option.id)}
-						style={`background-color: ${option.primary}`}
-						class="size-12 touch-manipulation rounded-[10px] border border-stone-300 transition-transform hover:scale-105 active:scale-95 active:duration-0 disabled:cursor-not-allowed disabled:active:scale-100 {colorSchemeId ===
-						option.id
-							? 'ring-2 ring-primary ring-offset-2 ring-offset-background'
-							: ''} {pending === option.id ? 'animate-pulse' : ''}"
-					></button>
+						style={`--swatch: ${option.primary}`}
+						class="group flex w-20 touch-manipulation flex-col items-center gap-2 rounded-[12px] p-1.5 transition-opacity focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none {pending &&
+						!selected
+							? 'opacity-50'
+							: ''}"
+					>
+						<span
+							class="flex size-12 items-center justify-center rounded-[10px] bg-(--swatch) text-white transition-[transform,box-shadow] {selected
+								? 'shadow-[0_0_0_2px_var(--background),0_0_0_4px_var(--swatch)]'
+								: 'border border-black/10'} {readOnly
+								? ''
+								: 'group-hover:scale-105 group-active:scale-95 group-active:duration-0'}"
+						>
+							{#if pending === option.id}
+								<Spinner class="size-5" aria-label="Saving" />
+							{:else if selected}
+								<CheckIcon class="size-5" strokeWidth={3} aria-hidden="true" />
+							{/if}
+						</span>
+						<span
+							class="text-caption {selected
+								? 'font-semibold text-foreground'
+								: readOnly
+									? 'text-muted-foreground'
+									: 'text-muted-foreground group-hover:text-foreground'}"
+						>
+							{option.label}
+						</span>
+					</button>
 				{/each}
 			</div>
-			{#if error}
-				<p class="mt-2 text-caption text-destructive">{error}</p>
-			{/if}
+			<p aria-live="polite" class="min-h-5 text-caption">
+				{#if error}
+					<span class="text-destructive">{error}</span>
+				{:else if pendingLabel}
+					<span class="text-muted-foreground">Saving {pendingLabel}…</span>
+				{:else if savedLabel}
+					<span class="inline-flex items-center gap-1 text-foreground">
+						<CheckIcon class="size-3.5" aria-hidden="true" />
+						{savedLabel} saved
+					</span>
+				{/if}
+			</p>
 		</SetupField>
 	</div>
 </Card>
