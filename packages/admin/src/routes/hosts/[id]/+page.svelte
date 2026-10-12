@@ -70,16 +70,16 @@
 <div class="min-h-0 flex-1 overflow-y-auto">
 	<div class="mx-auto max-w-3xl p-6 sm:p-8">
 		<a
-			href={resolve('/sysadmin/hosts')}
+			href={resolve('/hosts')}
 			class="mb-4 inline-flex items-center gap-1.5 text-body text-muted-foreground hover:text-foreground"
 		>
 			<ArrowLeft class="size-4" />
-			Hosts
+			{data.hostAccess.all ? 'Hosts' : 'My Hosts'}
 		</a>
 
 		<div class="mb-1 flex items-start justify-between gap-4">
 			<h1 class="text-h4 font-bold md:text-h3">{org.name}</h1>
-			{#if !editing}
+			{#if data.canManage && !editing}
 				<Button variant="outline" size="sm" onclick={() => (editing = true)}>
 					<Pencil class="size-4" />
 					Edit details
@@ -143,6 +143,7 @@
 			<ConversationsCard
 				conversations={data.conversations}
 				assignable={data.assignableConversations}
+				canAssign={data.canAssign}
 			/>
 		</div>
 
@@ -190,7 +191,7 @@
 								{m.role}
 							</span>
 
-							{#if !isSelf}
+							{#if data.canManage && !isSelf}
 								<form method="POST" action="?/setRole" use:enhance>
 									<input type="hidden" name="userId" value={m.id} />
 									<input
@@ -213,58 +214,60 @@
 			{/if}
 
 			<!-- Add member -->
-			<form
-				method="POST"
-				action="?/addMember"
-				use:addEnhance
-				class="border-t border-border px-5 py-4"
-			>
-				{#if msg}
-					<div
-						class={[
-							'mb-3 flex items-center gap-2 text-caption',
-							msg.kind === 'ok' ? 'text-success' : 'text-destructive'
-						].join(' ')}
-					>
-						{#if msg.kind === 'ok'}<CheckCircle2 class="size-4 shrink-0" />{:else}<AlertCircle
-								class="size-4 shrink-0"
-							/>{/if}
-						<span>{msg.text}</span>
+			{#if data.canManage}
+				<form
+					method="POST"
+					action="?/addMember"
+					use:addEnhance
+					class="border-t border-border px-5 py-4"
+				>
+					{#if msg}
+						<div
+							class={[
+								'mb-3 flex items-center gap-2 text-caption',
+								msg.kind === 'ok' ? 'text-success' : 'text-destructive'
+							].join(' ')}
+						>
+							{#if msg.kind === 'ok'}<CheckCircle2 class="size-4 shrink-0" />{:else}<AlertCircle
+									class="size-4 shrink-0"
+								/>{/if}
+							<span>{msg.text}</span>
+						</div>
+					{/if}
+
+					<div class="flex flex-wrap items-start gap-2">
+						<Form.Field {form} name="email" class="min-w-0 flex-1">
+							<Form.Control>
+								{#snippet children({ props })}
+									<input
+										{...props}
+										type="email"
+										bind:value={$formData.email}
+										placeholder="person@example.org"
+										class="w-full rounded-[10px] border border-stone-300 bg-transparent px-3 py-2 text-body focus:border-primary focus:outline-none"
+									/>
+								{/snippet}
+							</Form.Control>
+							<Form.FieldErrors class="mt-1 text-caption text-destructive" />
+						</Form.Field>
+
+						<select
+							bind:value={$formData.role}
+							class="rounded-[10px] border border-stone-300 bg-transparent px-3 py-2 text-body focus:border-primary focus:outline-none"
+						>
+							<option value="admin">Admin</option>
+							<option value="member">Member</option>
+						</select>
+
+						<Button type="submit" disabled={$submitting}>
+							{$submitting ? 'Adding…' : 'Add'}
+						</Button>
 					</div>
-				{/if}
-
-				<div class="flex flex-wrap items-start gap-2">
-					<Form.Field {form} name="email" class="min-w-0 flex-1">
-						<Form.Control>
-							{#snippet children({ props })}
-								<input
-									{...props}
-									type="email"
-									bind:value={$formData.email}
-									placeholder="person@example.org"
-									class="w-full rounded-[10px] border border-stone-300 bg-transparent px-3 py-2 text-body focus:border-primary focus:outline-none"
-								/>
-							{/snippet}
-						</Form.Control>
-						<Form.FieldErrors class="mt-1 text-caption text-destructive" />
-					</Form.Field>
-
-					<select
-						bind:value={$formData.role}
-						class="rounded-[10px] border border-stone-300 bg-transparent px-3 py-2 text-body focus:border-primary focus:outline-none"
-					>
-						<option value="admin">Admin</option>
-						<option value="member">Member</option>
-					</select>
-
-					<Button type="submit" disabled={$submitting}>
-						{$submitting ? 'Adding…' : 'Add'}
-					</Button>
-				</div>
-				<p class="mt-2 text-caption text-muted-foreground">
-					New emails get an account and a set-password email.
-				</p>
-			</form>
+					<p class="mt-2 text-caption text-muted-foreground">
+						New emails get an account and a set-password email.
+					</p>
+				</form>
+			{/if}
 		</section>
 	</div>
 </div>

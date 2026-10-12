@@ -14,6 +14,7 @@
 	import { afterNavigate } from '$app/navigation';
 	import { findByRouteSlug, type ConversationStatus } from '$lib/conversations';
 	import { resolve } from '$app/paths';
+	import { hostsLink as toHostsLink, NO_HOST_ACCESS } from '$lib/host-access';
 	import { Button } from '@civicos/shared/ui/button';
 	import NavigationProgress from '$lib/components/NavigationProgress.svelte';
 	import ConversationSkeleton from '$lib/components/skeletons/ConversationSkeleton.svelte';
@@ -21,7 +22,7 @@
 	let { children, data } = $props();
 
 	const isLogin = $derived(page.url.pathname === '/login');
-	const canCreateHost = $derived(data?.canCreateHost ?? false);
+	const hostsLink = $derived(toHostsLink(data?.hostAccess ?? NO_HOST_ACCESS));
 	const viewer = $derived(data?.viewer ?? null);
 	const viewerLabel = $derived(
 		viewer ? [viewer.name, viewer.role].filter(Boolean).join(', ') : 'Signed in'
@@ -29,7 +30,7 @@
 	// Nav highlights follow the destination while it loads, so a click registers
 	// at once rather than after every `load` on the next page has resolved.
 	const activePath = $derived(navigating.to?.url.pathname ?? page.url.pathname);
-	const onHosts = $derived(activePath.startsWith('/sysadmin/hosts'));
+	const onHosts = $derived(activePath.startsWith('/hosts'));
 
 	// Sidebar UI state.
 	// `collapsed` toggles icon-rail vs full sidebar on md+.
@@ -175,10 +176,12 @@
 					{/if}
 				</a>
 
-				{#if canCreateHost}
+				{#if hostsLink}
 					<a
-						href={resolve('/sysadmin/hosts')}
-						title="Hosts"
+						href={hostsLink.hostId
+							? resolve('/hosts/[id]', { id: hostsLink.hostId })
+							: resolve('/hosts')}
+						title={hostsLink.label}
 						class={[
 							'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-caption font-medium',
 							onHosts ? 'bg-primary/5' : 'hover:bg-muted/50',
@@ -187,7 +190,7 @@
 					>
 						<Building2 class="size-4 shrink-0" />
 						{#if !collapsed || mobileOpen}
-							<span>Hosts</span>
+							<span>{hostsLink.label}</span>
 						{/if}
 					</a>
 				{/if}

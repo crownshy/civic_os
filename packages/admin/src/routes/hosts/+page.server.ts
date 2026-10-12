@@ -1,8 +1,10 @@
 import { createApiClient } from '$lib/api/client';
+import { canViewHost } from '$lib/host-access';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ cookies, url, depends }) => {
-	depends('sysadmin:organizations');
+export const load: PageServerLoad = async ({ cookies, url, depends, parent }) => {
+	depends('hosts:list');
+	const { hostAccess } = await parent();
 
 	const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
 
@@ -14,12 +16,15 @@ export const load: PageServerLoad = async ({ cookies, url, depends }) => {
 	}> = [];
 	try {
 		const res = await api.ListOrganizations({ queries: { limit: 100 } });
-		organizations = res.records.map((o) => ({
-			id: o.id,
-			name: o.name,
-			externalUrl: o.externalUrl,
-			contactEmail: o.contactEmail
-		}));
+		// ListOrganizations returns every Host whoever asks; only a Super user sees them all.
+		organizations = res.records
+			.filter((o) => canViewHost(hostAccess, o.id))
+			.map((o) => ({
+				id: o.id,
+				name: o.name,
+				externalUrl: o.externalUrl,
+				contactEmail: o.contactEmail
+			}));
 	} catch (e) {
 		console.warn('ListOrganizations failed', e);
 	}

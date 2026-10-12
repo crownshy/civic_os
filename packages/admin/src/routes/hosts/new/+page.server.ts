@@ -1,12 +1,16 @@
-import { redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { createApiClient } from '$lib/api/client';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { hostDetailsSchema, toExternalUrl } from '$lib/hosts/host-details-schema';
+import { fetchHostAccess } from '$lib/host-access';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ cookies, url, depends }) => {
-	depends('sysadmin:regions');
+// Creating a Host stays with Super users; the rest of /hosts opened up in #454.
+export const load: PageServerLoad = async ({ cookies, url, depends, parent }) => {
+	depends('hosts:regions');
+	const { hostAccess } = await parent();
+	if (!hostAccess.all) redirect(303, '/hosts');
 
 	const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
 
@@ -28,6 +32,7 @@ export const actions: Actions = {
 		if (!form.valid) return message(form, { kind: 'error', text: 'Please fix the errors below.' });
 
 		const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
+		if (!(await fetchHostAccess(api)).all) error(403, 'Only Super users can create a Host.');
 		// Trimmed here rather than in the schema; see `limitedText`.
 		const { contactEmail, orgType, regionIds } = form.data;
 		const name = form.data.name.trim();
@@ -55,6 +60,6 @@ export const actions: Actions = {
 			);
 		}
 
-		redirect(303, `/sysadmin/hosts?created=${encodeURIComponent(name)}`);
+		redirect(303, `/hosts?created=${encodeURIComponent(name)}`);
 	}
 };

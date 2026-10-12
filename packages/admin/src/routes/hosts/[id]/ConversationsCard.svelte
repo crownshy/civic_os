@@ -10,9 +10,11 @@
 		conversations: HostConversation[];
 		/** Campaigns with no owning Host, offered in the assign control. */
 		assignable?: AssignableConversation[];
+		/** Show the controls that add or remove a Campaign. Super users only. */
+		canAssign?: boolean;
 	}
 
-	let { conversations, assignable = [] }: Props = $props();
+	let { conversations, assignable = [], canAssign = false }: Props = $props();
 
 	let selected = $state('');
 
@@ -65,7 +67,7 @@
 						{conversation.access === 'owner' ? 'Owner' : 'Co-host'}
 					</span>
 
-					{#if conversation.access === 'cohost'}
+					{#if canAssign && conversation.access === 'cohost'}
 						<form method="POST" action="?/revokeAccess" use:enhance>
 							<input type="hidden" name="conversationId" value={conversation.id} />
 							<Button type="submit" variant="destructive-outline" size="sm">Remove access</Button>
@@ -76,7 +78,7 @@
 		</ul>
 	{/if}
 
-	{#if assignable.length}
+	{#if canAssign && assignable.length}
 		<form
 			method="POST"
 			action="?/assignCampaign"
