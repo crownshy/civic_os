@@ -2,6 +2,7 @@
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import type { PollStatus } from '@civicos/shared/data/poll-status';
 	import type { PollStatusTarget } from '$lib/api/poll-status';
+	import { permissionDenied } from '$lib/api/describe-failure';
 	import PollStatRow from '$lib/components/PollStatRow.svelte';
 
 	interface Props {
@@ -72,7 +73,9 @@
 			await onChange(next);
 		} catch (e) {
 			console.error('Failed to change poll status', e);
-			error = e instanceof Error ? e.message : 'Could not change the poll status.';
+			error =
+				permissionDenied(e, 'change this poll’s status') ??
+				(e instanceof Error ? e.message : 'Could not change the poll status.');
 		} finally {
 			pending = null;
 		}

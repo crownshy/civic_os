@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PollStatus } from '@civicos/shared/data/poll-status';
 	import { resolve } from '$app/paths';
+	import { permissionDenied } from '$lib/api/describe-failure';
 
 	interface Props {
 		status: PollStatus;
@@ -30,7 +31,7 @@
 			await onGoLive();
 		} catch (e) {
 			console.error('Failed to go live', e);
-			error = 'Could not go live.';
+			error = permissionDenied(e, 'launch this poll') ?? 'Could not go live.';
 		} finally {
 			busy = false;
 		}

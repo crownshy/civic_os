@@ -47,3 +47,14 @@ export function describeApiFailure(error: unknown): string {
 
 	return 'the request failed before the server answered.';
 }
+
+/**
+ * The sentence to show when comhairle refused a call with 403, or null for any
+ * other failure. Comhairle checks roles per Campaign, so a Host admin who neither
+ * owns the Campaign nor holds a role on it is refused too; saying so beats a
+ * generic "could not" that reads like an outage.
+ */
+export function permissionDenied(error: unknown, action: string): string | null {
+	if (apiStatus(error) !== 403) return null;
+	return `You do not have permission to ${action}. Ask the Campaign owner to give you a role on this Campaign.`;
+}

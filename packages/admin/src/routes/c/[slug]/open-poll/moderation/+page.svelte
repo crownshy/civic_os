@@ -7,6 +7,7 @@
 		postSeed,
 		syncStatementAux
 	} from '$lib/api/aux';
+	import { permissionDenied } from '$lib/api/describe-failure';
 	import { Button } from '@civicos/shared/ui/button';
 	import { Spinner } from '@civicos/shared/ui/spinner';
 	import { untrack } from 'svelte';
@@ -56,7 +57,12 @@
 			await invalidate('open-poll:aux');
 		} catch (e) {
 			console.error('syncStatementAux failed', e);
-			notice = { text: 'Could not sync statements from Polis.', error: true };
+			notice = {
+				text:
+					permissionDenied(e, 'sync statements from Polis') ??
+					'Could not sync statements from Polis.',
+				error: true
+			};
 		} finally {
 			if (syncingStep === id) syncingStep = null;
 		}
