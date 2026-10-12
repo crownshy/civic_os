@@ -52,12 +52,12 @@ Run per-package from `packages/<name>`, or use the root scripts:
   `pnpm dev:report` the public report (5175).
 - `pnpm -r build` / `pnpm run build` build every package.
 - `pnpm -r check` / `pnpm run check` svelte-check (types) across packages. `civicos`
-  has a floor of two errors it cannot fix: `@crownshy/api-client` exports raw `.ts`
-  source generated against zod 3, and under the workspace's zod 4 its two one-arg
-  `z.record()` calls no longer type. Runtime is unaffected (zod 4 still accepts that
-  form and validates values), `skipLibCheck` does not reach a dependency's source, and
-  tsconfig `exclude` does not stop TS diagnosing an imported file. It goes when
-  api-client is regenerated against zod 4. Anything above two is yours.
+  and `admin` each have a floor of three errors they cannot fix: `@crownshy/api-client`
+  exports raw `.ts` source generated against zod 3, and under the workspace's zod 4 its
+  three one-arg `z.record()` calls no longer type. Runtime is unaffected (zod 4 still
+  accepts that form and validates values), `skipLibCheck` does not reach a dependency's
+  source, and tsconfig `exclude` does not stop TS diagnosing an imported file. It goes
+  when api-client is regenerated against zod 4. Anything above three is yours.
 - `pnpm --filter civic-os lint` / `pnpm --filter @civicos/admin lint` prettier check +
   eslint. `pnpm run lint` runs all four, `@civicos/shared` included. All four are green;
   keep them that way. Where a rule is suppressed the disable comment carries the reason
