@@ -6,11 +6,26 @@ import { addMemberSchema } from './member-schema';
 import { hostDetailsSchema, toExternalUrl, toWebsite } from '$lib/hosts/host-details-schema';
 import { COHOST_ROLE, CONVERSATION_RESOURCE } from '$lib/permissions';
 import { routeSlugFor, statusFor } from '$lib/conversations';
+import { canManageHost, canViewHost, fetchHostAccess, type HostAccess } from '$lib/host-access';
 import type { AssignableConversation, HostConversation } from './host-conversations';
 import type { Actions, PageServerLoad } from './$types';
 
 function client(url: URL, cookies: { get: (n: string) => string | undefined }) {
 	return createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
+}
+
+/**
+ * Host admins manage their own Host's details and team. Moving Campaigns between
+ * Hosts stays with Super users: it hands one Host's work to another, with no undo.
+ */
+const canAssignCampaigns = (access: HostAccess) => access.all;
+
+/** Form actions skip the layout gate, so each one checks for itself. */
+async function requireAccess(
+	api: ReturnType<typeof client>,
+	allowed: (access: HostAccess) => boolean
+) {
+	if (!allowed(await fetchHostAccess(api))) error(403, 'You cannot change this Host.');
 }
 
 /**
@@ -86,8 +101,11 @@ async function loadHostConversations(
 	return { attached, assignable };
 }
 
-export const load: PageServerLoad = async ({ params, cookies, url, depends }) => {
-	depends(`sysadmin:host:${params.id}`);
+export const load: PageServerLoad = async ({ params, cookies, url, depends, parent }) => {
+	depends(`hosts:host:${params.id}`);
+	const { hostAccess } = await parent();
+	// The same 404 as a missing Host, so the page does not confirm which ids exist.
+	if (!canViewHost(hostAccess, params.id)) error(404, 'Host not found');
 	const api = client(url, cookies);
 
 	const org = await api.GetOrganization({ params: { organization_id: params.id } }).catch((e) => {
@@ -136,8 +154,10 @@ export const load: PageServerLoad = async ({ params, cookies, url, depends }) =>
 		},
 		team,
 		conversations: conversations.attached,
-		assignableConversations: conversations.assignable,
+		assignableConversations: canAssignCampaigns(hostAccess) ? conversations.assignable : [],
 		currentUserId: me?.id ?? null,
+		canManage: canManageHost(hostAccess, params.id),
+		canAssign: canAssignCampaigns(hostAccess),
 		form: await superValidate(zod4(addMemberSchema)),
 		regions: regions.map((r) => ({ id: r.id, name: r.name })),
 		detailsForm: await superValidate(details, zod4(hostDetailsSchema), {
@@ -157,6 +177,7 @@ export const actions: Actions = {
 	 * and leaves the old value standing. Hence every field is always sent.
 	 */
 	updateHost: async ({ request, params, cookies, url }) => {
+		await requireAccess(client(url, cookies), (a) => canManageHost(a, params.id));
 		const form = await superValidate(request, zod4(hostDetailsSchema), { id: 'host-details' });
 		if (!form.valid) return message(form, { kind: 'error', text: 'Please fix the errors below.' });
 
@@ -193,6 +214,7 @@ export const actions: Actions = {
 			});
 
 		const api = client(url, cookies);
+		await requireAccess(api, (a) => canManageHost(a, params.id));
 		try {
 			const res = await api.AddOrganizationMember(
 				{
@@ -242,6 +264,7 @@ export const actions: Actions = {
 		if (!conversationId) return fail(400, { error: 'Select a Campaign to assign.' });
 
 		const api = client(url, cookies);
+		await requireAccess(api, canAssignCampaigns);
 
 		try {
 			await api.UpdateConversation(
@@ -258,7 +281,7 @@ export const actions: Actions = {
 				{
 					organization_id: params.id,
 					role_name: COHOST_ROLE,
-					grant_reason: 'Owning Host assigned via sysadmin'
+					grant_reason: 'Owning Host assigned in admin'
 				},
 				{ params: { resource_type: CONVERSATION_RESOURCE, resource_id: conversationId } }
 			);
@@ -283,6 +306,7 @@ export const actions: Actions = {
 		if (!conversationId) return fail(400, { error: 'Missing conversation.' });
 
 		const api = client(url, cookies);
+		await requireAccess(api, canAssignCampaigns);
 		try {
 			await api.RevokePermission(undefined, {
 				params: {
@@ -305,6 +329,7 @@ export const actions: Actions = {
 		if (role !== 'admin' && role !== 'member') return fail(400, { error: 'Invalid role' });
 
 		const api = client(url, cookies);
+		await requireAccess(api, (a) => canManageHost(a, params.id));
 		// Guard: don't let a user demote themselves out of admin.
 		const me = await api.CurrentUser().catch(() => null);
 		if (me?.id === userId && role === 'member') {
@@ -328,6 +353,7 @@ export const actions: Actions = {
 		const userId = String(fd.get('userId') ?? '');
 
 		const api = client(url, cookies);
+		await requireAccess(api, (a) => canManageHost(a, params.id));
 		// Guard: don't let a user remove themselves.
 		const me = await api.CurrentUser().catch(() => null);
 		if (me?.id === userId) return fail(400, { error: "You can't remove yourself." });

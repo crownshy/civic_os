@@ -15,15 +15,22 @@
 <div class="min-h-0 flex-1 overflow-y-auto p-6 sm:p-8">
 	<div class="mb-8 flex items-start justify-between gap-4">
 		<div>
-			<h1 class="mb-1 text-section font-bold">Hosts</h1>
-			<p class="text-body text-muted-foreground">
-				Host organizations on BLOOM. Create new Hosts and their initial admins.
-			</p>
+			{#if data.hostAccess.all}
+				<h1 class="mb-1 text-section font-bold">Hosts</h1>
+				<p class="text-body text-muted-foreground">
+					Host organizations on BLOOM. Create new Hosts and their initial admins.
+				</p>
+			{:else}
+				<h1 class="mb-1 text-section font-bold">My Hosts</h1>
+				<p class="text-body text-muted-foreground">The Host organizations you belong to.</p>
+			{/if}
 		</div>
-		<Button href="/sysadmin/hosts/new">
-			<Plus class="size-4" />
-			Create Host
-		</Button>
+		{#if data.hostAccess.all}
+			<Button href={resolve('/hosts/new')}>
+				<Plus class="size-4" />
+				Create Host
+			</Button>
+		{/if}
 	</div>
 
 	{#if data.created}
@@ -62,7 +69,7 @@
 						<tr class="relative border-b border-border last:border-b-0 hover:bg-muted/30">
 							<td class="px-4 py-3 text-body font-semibold">
 								<a
-									href={resolve('/sysadmin/hosts/[id]', { id: org.id })}
+									href={resolve('/hosts/[id]', { id: org.id })}
 									class="underline-offset-2 after:absolute after:inset-0 hover:text-primary hover:underline"
 								>
 									{org.name}

@@ -1,6 +1,7 @@
 import { createApiClient } from '$lib/api/client';
 import { browser } from '$app/environment';
 import type { ConversationSummary } from '$lib/conversations';
+import { NO_HOST_ACCESS } from '$lib/host-access';
 import type { LayoutLoad } from './$types';
 
 export const load: LayoutLoad = async ({ url, data, depends }) => {
@@ -19,7 +20,7 @@ export const load: LayoutLoad = async ({ url, data, depends }) => {
 	// deliberately not among them: it stays server-side.
 	return {
 		api,
-		canCreateHost: data?.canCreateHost ?? false,
+		hostAccess: data?.hostAccess ?? NO_HOST_ACCESS,
 		viewer: data?.viewer ?? null,
 		conversations: (data?.conversations ?? []) as ConversationSummary[],
 		conversationsError: data?.conversationsError ?? null

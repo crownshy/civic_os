@@ -251,8 +251,9 @@ The frontend detects this via **`GetUserOrganizations.canCreateOrganization`**, 
 backend's computed capability flag, *not* `GetUserRoles` (that handler is currently
 a stub that only ever reports `Admin`). `canCreateOrganization` is true only for
 Site super-admins, because `OrganizationCreate` is authorized solely through the
-super-admin bypass in `can_perform_resource_action`. The `/sysadmin` surface gates
-on this flag (named `canCreateHost` in the admin app).
+super-admin bypass in `can_perform_resource_action`. The admin app reads it as
+`hostAccess.all`: it gates Create Host and assigning Campaigns to a
+Host. A Host admin can manage their own Host at `/hosts/[id]` (ADR 0015).
 
 ### Organization member
 A user affiliated to exactly one Host (`User.organizationId`), as either an

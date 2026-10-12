@@ -3,9 +3,10 @@
 	import ConversationsCard from './ConversationsCard.svelte';
 
 	const { Story } = defineMeta({
-		title: 'Sysadmin/ConversationsCard',
+		title: 'Hosts/ConversationsCard',
 		component: ConversationsCard,
-		tags: ['autodocs']
+		tags: ['autodocs'],
+		args: { canAssign: true }
 	});
 </script>
 
@@ -29,6 +30,31 @@
 				access: 'cohost'
 			}
 		]
+	}}
+/>
+
+<!-- What a Host admin sees: the same list, with no controls to add or remove. -->
+<Story
+	name="Host admin (read only)"
+	args={{
+		canAssign: false,
+		conversations: [
+			{
+				id: '11111111-1111-1111-1111-111111111111',
+				slug: 'utah',
+				title: 'Utah Statewide Conversation',
+				status: 'live',
+				access: 'owner'
+			},
+			{
+				id: '22222222-2222-2222-2222-222222222222',
+				slug: 'salt-lake',
+				title: 'Salt Lake County Conversation',
+				status: 'draft',
+				access: 'cohost'
+			}
+		],
+		assignable: [{ id: '44444444-4444-4444-4444-444444444444', title: 'Unowned Draft' }]
 	}}
 />
 
@@ -62,7 +88,7 @@
 	}}
 />
 
-<!-- A Host created in /sysadmin/hosts/new but not yet attached to anything. -->
+<!-- A Host created in /hosts/new but not yet attached to anything. -->
 <Story name="No campaigns" args={{ conversations: [] }} />
 
 <!-- The assign control only appears when there is an unowned Campaign to give. -->

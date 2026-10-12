@@ -1,5 +1,8 @@
 # Super-user surfaces gate on canCreateOrganization, not the binary admin gate
 
+> The Host pages have since moved to `/hosts` and opened to Host admins. Creating
+> a Host is still gated as below. See ADR 0015.
+
 BLOOM staff tools (creating Hosts and Places) live under a new `/sysadmin` route
 area in the admin app, gated on `GetUserOrganizations.canCreateOrganization`, the
 backend's own computed capability flag. This is deliberately narrower than the

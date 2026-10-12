@@ -2,6 +2,7 @@ import { createApiClient } from '$lib/api/client';
 import { toSummary, type ConversationSummary } from '$lib/conversations';
 import { describeApiFailure } from '$lib/api/describe-failure';
 import { toViewer } from '$lib/viewer';
+import { NO_HOST_ACCESS, toHostAccess } from '$lib/host-access';
 import type { LayoutServerLoad } from './$types';
 
 /** Every Campaign the caller may see, unfiltered. */
@@ -30,11 +31,11 @@ function bySidebarOrder(a: ConversationSummary, b: ConversationSummary) {
  * Returning it means it is serialized into the client data payload — an
  * accepted tradeoff to let SSR render real data instead of empty-then-populate.
  *
- * `canCreateHost` gates the /sysadmin surfaces (create Hosts, and later Places /
- * users, #372). We read it from GetUserOrganizations.canCreateOrganization, the
- * backend's own capability flag (true only for Site super-admins), rather than
- * GetUserRoles — that handler is currently a stub that never reports SuperAdmin.
- * Distinct from the binary `isAdmin` gate in hooks.server.ts. See docs/adr/0002.
+ * `hostAccess` says which Host pages the caller may open (#454). Its `all` flag
+ * is GetUserOrganizations.canCreateOrganization, the backend's own capability
+ * flag (true only for Site super-admins), rather than GetUserRoles, which is a
+ * stub that never reports SuperAdmin. Distinct from the binary `isAdmin` gate in
+ * hooks.server.ts. See docs/adr/0002 and 0015.
  *
  * `viewer` names the signed-in user and their role for the sidebar footer
  * (#453), from the same GetUserOrganizations response plus CurrentUser.
@@ -51,7 +52,7 @@ export const load: LayoutServerLoad = async ({ cookies, url, depends }) => {
 	if (!authToken)
 		return {
 			authToken,
-			canCreateHost: false,
+			hostAccess: NO_HOST_ACCESS,
 			viewer: null,
 			conversations: [],
 			conversationsError: null
@@ -89,7 +90,7 @@ export const load: LayoutServerLoad = async ({ cookies, url, depends }) => {
 
 	return {
 		authToken,
-		canCreateHost: orgs?.canCreateOrganization ?? false,
+		hostAccess: toHostAccess(orgs),
 		viewer: toViewer(user, orgs),
 		conversations,
 		conversationsError

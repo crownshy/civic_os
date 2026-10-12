@@ -1,7 +1,7 @@
 /**
  * Resource-permission vocabulary shared by the two surfaces that read or write
  * it: the Campaign's Co-Hosts card (`c/[slug]/overview`) and the Host's
- * Conversations card (`sysadmin/hosts/[id]`).
+ * Conversations card (`hosts/[id]`).
  *
  * `content_editor` (ConversationContentEditor) is currently the ONLY
  * Conversation-level role in comhairle, so it is what a co-host grant uses.

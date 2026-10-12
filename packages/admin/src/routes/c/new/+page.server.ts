@@ -250,7 +250,7 @@ export const actions: Actions = {
 		//    to that Host's members: comhairle's `list_for_permitted_user` admits a
 		//    Conversation on `owner_id` or a matching `resource_permissions` row,
 		//    and `organization_id` is in neither, so without this grant only the
-		//    creator sees what they just made (same reasoning as the sysadmin
+		//    creator sees what they just made (same reasoning as the Host page's
 		//    assign action, which verified it against a local backend).
 		//
 		//    Logged, not rolled back: the Campaign is real and editable by its
