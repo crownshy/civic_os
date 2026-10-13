@@ -8,7 +8,7 @@
 		tags: ['autodocs'],
 		args: {
 			status: 'live',
-			onGoLive: async () => {},
+			onChange: async () => {},
 			slug: 'ai-utah'
 		}
 	});
@@ -22,12 +22,12 @@
 
 <Story name="Done" args={{ status: 'complete' }} />
 
-<!-- A rejected write leaves the badge on its old state and says so inline. -->
+<!-- A rejected write leaves the badge on its old state and says so in the menu. -->
 <Story
-	name="Go live fails"
+	name="Change fails"
 	args={{
 		status: 'draft',
-		onGoLive: async () => {
+		onChange: async () => {
 			throw new Error('nope');
 		}
 	}}

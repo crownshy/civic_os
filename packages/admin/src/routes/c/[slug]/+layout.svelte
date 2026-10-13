@@ -3,7 +3,7 @@
 	import { invalidate } from '$lib/activity.svelte';
 	import ConversationTabSkeleton from '$lib/components/skeletons/ConversationTabSkeleton.svelte';
 	import PollStatusControl from './PollStatusControl.svelte';
-	import { setPollStatus } from '$lib/api/poll-status';
+	import { setPollStatus, type PollStatusTarget } from '$lib/api/poll-status';
 	import { statusFor } from '$lib/conversations';
 	import { resolve } from '$app/paths';
 
@@ -64,11 +64,11 @@
 		}
 	}
 
-	const goLive = () =>
+	const changeStatus = (next: PollStatusTarget) =>
 		setPollStatus({
 			api: data.api,
 			conversationId: campaign.id,
-			next: 'live',
+			next,
 			pollLaunched: campaign.pollLaunched,
 			polisWorkflowStepId: campaign.polisWorkflowStepId,
 			reload: async () => {
@@ -116,7 +116,7 @@
 		{title}
 	</h1>
 	<div class="flex w-full min-w-0 items-center gap-1 font-ui xl:w-auto xl:max-w-[33%]">
-		<PollStatusControl {status} onGoLive={goLive} slug={campaign.slug} />
+		<PollStatusControl {status} onChange={changeStatus} slug={campaign.slug} />
 		{#if publicUrl}
 			<!-- Absolute participant-app URL on another host, so there is no SvelteKit
 			     route for resolve() to check it against. -->

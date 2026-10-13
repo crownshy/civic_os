@@ -4,6 +4,7 @@
 	import type { PollStatusTarget } from '$lib/api/poll-status';
 	import { permissionDenied } from '$lib/api/describe-failure';
 	import PollStatRow from '$lib/components/PollStatRow.svelte';
+	import { pollStatusCopy } from '$lib/poll-status-copy';
 
 	interface Props {
 		/** Same source as the header badge. */
@@ -19,48 +20,7 @@
 
 	let { status, pollUrl, participants, statements, votes, onChange }: Props = $props();
 
-	const copy: Record<
-		PollStatus,
-		{
-			label: string;
-			tone: string;
-			summary: string;
-			actions: { label: string; next: PollStatusTarget }[];
-		}
-	> = {
-		draft: {
-			label: 'NOT LIVE YET.',
-			tone: 'text-muted-foreground',
-			summary: 'Only your team can see it. Go live to start collecting responses.',
-			actions: [{ label: 'Go live.', next: 'live' }]
-		},
-		live: {
-			label: 'LIVE.',
-			tone: 'text-success',
-			summary: 'Collecting responses.',
-			actions: [
-				{ label: 'Pause the poll.', next: 'paused' },
-				{ label: 'Mark it done.', next: 'complete' }
-			]
-		},
-		paused: {
-			label: 'PAUSED.',
-			tone: 'text-primary',
-			summary: 'Not collecting responses. Participants can still open the Campaign page.',
-			actions: [
-				{ label: 'Turn the poll back on.', next: 'live' },
-				{ label: 'Mark it done.', next: 'complete' }
-			]
-		},
-		complete: {
-			label: 'DONE.',
-			tone: 'text-muted-foreground',
-			summary: 'This poll is complete. Participants see the results instead of the poll.',
-			actions: [{ label: 'Reopen the poll.', next: 'live' }]
-		}
-	};
-
-	const current = $derived(copy[status]);
+	const current = $derived(pollStatusCopy[status]);
 
 	let pending = $state<PollStatusTarget | null>(null);
 	let error = $state<string | null>(null);
