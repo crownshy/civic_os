@@ -1,5 +1,6 @@
 import { redirect, type Handle } from '@sveltejs/kit';
 import { createBackendClient } from '$lib/server/backend-client';
+import { clearHostSession, ensureHostSession } from '$lib/server/host-session';
 
 /**
  * SvelteKit mirrors every modulepreload into a `Link` response header. On the
@@ -81,13 +82,16 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const result = await probeAdmin(authToken);
 	if (result === 'unauthorized') {
 		event.cookies.delete('auth-token', { path: '/' });
+		clearHostSession(event.cookies);
 		throw redirect(303, '/login');
 	}
 	if (result === 'forbidden') {
 		event.cookies.delete('auth-token', { path: '/' });
+		clearHostSession(event.cookies);
 		throw redirect(303, '/login?denied=1');
 	}
 
+	ensureHostSession(event.cookies, authToken, event.url);
 	event.locals.isAdmin = true;
 	return withoutLinkHeader(resolve(event));
 };

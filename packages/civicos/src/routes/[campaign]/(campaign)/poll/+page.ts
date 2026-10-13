@@ -58,12 +58,22 @@ export const load: PageLoad = async ({ params, parent, depends }) => {
 	// The key admin's edits already invalidate the Campaign's own data under.
 	depends('civicos:conversation');
 
-	const { participant, participantResolved, campaign, region, api, participation, pollStatus } =
-		await parent();
+	const {
+		participant,
+		participantResolved,
+		campaign,
+		region,
+		api,
+		participation,
+		pollStatus,
+		preview,
+		previewAboutYou
+	} = await parent();
 
 	// Paused or Done: the landing page says which, and links the results. Polis
-	// refuses the votes as well, but only after someone has started voting.
-	if (pollStatus !== 'live') {
+	// refuses the votes as well, but only after someone has started voting. A
+	// preview is a draft, which votes on the preview poll.
+	if (pollStatus !== 'live' && !preview) {
 		redirect(307, campaignPath(params.campaign));
 	}
 
@@ -71,7 +81,8 @@ export const load: PageLoad = async ({ params, parent, depends }) => {
 	// while comhairle has no `zipcode` demographics question, so reading it back
 	// bounced every participant off this page and into a loop with the landing
 	// page. Restore `!participant?.zipCode` once that question exists.
-	if (participantResolved && !participant) {
+	// A preview never joins, so it has no participant to check.
+	if (participantResolved && !participant && !preview) {
 		redirect(307, campaignPath(params.campaign));
 	}
 
@@ -90,5 +101,8 @@ export const load: PageLoad = async ({ params, parent, depends }) => {
 		});
 	}
 
-	return { aboutYouQuestions: await aboutYouQuestionsForCampaign(api, campaign, participation) };
+	const aboutYouQuestions = previewAboutYou
+		? aboutYouQuestionsFromBackend(previewAboutYou)
+		: await aboutYouQuestionsForCampaign(api, campaign, participation);
+	return { aboutYouQuestions };
 };

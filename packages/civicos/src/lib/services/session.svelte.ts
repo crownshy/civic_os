@@ -57,6 +57,15 @@ class Session {
 	 */
 	#conversationId = $state('');
 
+	/**
+	 * A Host previewing a draft. Votes go to the draft's preview poll, which
+	 * launch discards, but nothing else may reach comhairle: a participation,
+	 * zip or demographics answer filed now would count in the live Campaign's
+	 * numbers, and under the Host's own account. The poll-scoped record is kept
+	 * apart too, so the preview poll's `pid` never resumes against the live one.
+	 */
+	#preview = $state(false);
+
 	#api: ApiClient | null = null;
 
 	/**
@@ -93,14 +102,25 @@ class Session {
 	 * `pid` or vote progress. Until this runs the fields hold whatever the env
 	 * Conversation had, which for a deployment that sets one is the same answer.
 	 */
-	useCampaign(conversationId: string) {
-		if (!conversationId || conversationId === this.#conversationId) return;
+	useCampaign(conversationId: string, preview = false) {
+		if (!conversationId) return;
+		if (conversationId === this.#conversationId && preview === this.#preview) return;
 		this.#conversationId = conversationId;
+		this.#preview = preview;
 		this.#readCampaign();
 	}
 
+	get preview() {
+		return this.#preview;
+	}
+
+	/** Where this Campaign's poll-scoped record is stored. */
+	get #campaignKey() {
+		return this.#preview ? `preview:${this.#conversationId}` : this.#conversationId;
+	}
+
 	#readCampaign() {
-		const record = loadCampaign(this.#conversationId);
+		const record = loadCampaign(this.#campaignKey);
 		this.pid = record.pid;
 		this.totalVotes = record.totalVotes;
 		this.hasSeenPause = record.hasSeenPause;
@@ -122,7 +142,7 @@ class Session {
 	}
 
 	private persistCampaign() {
-		saveCampaign(this.#conversationId, {
+		saveCampaign(this.#campaignKey, {
 			pid: this.pid,
 			totalVotes: this.totalVotes,
 			hasSeenPause: this.hasSeenPause,
@@ -257,7 +277,9 @@ class Session {
 
 	markDemographicsCompleted() {
 		this.demographicsCompleted = true;
-		this.persistAccount();
+		// The account record is shared by every Campaign, and a preview that
+		// marked it would skip About You on the live poll later.
+		if (!this.#preview) this.persistAccount();
 	}
 
 	saveVoteProgress(totalVotes: number, hasSeenPause: boolean) {
@@ -267,11 +289,15 @@ class Session {
 	}
 
 	async join(zipCode: string, email?: string, campaignConversationId?: string): Promise<boolean> {
+		if (campaignConversationId) this.useCampaign(campaignConversationId, this.#preview);
+
+		// Nothing to sign up, and the zip is not kept: the account record is
+		// shared by every Campaign. The poll votes under a throwaway xid.
+		if (this.#preview) return true;
+
 		this.loading = true;
 		this.error = null;
 		this.zipCode = zipCode;
-
-		if (campaignConversationId) this.useCampaign(campaignConversationId);
 
 		try {
 			// 1. Create guest user (sets auth-token cookie)
@@ -318,7 +344,7 @@ class Session {
 	 * `registerOnWorkflow` already treats as done.
 	 */
 	async enterCampaign(conversationId: string): Promise<void> {
-		this.useCampaign(conversationId);
+		this.useCampaign(conversationId, this.#preview);
 		await this.registerOnWorkflow();
 	}
 
@@ -336,7 +362,7 @@ class Session {
 	 * is a reporting gap, not a broken session, so this logs and lets them in.
 	 */
 	private async registerOnWorkflow(): Promise<void> {
-		if (!this.conversationId) return;
+		if (!this.conversationId || this.#preview) return;
 
 		try {
 			const workflows = await this.api.ListConversationWorkflows({
@@ -376,6 +402,10 @@ class Session {
 			console.warn('[Session] registerEmail skipped: missing conversationId or email');
 			return false;
 		}
+		if (this.#preview) {
+			this.#markEmailRegistered(conversationId);
+			return true;
+		}
 
 		try {
 			await this.api.RegisterEmailForUpdates(
@@ -397,7 +427,7 @@ class Session {
 	}
 
 	#markEmailRegistered(conversationId: string) {
-		if (conversationId === this.#conversationId) {
+		if (conversationId === this.#conversationId || this.#preview) {
 			this.emailRegistered = true;
 			this.persistCampaign();
 			return;
@@ -423,6 +453,8 @@ class Session {
 		// The zip rides on every call regardless: the About You screen sends
 		// demographics and no zip, and the server side gate on `/poll`
 		// reads the stored zip back.
+		if (this.#preview) return true;
+
 		const zipcode = data.zipcode || this.zipCode;
 		const body = {
 			consented: data.consented ?? true,
@@ -448,6 +480,8 @@ class Session {
 	 * is a 409 on create, so that one is updated instead.
 	 */
 	async saveDemographicResponse(questionSlug: string, value: string): Promise<boolean> {
+		if (this.#preview) return true;
+
 		const userId = this.userId;
 		if (!userId) return false;
 
@@ -478,6 +512,7 @@ class Session {
 		workflowStepId: string,
 		status: 'not_started' | 'in_progress' | 'done'
 	): Promise<boolean> {
+		if (this.#preview) return true;
 		if (!this.conversationId || !workflowId) return false;
 
 		try {

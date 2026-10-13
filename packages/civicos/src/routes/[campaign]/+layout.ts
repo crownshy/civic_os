@@ -18,6 +18,6 @@ import type { LayoutLoad } from './$types';
 export const load: LayoutLoad = ({ data, depends }) => {
 	depends('civicos:conversation');
 
-	if (browser && data.kind === 'campaign') session.useCampaign(data.campaign.id);
+	if (browser && data.kind === 'campaign') session.useCampaign(data.campaign.id, data.preview);
 	return data;
 };
