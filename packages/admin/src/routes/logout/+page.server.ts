@@ -1,8 +1,9 @@
 import { redirect, type Actions } from '@sveltejs/kit';
 import { createBackendClient } from '$lib/server/backend-client';
+import { clearHostSession } from '$lib/server/host-session';
 
 export const actions: Actions = {
-	default: async ({ cookies }) => {
+	default: async ({ cookies, url }) => {
 		const authToken = cookies.get('auth-token');
 		if (authToken) {
 			// Best effort: the local cookie goes either way, so a backend that is
@@ -12,6 +13,7 @@ export const actions: Actions = {
 				.catch(() => {});
 		}
 		cookies.delete('auth-token', { path: '/' });
+		clearHostSession(cookies, url);
 		throw redirect(303, '/login');
 	}
 };

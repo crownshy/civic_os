@@ -12,9 +12,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const GetConversation = vi.fn();
 const ListConverastions = vi.fn();
+// The client built from the Host's session, for a draft preview.
+const HostGetConversation = vi.fn();
+const GetDemographicsQuestions = vi.fn();
 
 vi.mock('@crownshy/api-client/client', () => ({
-	createApiClient: () => ({ GetConversation, ListConverastions })
+	createApiClient: (_url: string, token?: string) =>
+		token
+			? { GetConversation: HostGetConversation, GetDemographicsQuestions }
+			: { GetConversation, ListConverastions }
 }));
 
 /** A live, public Conversation as the directory lists it. */
@@ -36,15 +42,16 @@ function httpError(status: number) {
 	return Object.assign(new Error(`HTTP ${status}`), { response: { status } });
 }
 
-/** Run the layout load for `/<slug>`. */
-async function loadSlug(slug: string) {
+/** Run the layout load for `/<slug>`, signed in to admin when `hostSession` is given. */
+async function loadSlug(slug: string, hostSession?: string) {
 	const { load } = await import('./+layout.server');
 
 	return (await load({
 		params: { campaign: slug },
 		url: new URL(`http://localhost:5173/${slug}`),
+		cookies: { get: () => hostSession },
 		depends: () => {}
-		// The load reads only these three. The rest of the SvelteKit event is
+		// The load reads only these four. The rest of the SvelteKit event is
 		// irrelevant here and typing it out would only pin things this does not
 		// test.
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -52,9 +59,9 @@ async function loadSlug(slug: string) {
 }
 
 /** Run the layout load for `/<slug>`, and return how it failed. */
-async function loadFailure(slug: string) {
+async function loadFailure(slug: string, hostSession?: string) {
 	try {
-		await loadSlug(slug);
+		await loadSlug(slug, hostSession);
 	} catch (e) {
 		return e as { status: number; body: { message: string } };
 	}
@@ -153,5 +160,56 @@ describe('a slug that names a Place', () => {
 
 		expect(data.kind).toBe('campaign');
 		expect(ListConverastions).not.toHaveBeenCalled();
+	});
+});
+
+describe('a draft previewed by its Host', () => {
+	beforeEach(() => {
+		GetConversation.mockReset();
+		ListConverastions.mockReset();
+		HostGetConversation.mockReset();
+		GetDemographicsQuestions.mockReset();
+		ListConverastions.mockResolvedValue({ records: [] });
+		GetConversation.mockRejectedValue(httpError(403));
+		vi.spyOn(console, 'warn').mockImplementation(() => {});
+	});
+
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
+
+	it('serves the draft as a preview to someone on its team', async () => {
+		HostGetConversation.mockResolvedValue({
+			id: 'id-draft',
+			slug: 'draft',
+			title: 'Draft',
+			isLive: false,
+			isComplete: false
+		});
+		GetDemographicsQuestions.mockResolvedValue({ records: [{ slug: 'age' }] });
+
+		const data = await loadSlug('draft', 'host-token');
+
+		expect(data).toMatchObject({
+			kind: 'campaign',
+			preview: true,
+			pollStatus: 'draft',
+			previewAboutYou: [{ slug: 'age' }]
+		});
+	});
+
+	it('404s the draft when the Host session cannot read it', async () => {
+		HostGetConversation.mockRejectedValue(httpError(403));
+
+		expect((await loadFailure('draft', 'someone-else')).status).toBe(404);
+	});
+
+	it('never previews a live Campaign', async () => {
+		GetConversation.mockResolvedValue({ id: 'id-live', slug: 'live', title: 'Live' });
+
+		const data = await loadSlug('live', 'host-token');
+
+		expect(data).toMatchObject({ kind: 'campaign', preview: false, previewAboutYou: null });
+		expect(HostGetConversation).not.toHaveBeenCalled();
 	});
 });

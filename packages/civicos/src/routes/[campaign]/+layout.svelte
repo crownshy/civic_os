@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { colorSchemeCss } from '@civicos/shared/data/color-scheme';
+	import PreviewBadge from './PreviewBadge.svelte';
 
 	let { data, children } = $props();
 
@@ -18,5 +19,9 @@
 		{@html schemeStyle}
 	{/if}
 </svelte:head>
+
+{#if data.kind === 'campaign' && data.preview}
+	<PreviewBadge />
+{/if}
 
 {@render children()}

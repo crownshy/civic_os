@@ -11,7 +11,7 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, cookies }) => {
+	default: async ({ request, cookies, url }) => {
 		const form = await superValidate(request, zod4(loginSchema));
 		const { email, password } = form.data;
 		// Never echo the password back to the page.
@@ -41,7 +41,7 @@ export const actions: Actions = {
 		}
 
 		for (const setCookie of setCookies) {
-			forwardAuthCookie(setCookie, cookies);
+			forwardAuthCookie(setCookie, cookies, url.host);
 		}
 
 		throw redirect(303, '/');

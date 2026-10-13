@@ -15,6 +15,8 @@ import { readColorScheme } from '@civicos/shared/data/color-scheme';
 import { pollStatusFor } from '@civicos/shared/data/poll-status';
 import { inPlace, listDirectory } from '$lib/config/directory';
 import { httpStatusOf } from '$lib/utils/http';
+import { HOST_SESSION_COOKIE } from '@civicos/shared/data/host-session';
+import type { DemographicQuestionData } from '@civicos/shared/data/demographics';
 
 type ResolvedConversation = CampaignConversation &
 	ConversationCopy & { isLive: boolean; isComplete: boolean };
@@ -32,7 +34,7 @@ type ResolvedConversation = CampaignConversation &
  * (poll, events, report) sit in the `(campaign)` group, whose layout 404s a
  * Place.
  */
-export const load: LayoutServerLoad = async ({ params, url, depends }) => {
+export const load: LayoutServerLoad = async ({ params, url, cookies, depends }) => {
 	const slug = params.campaign;
 
 	// Admin edits this copy in real time, so it needs a key an invalidation can
@@ -53,6 +55,12 @@ export const load: LayoutServerLoad = async ({ params, url, depends }) => {
 	// when the truth was that it was still a draft or that comhairle was down.
 	let draft = false;
 	let unreachable = false;
+	// A draft read with the Host's own session, which admin shares with this
+	// site through the host-session cookie. Comhairle answers it for anyone
+	// with Read on the Conversation, so co-hosts can preview as well.
+	let preview = false;
+	const hostToken = cookies.get(HOST_SESSION_COOKIE);
+	const hostApi = hostToken ? createApiClient(`${url.origin}/api`, hostToken, 'server') : null;
 
 	let conversation: ResolvedConversation | null = null;
 	for (const candidate of campaignCandidates(slug)) {
@@ -66,6 +74,11 @@ export const load: LayoutServerLoad = async ({ params, url, depends }) => {
 				// refuses anonymously otherwise. Nothing else on this endpoint answers
 				// 403, so it means the Campaign exists and has not been launched.
 				draft = true;
+				conversation = await readDraft(hostApi, candidate);
+				if (conversation) {
+					preview = true;
+					break;
+				}
 			} else if (status === undefined || status >= 500) {
 				unreachable = true;
 			}
@@ -135,8 +148,39 @@ export const load: LayoutServerLoad = async ({ params, url, depends }) => {
 		participation: resolveParticipation(conversation),
 		// Null when the Host never picked one, and `theme.css` (Green) shows through.
 		colorScheme: readColorScheme(conversation?.metadata),
-		// Live, Paused or Done (#443). A draft never gets here: it 404s above. An
-		// unreachable legacy region reads as live, the same way it keeps its copy.
-		pollStatus: conversation ? pollStatusFor(conversation) : ('live' as const)
+		// Live, Paused or Done (#443). A draft only gets here as a preview; for
+		// anyone else it 404s above. An unreachable legacy region reads as live,
+		// the same way it keeps its copy.
+		pollStatus: conversation ? pollStatusFor(conversation) : ('live' as const),
+		preview,
+		// The poll's About You questions are read anonymously in the browser, and
+		// a draft refuses that, so the preview hands over the ones read here.
+		previewAboutYou: preview && hostApi ? await readAboutYou(hostApi, campaign.id) : null
 	};
 };
+
+type Api = ReturnType<typeof createApiClient>;
+
+async function readDraft(hostApi: Api | null, candidate: string) {
+	if (!hostApi) return null;
+	try {
+		return await hostApi.GetConversation({ params: { conversation_id: candidate } });
+	} catch {
+		// Signed out of admin, or not on this Campaign's team: the same 404 a
+		// stranger gets.
+		return null;
+	}
+}
+
+async function readAboutYou(hostApi: Api, conversationId: string | undefined) {
+	if (!conversationId) return null;
+	try {
+		const { records } = await hostApi.GetDemographicsQuestions({
+			queries: { conversation_id: conversationId, limit: 50 }
+		});
+		return records as DemographicQuestionData[];
+	} catch (e) {
+		console.warn(`[Preview] Could not read "${conversationId}"'s About You questions`, e);
+		return null;
+	}
+}

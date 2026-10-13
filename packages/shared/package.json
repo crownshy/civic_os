@@ -18,6 +18,7 @@
 		"./data/participant-asks": "./src/data/participant-asks.ts",
 		"./data/color-scheme": "./src/data/color-scheme.ts",
 		"./data/poll-status": "./src/data/poll-status.ts",
+		"./data/host-session": "./src/data/host-session.ts",
 		"./data/text-limits": "./src/data/text-limits.ts",
 		"./data/place": "./src/data/place.ts",
 		"./data/regions": "./src/data/regions.ts",

@@ -1,6 +1,7 @@
 import { createServer, type Server } from 'node:http';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createApiClient } from '@crownshy/api-client/client';
+import { HOST_SESSION_COOKIE } from '@civicos/shared/data/host-session';
 import { forwardAuthCookie, setCookiesOf } from './auth-cookie';
 
 /**
@@ -120,15 +121,33 @@ describe('forwardAuthCookie', () => {
 		const set: unknown[][] = [];
 		const cookies = { set: (...args: unknown[]) => set.push(args) };
 
-		const forwarded = forwardAuthCookie(SESSION, cookies as never);
+		const forwarded = forwardAuthCookie(SESSION, cookies as never, 'localhost:5174');
 
 		expect(forwarded).toBe(true);
-		expect(set).toEqual([
-			[
-				'auth-token',
-				'tok-abc123',
-				{ path: '/', maxAge: 604800, secure: true, httpOnly: true, sameSite: 'lax' }
-			]
+		expect(set[0]).toEqual([
+			'auth-token',
+			'tok-abc123',
+			{ path: '/', maxAge: 604800, secure: true, httpOnly: true, sameSite: 'lax' }
+		]);
+	});
+
+	it('copies the session to the host-session cookie civicos previews with', () => {
+		const set: unknown[][] = [];
+		const cookies = { set: (...args: unknown[]) => set.push(args) };
+
+		forwardAuthCookie(SESSION, cookies as never, 'localhost:5174');
+
+		expect(set[1]).toEqual([
+			HOST_SESSION_COOKIE,
+			'tok-abc123',
+			{
+				path: '/',
+				domain: undefined,
+				maxAge: 604800,
+				secure: true,
+				httpOnly: true,
+				sameSite: 'lax'
+			}
 		]);
 	});
 
@@ -136,7 +155,11 @@ describe('forwardAuthCookie', () => {
 		const set: unknown[][] = [];
 		const cookies = { set: (...args: unknown[]) => set.push(args) };
 
-		const forwarded = forwardAuthCookie('unrelated=ignored; Path=/', cookies as never);
+		const forwarded = forwardAuthCookie(
+			'unrelated=ignored; Path=/',
+			cookies as never,
+			'localhost:5174'
+		);
 
 		expect(forwarded).toBe(false);
 		expect(set).toEqual([]);

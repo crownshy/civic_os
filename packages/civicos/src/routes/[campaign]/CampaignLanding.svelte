@@ -126,7 +126,7 @@
 		// Polis and the voting screens are the heaviest chunks on the site, and
 		// almost everyone who lands here goes there next. Code only: preloading
 		// data would run the the poll gate before this visitor has joined.
-		if (pollStatus === 'live') void preloadCode(pollPath);
+		if (pollStatus === 'live' || page.data.preview) void preloadCode(pollPath);
 	});
 
 	function showTermsModal() {
