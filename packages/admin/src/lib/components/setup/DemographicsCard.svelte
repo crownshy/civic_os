@@ -39,15 +39,23 @@
 	let addOpen = $state(false);
 	let editingCategory = $state<CustomDemographicCategory | undefined>(undefined);
 
-	let pending = $state<Record<string, boolean>>({});
+	// `saving` blocks a second write to the same row; `heading` is the state a
+	// toggle is saving towards, shown until the reloaded data catches up.
+	let saving = $state<Record<string, boolean>>({});
+	let heading = $state<Record<string, boolean>>({});
 	let error = $state<string | null>(null);
 
 	const editable = $derived(!!onToggle);
 
+	function without(record: Record<string, boolean>, key: string) {
+		return Object.fromEntries(Object.entries(record).filter(([k]) => k !== key));
+	}
+
 	/** Shared write wrapper: per-key in-flight flag plus one error surface. */
-	async function run(key: string, fn: () => Promise<void>) {
-		if (pending[key]) return;
-		pending = { ...pending, [key]: true };
+	async function run(key: string, fn: () => Promise<void>, next?: boolean) {
+		if (saving[key]) return;
+		saving = { ...saving, [key]: true };
+		if (next !== undefined) heading = { ...heading, [key]: next };
 		error = null;
 		try {
 			await fn();
@@ -55,8 +63,17 @@
 			console.error('PatchConversationMetadata failed', e);
 			error = e instanceof Error ? e.message : 'Could not save that change.';
 		} finally {
-			pending = { ...pending, [key]: false };
+			saving = without(saving, key);
+			heading = without(heading, key);
 		}
+	}
+	/** Flip a row towards `next`, fixed at click time so the optimistic state cannot change it. */
+	function toggle<K extends string>(
+		key: K,
+		next: boolean,
+		write: (key: K, next: boolean) => Promise<void>
+	) {
+		return run(key, () => write(key, next), next);
 	}
 </script>
 
@@ -76,24 +93,26 @@
 
 		<div class="col-span-full grid grid-cols-subgrid divide-y divide-border">
 			{#each defaults as category (category.slug)}
-				{@const on = category.enabled}
+				{@const on = heading[category.slug] ?? category.enabled}
 				<ToggleRow
 					name={category.displayName}
 					detail={category.options.join(', ')}
 					{on}
-					disabled={!editable || pending[category.slug]}
-					onToggle={() => run(category.slug, () => onToggle!(category.slug, !on))}
+					disabled={!editable}
+					busy={saving[category.slug]}
+					onToggle={() => toggle(category.slug, !on, onToggle!)}
 				/>
 			{/each}
 
 			{#each custom as category (category.slug)}
-				{@const on = category.enabled}
+				{@const on = heading[category.slug] ?? category.enabled}
 				<ToggleRow
 					name={category.displayName}
 					detail={category.options.join(', ')}
 					{on}
-					disabled={!onToggleCustom || pending[category.slug]}
-					onToggle={() => run(category.slug, () => onToggleCustom!(category.slug, !on))}
+					disabled={!onToggleCustom}
+					busy={saving[category.slug]}
+					onToggle={() => toggle(category.slug, !on, onToggleCustom!)}
 					onEdit={onEditCustom
 						? () => {
 								editingCategory = category;

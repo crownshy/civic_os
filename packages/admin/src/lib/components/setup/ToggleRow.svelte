@@ -9,8 +9,10 @@
 		/** Dimmer second line under `detail`, for where the thing shows up. */
 		note?: string;
 		on: boolean;
-		/** Read-only cards, and rows with a write in flight, pass true. */
+		/** Read-only cards pass true. */
 		disabled?: boolean;
+		/** A save is in flight. `on` already shows where it is headed. */
+		busy?: boolean;
 		onToggle: () => void;
 		/** Renders an edit button left of the delete button. */
 		onEdit?: () => void;
@@ -18,7 +20,17 @@
 		onRemove?: () => void;
 	}
 
-	let { name, detail, note, on, disabled = false, onToggle, onEdit, onRemove }: Props = $props();
+	let {
+		name,
+		detail,
+		note,
+		on,
+		disabled = false,
+		busy = false,
+		onToggle,
+		onEdit,
+		onRemove
+	}: Props = $props();
 </script>
 
 <div
@@ -61,9 +73,14 @@
 			role="switch"
 			aria-checked={on}
 			aria-label={`Toggle ${name}`}
+			aria-busy={busy}
 			{disabled}
-			onclick={onToggle}
-			class="relative h-5 w-9 shrink-0 cursor-pointer touch-manipulation rounded-full transition-all select-none active:scale-95 active:duration-0 disabled:cursor-not-allowed disabled:active:scale-100 {on
+			onclick={() => {
+				if (!busy) onToggle();
+			}}
+			class="relative h-5 w-9 shrink-0 touch-manipulation rounded-full transition-all select-none active:scale-95 active:duration-0 disabled:cursor-not-allowed disabled:active:scale-100 {busy
+				? 'animate-pulse cursor-progress'
+				: 'cursor-pointer'} {on
 				? 'bg-primary hover:bg-primary/90 active:bg-primary/80'
 				: 'bg-muted-foreground/30 hover:bg-muted-foreground/45 active:bg-muted-foreground/55'}"
 		>
