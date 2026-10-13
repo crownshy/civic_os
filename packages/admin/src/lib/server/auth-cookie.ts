@@ -14,7 +14,7 @@ import { setHostSession } from './host-session';
  * Anything that is not the `auth-token` cookie is ignored. The session is also
  * copied to the host-session cookie, so the Host can preview a draft on civicos.
  */
-export function forwardAuthCookie(setCookie: string, cookies: Cookies): boolean {
+export function forwardAuthCookie(setCookie: string, cookies: Cookies, adminHost: string): boolean {
 	const [nameValue, ...attrs] = setCookie.split(';').map((s) => s.trim());
 	const [name, value] = nameValue.split('=');
 	if (name !== 'auth-token') return false;
@@ -31,7 +31,7 @@ export function forwardAuthCookie(setCookie: string, cookies: Cookies): boolean 
 	}
 
 	cookies.set(name, value, { path: '/', maxAge, secure, httpOnly, sameSite: 'lax' });
-	setHostSession(cookies, value, { maxAge, secure });
+	setHostSession(cookies, value, { adminHost, maxAge, secure });
 	return true;
 }
 

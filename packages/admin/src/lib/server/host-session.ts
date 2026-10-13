@@ -1,23 +1,48 @@
 import type { Cookies } from '@sveltejs/kit';
-import { env } from '$env/dynamic/private';
 import { HOST_SESSION_COOKIE } from '@civicos/shared/data/host-session';
+import { participantBase } from '$lib/conversations';
 
 /**
- * The parent domain admin and civicos share, e.g. `.bloomproject.us`. Unset
- * locally, where a host-only cookie already reaches both apps: cookies ignore
- * the port, so `localhost:5174` and `localhost:5173` see the same jar.
+ * The domain both apps sit under, so a cookie set here reaches the participant
+ * site too: `adminstage.bloomproject.us` and `stage.bloomproject.us` give
+ * `.bloomproject.us`. Undefined, a cookie for admin's own host, on localhost,
+ * where cookies ignore the port and already reach both, or when the two share
+ * no registrable domain.
  */
-const domain = () => env.SESSION_COOKIE_DOMAIN || undefined;
+export function sharedCookieDomain(adminHost: string, participantHost: string) {
+	const labels = (host: string) =>
+		host
+			.replace(/^https?:\/\//, '')
+			.replace(/[:/].*$/, '')
+			.toLowerCase()
+			.split('.')
+			.reverse();
+	const admin = labels(adminHost);
+	const participant = labels(participantHost);
+	if (!participantHost || isLocal(admin) || isLocal(participant)) return undefined;
+
+	const shared: string[] = [];
+	while (shared.length < admin.length && admin[shared.length] === participant[shared.length]) {
+		shared.push(admin[shared.length]);
+	}
+	return shared.length >= 2 ? `.${shared.reverse().join('.')}` : undefined;
+}
+
+function isLocal(labels: string[]) {
+	return labels[0] === 'localhost' || labels.every((l) => /^\d+$/.test(l));
+}
+
+const domainFor = (adminHost: string) => sharedCookieDomain(adminHost, participantBase());
 
 /** Copy admin's session to the cookie civicos reads for draft previews. */
 export function setHostSession(
 	cookies: Pick<Cookies, 'set'>,
 	token: string,
-	{ maxAge, secure }: { maxAge?: number; secure: boolean }
+	{ adminHost, maxAge, secure }: { adminHost: string; maxAge?: number; secure: boolean }
 ) {
 	cookies.set(HOST_SESSION_COOKIE, token, {
 		path: '/',
-		domain: domain(),
+		domain: domainFor(adminHost),
 		maxAge,
 		secure,
 		httpOnly: true,
@@ -32,9 +57,9 @@ export function setHostSession(
  */
 export function ensureHostSession(cookies: Pick<Cookies, 'get' | 'set'>, token: string, url: URL) {
 	if (cookies.get(HOST_SESSION_COOKIE) === token) return;
-	setHostSession(cookies, token, { secure: url.protocol === 'https:' });
+	setHostSession(cookies, token, { adminHost: url.host, secure: url.protocol === 'https:' });
 }
 
-export function clearHostSession(cookies: Pick<Cookies, 'delete'>) {
-	cookies.delete(HOST_SESSION_COOKIE, { path: '/', domain: domain() });
+export function clearHostSession(cookies: Pick<Cookies, 'delete'>, url: URL) {
+	cookies.delete(HOST_SESSION_COOKIE, { path: '/', domain: domainFor(url.host) });
 }

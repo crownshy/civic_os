@@ -3,7 +3,8 @@
  *
  * Admin and civicos are separate apps, so admin's `auth-token` never reaches
  * civicos. Admin copies it into this cookie, scoped to the parent domain both
- * apps share (`SESSION_COOKIE_DOMAIN`). It has its own name because civicos
+ * apps share, which it works out from its own host and the participant site's.
+ * It has its own name because civicos
  * already uses `auth-token` for the participant, and a Host must not vote or
  * answer demographics as their admin account.
  *

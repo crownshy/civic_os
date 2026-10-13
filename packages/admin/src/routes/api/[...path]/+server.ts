@@ -94,7 +94,8 @@ const handler: RequestHandler = async ({ request, params, cookies }) => {
 			sameSite: 'lax' // Use Lax for same-origin (Safari iOS friendly)
 		});
 		// A refresh or logout changes the session, and the preview copy follows it.
-		if (name === 'auth-token') setHostSession(cookies, value, { maxAge, secure });
+		if (name === 'auth-token')
+			setHostSession(cookies, value, { adminHost: url.host, maxAge, secure });
 	}
 
 	return new Response(res.body, {

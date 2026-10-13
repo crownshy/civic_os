@@ -121,7 +121,7 @@ describe('forwardAuthCookie', () => {
 		const set: unknown[][] = [];
 		const cookies = { set: (...args: unknown[]) => set.push(args) };
 
-		const forwarded = forwardAuthCookie(SESSION, cookies as never);
+		const forwarded = forwardAuthCookie(SESSION, cookies as never, 'localhost:5174');
 
 		expect(forwarded).toBe(true);
 		expect(set[0]).toEqual([
@@ -135,7 +135,7 @@ describe('forwardAuthCookie', () => {
 		const set: unknown[][] = [];
 		const cookies = { set: (...args: unknown[]) => set.push(args) };
 
-		forwardAuthCookie(SESSION, cookies as never);
+		forwardAuthCookie(SESSION, cookies as never, 'localhost:5174');
 
 		expect(set[1]).toEqual([
 			HOST_SESSION_COOKIE,
@@ -155,7 +155,11 @@ describe('forwardAuthCookie', () => {
 		const set: unknown[][] = [];
 		const cookies = { set: (...args: unknown[]) => set.push(args) };
 
-		const forwarded = forwardAuthCookie('unrelated=ignored; Path=/', cookies as never);
+		const forwarded = forwardAuthCookie(
+			'unrelated=ignored; Path=/',
+			cookies as never,
+			'localhost:5174'
+		);
 
 		expect(forwarded).toBe(false);
 		expect(set).toEqual([]);

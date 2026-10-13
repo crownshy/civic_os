@@ -82,12 +82,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const result = await probeAdmin(authToken);
 	if (result === 'unauthorized') {
 		event.cookies.delete('auth-token', { path: '/' });
-		clearHostSession(event.cookies);
+		clearHostSession(event.cookies, event.url);
 		throw redirect(303, '/login');
 	}
 	if (result === 'forbidden') {
 		event.cookies.delete('auth-token', { path: '/' });
-		clearHostSession(event.cookies);
+		clearHostSession(event.cookies, event.url);
 		throw redirect(303, '/login?denied=1');
 	}
 
