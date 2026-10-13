@@ -4,7 +4,7 @@
 	import { Button } from '@civicos/shared/ui/button';
 	import { Input } from '@civicos/shared/ui/input';
 	import { Label } from '@civicos/shared/ui/label';
-	import { METRIC_BUCKETS, METRIC_LABELS, type GoalMetric } from '$lib/config/representation-goals';
+	import { METRIC_LABELS, type GoalMetric } from '$lib/config/representation-goals';
 
 	interface Props {
 		open: boolean;
@@ -14,7 +14,7 @@
 		totalGoal: number;
 		conversationId: string;
 		workflowId: string | null;
-		/** Overrides the static bucket list — used for county, whose buckets are per-region. */
+		/** What a goal can be set against: a question's options, or the counties in play. */
 		buckets?: string[];
 	}
 
@@ -26,21 +26,13 @@
 		totalGoal,
 		conversationId,
 		workflowId,
-		buckets: bucketsOverride
+		buckets: bucketList
 	}: Props = $props();
 
-	const knownMetric = $derived(metric && metric in METRIC_LABELS ? (metric as GoalMetric) : null);
 	const title = $derived(
-		metric
-			? `Modify ${metricLabel ?? (knownMetric ? METRIC_LABELS[knownMetric] : metric)} Goals`
-			: ''
+		metric ? `Modify ${metricLabel ?? METRIC_LABELS[metric as GoalMetric] ?? metric} Goals` : ''
 	);
-	const buckets = $derived(
-		metric && metric !== 'totalParticipants'
-			? (bucketsOverride ??
-					(knownMetric && knownMetric !== 'totalParticipants' ? METRIC_BUCKETS[knownMetric] : []))
-			: []
-	);
+	const buckets = $derived(metric && metric !== 'totalParticipants' ? (bucketList ?? []) : []);
 
 	let submitting = $state(false);
 	let errorMsg = $state<string | null>(null);

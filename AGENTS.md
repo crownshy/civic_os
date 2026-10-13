@@ -127,14 +127,12 @@ focused PR; do not let them silently grow:
 - `sveltekit-superforms` + `formsnap` are installed and the shared `ui/form` primitives
   exist, but app forms do not use them yet. Migrate forms onto superforms as you touch
   them.
-- The generated `DemographicReport` declares only `categories` and `totalParticipants`
-  and lets every breakdown the apps read (`ethnicity`, `gender`, `politicalParty`,
-  `ageRanges`, `zipcodeCounts`) through `.passthrough()`, so they arrive as `unknown`.
-  `readParticipationDemographics` in `@civicos/shared/data/demographics` narrows them in
-  one place. Two things still open: civicos hand-declares the same shape in
-  `report/DemographicsSection.svelte`, so point that at the shared reader when you next
-  touch it; and nothing in either app reads `categories`, so if the backend has actually
-  moved to that shape, both pages have been rendering empty demographics and the fix is
-  a real one rather than a typing one. Worth confirming against a live response.
+- Since comhairle `a8d0a6ef5` (2026-08-28) the participation report sends only
+  `totalParticipants` and `categories` (question slug to counts, grouped by option label,
+  for the questions switched on for the Conversation). Admin's Participants tab reads it
+  through `readParticipationReport` in `@civicos/shared/data/demographics`. The civicos
+  public report still reads the old top-level keys (`ethnicity`, `ageRanges`,
+  `zipcodeCounts`, ...) in `report/DemographicsSection.svelte`, so its demographics render
+  empty. Point it at the shared reader.
 - `load` functions do not call `depends()` for explicit invalidation keys. Add them when
   you touch a `load` that needs targeted invalidation.

@@ -36,24 +36,7 @@
 	const participantsGoal = $derived(goals.totalParticipants);
 	const participantsDelta = 0;
 
-	function rowsFor(
-		categories: { value?: string | null; count: number }[] | undefined,
-		goalMap: Record<string, number>,
-		fallbackLabel = 'Not Provided'
-	) {
-		if (!categories || !categories.length) return [];
-		return categories.map((c) => {
-			const label = c.value || fallbackLabel;
-			const goal = goalMap[label];
-			return goal !== undefined ? { label, count: c.count, goal } : { label, count: c.count };
-		});
-	}
-
-	const ethnicityRows = $derived(rowsFor(demographics?.ethnicity, goals.ethnicity));
-	const genderRows = $derived(rowsFor(demographics?.gender, goals.gender));
-	const politicalRows = $derived(rowsFor(demographics?.politicalParty, goals.politicalParty));
-	const ageRows = $derived(rowsFor(demographics?.ageRanges, goals.ageRanges));
-	const customDemographicResults = $derived(data.customDemographicResults ?? []);
+	const questions = $derived(data.questions ?? []);
 
 	// Geography now groups by county (rolled up server-side). Rows = counties with
 	// participants ∪ counties with a goal set, so under-recruited (0-count) counties
@@ -86,10 +69,6 @@
 			.sort()
 	);
 
-	const totalEthnicity = $derived(ethnicityRows.reduce((s, r) => s + r.count, 0));
-	const totalGender = $derived(genderRows.reduce((s, r) => s + r.count, 0));
-	const totalPolitical = $derived(politicalRows.reduce((s, r) => s + r.count, 0));
-	const totalAge = $derived(ageRows.reduce((s, r) => s + r.count, 0));
 	const totalGeography = $derived(geographyRows.reduce((s, r) => s + r.count, 0));
 
 	// Feed the county choropleth: which states to draw (derived server-side from
@@ -107,11 +86,7 @@
 
 	const jumpLinks = $derived([
 		{ href: '#geography', label: 'Geography' },
-		{ href: '#ethnicity', label: 'Race / Ethnicity' },
-		{ href: '#gender', label: 'Gender' },
-		{ href: '#political', label: 'Political Affiliation' },
-		{ href: '#age', label: 'Age' },
-		...customDemographicResults.map((question) => ({
+		...questions.map((question) => ({
 			href: `#demographic-${question.slug}`,
 			label: question.displayName
 		}))
@@ -255,61 +230,15 @@
 				</Card>
 			</div>
 
-			<div id="ethnicity" class="scroll-mt-4">
-				<DemographicTable
-					title="Race / Ethnicity"
-					rows={ethnicityRows}
-					total={totalEthnicity}
-					participantCount={totalParticipants}
-					onModifyGoals={() => openModal('ethnicity')}
-				/>
-			</div>
-
-			<div id="gender" class="scroll-mt-4">
-				<DemographicTable
-					title="Gender"
-					rows={genderRows}
-					total={totalGender}
-					participantCount={totalParticipants}
-					onModifyGoals={() => openModal('gender')}
-				/>
-			</div>
-
-			<div id="political" class="scroll-mt-4">
-				<DemographicTable
-					title="Political Affiliation"
-					rows={politicalRows}
-					total={totalPolitical}
-					participantCount={totalParticipants}
-					onModifyGoals={() => openModal('politicalParty')}
-				/>
-			</div>
-
-			<div id="age" class="scroll-mt-4">
-				<DemographicTable
-					title="Age"
-					rows={ageRows}
-					total={totalAge}
-					participantCount={totalParticipants}
-					onModifyGoals={() => openModal('ageRanges')}
-				/>
-			</div>
-
-			{#each customDemographicResults as question (question.slug)}
+			{#each questions as question (question.slug)}
 				<div id={`demographic-${question.slug}`} class="scroll-mt-4">
 					<DemographicTable
 						title={question.displayName}
-						rows={question.rows.filter((row) => row.count > 0 || row.goal !== undefined)}
-						total={question.rows
-							.filter((row) => row.count > 0 || row.goal !== undefined)
-							.reduce((sum, row) => sum + row.count, 0)}
+						rows={question.rows}
+						total={question.rows.reduce((sum, row) => sum + row.count, 0)}
 						participantCount={totalParticipants}
 						onModifyGoals={() =>
-							openModal(
-								question.slug,
-								question.displayName,
-								question.rows.map((row) => row.label)
-							)}
+							openModal(question.goalMetric, question.displayName, question.buckets)}
 					/>
 				</div>
 			{/each}

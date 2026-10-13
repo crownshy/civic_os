@@ -324,31 +324,24 @@ export function repeatedOptionIndexes(options: readonly string[]): Set<number> {
 
 /**
  * One answer bucket in a participation report, and how many participants gave
- * it. `value` is absent or null for the ones who skipped the question, which is
- * why every caller supplies its own "Not Provided" label.
+ * it. Comhairle sends an empty `value` for the ones who skipped the question,
+ * which is why every caller supplies its own "Not Provided" label.
  */
 export interface DemographicCategoryCount {
 	value?: string | null;
 	count: number;
 }
 
-/** The per-question breakdowns `GetConversationWorkflowParticipationReport` returns. */
-export interface ParticipationDemographics {
+/** What `GetConversationWorkflowParticipationReport` returns, shaped. */
+export interface ParticipationReport {
 	totalParticipants: number;
-	ageRanges: DemographicCategoryCount[];
-	ethnicity: DemographicCategoryCount[];
-	gender: DemographicCategoryCount[];
-	politicalParty: DemographicCategoryCount[];
-	/** Zip code to participant count, before any roll-up. */
-	zipcodeCounts: Record<string, number>;
+	/**
+	 * Question slug to answer counts, for the questions switched on for the
+	 * Conversation. Comhairle has already grouped the answers by each
+	 * question's option labels.
+	 */
+	categories: Record<string, DemographicCategoryCount[]>;
 }
-
-const PARTICIPATION_CATEGORY_KEYS = [
-	'ageRanges',
-	'ethnicity',
-	'gender',
-	'politicalParty'
-] as const satisfies readonly (keyof ParticipationDemographics)[];
 
 function readCategoryCounts(value: unknown): DemographicCategoryCount[] {
 	if (!Array.isArray(value)) return [];
@@ -361,39 +354,23 @@ function readCategoryCounts(value: unknown): DemographicCategoryCount[] {
 	);
 }
 
-function readZipcodeCounts(value: unknown): Record<string, number> {
-	if (!value || typeof value !== 'object') return {};
-
-	return Object.fromEntries(
-		Object.entries(value as Record<string, unknown>).filter(
-			(entry): entry is [string, number] => typeof entry[1] === 'number'
-		)
-	);
-}
-
 /**
- * The participation report, shaped.
- *
- * The backend sends each breakdown as a top-level key, but the generated
- * `DemographicReport` schema declares only `categories` and `totalParticipants`
- * and lets the rest through `.passthrough()`. Everything a caller actually
- * reads therefore arrives as `unknown`. Narrowing here rather than casting at
- * each read keeps one description of the shape, and means a backend that stops
- * sending a key renders an empty section instead of throwing.
+ * The participation report, narrowed. The generated schema types `categories`
+ * loosely enough that its entries arrive as `unknown`, and a report missing a
+ * question should render an empty table rather than throw.
  */
-export function readParticipationDemographics(report: unknown): ParticipationDemographics {
+export function readParticipationReport(report: unknown): ParticipationReport {
 	const bag = report && typeof report === 'object' ? (report as Record<string, unknown>) : {};
-	const totalParticipants = bag.totalParticipants;
+	const total = bag.totalParticipants;
+	const rawCategories =
+		bag.categories && typeof bag.categories === 'object'
+			? (bag.categories as Record<string, unknown>)
+			: {};
 
 	return {
-		totalParticipants: typeof totalParticipants === 'number' ? totalParticipants : 0,
-		...PARTICIPATION_CATEGORY_KEYS.reduce(
-			(acc, key) => {
-				acc[key] = readCategoryCounts(bag[key]);
-				return acc;
-			},
-			{} as Record<(typeof PARTICIPATION_CATEGORY_KEYS)[number], DemographicCategoryCount[]>
-		),
-		zipcodeCounts: readZipcodeCounts(bag.zipcodeCounts)
+		totalParticipants: typeof total === 'number' ? total : 0,
+		categories: Object.fromEntries(
+			Object.entries(rawCategories).map(([slug, counts]) => [slug, readCategoryCounts(counts)])
+		)
 	};
 }

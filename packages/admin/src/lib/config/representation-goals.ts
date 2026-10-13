@@ -1,11 +1,7 @@
 /**
- * Representation-goal shape + canonical bucket lists.
- *
- * Goal *values* are now loaded per-workflow from comhairle's
- * `recruitment_targets` API (see participants/+page.server.ts).
- * The bucket *labels* below define the categories an admin can edit
- * in the Modify Goals modal — they must match the `value` strings that
- * the participation_report SQL returns so counts and goals line up.
+ * Representation-goal shape. Goal values are loaded per workflow from
+ * comhairle's recruitment targets (see participants/+page.server.ts); the
+ * buckets a goal can be set against are each question's options.
  */
 
 export interface RegionGoals {
@@ -25,35 +21,9 @@ export type GoalMetric =
 
 export const TOTAL_PARTICIPANTS_BUCKET = 'total';
 
-export const METRIC_BUCKETS: Record<Exclude<GoalMetric, 'totalParticipants'>, string[]> = {
-	ethnicity: [
-		'White or Caucasian',
-		'Black or African American',
-		'Hispanic or Latino',
-		'Asian / Pacific Islander',
-		'Native American',
-		'Middle Eastern / North African',
-		'Multiracial',
-		'Other'
-	],
-	politicalParty: [
-		'Democrat / Progressive / Liberal',
-		'No Party Preference / Independent',
-		'Republican / Conservative'
-	],
-	ageRanges: ['Under 18', '18-24', '25-34', '35-44', '45-54', '55-64', '65+'],
-	gender: ['Female', 'Male', 'Other'],
-	// County buckets are derived per-region from zip prefixes at runtime, so there
-	// is no static list here — the editor is fed its buckets dynamically.
-	county: []
-};
-
-export const METRIC_LABELS: Record<GoalMetric, string> = {
+/** Titles for the two goals that are not a demographic question. */
+export const METRIC_LABELS: Partial<Record<GoalMetric, string>> = {
 	totalParticipants: 'Total Participants',
-	ethnicity: 'Race / Ethnicity',
-	gender: 'Gender',
-	politicalParty: 'Political Affiliation',
-	ageRanges: 'Age',
 	county: 'Geography'
 };
 

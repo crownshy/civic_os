@@ -1,70 +1,57 @@
 import { describe, expect, it } from 'vitest';
-import { readParticipationDemographics } from '@civicos/shared/data/demographics';
+import { readParticipationReport } from '@civicos/shared/data/demographics';
 
 /**
- * The generated `DemographicReport` declares only `categories` and
- * `totalParticipants`, so every breakdown the page renders arrives through
- * `.passthrough()` as `unknown`. These pin the shape the backend actually
- * sends, and the behaviour when it sends something else.
+ * Comhairle sends one `categories` entry per question switched on for the
+ * Conversation, keyed by slug and already grouped by option label. These pin
+ * that shape, and the behaviour when it sends something else.
  */
-describe('readParticipationDemographics', () => {
+describe('readParticipationReport', () => {
 	const report = {
 		totalParticipants: 42,
-		ageRanges: [{ category: 'ageRanges', value: '25-34', count: 7 }],
-		ethnicity: [{ category: 'ethnicity', value: null, count: 3 }],
-		gender: [{ category: 'gender', value: 'woman', count: 12 }],
-		politicalParty: [{ category: 'politicalParty', value: 'independent', count: 5 }],
-		zipcodeCounts: { '84101': 4, '84102': 1 }
+		categories: {
+			age: [{ displayName: 'Age', value: '25-34', count: 7 }],
+			ethnicity: [{ displayName: 'Ethnicity', value: '', count: 3 }],
+			'do-you-own-a-dog': [{ displayName: 'Do you own a dog?', value: 'Yep', count: 2 }]
+		}
 	};
 
-	it('keeps every breakdown the report carries', () => {
-		const result = readParticipationDemographics(report);
+	it('keeps every question the report carries, built-in or custom', () => {
+		const result = readParticipationReport(report);
 
 		expect(result.totalParticipants).toBe(42);
-		expect(result.ageRanges).toEqual([{ category: 'ageRanges', value: '25-34', count: 7 }]);
-		expect(result.gender).toEqual([{ category: 'gender', value: 'woman', count: 12 }]);
-		expect(result.zipcodeCounts).toEqual({ '84101': 4, '84102': 1 });
-	});
-
-	it('keeps a bucket whose value is null, which is how a skipped question counts', () => {
-		expect(readParticipationDemographics(report).ethnicity).toEqual([
-			{ category: 'ethnicity', value: null, count: 3 }
+		expect(Object.keys(result.categories)).toEqual(['age', 'ethnicity', 'do-you-own-a-dog']);
+		expect(result.categories['do-you-own-a-dog']).toEqual([
+			{ displayName: 'Do you own a dog?', value: 'Yep', count: 2 }
 		]);
 	});
 
-	it('renders an empty section rather than throwing when a key is missing', () => {
-		const result = readParticipationDemographics({ totalParticipants: 9 });
+	it('keeps the empty bucket, which is how a skipped question counts', () => {
+		expect(readParticipationReport(report).categories.ethnicity).toEqual([
+			{ displayName: 'Ethnicity', value: '', count: 3 }
+		]);
+	});
+
+	it('has no categories rather than throwing when the key is missing', () => {
+		const result = readParticipationReport({ totalParticipants: 9 });
 
 		expect(result.totalParticipants).toBe(9);
-		expect(result.ageRanges).toEqual([]);
-		expect(result.ethnicity).toEqual([]);
-		expect(result.gender).toEqual([]);
-		expect(result.politicalParty).toEqual([]);
-		expect(result.zipcodeCounts).toEqual({});
+		expect(result.categories).toEqual({});
 	});
 
 	it('drops entries with no usable count instead of charting NaN', () => {
-		const result = readParticipationDemographics({
-			gender: [{ value: 'woman', count: 12 }, { value: 'man' }, null, 'nonsense']
+		const result = readParticipationReport({
+			categories: { gender: [{ value: 'Female', count: 12 }, { value: 'Male' }, null, 'nonsense'] }
 		});
 
-		expect(result.gender).toEqual([{ value: 'woman', count: 12 }]);
-	});
-
-	it('drops zip entries whose count is not a number', () => {
-		const result = readParticipationDemographics({
-			zipcodeCounts: { '84101': 4, '84102': 'lots', '84103': null }
-		});
-
-		expect(result.zipcodeCounts).toEqual({ '84101': 4 });
+		expect(result.categories.gender).toEqual([{ value: 'Female', count: 12 }]);
 	});
 
 	it('answers a report that is null or the wrong type at all', () => {
 		for (const input of [null, undefined, 'nope', 7]) {
-			const result = readParticipationDemographics(input);
+			const result = readParticipationReport(input);
 			expect(result.totalParticipants).toBe(0);
-			expect(result.gender).toEqual([]);
-			expect(result.zipcodeCounts).toEqual({});
+			expect(result.categories).toEqual({});
 		}
 	});
 });

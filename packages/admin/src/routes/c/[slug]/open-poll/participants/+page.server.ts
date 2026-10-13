@@ -5,14 +5,15 @@ import { describeApiFailure } from '$lib/api/describe-failure';
 import type { RecruitmentTargetDto } from '@crownshy/api-client/api';
 import {
 	emptyGoals,
-	METRIC_BUCKETS,
 	TOTAL_PARTICIPANTS_BUCKET,
 	type GoalMetric,
 	type RegionGoals
 } from '$lib/config/representation-goals';
 import {
-	readParticipationDemographics,
-	type ParticipationDemographics
+	readParticipationReport,
+	type CustomDemographicCategory,
+	type DemographicCategoryCount,
+	type ParticipationReport
 } from '@civicos/shared/data/demographics';
 import { rollUpByCounty } from '@civicos/shared/data/zipcodes';
 import { statesForZipCounts } from '@civicos/shared/data/zip-states';
@@ -25,6 +26,81 @@ const METRIC_NAMES: GoalMetric[] = [
 	'gender',
 	'county'
 ];
+
+/**
+ * The recruitment-target metric a built-in question's goals are stored under.
+ * These predate per-question goals, so they keep their old names; every other
+ * question stores goals under its slug.
+ */
+const GOAL_METRIC_BY_SLUG: Record<string, Exclude<GoalMetric, 'totalParticipants' | 'county'>> = {
+	age: 'ageRanges',
+	ethnicity: 'ethnicity',
+	gender: 'gender',
+	political_party: 'politicalParty'
+};
+
+const NOT_PROVIDED = 'Not Provided';
+
+export interface QuestionRow {
+	label: string;
+	count: number;
+	goal?: number;
+}
+
+/** One table on the page: a question switched on for this Campaign. */
+export interface QuestionResult {
+	slug: string;
+	displayName: string;
+	/** The recruitment-target metric its goals are stored under. */
+	goalMetric: string;
+	/** The question's options, which are what goals can be set against. */
+	buckets: string[];
+	rows: QuestionRow[];
+}
+
+/**
+ * A row per option, in the question's order, then any answer the options do
+ * not cover (skipped, or an option since renamed). An option nobody picked
+ * still gets a row so a goal set on it has somewhere to show.
+ */
+function questionRows(
+	options: string[],
+	counts: DemographicCategoryCount[],
+	goalMap: Record<string, number>
+): QuestionRow[] {
+	const byLabel = new Map<string, number>();
+	for (const c of counts) {
+		const label = c.value || NOT_PROVIDED;
+		byLabel.set(label, (byLabel.get(label) ?? 0) + c.count);
+	}
+	const labels = [...new Set([...options, ...byLabel.keys()])];
+	return labels.map((label) => ({ label, count: byLabel.get(label) ?? 0, goal: goalMap[label] }));
+}
+
+function questionResult(
+	question: CustomDemographicCategory,
+	report: ParticipationReport,
+	goals: RegionGoals
+): QuestionResult {
+	const builtInMetric = GOAL_METRIC_BY_SLUG[question.slug];
+	const goalMap = builtInMetric ? goals[builtInMetric] : (goals.custom[question.slug] ?? {});
+	return {
+		slug: question.slug,
+		displayName: question.displayName,
+		goalMetric: builtInMetric ?? question.slug,
+		buckets: question.options,
+		rows: questionRows(question.options, report.categories[question.slug] ?? [], goalMap)
+	};
+}
+
+/** Zip code to participant count, from the `zipcode` question's answers. */
+function zipcodeCounts(report: ParticipationReport): Record<string, number> {
+	const counts: Record<string, number> = {};
+	for (const c of report.categories.zipcode ?? []) {
+		if (c.value) counts[c.value] = (counts[c.value] ?? 0) + c.count;
+	}
+	return counts;
+}
 
 /** HTTP status of a failed api-client call, absent when it never reached the server. */
 function statusOf(e: unknown): number | undefined {
@@ -53,31 +129,29 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 	depends('open-poll:demographics');
 	depends('open-poll:goals');
 
-	const { campaign, customDemographics } = await parent();
-	const enabledCustomDemographics = customDemographics.filter((question) => question.enabled);
+	const { campaign, defaultDemographics, customDemographics } = await parent();
+	// The page shows what Setup has switched on, in Setup's order and by the
+	// question's stored name.
+	const enabledQuestions = [...defaultDemographics, ...customDemographics].filter(
+		(question) => question.enabled
+	);
 	const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
 	const conversationId = campaign.id;
 
-	let demographics: ParticipationDemographics | null = null;
+	let demographics: ParticipationReport | null = null;
 	let goals: RegionGoals = emptyGoals();
 	let workflowId: string | null = null;
 	let error: string | null = null;
 
 	// Zip counts roll up into counties, unscoped: the counties are whichever ones
-	// participants actually came from. This used to be filtered by the region's
-	// `zipPrefixes`, which meant every Campaign created in admin had no prefixes
-	// and so an empty Geography section. Places are still being worked out
-	// (#404, #405), so scoping waits for something that can express it rather
-	// than for a second list a Host has to keep in step with their Place.
+	// participants actually came from. Places are still being worked out (#404,
+	// #405), so scoping waits for something that can express it rather than for
+	// a second list a Host has to keep in step with their Place.
 	let countyCounts: Record<string, number> = {};
 	// USPS state codes the choropleth needs, derived from where participants
 	// actually live. Empty means no map to draw.
 	let mapStates: string[] = [];
-	let customDemographicResults: {
-		slug: string;
-		displayName: string;
-		rows: { label: string; count: number; goal?: number }[];
-	}[] = [];
+	let questions: QuestionResult[] = [];
 
 	try {
 		const workflows = await api.ListConversationWorkflows({
@@ -93,57 +167,24 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 			// Goals are optional furniture on this page, so a failure there leaves
 			// the empty set rather than blanking the demographics the page exists
 			// to show.
-			const [report, targets, customResponses] = await Promise.all([
+			const [report, targets] = await Promise.all([
 				api.GetConversationWorkflowParticipationReport({ params }),
 				api.ListRecruitmentTargets({ params }).catch((e) => {
 					console.warn('ListRecruitmentTargets failed', e);
 					return null;
-				}),
-				Promise.all(
-					enabledCustomDemographics.map(async (question) => ({
-						question,
-						responses: await api
-							.GetDemographicsResponses({
-								queries: {
-									conversation_id: conversationId,
-									question_slug: question.slug,
-									limit: 1000
-								}
-							})
-							.then((result) => result.records)
-							.catch((e) => {
-								console.warn(`GetDemographicsResponses failed for ${question.slug}`, e);
-								return [];
-							})
-					}))
-				)
+				})
 			]);
 
-			demographics = readParticipationDemographics(report);
-			const zips = demographics.zipcodeCounts;
+			const participation = readParticipationReport(report);
+			demographics = participation;
+			const zips = zipcodeCounts(participation);
 			countyCounts = rollUpByCounty(zips);
 			mapStates = statesForZipCounts(zips);
 			if (targets) goals = targetsToGoals(targets);
 
-			customDemographicResults = customResponses.map(({ question, responses }) => {
-				const counts = new Map<string, number>();
-				for (const response of responses) {
-					const label = String(response.value);
-					counts.set(label, (counts.get(label) ?? 0) + 1);
-				}
-				const labels = [...question.options, ...counts.keys()].filter(
-					(label, index, all) => all.indexOf(label) === index
-				);
-				return {
-					slug: question.slug,
-					displayName: question.displayName,
-					rows: labels.map((label) => ({
-						label,
-						count: counts.get(label) ?? 0,
-						goal: goals.custom[question.slug]?.[label]
-					}))
-				};
-			});
+			questions = enabledQuestions.map((question) =>
+				questionResult(question, participation, goals)
+			);
 		}
 	} catch (e) {
 		console.warn('Loading participants failed', e);
@@ -155,7 +196,7 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 		goals,
 		countyCounts,
 		mapStates,
-		customDemographicResults,
+		questions,
 		workflowId,
 		conversationId,
 		error
@@ -208,14 +249,12 @@ export const actions: Actions = {
 			const err = collect(TOTAL_PARTICIPANTS_BUCKET, form.get('value'));
 			if (err) return fail(400, { error: err });
 		} else {
-			// County buckets are per-region, not static — read them from the submitted
-			// `bucket:*` fields. Other metrics validate against their canonical list.
-			const known =
-				metric === 'county' || !isKnownMetric
-					? [...form.keys()]
-							.filter((k) => k.startsWith('bucket:'))
-							.map((k) => k.slice('bucket:'.length))
-					: METRIC_BUCKETS[metric as Exclude<GoalMetric, 'totalParticipants'>];
+			// Buckets are a question's options (or the counties in play), which only
+			// the modal that rendered them knows, so read them off the submitted
+			// `bucket:*` fields.
+			const known = [...form.keys()]
+				.filter((k) => k.startsWith('bucket:'))
+				.map((k) => k.slice('bucket:'.length));
 			for (const bucket of known) {
 				const err = collect(bucket, form.get(`bucket:${bucket}`));
 				if (err) return fail(400, { error: err });
