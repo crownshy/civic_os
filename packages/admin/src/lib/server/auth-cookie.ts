@@ -1,5 +1,8 @@
 import type { Cookies } from '@sveltejs/kit';
 import { setHostSession } from './host-session';
+import type { createBackendClient } from './backend-client';
+
+type BackendClient = ReturnType<typeof createBackendClient>;
 
 /**
  * Re-issue comhairle's `auth-token` cookie as a same-origin one.
@@ -33,6 +36,23 @@ export function forwardAuthCookie(setCookie: string, cookies: Cookies, adminHost
 	cookies.set(name, value, { path: '/', maxAge, secure, httpOnly, sameSite: 'lax' });
 	setHostSession(cookies, value, { adminHost, maxAge, secure });
 	return true;
+}
+
+/**
+ * Collect the `Set-Cookie` headers from every successful response `api` gets.
+ *
+ * comhairle hands the session back as a cookie, and the generated client returns
+ * the parsed body rather than the response, so the headers have to be caught on
+ * the way through. Read the result after the call settles: a reply that arrived
+ * but failed schema validation still carries the session.
+ */
+export function captureSetCookies(api: BackendClient): () => string[] {
+	let collected: string[] = [];
+	api.axios.interceptors.response.use((res) => {
+		collected = [...collected, ...setCookiesOf(res.headers)];
+		return res;
+	});
+	return () => collected;
 }
 
 /** The `Set-Cookie` headers on an axios response, normalised to an array. */
