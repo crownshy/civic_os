@@ -49,7 +49,7 @@
 			</div>
 		{/if}
 
-		<form method="POST" use:enhance class="flex flex-col gap-6">
+		<form method="POST" use:enhance novalidate class="flex flex-col gap-6">
 			<HostDetailsFields
 				{form}
 				regions={data.regions}

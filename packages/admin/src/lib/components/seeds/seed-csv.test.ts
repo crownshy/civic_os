@@ -71,6 +71,27 @@ describe('parseSeedCsv', () => {
 		expect(parsed.statements).toEqual(['line one line two']);
 	});
 
+	// #495: a quoted cell spanning lines is one statement, not one per line.
+	it('keeps a quoted cell that spans lines as one statement among others', async () => {
+		const file = [
+			'statement',
+			'"Buses should run later,',
+			'and on ""Sundays"" too"',
+			'Cycling is safe enough',
+			'"Trains',
+			'',
+			'need money"'
+		].join('\r\n');
+		const parsed = await parseSeedCsv(file);
+
+		expect(parsed.statements).toEqual([
+			'Buses should run later, and on "Sundays" too',
+			'Cycling is safe enough',
+			'Trains need money'
+		]);
+		expect(parsed.problems).toEqual([]);
+	});
+
 	it('unescapes doubled quotes inside a quoted field', async () => {
 		const parsed = await parseSeedCsv('"Say ""yes"" to buses"');
 		expect(parsed.statements).toEqual(['Say "yes" to buses']);

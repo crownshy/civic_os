@@ -1,7 +1,11 @@
 import { z } from 'zod';
 
+import { placeFromName } from '@civicos/shared/data/place';
 import { RESERVED_ROUTE_SLUGS } from '$lib/conversations';
 import { limitedText, requiredText } from '$lib/validation/text-fields';
+
+/** A Place name has to give a slug, so it needs something the slug can keep. */
+export const PLACE_NAME_UNREADABLE = 'The name needs at least one letter or number.';
 
 /**
  * Create-Campaign form.
@@ -36,7 +40,9 @@ export const createConversationSchema = z.object({
 	 * Conversation slug is scoped to it by the action, the same rule Setup
 	 * applies on a Place change.
 	 */
-	placeName: z.string().default(''),
+	placeName: limitedText('placeName')
+		.refine((s) => !s.trim() || placeFromName(s) !== null, PLACE_NAME_UNREADABLE)
+		.default(''),
 	description: limitedText('description').default(''),
 	/**
 	 * Owning Host. Preselected in `load` from the Host the creator belongs to;

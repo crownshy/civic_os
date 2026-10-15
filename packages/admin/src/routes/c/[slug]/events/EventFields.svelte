@@ -8,7 +8,15 @@
 	import { Calendar, Check, Copy, MapPin, Monitor, Video } from '@lucide/svelte';
 	import { earliestStart, formatWallDate } from '$lib/utils/event-time';
 	import TimeSelect from './TimeSelect.svelte';
-	import { BROWSER_TZ, type EventField, type EventForm, type MeetMode } from './event-form';
+	import {
+		BROWSER_TZ,
+		LOCATION_LIMITS,
+		type EventField,
+		type EventFieldErrors,
+		type EventForm,
+		type LocationForm,
+		type MeetMode
+	} from './event-form';
 
 	type Props = {
 		form: EventForm;
@@ -16,10 +24,12 @@
 		rsvpLink: string | null;
 		/** Grey out dates and times before now. */
 		limitToFuture: boolean;
+		/** Shown beside the field each one is about. */
+		errors?: EventFieldErrors;
 		oncommit?: (field: EventField) => void;
 	};
 
-	let { form = $bindable(), rsvpLink, limitToFuture, oncommit }: Props = $props();
+	let { form = $bindable(), rsvpLink, limitToFuture, errors = {}, oncommit }: Props = $props();
 
 	const TIMEZONES: string[] =
 		typeof Intl.supportedValuesOf === 'function'
@@ -31,6 +41,16 @@
 		{ value: 'civicos_online', label: 'CivicOS Online', icon: Video },
 		{ value: 'external_online', label: 'Zoom / Other Online', icon: Monitor }
 	] as const;
+
+	const locationFields: { key: keyof LocationForm; placeholder: string }[] = [
+		{ key: 'venue_name', placeholder: 'Venue name' },
+		{ key: 'address_line_1', placeholder: 'Address line 1' },
+		{ key: 'address_line_2', placeholder: 'Address line 2 (optional)' },
+		{ key: 'city', placeholder: 'City' },
+		{ key: 'state_province', placeholder: 'State / province' },
+		{ key: 'postal_code', placeholder: 'Postal code' },
+		{ key: 'country_code', placeholder: 'Country code (e.g. US)' }
+	];
 
 	let tzOpen = $state(false);
 	let dateEl = $state<HTMLInputElement | null>(null);
@@ -68,6 +88,12 @@
 		'flex h-14 items-center gap-3 rounded-lg border border-input bg-background px-4 focus-within:border-ring';
 </script>
 
+{#snippet fieldError(field: EventField)}
+	{#if errors[field]}
+		<p role="alert" class="text-body text-destructive">{errors[field]}</p>
+	{/if}
+{/snippet}
+
 <div class="space-y-8">
 	<div>
 		<input
@@ -79,6 +105,7 @@
 			class="w-full bg-transparent text-h3 font-bold outline-none placeholder:text-muted-foreground/60 md:text-h2"
 		/>
 		<CharCount count={form.name.length} limit={TEXT_LIMITS.eventName} />
+		{@render fieldError('name')}
 	</div>
 
 	<div class="border-t border-border"></div>
@@ -159,6 +186,7 @@
 				{/each}
 			</select>
 		{/if}
+		{@render fieldError('times')}
 	</div>
 
 	<div class="border-t border-border"></div>
@@ -183,58 +211,35 @@
 				</ToggleGroup.Item>
 			{/each}
 		</ToggleGroup.Root>
+		{@render fieldError('meetMode')}
 	</div>
 
 	{#if form.meet_mode === 'in_person'}
 		<div class="space-y-3">
 			<Label class={LABEL}>Location</Label>
 			<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-				<Input
-					bind:value={form.location.venue_name}
-					onblur={() => oncommit?.('location')}
-					placeholder="Venue name"
-					class="h-14 bg-background px-4 text-body-lg"
-				/>
-				<Input
-					bind:value={form.location.address_line_1}
-					onblur={() => oncommit?.('location')}
-					placeholder="Address line 1"
-					class="h-14 bg-background px-4 text-body-lg"
-				/>
-				<Input
-					bind:value={form.location.address_line_2}
-					onblur={() => oncommit?.('location')}
-					placeholder="Address line 2 (optional)"
-					class="h-14 bg-background px-4 text-body-lg"
-				/>
-				<Input
-					bind:value={form.location.city}
-					onblur={() => oncommit?.('location')}
-					placeholder="City"
-					class="h-14 bg-background px-4 text-body-lg"
-				/>
-				<Input
-					bind:value={form.location.state_province}
-					onblur={() => oncommit?.('location')}
-					placeholder="State / province"
-					class="h-14 bg-background px-4 text-body-lg"
-				/>
-				<Input
-					bind:value={form.location.postal_code}
-					onblur={() => oncommit?.('location')}
-					placeholder="Postal code"
-					class="h-14 bg-background px-4 text-body-lg"
-				/>
-				<Input
-					bind:value={form.location.country_code}
-					onblur={() => oncommit?.('location')}
-					placeholder="Country code (e.g. US)"
-					class="h-14 bg-background px-4 text-body-lg"
-				/>
+				{#each locationFields as field (field.key)}
+					{@const limit = LOCATION_LIMITS[field.key]}
+					<div>
+						<Input
+							bind:value={form.location[field.key]}
+							maxlength={limit}
+							onblur={() => oncommit?.('location')}
+							placeholder={field.placeholder}
+							aria-label={field.placeholder}
+							class="h-14 bg-background px-4 text-body-lg"
+						/>
+						<!-- Codes are a few characters; a counter under them is noise. -->
+						{#if limit === TEXT_LIMITS.eventAddressLine}
+							<CharCount count={form.location[field.key].length} {limit} class="mt-1" />
+						{/if}
+					</div>
+				{/each}
 			</div>
 			<p class="text-body italic">
 				All required address fields must be filled before location saves.
 			</p>
+			{@render fieldError('location')}
 		</div>
 	{:else if form.meet_mode === 'civicos_online'}
 		<div class="space-y-3">
@@ -269,13 +274,17 @@
 				id="ev-link"
 				type="url"
 				required
-				aria-invalid={missingCustomLink}
+				aria-invalid={missingCustomLink || !!errors.link}
 				bind:value={form.custom_event_link}
+				maxlength={TEXT_LIMITS.eventLink}
 				onblur={() => oncommit?.('link')}
 				placeholder="https://"
 				class="h-[76px] bg-background px-4 text-body-lg font-semibold"
 			/>
-			{#if missingCustomLink}
+			<CharCount count={form.custom_event_link.length} limit={TEXT_LIMITS.eventLink} />
+			{#if errors.link}
+				{@render fieldError('link')}
+			{:else if missingCustomLink}
 				<p class="text-body text-destructive">
 					Add the meeting link participants should join. Without it they have nowhere to go.
 				</p>
@@ -300,6 +309,7 @@
 			class="w-full rounded-lg border border-input bg-background px-4 py-4 text-body-lg leading-relaxed outline-none focus-visible:border-ring"
 		></textarea>
 		<CharCount count={form.description.length} limit={TEXT_LIMITS.eventDescription} class="mt-1" />
+		{@render fieldError('description')}
 	</div>
 
 	<div class="border-t border-border"></div>
@@ -316,6 +326,7 @@
 				placeholder="No limit"
 				class="h-14 bg-background px-4 text-body-lg font-semibold"
 			/>
+			{@render fieldError('capacity')}
 		</div>
 		<div class="space-y-3">
 			<Label for="ev-sign" class={LABEL}>Signup mode</Label>
@@ -328,6 +339,7 @@
 				<option value="open">Open</option>
 				<option value="invite">Invite only</option>
 			</select>
+			{@render fieldError('signup')}
 		</div>
 	</div>
 </div>

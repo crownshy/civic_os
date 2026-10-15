@@ -14,6 +14,7 @@
 	import { defaults, superForm } from 'sveltekit-superforms';
 	import { zod4, zod4Client } from 'sveltekit-superforms/adapters';
 	import eventRegistrationSchema from './EventRegistrationSchema';
+	import { TEXT_LIMITS } from '@civicos/shared/data/text-limits';
 	import type { ApiClient, LocalizedEventDto } from '@crownshy/api-client/api';
 	import { registerForEvent, registrationErrorMessage } from '$lib/services/event-registration';
 
@@ -110,6 +111,7 @@
 							<span class="relative">
 								<Input
 									bind:value={$formData.name}
+									maxlength={TEXT_LIMITS.participantName}
 									class="h-auto rounded-3xl py-6 pl-14 text-2xl md:text-2xl"
 									placeholder="Full name"
 									autocomplete="name"
@@ -132,6 +134,7 @@
 								<Input
 									type="email"
 									bind:value={$formData.email}
+									maxlength={TEXT_LIMITS.email}
 									class="h-auto rounded-3xl py-6 pl-14 text-2xl md:text-2xl"
 									placeholder="Email address"
 									autocomplete="email"

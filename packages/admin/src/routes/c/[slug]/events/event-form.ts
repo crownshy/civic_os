@@ -1,3 +1,6 @@
+import { TEXT_LIMITS, tooLong } from '@civicos/shared/data/text-limits';
+import { PAST_START_MESSAGE, zonedToISO } from '$lib/utils/event-time';
+
 export type LocationForm = {
 	venue_name: string;
 	address_line_1: string;
@@ -76,4 +79,69 @@ export function isBlankLocation(l: LocationForm): boolean {
 /** A positive whole capacity, or null for "no limit". */
 export function parseCapacity(raw: number | null): number | null {
 	return raw != null && Number.isFinite(raw) && raw > 0 ? Math.floor(raw) : null;
+}
+
+/** What is wrong with each field, keyed so the message can sit beside it. */
+export type EventFieldErrors = Partial<Record<EventField, string>>;
+
+/** The cap on each location field, in the order the form lays them out. */
+export const LOCATION_LIMITS: Record<keyof LocationForm, number> = {
+	venue_name: TEXT_LIMITS.eventAddressLine,
+	address_line_1: TEXT_LIMITS.eventAddressLine,
+	address_line_2: TEXT_LIMITS.eventAddressLine,
+	city: TEXT_LIMITS.eventAddressLine,
+	state_province: TEXT_LIMITS.eventAddressLine,
+	postal_code: TEXT_LIMITS.eventPostalCode,
+	country_code: TEXT_LIMITS.eventCountryCode
+};
+
+/** The first location field over its cap, or null. */
+function longLocationField(location: LocationForm): string | null {
+	const keys = Object.keys(LOCATION_LIMITS) as (keyof LocationForm)[];
+	const over = keys.find((key) => location[key].trim().length > LOCATION_LIMITS[key]);
+	return over ? `Keep each address field to ${LOCATION_LIMITS[over]} characters or fewer.` : null;
+}
+
+/**
+ * Why a new event cannot be created yet, per field. Empty when it can.
+ *
+ * The inputs carry `maxlength`, so the length checks only catch text that got
+ * past it (a script, or a value stored before the cap). comhairle checks none
+ * of this, so it is the last word on what is sent.
+ */
+export function newEventProblems(form: EventForm, now: number = Date.now()): EventFieldErrors {
+	const problems: EventFieldErrors = {};
+
+	const name = form.name.trim();
+	if (!name) problems.name = 'Give the event a name.';
+	else if (name.length > TEXT_LIMITS.eventName) problems.name = tooLong('eventName');
+
+	if (!form.start_date || !form.start_time || !form.end_time) {
+		problems.times = 'Pick a date, start time and end time.';
+	} else if (form.end_time <= form.start_time) {
+		problems.times = 'The end time must be after the start time.';
+	} else if (Date.parse(zonedToISO(form.start_date, form.start_time, form.time_zone)) < now) {
+		problems.times = PAST_START_MESSAGE;
+	}
+
+	const link = form.custom_event_link.trim();
+	if (form.meet_mode === 'external_online') {
+		if (!link) problems.link = 'Add the meeting link participants should join.';
+		else if (link.length > TEXT_LIMITS.eventLink) problems.link = tooLong('eventLink');
+	}
+
+	if (form.meet_mode === 'in_person') {
+		// A venue can be added later, but half an address would be dropped silently.
+		const incomplete = !isBlankLocation(form.location) && !completeLocation(form.location);
+		const location = incomplete
+			? 'Finish the address, or clear it and add it later.'
+			: longLocationField(form.location);
+		if (location) problems.location = location;
+	}
+
+	if (form.description.trim().length > TEXT_LIMITS.eventDescription) {
+		problems.description = tooLong('eventDescription');
+	}
+
+	return problems;
 }

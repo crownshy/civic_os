@@ -1,13 +1,14 @@
 <script lang="ts">
+	import { tick } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { Button } from '@civicos/shared/ui/button';
-	import { PAST_START_MESSAGE, zonedToISO } from '$lib/utils/event-time';
+	import { zonedToISO } from '$lib/utils/event-time';
 	import EventFields from '../EventFields.svelte';
 	import {
 		completeLocation,
 		emptyEventForm,
-		isBlankLocation,
+		newEventProblems,
 		parseCapacity,
 		type EventForm
 	} from '../event-form';
@@ -20,39 +21,35 @@
 
 	let form = $state<EventForm>(emptyEventForm());
 	let creating = $state(false);
+	/** A create the backend refused. Field problems sit beside their fields instead. */
 	let formError = $state<string | null>(null);
 
 	const eventsHref = $derived(resolve('/c/[slug]/events', { slug: campaign.slug }));
 
-	/** The first reason the form can't be created yet, or null when it can. */
-	function problem(): string | null {
-		if (!form.name.trim()) return 'Give the event a name.';
-		if (!form.start_date || !form.start_time || !form.end_time) {
-			return 'Pick a date, start time and end time.';
-		}
-		if (form.end_time <= form.start_time) return 'The end time must be after the start time.';
-		if (Date.parse(zonedToISO(form.start_date, form.start_time, form.time_zone)) < Date.now()) {
-			return PAST_START_MESSAGE;
-		}
-		if (form.meet_mode === 'external_online' && !form.custom_event_link.trim()) {
-			return 'Add the meeting link participants should join.';
-		}
-		// A venue can be added later, but half an address would be dropped silently.
-		if (
-			form.meet_mode === 'in_person' &&
-			!isBlankLocation(form.location) &&
-			!completeLocation(form.location)
-		) {
-			return 'Finish the address, or clear it and add it later.';
-		}
-		return null;
+	// Withheld until the first submit, so an untouched form is not already
+	// scolding; after that they follow the form as it is fixed.
+	let attempted = $state(false);
+	const fieldErrors = $derived(attempted ? newEventProblems(form) : {});
+
+	/** The button is at the bottom and a problem may be scrolled out of view above it. */
+	async function showFirstProblem(formEl: HTMLFormElement) {
+		await tick();
+		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		formEl.querySelector('[role="alert"]')?.scrollIntoView({
+			block: 'center',
+			behavior: reduceMotion ? 'auto' : 'smooth'
+		});
 	}
 
 	async function submit(e: SubmitEvent) {
 		e.preventDefault();
 		if (creating) return;
-		formError = problem();
-		if (formError) return;
+		attempted = true;
+		formError = null;
+		if (Object.keys(newEventProblems(form)).length) {
+			await showFirstProblem(e.currentTarget as HTMLFormElement);
+			return;
+		}
 
 		const inPerson = form.meet_mode === 'in_person';
 		const link = form.custom_event_link.trim();
@@ -99,7 +96,7 @@
 
 <div class="min-h-0 flex-1 [scrollbar-gutter:stable] overflow-y-auto px-8 py-8">
 	<form onsubmit={submit} novalidate class="space-y-8">
-		<EventFields bind:form rsvpLink={null} limitToFuture />
+		<EventFields bind:form rsvpLink={null} limitToFuture errors={fieldErrors} />
 
 		<div class="border-t border-border"></div>
 

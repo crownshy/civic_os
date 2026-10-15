@@ -123,7 +123,7 @@
 				</div>
 			{/if}
 
-			<form method="POST" use:enhance class="flex flex-col gap-6">
+			<form method="POST" use:enhance novalidate class="flex flex-col gap-6">
 				<Form.Field {form} name="title">
 					<Form.Control>
 						{#snippet children({ props })}
@@ -177,6 +177,7 @@
 							<input
 								{...props}
 								bind:value={$formData.placeName}
+								maxlength={TEXT_LIMITS.placeName}
 								placeholder="e.g. Dundee, Scotland"
 								class={inputClass}
 							/>
@@ -187,6 +188,11 @@
 							{/if}
 						{/snippet}
 					</Form.Control>
+					<CharCount
+						count={$formData.placeName.length}
+						limit={TEXT_LIMITS.placeName}
+						class="mt-1"
+					/>
 					<Form.FieldErrors class="mt-1 text-caption text-destructive" />
 				</Form.Field>
 
