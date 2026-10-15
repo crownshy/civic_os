@@ -21,7 +21,8 @@
 
 	let { children, data } = $props();
 
-	const isLogin = $derived(page.url.pathname === '/login');
+	// Signed-out pages render bare, without the sidebar.
+	const isAuthPage = $derived(['/login', '/signup', '/welcome'].includes(page.url.pathname));
 	const hostsLink = $derived(toHostsLink(data?.hostAccess ?? NO_HOST_ACCESS));
 	const viewer = $derived(data?.viewer ?? null);
 	const viewerLabel = $derived(
@@ -81,7 +82,7 @@
 
 <NavigationProgress />
 
-{#if isLogin}
+{#if isAuthPage}
 	{@render children?.()}
 {:else}
 	<div class="flex h-screen w-screen overflow-hidden bg-background font-sans text-foreground">

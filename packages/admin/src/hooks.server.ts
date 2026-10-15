@@ -15,7 +15,7 @@ async function withoutLinkHeader(response: Response | Promise<Response>) {
 	return res;
 }
 
-const PUBLIC_PATHS = ['/login', '/logout'];
+const PUBLIC_PATHS = ['/login', '/logout', '/signup', '/welcome'];
 const PUBLIC_PREFIXES = ['/api/auth/', '/_app/', '/favicon'];
 
 /**
