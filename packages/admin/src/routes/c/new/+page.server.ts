@@ -1,4 +1,4 @@
-import { redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { superValidate, message, setError } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { createApiClient } from '$lib/api/client';
@@ -13,7 +13,7 @@ import { shortDescriptionFrom } from '$lib/utils/rich-text';
 import { participantBase, slugTakenMessage } from '$lib/conversations';
 import type { PickerOrg } from '$lib/components/setup/AddCoHostsDialog.svelte';
 import { ownableHosts } from '$lib/host-access';
-import { createConversationSchema } from './create-conversation-schema';
+import { createConversationSchema, PLACE_NAME_UNREADABLE } from './create-conversation-schema';
 import type { Actions, PageServerLoad } from './$types';
 
 /** The half of a created workflow step `pollIdentity` reads. */
@@ -79,7 +79,8 @@ export const load: PageServerLoad = async ({ cookies, url, depends }) => {
 export const actions: Actions = {
 	default: async ({ request, cookies, url }) => {
 		const form = await superValidate(request, zod4(createConversationSchema));
-		if (!form.valid) return message(form, { kind: 'error', text: 'Please fix the errors below.' });
+		// The field errors already say what is wrong, beside each field.
+		if (!form.valid) return fail(400, { form });
 
 		const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
 		const { slug, hostId, cohostIds } = form.data;
@@ -89,12 +90,14 @@ export const actions: Actions = {
 		const placeName = form.data.placeName.trim();
 		const description = form.data.description.trim();
 
-		const fail = (text: string) => message(form, { kind: 'error', text }, { status: 400 });
+		const refuse = (text: string) => message(form, { kind: 'error', text }, { status: 400 });
 
 		// Refuse rather than create something invisible: /c/[slug] gates on
 		// GetPermittedConversations, so a Campaign with no owning Host would 404
 		// on its own Setup page the moment we redirected to it.
-		if (!hostId) return fail('Choose the Host that will own this conversation.');
+		if (!hostId) {
+			return setError(form, 'hostId', 'Choose the Host that will own this conversation.');
+		}
 
 		// The Host picker only offers the caller's own Hosts, but the post is the
 		// caller's to write, so check it against the same list rather than trust it.
@@ -107,7 +110,11 @@ export const actions: Actions = {
 		]);
 		const ownHostIds = orgs ? ownableHosts(orgs, everyHost).map((h) => h.id) : [];
 		if (!ownHostIds.includes(hostId)) {
-			return fail('You can only create a Campaign for a Host you manage or belong to.');
+			return setError(
+				form,
+				'hostId',
+				'You can only create a Campaign for a Host you manage or belong to.'
+			);
 		}
 
 		// The Place, and the Conversation slug it scopes. A Campaign runs in many
@@ -117,9 +124,7 @@ export const actions: Actions = {
 		// `rescopedSlug` is idempotent, so a slug already ending in the Place ("ai-utah"
 		// in Utah) is left alone rather than doubled.
 		const place = placeName ? placeFromName(placeName) : null;
-		if (placeName && !place) {
-			return fail('That place name needs at least one letter or number.');
-		}
+		if (placeName && !place) return setError(form, 'placeName', PLACE_NAME_UNREADABLE);
 
 		const conversationSlug = rescopedSlug(slug, '', place?.slug ?? '');
 
@@ -152,7 +157,7 @@ export const actions: Actions = {
 				);
 			}
 			console.error('CreateConversation failed', e);
-			return fail(`Could not create the conversation: ${describeApiFailure(e)}`);
+			return refuse(`Could not create the conversation: ${describeApiFailure(e)}`);
 		}
 
 		// Everything past this point is a partial Campaign if it fails. A
@@ -166,11 +171,11 @@ export const actions: Actions = {
 				});
 			} catch (e) {
 				console.error('Rollback DeleteConversation failed', e);
-				return fail(
+				return refuse(
 					`${text} A partly-created conversation was left behind; ask an admin to remove "${conversationSlug}".`
 				);
 			}
-			return fail(text);
+			return refuse(text);
 		};
 
 		try {

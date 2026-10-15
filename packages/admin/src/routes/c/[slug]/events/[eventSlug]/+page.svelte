@@ -15,6 +15,7 @@
 		emptyLocation,
 		parseCapacity,
 		type EventField,
+		type EventFieldErrors,
 		type EventForm,
 		type MeetMode
 	} from '../event-form';
@@ -66,9 +67,11 @@
 	// A one-time working copy: the layout remounts this page per event, and
 	// re-reading `event` would reset the form after every save's invalidate.
 	let form = $state<EventForm>(untrack(() => buildForm(event)));
-	// Keyed by what failed, so a later success on another field cannot hide it.
-	let failures = $state<Record<string, string>>({});
-	const error = $derived(Object.values(failures)[0] ?? null);
+	// Keyed by field, so each message sits beside the field it is about and a
+	// later success on another field cannot hide it.
+	let failures = $state<EventFieldErrors>({});
+	const failing = $derived(Object.keys(failures).length > 0);
+	let deleteError = $state<string | null>(null);
 	let pending = $state(0);
 	const saving = $derived(pending > 0);
 	let savedTick = $state(0);
@@ -86,7 +89,7 @@
 	// Saves run one at a time so an older write cannot land after a newer one.
 	let queue: Promise<void> = Promise.resolve();
 
-	function save(field: string, patch: Patch) {
+	function save(field: EventField, patch: Patch) {
 		// Captured now: by the time a queued save runs, the switcher may have moved on.
 		const target = event;
 		const conversationId = campaign.id;
@@ -102,7 +105,7 @@
 				savedTick++;
 			} catch (e) {
 				console.error('UpdateEvent failed', e);
-				failures[field] = 'Save failed.';
+				failures[field] = "Couldn't save this. Try again.";
 			} finally {
 				pending--;
 			}
@@ -211,9 +214,15 @@
 	// that already happened keeps its own date valid (#468).
 	const isUpcoming = $derived(!event || Date.parse(event.startTime) > Date.now());
 
+	function openDelete() {
+		deleteError = null;
+		deleteOpen = true;
+	}
+
 	async function doDelete() {
 		if (!event || deleting) return;
 		deleting = true;
+		deleteError = null;
 		try {
 			await api.DeleteEvent(undefined, {
 				params: { conversation_id: campaign.id, event_id: event.id }
@@ -224,7 +233,7 @@
 			await goto(resolve(`/c/${campaign.slug}/events`), { invalidate: ['events:list'] });
 		} catch (e) {
 			console.error('DeleteEvent failed', e);
-			failures.delete = 'Delete failed.';
+			deleteError = "Couldn't delete the event. Try again.";
 			deleting = false;
 		}
 	}
@@ -237,15 +246,12 @@
 		<div class="flex items-center justify-end gap-3 text-caption">
 			{#if saving}
 				<span class="text-muted-foreground">saving…</span>
-			{:else if savedTick > 0 && !error}
+			{:else if savedTick > 0 && !failing}
 				{#key savedTick}
 					<span class="inline-flex items-center gap-1 text-success">
 						<Check class="size-3.5" /> saved
 					</span>
 				{/key}
-			{/if}
-			{#if error}
-				<span class="text-destructive">{error}</span>
 			{/if}
 		</div>
 
@@ -253,6 +259,7 @@
 			bind:form
 			{rsvpLink}
 			limitToFuture={isUpcoming}
+			errors={failures}
 			oncommit={(field) => savers[field]()}
 		/>
 
@@ -267,7 +274,7 @@
 					Removes the event, RSVPs, and any uploaded recordings.
 				</div>
 			</div>
-			<Button variant="destructive-outline" size="sm" onclick={() => (deleteOpen = true)}>
+			<Button variant="destructive-outline" size="sm" onclick={openDelete}>
 				<Trash2 class="size-3.5" /> delete event…
 			</Button>
 		</div>
@@ -282,6 +289,9 @@
 					undone.
 				</Dialog.Description>
 			</Dialog.Header>
+			{#if deleteError}
+				<p role="alert" class="text-body text-destructive">{deleteError}</p>
+			{/if}
 			<Dialog.Footer class="gap-2">
 				<Button variant="secondary" onclick={() => (deleteOpen = false)} disabled={deleting}>
 					cancel

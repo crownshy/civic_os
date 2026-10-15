@@ -123,7 +123,7 @@
 				</div>
 			{/if}
 
-			<form method="POST" use:enhance class="flex flex-col gap-6">
+			<form method="POST" use:enhance novalidate class="flex flex-col gap-6">
 				<Form.Field {form} name="title">
 					<Form.Control>
 						{#snippet children({ props })}

@@ -28,7 +28,7 @@
 </script>
 
 <AuthCard>
-	<form method="POST" use:enhance aria-busy={$submitting} class="space-y-4">
+	<form method="POST" use:enhance novalidate aria-busy={$submitting} class="space-y-4">
 		<Form.Field {form} name="email" class="space-y-1.5">
 			<Form.Control>
 				{#snippet children({ props })}

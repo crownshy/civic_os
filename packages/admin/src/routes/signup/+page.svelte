@@ -35,7 +35,7 @@
 		<p class="text-body" role="status">{$message?.text}</p>
 		<Button href={resolve('/login')} class="h-10 w-full rounded-md text-body">Go to sign in</Button>
 	{:else}
-		<form method="POST" use:enhance aria-busy={$submitting} class="space-y-4">
+		<form method="POST" use:enhance novalidate aria-busy={$submitting} class="space-y-4">
 			<Form.Field {form} name="username" class="space-y-1.5">
 				<Form.Control>
 					{#snippet children({ props })}

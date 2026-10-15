@@ -8,7 +8,13 @@
 	import { Calendar, Check, Copy, MapPin, Monitor, Video } from '@lucide/svelte';
 	import { earliestStart, formatWallDate } from '$lib/utils/event-time';
 	import TimeSelect from './TimeSelect.svelte';
-	import { BROWSER_TZ, type EventField, type EventForm, type MeetMode } from './event-form';
+	import {
+		BROWSER_TZ,
+		type EventField,
+		type EventFieldErrors,
+		type EventForm,
+		type MeetMode
+	} from './event-form';
 
 	type Props = {
 		form: EventForm;
@@ -16,10 +22,12 @@
 		rsvpLink: string | null;
 		/** Grey out dates and times before now. */
 		limitToFuture: boolean;
+		/** Shown beside the field each one is about. */
+		errors?: EventFieldErrors;
 		oncommit?: (field: EventField) => void;
 	};
 
-	let { form = $bindable(), rsvpLink, limitToFuture, oncommit }: Props = $props();
+	let { form = $bindable(), rsvpLink, limitToFuture, errors = {}, oncommit }: Props = $props();
 
 	const TIMEZONES: string[] =
 		typeof Intl.supportedValuesOf === 'function'
@@ -68,6 +76,12 @@
 		'flex h-14 items-center gap-3 rounded-lg border border-input bg-background px-4 focus-within:border-ring';
 </script>
 
+{#snippet fieldError(field: EventField)}
+	{#if errors[field]}
+		<p role="alert" class="text-body text-destructive">{errors[field]}</p>
+	{/if}
+{/snippet}
+
 <div class="space-y-8">
 	<div>
 		<input
@@ -79,6 +93,7 @@
 			class="w-full bg-transparent text-h3 font-bold outline-none placeholder:text-muted-foreground/60 md:text-h2"
 		/>
 		<CharCount count={form.name.length} limit={TEXT_LIMITS.eventName} />
+		{@render fieldError('name')}
 	</div>
 
 	<div class="border-t border-border"></div>
@@ -159,6 +174,7 @@
 				{/each}
 			</select>
 		{/if}
+		{@render fieldError('times')}
 	</div>
 
 	<div class="border-t border-border"></div>
@@ -183,6 +199,7 @@
 				</ToggleGroup.Item>
 			{/each}
 		</ToggleGroup.Root>
+		{@render fieldError('meetMode')}
 	</div>
 
 	{#if form.meet_mode === 'in_person'}
@@ -235,6 +252,7 @@
 			<p class="text-body italic">
 				All required address fields must be filled before location saves.
 			</p>
+			{@render fieldError('location')}
 		</div>
 	{:else if form.meet_mode === 'civicos_online'}
 		<div class="space-y-3">
@@ -269,13 +287,15 @@
 				id="ev-link"
 				type="url"
 				required
-				aria-invalid={missingCustomLink}
+				aria-invalid={missingCustomLink || !!errors.link}
 				bind:value={form.custom_event_link}
 				onblur={() => oncommit?.('link')}
 				placeholder="https://"
 				class="h-[76px] bg-background px-4 text-body-lg font-semibold"
 			/>
-			{#if missingCustomLink}
+			{#if errors.link}
+				{@render fieldError('link')}
+			{:else if missingCustomLink}
 				<p class="text-body text-destructive">
 					Add the meeting link participants should join. Without it they have nowhere to go.
 				</p>
@@ -300,6 +320,7 @@
 			class="w-full rounded-lg border border-input bg-background px-4 py-4 text-body-lg leading-relaxed outline-none focus-visible:border-ring"
 		></textarea>
 		<CharCount count={form.description.length} limit={TEXT_LIMITS.eventDescription} class="mt-1" />
+		{@render fieldError('description')}
 	</div>
 
 	<div class="border-t border-border"></div>
@@ -316,6 +337,7 @@
 				placeholder="No limit"
 				class="h-14 bg-background px-4 text-body-lg font-semibold"
 			/>
+			{@render fieldError('capacity')}
 		</div>
 		<div class="space-y-3">
 			<Label for="ev-sign" class={LABEL}>Signup mode</Label>
@@ -328,6 +350,7 @@
 				<option value="open">Open</option>
 				<option value="invite">Invite only</option>
 			</select>
+			{@render fieldError('signup')}
 		</div>
 	</div>
 </div>

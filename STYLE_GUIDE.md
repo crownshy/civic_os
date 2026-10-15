@@ -131,6 +131,25 @@ shared primitives, which wrap `sveltekit-superforms` and `formsnap`:
 - The schema is the single source of truth for both client and server validation. Do not
   duplicate validation logic outside it.
 
+### Where an error is shown
+
+Report each failure once, in one place (#493).
+
+- **Beside the field** for anything the person can fix there: validation, a value the
+  backend refused (a taken slug), a field that did not autosave. Use `Form.FieldErrors`,
+  or a `text-destructive` line under the input when the form is not on superforms.
+- **Beside the form** (above it, or by its submit button) only for a failure that belongs
+  to no single field: the save itself failed, or the action was refused. In a dialog, that
+  line goes inside the dialog.
+- No form-level "Please fix the errors below" on top of field errors. An invalid
+  superform returns `fail(400, { form })`, and a server-side problem with one field is a
+  `setError` on that field, not a `message`.
+- Put `novalidate` on every form whose schema checks its inputs. Otherwise `type="email"`,
+  `type="url"` or `required` also raise the browser's own popup for the same problem.
+- An autosave status line ("Saving", "Saved", "Couldn't save Title") can sit alongside
+  field errors: it says what happened, the field says why.
+- Toasts are only for background work with no form to attach to. Admin has none today.
+
 ### Reuse before you build
 
 Before hand-rolling UI or a helper, check what already exists in

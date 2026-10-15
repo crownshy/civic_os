@@ -179,7 +179,7 @@ export const actions: Actions = {
 	updateHost: async ({ request, params, cookies, url }) => {
 		await requireAccess(client(url, cookies), (a) => canManageHost(a, params.id));
 		const form = await superValidate(request, zod4(hostDetailsSchema), { id: 'host-details' });
-		if (!form.valid) return message(form, { kind: 'error', text: 'Please fix the errors below.' });
+		if (!form.valid) return fail(400, { form });
 
 		const { contactEmail, orgType, regionIds } = form.data;
 		try {
@@ -207,11 +207,7 @@ export const actions: Actions = {
 
 	addMember: async ({ request, params, cookies, url }) => {
 		const form = await superValidate(request, zod4(addMemberSchema));
-		if (!form.valid)
-			return message(form, {
-				kind: 'error',
-				text: 'Please fix the errors below.'
-			});
+		if (!form.valid) return fail(400, { form });
 
 		const api = client(url, cookies);
 		await requireAccess(api, (a) => canManageHost(a, params.id));

@@ -118,6 +118,7 @@
 				method="POST"
 				action="?/updateHost"
 				use:detailsEnhance
+				novalidate
 				class="mb-8 flex flex-col gap-6 rounded-xl border border-border p-5"
 			>
 				{#if detailsMsg?.kind === 'error'}
@@ -219,6 +220,7 @@
 					method="POST"
 					action="?/addMember"
 					use:addEnhance
+					novalidate
 					class="border-t border-border px-5 py-4"
 				>
 					{#if msg}

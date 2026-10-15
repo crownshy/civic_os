@@ -1,3 +1,5 @@
+import { PAST_START_MESSAGE, zonedToISO } from '$lib/utils/event-time';
+
 export type LocationForm = {
 	venue_name: string;
 	address_line_1: string;
@@ -76,4 +78,39 @@ export function isBlankLocation(l: LocationForm): boolean {
 /** A positive whole capacity, or null for "no limit". */
 export function parseCapacity(raw: number | null): number | null {
 	return raw != null && Number.isFinite(raw) && raw > 0 ? Math.floor(raw) : null;
+}
+
+/** What is wrong with each field, keyed so the message can sit beside it. */
+export type EventFieldErrors = Partial<Record<EventField, string>>;
+
+/**
+ * Why a new event cannot be created yet, per field. Empty when it can.
+ */
+export function newEventProblems(form: EventForm, now: number = Date.now()): EventFieldErrors {
+	const problems: EventFieldErrors = {};
+
+	const name = form.name.trim();
+	if (!name) problems.name = 'Give the event a name.';
+
+	if (!form.start_date || !form.start_time || !form.end_time) {
+		problems.times = 'Pick a date, start time and end time.';
+	} else if (form.end_time <= form.start_time) {
+		problems.times = 'The end time must be after the start time.';
+	} else if (Date.parse(zonedToISO(form.start_date, form.start_time, form.time_zone)) < now) {
+		problems.times = PAST_START_MESSAGE;
+	}
+
+	const link = form.custom_event_link.trim();
+	if (form.meet_mode === 'external_online' && !link) {
+		problems.link = 'Add the meeting link participants should join.';
+	}
+
+	if (form.meet_mode === 'in_person') {
+		// A venue can be added later, but half an address would be dropped silently.
+		if (!isBlankLocation(form.location) && !completeLocation(form.location)) {
+			problems.location = 'Finish the address, or clear it and add it later.';
+		}
+	}
+
+	return problems;
 }

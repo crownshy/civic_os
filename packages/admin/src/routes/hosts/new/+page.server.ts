@@ -1,4 +1,4 @@
-import { error, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { createApiClient } from '$lib/api/client';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
@@ -29,7 +29,8 @@ export const load: PageServerLoad = async ({ cookies, url, depends, parent }) =>
 export const actions: Actions = {
 	default: async ({ request, cookies, url }) => {
 		const form = await superValidate(request, zod4(hostDetailsSchema));
-		if (!form.valid) return message(form, { kind: 'error', text: 'Please fix the errors below.' });
+		// The field errors already say what is wrong, beside each field.
+		if (!form.valid) return fail(400, { form });
 
 		const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
 		if (!(await fetchHostAccess(api)).all) error(403, 'Only Super users can create a Host.');
