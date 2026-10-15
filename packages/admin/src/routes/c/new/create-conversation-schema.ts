@@ -40,8 +40,7 @@ export const createConversationSchema = z.object({
 	 * Conversation slug is scoped to it by the action, the same rule Setup
 	 * applies on a Place change.
 	 */
-	placeName: z
-		.string()
+	placeName: limitedText('placeName')
 		.refine((s) => !s.trim() || placeFromName(s) !== null, PLACE_NAME_UNREADABLE)
 		.default(''),
 	description: limitedText('description').default(''),

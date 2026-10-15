@@ -63,12 +63,14 @@
 					<input
 						{...props}
 						bind:value={$formData.website}
+						maxlength={TEXT_LIMITS.hostWebsite}
 						placeholder="www.example.org"
 						class="flex-1 bg-transparent py-2.5 pl-0.5 text-body focus:outline-none"
 					/>
 				</div>
 			{/snippet}
 		</Form.Control>
+		<CharCount count={$formData.website.length} limit={TEXT_LIMITS.hostWebsite} class="mt-1" />
 		<Form.FieldErrors class="mt-1 text-caption text-destructive" />
 	</Form.Field>
 
@@ -80,11 +82,13 @@
 					{...props}
 					type="email"
 					bind:value={$formData.contactEmail}
+					maxlength={TEXT_LIMITS.email}
 					placeholder="info@example.org"
 					class={inputClass}
 				/>
 			{/snippet}
 		</Form.Control>
+		<CharCount count={$formData.contactEmail.length} limit={TEXT_LIMITS.email} class="mt-1" />
 		<Form.FieldErrors class="mt-1 text-caption text-destructive" />
 	</Form.Field>
 </div>

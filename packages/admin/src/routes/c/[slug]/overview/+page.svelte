@@ -772,6 +772,7 @@
 	<div class="flex min-h-9 flex-col gap-1.5">
 		<input
 			bind:value={placeName}
+			maxlength={TEXT_LIMITS.placeName}
 			onblur={savePlace}
 			onkeydown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
 			aria-label="Place"
@@ -779,6 +780,7 @@
 			placeholder="e.g. Dundee, Scotland"
 			class="field-sizing-content min-w-40 rounded-[10px] border border-stone-300 bg-muted px-3 py-1.5 text-body font-semibold focus:border-primary focus:outline-none"
 		/>
+		<CharCount count={placeName.length} limit={TEXT_LIMITS.placeName} class="text-left" />
 		{#if placeError}
 			<p class="text-caption text-destructive">{placeError}</p>
 		{:else if placeMoves}

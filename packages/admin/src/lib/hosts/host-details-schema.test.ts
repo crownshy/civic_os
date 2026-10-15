@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { TEXT_LIMITS } from '@civicos/shared/data/text-limits';
 import { hostDetailsSchema, toExternalUrl, toWebsite } from './host-details-schema';
 
 const parse = (fields: Record<string, unknown>) =>
@@ -21,6 +22,18 @@ describe('hostDetailsSchema', () => {
 		const result = parse({ name: 'Dundee ', description: 'We run ' });
 		expect(result.success && result.data.name).toBe('Dundee ');
 		expect(result.success && result.data.description).toBe('We run ');
+	});
+
+	it('caps the website and contact email (#495)', () => {
+		const website = 'x'.repeat(TEXT_LIMITS.hostWebsite);
+		expect(parse({ website }).success).toBe(true);
+		expect(parse({ website: `${website}x` }).success).toBe(false);
+
+		const domain = '@example.org';
+		const email = `${'a'.repeat(TEXT_LIMITS.email - domain.length)}${domain}`;
+		expect(parse({ contactEmail: email }).success).toBe(true);
+		expect(parse({ contactEmail: `a${email}` }).success).toBe(false);
+		expect(parse({ contactEmail: '' }).success).toBe(true);
 	});
 });
 

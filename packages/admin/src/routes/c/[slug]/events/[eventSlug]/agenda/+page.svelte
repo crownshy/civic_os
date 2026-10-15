@@ -1,10 +1,13 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import { Button } from '@civicos/shared/ui/button';
 	import { invalidate } from '$lib/activity.svelte';
 	import { GripVertical, Pencil, Plus, Trash2, Users } from '@lucide/svelte';
 	import { dndzone, type DndEvent } from 'svelte-dnd-action';
 	import type { EventAgendaItem } from '@crownshy/api-client/api';
 	import { flip } from 'svelte/animate';
+	import CharCount from '$lib/components/CharCount.svelte';
+	import { TEXT_LIMITS } from '@civicos/shared/data/text-limits';
 
 	let { data } = $props();
 
@@ -110,19 +113,11 @@
 		});
 	}
 
-	let items = $state<Row[]>([]);
+	// A one-time working copy, as on the event page: the layout remounts this
+	// page per event, and re-reading `event` would reset it after every save.
+	let items = $state<Row[]>(untrack(() => fromAgenda(event?.agenda)));
 	let saving = $state(false);
 	let error = $state<string | null>(null);
-	let loaded = false;
-
-	$effect(() => {
-		if (loaded) return;
-		const next = fromAgenda(event?.agenda);
-		if (next.length || event) {
-			items = next;
-			loaded = true;
-		}
-	});
 
 	async function persist(next: Row[]) {
 		if (!event) return;
@@ -185,6 +180,10 @@
 		next[i] = { ...next[i], ...patch } as Row;
 		persist(next);
 	}
+
+	// The one-line fields show their count only while being typed into, so a
+	// list of rows does not carry a counter under every title.
+	let focusedLine = $state<string | null>(null);
 
 	const FLIP_MS = 200;
 
@@ -271,8 +270,13 @@
 							<label class="group/title relative flex flex-1 items-center">
 								<input
 									type="text"
-									value={item.prompt}
-									onblur={(e) => commitEdit(i, { prompt: e.currentTarget.value } as Partial<Row>)}
+									bind:value={item.prompt}
+									maxlength={TEXT_LIMITS.agendaPrompt}
+									onfocus={() => (focusedLine = item.id)}
+									onblur={() => {
+										focusedLine = null;
+										commitEdit(i, { prompt: item.prompt });
+									}}
 									placeholder="Breakout prompt"
 									class="w-full rounded-md border border-foreground/0 bg-transparent px-1.5 py-1 pr-6 text-caption font-bold transition-colors outline-none hover:border-foreground/15 focus:border-foreground/20"
 								/>
@@ -284,8 +288,13 @@
 							<label class="group/title relative flex flex-1 items-center">
 								<input
 									type="text"
-									value={item.title}
-									onblur={(e) => commitEdit(i, { title: e.currentTarget.value } as Partial<Row>)}
+									bind:value={item.title}
+									maxlength={TEXT_LIMITS.agendaTitle}
+									onfocus={() => (focusedLine = item.id)}
+									onblur={() => {
+										focusedLine = null;
+										commitEdit(i, { title: item.title });
+									}}
 									class="w-full rounded-md border border-foreground/0 bg-transparent px-1.5 py-1 pr-6 text-caption font-bold transition-colors outline-none hover:border-foreground/15 focus:border-foreground/20"
 								/>
 								<Pencil
@@ -315,17 +324,25 @@
 							<Trash2 class="size-4" />
 						</button>
 					</div>
+					{#if focusedLine === item.id}
+						{#if item.kind === 'breakout'}
+							<CharCount count={item.prompt.length} limit={TEXT_LIMITS.agendaPrompt} class="mt-1" />
+						{:else}
+							<CharCount count={item.title.length} limit={TEXT_LIMITS.agendaTitle} class="mt-1" />
+						{/if}
+					{/if}
 
 					{#if item.kind === 'breakout'}
 						<div class="mt-2.5 ml-6 space-y-2">
 							<textarea
-								value={item.instructions}
-								onblur={(e) =>
-									commitEdit(i, { instructions: e.currentTarget.value } as Partial<Row>)}
+								bind:value={item.instructions}
+								maxlength={TEXT_LIMITS.agendaInstructions}
+								onblur={() => commitEdit(i, { instructions: item.instructions })}
 								placeholder="Instructions for participants"
 								rows="2"
 								class="w-full rounded-lg border border-foreground/15 bg-foreground/5 px-2 py-1.5 text-caption outline-none"
 							></textarea>
+							<CharCount count={item.instructions.length} limit={TEXT_LIMITS.agendaInstructions} />
 							<div class="flex items-center gap-4 text-caption text-muted-foreground">
 								<label class="flex items-center gap-1.5">
 									<span>time limit</span>
@@ -339,7 +356,7 @@
 												time_limit: v === '' ? null : Number(v) || 0
 											} as Partial<Row>);
 										}}
-										placeholder="—"
+										placeholder="-"
 										class="w-14 rounded-md border border-foreground/20 bg-foreground/10 px-2 py-1 text-right outline-none"
 									/>
 									<span>min</span>
@@ -356,7 +373,7 @@
 												max_per_room: v === '' ? null : Number(v) || 0
 											} as Partial<Row>);
 										}}
-										placeholder="—"
+										placeholder="-"
 										class="w-14 rounded-md border border-foreground/20 bg-foreground/10 px-2 py-1 text-right outline-none"
 									/>
 								</label>

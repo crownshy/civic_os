@@ -3,6 +3,8 @@
 	import * as Dialog from '@civicos/shared/ui/dialog';
 	import { Button } from '@civicos/shared/ui/button';
 	import SetupField from './SetupField.svelte';
+	import CharCount from '$lib/components/CharCount.svelte';
+	import { TEXT_LIMITS, tooLong } from '@civicos/shared/data/text-limits';
 	import { faqAnswerToHtml, faqAnswerToText, type FaqEntry } from '@civicos/shared/data/faq';
 
 	interface Props {
@@ -47,6 +49,9 @@
 		const asked = question.trim();
 		if (!asked) return 'Give the question a name.';
 		if (!answer.trim()) return 'Write an answer.';
+		// `maxlength` stops typing at the cap, but an entry saved before it can be longer.
+		if (asked.length > TEXT_LIMITS.faqQuestion) return `Question: ${tooLong('faqQuestion')}`;
+		if (answer.trim().length > TEXT_LIMITS.faqAnswer) return `Answer: ${tooLong('faqAnswer')}`;
 
 		const clash = existing.some(
 			(e, i) => i !== editingIndex && e.question.trim().toLowerCase() === asked.toLowerCase()
@@ -100,15 +105,18 @@
 				<SetupField label="Question">
 					<input
 						bind:value={question}
+						maxlength={TEXT_LIMITS.faqQuestion}
 						{@attach takeFocus}
 						placeholder="e.g. Are my responses anonymous?"
 						class="w-full rounded-[10px] border border-input bg-background px-4 py-4 text-body-lg font-semibold focus:ring-2 focus:ring-ring focus:outline-none"
 					/>
+					<CharCount count={question.length} limit={TEXT_LIMITS.faqQuestion} />
 				</SetupField>
 
 				<SetupField label="Answer">
 					<textarea
 						bind:value={answer}
+						maxlength={TEXT_LIMITS.faqAnswer}
 						rows="6"
 						placeholder="Keep it short. A blank line starts a new paragraph."
 						onkeydown={(e) => {
@@ -117,6 +125,7 @@
 						}}
 						class="w-full resize-y rounded-[10px] border border-input bg-background px-4 py-3 text-body font-medium focus:ring-2 focus:ring-ring focus:outline-none"
 					></textarea>
+					<CharCount count={answer.length} limit={TEXT_LIMITS.faqAnswer} />
 					<p class="mt-1.5 text-caption text-foreground/60">
 						Plain text. Links are not supported here yet, so spell out any web address.
 					</p>

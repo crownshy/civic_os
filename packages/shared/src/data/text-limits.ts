@@ -21,7 +21,24 @@ export const TEXT_LIMITS = {
 	demographicOption: 60,
 	demographicOptionCount: 12,
 	eventName: 120,
-	eventDescription: 2000
+	eventDescription: 2000,
+	/** Venue name, address lines, city and state of an in-person event. */
+	eventAddressLine: 120,
+	eventPostalCode: 20,
+	/** ISO 3166 code, two or three letters. */
+	eventCountryCode: 3,
+	/** Long enough for a meeting link with its passcode in the query string. */
+	eventLink: 2000,
+	agendaTitle: 120,
+	agendaPrompt: 240,
+	agendaInstructions: 1000,
+	faqQuestion: 240,
+	faqAnswer: 2000,
+	placeName: 80,
+	hostWebsite: 200,
+	/** The longest address SMTP allows (RFC 5321). */
+	email: 254,
+	participantName: 100
 } as const;
 
 export function tooLong(field: keyof typeof TEXT_LIMITS): string {

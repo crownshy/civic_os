@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { TEXT_LIMITS, tooLong } from '@civicos/shared/data/text-limits';
 import { limitedText, requiredText } from '$lib/validation/text-fields';
 
 /**
@@ -17,8 +18,13 @@ export const hostDetailsSchema = z.object({
 	// Optional: a Host can be created first and describe itself later (#475).
 	description: limitedText('hostDescription').default(''),
 	// Bare website (no protocol); see `toExternalUrl`.
-	website: z.string().default(''),
-	contactEmail: z.union([z.literal(''), z.email('Enter a valid contact email')]).default(''),
+	website: limitedText('hostWebsite').default(''),
+	contactEmail: z
+		.union([
+			z.literal(''),
+			z.email('Enter a valid contact email').max(TEXT_LIMITS.email, tooLong('email'))
+		])
+		.default(''),
 	orgType: z.enum(['non_profit', 'governmental', 'other']).default('other'),
 	regionIds: z.array(z.string().uuid()).default([])
 });

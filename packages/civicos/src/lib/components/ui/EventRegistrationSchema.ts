@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { TEXT_LIMITS, tooLong } from '@civicos/shared/data/text-limits';
 
 /**
  * What someone signing up for an event is asked for.
@@ -10,8 +11,12 @@ import { z } from 'zod';
  * invent at the door.
  */
 const eventRegistrationSchema = z.object({
-	email: z.email('Please enter a valid email'),
-	name: z.string().trim().min(2, { message: 'Please enter your name' })
+	email: z.email('Please enter a valid email').max(TEXT_LIMITS.email, tooLong('email')),
+	name: z
+		.string()
+		.trim()
+		.min(2, { message: 'Please enter your name' })
+		.max(TEXT_LIMITS.participantName, tooLong('participantName'))
 });
 
 export type EventRegistrationSchema = z.infer<typeof eventRegistrationSchema>;
