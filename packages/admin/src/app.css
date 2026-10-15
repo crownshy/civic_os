@@ -195,6 +195,33 @@ label,
 	touch-action: manipulation;
 }
 
+/* The browser's `cursor: auto` turns into a text I-beam over any selectable
+   text, so headings, table headers and labels read as editable, most visibly
+   while a page loads and there is nothing to click (#490). Admin is an app, not
+   a document: static text keeps the arrow and only real text entry shows the
+   I-beam. Text is still selectable. In `base` so cursor utilities still win. */
+@layer base {
+	body {
+		cursor: default;
+	}
+
+	input:not(
+		[type='button'],
+		[type='checkbox'],
+		[type='color'],
+		[type='file'],
+		[type='image'],
+		[type='radio'],
+		[type='range'],
+		[type='reset'],
+		[type='submit']
+	),
+	textarea,
+	[contenteditable]:not([contenteditable='false']) {
+		cursor: text;
+	}
+}
+
 /* Card shadow matching wireframe spec */
 .shadow-card {
 	box-shadow: 0px 5px 15px 0px rgba(12, 34, 95, 0.13);
