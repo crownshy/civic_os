@@ -1,7 +1,7 @@
 <script lang="ts">
 	import CharCount from '$lib/components/CharCount.svelte';
 	import { TEXT_LIMITS } from '@civicos/shared/data/text-limits';
-	import { untrack } from 'svelte';
+	import { tick, untrack } from 'svelte';
 	import { superForm } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import * as Form from '@civicos/shared/ui/form';
@@ -19,12 +19,23 @@
 
 	// Seeded once from the initial load data; untrack makes that intentional
 	// one-time read explicit (same pattern as Create Host and Setup).
+	let errorBanner = $state<HTMLElement>();
+
 	const form = superForm(
 		untrack(() => data.form),
 		{
 			dataType: 'json',
 			validators: zod4Client(createConversationSchema),
-			resetForm: false
+			resetForm: false,
+			// superforms scrolls to a field error itself, but a failure with no field
+			// to point at only shows the banner at the top, out of sight once the
+			// Host has scrolled down to the Create button.
+			async onUpdated({ form }) {
+				const failed = (form.message as CreateConversationMessage | undefined)?.kind === 'error';
+				if (!failed || Object.keys(form.errors).length > 0) return;
+				await tick();
+				errorBanner?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			}
 		}
 	);
 	const { form: formData, enhance, submitting, message } = form;
@@ -116,7 +127,9 @@
 		{:else}
 			{#if msg?.kind === 'error'}
 				<div
-					class="mb-6 flex items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-body text-destructive"
+					bind:this={errorBanner}
+					role="alert"
+					class="mb-6 flex scroll-mt-6 items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-body text-destructive"
 				>
 					<AlertCircle class="size-4 shrink-0" />
 					<span>{msg.text}</span>

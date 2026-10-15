@@ -74,9 +74,14 @@
 			: null
 	);
 
-	// Close drawer when route changes
+	let conversationList = $state<HTMLElement>();
+
+	// Close drawer when route changes. The list puts live Campaigns first, so a
+	// freshly created draft sits far below the fold; scroll the current one into
+	// view so it does not look like it was never created.
 	afterNavigate(() => {
 		mobileOpen = false;
+		conversationList?.querySelector('[aria-current="page"]')?.scrollIntoView({ block: 'nearest' });
 	});
 </script>
 
@@ -206,12 +211,14 @@
 			{/if}
 
 			<div
+				bind:this={conversationList}
 				class="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto border-b border-border pb-2.5"
 			>
 				{#each conversations as conversation (conversation.id)}
 					<a
 						href={resolve('/c/[slug]/overview', { slug: conversation.slug })}
 						title={conversation.title}
+						aria-current={currentSlug === conversation.slug ? 'page' : undefined}
 						class={[
 							'flex items-center gap-2 rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl px-2.5 py-2 text-caption font-medium',
 							currentSlug === conversation.slug ? 'bg-muted-foreground/20' : 'hover:bg-muted/50',
