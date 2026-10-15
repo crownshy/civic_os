@@ -23,6 +23,10 @@ vi.mock('@crownshy/api-client/client', () => ({
 			: { GetConversation, ListConverastions }
 }));
 
+// Imported once here, not inside a test: the first cold import of the layout
+// and its config modules can take longer than a test's 5s budget on CI.
+const { load } = await import('./+layout.server');
+
 /** A live, public Conversation as the directory lists it. */
 function listed(slug: string, place: { slug: string; name: string }) {
 	return {
@@ -44,8 +48,6 @@ function httpError(status: number) {
 
 /** Run the layout load for `/<slug>`, signed in to admin when `hostSession` is given. */
 async function loadSlug(slug: string, hostSession?: string) {
-	const { load } = await import('./+layout.server');
-
 	return (await load({
 		params: { campaign: slug },
 		url: new URL(`http://localhost:5173/${slug}`),

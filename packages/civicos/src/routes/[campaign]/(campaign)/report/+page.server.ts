@@ -50,7 +50,7 @@ export const load: PageServerLoad = async ({ parent, params, cookies, url, depen
 				.GetConversationWorkflowParticipationReport({
 					params: { conversation_id: conversationId, workflow_id: workflow.id }
 				})
-				.catch((e) => {
+				.catch((e: unknown) => {
 					console.warn('[Report] Demographics unavailable:', e);
 					return null;
 				})
