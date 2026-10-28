@@ -115,8 +115,8 @@ importers:
         specifier: workspace:*
         version: link:../shared
       '@crownshy/api-client':
-        specifier: ^0.0.52
-        version: 0.0.52(axios@1.18.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0))(zod@4.4.3)
+        specifier: ^0.0.65
+        version: 0.0.65(axios@1.18.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0))(zod@4.4.3)
       '@lucide/svelte':
         specifier: ^1.16.0
         version: 1.22.0(svelte@5.56.4(@typescript-eslint/types@8.62.1))
@@ -266,8 +266,8 @@ importers:
         specifier: workspace:*
         version: link:../shared
       '@crownshy/api-client':
-        specifier: ^0.0.52
-        version: 0.0.52(axios@1.18.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0))(zod@4.4.3)
+        specifier: ^0.0.65
+        version: 0.0.65(axios@1.18.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0))(zod@4.4.3)
       '@lukulent/svelte-umami':
         specifier: ^0.0.4
         version: 0.0.4(svelte@5.56.4(@typescript-eslint/types@8.62.1))
@@ -670,8 +670,8 @@ packages:
     peerDependencies:
       storybook: ^0.0.0-0 || ^10.1.0 || ^10.1.0-0 || ^10.2.0-0 || ^10.3.0-0 || ^10.4.0-0 || ^10.5.0-0 || ^10.6.0-0
 
-  '@crownshy/api-client@0.0.52':
-    resolution: {integrity: sha512-YgcFMbUINsDOMIOfnG+/5Q3qat36MDJ41yjFY28farIVrW0lwW+tm8T5AMMZToWff0triS8HEYu+jK53o7pYAw==}
+  '@crownshy/api-client@0.0.65':
+    resolution: {integrity: sha512-xtgBRoVyVan6PHtOIbxPVF4ffv5XoGB+HEOIDJDzt/sEnTBKJ2jGt1ZBsn+C2KeqWPV/wjjU3U0VrGTitVnwkg==}
 
   '@csstools/color-helpers@6.1.1':
     resolution: {integrity: sha512-gLNsunvwf3mCi5u5o46/Z/JcJMnhbHSaZ69rkgPzNM3J4s8hWwpPUQB6/tt0EDFyCiWzxANlx+2LJwpYj4zS1w==}
@@ -4083,7 +4083,7 @@ snapshots:
       - '@chromatic-com/playwright'
       - '@chromatic-com/vitest'
 
-  '@crownshy/api-client@0.0.52(axios@1.18.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0))(zod@4.4.3)':
+  '@crownshy/api-client@0.0.65(axios@1.18.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0))(zod@4.4.3)':
     dependencies:
       '@zodios/core': 10.9.6(axios@1.18.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0))(zod@4.4.3)
       typescript: 5.9.3
