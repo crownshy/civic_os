@@ -7,7 +7,7 @@
 		postSeed,
 		syncStatementAux
 	} from '$lib/api/aux';
-	import { permissionDenied } from '$lib/api/describe-failure';
+	import { polisFailure } from '$lib/api/describe-failure';
 	import { Button } from '@civicos/shared/ui/button';
 	import { Spinner } from '@civicos/shared/ui/spinner';
 	import { untrack } from 'svelte';
@@ -59,8 +59,7 @@
 			console.error('syncStatementAux failed', e);
 			notice = {
 				text:
-					permissionDenied(e, 'sync statements from Polis') ??
-					'Could not sync statements from Polis.',
+					polisFailure(e, 'sync statements from Polis') ?? 'Could not sync statements from Polis.',
 				error: true
 			};
 		} finally {

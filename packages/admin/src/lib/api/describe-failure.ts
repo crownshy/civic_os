@@ -58,3 +58,22 @@ export function permissionDenied(error: unknown, action: string): string | null 
 	if (apiStatus(error) !== 403) return null;
 	return `You do not have permission to ${action}. Ask the Campaign owner to give you a role on this Campaign.`;
 }
+
+/**
+ * The sentence to show when a Polis call (sync, seeding) failed for a reason the Host can
+ * act on, or null to keep the caller's generic line. A 403 and a 422 otherwise read the
+ * same, and they need different people to fix them (#497).
+ *
+ * The 422 carries Comhairle's `err` text, unlike `describeApiFailure`: it names the
+ * misconfigured step ("Workflow Step has wrong type expected Polis"), and this is an
+ * admin-only surface.
+ */
+export function polisFailure(error: unknown, action: string): string | null {
+	const denied = permissionDenied(error, action);
+	if (denied) return denied;
+	if (apiStatus(error) !== 422) return null;
+
+	const detail = (error as { response?: { data?: { err?: unknown } } })?.response?.data?.err;
+	const suffix = typeof detail === 'string' && detail ? ` Comhairle said: "${detail}".` : '';
+	return `This conversation's Polis step is not set up correctly.${suffix}`;
+}
