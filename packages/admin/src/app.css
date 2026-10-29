@@ -120,6 +120,27 @@
 	--color-theme-bar: #16a34a; /* themes count bar       (green-600)  */
 }
 
+/* Place levels in the place selector: row tints, chips, and map fills. A state,
+   county and city each keep one hue everywhere so the list and the map agree.
+   Data channels like the meter palette, not brand colours. */
+@theme {
+	--color-place-state: #3846bf;
+	--color-place-state-tint: #e2e5fa;
+	--color-place-county: #0c765d;
+	--color-place-county-tint: #d3eee6;
+	--color-place-city: #b35208;
+	--color-place-city-tint: #fce5cf;
+}
+
+.dark {
+	--color-place-state: #a3adff;
+	--color-place-state-tint: #2b3160;
+	--color-place-county: #62d3b4;
+	--color-place-county-tint: #173e35;
+	--color-place-city: #f6a75f;
+	--color-place-city-tint: #4a321c;
+}
+
 /* Admin accent roles. The admin surface is neutral (see :root below), so the
    accent palette carries all the meaning. Three distinct roles — the whole
    admin UI reads from exactly these, so keep them straight when asked:
