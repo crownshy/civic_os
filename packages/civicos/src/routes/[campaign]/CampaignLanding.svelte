@@ -12,8 +12,7 @@
 	import { session } from '$lib/services/session.svelte';
 	import type { ParticipantSession } from '$lib/services/participant';
 	import { getRegionByZipcode } from '$lib/config/regions';
-	import type { RegionConfig } from '$lib/config/regions';
-	import { placeNameFor, type Campaign } from '$lib/config/campaign';
+	import type { Campaign } from '$lib/config/campaign';
 	import {
 		HERO_BLURB,
 		OPEN_POLL_EXPLAINER,
@@ -32,13 +31,12 @@
 	// Derived, not captured: a client-side move to another Campaign, or an
 	// `invalidate('civicos:conversation')` after a Host edit, keeps this component
 	// and only swaps `page.data` under it.
-	const region: RegionConfig = $derived(page.data.region);
 	const campaign: Campaign = $derived(page.data.campaign);
 	const hostCopy = $derived(page.data.hostCopy);
-	const placeName = $derived(placeNameFor(campaign, region));
+	const placeName = $derived(campaign.placeName);
 	// The same Key Question the poll resolves, so the skeleton shown here and
 	// the voting screen it becomes label the statement identically.
-	const question = $derived(campaign?.poll?.question || region.question);
+	const question = $derived(campaign.poll?.question ?? '');
 	const pollPath = $derived(resolve('/[campaign]/(campaign)/poll', { campaign: campaign.slug }));
 	const reportPath = $derived(
 		resolve('/[campaign]/(campaign)/report', { campaign: campaign.slug })
@@ -162,10 +160,10 @@
 		// Campaign, which is Utah, Oregon and the catch-all. For a Campaign
 		// published to a Place, the URL already names which Campaign this is, so
 		// routing by zip would drop its participants on a different one.
-		if (campaign.isLegacyRegion && zipRegion.slug !== region.slug) {
+		if (campaign.isLegacyRegion && zipRegion.conversationId !== campaign.id) {
 			trackEvent('UnsupportedZipCode', {
 				zipCode,
-				regionSlug: region.slug,
+				regionSlug: campaign.slug,
 				zipRegion: zipRegion.slug
 			});
 			// A full load on this host rather than `goto`: the zip is read back in

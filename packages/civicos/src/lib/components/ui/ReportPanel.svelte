@@ -2,7 +2,6 @@
 	import { fly, fade } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import { X } from 'lucide-svelte';
-	import type { RegionConfig } from '$lib/config/regions';
 
 	// TODO: Swap REPORT_FORM_ID for the real HeyForm form ID once the report form is built.
 	const REPORT_FORM_ID = 'SogNEF5B';
@@ -11,10 +10,10 @@
 		open: boolean;
 		statementId: number | string;
 		statementText: string;
-		region: RegionConfig;
+		campaignSlug: string;
 	}
 
-	let { open = $bindable(false), statementId, statementText, region }: Props = $props();
+	let { open = $bindable(false), statementId, statementText, campaignSlug }: Props = $props();
 
 	let iframeLoaded = $state(false);
 
@@ -24,7 +23,7 @@
 		`https://forms.bloomproject.us/form/${REPORT_FORM_ID}` +
 			`?statement_id=${encodeURIComponent(String(statementId))}` +
 			`&statement_text=${encodeURIComponent(statementText)}` +
-			`&region=${encodeURIComponent(region.slug)}` +
+			`&region=${encodeURIComponent(campaignSlug)}` +
 			`&hideAfterSubmit=true&autoClose=1`
 	);
 

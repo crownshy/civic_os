@@ -3,8 +3,6 @@ import { GENERIC_REGION, REGIONS } from '@civicos/shared/data/regions';
 import {
 	campaignCandidates,
 	legacyRegionForSlug,
-	placeNameFor,
-	pollFor,
 	regionForCampaign,
 	resolveCampaign
 } from './campaign';
@@ -84,6 +82,7 @@ describe('resolveCampaign', () => {
 			title: 'AI and the Future of Dundee',
 			shortDescription: 'What should Dundee ask of AI?',
 			place: { slug: 'dundee', name: 'Dundee, Scotland' },
+			placeName: 'Dundee, Scotland',
 			poll: null,
 			org: { slug: toPlaceSlug(oregon.hostName), name: oregon.hostName },
 			// Not Oregon's partners: the region only supplies its defaults here, it
@@ -100,9 +99,14 @@ describe('resolveCampaign', () => {
 			slug: oregon.slug,
 			title: oregon.heroHeader,
 			shortDescription: '',
-			poll: null,
+			poll: {
+				polisId: oregon.polisId,
+				question: oregon.question,
+				workflowStepId: oregon.polis_workflow_step_id
+			},
 			org: { slug: toPlaceSlug(oregon.hostName), name: oregon.hostName },
 			place: { slug: oregon.slug, name: oregon.stateName },
+			placeName: oregon.stateName,
 			cohosts: oregon.partners.map((p) => ({ name: p.name, url: p.url })),
 			source: 'region',
 			isLegacyRegion: true
@@ -172,30 +176,6 @@ describe('resolveCampaign', () => {
 	});
 });
 
-describe('resolveCampaign poll identity', () => {
-	it('takes the mirrored poll off the conversation', () => {
-		const withPoll = {
-			...stored,
-			metadata: {
-				place: { slug: 'dundee', name: 'Dundee, Scotland' },
-				poll: { polisId: '2y2akzkmbb', question: 'How can Dundee…' }
-			}
-		};
-
-		expect(resolveCampaign(withPoll, oregon).poll).toEqual({
-			polisId: '2y2akzkmbb',
-			question: 'How can Dundee…'
-		});
-	});
-
-	it('is null when the Campaign has not been published, so the caller falls back', () => {
-		// Null here is what sends `contribute` back to `regions.ts`, which is the
-		// only other place a polis id exists: the Polis step is 401 anonymously.
-		expect(resolveCampaign(stored, oregon).poll).toBeNull();
-		expect(resolveCampaign(null, oregon).poll).toBeNull();
-	});
-});
-
 describe('resolveCampaign org', () => {
 	it('prefers the Host mirrored onto the conversation', () => {
 		const withOrg = {
@@ -214,32 +194,25 @@ describe('resolveCampaign org', () => {
 	});
 });
 
-describe('placeNameFor', () => {
+describe('resolveCampaign placeName', () => {
 	it("labels the chrome with the Campaign's Place", () => {
-		expect(placeNameFor(resolveCampaign(stored, oregon), oregon)).toBe('Dundee, Scotland');
+		expect(resolveCampaign(stored, oregon).placeName).toBe('Dundee, Scotland');
 	});
 
 	it('falls back to the region for a Campaign with no Place', () => {
 		const unpublished = { ...stored, metadata: {} };
 
-		expect(placeNameFor(resolveCampaign(unpublished, GENERIC_REGION), oregon)).toBe(
-			oregon.stateName
-		);
+		expect(resolveCampaign(unpublished, GENERIC_REGION).placeName).toBe(GENERIC_REGION.stateName);
 	});
 
 	it('keeps a legacy region rendering its own name', () => {
 		// Utah and Oregon predate Places, so theirs is derived from the region
 		// entry rather than stored. The chrome must not change for them.
-		expect(placeNameFor(resolveCampaign(null, oregon), oregon)).toBe(oregon.stateName);
-	});
-
-	it('never answers a hardcoded state for a Campaign it cannot place', () => {
-		expect(placeNameFor(null, GENERIC_REGION)).toBe(GENERIC_REGION.stateName);
-		expect(placeNameFor(undefined, GENERIC_REGION)).not.toBe('Utah');
+		expect(resolveCampaign(null, oregon).placeName).toBe(oregon.stateName);
 	});
 });
 
-describe('pollFor', () => {
+describe('resolveCampaign poll', () => {
 	const mirrored = {
 		...stored,
 		metadata: {
@@ -248,9 +221,7 @@ describe('pollFor', () => {
 	};
 
 	it('takes the poll admin mirrored into the metadata', () => {
-		const campaign = resolveCampaign(mirrored, GENERIC_REGION);
-
-		expect(pollFor(campaign, GENERIC_REGION)).toEqual({
+		expect(resolveCampaign(mirrored, GENERIC_REGION).poll).toEqual({
 			polisId: '2y2akzkmbb',
 			question: 'Key question?',
 			workflowStepId: 'step-1'
@@ -262,15 +233,11 @@ describe('pollFor', () => {
 		// naming its poll. This used to fall through to the participant's zip code
 		// and then to PUBLIC_POLIS_ID, which could only open a different
 		// Campaign's poll (#422, #421). `/poll` answers 503 on this.
-		const campaign = resolveCampaign({ ...stored, metadata: {} }, GENERIC_REGION);
-
-		expect(pollFor(campaign, GENERIC_REGION)).toBeNull();
+		expect(resolveCampaign({ ...stored, metadata: {} }, GENERIC_REGION).poll).toBeNull();
 	});
 
 	it('falls back to the region only where the region IS the Campaign', () => {
-		const legacy = resolveCampaign(null, oregon);
-
-		expect(pollFor(legacy, oregon)).toEqual({
+		expect(resolveCampaign(null, oregon).poll).toEqual({
 			polisId: oregon.polisId,
 			question: oregon.question,
 			workflowStepId: oregon.polis_workflow_step_id
@@ -284,6 +251,17 @@ describe('pollFor', () => {
 			oregon
 		);
 
-		expect(pollFor(campaign, oregon)?.polisId).toBe('stored-id');
+		expect(campaign.poll?.polisId).toBe('stored-id');
+	});
+
+	it("keeps a legacy region's workflow step when the mirror has none", () => {
+		// The report reads the step from here. Before the poll was resolved in one
+		// place it fell back to the region's step on its own.
+		const campaign = resolveCampaign(
+			{ id: oregon.conversationId, title: 'Oregon', metadata: { poll: { polisId: 'stored-id' } } },
+			oregon
+		);
+
+		expect(campaign.poll?.workflowStepId).toBe(oregon.polis_workflow_step_id);
 	});
 });

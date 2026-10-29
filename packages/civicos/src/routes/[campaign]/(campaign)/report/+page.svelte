@@ -10,14 +10,12 @@
 	import NextStepsSection from './NextStepsSection.svelte';
 	import EmailSignupSection from './EmailSignupSection.svelte';
 	import FloatingNavPill from './FloatingNavPill.svelte';
-	import type { RegionConfig } from '$lib/config/regions';
-	import { placeNameFor, type Campaign } from '$lib/config/campaign';
+	import type { Campaign } from '$lib/config/campaign';
 	import type { WikiPollReport } from '$lib/types/report';
 
 	const report: WikiPollReport | null = $derived(page.data.report);
 	const demographics = $derived(page.data.demographics ?? null);
 	const error: string | null = $derived(page.data.error ?? null);
-	const region: RegionConfig = page.data.region;
 	const campaign: Campaign | undefined = page.data.campaign;
 
 	const participantCount = $derived(report?.groups?.reduce((a, b) => a + b.total_members, 0) ?? 0);
@@ -40,7 +38,7 @@
 
 	const heroTitle = 'AI and the Future of Our Communities';
 	// The Campaign's Place, region behind it (#423).
-	const heroRegion = placeNameFor(campaign, region).toUpperCase();
+	const heroRegion = (campaign?.placeName ?? '').toUpperCase();
 	const heroPhase = 'PHASE 1: IDEAS REPORT';
 	const heroDescription =
 		'This is what this poll is about. Write a few sentence to describe what this topic is about, why is it important. Maybe in a very high-level, summarise how it went.';

@@ -90,7 +90,7 @@ A `+page.svelte` should mostly wire these together and branch between screens.
     // src/routes/+layout.ts
     import { createApiClient } from '@civicos/shared/api';
     const api = createApiClient(url.origin + '/api', undefined, browser ? 'client' : 'server');
-    return { api, region: data.region };
+    return { api };
     ```
 
     Import it from `@civicos/shared/api`, not `@crownshy/api-client/client`: the shared
@@ -104,8 +104,8 @@ A `+page.svelte` should mostly wire these together and branch between screens.
     ```ts
     // src/routes/conversations/+page.ts
     export const load: PageLoad = async ({ parent }) => {
-    	const { region, api } = await parent();
-    	const events = await api.ListEvents({ params: { conversation_id: region.conversationId } });
+    	const { campaign, api } = await parent();
+    	const events = await api.ListEvents({ params: { conversation_id: campaign.id } });
     	return { events: events?.records ?? [] };
     };
     ```

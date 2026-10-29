@@ -7,7 +7,6 @@ export const load: LayoutLoad = async ({ url, data }) => {
 
 	return {
 		api,
-		region: data.region,
 		participant: data.participant,
 		participantResolved: data.participantResolved
 	};

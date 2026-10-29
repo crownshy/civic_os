@@ -17,6 +17,7 @@
 	name="Default"
 	args={{
 		placeName: 'UTAH COUNTY',
+		campaignSlug: 'utah',
 		question: REGIONS.utah.question,
 		statementText: 'Social media companies should be held more accountable when they harm someone.',
 		remaining: 7,
@@ -34,6 +35,7 @@
 	name="Short Statement"
 	args={{
 		placeName: 'UTAH COUNTY',
+		campaignSlug: 'utah',
 		question: REGIONS.utah.question,
 		statementText: 'This is a fairly short opinion.',
 		remaining: 10,
@@ -52,6 +54,7 @@
 	name="At the Limits"
 	args={{
 		placeName: 'UTAH COUNTY',
+		campaignSlug: 'utah',
 		question:
 			'How should our county decide when local government, schools, hospitals and police are allowed to use artificial intelligence, who gets a say in those decisions, and what should happen when an AI system gets something wrong about a resident?',
 		statementText:

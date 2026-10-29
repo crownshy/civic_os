@@ -7,7 +7,6 @@
 	import EventCalendarInviteButton from '$lib/components/ui/EventCalendarInviteButton.svelte';
 	import EventRegistrationModal from '$lib/components/ui/EventRegistrationModal.svelte';
 	import { formatDurationLabel } from '$lib/config/regions';
-	import { placeNameFor } from '$lib/config/campaign';
 	import { formatTimeDuration } from '$lib/utils/dates.js';
 	import { addHours, isBefore, format } from 'date-fns';
 	import { onMount, onDestroy } from 'svelte';
@@ -19,7 +18,7 @@
 
 	// Where this Campaign runs, from the Campaign rather than from the region the
 	// subdomain matched (#423).
-	const placeName = $derived(placeNameFor(data.campaign, page.data.region));
+	const placeName = $derived(data.campaign.placeName);
 	// Who hosts it, from the Campaign's own `metadata.org`. This used to be
 	// `regions.ts`'s hostName and hostUrl, which credited The Bloom Project on
 	// every Campaign created in admin.

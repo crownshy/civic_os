@@ -1,6 +1,6 @@
 import { campaignPath } from '@civicos/shared/data/place';
 import { error, redirect } from '@sveltejs/kit';
-import { pollFor, type Campaign } from '$lib/config/campaign';
+import type { Campaign } from '$lib/config/campaign';
 import {
 	aboutYouQuestionsFor,
 	aboutYouQuestionsFromBackend,
@@ -62,7 +62,6 @@ export const load: PageLoad = async ({ params, parent, depends }) => {
 		participant,
 		participantResolved,
 		campaign,
-		region,
 		api,
 		participation,
 		pollStatus,
@@ -94,7 +93,7 @@ export const load: PageLoad = async ({ params, parent, depends }) => {
 	// The cause is always on the admin side: the Polis step is 401 anonymously,
 	// so `metadata.poll` is the only copy, and creation writes it but only logs
 	// a failure. Admin's header says so on the Campaign and offers the repair.
-	if (!pollFor(campaign, region)) {
+	if (!campaign.poll) {
 		console.warn(`[Poll] "${params.campaign}" has no poll to serve`);
 		error(503, {
 			message: 'This conversation is not open for voting yet. Please try again shortly.'

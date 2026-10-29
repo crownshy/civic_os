@@ -5,7 +5,6 @@
 	import { InfoBar, ConversationEventCard, Button, AlertBanner } from '$lib/components/ui';
 	import { Input } from '@civicos/shared/ui/input';
 	import { session } from '$lib/services/session.svelte';
-	import { placeNameFor } from '$lib/config/campaign';
 	import { fly, fade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
 	import { cubicOut, backOut } from 'svelte/easing';
@@ -25,7 +24,7 @@
 
 	// Where this Campaign runs, from the Campaign rather than from the region the
 	// subdomain matched (#423).
-	const placeName = $derived(placeNameFor(data.campaign, data.region));
+	const placeName = $derived(data.campaign.placeName);
 
 	type Filter = 'all' | 'online' | 'in_person';
 	let activeFilter: Filter = $state('all');

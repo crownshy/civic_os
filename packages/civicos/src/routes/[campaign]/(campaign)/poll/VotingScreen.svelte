@@ -2,7 +2,6 @@
 	import { fly, slide } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import { InfoBar, VoteBar, ReportPanel, AlertBanner } from '$lib/components/ui';
-	import type { RegionConfig } from '$lib/config/regions';
 	import StatementPlaceholder from './StatementPlaceholder.svelte';
 
 	interface Props {
@@ -27,7 +26,8 @@
 		onCompose: () => void;
 		/** False when the Host turned off "Add a Statement". */
 		showCompose?: boolean;
-		region: RegionConfig;
+		/** Tags a reported statement with the Campaign it was reported from. */
+		campaignSlug: string;
 	}
 
 	let {
@@ -44,7 +44,7 @@
 		onEnd,
 		onCompose,
 		showCompose = true,
-		region
+		campaignSlug
 	}: Props = $props();
 
 	let reportOpen = $state(false);
@@ -144,5 +144,5 @@
 		{showCompose}
 	/>
 
-	<ReportPanel bind:open={reportOpen} {statementId} {statementText} {region} />
+	<ReportPanel bind:open={reportOpen} {statementId} {statementText} {campaignSlug} />
 </div>
