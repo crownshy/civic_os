@@ -5,6 +5,7 @@
 	import { InfoBar, ConversationEventCard, Button, AlertBanner } from '$lib/components/ui';
 	import { Input } from '@civicos/shared/ui/input';
 	import { session } from '$lib/services/session.svelte';
+	import { signUpForUpdates } from '$lib/services/join';
 	import { fly, fade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
 	import { cubicOut, backOut } from 'svelte/easing';
@@ -51,7 +52,7 @@
 		const trimmed = email.trim();
 		if (!trimmed) return;
 		submitting = true;
-		signUpFailed = !(await session.registerEmail(trimmed, campaign.id));
+		signUpFailed = !(await signUpForUpdates(data.joinContext, trimmed));
 		submitting = false;
 	}
 </script>

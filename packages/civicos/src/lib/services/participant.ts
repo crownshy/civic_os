@@ -34,6 +34,50 @@ export interface ParticipantResolution {
 	resolved: boolean;
 }
 
+/** Who a page is talking to: the server's answer, or the cache where it has none. */
+export interface KnownParticipant {
+	/** Null for nobody, which is not the same as a backend that could not say. */
+	userId: string | null;
+	zipCode: string;
+	/** Joined with a zip before, so the landing page offers CONTINUE. */
+	isReturning: boolean;
+}
+
+/** What this browser's cache remembers about the participant. */
+export interface CachedParticipant {
+	userId: string | null;
+	zipCode: string;
+}
+
+/**
+ * Settle the server's answer against this browser's cache, once, so pages do
+ * not each decide which one wins.
+ *
+ * The cache stands in only where the server has no answer to disagree with:
+ * the gate on the poll reads the server and nothing else, and anything the
+ * landing page let through that the gate turns away is a silent redirect back.
+ * The zip is the exception. Comhairle cannot keep it yet (see `join.ts`), so a
+ * participant the server knows still borrows the cached zip to fill the field.
+ */
+export function knownParticipant(
+	{ participant, resolved }: ParticipantResolution,
+	cached: CachedParticipant
+): KnownParticipant {
+	if (!resolved) {
+		return {
+			userId: cached.userId,
+			zipCode: cached.zipCode,
+			isReturning: cached.userId !== null && !!cached.zipCode
+		};
+	}
+	if (!participant) return { userId: null, zipCode: '', isReturning: false };
+	return {
+		userId: participant.userId,
+		zipCode: participant.zipCode || cached.zipCode,
+		isReturning: !!participant.zipCode
+	};
+}
+
 type ParticipantApi = Pick<ApiClient, 'CurrentUser' | 'GetDemographicsResponses'>;
 
 const ZIPCODE_SLUG = 'zipcode';

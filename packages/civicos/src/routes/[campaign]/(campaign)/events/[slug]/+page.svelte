@@ -33,16 +33,7 @@
 	let interval: ReturnType<typeof setInterval> | null = null;
 	let showForm = $state(false);
 
-	/**
-	 * Whether this participant is on the event's attendance list.
-	 *
-	 * The server load is the answer (#420). The cached flag stands in only when
-	 * it could not resolve one, so a participant whose registration the backend
-	 * cannot confirm is not shown the signup form again.
-	 */
-	let isRegistered = $derived(
-		data.registrationResolved ? data.isRegistered : session.isRegisteredForEvent(event.id)
-	);
+	const isRegistered = $derived(data.isRegistered);
 	let activeSection = $state<'details' | 'description'>('details');
 	let scrollContainer = $state<HTMLElement | undefined>(undefined);
 

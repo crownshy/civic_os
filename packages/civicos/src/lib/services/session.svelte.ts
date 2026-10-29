@@ -1,4 +1,3 @@
-import type { ApiClient } from '@crownshy/api-client/api';
 import type { ParticipantSession } from './participant';
 import {
 	clearCampaigns,
@@ -7,7 +6,6 @@ import {
 	saveAccount,
 	saveCampaign
 } from './session-storage';
-import { httpStatusOf } from '$lib/utils/http';
 
 export interface User {
 	id: string;
@@ -26,6 +24,10 @@ export interface User {
  * and the CTA flags belong to one poll and are read back per Conversation, so
  * a Place serving a second Campaign cannot resume against the first one's
  * votes. See `session-storage.ts`.
+ *
+ * Storage only: nothing here calls comhairle. Joining and signing up for
+ * updates are in `join.ts`, About You answers in `profile.ts`, and which
+ * participant a page is talking to is resolved in the `[campaign]` layout load.
  */
 class Session {
 	user = $state<User | null>(null);
@@ -39,8 +41,6 @@ class Session {
 	totalVotes = $state(0);
 	hasSeenPause = $state(false);
 	hasSeenComposeInstructions = $state(false);
-	error = $state<string | null>(null);
-	loading = $state(false);
 	hasAgreedToTos = $state(false);
 	endCtaShareCompleted = $state(false);
 	endCtaReviewCompleted = $state(false);
@@ -58,29 +58,12 @@ class Session {
 	#conversationId = $state('');
 
 	/**
-	 * A Host previewing a draft. Votes go to the draft's preview poll, which
-	 * launch discards, but nothing else may reach comhairle: a participation,
-	 * zip or demographics answer filed now would count in the live Campaign's
-	 * numbers, and under the Host's own account. The poll-scoped record is kept
-	 * apart too, so the preview poll's `pid` never resumes against the live one.
+	 * A Host previewing a draft. Its poll-scoped record is kept apart, so the
+	 * preview poll's `pid` never resumes against the live one, and it never
+	 * writes the account record every Campaign shares. `join.ts` and
+	 * `profile.ts` keep its answers away from comhairle.
 	 */
 	#preview = $state(false);
-
-	#api: ApiClient | null = null;
-
-	/**
-	 * Wired once from the root layout with the client built in `load`, so the
-	 * session does not construct its own. Browser only: this is a module
-	 * singleton and a per-request client must not leak across SSR requests.
-	 */
-	setApi(api: ApiClient) {
-		this.#api = api;
-	}
-
-	private get api(): ApiClient {
-		if (!this.#api) throw new Error('Session.setApi() was never called; see routes/+layout.svelte');
-		return this.#api;
-	}
 
 	constructor() {
 		const account = loadAccount();
@@ -108,10 +91,6 @@ class Session {
 		this.#conversationId = conversationId;
 		this.#preview = preview;
 		this.#readCampaign();
-	}
-
-	get preview() {
-		return this.#preview;
 	}
 
 	/** Where this Campaign's poll-scoped record is stored. */
@@ -214,10 +193,6 @@ class Session {
 		clearCampaigns();
 	}
 
-	get conversationId() {
-		return this.#conversationId;
-	}
-
 	/** Whether to skip asking for an email on this Campaign. */
 	get emailProvided() {
 		return this.#accountEmail || this.emailRegistered;
@@ -229,10 +204,6 @@ class Session {
 
 	get isAuthenticated() {
 		return this.user !== null;
-	}
-
-	get hasSession() {
-		return this.user !== null && !!this.zipCode;
 	}
 
 	markComposeInstructionsSeen() {
@@ -288,251 +259,30 @@ class Session {
 		this.persistCampaign();
 	}
 
-	async join(zipCode: string, email?: string, campaignConversationId?: string): Promise<boolean> {
-		if (campaignConversationId) this.useCampaign(campaignConversationId, this.#preview);
-
-		// Nothing to sign up, and the zip is not kept: the account record is
-		// shared by every Campaign. The poll votes under a throwaway xid.
-		if (this.#preview) return true;
-
-		this.loading = true;
-		this.error = null;
+	/**
+	 * Remember the guest account a join created, and the zip it joined with.
+	 * The zip is cached even though comhairle may not have kept it: the poll
+	 * sends it again with every profile write.
+	 */
+	rememberJoin(user: User, zipCode: string) {
+		this.user = user;
 		this.zipCode = zipCode;
-
-		try {
-			// 1. Create guest user (sets auth-token cookie)
-			const user = await this.api.SignupGuestUser(undefined, {});
-			this.user = user;
-			this.persistAccount();
-
-			// 2. Put them on the Campaign's workflow, which is where every
-			// participation number comes from.
-			await this.registerOnWorkflow();
-
-			// 3. Save the zip, best effort. TEMPORARY: comhairle 404s the first
-			// profile write because there is no `zipcode` demographics question to
-			// file the answer under, so this fails for everyone and the throw it
-			// used to do ended every first join. Put the throw back, and the
-			// comment about the zip having to land, once that question exists.
-			if (zipCode) await this.saveProfile({ zipcode: zipCode });
-
-			// 4. Register email if provided (awaited so it completes before navigation)
-			if (email) {
-				await this.registerEmail(email, this.conversationId);
-			}
-
-			return true;
-		} catch (e) {
-			// The real error goes to the console. `error` is rendered on the landing
-			// page, so it says something a participant can act on rather than
-			// whatever axios called the status code.
-			console.error('[Session] Failed to join:', e);
-			this.error = 'Something went wrong joining this conversation. Please try again.';
-			return false;
-		} finally {
-			this.loading = false;
-		}
+		this.persistAccount();
 	}
 
 	/**
-	 * Put a participant who already has an account on this Campaign's workflow.
-	 *
-	 * Every Campaign shares one origin, and so one `auth-token`, since the Place
-	 * left the hostname (ADR 0011). Someone who joined Utah arrives at Oregon
-	 * already known, skips `join`, and would otherwise vote without ever being
-	 * registered on Oregon's workflow. A second registration is a 409, which
-	 * `registerOnWorkflow` already treats as done.
+	 * Remember a signup for updates that went through, for that Campaign only,
+	 * so signing up on one Campaign does not skip another's ask. The
+	 * Conversation is an argument because the one `useCampaign` last pointed at
+	 * is not necessarily the one the participant signed up on.
 	 */
-	async enterCampaign(conversationId: string): Promise<void> {
-		this.useCampaign(conversationId, this.#preview);
-		await this.registerOnWorkflow();
-	}
-
-	/**
-	 * Put this participant on the Campaign's workflow.
-	 *
-	 * An invite used to do this, through `AcceptInvite`, and it was ceremony: the
-	 * invite carried nothing we read back, it had to be created and then mirrored
-	 * onto `metadata.poll` before civicos could find it, and a Campaign without
-	 * one of its own was handed another Campaign's, which 404s. Registering says
-	 * the same thing directly and needs only the workflow, which
-	 * `ListConversationWorkflows` answers anonymously.
-	 *
-	 * Not fatal to the join. A participant who votes without a participation row
-	 * is a reporting gap, not a broken session, so this logs and lets them in.
-	 */
-	private async registerOnWorkflow(): Promise<void> {
-		if (!this.conversationId || this.#preview) return;
-
-		try {
-			const workflows = await this.api.ListConversationWorkflows({
-				params: { conversation_id: this.conversationId }
-			});
-			const workflow = workflows.find((w) => w.isActive) ?? workflows[0];
-			if (!workflow) {
-				console.warn('[Session] No workflow to register on');
-				return;
-			}
-
-			await this.api.RegisterUserForConversationWorkflow(undefined, {
-				params: { conversation_id: this.conversationId, workflow_id: workflow.id }
-			});
-		} catch (e) {
-			// 409 is comhairle saying they are already on it, which is the state we
-			// wanted. Anything else is worth knowing about but not worth blocking on.
-			if (httpStatusOf(e) === 409) return;
-			console.error('[Session] Failed to register on the workflow:', e);
-		}
-	}
-
-	/**
-	 * Sign this email up for updates on one Campaign.
-	 *
-	 * The Conversation is an argument rather than the remembered
-	 * `this.conversationId`, which names whichever Campaign was loaded last and
-	 * not necessarily the one the participant is looking at. `/campaign/ai` sits
-	 * outside the `[campaign]` route and never points it anywhere at all.
-	 *
-	 * Only a signup that went through is remembered, and only for that Campaign,
-	 * so a failure asks again and signing up on one Campaign does not skip
-	 * another's ask.
-	 */
-	async registerEmail(email: string, conversationId: string): Promise<boolean> {
-		if (!conversationId || !email) {
-			console.warn('[Session] registerEmail skipped: missing conversationId or email');
-			return false;
-		}
-		if (this.#preview) {
-			this.#markEmailRegistered(conversationId);
-			return true;
-		}
-
-		try {
-			await this.api.RegisterEmailForUpdates(
-				{
-					email,
-					receive_updates_by_email: true,
-					receive_similar_conversation_updates_by_email: false
-				},
-				{
-					params: { conversation_id: conversationId }
-				}
-			);
-			this.#markEmailRegistered(conversationId);
-			return true;
-		} catch (e) {
-			console.error('[Session] Failed to register email:', e);
-			return false;
-		}
-	}
-
-	#markEmailRegistered(conversationId: string) {
+	markEmailRegistered(conversationId: string) {
 		if (conversationId === this.#conversationId || this.#preview) {
 			this.emailRegistered = true;
 			this.persistCampaign();
 			return;
 		}
 		saveCampaign(conversationId, { ...loadCampaign(conversationId), emailRegistered: true });
-	}
-
-	async saveProfile(data: {
-		zipcode?: string;
-		age?: number;
-		ethnicity?: string;
-		gender?: string;
-		consented?: boolean;
-		politicalParty?: string;
-	}): Promise<boolean> {
-		// Only the fields this call has a value for. `UpsertUserProfileRequest` is
-		// fully optional and the upsert merges, so an omitted field keeps what is
-		// stored. Sending an explicit null does not clear it either, and comhairle
-		// resolves a demographics question for every key in the body, so a null
-		// for an unanswered category 404s the whole request with
-		// `demographics_question not found` and joining fails on the zip.
-		//
-		// The zip rides on every call regardless: the About You screen sends
-		// demographics and no zip, and the server side gate on `/poll`
-		// reads the stored zip back.
-		if (this.#preview) return true;
-
-		const zipcode = data.zipcode || this.zipCode;
-		const body = {
-			consented: data.consented ?? true,
-			...(zipcode ? { zipcode } : {}),
-			...(data.age !== undefined ? { age: data.age } : {}),
-			...(data.ethnicity ? { ethnicity: data.ethnicity } : {}),
-			...(data.gender ? { gender: data.gender } : {}),
-			...(data.politicalParty ? { politicalParty: data.politicalParty } : {})
-		};
-		try {
-			await this.api.UpsertUserProfile(body);
-			return true;
-		} catch (e) {
-			console.error('[Session] Failed to save profile:', e);
-			return false;
-		}
-	}
-
-	/**
-	 * File an answer to a Host's own About You category (#441). The four
-	 * built-ins go through `saveProfile`; comhairle has no profile column for
-	 * anything else. An answer already on file, from a retry or a second pass,
-	 * is a 409 on create, so that one is updated instead.
-	 */
-	async saveDemographicResponse(questionSlug: string, value: string): Promise<boolean> {
-		if (this.#preview) return true;
-
-		const userId = this.userId;
-		if (!userId) return false;
-
-		try {
-			await this.api.CreateDemographicsResponse({ questionSlug, userId, value });
-			return true;
-		} catch (e) {
-			if (httpStatusOf(e) !== 409) {
-				console.error(`[Session] Failed to save "${questionSlug}":`, e);
-				return false;
-			}
-		}
-
-		try {
-			await this.api.UpdateDemographicsResponse(
-				{ value },
-				{ params: { question_slug: questionSlug, user_id: userId } }
-			);
-			return true;
-		} catch (e) {
-			console.error(`[Session] Failed to update "${questionSlug}":`, e);
-			return false;
-		}
-	}
-
-	async setStepProgress(
-		workflowId: string,
-		workflowStepId: string,
-		status: 'not_started' | 'in_progress' | 'done'
-	): Promise<boolean> {
-		if (this.#preview) return true;
-		if (!this.conversationId || !workflowId) return false;
-
-		try {
-			// UpdateUserProgress is an object body, not a bare status string. The
-			// client's types could not catch this while zod was unresolvable.
-			await this.api.SetUserProgress(
-				{ status },
-				{
-					params: {
-						conversation_id: this.conversationId,
-						workflow_id: workflowId,
-						workflow_step_id: workflowStepId
-					}
-				}
-			);
-			return true;
-		} catch (e) {
-			console.error('[Session] Failed to set progress:', e);
-			return false;
-		}
 	}
 }
 

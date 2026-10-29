@@ -3,19 +3,20 @@
 	import { fade } from 'svelte/transition';
 	import { Mail, Check } from 'lucide-svelte';
 	import { session } from '$lib/services/session.svelte';
+	import { signUpForUpdates, type JoinContext } from '$lib/services/join';
 	import Button from './Button.svelte';
 	import AlertBanner from './AlertBanner.svelte';
 	import { Input } from '@civicos/shared/ui/input';
 
 	interface Props {
 		/** The Campaign this signup is for, from the route rather than the session. */
-		conversationId: string;
+		joinContext: JoinContext;
 		umamiSubmitEvent?: string;
 		/** Fired after a successful email submission. Caller typically closes the panel or advances. */
 		onComplete?: () => void;
 	}
 
-	let { conversationId, umamiSubmitEvent, onComplete }: Props = $props();
+	let { joinContext, umamiSubmitEvent, onComplete }: Props = $props();
 
 	let email = $state('');
 	let submitting = $state(false);
@@ -46,7 +47,7 @@
 			return;
 		}
 		submitting = true;
-		const ok = await session.registerEmail(trimmed, conversationId);
+		const ok = await signUpForUpdates(joinContext, trimmed);
 		submitting = false;
 		if (!ok) {
 			failed = true;

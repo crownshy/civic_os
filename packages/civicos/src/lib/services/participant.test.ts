@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { DemographicsResponse, UserDto } from '@crownshy/api-client/api';
-import { resolveParticipant, toParticipantSession } from './participant';
+import { knownParticipant, resolveParticipant, toParticipantSession } from './participant';
 
 const USER: UserDto = {
 	id: '11111111-1111-1111-1111-111111111111',
@@ -130,6 +130,50 @@ describe('resolveParticipant', () => {
 		expect(resolution).toEqual({
 			participant: expect.objectContaining({ userId: USER.id, zipCode: '' }),
 			resolved: true
+		});
+	});
+});
+
+describe('knownParticipant', () => {
+	const SERVER = toParticipantSession(USER, ZIP_ONLY);
+	const CACHED = { userId: 'cached-user', zipCode: '97201' };
+	const EMPTY_CACHE = { userId: null, zipCode: '' };
+
+	it('takes the server participant over the cache', () => {
+		expect(knownParticipant({ participant: SERVER, resolved: true }, CACHED)).toEqual({
+			userId: USER.id,
+			zipCode: '84101',
+			isReturning: true
+		});
+	});
+
+	it('ignores the cache when the server says nobody is signed in', () => {
+		expect(knownParticipant({ participant: null, resolved: true }, CACHED)).toEqual({
+			userId: null,
+			zipCode: '',
+			isReturning: false
+		});
+	});
+
+	it('falls back to the cache when the backend could not answer', () => {
+		expect(knownParticipant({ participant: null, resolved: false }, CACHED)).toEqual({
+			userId: 'cached-user',
+			zipCode: '97201',
+			isReturning: true
+		});
+	});
+
+	it('is not returning on an outage with nothing cached', () => {
+		const known = knownParticipant({ participant: null, resolved: false }, EMPTY_CACHE);
+		expect(known.isReturning).toBe(false);
+	});
+
+	it('borrows the cached zip for a known participant whose zip the server lost', () => {
+		const noZip = toParticipantSession(USER, []);
+		expect(knownParticipant({ participant: noZip, resolved: true }, CACHED)).toEqual({
+			userId: USER.id,
+			zipCode: '97201',
+			isReturning: false
 		});
 	});
 });
