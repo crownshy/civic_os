@@ -1,4 +1,4 @@
-import { createApiClient } from '@crownshy/api-client/client';
+import { serverApi } from '@civicos/shared/api';
 import { findAttendance } from '$lib/services/event-attendance';
 import { requireCampaign } from '../../require-campaign';
 import type { PageServerLoad } from './$types';
@@ -19,7 +19,7 @@ export const load: PageServerLoad = async ({ params, parent, cookies, url, depen
 	// unresolved and the page keeps its cached flag, which is what it did before
 	// this load existed. Confirm against a real participant session (#420).
 	const authToken = cookies.get('auth-token');
-	const api = createApiClient(`${url.origin}/api`, authToken, 'server');
+	const api = serverApi(url, authToken);
 
 	const { registered, resolved } = await findAttendance(api, {
 		conversationId: campaign.id,

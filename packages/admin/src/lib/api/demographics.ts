@@ -1,11 +1,9 @@
-import type { createApiClient } from '@crownshy/api-client/client';
+import type { Api } from '@civicos/shared/api';
 import {
 	DEFAULT_DEMOGRAPHIC_QUESTIONS,
 	hasBucketOptions,
 	type DemographicQuestionData
 } from '@civicos/shared/data/demographics';
-
-type Api = ReturnType<typeof createApiClient>;
 
 /** What reading and repairing the question definitions needs. */
 type QuestionsApi = Pick<

@@ -16,8 +16,8 @@ const ListConverastions = vi.fn();
 const HostGetConversation = vi.fn();
 const GetDemographicsQuestions = vi.fn();
 
-vi.mock('@crownshy/api-client/client', () => ({
-	createApiClient: (_url: string, token?: string) =>
+vi.mock('@civicos/shared/api', () => ({
+	serverApi: (_url: URL, token?: string) =>
 		token
 			? { GetConversation: HostGetConversation, GetDemographicsQuestions }
 			: { GetConversation, ListConverastions }

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { createApiClient } from '@crownshy/api-client/client';
+	import type { Api } from '@civicos/shared/api';
 	import { AudioFormat } from '@crownshy/api-client/api';
 	import * as Dialog from '@civicos/shared/ui/dialog';
 	import { Button } from '@civicos/shared/ui/button';
@@ -7,8 +7,6 @@
 	import { Label } from '@civicos/shared/ui/label';
 	import { Progress } from '@civicos/shared/ui/progress';
 	import { uploadToSignedUrl } from '@civicos/shared/utils';
-
-	type Api = ReturnType<typeof createApiClient>;
 
 	interface Props {
 		open: boolean;

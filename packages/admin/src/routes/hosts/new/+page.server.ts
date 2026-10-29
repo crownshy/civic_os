@@ -1,5 +1,5 @@
 import { error, fail, redirect } from '@sveltejs/kit';
-import { createApiClient } from '$lib/api/client';
+import { serverApi } from '@civicos/shared/api';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { hostDetailsSchema, toExternalUrl } from '$lib/hosts/host-details-schema';
@@ -12,7 +12,7 @@ export const load: PageServerLoad = async ({ cookies, url, depends, parent }) =>
 	const { hostAccess } = await parent();
 	if (!hostAccess.all) redirect(303, '/hosts');
 
-	const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
+	const api = serverApi(url, cookies.get('auth-token'));
 
 	let regions: Array<{ id: string; name: string }> = [];
 	try {
@@ -32,7 +32,7 @@ export const actions: Actions = {
 		// The field errors already say what is wrong, beside each field.
 		if (!form.valid) return fail(400, { form });
 
-		const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
+		const api = serverApi(url, cookies.get('auth-token'));
 		if (!(await fetchHostAccess(api)).all) error(403, 'Only Super users can create a Host.');
 		// Trimmed here rather than in the schema; see `limitedText`.
 		const { contactEmail, orgType, regionIds } = form.data;

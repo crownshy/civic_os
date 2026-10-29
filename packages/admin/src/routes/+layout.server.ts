@@ -1,4 +1,4 @@
-import { createApiClient } from '$lib/api/client';
+import { serverApi } from '@civicos/shared/api';
 import { toSummary, type ConversationSummary } from '$lib/conversations';
 import { describeApiFailure } from '$lib/api/describe-failure';
 import { toViewer } from '$lib/viewer';
@@ -58,7 +58,7 @@ export const load: LayoutServerLoad = async ({ cookies, url, depends }) => {
 			conversationsError: null
 		};
 
-	const api = createApiClient(`${url.origin}/api`, authToken, 'server');
+	const api = serverApi(url, authToken);
 
 	/**
 	 * An empty list and a failed call are different problems with the same shape,
