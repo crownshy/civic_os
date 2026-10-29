@@ -1,3 +1,5 @@
+import { config } from './api';
+
 export type PolisStatement = {
 	txt: string;
 	tid: number;
@@ -35,7 +37,7 @@ export default class PolisApi {
 		userId: string,
 		polisId: string,
 		lang: string = 'en',
-		baseUrl: string = 'https://polis.comhairle.scot',
+		baseUrl: string = config.polisUrl,
 		initialPid?: number
 	) {
 		this.polisId = polisId;

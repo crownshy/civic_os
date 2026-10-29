@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
-	import { Mail, MessageSquare, Link as LinkIcon, Check } from 'lucide-svelte';
+	import { Mail, MessageSquare, Link as LinkIcon, Check } from '@lucide/svelte';
 	import { session } from '$lib/services/session.svelte';
 
 	interface Props {

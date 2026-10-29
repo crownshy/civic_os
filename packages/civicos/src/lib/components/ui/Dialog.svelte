@@ -3,7 +3,7 @@
 	import { cn } from '$lib/utils';
 	import Button from './Button.svelte';
 	import type { Snippet } from 'svelte';
-	import { X } from 'lucide-svelte';
+	import { X } from '@lucide/svelte';
 
 	interface Props {
 		open: boolean;

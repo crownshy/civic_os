@@ -77,3 +77,23 @@ export function polisFailure(error: unknown, action: string): string | null {
 	const suffix = typeof detail === 'string' && detail ? ` Comhairle said: "${detail}".` : '';
 	return `This conversation's Polis step is not set up correctly.${suffix}`;
 }
+
+/**
+ * The line to show for a caught error. An api-client failure gets
+ * `describeApiFailure` after the caller's fallback, because axios's own message
+ * ("Request failed with status code 500") means nothing to a Host. An `Error`
+ * this app threw on purpose already carries a sentence for the UI, so it passes
+ * through.
+ */
+export function failureMessage(error: unknown, fallback: string): string {
+	const err = error as { name?: string; code?: string; cause?: { issues?: unknown[] } };
+	const fromApi =
+		apiStatus(error) !== undefined ||
+		err?.name === 'AxiosError' ||
+		Array.isArray(err?.cause?.issues) ||
+		typeof err?.code === 'string';
+
+	if (fromApi) return `${fallback.replace(/\.$/, '')}: ${describeApiFailure(error)}`;
+	if (error instanceof Error && error.message) return error.message;
+	return fallback;
+}

@@ -9,7 +9,7 @@
 	import { fly, fade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
 	import { cubicOut, backOut } from 'svelte/easing';
-	import { Mail } from 'lucide-svelte';
+	import { Mail } from '@lucide/svelte';
 	import { addHours, isBefore } from 'date-fns';
 
 	const { data } = $props();

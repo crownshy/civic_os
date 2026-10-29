@@ -1,7 +1,8 @@
 <script lang="ts">
+	import { isValidEmail } from '$lib/utils/forms';
 	import { onDestroy } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import { Mail, Check } from 'lucide-svelte';
+	import { Mail, Check } from '@lucide/svelte';
 	import { session } from '$lib/services/session.svelte';
 	import { signUpForUpdates, type JoinContext } from '$lib/services/join';
 	import Button from './Button.svelte';
@@ -29,10 +30,6 @@
 	// the user provided their email this session — not as a momentary flash right after submit.
 	// `justSubmitted` is our own success-beat state; the parent will close us shortly after.
 	const alreadyDone = $derived(session.emailProvided && !justSubmitted);
-
-	function isValidEmail(value: string): boolean {
-		return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-	}
 
 	async function handleSubmit() {
 		error = '';

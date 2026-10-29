@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { failureMessage } from '$lib/api/describe-failure';
 	import type { Api } from '@civicos/shared/api';
 	import { AudioFormat } from '@crownshy/api-client/api';
 	import * as Dialog from '@civicos/shared/ui/dialog';
@@ -107,7 +108,7 @@
 			onUploaded?.();
 		} catch (e) {
 			submitting = false;
-			errorMsg = e instanceof Error ? e.message : 'Upload failed. Please try again.';
+			errorMsg = failureMessage(e, 'Upload failed. Please try again.');
 		}
 	}
 </script>

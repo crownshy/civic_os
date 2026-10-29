@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { failureMessage } from '$lib/api/describe-failure';
 	import { ArrowDown, ArrowUp, Pencil, Trash2 } from '@lucide/svelte';
 	import SetupCard from './SetupCard.svelte';
 	import EditFaqDialog from './EditFaqDialog.svelte';
@@ -36,7 +37,7 @@
 			await onSave(next);
 		} catch (e) {
 			console.error('Saving the FAQ failed', e);
-			error = e instanceof Error ? e.message : 'Could not save that change.';
+			error = failureMessage(e, 'Could not save that change.');
 		} finally {
 			pending = null;
 		}

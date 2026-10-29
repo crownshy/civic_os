@@ -1,4 +1,5 @@
 import { serverApi } from '@civicos/shared/api';
+import { readParticipationReport } from '@civicos/shared/data/demographics';
 import { requireCampaign } from '../require-campaign';
 import type { PageServerLoad } from './$types';
 
@@ -50,7 +51,11 @@ export const load: PageServerLoad = async ({ parent, params, cookies, url, depen
 				})
 		]);
 
-		return { report, demographics, error: null };
+		return {
+			report,
+			demographics: demographics ? readParticipationReport(demographics) : null,
+			error: null
+		};
 	} catch (e) {
 		console.error('[Report] Failed to load report data:', e);
 		return {

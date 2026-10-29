@@ -4,23 +4,13 @@
 	import SwipeCarousel from '$lib/components/ui/SwipeCarousel.svelte';
 	import DonutChart from '$lib/components/ui/DonutChart.svelte';
 
-	interface DemographicCategory {
-		category: string;
-		count: number;
-		value?: string | null;
-	}
-
-	interface DemographicReport {
-		ageRanges: DemographicCategory[];
-		ethnicity: DemographicCategory[];
-		gender: DemographicCategory[];
-		politicalParty: DemographicCategory[];
-		totalParticipants: number;
-		zipcodeCounts: Record<string, number>;
-	}
+	import type {
+		DemographicCategoryCount,
+		ParticipationReport
+	} from '@civicos/shared/data/demographics';
 
 	interface Props {
-		demographics: DemographicReport | null;
+		demographics: ParticipationReport | null;
 	}
 
 	let { demographics }: Props = $props();
@@ -37,7 +27,13 @@
 	const tabs = ['Age', 'Location', 'Gender', 'Race & Ethnicity', 'Political'] as const;
 	let activeTab = $state(1);
 
-	function toCategoryItems(categories: DemographicCategory[]) {
+	// Keyed by question slug since comhairle a8d0a6ef5. A question the Host
+	// switched off is absent, which renders as no data.
+	function itemsFor(slug: string) {
+		return toCategoryItems(demographics?.categories[slug] ?? []);
+	}
+
+	function toCategoryItems(categories: DemographicCategoryCount[]) {
 		return categories.map((c, i) => ({
 			label: c.value ? c.value : 'Not Provided',
 			color: c.value ? chartColors[i % chartColors.length] : 'bg-chart-undefined',
@@ -45,21 +41,10 @@
 		}));
 	}
 
-	const ageData = $derived(
-		demographics?.ageRanges?.length ? toCategoryItems(demographics.ageRanges) : []
-	);
-
-	const genderData = $derived(
-		demographics?.gender?.length ? toCategoryItems(demographics.gender) : []
-	);
-
-	const ethnicityData = $derived(
-		demographics?.ethnicity?.length ? toCategoryItems(demographics.ethnicity) : []
-	);
-
-	const politicalData = $derived(
-		demographics?.politicalParty?.length ? toCategoryItems(demographics.politicalParty) : []
-	);
+	const ageData = $derived(itemsFor('age'));
+	const genderData = $derived(itemsFor('gender'));
+	const ethnicityData = $derived(itemsFor('ethnicity'));
+	const politicalData = $derived(itemsFor('political_party'));
 
 	function handleTabClick(index: number) {
 		activeTab = index;

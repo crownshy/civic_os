@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { failureMessage } from '$lib/api/describe-failure';
 	import { page, navigating } from '$app/state';
 	import { invalidate } from '$lib/activity.svelte';
 	import { writeMetadata } from '@civicos/shared/data/metadata';
@@ -56,7 +57,7 @@
 			await invalidate(`campaign:${page.params.slug}`);
 		} catch (e) {
 			console.error('Repairing the poll mirror failed', e);
-			repairError = e instanceof Error ? e.message : 'Could not write the mirror.';
+			repairError = failureMessage(e, 'Could not write the mirror.');
 		} finally {
 			repairing = false;
 		}

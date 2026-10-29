@@ -14,7 +14,7 @@
 	import { page } from '$app/state';
 	import { session } from '$lib/services/session.svelte';
 	import type { JoinContext } from '$lib/services/join';
-	import { ArrowRight, Check } from 'lucide-svelte';
+	import { ArrowRight, Check } from '@lucide/svelte';
 	import { END_CTA_COPY } from '$lib/config/landing-copy';
 	import { HOST_COPY_PROSE_CLASS, renderHostCopy } from '$lib/config/host-copy';
 	import type { AskToggles } from '$lib/config/participation';

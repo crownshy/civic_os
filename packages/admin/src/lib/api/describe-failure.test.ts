@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { permissionDenied, polisFailure } from './describe-failure';
+import { failureMessage, permissionDenied, polisFailure } from './describe-failure';
 
 describe('polisFailure', () => {
 	it('uses the permission sentence on a 403', () => {
@@ -40,5 +40,29 @@ describe('permissionDenied', () => {
 		expect(permissionDenied({ response: { status: 401 } }, 'x')).toBeNull();
 		expect(permissionDenied({ response: { status: 500 } }, 'x')).toBeNull();
 		expect(permissionDenied(new Error('network'), 'x')).toBeNull();
+	});
+});
+
+describe('failureMessage', () => {
+	it('describes an api failure instead of showing axios text', () => {
+		const error = Object.assign(new Error('Request failed with status code 500'), {
+			response: { status: 500 }
+		});
+
+		expect(failureMessage(error, 'Could not save that change.')).toBe(
+			'Could not save that change: the server responded 500.'
+		);
+	});
+
+	it('passes through a sentence this app threw for the UI', () => {
+		const error = new Error('Saved, but the poll is still accepting votes. Try again.');
+
+		expect(failureMessage(error, 'Could not change the poll status.')).toBe(error.message);
+	});
+
+	it('falls back for something that is not an Error', () => {
+		expect(failureMessage('boom', 'Could not save the question.')).toBe(
+			'Could not save the question.'
+		);
 	});
 });

@@ -268,6 +268,9 @@ importers:
       '@crownshy/api-client':
         specifier: ^0.0.66-rc.0
         version: 0.0.66-rc.0(axios@1.18.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0))(zod@4.4.3)
+      '@lucide/svelte':
+        specifier: ^1.16.0
+        version: 1.22.0(svelte@5.56.4(@typescript-eslint/types@8.62.1))
       '@lukulent/svelte-umami':
         specifier: ^0.0.4
         version: 0.0.4(svelte@5.56.4(@typescript-eslint/types@8.62.1))
@@ -275,7 +278,7 @@ importers:
         specifier: ^2.14.0
         version: 2.14.0
       bits-ui:
-        specifier: ^2.15.7
+        specifier: ^2.18.1
         version: 2.18.1(@internationalized/date@3.12.2)(@sveltejs/kit@2.68.0(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.56.4(@typescript-eslint/types@8.62.1))(vite@7.3.6(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)))(svelte@5.56.4(@typescript-eslint/types@8.62.1))(typescript@5.9.3)(vite@7.3.6(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)))(svelte@5.56.4(@typescript-eslint/types@8.62.1))
       clsx:
         specifier: ^2.1.1
@@ -298,9 +301,6 @@ importers:
       layercake:
         specifier: ^10.0.2
         version: 10.0.2(svelte@5.56.4(@typescript-eslint/types@8.62.1))(typescript@5.9.3)
-      lucide-svelte:
-        specifier: ^0.575.0
-        version: 0.575.0(svelte@5.56.4(@typescript-eslint/types@8.62.1))
       tailwind-merge:
         specifier: ^3.4.1
         version: 3.6.0
@@ -326,9 +326,6 @@ importers:
       '@internationalized/date':
         specifier: ^3.12.1
         version: 3.12.2
-      '@lucide/svelte':
-        specifier: ^1.16.0
-        version: 1.22.0(svelte@5.56.4(@typescript-eslint/types@8.62.1))
       '@playwright/test':
         specifier: ^1.58.1
         version: 1.61.1
@@ -573,6 +570,9 @@ importers:
       tailwind-variants:
         specifier: ^3.2.2
         version: 3.2.2(tailwind-merge@3.6.0)(tailwindcss@4.3.2)
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
     devDependencies:
       '@eslint/compat':
         specifier: ^2.0.2
@@ -3082,12 +3082,6 @@ packages:
   lru-cache@11.5.2:
     resolution: {integrity: sha512-4pfM1Ff0x50o0tQwb5ucw/RzNyD0/YJME6IVcStalZuMWxdt3sR3huStTtxz4PUmvZfRguvDejasvQ2kifR11g==}
     engines: {node: 20 || >=22}
-
-  lucide-svelte@0.575.0:
-    resolution: {integrity: sha512-Tu15tJfbmRNPaU61yeNFf3jfRHs8ABA+NwTt7TWmwVbhlSA3H7sW65tX6RttcP7HGV4aHUlYhXixZOlntoFBdw==}
-    deprecated: Package deprecated. Please use @lucide/svelte instead.
-    peerDependencies:
-      svelte: ^3 || ^4 || ^5.0.0-next.42
 
   lz-string@1.5.0:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
@@ -6377,10 +6371,6 @@ snapshots:
   loupe@3.2.1: {}
 
   lru-cache@11.5.2: {}
-
-  lucide-svelte@0.575.0(svelte@5.56.4(@typescript-eslint/types@8.62.1)):
-    dependencies:
-      svelte: 5.56.4(@typescript-eslint/types@8.62.1)
 
   lz-string@1.5.0: {}
 
