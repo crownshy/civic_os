@@ -23,15 +23,15 @@ function client(url: URL, cookies: { get: (n: string) => string | undefined }) {
 const canAssignCampaigns = (access: HostAccess) => access.all;
 
 /**
- * Comhairle refuses a team change with 403 when the caller lacks the Host role,
- * and also when the Host's groups hold `super_admin`: changing who is in them
- * hands out super user access, which only a super user may grant.
+ * Comhairle answers a refused team change with 403, and its `err` text says
+ * which check failed. Admin-only surface, so the text is shown as is.
  */
 function teamFailure(e: unknown, action: string): string {
-	if (apiStatus(e) === 403) {
-		return `Could not ${action}: Comhairle refused it. Changing this team may need a super user.`;
-	}
-	return `Could not ${action}: ${describeApiFailure(e)}`;
+	const status = apiStatus(e);
+	if (status === undefined) return `Could not ${action}: ${describeApiFailure(e)}`;
+	const detail = (e as { response?: { data?: { err?: unknown } } }).response?.data?.err;
+	const said = typeof detail === 'string' && detail ? ` Comhairle said: "${detail}".` : '';
+	return `Could not ${action}: Comhairle answered ${status}.${said}`;
 }
 
 /** Form actions skip the layout gate, so each one checks for itself. */
