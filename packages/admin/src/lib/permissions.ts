@@ -3,11 +3,10 @@
  * it: the Campaign's Co-Hosts card (`c/[slug]/overview`) and the Host's
  * Conversations card (`hosts/[id]`).
  *
- * `content_editor` (ConversationContentEditor) is currently the ONLY
- * Conversation-level role in comhairle, so it is what a co-host grant uses.
- * PROVISIONAL: whether this role also propagates Campaign visibility to the
- * co-host's members (the #362 dashboard requirement) is unconfirmed with the
- * backend. If a dedicated co-host/steward role lands, change it here only.
+ * A co-host grant uses `content_editor` (ConversationContentEditor). Comhairle
+ * also has `observer` and `admin` Conversation roles, but those are what its
+ * trigger grants the owning Host's members and admins groups, so admin never
+ * writes them. If a dedicated co-host/steward role lands, change it here only.
  */
 export const COHOST_ROLE = 'content_editor';
 

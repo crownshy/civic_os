@@ -2,7 +2,8 @@ import { error, fail } from '@sveltejs/kit';
 import { createApiClient } from '$lib/api/client';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
-import { addMemberSchema } from './member-schema';
+import type { OrganizationTeamResponseDto } from '@crownshy/api-client/api';
+import { addMemberSchema, groupForRole, toTeamMember } from './member-schema';
 import { hostDetailsSchema, toExternalUrl, toWebsite } from '$lib/hosts/host-details-schema';
 import { COHOST_ROLE, CONVERSATION_RESOURCE } from '$lib/permissions';
 import { routeSlugFor, statusFor } from '$lib/conversations';
@@ -117,7 +118,8 @@ export const load: PageServerLoad = async ({ params, cookies, url, depends, pare
 	const [team, me, regions, conversations] = await Promise.all([
 		api
 			.GetOrganizationTeam({ params: { organization_id: params.id } })
-			.then((r) => r.members)
+			// Annotated because api-client 0.0.66-rc.0 types this endpoint as any.
+			.then((r: OrganizationTeamResponseDto) => r.members.map(toTeamMember))
 			.catch((e) => {
 				console.warn('GetOrganizationTeam failed', e);
 				return [];
@@ -215,7 +217,7 @@ export const actions: Actions = {
 			const res = await api.AddOrganizationMember(
 				{
 					email: form.data.email,
-					role: form.data.role,
+					group: groupForRole(form.data.role),
 					allow_create_user: true
 				},
 				{ params: { organization_id: params.id } }
@@ -239,20 +241,10 @@ export const actions: Actions = {
 	/**
 	 * Give an unowned Campaign to this Host.
 	 *
-	 * Two writes, both required. `POST /conversation` silently drops
-	 * `organization_id`, so a Campaign is born unowned and the PUT is the only
-	 * thing that records an owner at all.
-	 *
-	 * The PUT alone does not let the Host's members see it. Comhairle's
-	 * `list_for_permitted_user` admits a Campaign when `conversation.owner_id` is
-	 * the caller or a `resource_permissions` row matches them or their
-	 * organization. `conversation.organization_id` is not in that condition, so
-	 * ownership without a grant is invisible to everyone in the owning Host.
-	 * Verified against a local backend: adding the grant took a Host member's
-	 * dashboard from empty to showing the Campaign.
-	 *
-	 * `content_editor` is the role because the owning Host should be able to edit
-	 * its own Campaign; `conversation_co_host` carries read only.
+	 * `POST /conversation` silently drops `organization_id`, so a Campaign is born
+	 * unowned and this PUT is the only thing that records an owner. Setting it
+	 * fires a comhairle trigger that grants `observer` to the Host's members group
+	 * and `admin` to its admins group, so the team sees it without a grant from us.
 	 */
 	assignCampaign: async ({ request, params, cookies, url }) => {
 		const fd = await request.formData();
@@ -271,23 +263,6 @@ export const actions: Actions = {
 			console.error('UpdateConversation (assign owner) failed', e);
 			return fail(400, { error: 'Could not assign that Campaign.' });
 		}
-
-		try {
-			await api.GrantPermission(
-				{
-					organization_id: params.id,
-					role_name: COHOST_ROLE,
-					grant_reason: 'Owning Host assigned in admin'
-				},
-				{ params: { resource_type: CONVERSATION_RESOURCE, resource_id: conversationId } }
-			);
-		} catch (e) {
-			console.error('GrantPermission (owning host) failed', e);
-			return fail(400, {
-				error: 'Campaign assigned, but its team cannot see it yet. Re-run the assignment.'
-			});
-		}
-
 		return { ok: true };
 	},
 
@@ -332,14 +307,22 @@ export const actions: Actions = {
 			return fail(400, { error: "You can't remove your own admin role." });
 		}
 
+		// Roles are group memberships: admins is a subset of members, so demoting
+		// means leaving the admins group, not joining members.
+		const groupParams = {
+			organization_id: params.id,
+			group: groupForRole('admin'),
+			user_id: userId
+		};
 		try {
-			await api.UpdateOrganizationMemberRole(
-				{ role },
-				{ params: { organization_id: params.id, user_id: userId } }
-			);
+			if (role === 'admin') {
+				await api.AddOrganizationGroupMember(undefined, { params: groupParams });
+			} else {
+				await api.RemoveOrganizationGroupMember(undefined, { params: groupParams });
+			}
 			return { ok: true };
 		} catch (e) {
-			console.error('UpdateOrganizationMemberRole failed', e);
+			console.error('Updating organization admins group failed', e);
 			return fail(400, { error: 'Could not update role.' });
 		}
 	},
