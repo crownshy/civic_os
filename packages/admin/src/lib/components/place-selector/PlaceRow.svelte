@@ -1,27 +1,7 @@
 <script module lang="ts">
-	import { ArrowRight, Building2Icon, Check, Grid2x2Icon, MapIcon } from '@lucide/svelte';
+	import { ArrowRight, Check } from '@lucide/svelte';
+	import { LEVEL_STYLE } from './levels';
 	import type { Place, PlaceLevel } from './places';
-
-	const LEVEL_STYLE = {
-		state: {
-			icon: MapIcon,
-			square: 'bg-place-state-tint text-place-state',
-			selectedRow: 'bg-place-state-tint/60',
-			selectedCheck: 'border-place-state bg-place-state'
-		},
-		county: {
-			icon: Grid2x2Icon,
-			square: 'bg-place-county-tint text-place-county',
-			selectedRow: 'bg-place-county-tint/60',
-			selectedCheck: 'border-place-county bg-place-county'
-		},
-		city: {
-			icon: Building2Icon,
-			square: 'bg-place-city-tint text-place-city',
-			selectedRow: 'bg-place-city-tint/60',
-			selectedCheck: 'border-place-city bg-place-city'
-		}
-	} as const;
 
 	const CHILD_NOUN: Record<PlaceLevel, string> = {
 		state: 'counties',
