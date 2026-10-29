@@ -35,7 +35,10 @@
 		return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 	}
 
+	// The row under the pointer slides away without a pointerleave, so clear the
+	// map highlight whenever the list moves.
 	async function drill(place: Place) {
+		onhover?.(null);
 		leavingId = null;
 		void selector.drill(place.id);
 		await tick();
@@ -43,6 +46,7 @@
 	}
 
 	async function jumpTo(place: Place) {
+		onhover?.(null);
 		leavingId = null;
 		slideInstantly = true;
 		void selector.jumpTo(place.id);
@@ -55,6 +59,7 @@
 
 	async function goBack(event: MouseEvent) {
 		if (!selector.canGoBack) return;
+		onhover?.(null);
 		const cameFromId = selector.currentId;
 		// A keyboard press on a button fires a click with no pointer detail.
 		const viaKeyboard = event.detail === 0;

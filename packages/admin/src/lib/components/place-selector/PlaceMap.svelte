@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { cn } from '@civicos/shared/utils';
 	import type { ExpressionSpecification, GeoJSONSource, Map as MapLibreMap } from 'maplibre-gl';
 	import 'maplibre-gl/dist/maplibre-gl.css';
 	import {
@@ -21,9 +22,10 @@
 		geometrySource: PlaceGeometrySource;
 		/** The row hovered or focused in the picker, highlighted on the map. */
 		hoveredId?: string | null;
+		class?: string;
 	};
 
-	let { state: selector, geometrySource, hoveredId = null }: Props = $props();
+	let { state: selector, geometrySource, hoveredId = null, class: className }: Props = $props();
 
 	// Ink, muted dots and label halos match the basemap rather than page tokens: admin
 	// has no dark surface palette, so --foreground would vanish on Dark Matter.
@@ -262,7 +264,12 @@
 	});
 </script>
 
-<figure class="relative m-0 h-full min-h-64 w-full overflow-hidden rounded-md border bg-muted">
+<figure
+	class={cn(
+		'relative m-0 h-full min-h-64 w-full overflow-hidden rounded-md border bg-muted',
+		className
+	)}
+>
 	<figcaption class="sr-only">{description}</figcaption>
 	<!-- absolute! because maplibre-gl.css sets .maplibregl-map to position: relative. -->
 	<div bind:this={container} class="absolute! inset-0"></div>
