@@ -1,6 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { createApiClient } from '$lib/api/client';
-import type { createApiClient as ApiClientFactory } from '@crownshy/api-client/client';
+import { serverApi, type Api } from '@civicos/shared/api';
 import { findByRouteSlug, participantBase, regionFor } from '$lib/conversations';
 import { placeForCampaign } from '$lib/config/place';
 import { hasLivePoll, polisConfigFor } from '$lib/polis-step';
@@ -12,8 +11,6 @@ import {
 } from '@civicos/shared/data/demographics';
 import { readPoll } from '@civicos/shared/data/place';
 import type { LayoutServerLoad } from './$types';
-
-type Api = ReturnType<typeof ApiClientFactory>;
 
 export const load: LayoutServerLoad = async ({ params, parent, cookies, url, depends }) => {
 	depends(`campaign:${params.slug}`);
@@ -28,7 +25,7 @@ export const load: LayoutServerLoad = async ({ params, parent, cookies, url, dep
 		error(404, `Unknown conversation: ${params.slug}`);
 	}
 
-	const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
+	const api = serverApi(url, cookies.get('auth-token'));
 
 	// withTranslations (admin only) returns the resolved display strings *and*
 	// each text field's TextContent id + locale. Those ids are what edits are

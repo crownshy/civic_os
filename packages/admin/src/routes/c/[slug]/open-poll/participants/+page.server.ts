@@ -1,6 +1,6 @@
 import { fail, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { createApiClient } from '$lib/api/client';
+import { serverApi } from '@civicos/shared/api';
 import { describeApiFailure } from '$lib/api/describe-failure';
 import type { RecruitmentTargetDto } from '@crownshy/api-client/api';
 import {
@@ -135,7 +135,7 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 	const enabledQuestions = [...defaultDemographics, ...customDemographics].filter(
 		(question) => question.enabled
 	);
-	const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
+	const api = serverApi(url, cookies.get('auth-token'));
 	const conversationId = campaign.id;
 
 	let demographics: ParticipationReport | null = null;
@@ -206,7 +206,7 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 export const actions: Actions = {
 	saveGoals: async ({ request, cookies, params, url }) => {
 		const form = await request.formData();
-		const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
+		const api = serverApi(url, cookies.get('auth-token'));
 		const metric = String(form.get('metric') ?? '');
 		const conversationId = String(form.get('conversationId') ?? '');
 		const workflowId = String(form.get('workflowId') ?? '');

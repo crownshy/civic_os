@@ -88,10 +88,15 @@ A `+page.svelte` should mostly wire these together and branch between screens.
 
     ```ts
     // src/routes/+layout.ts
-    import { createApiClient } from '@crownshy/api-client/client';
+    import { createApiClient } from '@civicos/shared/api';
     const api = createApiClient(url.origin + '/api', undefined, browser ? 'client' : 'server');
     return { api, region: data.region };
     ```
+
+    Import it from `@civicos/shared/api`, not `@crownshy/api-client/client`: the shared
+    one stops comhairle's empty 200 responses from failing validation after the write
+    has already landed. A `+page.server.ts` that needs its own client calls
+    `serverApi(url, cookies.get('auth-token'))` from the same module.
 
     Child loads read it from the parent and call typed methods, they do not construct
     their own:

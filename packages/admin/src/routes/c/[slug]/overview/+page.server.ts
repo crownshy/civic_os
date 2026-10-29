@@ -1,5 +1,5 @@
 import { fail } from '@sveltejs/kit';
-import { createApiClient } from '$lib/api/client';
+import { serverApi } from '@civicos/shared/api';
 import { COHOST_ROLE, CONVERSATION_RESOURCE, cohostOrgIds } from '$lib/permissions';
 import { mirrorHosts } from '$lib/cohost-mirror';
 import type { Actions, PageServerLoad } from './$types';
@@ -21,7 +21,7 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 	const convId = campaign.id;
 	depends(`cohosts:${convId}`);
 
-	const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
+	const api = serverApi(url, cookies.get('auth-token'));
 
 	const [allOrgs, permissions] = await Promise.all([
 		api
@@ -91,7 +91,7 @@ export const actions: Actions = {
 		const orgNames = fd.getAll('orgNames').map(String);
 		if (!convId || orgIds.length === 0) return fail(400, { error: 'Select at least one host.' });
 
-		const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
+		const api = serverApi(url, cookies.get('auth-token'));
 		const nameOf = (i: number) => orgNames[i] || 'a host';
 
 		const added: string[] = [];
@@ -132,7 +132,7 @@ export const actions: Actions = {
 		const orgId = String(fd.get('orgId') ?? '');
 		if (!convId || !orgId) return fail(400, { error: 'Missing host.' });
 
-		const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
+		const api = serverApi(url, cookies.get('auth-token'));
 		try {
 			await api.RevokePermission(undefined, {
 				params: { resource_type: CONVERSATION_RESOURCE, resource_id: convId },

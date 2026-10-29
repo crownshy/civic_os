@@ -1,4 +1,4 @@
-import { createApiClient } from '$lib/api/client';
+import { serverApi } from '@civicos/shared/api';
 import { canViewHost } from '$lib/host-access';
 import type { PageServerLoad } from './$types';
 
@@ -6,7 +6,7 @@ export const load: PageServerLoad = async ({ cookies, url, depends, parent }) =>
 	depends('hosts:list');
 	const { hostAccess } = await parent();
 
-	const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
+	const api = serverApi(url, cookies.get('auth-token'));
 
 	let organizations: Array<{
 		id: string;

@@ -1,4 +1,4 @@
-import { createApiClient } from '@crownshy/api-client/client';
+import { serverApi } from '@civicos/shared/api';
 import { requireCampaign } from '../require-campaign';
 import type { PageServerLoad } from './$types';
 
@@ -31,7 +31,7 @@ export const load: PageServerLoad = async ({ parent, params, cookies, url, depen
 		return empty(`No Polis workflow step on Campaign "${campaign.slug}"`);
 	}
 
-	const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
+	const api = serverApi(url, cookies.get('auth-token'));
 
 	try {
 		const workflows = await api.ListConversationWorkflows({

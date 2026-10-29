@@ -1,5 +1,5 @@
 import { error, fail } from '@sveltejs/kit';
-import { createApiClient } from '$lib/api/client';
+import { serverApi } from '@civicos/shared/api';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import type { OrganizationTeamResponseDto } from '@crownshy/api-client/api';
@@ -12,7 +12,7 @@ import type { AssignableConversation, HostConversation } from './host-conversati
 import type { Actions, PageServerLoad } from './$types';
 
 function client(url: URL, cookies: { get: (n: string) => string | undefined }) {
-	return createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
+	return serverApi(url, cookies.get('auth-token'));
 }
 
 /**

@@ -1,4 +1,4 @@
-import type { createApiClient } from '@crownshy/api-client/client';
+import type { Api } from '@civicos/shared/api';
 import type {
 	PolisStatementAux,
 	CreatePolisStatementAux,
@@ -18,8 +18,6 @@ import type {
  * of both request and response. Pass the `api` instance from the root layout
  * load (`data.api`, or `const { api } = await parent()` inside a load).
  */
-
-type Api = ReturnType<typeof createApiClient>;
 
 export function listStatementAux(api: Api, workflow_step_id: string): Promise<PolisStatementAux[]> {
 	return api.PolisListStatementAux({ queries: { workflow_step_id } });

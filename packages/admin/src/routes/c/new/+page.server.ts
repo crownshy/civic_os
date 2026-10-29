@@ -1,7 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { superValidate, message, setError } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
-import { createApiClient } from '$lib/api/client';
+import { serverApi, type Api } from '@civicos/shared/api';
 import { placeFromName, type CampaignPoll } from '@civicos/shared/data/place';
 import { rescopedSlug } from '$lib/config/place';
 import { apiStatus, describeApiFailure } from '$lib/api/describe-failure';
@@ -25,7 +25,7 @@ const REQUIRED_VOTES = 10;
 export const load: PageServerLoad = async ({ cookies, url, depends }) => {
 	depends('app:hosts');
 
-	const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
+	const api = serverApi(url, cookies.get('auth-token'));
 
 	// Kept apart from an empty list: a failed lookup is not "you belong to no
 	// Host", and saying so sends people asking for access they already have.
@@ -82,7 +82,7 @@ export const actions: Actions = {
 		// The field errors already say what is wrong, beside each field.
 		if (!form.valid) return fail(400, { form });
 
-		const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
+		const api = serverApi(url, cookies.get('auth-token'));
 		const { slug, hostId, cohostIds } = form.data;
 		// Trimmed here rather than in the schema; see `limitedText`.
 		const title = form.data.title.trim();
@@ -315,7 +315,7 @@ export const actions: Actions = {
 	}
 };
 
-function listPickerOrgs(api: ReturnType<typeof createApiClient>): Promise<PickerOrg[]> {
+function listPickerOrgs(api: Api): Promise<PickerOrg[]> {
 	return api
 		.ListOrganizations({ queries: { limit: 200 } })
 		.then((r) =>

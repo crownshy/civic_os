@@ -1,4 +1,4 @@
-import { createApiClient } from '@crownshy/api-client/client';
+import { serverApi } from '@civicos/shared/api';
 import { resolveParticipant } from '$lib/services/participant';
 import { GENERIC_REGION } from '$lib/config/regions';
 import type { LayoutServerLoad } from './$types';
@@ -13,7 +13,7 @@ export const load: LayoutServerLoad = async ({ cookies, url, depends }) => {
 	// Through the same-origin proxy, as every server load here does. Unlike the
 	// others this one passes the token on, because the cookie the proxy forwards
 	// is the whole of what identifies the participant.
-	const api = createApiClient(`${url.origin}/api`, authToken, 'server');
+	const api = serverApi(url, authToken);
 
 	const { participant, resolved } = await resolveParticipant(api, authToken);
 
