@@ -39,7 +39,7 @@ export const load: LayoutServerLoad = async ({ params, url, cookies, depends }) 
 
 	// Admin edits this copy in real time, so it needs a key an invalidation can
 	// target rather than relying on a full reload. The directory key covers the
-	// Place branch, which is the same list as `/conversations`.
+	// Place branch, which is the same list as the site root.
 	depends('civicos:conversation');
 	depends('civicos:directory');
 
