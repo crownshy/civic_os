@@ -1,6 +1,7 @@
 import { redirect, type Handle } from '@sveltejs/kit';
 import { createBackendClient } from '$lib/server/backend-client';
 import { clearHostSession, ensureHostSession } from '$lib/server/host-session';
+import { probeAdmin } from '$lib/server/admin-gate';
 
 /**
  * SvelteKit mirrors every modulepreload into a `Link` response header. On the
@@ -18,58 +19,6 @@ async function withoutLinkHeader(response: Response | Promise<Response>) {
 const PUBLIC_PATHS = ['/login', '/logout', '/signup', '/welcome'];
 const PUBLIC_PREFIXES = ['/api/auth/', '/_app/', '/favicon'];
 
-/**
- * Probe an admin-gated comhairle endpoint with the user's cookie, and nothing
- * else. comhairle authenticates an `Authorization: Bearer` token in preference
- * to the cookie, so a service key sent alongside would probe the key's owner
- * instead of this user, and a stale key would 401 every admin back to login.
- *
- * 200 → user is an admin. 401 → no/expired session, or logged in but not admin
- * (comhairle answers both with 401, so `CurrentUser` tells them apart). 403 →
- * forbidden, though `/regions` does not return it today.
- *
- * Only the status decides, never the body, so a reply that arrives but fails
- * schema validation still counts as admin: drift between the generated client
- * and `/regions` must not lock every admin out of the app. A request that never
- * reached the server rethrows, which is what the raw-fetch version did.
- *
- * `limit: 1` because this runs on every non-public request and the payload is
- * thrown away; the raw-fetch version never read the body at all.
- */
-async function probeAdmin(authToken: string): Promise<'admin' | 'unauthorized' | 'forbidden'> {
-	const api = createBackendClient(authToken);
-
-	try {
-		await api.ListRegions({ queries: { limit: 1 } });
-		return 'admin';
-	} catch (e) {
-		const err = e as {
-			response?: { status?: number };
-			cause?: { issues?: unknown[] };
-			issues?: unknown[];
-		};
-
-		if (Array.isArray(err.issues) || Array.isArray(err.cause?.issues)) return 'admin';
-
-		const status = err.response?.status;
-		if (status === undefined) throw e;
-		if (status === 403) return 'forbidden';
-		// comhairle answers "not an admin" with the same 401 as "not logged in".
-		// A Host member is the first case (#442), and bouncing them to a blank
-		// login page reads as a broken password, so ask who they are.
-		return (await isSignedIn(api)) ? 'forbidden' : 'unauthorized';
-	}
-}
-
-async function isSignedIn(api: ReturnType<typeof createBackendClient>): Promise<boolean> {
-	try {
-		await api.CurrentUser();
-		return true;
-	} catch {
-		return false;
-	}
-}
-
 export const handle: Handle = async ({ event, resolve }) => {
 	const path = event.url.pathname;
 
@@ -79,7 +28,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const authToken = event.cookies.get('auth-token');
 	if (!authToken) throw redirect(303, '/login');
 
-	const result = await probeAdmin(authToken);
+	// The user's cookie and nothing else: comhairle prefers a Bearer token over
+	// the cookie, so a service key sent alongside would probe the key's owner.
+	const result = await probeAdmin(createBackendClient(authToken));
 	if (result === 'unauthorized') {
 		event.cookies.delete('auth-token', { path: '/' });
 		clearHostSession(event.cookies, event.url);
