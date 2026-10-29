@@ -41,6 +41,6 @@ Back in this repo:
 pnpm dev
 ```
 
-Open the URL the script prints (`http://localhost:5173/host/conversations/<slug>`). Re-seed = re-run script + restart `pnpm dev`.
+Open the URL the script prints (`http://localhost:5173/<slug>`), or `http://localhost:5173/` for the directory. Re-seed = re-run script + restart `pnpm dev`.
 
 For deeper stuff (regions, auth, api-client, polis redirect) → [README.md](README.md).
