@@ -1,5 +1,5 @@
 import type { UserOrganizationsResponse } from '@crownshy/api-client/api';
-import type { createApiClient } from '$lib/api/client';
+import type { Api } from '@civicos/shared/api';
 
 /**
  * Which Host pages the signed-in user may open, and what they may do there (#454).
@@ -33,9 +33,7 @@ export function toHostAccess(orgs: UserOrganizationsResponse | null): HostAccess
  * For form actions, which run without the layout loads and so cannot read
  * `hostAccess` through `parent()`. A failed call grants nothing.
  */
-export async function fetchHostAccess(
-	api: Pick<ReturnType<typeof createApiClient>, 'GetUserOrganizations'>
-): Promise<HostAccess> {
+export async function fetchHostAccess(api: Pick<Api, 'GetUserOrganizations'>): Promise<HostAccess> {
 	return toHostAccess(await api.GetUserOrganizations().catch(() => null));
 }
 

@@ -1,5 +1,5 @@
 /**
- * The Campaigns anyone can walk into, for the directory at `/conversations` and
+ * The Campaigns anyone can walk into, for the directory at the site root and
  * for each Place's page at `/<place-slug>`.
  *
  * A 404 used to offer nothing but a link off the product, because there is no

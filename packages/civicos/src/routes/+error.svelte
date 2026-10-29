@@ -34,8 +34,6 @@
 		<!-- The directory, not a corrective link. Nothing here knows which Campaign
 		     was meant, and ADR 0007 keeps it that way; a list of what is running
 		     lets the participant pick without the page guessing. -->
-		<Button variant="soft" size="md" href="/conversations" class="mt-8">
-			SEE LIVE CONVERSATIONS
-		</Button>
+		<Button variant="soft" size="md" href="/" class="mt-8">SEE LIVE CONVERSATIONS</Button>
 	</div>
 </AppShell>

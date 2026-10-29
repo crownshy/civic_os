@@ -8,7 +8,7 @@ import {
 	type Participation
 } from '$lib/config/participation';
 import type { DemographicQuestionData } from '@civicos/shared/data/demographics';
-import type { createApiClient } from '@crownshy/api-client/client';
+import type { Api } from '@civicos/shared/api';
 import type { PageLoad } from './$types';
 
 /**
@@ -22,7 +22,7 @@ import type { PageLoad } from './$types';
  * them, so an empty answer there means never configured, not all switched off.
  */
 async function aboutYouQuestionsForCampaign(
-	api: ReturnType<typeof createApiClient>,
+	api: Api,
 	campaign: Campaign,
 	participation: Participation
 ): Promise<AboutYouQuestion[]> {

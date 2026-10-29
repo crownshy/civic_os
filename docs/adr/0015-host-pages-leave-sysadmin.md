@@ -35,6 +35,11 @@ The root layout turns `GetUserOrganizations` into `hostAccess`
 the caller cannot see, and every form action re-reads access itself, because
 actions run without the layout loads. Comhairle checks each write as well.
 
+Getting into admin at all follows the same rule (#442). The sign-in gate
+(`$lib/server/admin-gate.ts`) passes a comhairle system admin on `/regions`, and
+otherwise anyone `GetUserOrganizations` lists in at least one Host. Host roles are
+organization roles, so `/regions` alone turned every Host admin away.
+
 `ListOrganizations` returns every Host to whoever asks, so the list page filters
 it to the caller's Hosts. Comhairle keeps one organization per user today, so the
 "more than one Host" rows are there for when it stops doing that.

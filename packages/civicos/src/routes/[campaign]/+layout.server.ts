@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { createApiClient } from '@crownshy/api-client/client';
+import { serverApi, type Api } from '@civicos/shared/api';
 import type { LayoutServerLoad } from './$types';
 import { resolveFaq, resolveHostCopy, type ConversationCopy } from '$lib/config/host-copy';
 import {
@@ -39,7 +39,7 @@ export const load: LayoutServerLoad = async ({ params, url, cookies, depends }) 
 
 	// Admin edits this copy in real time, so it needs a key an invalidation can
 	// target rather than relying on a full reload. The directory key covers the
-	// Place branch, which is the same list as `/conversations`.
+	// Place branch, which is the same list as the site root.
 	depends('civicos:conversation');
 	depends('civicos:directory');
 
@@ -47,7 +47,7 @@ export const load: LayoutServerLoad = async ({ params, url, cookies, depends }) 
 	// returns the api client, which cannot be serialized, so SvelteKit re-runs
 	// it on hydration. Fetching there would cost two requests per first paint.
 	// `campaign` and `hostCopy` are plain data, so they transport.
-	const api = createApiClient(`${url.origin}/api`, undefined, 'server');
+	const api = serverApi(url);
 
 	// Why the lookup failed, when it did. A 404 is the only ordinary miss: the
 	// list is candidates, not guarantees. The other two are not misses at all and
@@ -60,7 +60,7 @@ export const load: LayoutServerLoad = async ({ params, url, cookies, depends }) 
 	// with Read on the Conversation, so co-hosts can preview as well.
 	let preview = false;
 	const hostToken = cookies.get(HOST_SESSION_COOKIE);
-	const hostApi = hostToken ? createApiClient(`${url.origin}/api`, hostToken, 'server') : null;
+	const hostApi = hostToken ? serverApi(url, hostToken) : null;
 
 	let conversation: ResolvedConversation | null = null;
 	for (const candidate of campaignCandidates(slug)) {
@@ -158,8 +158,6 @@ export const load: LayoutServerLoad = async ({ params, url, cookies, depends }) 
 		previewAboutYou: preview && hostApi ? await readAboutYou(hostApi, campaign.id) : null
 	};
 };
-
-type Api = ReturnType<typeof createApiClient>;
 
 async function readDraft(hostApi: Api | null, candidate: string) {
 	if (!hostApi) return null;

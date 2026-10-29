@@ -1,8 +1,6 @@
-import type { createApiClient } from '@crownshy/api-client/client';
+import type { Api } from '@civicos/shared/api';
 import type { CampaignPoll } from '@civicos/shared/data/place';
 import { POLL_PAUSED_METADATA_KEY, type PollStatus } from '@civicos/shared/data/poll-status';
-
-type Api = ReturnType<typeof createApiClient>;
 
 /** Draft is not a target: once launched, a Campaign never goes back (#443). */
 export type PollStatusTarget = Exclude<PollStatus, 'draft'>;

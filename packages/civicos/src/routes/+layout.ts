@@ -1,4 +1,4 @@
-import { createApiClient } from '@crownshy/api-client/client';
+import { createApiClient } from '@civicos/shared/api';
 import type { LayoutLoad } from './$types';
 import { browser } from '$app/environment';
 

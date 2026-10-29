@@ -10,6 +10,7 @@
 	"exports": {
 		".": "./src/index.ts",
 		"./types": "./src/types/index.ts",
+		"./api": "./src/api.ts",
 		"./utils": "./src/utils.ts",
 		"./sanitize": "./src/sanitize.ts",
 		"./rich-text": "./src/rich-text.ts",
@@ -60,6 +61,7 @@
 		"tailwind-variants": "^3.2.2"
 	},
 	"peerDependencies": {
+		"@crownshy/api-client": "^0.0.66-rc.0",
 		"svelte": "^5.0.0"
 	},
 	"devDependencies": {

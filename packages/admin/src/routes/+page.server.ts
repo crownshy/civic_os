@@ -1,4 +1,4 @@
-import { createApiClient } from '$lib/api/client';
+import { serverApi } from '@civicos/shared/api';
 import type { PageServerLoad } from './$types';
 
 /**
@@ -11,7 +11,7 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 	depends('dashboard:event-counts');
 
 	const { conversations } = await parent();
-	const api = createApiClient(`${url.origin}/api`, cookies.get('auth-token'), 'server');
+	const api = serverApi(url, cookies.get('auth-token'));
 
 	const counts = await Promise.all(
 		conversations.map((conversation) =>

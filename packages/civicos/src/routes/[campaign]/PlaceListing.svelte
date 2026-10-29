@@ -38,7 +38,7 @@
 		</div>
 
 		<div class="mt-auto flex justify-center px-6 pt-2 pb-10 md:px-12">
-			<Button variant="soft" size="md" href="/conversations">SEE ALL CONVERSATIONS</Button>
+			<Button variant="soft" size="md" href="/">SEE ALL CONVERSATIONS</Button>
 		</div>
 	</div>
 </AppShell>

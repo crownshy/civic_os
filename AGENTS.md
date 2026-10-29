@@ -78,7 +78,7 @@ The short list. Full rationale for each is in [STYLE_GUIDE.md](STYLE_GUIDE.md).
 
 - **Do not `git commit`.** Leave changes for the human to review and commit.
 - **Backend data goes through the generated API client, never a hand-rolled `fetch`.**
-  Use `createApiClient` from `@crownshy/api-client/client` (created once in the root
+  Use `createApiClient` from `@civicos/shared/api` (created once in the root
   `+layout.ts`, read in child loads via `await parent()`), e.g. `api.ListEvents(...)`.
   Raw `fetch` is allowed only for things the client does not cover: the
   `/api/[...path]` proxy route itself, static assets, and third-party services (Polis).

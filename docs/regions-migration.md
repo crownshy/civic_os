@@ -49,8 +49,8 @@ Nothing else. A slug naming no Campaign is a 404, not a reason to serve a
 different one. The exception is a legacy region whose backend is unreachable:
 Utah still renders from `regions.ts` rather than going dark.
 
-`PUBLIC_CAMPAIGN_SLUG` says which Campaign the root `/` redirects to on a
-deployment that has no legacy subdomain. It takes no part in resolution.
+The root `/` is the directory of live Campaigns on every deployment without a
+legacy subdomain (#537). There is no setting to point it at one Campaign.
 
 ## What a Campaign created in admin still gets from regions.ts
 
