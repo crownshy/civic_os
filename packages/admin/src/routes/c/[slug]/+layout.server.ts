@@ -11,6 +11,7 @@ import {
 	demographicsFromBackend
 } from '@civicos/shared/data/demographics';
 import { readPoll } from '@civicos/shared/data/place';
+import type { UserActions } from '@crownshy/api-client/api';
 import type { LayoutServerLoad } from './$types';
 
 type Api = ReturnType<typeof ApiClientFactory>;
@@ -75,14 +76,32 @@ export const load: LayoutServerLoad = async ({ params, parent, cookies, url, dep
 			return [];
 		});
 
-	const [conversation, polisStep, hostName, demographicQuestions, conversationDemographics] =
-		await Promise.all([
-			conversationPromise,
-			polisStepPromise,
-			hostNamePromise,
-			demographicQuestionsPromise,
-			conversationDemographicsPromise
-		]);
+	// Deleting needs the Conversation `admin` role. A Host's admins have it on the
+	// Host's own Campaigns; its members and co-hosts do not. A failed lookup hides
+	// the button rather than offering a delete that would 403.
+	const canDeletePromise = api
+		.GetUserActions({ params: { resource_type: 'conversation', resource_id: summary.id } })
+		.then((r: UserActions) => r.actions.includes('conversation_delete'))
+		.catch((e) => {
+			console.warn('GetUserActions failed', e);
+			return false;
+		});
+
+	const [
+		conversation,
+		polisStep,
+		hostName,
+		demographicQuestions,
+		conversationDemographics,
+		canDelete
+	] = await Promise.all([
+		conversationPromise,
+		polisStepPromise,
+		hostNamePromise,
+		demographicQuestionsPromise,
+		conversationDemographicsPromise,
+		canDeletePromise
+	]);
 	const demographicCategories = demographicsFromBackend(
 		demographicQuestions,
 		conversationDemographics
@@ -204,7 +223,14 @@ export const load: LayoutServerLoad = async ({ params, parent, cookies, url, dep
 				: ('step' as const)
 	};
 
-	return { campaign, conversation, textContent, defaultDemographics, customDemographics };
+	return {
+		campaign,
+		conversation,
+		textContent,
+		defaultDemographics,
+		customDemographics,
+		canDelete
+	};
 };
 
 /**

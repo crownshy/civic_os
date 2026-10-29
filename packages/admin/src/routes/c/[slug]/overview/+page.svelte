@@ -972,32 +972,34 @@
 		/>
 
 		<!-- Danger zone: not in the Figma refresh. -->
-		<Card
-			class="rounded-[20px] border-destructive/30 bg-destructive/5 transition-colors duration-200 hover:border-destructive/60 hover:bg-destructive/10"
-		>
-			<div
-				class="flex flex-col items-start gap-3 px-4 py-5 sm:flex-row sm:items-center sm:justify-between md:px-8"
+		{#if data.canDelete}
+			<Card
+				class="rounded-[20px] border-destructive/30 bg-destructive/5 transition-colors duration-200 hover:border-destructive/60 hover:bg-destructive/10"
 			>
-				<div>
-					<div class="text-caption font-bold tracking-tight text-destructive">DANGER ZONE</div>
-					<div class="text-caption text-muted-foreground">
-						Permanently delete this conversation and all its data.
-					</div>
-				</div>
-				<Button
-					size="sm"
-					variant="destructive-outline"
-					onclick={() => {
-						deleteError = null;
-						deleteConfirm = '';
-						deleteOpen = true;
-					}}
+				<div
+					class="flex flex-col items-start gap-3 px-4 py-5 sm:flex-row sm:items-center sm:justify-between md:px-8"
 				>
-					<Trash2 class="size-3.5" />
-					delete conversation…
-				</Button>
-			</div>
-		</Card>
+					<div>
+						<div class="text-caption font-bold tracking-tight text-destructive">DANGER ZONE</div>
+						<div class="text-caption text-muted-foreground">
+							Permanently delete this conversation and all its data.
+						</div>
+					</div>
+					<Button
+						size="sm"
+						variant="destructive-outline"
+						onclick={() => {
+							deleteError = null;
+							deleteConfirm = '';
+							deleteOpen = true;
+						}}
+					>
+						<Trash2 class="size-3.5" />
+						delete conversation…
+					</Button>
+				</div>
+			</Card>
+		{/if}
 	</div>
 </div>
 
