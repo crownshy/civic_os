@@ -6,6 +6,7 @@ import type { OrganizationTeamResponseDto } from '@crownshy/api-client/api';
 import { addMemberSchema, groupForRole, toTeamMember } from './member-schema';
 import { hostDetailsSchema, toExternalUrl, toWebsite } from '$lib/hosts/host-details-schema';
 import { COHOST_ROLE, CONVERSATION_RESOURCE } from '$lib/permissions';
+import { apiStatus, describeApiFailure } from '$lib/api/describe-failure';
 import { routeSlugFor, statusFor } from '$lib/conversations';
 import { canManageHost, canViewHost, fetchHostAccess, type HostAccess } from '$lib/host-access';
 import type { AssignableConversation, HostConversation } from './host-conversations';
@@ -20,6 +21,18 @@ function client(url: URL, cookies: { get: (n: string) => string | undefined }) {
  * Hosts stays with Super users: it hands one Host's work to another, with no undo.
  */
 const canAssignCampaigns = (access: HostAccess) => access.all;
+
+/**
+ * Comhairle refuses a team change with 403 when the caller lacks the Host role,
+ * and also when the Host's groups hold `super_admin`: changing who is in them
+ * hands out super user access, which only a super user may grant.
+ */
+function teamFailure(e: unknown, action: string): string {
+	if (apiStatus(e) === 403) {
+		return `Could not ${action}: Comhairle refused it. Changing this team may need a super user.`;
+	}
+	return `Could not ${action}: ${describeApiFailure(e)}`;
+}
 
 /** Form actions skip the layout gate, so each one checks for itself. */
 async function requireAccess(
@@ -301,11 +314,9 @@ export const actions: Actions = {
 
 		const api = client(url, cookies);
 		await requireAccess(api, (a) => canManageHost(a, params.id));
-		// Guard: don't let a user demote themselves out of admin.
+		// Comhairle refuses any change to your own groups, promotion included.
 		const me = await api.CurrentUser().catch(() => null);
-		if (me?.id === userId && role === 'member') {
-			return fail(400, { error: "You can't remove your own admin role." });
-		}
+		if (me?.id === userId) return fail(400, { error: "You can't change your own role." });
 
 		// Roles are group memberships: admins is a subset of members, so demoting
 		// means leaving the admins group, not joining members.
@@ -323,7 +334,7 @@ export const actions: Actions = {
 			return { ok: true };
 		} catch (e) {
 			console.error('Updating organization admins group failed', e);
-			return fail(400, { error: 'Could not update role.' });
+			return fail(400, { error: teamFailure(e, 'update role') });
 		}
 	},
 
@@ -344,7 +355,7 @@ export const actions: Actions = {
 			return { ok: true };
 		} catch (e) {
 			console.error('RemoveOrganizationMember failed', e);
-			return fail(400, { error: 'Could not remove member.' });
+			return fail(400, { error: teamFailure(e, 'remove member') });
 		}
 	}
 };
