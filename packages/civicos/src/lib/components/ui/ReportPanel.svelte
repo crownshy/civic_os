@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fly, fade } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
-	import { X } from 'lucide-svelte';
+	import { X } from '@lucide/svelte';
 
 	// TODO: Swap REPORT_FORM_ID for the real HeyForm form ID once the report form is built.
 	const REPORT_FORM_ID = 'SogNEF5B';

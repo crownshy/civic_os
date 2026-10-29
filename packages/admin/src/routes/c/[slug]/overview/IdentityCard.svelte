@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { failureMessage } from '$lib/api/describe-failure';
 	import type { Snippet } from 'svelte';
 	import Card from '@civicos/shared/ui/Card.svelte';
 	import SetupField from '$lib/components/setup/SetupField.svelte';
@@ -69,7 +70,7 @@
 			savedTimer = setTimeout(() => (saved = null), 2500);
 		} catch (e) {
 			console.error('PatchConversationMetadata failed', e);
-			error = e instanceof Error ? e.message : 'Could not save that colour scheme.';
+			error = failureMessage(e, 'Could not save that colour scheme.');
 		} finally {
 			pending = null;
 		}

@@ -3,7 +3,7 @@
 	import { page } from '$app/state';
 	import Dialog from '$lib/components/ui/Dialog.svelte';
 	import { Input } from '@civicos/shared/ui/input';
-	import { Mail, User } from 'lucide-svelte';
+	import { Mail, User } from '@lucide/svelte';
 	import { Button } from '$lib/components/ui';
 	import { format } from 'date-fns';
 	import * as Form from '@civicos/shared/ui/form';

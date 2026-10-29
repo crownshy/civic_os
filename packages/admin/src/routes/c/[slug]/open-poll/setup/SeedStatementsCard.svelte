@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { failureMessage } from '$lib/api/describe-failure';
 	import { Plus, X } from '@lucide/svelte';
 	import SetupCard from '$lib/components/setup/SetupCard.svelte';
 	import AddSeedStatementsDialog from '$lib/components/seeds/AddSeedStatementsDialog.svelte';
@@ -50,7 +51,7 @@
 			await onSetStatus(row, decision);
 		} catch (e) {
 			console.error('moderateStatementAux failed', e);
-			error = e instanceof Error ? e.message : 'Could not update the statement.';
+			error = failureMessage(e, 'Could not update the statement.');
 		} finally {
 			pending = { ...pending, [row.id]: false };
 		}

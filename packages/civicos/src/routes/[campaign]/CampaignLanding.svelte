@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { isValidEmail } from '$lib/utils/forms';
 	import { campaignPath } from '@civicos/shared/data/place';
 	import { fade } from 'svelte/transition';
 	import { goto, preloadCode } from '$app/navigation';
@@ -7,7 +8,7 @@
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { AboutDialog, Button, Dialog, ZipInput, Accordion, StickyNav } from '$lib/components/ui';
-	import { Mail } from 'lucide-svelte';
+	import { Mail } from '@lucide/svelte';
 	import { Input } from '@civicos/shared/ui/input';
 	import { session } from '$lib/services/session.svelte';
 	import { enterCampaign, join, signUpForUpdates, type JoinContext } from '$lib/services/join';
@@ -181,10 +182,6 @@
 		trackEvent('SucccesfullSignup');
 		await goto(pollPath);
 		leaving = false;
-	}
-
-	function isValidEmail(value: string): boolean {
-		return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 	}
 
 	async function handleEmailSignup() {

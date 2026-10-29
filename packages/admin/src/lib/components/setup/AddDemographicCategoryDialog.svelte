@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { failureMessage } from '$lib/api/describe-failure';
 	import CharCount from '$lib/components/CharCount.svelte';
 	import { ArrowUp, ArrowDown, Pencil, X } from '@lucide/svelte';
 	import * as Dialog from '@civicos/shared/ui/dialog';
@@ -145,7 +146,7 @@
 			open = false;
 		} catch (e) {
 			console.error('Adding a demographic category failed', e);
-			error = e instanceof Error ? e.message : 'Could not save the category.';
+			error = failureMessage(e, 'Could not save the category.');
 		} finally {
 			submitting = false;
 		}

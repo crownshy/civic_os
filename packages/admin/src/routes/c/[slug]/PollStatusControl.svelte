@@ -4,7 +4,7 @@
 	import type { PollStatus } from '@civicos/shared/data/poll-status';
 	import type { PollStatusTarget } from '$lib/api/poll-status';
 	import { resolve } from '$app/paths';
-	import { permissionDenied } from '$lib/api/describe-failure';
+	import { failureMessage, permissionDenied } from '$lib/api/describe-failure';
 	import { pollStatusCopy } from '$lib/poll-status-copy';
 
 	interface Props {
@@ -41,7 +41,7 @@
 			console.error('Failed to change poll status', e);
 			error =
 				permissionDenied(e, 'change this poll’s status') ??
-				(e instanceof Error ? e.message : 'Could not change the poll status.');
+				failureMessage(e, 'Could not change the poll status.');
 		} finally {
 			pending = null;
 		}

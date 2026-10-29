@@ -6,7 +6,7 @@
 	import * as Popover from '@civicos/shared/ui/popover';
 	import { cn } from '$lib/utils.js';
 	import { Input } from '@civicos/shared/ui/input';
-	import { LucideX } from 'lucide-svelte';
+	import { LucideX } from '@lucide/svelte';
 
 	interface Props {
 		value: string;

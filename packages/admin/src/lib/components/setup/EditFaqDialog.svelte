@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { failureMessage } from '$lib/api/describe-failure';
 	import { untrack } from 'svelte';
 	import * as Dialog from '@civicos/shared/ui/dialog';
 	import { Button } from '@civicos/shared/ui/button';
@@ -80,7 +81,7 @@
 			onClose();
 		} catch (e) {
 			console.error('Saving the FAQ entry failed', e);
-			error = e instanceof Error ? e.message : 'Could not save the question.';
+			error = failureMessage(e, 'Could not save the question.');
 		} finally {
 			submitting = false;
 		}

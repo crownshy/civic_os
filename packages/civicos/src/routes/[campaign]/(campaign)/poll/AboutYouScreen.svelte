@@ -3,7 +3,7 @@
 	import { cubicOut } from 'svelte/easing';
 	import type { AboutYouQuestion } from '$lib/config/participation';
 	import { InfoBar, Button, Dialog, Link, AlertBanner } from '$lib/components/ui';
-	import { Check, Plus } from 'lucide-svelte';
+	import { Check, Plus } from '@lucide/svelte';
 
 	interface Props {
 		placeName: string;

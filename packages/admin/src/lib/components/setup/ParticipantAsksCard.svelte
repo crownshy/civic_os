@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { failureMessage } from '$lib/api/describe-failure';
 	import SetupCard from './SetupCard.svelte';
 	import ToggleRow from './ToggleRow.svelte';
 	import {
@@ -40,7 +41,7 @@
 			await fn();
 		} catch (e) {
 			console.error('PatchConversationMetadata failed', e);
-			error = e instanceof Error ? e.message : 'Could not save that change.';
+			error = failureMessage(e, 'Could not save that change.');
 		} finally {
 			saving = without(saving, key);
 			heading = without(heading, key);
