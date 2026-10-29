@@ -95,7 +95,8 @@ Undo: `pnpm unlink --global @crownshy/api-client && pnpm install`.
 src/
 ├── routes/
 │   ├── api/[...path]/+server.ts    proxy → comhairle
-│   ├── conversations/              directory of live Campaigns
+│   ├── +page.svelte                directory of live Campaigns
+│   ├── conversations/              308 to /
 │   ├── [campaign]/                 Campaign page, or Place listing
 │   │   └── (campaign)/             poll/ events/ report/
 │   └── [org]/conversations/…       308 from the old URLs

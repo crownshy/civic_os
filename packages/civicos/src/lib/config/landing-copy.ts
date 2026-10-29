@@ -55,7 +55,7 @@ export interface FooterLink {
  *
  * The Open Poll link has to be built per Campaign: each one's poll is
  * `/<campaign>/poll`, so a fixed path would 404 on every Campaign.
- * `/conversations` stays absolute, because that one is the cross-Campaign
+ * `/` stays absolute, because that one is the cross-Campaign
  * directory rather than this Campaign's.
  */
 export function footerLinks(campaignSlug: string | undefined): FooterLink[] {
@@ -66,7 +66,7 @@ export function footerLinks(campaignSlug: string | undefined): FooterLink[] {
 }
 
 const FOOTER_LINKS: FooterLink[] = [
-	{ label: 'Join a Community Conversation', href: '/conversations' },
+	{ label: 'Join a Community Conversation', href: '/' },
 	{ label: 'About BLOOM Project', href: 'https://www.bloom-project.org/', external: true },
 	{
 		label: 'Terms and Conditions',

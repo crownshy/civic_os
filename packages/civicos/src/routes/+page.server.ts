@@ -1,8 +1,18 @@
+import { redirect } from '@sveltejs/kit';
 import { createApiClient } from '@crownshy/api-client/client';
+import { campaignPath } from '@civicos/shared/data/place';
 import { listDirectory } from '$lib/config/directory';
+import { extractSubdomain } from '$lib/config/regions';
+import { legacyRegionForSlug } from '$lib/config/campaign';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ url, depends }) => {
+	// Production still serves `utah.bloomproject.us`, `oregon.`, `testing.` and
+	// `all.`, and links already shared expect the root of each to open that
+	// region's Campaign (ADR 0011). Every other host gets the directory.
+	const legacy = legacyRegionForSlug(extractSubdomain(url.hostname));
+	if (legacy) redirect(307, campaignPath(legacy.slug));
+
 	// A Host publishing a Campaign changes this list, so it needs a key an
 	// invalidation can target.
 	depends('civicos:directory');

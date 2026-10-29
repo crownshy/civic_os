@@ -122,6 +122,10 @@ not a corrective link: it does not claim to know which Campaign the wrong URL
 meant, so it stays right under either model. The 404 points at it instead of off
 the product.
 
+**The directory moves to `/` (2026-10-29, #537).** The site root renders it on
+every host but the four legacy subdomains, and `/conversations` redirects there
+with its query string.
+
 It is built from `GET /conversation`, the one list endpoint the anonymous app can
 reach. That endpoint returns only `is_live` Campaigns and ignores the `is_live`
 query param, which is a defect for admin (see `sysadmin/hosts/[id]`) and exactly

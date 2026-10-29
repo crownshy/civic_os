@@ -101,7 +101,7 @@
 		<!-- CTA cards -->
 		<div class="mx-auto mt-6 grid w-full max-w-4xl grid-cols-1 gap-3.5 px-7 md:grid-cols-2">
 			<a
-				href={resolve('/conversations')}
+				href={resolve('/')}
 				data-umami-event="end-cta-join-click"
 				class="group flex touch-manipulation flex-col gap-2 rounded-[30px] bg-card p-6 shadow-[0px_4px_24px_rgba(134,101,73,0.20)] transition-all hover:scale-[1.01] active:scale-[0.99] active:shadow-[0px_1px_8px_rgba(134,101,73,0.20)] active:duration-0"
 			>
