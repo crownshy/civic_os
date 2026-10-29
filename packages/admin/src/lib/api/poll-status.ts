@@ -1,6 +1,7 @@
 import type { Api } from '@civicos/shared/api';
 import type { CampaignPoll } from '@civicos/shared/data/place';
-import { POLL_PAUSED_METADATA_KEY, type PollStatus } from '@civicos/shared/data/poll-status';
+import { writeMetadata } from '@civicos/shared/data/metadata';
+import type { PollStatus } from '@civicos/shared/data/poll-status';
 
 /** Draft is not a target: once launched, a Campaign never goes back (#443). */
 export type PollStatusTarget = Exclude<PollStatus, 'draft'>;
@@ -58,7 +59,7 @@ export async function setPollStatus({
 	} else {
 		await api.LaunchConversation(undefined, params);
 	}
-	await api.PatchConversationMetadata({ [POLL_PAUSED_METADATA_KEY]: next === 'paused' }, params);
+	await writeMetadata(api, conversationId, { pollPaused: next === 'paused' });
 
 	try {
 		if (polisWorkflowStepId) {
@@ -78,7 +79,7 @@ export async function setPollStatus({
 	}
 	await reload();
 
-	if (next === 'live') await mirrorPollIdentity(api, params, pollIdentity, reload);
+	if (next === 'live') await mirrorPollIdentity(api, conversationId, pollIdentity, reload);
 }
 
 /**
@@ -87,7 +88,7 @@ export async function setPollStatus({
  */
 async function mirrorPollIdentity(
 	api: Api,
-	params: { params: { conversation_id: string } },
+	conversationId: string,
 	pollIdentity: () => CampaignPoll | null,
 	reload: () => Promise<void>
 ) {
@@ -95,7 +96,7 @@ async function mirrorPollIdentity(
 	if (!poll) return;
 
 	try {
-		await api.PatchConversationMetadata({ poll }, params);
+		await writeMetadata(api, conversationId, { poll });
 		await reload();
 	} catch (e) {
 		// Not worth failing the change: the Campaign is live either way, and going

@@ -3,6 +3,7 @@ import { superValidate, message, setError } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { serverApi, type Api } from '@civicos/shared/api';
 import { placeFromName, type CampaignPoll } from '@civicos/shared/data/place';
+import { writeMetadata } from '@civicos/shared/data/metadata';
 import { rescopedSlug } from '$lib/config/place';
 import { apiStatus, describeApiFailure } from '$lib/api/describe-failure';
 import { enableDefaultDemographics } from '$lib/api/demographics';
@@ -294,10 +295,10 @@ export const actions: Actions = {
 		const poll = pollIdentity(polisStep, keyQuestion);
 		if (poll || place) {
 			try {
-				await api.PatchConversationMetadata(
-					{ ...(poll ? { poll } : {}), ...(place ? { place } : {}) },
-					{ params: { conversation_id: conversationId } }
-				);
+				await writeMetadata(api, conversationId, {
+					...(poll ? { poll } : {}),
+					...(place ? { place } : {})
+				});
 			} catch (e) {
 				console.error('Mirroring poll / place into metadata failed', e);
 			}

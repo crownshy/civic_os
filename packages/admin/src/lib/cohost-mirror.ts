@@ -20,8 +20,9 @@
 
 import { CONVERSATION_RESOURCE, cohostOrgIds } from '$lib/permissions';
 import { toPlaceSlug, type CampaignCoHost, type CampaignOrg } from '@civicos/shared/data/place';
+import { writeMetadata, type MetadataApi } from '@civicos/shared/data/metadata';
 
-type Api = {
+type Api = MetadataApi & {
 	ListOrganizations: (args: { queries: { limit: number } }) => Promise<{
 		records: {
 			id: string;
@@ -40,10 +41,6 @@ type Api = {
 			role_name?: string | null;
 		}[];
 	}>;
-	PatchConversationMetadata: (
-		body: Record<string, unknown>,
-		options: { params: { conversation_id: string } }
-	) => Promise<unknown>;
 };
 
 /** What an action says when it saved but `mirrorHosts` could not write. */
@@ -105,10 +102,7 @@ export async function mirrorHosts(
 					}
 				: null;
 
-		await api.PatchConversationMetadata(
-			{ cohosts, ...(org ? { org } : {}) },
-			{ params: { conversation_id: conversationId } }
-		);
+		await writeMetadata(api, conversationId, { cohosts, ...(org ? { org } : {}) });
 		return true;
 	} catch (e) {
 		console.error('Mirroring hosts into metadata failed', e);

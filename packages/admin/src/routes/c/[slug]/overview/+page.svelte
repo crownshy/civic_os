@@ -23,6 +23,8 @@
 	import FaqCard from '$lib/components/setup/FaqCard.svelte';
 	import ParticipantAsksCard from '$lib/components/setup/ParticipantAsksCard.svelte';
 	import { readColorScheme } from '@civicos/shared/data/color-scheme';
+	import { writeMetadata, type MetadataWrites } from '@civicos/shared/data/metadata';
+	import { readOrg } from '@civicos/shared/data/place';
 	import { readFaqs, toFaqsHtml, type FaqEntry } from '@civicos/shared/data/faq';
 	import type { CustomDemographicCategory } from '@civicos/shared/data/demographics';
 	import {
@@ -274,10 +276,7 @@
 				await data.api.PolisUpdateConfig({ workflow_step_id: stepId, topic: content });
 				const poll = campaign.pollIdentity;
 				if (!poll) return;
-				await data.api.PatchConversationMetadata(
-					{ poll: { ...poll, question: content } },
-					{ params: { conversation_id: campaign.id } }
-				);
+				await writeMetadata(data.api, campaign.id, { poll: { ...poll, question: content } });
 			};
 		}
 
@@ -440,14 +439,10 @@
 	 * until comhairle promotes them. Demographics moved to real
 	 * ConversationDemographics links (#441).
 	 *
-	 * Each write sends its whole key. PatchConversationMetadata merges only at the
-	 * top level and replaces nested values wholesale, so a partial object drops
-	 * whatever it omits.
+	 * `writeMetadata` owns how each key merges.
 	 */
-	async function patchMetadata(patch: Record<string, unknown>) {
-		await data.api.PatchConversationMetadata(patch, {
-			params: { conversation_id: campaign.id }
-		});
+	async function patchMetadata(writes: MetadataWrites) {
+		await writeMetadata(data.api, campaign.id, writes);
 		await invalidate(`campaign:${page.params.slug}`);
 	}
 
@@ -549,7 +544,7 @@
 	// --- Place -----------------------------------------------------------------
 	// A fourth destination, and the reason it sits outside the superform above:
 	// a Place is not a Conversation field at all, it is `metadata.place`, written
-	// through the same PatchConversationMetadata path as demographics and asks.
+	// through `writeMetadata` like the asks and the colour scheme.
 	//
 	// The Host types a name; the slug is derived from it, never typed, because it
 	// is a URL segment and the two must not drift. That does mean renaming a Place
@@ -595,10 +590,14 @@
 		// Campaign from that subdomain; it does not stop it being served, because a
 		// Campaign with no Place is served from the apex. Wiping these would break
 		// a Campaign that is still perfectly reachable.
+		//
+		// The Host is written only when none is stored. `mirrorHosts` owns it and
+		// stores the Host's url too, which a name-only object here used to drop.
 		const poll = campaign.pollIdentity;
-		const org = campaign.hostName
-			? { slug: toPlaceSlug(campaign.hostName), name: campaign.hostName }
-			: null;
+		const org =
+			campaign.hostName && !readOrg(conversation?.metadata)
+				? { slug: toPlaceSlug(campaign.hostName), name: campaign.hostName }
+				: null;
 
 		placeError = null;
 		saveStatus = 'saving';
@@ -607,7 +606,7 @@
 		// suffix off would leave the old one in place (`ai-utah-oregon`).
 		const previousPlaceSlug = storedPlaceSlug;
 		try {
-			await patchMetadata({ place, poll, org });
+			await patchMetadata({ place, ...(poll ? { poll } : {}), ...(org ? { org } : {}) });
 			savedPlaceName = next;
 			await rescopeSlug(previousPlaceSlug, place?.slug ?? '');
 			settle(['place'], []);

@@ -7,6 +7,9 @@ function fakeApi() {
 		UpdateConversation: vi.fn(async () => ({})),
 		LaunchConversation: vi.fn(async () => ({})),
 		PatchConversationMetadata: vi.fn(async () => ({})),
+		GetConversation: vi.fn(async () => ({
+			metadata: { poll: { polisId: 'old', question: 'Key question?' } }
+		})),
 		PolisUpdateConfig: vi.fn(async () => ({ poll_id: 'p' }))
 	};
 }
@@ -89,6 +92,21 @@ describe('setPollStatus', () => {
 
 		expect(api.LaunchConversation).toHaveBeenCalledWith(undefined, params);
 		expect(api.UpdateConversation).not.toHaveBeenCalled();
+	});
+
+	it('mirrors the launched poll without losing the stored Key Question', async () => {
+		// Launching repoints the step at a new poll, and comhairle never reports the
+		// topic back, so the question only survives if the mirror merges over it.
+		const { api, promise } = run('live', {
+			pollLaunched: false,
+			pollIdentity: () => ({ polisId: 'new', workflowStepId: 's1' })
+		});
+		await promise;
+
+		expect(api.PatchConversationMetadata).toHaveBeenLastCalledWith(
+			{ poll: { polisId: 'new', workflowStepId: 's1', question: 'Key question?' } },
+			params
+		);
 	});
 
 	it('refuses to pause a draft', async () => {
