@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$lib/activity.svelte';
 	import { Button } from '@civicos/shared/ui/button';
-	import { ArrowUpRight, MessagesSquare } from '@lucide/svelte';
+	import { AlertCircle, ArrowUpRight, MessagesSquare } from '@lucide/svelte';
 	import type { AssignableConversation, HostConversation } from './host-conversations';
 	import type { ConversationStatus } from '$lib/conversations';
 	import { resolve } from '$app/paths';
@@ -12,9 +12,11 @@
 		assignable?: AssignableConversation[];
 		/** Show the controls that add or remove a Campaign. Super users only. */
 		canAssign?: boolean;
+		/** Set when an assign or revoke saved but the public Campaign page did not follow. */
+		warning?: string | null;
 	}
 
-	let { conversations, assignable = [], canAssign = false }: Props = $props();
+	let { conversations, assignable = [], canAssign = false, warning = null }: Props = $props();
 
 	let selected = $state('');
 
@@ -33,6 +35,15 @@
 			Campaigns this Host owns, plus the ones it was added to as a co-host.
 		</p>
 	</div>
+
+	{#if warning}
+		<div
+			class="flex items-center gap-2 border-b border-border bg-muted px-5 py-2.5 text-caption text-muted-foreground"
+		>
+			<AlertCircle class="size-4 shrink-0" />
+			<span>{warning}</span>
+		</div>
+	{/if}
 
 	{#if conversations.length === 0}
 		<div class="flex flex-col items-center gap-2 px-5 py-10 text-body text-muted-foreground">
@@ -70,6 +81,7 @@
 					{#if canAssign && conversation.access === 'cohost'}
 						<form method="POST" action="?/revokeAccess" use:enhance>
 							<input type="hidden" name="conversationId" value={conversation.id} />
+							<input type="hidden" name="owningOrgId" value={conversation.ownerId ?? ''} />
 							<Button type="submit" variant="destructive-outline" size="sm">Remove access</Button>
 						</form>
 					{/if}

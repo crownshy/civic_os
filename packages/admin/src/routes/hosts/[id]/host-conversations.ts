@@ -9,6 +9,8 @@ export type HostConversation = {
 	status: ConversationStatus;
 	/** How the Host is attached: it owns the Campaign, or co-hosts it. */
 	access: 'owner' | 'cohost';
+	/** The Host that owns the Campaign, so a revoke can rebuild its credit list. */
+	ownerId: string | null;
 };
 
 /** A Campaign with no owning Host, offered for assignment on the Host page. */

@@ -20,14 +20,16 @@
 				slug: 'utah',
 				title: 'Utah Statewide Conversation',
 				status: 'live',
-				access: 'owner'
+				access: 'owner',
+				ownerId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
 			},
 			{
 				id: '22222222-2222-2222-2222-222222222222',
 				slug: 'oregon',
 				title: 'Central Oregon Housing',
 				status: 'draft',
-				access: 'cohost'
+				access: 'cohost',
+				ownerId: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'
 			}
 		]
 	}}
@@ -44,14 +46,16 @@
 				slug: 'utah',
 				title: 'Utah Statewide Conversation',
 				status: 'live',
-				access: 'owner'
+				access: 'owner',
+				ownerId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
 			},
 			{
 				id: '22222222-2222-2222-2222-222222222222',
 				slug: 'salt-lake',
 				title: 'Salt Lake County Conversation',
 				status: 'draft',
-				access: 'cohost'
+				access: 'cohost',
+				ownerId: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'
 			}
 		],
 		assignable: [{ id: '44444444-4444-4444-4444-444444444444', title: 'Unowned Draft' }]
@@ -68,21 +72,24 @@
 				slug: 'live-campaign',
 				title: 'Live Campaign',
 				status: 'live',
-				access: 'owner'
+				access: 'owner',
+				ownerId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
 			},
 			{
 				id: '22222222-2222-2222-2222-222222222222',
 				slug: 'draft-campaign',
 				title: 'Draft Campaign',
 				status: 'draft',
-				access: 'owner'
+				access: 'owner',
+				ownerId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
 			},
 			{
 				id: '33333333-3333-3333-3333-333333333333',
 				slug: 'finished-campaign',
 				title: 'Finished Campaign',
 				status: 'complete',
-				access: 'owner'
+				access: 'owner',
+				ownerId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
 			}
 		]
 	}}
@@ -101,12 +108,32 @@
 				slug: 'utah',
 				title: 'Utah Statewide Conversation',
 				status: 'live',
-				access: 'owner'
+				access: 'owner',
+				ownerId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
 			}
 		],
 		assignable: [
 			{ id: '44444444-4444-4444-4444-444444444444', title: 'Unassigned Fixture Campaign' },
 			{ id: '55555555-5555-5555-5555-555555555555', title: 'Draft Housing Poll' }
+		]
+	}}
+/>
+
+<!-- An assign or revoke that saved, but whose metadata mirror failed. -->
+<Story
+	name="Public page stale"
+	args={{
+		warning:
+			'Saved, but the public Campaign page did not update. Add or remove a co-host to try again.',
+		conversations: [
+			{
+				id: '22222222-2222-2222-2222-222222222222',
+				slug: 'oregon',
+				title: 'Central Oregon Housing',
+				status: 'draft',
+				access: 'cohost',
+				ownerId: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'
+			}
 		]
 	}}
 />

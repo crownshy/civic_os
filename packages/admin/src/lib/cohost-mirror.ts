@@ -46,6 +46,10 @@ type Api = {
 	) => Promise<unknown>;
 };
 
+/** What an action says when it saved but `mirrorHosts` could not write. */
+export const STALE_PUBLIC_PAGE =
+	'Saved, but the public Campaign page did not update. Add or remove a co-host to try again.';
+
 /**
  * Rebuild both from the grants and write them in one patch.
  *

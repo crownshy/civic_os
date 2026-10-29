@@ -56,6 +56,8 @@
 
 	// Error from the small role/remove actions (SvelteKit fail()).
 	const actionError = $derived((page.form as { error?: string } | null)?.error);
+	// Only the Campaign actions return a warning: they saved, but the public page did not follow.
+	const campaignWarning = $derived((page.form as { warning?: string } | null)?.warning ?? null);
 
 	function displayUrl(url?: string | null): string {
 		return url ? url.replace(/^https?:\/\//, '').replace(/\/$/, '') : '';
@@ -145,6 +147,7 @@
 				conversations={data.conversations}
 				assignable={data.assignableConversations}
 				canAssign={data.canAssign}
+				warning={campaignWarning}
 			/>
 		</div>
 
