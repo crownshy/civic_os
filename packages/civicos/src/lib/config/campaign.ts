@@ -57,12 +57,10 @@ export interface Campaign {
 	 * claims it, which leaves it off every Place page (ADR 0011).
 	 */
 	place: Place | null;
-	/**
-	 * Which Polis conversation this Campaign's poll is, when the Conversation
-	 * says. Null falls back to `regions.ts`, which is the only other place the
-	 * poll id exists: the Polis workflow step is 401 anonymously.
-	 */
-	poll: CampaignPoll | null;
+	/** The geography to label participant chrome with. See `placeNameFor`. */
+	placeName: string;
+	/** Which poll this Campaign runs, or null when nothing names one. See `pollFor`. */
+	poll: ResolvedPoll | null;
 	/** The Host, credited on event pages and in the calendar invite. */
 	org: CampaignOrg | null;
 	/**
@@ -166,14 +164,16 @@ export function resolveCampaign(
 	region: RegionConfig
 ): Campaign {
 	if (!conversation) {
+		const place = placeFromRegion(region);
 		return {
 			id: region.conversationId,
 			slug: region.slug,
 			title: region.heroHeader,
 			shortDescription: '',
 			// Reached only when the slug names this region, so it is the Place.
-			place: placeFromRegion(region),
-			poll: null,
+			place,
+			placeName: placeNameFor(place, region),
+			poll: pollFor(null, true, region),
 			org: region.hostName ? { slug: toPlaceSlug(region.hostName), name: region.hostName } : null,
 			// Reached only when the region IS the Campaign, so its partners are its
 			// co-hosts.
@@ -185,14 +185,16 @@ export function resolveCampaign(
 	}
 
 	const isLegacyRegion = isLegacyRegionConversation(conversation.id);
+	const place = placeForConversation(conversation.id, conversation.metadata);
 
 	return {
 		id: conversation.id,
 		slug: firstNonEmpty(conversation.slug, region.slug),
 		title: firstNonEmpty(conversation.title, region.heroHeader),
 		shortDescription: conversation.shortDescription?.trim() ?? '',
-		place: placeForConversation(conversation.id, conversation.metadata),
-		poll: readPoll(conversation.metadata),
+		place,
+		placeName: placeNameFor(place, region),
+		poll: pollFor(readPoll(conversation.metadata), isLegacyRegion, region),
 		org:
 			readOrg(conversation.metadata) ??
 			(region.hostName ? { slug: toPlaceSlug(region.hostName), name: region.hostName } : null),
@@ -242,21 +244,23 @@ export interface ResolvedPoll {
  * someone into a poll belonging to a different Campaign (#422, #421). The
  * caller is expected to refuse rather than serve a poll that is not this one.
  */
-export function pollFor(
-	campaign: Pick<Campaign, 'poll' | 'isLegacyRegion'>,
+function pollFor(
+	stored: CampaignPoll | null,
+	isLegacyRegion: boolean,
 	region: RegionConfig
 ): ResolvedPoll | null {
-	const stored = campaign.poll;
 	if (stored?.polisId) {
+		const workflowStepId =
+			stored.workflowStepId ?? (isLegacyRegion ? region.polis_workflow_step_id : undefined);
 		return {
 			polisId: stored.polisId,
 			...(stored.polisUrl ? { polisUrl: stored.polisUrl } : {}),
 			question: stored.question ?? '',
-			...(stored.workflowStepId ? { workflowStepId: stored.workflowStepId } : {})
+			...(workflowStepId ? { workflowStepId } : {})
 		};
 	}
 
-	if (campaign.isLegacyRegion && region.polisId) {
+	if (isLegacyRegion && region.polisId) {
 		return {
 			polisId: region.polisId,
 			question: region.question,
@@ -284,9 +288,6 @@ export function pollFor(
  * region claims, because `regionForCampaign` is total. #425 is what makes that
  * unrepresentable.
  */
-export function placeNameFor(
-	campaign: Pick<Campaign, 'place'> | null | undefined,
-	region: RegionConfig
-): string {
-	return campaign?.place?.name ?? region.stateName;
+function placeNameFor(place: Place | null, region: RegionConfig): string {
+	return place?.name ?? region.stateName;
 }

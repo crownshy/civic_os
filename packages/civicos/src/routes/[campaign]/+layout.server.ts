@@ -120,8 +120,8 @@ export const load: LayoutServerLoad = async ({ params, url, cookies, depends }) 
 	}
 
 	// Picked by the Campaign, not by the host it was opened under: any host
-	// serves any Campaign now (ADR 0011). Returned so every page below reads this
-	// region rather than the root layout's catch-all.
+	// serves any Campaign now (ADR 0011). Not returned: everything a page needs
+	// from it is resolved onto the Campaign and the Host copy here (#548).
 	const region = regionForCampaign(conversation?.id, slug);
 	const campaign = resolveCampaign(conversation, region);
 
@@ -133,7 +133,6 @@ export const load: LayoutServerLoad = async ({ params, url, cookies, depends }) 
 
 	return {
 		kind: 'campaign' as const,
-		region,
 		campaign,
 		// Derived from this request, not from `regions.ts`: a stored `shareUrl`
 		// pointed every admin-created Campaign at the USA catch-all.

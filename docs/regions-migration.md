@@ -61,17 +61,18 @@ at all.
 What is left is last-resort identity, reached only when a Conversation field is
 empty, and never copy:
 
-| Surface                           | Read site                        | Field                                   | When it is reached                                            |
-| --------------------------------- | -------------------------------- | --------------------------------------- | ------------------------------------------------------------- |
-| Campaign title                    | `campaign.ts:169,188`            | `heroHeader`                            | `Conversation.title` is empty, which the Setup schema forbids |
-| Key question                      | `[campaign]/+page.svelte:36`     | `question`                              | `metadata.poll.question` is missing                           |
-| Place chip                        | `campaign.ts:244`, `place.ts:32` | `stateName`, `slug`                     | The Campaign has no `metadata.place`                          |
-| Report data                       | `report/+page.server.ts:19`      | `polis_workflow_step_id`                | Legacy regions only, gated on `isLegacyRegion`                |
-| Voting poll                       | `poll/+page.svelte:58`           | `polisId`                               | Legacy regions only, gated on `isLegacyRegion`                |
-| Landing Context, What's Next, FAQ | `host-copy.ts`                   | `contextParagraphs`, `whatsNext`, `faq` | Legacy regions only, gated on `isLegacyRegion`                |
-| Hosted by, Your Hosts             | `campaign.ts:148`                | `partners`                              | Legacy regions only, gated on `isLegacyRegion`                |
+| Surface                           | Read site                                   | Field                                           | When it is reached                                            |
+| --------------------------------- | ------------------------------------------- | ----------------------------------------------- | ------------------------------------------------------------- |
+| Campaign title                    | `campaign.ts:169,188`                       | `heroHeader`                                    | `Conversation.title` is empty, which the Setup schema forbids |
+| Place chip                        | `campaign.ts` `placeNameFor`, `place.ts:32` | `stateName`, `slug`                             | The Campaign has no `metadata.place`                          |
+| Poll, Key Question, report step   | `campaign.ts` `pollFor`                     | `polisId`, `question`, `polis_workflow_step_id` | Legacy regions only, gated on `isLegacyRegion`                |
+| Landing Context, What's Next, FAQ | `host-copy.ts`                              | `contextParagraphs`, `whatsNext`, `faq`         | Legacy regions only, gated on `isLegacyRegion`                |
+| Hosted by, Your Hosts             | `campaign.ts:148`                           | `partners`                                      | Legacy regions only, gated on `isLegacyRegion`                |
 
-The four `isLegacyRegion` rows are Utah's and Oregon's live copy. They go when
+The Place chip and poll rows resolve once in `resolveCampaign`, onto
+`Campaign.placeName` and `Campaign.poll`. No page reads the region (#548).
+
+The three `isLegacyRegion` rows are Utah's and Oregon's live copy. They go when
 those two Campaigns have their values saved into their own records, which is
 the one step left.
 

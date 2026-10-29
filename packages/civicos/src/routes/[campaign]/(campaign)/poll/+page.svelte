@@ -21,8 +21,7 @@
 		type AboutYouQuestion,
 		type Participation
 	} from '$lib/config/participation';
-	import { placeNameFor, pollFor } from '$lib/config/campaign';
-	import type { RegionConfig } from '$lib/config/regions';
+	import type { Campaign } from '$lib/config/campaign';
 	import PolisApi from '$lib/services/polis-api.svelte';
 	import { session } from '$lib/services/session.svelte';
 	import type { ParticipantSession } from '$lib/services/participant';
@@ -34,20 +33,16 @@
 	import CheckpointScreen, { type CheckpointVariant } from './CheckpointScreen.svelte';
 	import ThankYouScreen from './ThankYouScreen.svelte';
 
-	// The Campaign's `regions.ts` defaults, picked by the Campaign in the layout load
-	const region: RegionConfig = page.data.region;
-
 	// The participant the server resolved from the cookie. The cached session sits
 	// behind it for a load that could not reach the backend, and is still the only
 	// source of `pid` and vote progress, which the backend does not store.
 	const participant: ParticipantSession | null = page.data.participant;
 
-	const campaign = page.data.campaign;
+	const campaign: Campaign = page.data.campaign;
 
-	// Which Polis conversation this poll is, resolved by `pollFor` so this and the
-	// `load` that refuses to render without one cannot disagree. Non-null here:
-	// the load has already answered 503 otherwise.
-	const poll = pollFor(campaign, region)!;
+	// Which Polis conversation this poll is, resolved once in the layout load.
+	// Non-null here: this page's load has already answered 503 otherwise.
+	const poll = campaign.poll!;
 	const polisId = poll.polisId;
 	const polisUrl = poll.polisUrl;
 	const question = poll.question;
@@ -55,7 +50,7 @@
 
 	// The geography the chrome labels itself with. The Campaign's Place, not the
 	// zip's region: the URL says which Campaign this is (#423).
-	const placeName = placeNameFor(campaign, region);
+	const placeName = campaign.placeName;
 
 	// Which asks this Host makes, resolved from the Conversation's metadata in the
 	// layout load. All on by default, so a Campaign nobody has configured runs the
@@ -384,7 +379,7 @@
 				onEnd={handleEnd}
 				onCompose={() => (screen = 'compose')}
 				showCompose={participation.asks.contribute}
-				{region}
+				campaignSlug={campaign.slug}
 			/>
 		{:else}
 			<VotingSkeleton {placeName} {question} />

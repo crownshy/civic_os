@@ -5,23 +5,17 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ parent, params, cookies, url, depends }) => {
 	depends('report:data');
 
-	const { campaign, region } = requireCampaign(await parent(), params.campaign);
+	const { campaign } = requireCampaign(await parent(), params.campaign);
 	const conversationId = campaign.id;
 
-	// The Campaign's own step, mirrored into `metadata.poll` when admin published
-	// it, because the Polis workflow step is 401 anonymously.
-	//
-	// `regions.ts` stays behind it only for a legacy region, where the region IS
-	// the Campaign. It used to be the only source, which handed every Campaign
-	// created in admin the USA catch-all's step and rendered the catch-all's
-	// report under that Host's name. See #401.
-	const workflowStepId =
-		campaign.poll?.workflowStepId ??
-		(campaign.isLegacyRegion ? region.polis_workflow_step_id : undefined);
+	// The Campaign's own step, which `pollFor` takes from `metadata.poll` and only
+	// for a legacy region from `regions.ts`. Using the region unconditionally
+	// rendered the USA catch-all's report under another Host's name (#401).
+	const workflowStepId = campaign.poll?.workflowStepId;
 
 	const empty = (error: string) => {
 		console.warn('[Report]', error);
-		return { report: null, demographics: null, error, region };
+		return { report: null, demographics: null, error };
 	};
 
 	if (!conversationId) {
@@ -56,14 +50,13 @@ export const load: PageServerLoad = async ({ parent, params, cookies, url, depen
 				})
 		]);
 
-		return { report, demographics, error: null, region };
+		return { report, demographics, error: null };
 	} catch (e) {
 		console.error('[Report] Failed to load report data:', e);
 		return {
 			report: null,
 			demographics: null,
-			error: e instanceof Error ? e.message : String(e),
-			region
+			error: e instanceof Error ? e.message : String(e)
 		};
 	}
 };

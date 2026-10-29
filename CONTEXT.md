@@ -200,9 +200,9 @@ back, and a step comhairle has not finished provisioning reports no poll id to
 mirror at all. So the invariant is stated and checked rather than assumed: admin
 shows `campaign.pollBlocker` in the Campaign header with a one-click repair, and
 civicos answers 503 from `/poll` instead of opening a poll that is not
-this Campaign's. `pollFor` in `campaign.ts` is the single place the poll
-resolves, so the guard and the voting screen cannot disagree about whether there
-is one.
+this Campaign's. `resolveCampaign` in `campaign.ts` resolves the poll once onto
+`Campaign.poll`, so the guard and the voting screen cannot disagree about whether
+there is one.
 
 ### Host
 An **Organization** that stewards Campaigns in its community. Modeled in comhairle
