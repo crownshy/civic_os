@@ -37,7 +37,7 @@
 	import { shortDescriptionFrom } from '$lib/utils/rich-text';
 	import { blockHtmlToPlainText } from '@civicos/shared/rich-text';
 	import { setupSchema } from './setup-schema';
-	import { apiStatus, describeApiFailure } from '$lib/api/describe-failure';
+	import { apiStatus, describeApiFailure, permissionDenied } from '$lib/api/describe-failure';
 
 	let { data } = $props();
 
@@ -700,7 +700,9 @@
 			await goto(resolve('/'), { invalidate: ['app:conversations'] });
 		} catch (e) {
 			console.error('DeleteConversation failed', e);
-			deleteError = `Could not delete the conversation: ${describeApiFailure(e)}`;
+			deleteError =
+				permissionDenied(e, 'delete this Campaign') ??
+				`Could not delete the conversation: ${describeApiFailure(e)}`;
 			deleting = false;
 		}
 	}
