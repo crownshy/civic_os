@@ -1,5 +1,6 @@
 <script lang="ts">
 	import CharCount from '$lib/components/CharCount.svelte';
+	import { polisFailure } from '$lib/api/describe-failure';
 	import * as Dialog from '@civicos/shared/ui/dialog';
 	import { Button } from '@civicos/shared/ui/button';
 	import { Spinner } from '@civicos/shared/ui/spinner';
@@ -66,11 +67,17 @@
 
 	const plural = (n: number) => `${n} ${n === 1 ? 'statement' : 'statements'}`;
 
+	/** A 403 or 422 from Polis, as a sentence ending in a space, or '' for anything else. */
+	const polisReason = (failure: unknown, action: string) => {
+		const reason = polisFailure(failure, action);
+		return reason ? `${reason} ` : '';
+	};
+
 	/**
 	 * Posts each statement in order, stopping at the first failure. Polis has no batch create
 	 * and a post cannot be undone, so a partial batch is reported, not rolled back.
 	 */
-	async function postSeeds(texts: string[]): Promise<number> {
+	async function postSeeds(texts: string[]): Promise<{ posted: number; failure: unknown }> {
 		postedCount = 0;
 		totalCount = texts.length;
 		for (const text of texts) {
@@ -78,28 +85,22 @@
 				await onPost(text);
 			} catch (e) {
 				console.error('postSeed failed', e);
-				break;
+				return { posted: postedCount, failure: e };
 			}
 			postedCount += 1;
 		}
-		return postedCount;
-	}
-
-	/** Reloads the list behind the dialog. Resolves to false when that failed. */
-	async function refresh(): Promise<boolean> {
-		try {
-			await onPosted();
-			return true;
-		} catch (e) {
-			console.error('Refreshing after seeding failed', e);
-			return false;
-		}
+		return { posted: postedCount, failure: null };
 	}
 
 	/** Shared ending for both paths once at least one statement went in. */
 	async function afterPosting(posted: number) {
-		if (await refresh()) return;
-		staleNotice = `Posted ${plural(posted)}, but the list did not refresh. Reload the page to see ${posted === 1 ? 'it' : 'them'}. Do not post ${posted === 1 ? 'it' : 'them'} again.`;
+		try {
+			await onPosted();
+		} catch (e) {
+			console.error('Refreshing after seeding failed', e);
+			const reason = polisReason(e, 'sync statements from Polis');
+			staleNotice = `Posted ${plural(posted)}, but the list did not refresh. ${reason}Reload the page to see ${posted === 1 ? 'it' : 'them'}. Do not post ${posted === 1 ? 'it' : 'them'} again.`;
+		}
 	}
 
 	async function addSingle() {
@@ -114,10 +115,10 @@
 		}
 
 		mode = 'single';
-		const posted = await postSeeds([text]);
+		const { posted, failure } = await postSeeds([text]);
 		if (posted === 0) {
 			mode = null;
-			error = 'Could not add the statement.';
+			error = polisFailure(failure, 'add seed statements') ?? 'Could not add the statement.';
 			return;
 		}
 		draft = '';
@@ -191,12 +192,12 @@
 		staleNotice = null;
 		mode = 'csv';
 
-		const posted = await postSeeds(texts);
+		const { posted, failure } = await postSeeds(texts);
 		if (posted > 0) await afterPosting(posted);
 		mode = null;
 
 		if (posted < texts.length) {
-			error = `Posted ${posted} of ${texts.length}, then "${shorten(texts[posted])}" failed. The rest were not posted.`;
+			error = `Posted ${posted} of ${texts.length}, then "${shorten(texts[posted])}" failed. ${polisReason(failure, 'add seed statements')}The rest were not posted.`;
 			// Posting walks the non-empty drafts in order, so the first `posted` of them went in.
 			// Drop those and leave the rest on screen to retry or remove.
 			let landed = posted;
