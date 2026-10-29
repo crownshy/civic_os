@@ -1,4 +1,4 @@
-import type { ApiClient } from '@crownshy/api-client/api';
+import type { ApiClient, PaginatedResults_for_EventAttendanceEtx } from '@crownshy/api-client/api';
 
 export type AttendanceApi = Pick<ApiClient, 'ListEventAttendances'>;
 
@@ -48,7 +48,8 @@ export async function findAttendance(
 
 	try {
 		for (let page = 0; page < MAX_PAGES; page++) {
-			const result = await api.ListEventAttendances({
+			// Annotated because api-client 0.0.66-rc.0 types this endpoint as any.
+			const result: PaginatedResults_for_EventAttendanceEtx = await api.ListEventAttendances({
 				params: { conversation_id: conversationId, event_id: eventId },
 				queries: { limit: PAGE_SIZE, offset: page * PAGE_SIZE }
 			});

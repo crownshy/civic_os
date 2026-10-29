@@ -4,7 +4,7 @@ import { begin } from '$lib/activity.svelte';
 /**
  * `createApiClient` with the empty-body response normalised.
  *
- * Comhairle answers its write endpoints (`UpdateOrganizationMemberRole`,
+ * Comhairle answers its write endpoints (`AddOrganizationGroupMember`,
  * `RemoveOrganizationMember`, `RevokePermission`, and 18 others) with HTTP 200,
  * a zero-length body and no `Content-Type`. Axios cannot parse that, so it hands
  * back `data: ''`. The generated schemas declare `response: z.void()`, and
