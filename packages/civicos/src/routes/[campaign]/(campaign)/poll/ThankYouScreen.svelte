@@ -13,6 +13,7 @@
 	} from '$lib/components/ui';
 	import { page } from '$app/state';
 	import { session } from '$lib/services/session.svelte';
+	import type { JoinContext } from '$lib/services/join';
 	import { ArrowRight, Check } from 'lucide-svelte';
 	import { END_CTA_COPY } from '$lib/config/landing-copy';
 	import { HOST_COPY_PROSE_CLASS, renderHostCopy } from '$lib/config/host-copy';
@@ -56,11 +57,11 @@
 		 */
 		asks: AskToggles;
 		/** The Campaign this end screen belongs to, for the email signup. */
-		conversationId: string;
+		joinContext: JoinContext;
 		onBackToVoting?: () => void;
 	}
 
-	let { placeName, onBackToVoting, whatsNext, asks, conversationId }: Props = $props();
+	let { placeName, onBackToVoting, whatsNext, asks, joinContext }: Props = $props();
 
 	let emailPanelOpen = $state(false);
 	let sharePanelOpen = $state(false);
@@ -236,7 +237,7 @@
 	umamiDismissEvent="end-panel-dismiss-email"
 >
 	<EmailPanelContent
-		{conversationId}
+		{joinContext}
 		umamiSubmitEvent="end-email-submit"
 		onComplete={() => (emailPanelOpen = false)}
 	/>

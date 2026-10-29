@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { campaignPath } from '@civicos/shared/data/place';
 	import { fade } from 'svelte/transition';
-	import { goto, invalidate, preloadCode } from '$app/navigation';
+	import { goto, preloadCode } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
@@ -10,7 +10,8 @@
 	import { Mail } from 'lucide-svelte';
 	import { Input } from '@civicos/shared/ui/input';
 	import { session } from '$lib/services/session.svelte';
-	import type { ParticipantSession } from '$lib/services/participant';
+	import { enterCampaign, join, signUpForUpdates, type JoinContext } from '$lib/services/join';
+	import type { KnownParticipant } from '$lib/services/participant';
 	import { getRegionByZipcode } from '$lib/config/regions';
 	import type { Campaign } from '$lib/config/campaign';
 	import {
@@ -64,22 +65,12 @@
 			return [section];
 		})
 	);
-	// Who the server says this is, resolved from the cookie in the root layout.
-	// A returning participant gets CONTINUE on the first paint instead of after
-	// hydration. Only a zip counts: an email-only signup has an account but has
-	// never told us where they are, so it is not a session to continue.
-	//
-	// This has to agree with the gate on the poll, which reads the server
-	// answer and nothing else. Anything CONTINUE lets through that the gate then
-	// turns away is a redirect straight back to this page, and on a client side
-	// navigation that is silent: the button appears dead. So the cached session
-	// only stands in where the server has no answer to disagree with, which is
-	// the one case it was ever meant to cover.
-	const participant: ParticipantSession | null = $derived(page.data.participant);
-	const participantResolved: boolean = $derived(page.data.participantResolved);
-	const isReturning = $derived(
-		!!participant?.zipCode || (!participantResolved && session.hasSession)
-	);
+	// Settled against the cache in the layout load. Only a zip counts as
+	// returning: an email-only signup has an account but has never told us
+	// where they are, so it is not a session to continue.
+	const participant: KnownParticipant = $derived(page.data.knownParticipant);
+	const joinContext: JoinContext = $derived(page.data.joinContext);
+	const isReturning = $derived(participant.isReturning);
 
 	// Only the browser can read the cached session, so on the outage path
 	// `isReturning` is false during SSR and may turn true at hydration. Rendering
@@ -94,13 +85,14 @@
 	// dialog opening, which silently empties the field mid-join. Nothing on this
 	// page changes the participant except a successful join, which navigates away
 	// immediately, so there is no resync to miss.
-	let zipCode = $state(page.data.participant?.zipCode || session.zipCode);
+	let zipCode = $state(page.data.knownParticipant.zipCode);
 	let hasZip = $derived(!!zipCode.trim());
 	// True from the click until the poll has rendered, across the join
 	// request, the participant invalidation and the navigation itself. Reset only
 	// if we are still on this page afterwards: a failed join, or the gate on
 	// the poll sending us back.
 	let leaving = $state(false);
+	let joinFailed = $state(false);
 	let zipFlash = $state(false);
 	let hasAgreedToTos = $derived(session.hasAgreedToTos);
 	let showAboutMessage = $state(false);
@@ -148,7 +140,7 @@
 			// Put them on this Campaign's workflow on the way in. Not awaited: a
 			// missing participation row is a reporting gap, not a reason to hold
 			// CONTINUE back, and the request outlives the client-side navigation.
-			void session.enterCampaign(campaign.id);
+			void enterCampaign(joinContext);
 			await goto(pollPath);
 			leaving = false;
 			return;
@@ -175,20 +167,18 @@
 		}
 
 		leaving = true;
-		// The Campaign the URL resolved to, not the zip's `regions.ts` entry. For
-		// Utah and Oregon these are the same Conversation (the redirect above
-		// guarantees the zip matches this Campaign); for a Campaign created in
-		// admin only `campaign.id` is right, because its region is the catch-all
-		// and would have put its participants in the USA catch-all poll.
-		const success = await session.join(zipCode.trim(), undefined, campaign.id);
-		if (!success) {
+		joinFailed = false;
+		// `joinContext` names the Campaign the URL resolved to, not the zip's
+		// `regions.ts` entry. For Utah and Oregon these are the same Conversation
+		// (the redirect above guarantees the zip matches this Campaign); for a
+		// Campaign created in admin only the URL's is right, because its region is
+		// the catch-all and would have put its participants in the USA catch-all poll.
+		if (!(await join(joinContext, zipCode.trim()))) {
+			joinFailed = true;
 			leaving = false;
 			return;
 		}
 		trackEvent('SucccesfullSignup');
-		// The root layout resolved "anonymous" before this. Re-run it so the
-		// server side gate on the poll sees the participant that now exists.
-		await invalidate('civicos:participant');
 		await goto(pollPath);
 		leaving = false;
 	}
@@ -197,9 +187,6 @@
 		return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 	}
 
-	// Email-only signup (no zip). Reuses session.join with empty zip — see
-	// docs/adr/0002-landing-email-reuses-participant-flow.md for the rationale and
-	// follow-up about a dedicated newsletter endpoint.
 	async function handleEmailSignup() {
 		emailError = '';
 		const trimmed = email.trim();
@@ -212,15 +199,7 @@
 			return;
 		}
 		emailSubmitting = true;
-		// A returning participant only needs the signup. Everyone else gets a
-		// minimal session (no zip) first, because the signup is a call as this
-		// user. Either way the Campaign is this page's, not a remembered one.
-		let ok = true;
-		if (!session.hasSession) {
-			ok = await session.join('', undefined, campaign.id);
-			await invalidate('civicos:participant');
-		}
-		if (ok) ok = await session.registerEmail(trimmed, campaign.id);
+		const ok = await signUpForUpdates(joinContext, trimmed);
 		emailSubmitting = false;
 		if (!ok) {
 			emailError = "We couldn't sign you up. Please try again.";
@@ -310,8 +289,10 @@
 								>
 									{isReturning ? 'CONTINUE' : 'JOIN THE CONVERSATION'}
 								</Button>
-								{#if session.error}
-									<p class="mt-2 px-2 font-sans text-sm text-destructive">{session.error}</p>
+								{#if joinFailed}
+									<p class="mt-2 px-2 font-sans text-sm text-destructive">
+										Something went wrong joining this conversation. Please try again.
+									</p>
 								{/if}
 							</div>
 						{:else}
@@ -426,7 +407,7 @@
 		</section>
 	{/if}
 
-	<!-- Email signup. Reuses session.registerEmail flow — see ADR 0002. -->
+	<!-- Email signup, through the same join flow as the zip. -->
 	<section class="mx-auto max-w-4xl border-y border-stone-500/20 px-8 py-12">
 		<div class="mx-auto flex max-w-md flex-col gap-4">
 			<h2 class="text-center font-display text-3xl font-medium md:text-4xl">Stay in touch.</h2>

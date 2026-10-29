@@ -22,9 +22,12 @@
 		type Participation
 	} from '$lib/config/participation';
 	import type { Campaign } from '$lib/config/campaign';
+	import { BATCH_SIZE, recordVote, resumeProgress } from '$lib/utils/poll-checkpoints';
 	import PolisApi from '$lib/services/polis-api.svelte';
 	import { session } from '$lib/services/session.svelte';
-	import type { ParticipantSession } from '$lib/services/participant';
+	import type { JoinContext } from '$lib/services/join';
+	import type { KnownParticipant } from '$lib/services/participant';
+	import { saveDemographicResponse, saveProfile, type ProfileAnswers } from '$lib/services/profile';
 	import VotingScreen from './VotingScreen.svelte';
 	import VotingSkeleton from './VotingSkeleton.svelte';
 	import ComposeScreen from './ComposeScreen.svelte';
@@ -33,10 +36,10 @@
 	import CheckpointScreen, { type CheckpointVariant } from './CheckpointScreen.svelte';
 	import ThankYouScreen from './ThankYouScreen.svelte';
 
-	// The participant the server resolved from the cookie. The cached session sits
-	// behind it for a load that could not reach the backend, and is still the only
-	// source of `pid` and vote progress, which the backend does not store.
-	const participant: ParticipantSession | null = page.data.participant;
+	// Settled against the cache in the layout load. The cached session is still
+	// the only source of `pid` and vote progress, which the backend does not store.
+	const participant: KnownParticipant = page.data.knownParticipant;
+	const joinContext: JoinContext = page.data.joinContext;
 
 	const campaign: Campaign = page.data.campaign;
 
@@ -62,8 +65,7 @@
 	const aboutYouQuestions: AboutYouQuestion[] = $derived(page.data.aboutYouQuestions);
 
 	// Use the participant's user ID for the Polis xid (falls back to random if not yet joined)
-	const userId =
-		participant?.userId ?? session.userId ?? `bloom-anon-${Math.random().toString(36).slice(2, 8)}`;
+	const userId = participant.userId ?? `bloom-anon-${Math.random().toString(36).slice(2, 8)}`;
 
 	// Pass persisted pid so returning users only see unvoted statements. Started
 	// on mount rather than here, so server rendering never calls Polis.
@@ -100,18 +102,8 @@
 		| 'pop-quiz'
 		| 'nice-job';
 
-	const BATCH_SIZE = 10;
-
-	// The asks the Host left switched on, in checkpoint order. Each batch boundary
-	// consumes the next variant whose action isn't already done (rolling past
-	// completed ones), so a returning user with email already provided sees
-	// `contribute → feedback → share` instead of `contribute → (silent skip) → feedback → share`.
-	//   contribute  — always shows (composing is repeatable)
-	//   email       — skipped if session.emailProvided
-	//   feedback    — skipped if session.endCtaReviewCompleted
-	//   share       — skipped if session.endCtaShareCompleted
-	// Once all of them are consumed: no more pauses. An empty list means the Host
-	// switched every ask off, so voting is never interrupted.
+	// The asks the Host left switched on, in checkpoint order. `recordVote` says
+	// which one a finished batch pauses on.
 	const checkpointVariants: CheckpointVariant[] = $derived(askedVariants(participation.asks));
 
 	/** Whether a checkpoint variant should be skipped because its action is already done. */
@@ -132,18 +124,12 @@
 	const isReturning = session.pid !== undefined;
 	const initialScreen: Screen = session.demographicsCompleted && isReturning ? 'loading' : 'voting';
 	let screen = $state<Screen>(initialScreen);
-	let totalVotes = $state(session.totalVotes);
-	let hasSeenPause = $state(session.hasSeenPause);
-	let votesInRound = $state(hasSeenPause ? 0 : totalVotes);
-	// Index into checkpointVariants for the *next* variant to consider showing.
-	// Advances past variants that have actually been shown (or skipped because all later ones
-	// were also already-done). Returning users approximate from totalVotes.
-	//
-	// `untrack` because this is a cursor, not a mirror: it takes its starting
-	// position from the list once and then walks itself. A Host editing the asks
-	// mid-poll changes what the cursor points at, not where it is.
-	let nextCheckpointIdx = $state(
-		untrack(() => Math.min(Math.floor(totalVotes / BATCH_SIZE), checkpointVariants.length))
+	// `untrack` because the checkpoint cursor takes its starting position from
+	// the asks once and then walks itself.
+	let progress = $state(
+		untrack(() =>
+			resumeProgress(session.totalVotes, session.hasSeenPause, checkpointVariants.length)
+		)
 	);
 	// Variant currently displayed on the pause screen. Set when entering 'pause'.
 	let currentVariant = $state<CheckpointVariant>('contribute');
@@ -185,7 +171,7 @@
 	const currentQuiz = $derived(popQuizQuestions[quizIndex % popQuizQuestions.length]);
 
 	// Progress bar reflects current batch of BATCH_SIZE votes.
-	const displayedRemaining = $derived(Math.max(0, BATCH_SIZE - votesInRound));
+	const displayedRemaining = $derived(Math.max(0, BATCH_SIZE - progress.votesInRound));
 	const displayedTotal = BATCH_SIZE;
 
 	// When Polis runs out of statements while voting, go to end flow
@@ -209,32 +195,14 @@
 			await recheckPollStatus();
 			return;
 		}
-		totalVotes++;
-		votesInRound++;
+		const outcome = recordVote(progress, checkpointVariants, isCheckpointAlreadyDone);
+		progress = outcome.progress;
+		// Persisted so a refresh picks up the count where it was.
+		session.saveVoteProgress(progress.totalVotes, progress.hasSeenPause);
 
-		// Persist vote progress so it survives page refresh
-		session.saveVoteProgress(totalVotes, hasSeenPause);
-
-		if (votesInRound >= BATCH_SIZE) {
-			votesInRound = 0;
-			if (!hasSeenPause) {
-				hasSeenPause = true;
-				session.saveVoteProgress(totalVotes, hasSeenPause);
-			}
-			// Roll forward to the next variant whose action isn't already done.
-			// 'contribute' never reports done, so this loop always terminates if any slots remain.
-			while (
-				nextCheckpointIdx < checkpointVariants.length &&
-				isCheckpointAlreadyDone(checkpointVariants[nextCheckpointIdx])
-			) {
-				nextCheckpointIdx++;
-			}
-			if (nextCheckpointIdx < checkpointVariants.length) {
-				currentVariant = checkpointVariants[nextCheckpointIdx];
-				nextCheckpointIdx++;
-				screen = 'pause';
-			}
-			// All checkpoints used: keep voting, no more pauses.
+		if (outcome.checkpoint) {
+			currentVariant = outcome.checkpoint;
+			screen = 'pause';
 		}
 	}
 
@@ -258,7 +226,7 @@
 		// the profile, which the participation report reads; a Host's own
 		// categories are filed as demographics responses.
 		if (answers) {
-			const profile: Parameters<typeof session.saveProfile>[0] = {};
+			const profile: ProfileAnswers = {};
 			const custom: [string, string][] = [];
 			for (const question of aboutYouQuestions) {
 				const value = answers[question.key];
@@ -268,8 +236,8 @@
 				else custom.push([question.key, value]);
 			}
 			const saved = await Promise.all([
-				session.saveProfile(profile),
-				...custom.map(([slug, value]) => session.saveDemographicResponse(slug, value))
+				saveProfile(joinContext, profile),
+				...custom.map(([slug, value]) => saveDemographicResponse(joinContext, slug, value))
 			]);
 			if (saved.includes(false)) return false;
 		}
@@ -415,7 +383,7 @@
 			onBackToVoting={polis.currentStatement ? handleBackToVoting : undefined}
 			whatsNext={page.data.hostCopy.whatsNext}
 			asks={participation.asks}
-			conversationId={campaign.id}
+			{joinContext}
 		/>
 
 		<!-- Preserved screens (unused in conference flow) -->
@@ -444,7 +412,7 @@
 	umamiDismissEvent="checkpoint-panel-dismiss-email"
 >
 	<EmailPanelContent
-		conversationId={campaign.id}
+		{joinContext}
 		umamiSubmitEvent="checkpoint-email-submit"
 		onComplete={handlePanelComplete}
 	/>

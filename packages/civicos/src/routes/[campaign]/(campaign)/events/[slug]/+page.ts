@@ -1,5 +1,7 @@
 import { CAMPAIGN_PAGES, campaignPath } from '@civicos/shared/data/place';
 import { redirect } from '@sveltejs/kit';
+import { browser } from '$app/environment';
+import { session } from '$lib/services/session.svelte';
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ parent, params, data }) => {
@@ -11,9 +13,15 @@ export const load: PageLoad = async ({ parent, params, data }) => {
 			params: { conversation_id: campaign.id, event_id: slug }
 		});
 
-		// `data` is the server load's answer on this route: whether the attendance
-		// list already names this participant (#420).
-		return { ...data, event };
+		// Whether this participant is on the event's attendance list. The server
+		// load is the answer (#420). The cached flag stands in only when it could
+		// not resolve one, so a participant whose registration the backend cannot
+		// confirm is not shown the signup form again.
+		const isRegistered = data.registrationResolved
+			? data.isRegistered
+			: browser && session.isRegisteredForEvent(event.id);
+
+		return { ...data, event, isRegistered };
 	} catch (e) {
 		console.error(e);
 
