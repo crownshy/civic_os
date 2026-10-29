@@ -1,11 +1,8 @@
 import { fail } from '@sveltejs/kit';
 import { serverApi } from '@civicos/shared/api';
 import { COHOST_ROLE, CONVERSATION_RESOURCE, cohostOrgIds } from '$lib/permissions';
-import { mirrorHosts } from '$lib/cohost-mirror';
+import { STALE_PUBLIC_PAGE, mirrorHosts } from '$lib/cohost-mirror';
 import type { Actions, PageServerLoad } from './$types';
-
-const STALE_PUBLIC_PAGE =
-	'Saved, but the public Campaign page did not update. Add or remove a co-host to try again.';
 
 /** "A", "A and B", "A, B and C". */
 function listOf(names: string[]): string {

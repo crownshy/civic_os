@@ -9,6 +9,7 @@ import { COHOST_ROLE, CONVERSATION_RESOURCE } from '$lib/permissions';
 import { apiStatus, describeApiFailure } from '$lib/api/describe-failure';
 import { routeSlugFor, statusFor } from '$lib/conversations';
 import { canManageHost, canViewHost, fetchHostAccess, type HostAccess } from '$lib/host-access';
+import { STALE_PUBLIC_PAGE, mirrorHosts } from '$lib/cohost-mirror';
 import type { AssignableConversation, HostConversation } from './host-conversations';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -94,7 +95,8 @@ async function loadHostConversations(
 			status: statusFor(c),
 			// Ownership wins the label: an org that owns a Campaign and also holds a
 			// stray grant on it is still its Host, and its access is not revocable.
-			access: c.organizationId === orgId ? ('owner' as const) : ('cohost' as const)
+			access: c.organizationId === orgId ? ('owner' as const) : ('cohost' as const),
+			ownerId: c.organizationId ?? null
 		}))
 		.sort((a, b) => a.title.localeCompare(b.title));
 
@@ -276,7 +278,9 @@ export const actions: Actions = {
 			console.error('UpdateConversation (assign owner) failed', e);
 			return fail(400, { error: 'Could not assign that Campaign.' });
 		}
-		return { ok: true };
+		// The new owner leads the "Hosted by" strip civicos renders from metadata.
+		const mirrored = await mirrorHosts(api, conversationId, params.id);
+		return mirrored ? { ok: true } : { ok: true, warning: STALE_PUBLIC_PAGE };
 	},
 
 	/**
@@ -287,6 +291,7 @@ export const actions: Actions = {
 	revokeAccess: async ({ request, params, cookies, url }) => {
 		const fd = await request.formData();
 		const conversationId = String(fd.get('conversationId') ?? '');
+		const owningOrgId = String(fd.get('owningOrgId') ?? '') || null;
 		if (!conversationId) return fail(400, { error: 'Missing conversation.' });
 
 		const api = client(url, cookies);
@@ -299,7 +304,8 @@ export const actions: Actions = {
 				},
 				queries: { organization_id: params.id, role_name: COHOST_ROLE }
 			});
-			return { ok: true };
+			const mirrored = await mirrorHosts(api, conversationId, owningOrgId);
+			return mirrored ? { ok: true } : { ok: true, warning: STALE_PUBLIC_PAGE };
 		} catch (e) {
 			console.error('RevokePermission failed', e);
 			return fail(400, { error: 'Could not remove access.' });
