@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page, navigating } from '$app/state';
 	import { invalidate } from '$lib/activity.svelte';
+	import { writeMetadata } from '@civicos/shared/data/metadata';
 	import ConversationTabSkeleton from '$lib/components/skeletons/ConversationTabSkeleton.svelte';
 	import PollStatusControl from './PollStatusControl.svelte';
 	import { setPollStatus, type PollStatusTarget } from '$lib/api/poll-status';
@@ -51,10 +52,7 @@
 		repairing = true;
 		repairError = null;
 		try {
-			await data.api.PatchConversationMetadata(
-				{ poll },
-				{ params: { conversation_id: campaign.id } }
-			);
+			await writeMetadata(data.api, campaign.id, { poll });
 			await invalidate(`campaign:${page.params.slug}`);
 		} catch (e) {
 			console.error('Repairing the poll mirror failed', e);

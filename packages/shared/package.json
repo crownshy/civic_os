@@ -22,6 +22,7 @@
 		"./data/host-session": "./src/data/host-session.ts",
 		"./data/text-limits": "./src/data/text-limits.ts",
 		"./data/place": "./src/data/place.ts",
+		"./data/metadata": "./src/data/metadata.ts",
 		"./data/regions": "./src/data/regions.ts",
 		"./data/zipcodes": "./src/data/zipcodes.ts",
 		"./data/zip-states": "./src/data/zip-states.ts",

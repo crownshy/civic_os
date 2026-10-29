@@ -90,7 +90,10 @@ is still admin-only.
 Host-configurable definitions belong in `packages/shared/src/data/`, next to
 `place.ts`, for the same reason: `admin` writes the configuration and `civicos`
 renders it, so both have to read one list. `demographics.ts` and
-`participant-asks.ts` live there.
+`participant-asks.ts` live there. Writes to `Conversation.metadata` go through
+`writeMetadata` in `data/metadata.ts`, never a direct `PatchConversationMetadata`:
+the patch replaces each key wholesale, and that module is what merges the poll
+over what is stored.
 
 ## Migration order (civicos → shared) — PARKED; one PR each, verify visually
 
