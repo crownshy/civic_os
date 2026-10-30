@@ -29,10 +29,17 @@ export class PlaceSelectorState {
 	#places = new SvelteMap<string, Place>();
 	#childIds = new SvelteMap<string, string[]>();
 	#searchRun = 0;
+	#onchange: ((selectedIds: string[]) => void) | undefined;
 
-	constructor(source: PlaceSource, selectedIds: string[] = []) {
+	/** `onchange` hears every toggle and removal, so the owner can save the selection. */
+	constructor(
+		source: PlaceSource,
+		selectedIds: string[] = [],
+		onchange?: (selectedIds: string[]) => void
+	) {
 		this.#source = source;
 		this.selectedIds = [...selectedIds];
+		this.#onchange = onchange;
 	}
 
 	/** Load the states and the places already selected, so chips have names. */
@@ -63,11 +70,16 @@ export class PlaceSelectorState {
 
 	toggle(id: string): void {
 		if (this.isSelected(id)) this.remove(id);
-		else this.selectedIds = [...this.selectedIds, id];
+		else this.#select([...this.selectedIds, id]);
 	}
 
 	remove(id: string): void {
-		this.selectedIds = this.selectedIds.filter((selectedId) => selectedId !== id);
+		this.#select(this.selectedIds.filter((selectedId) => selectedId !== id));
+	}
+
+	#select(selectedIds: string[]): void {
+		this.selectedIds = selectedIds;
+		this.#onchange?.(selectedIds);
 	}
 
 	get currentId(): string | null {

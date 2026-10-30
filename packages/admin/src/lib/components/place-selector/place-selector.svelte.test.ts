@@ -27,6 +27,16 @@ describe('PlaceSelectorState selection', () => {
 		expect(state.selectedIds).toEqual(['state-41']);
 	});
 
+	it('reports each change to onchange', async () => {
+		const changes: string[][] = [];
+		const state = new PlaceSelectorState(createFixtureSource(), ['state-41'], (ids) =>
+			changes.push(ids)
+		);
+		state.toggle('state-49');
+		state.remove('state-41');
+		expect(changes).toEqual([['state-41', 'state-49'], ['state-49']]);
+	});
+
 	it('removes a place', async () => {
 		const state = await loaded(['state-41', 'state-49']);
 		state.remove('state-41');
