@@ -2,7 +2,7 @@ import { error, fail } from '@sveltejs/kit';
 import { serverApi } from '@civicos/shared/api';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
-import type { OrganizationTeamResponseDto } from '@crownshy/api-client/api';
+import type { OrganizationTeamResponseDto, UserOrganizationAccess } from '@crownshy/api-client/api';
 import { addMemberSchema, groupForRole, toTeamMember } from './member-schema';
 import { hostDetailsSchema, toExternalUrl, toWebsite } from '$lib/hosts/host-details-schema';
 import { COHOST_ROLE, CONVERSATION_RESOURCE } from '$lib/permissions';
@@ -124,10 +124,7 @@ export const load: PageServerLoad = async ({ params, cookies, url, depends, pare
 	if (!canViewHost(hostAccess, params.id)) error(404, 'Host not found');
 	const api = client(url, cookies);
 
-	const org = await api.GetOrganization({ params: { organization_id: params.id } }).catch((e) => {
-		console.warn('GetOrganization failed', e);
-		return null;
-	});
+	const org: UserOrganizationAccess | undefined = hostAccess.hosts.find((h) => h.organization.id === params.id);
 	if (!org) error(404, 'Host not found');
 
 	const [team, me, regions, conversations] = await Promise.all([
@@ -149,31 +146,31 @@ export const load: PageServerLoad = async ({ params, cookies, url, depends, pare
 
 	// Resolve the org's region ids to names for display.
 	const regionNames = new Map(regions.map((r) => [r.id, r.name]));
-	const places = org.regions.map((id) => regionNames.get(id) ?? id);
+	const places = org.organization.regions.map((id) => regionNames.get(id) ?? id);
 
 	const details = {
-		name: org.name,
-		description: org.description,
-		website: toWebsite(org.externalUrl),
-		contactEmail: org.contactEmail ?? '',
-		orgType: org.orgType,
-		regionIds: org.regions
+		name: org.organization.name,
+		description: org.organization.description,
+		website: toWebsite(org.organization.externalUrl),
+		contactEmail: org.organization.contactEmail ?? '',
+		orgType: org.organization.orgType,
+		regionIds: org.organization.regions
 	};
 
 	return {
 		org: {
-			id: org.id,
-			name: org.name,
-			description: org.description,
-			externalUrl: org.externalUrl,
-			contactEmail: org.contactEmail,
+			id: org.organization.id,
+			name: org.organization.name,
+			description: org.organization.description,
+			externalUrl: org.organization.externalUrl,
+			contactEmail: org.organization.contactEmail,
 			places
 		},
 		team,
 		conversations: conversations.attached,
 		assignableConversations: canAssignCampaigns(hostAccess) ? conversations.assignable : [],
 		currentUserId: me?.id ?? null,
-		canManage: canManageHost(hostAccess, params.id),
+		canManage: org.canUpdate,
 		canAssign: canAssignCampaigns(hostAccess),
 		form: await superValidate(zod4(addMemberSchema)),
 		regions: regions.map((r) => ({ id: r.id, name: r.name })),

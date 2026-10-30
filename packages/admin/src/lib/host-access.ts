@@ -1,4 +1,4 @@
-import type { UserOrganizationsResponse } from '@crownshy/api-client/api';
+import type { UserOrganizationAccess, UserOrganizationsResponse } from '@crownshy/api-client/api';
 import type { Api } from '@civicos/shared/api';
 
 /**
@@ -13,19 +13,17 @@ export type HostAccess = {
 	/** Sees and manages every Host, and is the only one who may create one. */
 	all: boolean;
 	/** Hosts the user belongs to. Empty for a Super user, who sees all of them anyway. */
-	hosts: Array<{ id: string; name: string; isAdmin: boolean }>;
+	hosts: Array<UserOrganizationAccess>;
 };
 
 export const NO_HOST_ACCESS: HostAccess = { all: false, hosts: [] };
 
 export function toHostAccess(orgs: UserOrganizationsResponse | null): HostAccess {
-	if (!orgs) return NO_HOST_ACCESS;
-	if (orgs.canCreateOrganization) return { all: true, hosts: [] };
+	if (orgs === null) return NO_HOST_ACCESS;
 	return {
-		all: false,
-		hosts: orgs.organizations
-			.filter((o) => o.isAssociated)
-			.map((o) => ({ id: o.organization.id, name: o.organization.name, isAdmin: o.canUpdate }))
+		all: orgs.canCreateOrganization,
+		// Filter out irrelevant organizations the user is not associated with.
+		hosts: orgs.organizations.filter((o) => o.isAssociated)
 	};
 }
 
@@ -38,11 +36,11 @@ export async function fetchHostAccess(api: Pick<Api, 'GetUserOrganizations'>): P
 }
 
 export function canViewHost(access: HostAccess, hostId: string): boolean {
-	return access.all || access.hosts.some((h) => h.id === hostId);
+	return access.all || access.hosts.some((h) => h.organization.id === hostId);
 }
 
 export function canManageHost(access: HostAccess, hostId: string): boolean {
-	return access.all || access.hosts.some((h) => h.id === hostId && h.isAdmin);
+	return access.all || access.hosts.some((h) => h.organization.id === hostId && h.canUpdate);
 }
 
 /** `hostId` set means link straight to that Host rather than to the list. */
@@ -59,7 +57,7 @@ export function hostsLink(access: HostAccess): HostsLink | null {
 	const [only, ...rest] = access.hosts;
 	if (!only) return null;
 	if (rest.length) return { label: 'My Hosts' };
-	return only.isAdmin ? { label: 'My Host', hostId: only.id } : null;
+	return only.canUpdate ? { label: 'My Host', hostId: only.organization.id } : null;
 }
 
 export type HostOption = { id: string; name: string };

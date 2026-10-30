@@ -59,43 +59,53 @@
 						<th class="px-4 py-3">NAME</th>
 						<th class="px-4 py-3">WEBSITE</th>
 						<th class="px-4 py-3">CONTACT EMAIL</th>
+						<th class="px-4 py-3">ROLE</th>
 					</tr>
 				</thead>
 				<tbody>
-					{#each data.organizations as org (org.id)}
+					{#each data.organizations as orgAccess (orgAccess.organization.id)}
 						<!-- The name link stretches over the whole row (#451), so the row is one
 							real link: cmd-click and middle-click work and the keyboard sees one
 							stop. The website and email links sit above it and keep their own. -->
 						<tr class="relative border-b border-border last:border-b-0 hover:bg-muted/30">
 							<td class="px-4 py-3 text-body font-semibold">
 								<a
-									href={resolve('/hosts/[id]', { id: org.id })}
+									href={resolve('/hosts/[id]', { id: orgAccess.organization.id })}
 									class="underline-offset-2 after:absolute after:inset-0 hover:text-primary hover:underline"
 								>
-									{org.name}
+									{orgAccess.organization.name}
 								</a>
 							</td>
 							<td class="px-4 py-3 text-body">
-								{#if org.externalUrl}
+								{#if orgAccess.externalUrl}
 									<a
-										href={org.externalUrl}
+										href={orgAccess.organization.externalUrl}
 										target="_blank"
 										rel="noreferrer"
 										class="relative z-10 text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
 									>
-										{displayUrl(org.externalUrl)}
+										{displayUrl(orgAccess.organization.externalUrl)}
 									</a>
 								{/if}
 							</td>
 							<td class="px-4 py-3 text-body">
-								{#if org.contactEmail}
+								{#if orgAccess.organization.contactEmail}
 									<a
-										href={`mailto:${org.contactEmail}`}
+										href={`mailto:${orgAccess.organization.contactEmail}`}
 										class="relative z-10 text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
 									>
-										{org.contactEmail}
+										{orgAccess.organization.contactEmail}
 									</a>
 								{/if}
+							</td>
+							<td class="px-4 py-3">
+								<span
+									class="relative z-10 inline-flex items-center rounded-full px-2.5 py-0.5 text-label font-medium {orgAccess.canUpdate
+										? 'bg-primary/10 text-primary'
+										: 'bg-muted text-muted-foreground'}"
+								>
+									{orgAccess.canUpdate ? 'Admin' : 'Member'}
+								</span>
 							</td>
 						</tr>
 					{/each}

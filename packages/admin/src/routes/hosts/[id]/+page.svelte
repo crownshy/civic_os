@@ -151,74 +151,74 @@
 			/>
 		</div>
 
-		<!-- ===== Team ===== -->
-		<section class="rounded-xl border border-border">
-			<div class="border-b border-border px-5 py-4">
-				<h2 class="text-body font-bold">Team</h2>
-				<p class="text-caption text-muted-foreground">
-					Admins can manage this Host. Members can view it.
-				</p>
-			</div>
-
-			{#if actionError}
-				<div
-					class="flex items-center gap-2 border-b border-destructive/30 bg-destructive/5 px-5 py-2.5 text-caption text-destructive"
-				>
-					<AlertCircle class="size-4 shrink-0" />
-					<span>{actionError}</span>
+		{#if data.canManage}
+			<!-- ===== Team ===== -->
+			<section class="rounded-xl border border-border">
+				<div class="border-b border-border px-5 py-4">
+					<h2 class="text-body font-bold">Team</h2>
+					<p class="text-caption text-muted-foreground">
+						Admins can manage this Host. Members can view it.
+					</p>
 				</div>
-			{/if}
 
-			{#if team.length === 0}
-				<p class="px-5 py-6 text-body text-muted-foreground">No team members yet.</p>
-			{:else}
-				<ul>
-					{#each team as m (m.id)}
-						{@const isSelf = m.id === data.currentUserId}
-						<li class="flex items-center gap-3 border-b border-border px-5 py-3 last:border-b-0">
-							<div class="min-w-0 flex-1">
-								<span class="text-body font-semibold">{label(m)}</span>
-								{#if isSelf}
-									<span class="text-caption text-muted-foreground"> · you</span>
+				{#if actionError}
+					<div
+						class="flex items-center gap-2 border-b border-destructive/30 bg-destructive/5 px-5 py-2.5 text-caption text-destructive"
+					>
+						<AlertCircle class="size-4 shrink-0" />
+						<span>{actionError}</span>
+					</div>
+				{/if}
+
+				{#if team.length === 0}
+					<p class="px-5 py-6 text-body text-muted-foreground">No team members yet.</p>
+				{:else}
+					<ul>
+						{#each team as m (m.id)}
+							{@const isSelf = m.id === data.currentUserId}
+							<li class="flex items-center gap-3 border-b border-border px-5 py-3 last:border-b-0">
+								<div class="min-w-0 flex-1">
+									<span class="text-body font-semibold">{label(m)}</span>
+									{#if isSelf}
+										<span class="text-caption text-muted-foreground"> · you</span>
+									{/if}
+								</div>
+
+								<span
+									class={[
+										'inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-caption font-semibold',
+										m.role === 'admin'
+											? 'bg-success/15 text-success'
+											: 'bg-muted text-muted-foreground'
+									].join(' ')}
+								>
+									{#if m.role === 'admin'}<ShieldCheck class="size-3" />{/if}
+									{m.role}
+								</span>
+
+								{#if data.canManage && !isSelf}
+									<form method="POST" action="?/setRole" use:enhance>
+										<input type="hidden" name="userId" value={m.id} />
+										<input
+											type="hidden"
+											name="role"
+											value={m.role === 'admin' ? 'member' : 'admin'}
+										/>
+										<Button type="submit" variant="outline" size="sm">
+											{m.role === 'admin' ? 'Make member' : 'Make admin'}
+										</Button>
+									</form>
+									<form method="POST" action="?/removeMember" use:enhance>
+										<input type="hidden" name="userId" value={m.id} />
+										<Button type="submit" variant="destructive-outline" size="sm">Remove</Button>
+									</form>
 								{/if}
-							</div>
+							</li>
+						{/each}
+					</ul>
+				{/if}
 
-							<span
-								class={[
-									'inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-caption font-semibold',
-									m.role === 'admin'
-										? 'bg-success/15 text-success'
-										: 'bg-muted text-muted-foreground'
-								].join(' ')}
-							>
-								{#if m.role === 'admin'}<ShieldCheck class="size-3" />{/if}
-								{m.role}
-							</span>
-
-							{#if data.canManage && !isSelf}
-								<form method="POST" action="?/setRole" use:enhance>
-									<input type="hidden" name="userId" value={m.id} />
-									<input
-										type="hidden"
-										name="role"
-										value={m.role === 'admin' ? 'member' : 'admin'}
-									/>
-									<Button type="submit" variant="outline" size="sm">
-										{m.role === 'admin' ? 'Make member' : 'Make admin'}
-									</Button>
-								</form>
-								<form method="POST" action="?/removeMember" use:enhance>
-									<input type="hidden" name="userId" value={m.id} />
-									<Button type="submit" variant="destructive-outline" size="sm">Remove</Button>
-								</form>
-							{/if}
-						</li>
-					{/each}
-				</ul>
-			{/if}
-
-			<!-- Add member -->
-			{#if data.canManage}
+				<!-- Add member -->
 				<form
 					method="POST"
 					action="?/addMember"
@@ -272,7 +272,7 @@
 						New emails get an account and a set-password email.
 					</p>
 				</form>
-			{/if}
-		</section>
+			</section>
+		{/if}
 	</div>
 </div>
