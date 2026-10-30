@@ -1,33 +1,13 @@
 import { serverApi } from '@civicos/shared/api';
 import { canViewHost } from '$lib/host-access';
 import type { PageServerLoad } from './$types';
+import type { UserOrganizationAccess } from '@crownshy/api-client/api';
 
-export const load: PageServerLoad = async ({ cookies, url, depends, parent }) => {
+export const load: PageServerLoad = async ({ url, depends, parent }) => {
 	depends('hosts:list');
 	const { hostAccess } = await parent();
 
-	const api = serverApi(url, cookies.get('auth-token'));
-
-	let organizations: Array<{
-		id: string;
-		name: string;
-		externalUrl?: string | null;
-		contactEmail?: string | null;
-	}> = [];
-	try {
-		const res = await api.ListOrganizations({ queries: { limit: 100 } });
-		// ListOrganizations returns every Host whoever asks; only a Super user sees them all.
-		organizations = res.records
-			.filter((o) => canViewHost(hostAccess, o.id))
-			.map((o) => ({
-				id: o.id,
-				name: o.name,
-				externalUrl: o.externalUrl,
-				contactEmail: o.contactEmail
-			}));
-	} catch (e) {
-		console.warn('ListOrganizations failed', e);
-	}
+	let organizations: Array<UserOrganizationAccess> = hostAccess.hosts;
 
 	return { organizations, created: url.searchParams.get('created') };
 };

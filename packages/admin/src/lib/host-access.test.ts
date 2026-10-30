@@ -1,15 +1,15 @@
 import { describe, it, expect } from 'vitest';
-import type { UserOrganizationsResponse } from '@crownshy/api-client/api';
+import type { UserOrganizationAccess, UserOrganizationsResponse } from '@crownshy/api-client/api';
 import { canManageHost, canViewHost, hostsLink, ownableHosts, toHostAccess } from './host-access';
 
 type Access = UserOrganizationsResponse['organizations'][number];
 
-function org(id: string, access: { isAssociated: boolean; canUpdate: boolean }): Access {
+function org(id: string, access: { isAssociated: boolean; canUpdate: boolean }): UserOrganizationAccess {
 	return {
 		...access,
 		canDelete: access.canUpdate,
 		canManageTeam: access.canUpdate,
-		organization: { id, name: id.toUpperCase() } as Access['organization']
+		organization: { id, name: id.toUpperCase() } as UserOrganizationAccess['organization']
 	};
 }
 
@@ -36,7 +36,7 @@ describe('toHostAccess', () => {
 		const access = toHostAccess(
 			orgs(false, [elsewhere, org('bloom', { isAssociated: true, canUpdate: true })])
 		);
-		expect(access.hosts.map((h) => h.id)).toEqual(['bloom']);
+		expect(access.hosts.map((h) => h.organization.id)).toEqual(['bloom']);
 		expect(canViewHost(access, 'other')).toBe(false);
 		expect(canManageHost(access, 'other')).toBe(false);
 	});
