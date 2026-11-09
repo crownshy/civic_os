@@ -4,6 +4,7 @@
 	import { createFixtureSource } from './fixture';
 	import { createFixtureGeometrySource } from './geometry-fixture';
 	import PlaceSelector from './PlaceSelector.svelte';
+	import { createSeedGeometrySource, createSeedPlaceSource } from './seed-places';
 
 	const { Story } = defineMeta({
 		title: 'Places/PlaceSelector',
@@ -16,6 +17,9 @@
 	// Storybook serves the app's static folder, so counties get their real shapes.
 	const geometrySource = createFixtureGeometrySource(undefined, { countiesUrl: '/counties' });
 	const mixedSelection = ['state-49', 'county-41017', 'county-41031', 'city-4105800'];
+
+	const seedSource = createSeedPlaceSource();
+	const seedGeometrySource = createSeedGeometrySource();
 </script>
 
 <!-- The prototype's opening state: Utah, two Oregon counties and Bend. -->
@@ -74,4 +78,14 @@
 	<div class="w-[375px]">
 		<PlaceSelector {source} {geometrySource} selectedIds={mixedSelection} />
 	</div>
+</Story>
+
+<!-- The seeded Oregon and Utah Areas from seed-places.ts, which stand in for real data
+     until the API-backed source lands. -->
+<Story name="Seeded Oregon and Utah" asChild>
+	<PlaceSelector
+		source={seedSource}
+		geometrySource={seedGeometrySource}
+		selectedIds={['county-41051', 'city-4967000']}
+	/>
 </Story>

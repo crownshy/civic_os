@@ -1,8 +1,11 @@
 import type { Bbox, Place, PlaceSource } from './places';
 
-type StateSeed = { geoid: string; name: string; abbreviation: string; bbox: Bbox };
-type CountySeed = { geoid: string; name: string; state: string; bbox: Bbox };
-type CitySeed = { geoid: string; name: string; county: string; bbox: Bbox };
+export type StateSeed = { geoid: string; name: string; abbreviation: string; bbox: Bbox };
+export type CountySeed = { geoid: string; name: string; state: string; bbox: Bbox };
+export type CitySeed = { geoid: string; name: string; county: string; bbox: Bbox };
+
+/** Flat rows keyed by Census geoid, with each row naming its parent's geoid. */
+export type PlaceSeeds = { states: StateSeed[]; counties: CountySeed[]; cities: CitySeed[] };
 
 const STATES: StateSeed[] = [
 	{ geoid: '06', name: 'California', abbreviation: 'CA', bbox: [-124.48, 32.53, -114.13, 42.01] },
@@ -51,30 +54,32 @@ const CITIES: CitySeed[] = [
 	{ geoid: '4958070', name: 'Park City', county: '49043', bbox: [-111.55, 40.62, -111.46, 40.69] }
 ];
 
-function buildFixturePlaces(): Place[] {
-	const stateByGeoid = new Map(STATES.map((state) => [state.geoid, state]));
-	const countyByGeoid = new Map(COUNTIES.map((county) => [county.geoid, county]));
+/** Turns seed rows into `Place`s, filling in ancestors, context lines and child counts. */
+export function buildPlaces(seeds: PlaceSeeds): Place[] {
+	const { states: stateRows, counties: countyRows, cities: cityRows } = seeds;
+	const stateByGeoid = new Map(stateRows.map((state) => [state.geoid, state]));
+	const countyByGeoid = new Map(countyRows.map((county) => [county.geoid, county]));
 	const countOf = <T>(items: T[], matches: (item: T) => boolean) => items.filter(matches).length;
 
-	const states = STATES.map<Place>((state) => ({
+	const states = stateRows.map<Place>((state) => ({
 		id: `state-${state.geoid}`,
 		level: 'state',
 		name: state.name,
 		ancestorIds: [],
 		context: 'State',
-		childCount: countOf(COUNTIES, (county) => county.state === state.geoid),
+		childCount: countOf(countyRows, (county) => county.state === state.geoid),
 		bbox: state.bbox
 	}));
-	const counties = COUNTIES.map<Place>((county) => ({
+	const counties = countyRows.map<Place>((county) => ({
 		id: `county-${county.geoid}`,
 		level: 'county',
 		name: county.name,
 		ancestorIds: [`state-${county.state}`],
 		context: stateByGeoid.get(county.state)!.name,
-		childCount: countOf(CITIES, (city) => city.county === county.geoid),
+		childCount: countOf(cityRows, (city) => city.county === county.geoid),
 		bbox: county.bbox
 	}));
-	const cities = CITIES.map<Place>((city) => {
+	const cities = cityRows.map<Place>((city) => {
 		const county = countyByGeoid.get(city.county)!;
 		const state = stateByGeoid.get(county.state)!;
 		return {
@@ -91,7 +96,11 @@ function buildFixturePlaces(): Place[] {
 }
 
 /** Three states, a handful of counties and cities, with roughly real bounding boxes. */
-export const fixturePlaces: Place[] = buildFixturePlaces();
+export const fixturePlaces: Place[] = buildPlaces({
+	states: STATES,
+	counties: COUNTIES,
+	cities: CITIES
+});
 
 /**
  * An in-memory `PlaceSource` for tests and stories. `delayMs` makes each call resolve
