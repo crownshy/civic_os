@@ -1,4 +1,5 @@
 import type { Api } from '../api';
+import { AREAS_METADATA_KEY, type CampaignArea } from './areas';
 import type { AskToggles } from './participant-asks';
 import { COLOR_SCHEME_METADATA_KEY } from './color-scheme';
 import { POLL_PAUSED_METADATA_KEY } from './poll-status';
@@ -20,6 +21,7 @@ import {
  */
 export interface MetadataWrites {
 	place?: Place | null;
+	areas?: CampaignArea[];
 	/** Merged over the stored poll, so a write only ever adds to it. */
 	poll?: Partial<CampaignPoll>;
 	org?: CampaignOrg | null;
@@ -51,6 +53,7 @@ export async function writeMetadata(
 	const body: Record<string, unknown> = {};
 
 	if (writes.place !== undefined) body[PLACE_METADATA_KEY] = writes.place;
+	if (writes.areas !== undefined) body[AREAS_METADATA_KEY] = writes.areas;
 	if (writes.org !== undefined) body[ORG_METADATA_KEY] = writes.org;
 	if (writes.cohosts !== undefined) body[COHOSTS_METADATA_KEY] = writes.cohosts;
 	if (writes.colorScheme !== undefined) body[COLOR_SCHEME_METADATA_KEY] = writes.colorScheme;

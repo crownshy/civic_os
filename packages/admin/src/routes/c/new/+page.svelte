@@ -10,6 +10,12 @@
 	import { resolve } from '$app/paths';
 	import AddCoHostsDialog from '$lib/components/setup/AddCoHostsDialog.svelte';
 	import { placeFromName } from '$lib/config/place';
+	import PlaceSelector from '$lib/components/place-selector/PlaceSelector.svelte';
+	import { areasForIds } from '$lib/components/place-selector/campaign-areas';
+	import {
+		createPlaceGeometrySource,
+		createPlaceSource
+	} from '$lib/components/place-selector/sources';
 	import {
 		createConversationSchema,
 		type CreateConversationMessage
@@ -60,6 +66,16 @@
 	// "Dundee, Scotland" turns into before they commit to it. The action derives
 	// the same slug; this only previews it.
 	const placeSlug = $derived(placeFromName($formData.placeName)?.slug ?? '');
+
+	const placeSource = createPlaceSource();
+	const placeGeometrySource = createPlaceGeometrySource();
+	// Names resolve asynchronously, so a slow lookup must not overwrite a newer pick.
+	let areasRequest = 0;
+	async function onAreasChange(ids: string[]) {
+		const request = ++areasRequest;
+		const areas = await areasForIds(placeSource, ids);
+		if (request === areasRequest) $formData.areas = areas;
+	}
 
 	let cohostPickerOpen = $state(false);
 
@@ -208,6 +224,19 @@
 					/>
 					<Form.FieldErrors class="mt-1 text-caption text-destructive" />
 				</Form.Field>
+
+				<div class="flex flex-col gap-1">
+					<span class={labelClass}>Where it runs</span>
+					<p class="mb-1 text-caption text-muted-foreground">
+						The states, counties and cities this conversation is for. You can change them later in
+						Setup.
+					</p>
+					<PlaceSelector
+						source={placeSource}
+						geometrySource={placeGeometrySource}
+						onchange={onAreasChange}
+					/>
+				</div>
 
 				<Form.Field {form} name="keyQuestion">
 					<Form.Control>

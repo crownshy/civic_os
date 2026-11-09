@@ -16,6 +16,7 @@
 	import { Label } from '@civicos/shared/ui/label';
 	import { Trash2 } from '@lucide/svelte';
 	import IdentityCard from './IdentityCard.svelte';
+	import AreasCard from './AreasCard.svelte';
 	import CoHostsCard from './CoHostsCard.svelte';
 	import { noticeFrom } from './cohost-notice';
 	import AddCoHostsDialog from '$lib/components/setup/AddCoHostsDialog.svelte';
@@ -873,6 +874,9 @@
 			{colorSchemeId}
 			onSelectColorScheme={selectColorScheme}
 		/>
+
+		<!-- ===== Where it runs (#514) ===== -->
+		<AreasCard areas={campaign.areas} onSave={(areas) => patchMetadata({ areas })} />
 
 		<!-- ===== Co-Hosts ===== -->
 		<!-- Live co-hosts; "Add New…" opens the org picker and grants the

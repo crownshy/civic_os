@@ -10,6 +10,7 @@ import {
 	demographicsFromBackend
 } from '@civicos/shared/data/demographics';
 import { readPoll } from '@civicos/shared/data/place';
+import { readAreas } from '@civicos/shared/data/areas';
 import type { UserActions } from '@crownshy/api-client/api';
 import type { LayoutServerLoad } from './$types';
 
@@ -153,6 +154,8 @@ export const load: LayoutServerLoad = async ({ params, parent, cookies, url, dep
 		// entry is the fallback. The list resolves the same thing in `toSummary`,
 		// so this and the dashboard agree.
 		place: placeForCampaign(conversation?.metadata, region),
+		// The states, counties and cities it runs in, picked on Setup (#514).
+		areas: readAreas(conversation?.metadata),
 		// Utah and Oregon predate place-scoped slugs and their slugs are pinned by
 		// `regions.ts`. Setup must never auto-rename one off the back of a Place
 		// edit: the many-to-many scheme is for new Campaigns (ADR 0007).
