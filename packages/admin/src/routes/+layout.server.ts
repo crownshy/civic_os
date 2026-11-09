@@ -1,4 +1,3 @@
-import { serverApi } from '@civicos/shared/api';
 import { toSummary, type ConversationSummary } from '$lib/conversations';
 import { describeApiFailure } from '$lib/api/describe-failure';
 import { toViewer } from '$lib/viewer';
@@ -45,7 +44,7 @@ function bySidebarOrder(a: ConversationSummary, b: ConversationSummary) {
  * GetPermittedConversations is the backend's own answer to "what may this user
  * see", so a Host member gets their org's Campaigns and a super-admin gets all.
  */
-export const load: LayoutServerLoad = async ({ cookies, url, depends }) => {
+export const load: LayoutServerLoad = async ({ cookies, locals, depends }) => {
 	depends('app:conversations');
 
 	const authToken = cookies.get('auth-token');
@@ -58,7 +57,7 @@ export const load: LayoutServerLoad = async ({ cookies, url, depends }) => {
 			conversationsError: null
 		};
 
-	const api = serverApi(url, authToken);
+	const api = locals.api;
 
 	/**
 	 * An empty list and a failed call are different problems with the same shape,
@@ -70,7 +69,7 @@ export const load: LayoutServerLoad = async ({ cookies, url, depends }) => {
 	let conversationsError: string | null = null;
 
 	const [orgs, user, conversations] = await Promise.all([
-		api.GetUserOrganizations().catch((e) => {
+		locals.userOrganizations().catch((e) => {
 			console.warn('GetUserOrganizations failed', e);
 			return null;
 		}),

@@ -3,7 +3,7 @@ import { begin } from '$lib/activity.svelte';
 
 /**
  * The shared client plus admin's busy indicator. Use this for the browser
- * client; server loads can call `serverApi` from `@civicos/shared/api`.
+ * client; server loads and actions read `locals.api` (see `$lib/server/backend-client`).
  */
 export const createApiClient: typeof createSharedClient = (...args) => {
 	const api = createSharedClient(...args);

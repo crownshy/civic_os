@@ -1,5 +1,4 @@
 import { error, fail } from '@sveltejs/kit';
-import { serverApi } from '@civicos/shared/api';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import type { OrganizationTeamResponseDto, UserOrganizationAccess } from '@crownshy/api-client/api';
@@ -11,11 +10,8 @@ import { routeSlugFor, statusFor } from '$lib/conversations';
 import { canManageHost, canViewHost, fetchHostAccess, type HostAccess } from '$lib/host-access';
 import { STALE_PUBLIC_PAGE, mirrorHosts } from '$lib/cohost-mirror';
 import type { AssignableConversation, HostConversation } from './host-conversations';
+import type { BackendClient } from '$lib/server/backend-client';
 import type { Actions, PageServerLoad } from './$types';
-
-function client(url: URL, cookies: { get: (n: string) => string | undefined }) {
-	return serverApi(url, cookies.get('auth-token'));
-}
 
 /**
  * Host admins manage their own Host's details and team. Moving Campaigns between
@@ -36,10 +32,7 @@ function teamFailure(e: unknown, action: string): string {
 }
 
 /** Form actions skip the layout gate, so each one checks for itself. */
-async function requireAccess(
-	api: ReturnType<typeof client>,
-	allowed: (access: HostAccess) => boolean
-) {
+async function requireAccess(api: BackendClient, allowed: (access: HostAccess) => boolean) {
 	if (!allowed(await fetchHostAccess(api))) error(403, 'You cannot change this Host.');
 }
 
@@ -60,7 +53,7 @@ async function requireAccess(
  * `title` and `description` are TextContentId UUIDs, not text.
  */
 async function loadHostConversations(
-	api: ReturnType<typeof client>,
+	api: BackendClient,
 	orgId: string
 ): Promise<{ attached: HostConversation[]; assignable: AssignableConversation[] }> {
 	const [conversations, grants] = await Promise.all([
@@ -117,14 +110,16 @@ async function loadHostConversations(
 	return { attached, assignable };
 }
 
-export const load: PageServerLoad = async ({ params, cookies, url, depends, parent }) => {
+export const load: PageServerLoad = async ({ params, locals, depends, parent }) => {
 	depends(`hosts:host:${params.id}`);
 	const { hostAccess } = await parent();
 	// The same 404 as a missing Host, so the page does not confirm which ids exist.
 	if (!canViewHost(hostAccess, params.id)) error(404, 'Host not found');
-	const api = client(url, cookies);
+	const api = locals.api;
 
-	const org: UserOrganizationAccess | undefined = hostAccess.hosts.find((h) => h.organization.id === params.id);
+	const org: UserOrganizationAccess | undefined = hostAccess.hosts.find(
+		(h) => h.organization.id === params.id
+	);
 	if (!org) error(404, 'Host not found');
 
 	const [team, me, regions, conversations] = await Promise.all([
@@ -190,14 +185,14 @@ export const actions: Actions = {
 	 * is cleared with an empty string, because a null is dropped from the update
 	 * and leaves the old value standing. Hence every field is always sent.
 	 */
-	updateHost: async ({ request, params, cookies, url }) => {
-		await requireAccess(client(url, cookies), (a) => canManageHost(a, params.id));
+	updateHost: async ({ request, params, locals }) => {
+		await requireAccess(locals.api, (a) => canManageHost(a, params.id));
 		const form = await superValidate(request, zod4(hostDetailsSchema), { id: 'host-details' });
 		if (!form.valid) return fail(400, { form });
 
 		const { contactEmail, orgType, regionIds } = form.data;
 		try {
-			await client(url, cookies).UpdateOrganization(
+			await locals.api.UpdateOrganization(
 				{
 					name: form.data.name.trim(),
 					description: form.data.description.trim(),
@@ -219,11 +214,11 @@ export const actions: Actions = {
 		return message(form, { kind: 'ok', text: 'Saved.' });
 	},
 
-	addMember: async ({ request, params, cookies, url }) => {
+	addMember: async ({ request, params, locals }) => {
 		const form = await superValidate(request, zod4(addMemberSchema));
 		if (!form.valid) return fail(400, { form });
 
-		const api = client(url, cookies);
+		const api = locals.api;
 		await requireAccess(api, (a) => canManageHost(a, params.id));
 		try {
 			const res = await api.AddOrganizationMember(
@@ -258,12 +253,12 @@ export const actions: Actions = {
 	 * fires a comhairle trigger that grants `observer` to the Host's members group
 	 * and `admin` to its admins group, so the team sees it without a grant from us.
 	 */
-	assignCampaign: async ({ request, params, cookies, url }) => {
+	assignCampaign: async ({ request, params, locals }) => {
 		const fd = await request.formData();
 		const conversationId = String(fd.get('conversationId') ?? '');
 		if (!conversationId) return fail(400, { error: 'Select a Campaign to assign.' });
 
-		const api = client(url, cookies);
+		const api = locals.api;
 		await requireAccess(api, canAssignCampaigns);
 
 		try {
@@ -285,13 +280,13 @@ export const actions: Actions = {
 	 * `Conversation.organizationId`, so removing it would mean reassigning the
 	 * Campaign to another Host, which is a different (and unbuilt) operation.
 	 */
-	revokeAccess: async ({ request, params, cookies, url }) => {
+	revokeAccess: async ({ request, params, locals }) => {
 		const fd = await request.formData();
 		const conversationId = String(fd.get('conversationId') ?? '');
 		const owningOrgId = String(fd.get('owningOrgId') ?? '') || null;
 		if (!conversationId) return fail(400, { error: 'Missing conversation.' });
 
-		const api = client(url, cookies);
+		const api = locals.api;
 		await requireAccess(api, canAssignCampaigns);
 		try {
 			await api.RevokePermission(undefined, {
@@ -309,13 +304,13 @@ export const actions: Actions = {
 		}
 	},
 
-	setRole: async ({ request, params, cookies, url }) => {
+	setRole: async ({ request, params, locals }) => {
 		const fd = await request.formData();
 		const userId = String(fd.get('userId') ?? '');
 		const role = String(fd.get('role') ?? '');
 		if (role !== 'admin' && role !== 'member') return fail(400, { error: 'Invalid role' });
 
-		const api = client(url, cookies);
+		const api = locals.api;
 		await requireAccess(api, (a) => canManageHost(a, params.id));
 		// Comhairle refuses any change to your own groups, promotion included.
 		const me = await api.CurrentUser().catch(() => null);
@@ -341,11 +336,11 @@ export const actions: Actions = {
 		}
 	},
 
-	removeMember: async ({ request, params, cookies, url }) => {
+	removeMember: async ({ request, params, locals }) => {
 		const fd = await request.formData();
 		const userId = String(fd.get('userId') ?? '');
 
-		const api = client(url, cookies);
+		const api = locals.api;
 		await requireAccess(api, (a) => canManageHost(a, params.id));
 		// Guard: don't let a user remove themselves.
 		const me = await api.CurrentUser().catch(() => null);

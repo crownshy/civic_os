@@ -1,6 +1,5 @@
 import { fail, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { serverApi } from '@civicos/shared/api';
 import { describeApiFailure } from '$lib/api/describe-failure';
 import type { RecruitmentTargetDto } from '@crownshy/api-client/api';
 import {
@@ -125,7 +124,7 @@ function targetsToGoals(targets: RecruitmentTargetDto[]): RegionGoals {
 	return goals;
 }
 
-export const load: PageServerLoad = async ({ parent, cookies, url, depends }) => {
+export const load: PageServerLoad = async ({ parent, locals, depends }) => {
 	depends('open-poll:demographics');
 	depends('open-poll:goals');
 
@@ -135,7 +134,7 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 	const enabledQuestions = [...defaultDemographics, ...customDemographics].filter(
 		(question) => question.enabled
 	);
-	const api = serverApi(url, cookies.get('auth-token'));
+	const api = locals.api;
 	const conversationId = campaign.id;
 
 	let demographics: ParticipationReport | null = null;
@@ -204,9 +203,9 @@ export const load: PageServerLoad = async ({ parent, cookies, url, depends }) =>
 };
 
 export const actions: Actions = {
-	saveGoals: async ({ request, cookies, params, url }) => {
+	saveGoals: async ({ request, params, locals }) => {
 		const form = await request.formData();
-		const api = serverApi(url, cookies.get('auth-token'));
+		const api = locals.api;
 		const metric = String(form.get('metric') ?? '');
 		const conversationId = String(form.get('conversationId') ?? '');
 		const workflowId = String(form.get('workflowId') ?? '');

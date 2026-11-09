@@ -1,7 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { superValidate, message, setError } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
-import { serverApi, type Api } from '@civicos/shared/api';
+import type { Api } from '@civicos/shared/api';
 import { placeFromName, type CampaignPoll } from '@civicos/shared/data/place';
 import { writeMetadata } from '@civicos/shared/data/metadata';
 import { rescopedSlug } from '$lib/config/place';
@@ -23,10 +23,10 @@ type StepLike = { id: string; toolConfig?: unknown; previewToolConfig?: unknown 
 /** Polis defaults for a fresh poll, matching comhairle's own Setup screen. */
 const REQUIRED_VOTES = 10;
 
-export const load: PageServerLoad = async ({ cookies, url, depends }) => {
+export const load: PageServerLoad = async ({ locals, depends }) => {
 	depends('app:hosts');
 
-	const api = serverApi(url, cookies.get('auth-token'));
+	const api = locals.api;
 
 	// Kept apart from an empty list: a failed lookup is not "you belong to no
 	// Host", and saying so sends people asking for access they already have.
@@ -36,7 +36,7 @@ export const load: PageServerLoad = async ({ cookies, url, depends }) => {
 	// the Hosts the creator belongs to (the point is a coalition), so this is the
 	// same list the Campaign's Co-Hosts card offers after creation.
 	const [orgs, pickerOrgs] = await Promise.all([
-		api.GetUserOrganizations().catch((e) => {
+		locals.userOrganizations().catch((e) => {
 			console.warn('GetUserOrganizations failed', e);
 			hostsError = describeApiFailure(e);
 			return null;
@@ -78,12 +78,12 @@ export const load: PageServerLoad = async ({ cookies, url, depends }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, cookies, url }) => {
+	default: async ({ request, locals }) => {
 		const form = await superValidate(request, zod4(createConversationSchema));
 		// The field errors already say what is wrong, beside each field.
 		if (!form.valid) return fail(400, { form });
 
-		const api = serverApi(url, cookies.get('auth-token'));
+		const api = locals.api;
 		const { slug, hostId, cohostIds } = form.data;
 		// Trimmed here rather than in the schema; see `limitedText`.
 		const title = form.data.title.trim();
@@ -103,7 +103,7 @@ export const actions: Actions = {
 		// The Host picker only offers the caller's own Hosts, but the post is the
 		// caller's to write, so check it against the same list rather than trust it.
 		const [orgs, everyHost] = await Promise.all([
-			api.GetUserOrganizations().catch((e) => {
+			locals.userOrganizations().catch((e) => {
 				console.warn('GetUserOrganizations failed', e);
 				return null;
 			}),
