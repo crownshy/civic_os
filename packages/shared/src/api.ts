@@ -18,6 +18,12 @@ export const createApiClient: typeof createGeneratedClient = (...args) => {
 		if (response.data === '') response.data = undefined;
 		return response;
 	});
+	// A server-side call must fail on a redirect, never follow it. On Node, axios
+	// follows a 3xx and keeps the cookie on the same host, so a 303 to /login
+	// from the admin gate turned into a render of /login, whose loads called the
+	// backend again and were redirected again: one throttled call fanned out
+	// without bound until the api pod went down.
+	if (args[2] === 'server') api.axios.defaults.maxRedirects = 0;
 	return api;
 };
 
