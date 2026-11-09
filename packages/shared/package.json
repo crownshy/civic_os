@@ -62,7 +62,7 @@
 		"tailwind-variants": "^3.2.2"
 	},
 	"peerDependencies": {
-		"@crownshy/api-client": "^0.0.66-rc.0",
+		"@crownshy/api-client": "^0.0.73",
 		"svelte": "^5.0.0",
 		"zod": "^4.4.3"
 	},
