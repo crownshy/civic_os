@@ -43,6 +43,16 @@ export const createConversationSchema = z.object({
 	placeName: limitedText('placeName')
 		.refine((s) => !s.trim() || placeFromName(s) !== null, PLACE_NAME_UNREADABLE)
 		.default(''),
+	/** The states, counties and cities it runs in, from the place selector (#514). */
+	areas: z
+		.array(
+			z.object({
+				geoid: z.string().regex(/^\d+$/),
+				level: z.enum(['state', 'county', 'city']),
+				name: z.string().trim().min(1)
+			})
+		)
+		.default([]),
 	description: limitedText('description').default(''),
 	/**
 	 * Owning Host. Preselected in `load` from the Host the creator belongs to;

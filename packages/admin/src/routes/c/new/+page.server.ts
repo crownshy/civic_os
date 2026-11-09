@@ -293,14 +293,16 @@ export const actions: Actions = {
 		//    whichever poll `regions.ts` guesses, so it is logged, not rolled back.
 		//    Going live mirrors the poll again, so a failure here is recoverable.
 		const poll = pollIdentity(polisStep, keyQuestion);
-		if (poll || place) {
+		const areas = form.data.areas;
+		if (poll || place || areas.length > 0) {
 			try {
 				await writeMetadata(api, conversationId, {
 					...(poll ? { poll } : {}),
-					...(place ? { place } : {})
+					...(place ? { place } : {}),
+					...(areas.length > 0 ? { areas } : {})
 				});
 			} catch (e) {
-				console.error('Mirroring poll / place into metadata failed', e);
+				console.error('Mirroring poll / place / areas into metadata failed', e);
 			}
 		}
 
