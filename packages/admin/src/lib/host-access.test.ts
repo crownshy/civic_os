@@ -4,7 +4,10 @@ import { canManageHost, canViewHost, hostsLink, ownableHosts, toHostAccess } fro
 
 type Access = UserOrganizationsResponse['organizations'][number];
 
-function org(id: string, access: { isAssociated: boolean; canUpdate: boolean }): UserOrganizationAccess {
+function org(
+	id: string,
+	access: { isAssociated: boolean; canUpdate: boolean }
+): UserOrganizationAccess {
 	return {
 		...access,
 		canDelete: access.canUpdate,

@@ -1,4 +1,3 @@
-import { serverApi } from '@civicos/shared/api';
 import type { PageServerLoad } from './$types';
 
 /**
@@ -7,11 +6,11 @@ import type { PageServerLoad } from './$types';
  * because nothing else needs it: `limit: 1` because we want `total`, not the
  * records.
  */
-export const load: PageServerLoad = async ({ parent, cookies, url, depends }) => {
+export const load: PageServerLoad = async ({ parent, locals, depends }) => {
 	depends('dashboard:event-counts');
 
 	const { conversations } = await parent();
-	const api = serverApi(url, cookies.get('auth-token'));
+	const api = locals.api;
 
 	const counts = await Promise.all(
 		conversations.map((conversation) =>

@@ -1,8 +1,7 @@
 import { fail } from '@sveltejs/kit';
-import { serverApi } from '@civicos/shared/api';
-import { COHOST_ROLE, CONVERSATION_RESOURCE, cohostOrgIds } from '$lib/permissions';
+import { COHOST_ROLE, CONVERSATION_RESOURCE } from '$lib/permissions';
 import { STALE_PUBLIC_PAGE, mirrorHosts } from '$lib/cohost-mirror';
-import type { Actions, PageServerLoad } from './$types';
+import type { Actions } from './$types';
 
 /** "A", "A and B", "A, B and C". */
 function listOf(names: string[]): string {
@@ -11,76 +10,8 @@ function listOf(names: string[]): string {
 		: `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`;
 }
 
-type PickerOrg = { id: string; name: string; website?: string | null; email?: string | null };
-
-export const load: PageServerLoad = async ({ parent, cookies, url, depends }) => {
-	const { campaign, conversation } = await parent();
-	const convId = campaign.id;
-	depends(`cohosts:${convId}`);
-
-	const api = serverApi(url, cookies.get('auth-token'));
-
-	const [allOrgs, permissions] = await Promise.all([
-		api
-			.ListOrganizations({ queries: { limit: 200 } })
-			.then((r) => r.records)
-			.catch((e) => {
-				console.warn('ListOrganizations failed', e);
-				return [];
-			}),
-		api
-			.ListResourcePermissions({
-				params: { resource_type: CONVERSATION_RESOURCE, resource_id: convId },
-				queries: { limit: 200 }
-			})
-			.then((r) => r.records)
-			.catch((e) => {
-				console.warn('ListResourcePermissions failed', e);
-				return [];
-			})
-	]);
-	const grantedOrgIds = cohostOrgIds(permissions, allOrgs);
-	const orgById = new Map(allOrgs.map((o) => [o.id, o]));
-
-	const owningOrgId =
-		(conversation as { organizationId?: string | null } | null)?.organizationId ?? null;
-
-	const toCoHost = (id: string, isOwner: boolean) => {
-		const o = orgById.get(id);
-		if (!o) return null;
-		return {
-			id,
-			name: o.name,
-			website: o.externalUrl ?? undefined,
-			email: o.contactEmail ?? undefined,
-			isOwner
-		};
-	};
-
-	// The owning Host also holds a `content_editor` grant, because ownership alone
-	// does not make a Campaign visible to its own team, so it comes back in
-	// `grantedOrgIds` too. Drop it there and let the owner row win, otherwise the
-	// Host is listed twice and the keyed each block collides (#393).
-	const cohosts = [
-		...(owningOrgId ? [toCoHost(owningOrgId, true)] : []),
-		...grantedOrgIds.filter((id) => id !== owningOrgId).map((id) => toCoHost(id, false))
-	].filter((c): c is NonNullable<typeof c> => c != null);
-
-	// Orgs already attached (owning + co-hosts) are excluded from the picker.
-	const excludeIds = [owningOrgId, ...grantedOrgIds].filter((id): id is string => !!id);
-
-	const pickerOrgs: PickerOrg[] = allOrgs.map((o) => ({
-		id: o.id,
-		name: o.name,
-		website: o.externalUrl,
-		email: o.contactEmail
-	}));
-
-	return { convId, owningOrgId, cohosts, pickerOrgs, excludeIds };
-};
-
 export const actions: Actions = {
-	grantCohosts: async ({ request, cookies, url }) => {
+	grantCohosts: async ({ request, locals }) => {
 		const fd = await request.formData();
 		const convId = String(fd.get('convId') ?? '');
 		const owningOrgId = String(fd.get('owningOrgId') ?? '') || null;
@@ -88,7 +19,7 @@ export const actions: Actions = {
 		const orgNames = fd.getAll('orgNames').map(String);
 		if (!convId || orgIds.length === 0) return fail(400, { error: 'Select at least one host.' });
 
-		const api = serverApi(url, cookies.get('auth-token'));
+		const api = locals.api;
 		const nameOf = (i: number) => orgNames[i] || 'a host';
 
 		const added: string[] = [];
@@ -122,14 +53,14 @@ export const actions: Actions = {
 		return { added: added.length };
 	},
 
-	removeCohost: async ({ request, cookies, url }) => {
+	removeCohost: async ({ request, locals }) => {
 		const fd = await request.formData();
 		const convId = String(fd.get('convId') ?? '');
 		const owningOrgId = String(fd.get('owningOrgId') ?? '') || null;
 		const orgId = String(fd.get('orgId') ?? '');
 		if (!convId || !orgId) return fail(400, { error: 'Missing host.' });
 
-		const api = serverApi(url, cookies.get('auth-token'));
+		const api = locals.api;
 		try {
 			await api.RevokePermission(undefined, {
 				params: { resource_type: CONVERSATION_RESOURCE, resource_id: convId },

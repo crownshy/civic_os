@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { serverApi, type Api } from '@civicos/shared/api';
+import type { Api } from '@civicos/shared/api';
 import { findByRouteSlug, participantBase, regionFor } from '$lib/conversations';
 import { placeForCampaign } from '$lib/config/place';
 import { hasLivePoll, polisConfigFor } from '$lib/polis-step';
@@ -14,7 +14,7 @@ import { readAreas } from '@civicos/shared/data/areas';
 import type { UserActions } from '@crownshy/api-client/api';
 import type { LayoutServerLoad } from './$types';
 
-export const load: LayoutServerLoad = async ({ params, parent, cookies, url, depends }) => {
+export const load: LayoutServerLoad = async ({ params, parent, locals, depends }) => {
 	depends(`campaign:${params.slug}`);
 
 	// The permitted list is this route's access check, not just its lookup: a
@@ -27,7 +27,7 @@ export const load: LayoutServerLoad = async ({ params, parent, cookies, url, dep
 		error(404, `Unknown conversation: ${params.slug}`);
 	}
 
-	const api = serverApi(url, cookies.get('auth-token'));
+	const api = locals.api;
 
 	// withTranslations (admin only) returns the resolved display strings *and*
 	// each text field's TextContent id + locale. Those ids are what edits are

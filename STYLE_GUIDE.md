@@ -95,8 +95,18 @@ A `+page.svelte` should mostly wire these together and branch between screens.
 
     Import it from `@civicos/shared/api`, not `@crownshy/api-client/client`: the shared
     one stops comhairle's empty 200 responses from failing validation after the write
-    has already landed. A `+page.server.ts` that needs its own client calls
-    `serverApi(url, cookies.get('auth-token'))` from the same module.
+    has already landed.
+
+    Server code in **admin** (`+page.server.ts`, `+layout.server.ts`, form actions)
+    uses `locals.api`, which `hooks.server.ts` builds per request and points straight
+    at comhairle. Do not call `serverApi` there: it goes to the app's own public
+    `/api` URL, so each call leaves the pod and comes back in through the ingress.
+    Using `url` to build a client also makes the load re-run on every navigation.
+    civicos still uses `serverApi(url, cookies.get('auth-token'))` for now.
+
+    A server load that calls `await parent()` makes the server re-run every parent
+    server load. If a page only needs parent data plus a couple of reads, prefer a
+    universal `+page.ts` that reads `api` from `parent()`.
 
     Child loads read it from the parent and call typed methods, they do not construct
     their own:

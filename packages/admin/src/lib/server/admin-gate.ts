@@ -1,10 +1,38 @@
 import type { UserOrganizationsResponse } from '@crownshy/api-client/api';
-import type { createBackendClient } from './backend-client';
+import type { BackendClient } from './backend-client';
 import { toHostAccess } from '$lib/host-access';
 
 export type AdminGate = 'admin' | 'unauthorized' | 'forbidden';
 
-type GateApi = Pick<ReturnType<typeof createBackendClient>, 'ListRegions' | 'GetUserOrganizations'>;
+type GateApi = Pick<BackendClient, 'ListRegions' | 'GetUserOrganizations'>;
+
+const ADMIN_TTL_MS = 30_000;
+const MAX_REMEMBERED = 1_000;
+
+/**
+ * Remembers which sessions passed the gate, for `ttlMs`. Every navigation and
+ * hover preload goes through the gate, and each probe is up to two comhairle
+ * calls, so without this a few clicks a second become a steady stream of them.
+ * Only passes are remembered; a refusal is always checked again. Losing admin
+ * access takes up to `ttlMs` to apply. Logging out applies at once, because it
+ * removes the cookie.
+ */
+export function createAdminCache(ttlMs = ADMIN_TTL_MS, now: () => number = Date.now) {
+	const expiry = new Map<string, number>();
+	return {
+		has(token: string) {
+			const until = expiry.get(token);
+			if (until === undefined) return false;
+			if (until > now()) return true;
+			expiry.delete(token);
+			return false;
+		},
+		remember(token: string) {
+			if (expiry.size >= MAX_REMEMBERED) expiry.clear();
+			expiry.set(token, now() + ttlMs);
+		}
+	};
+}
 
 type ApiFailure = {
 	response?: { status?: number };
