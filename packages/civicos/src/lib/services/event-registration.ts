@@ -1,4 +1,4 @@
-import type { ApiClient } from '@crownshy/api-client/api';
+import type { ApiClient, UserDto } from '@crownshy/api-client/api';
 import { httpErrorMessage, httpStatusOf } from '$lib/utils/http';
 
 type EventRegistrationApi = Pick<ApiClient, 'SignupOtp' | 'CreateEventAttendance'>;
@@ -16,24 +16,44 @@ export interface EventRegistration {
 	email: string;
 	/** What the participant typed. The only field comhairle can keep it in is the username. */
 	name: string;
+	/** Already signed in as `email`, so there is no account to create. */
+	signedIn?: boolean;
 }
 
 /**
  * Sign a participant up and put them on an event's attendance list.
+ *
+ * Resolves to the account a signup created, which this browser is now signed
+ * in as, or null when there was none: the participant was signed in already,
+ * or the email belonged to an existing account.
  *
  * Throws whatever the call rejected with, so the caller can render the server's
  * message.
  */
 export async function registerForEvent(
 	api: EventRegistrationApi,
-	{ conversationId, eventId, email, name }: EventRegistration
-): Promise<void> {
+	{ conversationId, eventId, email, name, signedIn = false }: EventRegistration
+): Promise<UserDto | null> {
+	const account = signedIn ? null : await signUp(api, email, name);
+
+	await api.CreateEventAttendance(
+		{ role: 'participant', user_email: email },
+		{ params: { conversation_id: conversationId, event_id: eventId } }
+	);
+	return account;
+}
+
+async function signUp(
+	api: EventRegistrationApi,
+	email: string,
+	name: string
+): Promise<UserDto | null> {
 	// Their name is the username, because `UserDto` has nowhere else to put it
 	// and the Host needs something to read on a registration list. Asking for a
 	// username instead is what this flow used to do, and it made a participant
 	// answer for comhairle's account model.
 	try {
-		await api.SignupOtp({ email, username: name });
+		return await api.SignupOtp({ email, username: name });
 	} catch (e) {
 		if (httpStatusOf(e) !== 409) throw e;
 
@@ -42,16 +62,12 @@ export async function registerForEvent(
 		// Smith will manage between them. Retry under the email, which is unique
 		// by construction, so only the first case survives to be swallowed.
 		try {
-			await api.SignupOtp({ email, username: email });
+			return await api.SignupOtp({ email, username: email });
 		} catch (retry) {
 			if (httpStatusOf(retry) !== 409) throw retry;
+			return null;
 		}
 	}
-
-	await api.CreateEventAttendance(
-		{ role: 'participant', user_email: email },
-		{ params: { conversation_id: conversationId, event_id: eventId } }
-	);
 }
 
 const FALLBACK_MESSAGE = 'Something went wrong registering you for the event';
