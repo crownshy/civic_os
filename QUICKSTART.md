@@ -1,6 +1,6 @@
 # Quickstart
 
-This will use the staging backend at https://bloom.comhairle.scot and the actual Polis ids for those regions (confim).
+The fastest path: point the app at the staging backend. In `packages/civicos/.env` set `API_URL=https://bloom.comhairle.scot` and `API_PREFIX=/api`.
 
 ```sh
 # 1. Node (version from .nvmrc) + pnpm 12.3.4 (skip if you have them)
@@ -9,7 +9,8 @@ corepack enable && corepack prepare pnpm@12.3.4 --activate
 
 # 2. Install + config
 pnpm install
-cp .env.example .env   # defaults point at testing conversation — safe
+cp packages/civicos/.env.example packages/civicos/.env
+cp packages/admin/.env.example packages/admin/.env   # only if you run admin
 
 # 3. Run
 pnpm dev
@@ -26,7 +27,7 @@ Stop: `Ctrl+C`. Start again: `pnpm dev`. That's it.
 Want own Postgres + API + seeded conversation? Need [comhairle](https://github.com/...) repo cloned next to this one, plus Nix (flakes) + Docker.
 
 ```sh
-# In comhairle repo — 3 shells
+# In comhairle repo, 3 shells
 nix develop
 cp .env.example .env
 just pg         # shell A: postgres :5434
@@ -37,7 +38,7 @@ just seed       # shell C: makes admin@crown-shy.com / adminPassword123!
 Back in this repo:
 
 ```sh
-./scripts/seed-dev.sh   # mints conversation/invite/polis ids, writes to .env
+./scripts/seed-dev.sh   # creates a Campaign, writes packages/civicos/.env + packages/admin/.env
 pnpm dev
 ```
 
