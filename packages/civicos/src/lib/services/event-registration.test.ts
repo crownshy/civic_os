@@ -79,7 +79,19 @@ describe('registerForEvent', () => {
 	it('treats a 409 on the retry as the account already existing', async () => {
 		const api = fakeApi({ SignupOtp: signupRejecting(409, 409) });
 
-		await expect(registerForEvent(api, details)).resolves.toBeUndefined();
+		await expect(registerForEvent(api, details)).resolves.toBeNull();
+		expect(api.CreateEventAttendance).toHaveBeenCalled();
+	});
+
+	it('hands back the account a signup created', async () => {
+		await expect(registerForEvent(fakeApi(), details)).resolves.toEqual(USER);
+	});
+
+	it('files a signed-in participant without a signup', async () => {
+		const api = fakeApi();
+
+		await expect(registerForEvent(api, { ...details, signedIn: true })).resolves.toBeNull();
+		expect(api.SignupOtp).not.toHaveBeenCalled();
 		expect(api.CreateEventAttendance).toHaveBeenCalled();
 	});
 

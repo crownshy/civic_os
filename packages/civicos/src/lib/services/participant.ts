@@ -13,6 +13,8 @@ export interface ParticipantSession {
 	userId: string;
 	authType: UserDto['authType'];
 	email: string | null;
+	/** Their name, for an account made by email. Comhairle keeps it as the username. */
+	username: string | null;
 	emailVerified: boolean;
 	/** Empty for an email-only signup, which never gives one. */
 	zipCode: string;
@@ -110,6 +112,7 @@ export function toParticipantSession(
 		userId: user.id,
 		authType: user.authType,
 		email: user.email ?? null,
+		username: user.username ?? null,
 		emailVerified: user.emailVerified,
 		zipCode: answerFor(responses, ZIPCODE_SLUG),
 		demographicsCompleted: hasDemographics(responses),

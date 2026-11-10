@@ -5,9 +5,10 @@
 	import { AppShell } from '$lib/components/layout';
 	import { Button, InfoBar } from '$lib/components/ui';
 	import EventCalendarInviteButton from '$lib/components/ui/EventCalendarInviteButton.svelte';
-	import EventRegistrationModal from '$lib/components/ui/EventRegistrationModal.svelte';
 	import { formatDurationLabel } from '$lib/config/regions';
-	import { formatTimeDuration } from '$lib/utils/dates.js';
+	import { eventCountdownLabel, formatTimeDuration } from '$lib/utils/dates.js';
+	import { signOut } from '$lib/services/sign-out';
+	import EventJoinSheet from './EventJoinSheet.svelte';
 	import { addHours, isBefore, format } from 'date-fns';
 	import { onMount, onDestroy } from 'svelte';
 	import { invalidate } from '$app/navigation';
@@ -34,6 +35,17 @@
 	let showForm = $state(false);
 
 	const isRegistered = $derived(data.isRegistered);
+	const countdown = $derived(eventCountdownLabel(eventStartDate, new Date()));
+	// Only an account with an email can register as itself; a guest fills the form in.
+	const account = $derived.by(() => {
+		const participant = data.participant;
+		if (!participant?.email) return null;
+		return {
+			email: participant.email,
+			name: participant.username ?? '',
+			zipCode: data.knownParticipant.zipCode
+		};
+	});
 	let activeSection = $state<'details' | 'description'>('details');
 	let scrollContainer = $state<HTMLElement | undefined>(undefined);
 
@@ -141,6 +153,11 @@
 							ALREADY REGISTERED <span class="text-2xl">✓</span>
 						</Button>
 					{:else}
+						{#if countdown && !isPast}
+							<p class="mb-3 text-center font-mono text-base font-medium text-foreground uppercase">
+								{countdown}
+							</p>
+						{/if}
 						<Button
 							variant="primary"
 							fullWidth
@@ -148,10 +165,10 @@
 							onclick={() => {
 								showForm = true;
 							}}
-							class="uppercase"
+							class="font-display text-xl normal-case"
 							disabled={isPast}
 						>
-							{#if isPast}Event has past{:else}SIGN UP TODAY{/if}
+							{#if isPast}Event has passed{:else}Register{/if}
 						</Button>
 					{/if}
 
@@ -284,12 +301,15 @@
 			</div>
 		</div>
 
-		<EventRegistrationModal
-			open={showForm}
+		<EventJoinSheet
+			bind:open={showForm}
 			{event}
 			conversationId={data.campaign.id}
 			{org}
 			api={data.api}
+			{account}
+			preview={data.preview}
+			onSignOut={() => signOut(data.api)}
 			{onRegistered}
 		/>
 	</AppShell>

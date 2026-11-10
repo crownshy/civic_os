@@ -107,6 +107,7 @@ describe('resolveParticipant', () => {
 				userId: USER.id,
 				authType: 'guest',
 				email: null,
+				username: null,
 				emailVerified: false,
 				zipCode: '84101',
 				demographicsCompleted: false,
