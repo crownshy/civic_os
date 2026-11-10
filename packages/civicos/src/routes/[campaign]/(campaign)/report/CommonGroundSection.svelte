@@ -25,50 +25,53 @@
 			.sort((a, b) => (b.group_informed_consensus ?? 0) - (a.group_informed_consensus ?? 0))
 			.slice(0, 6)
 	);
+	import SectionContent from './SectionContent.svelte';
 </script>
 
 <section class="-px-10 relative overflow-hidden bg-background py-8">
-	<div class="px-6">
-		<Badge variant="soft" size="lg">COMMON GROUND</Badge>
-	</div>
+	<SectionContent>
+		<div class="px-6">
+			<Badge variant="soft" size="lg">COMMON GROUND</Badge>
+		</div>
 
-	<div class="mt-3 px-8">
-		<h2 class="font-display text-3xl leading-8 font-medium tracking-display text-foreground">
-			After engaging
-			<span class="text-primary">{participantCount.toLocaleString()} people</span>
-			all over {regionName}, we found a lot of
-			<span class="text-primary">common ground.</span>
-		</h2>
-	</div>
+		<div class="mt-3 px-8">
+			<h2 class="font-display text-3xl leading-8 font-medium tracking-display text-foreground">
+				After engaging
+				<span class="text-primary">{participantCount.toLocaleString()} people</span>
+				all over {regionName}, we found a lot of
+				<span class="text-primary">common ground.</span>
+			</h2>
+		</div>
 
-	<p class="mt-5 px-8 font-sans text-base font-medium text-muted-foreground">
-		These were statements that people tended to agree about regardless of their differences on other
-		things.
-	</p>
+		<p class="mt-5 px-8 font-sans text-base font-medium text-muted-foreground">
+			These were statements that people tended to agree about regardless of their differences on
+			other things.
+		</p>
 
-	<!-- Carousel -->
-	<div class="mt-5 px-6 select-none">
-		<SwipeCarousel count={consensusStatements.length} hideDots={true} autoScrollMs={4000}>
-			{#snippet children(i)}
-				{@const statement = consensusStatements[i]}
-				<div class="relative flex flex-col items-center">
-					<!-- Avatar -->
-					<div class="z-10 h-12 w-12 rounded-full bg-accent outline-[0.8px] outline-border"></div>
-					<!-- Card body (overlaps avatar) -->
-					<PanelCard borderClass="border border-border" bg="bg-card" class="-mt-5">
-						<div class="flex min-h-48 w-full flex-col justify-between px-7 pt-10 pb-7">
-							<p class="font-sans text-xl leading-6 font-semibold text-foreground">
-								"{statement.text}"
-							</p>
-							<div class="mt-4 flex justify-center">
-								<Badge variant="primary" size="md" class="rounded-[10px] px-2 py-0.5 text-sm">
-									{getAgreementPercent(statement)}% AGREEMENT
-								</Badge>
+		<!-- Carousel -->
+		<div class="mt-5 px-6 select-none">
+			<SwipeCarousel count={consensusStatements.length} hideDots={true} autoScrollMs={4000}>
+				{#snippet children(i)}
+					{@const statement = consensusStatements[i]}
+					<div class="relative flex flex-col items-center">
+						<!-- Avatar -->
+						<div class="z-10 h-12 w-12 rounded-full bg-accent outline-[0.8px] outline-border"></div>
+						<!-- Card body (overlaps avatar) -->
+						<PanelCard borderClass="border border-border" bg="bg-card" class="-mt-5">
+							<div class="flex min-h-48 w-full flex-col justify-between px-7 pt-10 pb-7">
+								<p class="font-sans text-xl leading-6 font-semibold text-foreground">
+									"{statement.text}"
+								</p>
+								<div class="mt-4 flex justify-center">
+									<Badge variant="primary" size="md" class="rounded-[10px] px-2 py-0.5 text-sm">
+										{getAgreementPercent(statement)}% AGREEMENT
+									</Badge>
+								</div>
 							</div>
-						</div>
-					</PanelCard>
-				</div>
-			{/snippet}
-		</SwipeCarousel>
-	</div>
+						</PanelCard>
+					</div>
+				{/snippet}
+			</SwipeCarousel>
+		</div>
+	</SectionContent>
 </section>

@@ -52,6 +52,7 @@
 	}
 
 	const selectedGroupLetter = $derived(String.fromCharCode(65 + selectedGroup));
+	import SectionContent from './SectionContent.svelte';
 </script>
 
 <section class="relative overflow-hidden bg-background py-6">
@@ -63,144 +64,146 @@
 		class="pointer-events-none absolute -top-5 -left-32 h-80 w-80 rounded-full opacity-40 outline outline-destructive"
 	></div>
 
-	<div class="relative z-10 px-6">
-		<Badge variant="soft" size="lg">OPINION GROUPS</Badge>
-	</div>
+	<SectionContent>
+		<div class="relative z-10 px-6">
+			<Badge variant="soft" size="lg">OPINION GROUPS</Badge>
+		</div>
 
-	<div class="relative z-10 mt-8 px-8">
-		<h2 class="font-display text-3xl leading-8 font-medium tracking-display text-foreground">
-			After analyzing
-			<span class="text-destructive"
-				>{totalVotes.toLocaleString()} votes on {statementCount} statements,</span
+		<div class="relative z-10 mt-8 px-8">
+			<h2 class="font-display text-3xl leading-8 font-medium tracking-display text-foreground">
+				After analyzing
+				<span class="text-destructive"
+					>{totalVotes.toLocaleString()} votes on {statementCount} statements,</span
+				>
+				we found a few patterns...
+			</h2>
+		</div>
+
+		<p class="relative z-10 mt-5 px-8 font-sans text-base font-medium text-foreground">
+			The following groups are not based on demographics, but on voting patterns. Flip through the
+			statements to get a sense of where people differ on this issue.
+		</p>
+
+		<!-- Statement flipper card -->
+		{#if representativeStatements.length > 0}
+			<PanelCard
+				borderClass="border border-border"
+				bg="bg-card"
+				shadow="shadow-[0px_4px_24.3px_0px_rgba(134,101,73,0.20)]"
+				class="relative z-10 mx-6 mt-10"
 			>
-			we found a few patterns...
-		</h2>
-	</div>
-
-	<p class="relative z-10 mt-5 px-8 font-sans text-base font-medium text-foreground">
-		The following groups are not based on demographics, but on voting patterns. Flip through the
-		statements to get a sense of where people differ on this issue.
-	</p>
-
-	<!-- Statement flipper card -->
-	{#if representativeStatements.length > 0}
-		<PanelCard
-			borderClass="border border-border"
-			bg="bg-card"
-			shadow="shadow-[0px_4px_24.3px_0px_rgba(134,101,73,0.20)]"
-			class="relative z-10 mx-6 mt-10"
-		>
-			<!-- Group selection header -->
-			<div class="flex items-center justify-between px-5 pt-5">
-				<span class="font-mono text-xs font-medium text-muted-foreground">GROUP SELECTION</span>
-				<div class="flex items-center gap-[5px]">
-					{#each groups as group, gi (group.group_id)}
-						<button
-							onclick={() => selectGroup(gi)}
-							class="flex h-7 w-7 touch-manipulation items-center justify-center rounded-full font-mono text-sm font-medium transition-all select-none active:scale-90 active:duration-0 {selectedGroup ===
-							gi
-								? 'bg-foreground text-background hover:bg-foreground/90 active:bg-foreground/80'
-								: 'bg-secondary/10 text-foreground hover:bg-secondary/20 active:bg-secondary/30'}"
-						>
-							{String.fromCharCode(65 + gi)}
-						</button>
-					{/each}
+				<!-- Group selection header -->
+				<div class="flex items-center justify-between px-5 pt-5">
+					<span class="font-mono text-xs font-medium text-muted-foreground">GROUP SELECTION</span>
+					<div class="flex items-center gap-[5px]">
+						{#each groups as group, gi (group.group_id)}
+							<button
+								onclick={() => selectGroup(gi)}
+								class="flex h-7 w-7 touch-manipulation items-center justify-center rounded-full font-mono text-sm font-medium transition-all select-none active:scale-90 active:duration-0 {selectedGroup ===
+								gi
+									? 'bg-foreground text-background hover:bg-foreground/90 active:bg-foreground/80'
+									: 'bg-secondary/10 text-foreground hover:bg-secondary/20 active:bg-secondary/30'}"
+							>
+								{String.fromCharCode(65 + gi)}
+							</button>
+						{/each}
+					</div>
 				</div>
-			</div>
 
-			<!-- Subtitle -->
-			<div class="px-5 pt-3">
-				<span class="font-mono text-xs font-medium text-muted-foreground">
-					STATEMENTS THAT SET GROUP {selectedGroupLetter} APART
-				</span>
-			</div>
+				<!-- Subtitle -->
+				<div class="px-5 pt-3">
+					<span class="font-mono text-xs font-medium text-muted-foreground">
+						STATEMENTS THAT SET GROUP {selectedGroupLetter} APART
+					</span>
+				</div>
 
-			<!-- Swipeable statements -->
-			<SwipeCarousel
-				count={representativeStatements.length}
-				bind:index={currentStatementIndex}
-				hideDots={true}
-			>
-				{#snippet children(i)}
-					{@const statement = representativeStatements[i]}
-					<div class="px-5 pt-4 pb-2">
-						<!-- Statement text card -->
-						<div
-							class="flex items-center gap-5 rounded-[10px] border-b border-muted bg-muted px-5 py-4"
-						>
+				<!-- Swipeable statements -->
+				<SwipeCarousel
+					count={representativeStatements.length}
+					bind:index={currentStatementIndex}
+					hideDots={true}
+				>
+					{#snippet children(i)}
+						{@const statement = representativeStatements[i]}
+						<div class="px-5 pt-4 pb-2">
+							<!-- Statement text card -->
 							<div
-								class="h-8 w-8 shrink-0 rounded-full bg-accent outline outline-[0.54px] outline-border"
-							></div>
-							<p class="font-sans text-sm leading-4 font-semibold text-foreground">
-								"{statement.text}"
-							</p>
-						</div>
-
-						<!-- Bar chart -->
-						<div class="mt-5">
-							<!-- Axis labels -->
-							<div class="mb-2 flex items-center pl-20">
-								<span class="font-mono text-xs text-muted-foreground/60">0%</span>
-								<span class="ml-[22%] font-mono text-xs text-muted-foreground/60">25</span>
-								<span class="ml-[22%] font-mono text-xs text-muted-foreground/60">50</span>
-								<span class="ml-[22%] font-mono text-xs text-muted-foreground/60">75</span>
-								<span class="ml-auto font-mono text-xs text-muted-foreground/60">100</span>
+								class="flex items-center gap-5 rounded-[10px] border-b border-muted bg-muted px-5 py-4"
+							>
+								<div
+									class="h-8 w-8 shrink-0 rounded-full bg-accent outline outline-[0.54px] outline-border"
+								></div>
+								<p class="font-sans text-sm leading-4 font-semibold text-foreground">
+									"{statement.text}"
+								</p>
 							</div>
 
-							<!-- Groups with vertical stacked bars -->
-							{#each groups as group, gi (group.group_id)}
-								{@const percents = getGroupPercents(statement, group.group_id)}
-								{@const isSelected = gi === selectedGroup}
-								<div class="mb-4">
-									<!-- Group label -->
-									<span
-										class="font-mono text-sm leading-4 font-medium {isSelected
-											? 'text-primary underline'
-											: 'text-muted-foreground'}"
-									>
-										{groupLabels[gi] ?? `GROUP ${String.fromCharCode(65 + gi)}`}
-									</span>
-
-									<!-- Vertical stacked bars with grid -->
-									<div class="relative mt-1.5 ml-0 flex flex-col gap-1">
-										<!-- Grid lines -->
-										<div class="pointer-events-none absolute inset-0">
-											{#each [0, 25, 50, 75, 100] as tick (tick)}
-												<div
-													class="absolute top-0 h-full border-l border-border"
-													style="left: {tick}%"
-												></div>
-											{/each}
-										</div>
-										<!-- Agree bar -->
-										<div class="h-1.5 bg-primary" style="width: {percents.agree}%"></div>
-										<!-- Disagree bar -->
-										<div class="h-1.5 bg-destructive" style="width: {percents.disagree}%"></div>
-										<!-- Pass bar -->
-										<div class="h-1.5 bg-input" style="width: {percents.pass}%"></div>
-									</div>
+							<!-- Bar chart -->
+							<div class="mt-5">
+								<!-- Axis labels -->
+								<div class="mb-2 flex items-center pl-20">
+									<span class="font-mono text-xs text-muted-foreground/60">0%</span>
+									<span class="ml-[22%] font-mono text-xs text-muted-foreground/60">25</span>
+									<span class="ml-[22%] font-mono text-xs text-muted-foreground/60">50</span>
+									<span class="ml-[22%] font-mono text-xs text-muted-foreground/60">75</span>
+									<span class="ml-auto font-mono text-xs text-muted-foreground/60">100</span>
 								</div>
-							{/each}
-						</div>
-					</div>
-				{/snippet}
-			</SwipeCarousel>
 
-			<!-- Legend (outside carousel) -->
-			<div class="flex items-center justify-center gap-5 px-5 pb-5">
-				<div class="flex items-center gap-1.5">
-					<div class="h-3 w-3 rounded-full bg-primary"></div>
-					<span class="font-mono text-xs font-medium text-muted-foreground">AGREE</span>
+								<!-- Groups with vertical stacked bars -->
+								{#each groups as group, gi (group.group_id)}
+									{@const percents = getGroupPercents(statement, group.group_id)}
+									{@const isSelected = gi === selectedGroup}
+									<div class="mb-4">
+										<!-- Group label -->
+										<span
+											class="font-mono text-sm leading-4 font-medium {isSelected
+												? 'text-primary underline'
+												: 'text-muted-foreground'}"
+										>
+											{groupLabels[gi] ?? `GROUP ${String.fromCharCode(65 + gi)}`}
+										</span>
+
+										<!-- Vertical stacked bars with grid -->
+										<div class="relative mt-1.5 ml-0 flex flex-col gap-1">
+											<!-- Grid lines -->
+											<div class="pointer-events-none absolute inset-0">
+												{#each [0, 25, 50, 75, 100] as tick (tick)}
+													<div
+														class="absolute top-0 h-full border-l border-border"
+														style="left: {tick}%"
+													></div>
+												{/each}
+											</div>
+											<!-- Agree bar -->
+											<div class="h-1.5 bg-primary" style="width: {percents.agree}%"></div>
+											<!-- Disagree bar -->
+											<div class="h-1.5 bg-destructive" style="width: {percents.disagree}%"></div>
+											<!-- Pass bar -->
+											<div class="h-1.5 bg-input" style="width: {percents.pass}%"></div>
+										</div>
+									</div>
+								{/each}
+							</div>
+						</div>
+					{/snippet}
+				</SwipeCarousel>
+
+				<!-- Legend (outside carousel) -->
+				<div class="flex items-center justify-center gap-5 px-5 pb-5">
+					<div class="flex items-center gap-1.5">
+						<div class="h-3 w-3 rounded-full bg-primary"></div>
+						<span class="font-mono text-xs font-medium text-muted-foreground">AGREE</span>
+					</div>
+					<div class="flex items-center gap-1.5">
+						<div class="h-3 w-3 rounded-full bg-destructive"></div>
+						<span class="font-mono text-xs font-medium text-muted-foreground">DISAGREE</span>
+					</div>
+					<div class="flex items-center gap-1.5">
+						<div class="h-3 w-3 rounded-full bg-input"></div>
+						<span class="font-mono text-xs font-medium text-muted-foreground">PASS/UNSURE</span>
+					</div>
 				</div>
-				<div class="flex items-center gap-1.5">
-					<div class="h-3 w-3 rounded-full bg-destructive"></div>
-					<span class="font-mono text-xs font-medium text-muted-foreground">DISAGREE</span>
-				</div>
-				<div class="flex items-center gap-1.5">
-					<div class="h-3 w-3 rounded-full bg-input"></div>
-					<span class="font-mono text-xs font-medium text-muted-foreground">PASS/UNSURE</span>
-				</div>
-			</div>
-		</PanelCard>
-	{/if}
+			</PanelCard>
+		{/if}
+	</SectionContent>
 </section>
