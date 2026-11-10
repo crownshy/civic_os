@@ -1,11 +1,11 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
-	import AreasCard from './AreasCard.svelte';
+	import AreasPicker from './AreasPicker.svelte';
 
 	const { Story } = defineMeta({
-		title: 'Setup/AreasCard',
-		component: AreasCard,
+		title: 'Setup/AreasPicker',
+		component: AreasPicker,
 		tags: ['autodocs'],
 		parameters: { a11y: { test: 'error' } },
 		args: {

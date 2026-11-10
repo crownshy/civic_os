@@ -16,7 +16,7 @@
 	import { Label } from '@civicos/shared/ui/label';
 	import { Trash2 } from '@lucide/svelte';
 	import IdentityCard from './IdentityCard.svelte';
-	import AreasCard from './AreasCard.svelte';
+	import AreasDialog from './AreasDialog.svelte';
 	import CoHostsCard from './CoHostsCard.svelte';
 	import { noticeFrom } from './cohost-notice';
 	import AddCoHostsDialog from '$lib/components/setup/AddCoHostsDialog.svelte';
@@ -57,6 +57,8 @@
 		campaign.shareUrl?.replace(/^https?:\/\//, '').replace(/\/.*$/, '') ?? ''
 	);
 	const places = $derived(campaign.place ? [campaign.place.name] : []);
+	const areaNames = $derived(campaign.areas.map((area) => area.name).join(', '));
+	let areasOpen = $state(false);
 
 	// Live co-hosts: the owning host (Admin badge) plus organizations granted the
 	// co-host role on this Conversation. Resolved server-side in +page.server.ts
@@ -794,6 +796,14 @@
 				Listed at {baseUrl}/{storedPlaceSlug}
 			</p>
 		{/if}
+		<div class="flex flex-wrap items-center gap-x-2 text-caption">
+			<span class={areaNames ? 'text-foreground' : 'text-muted-foreground'}>
+				{areaNames ? `Covers ${areaNames}` : 'No areas picked yet'}
+			</span>
+			<Button variant="link" size="sm" class="h-auto p-0" onclick={() => (areasOpen = true)}>
+				{areaNames ? 'Edit areas' : 'Pick areas'}
+			</Button>
+		</div>
 	</div>
 {/snippet}
 
@@ -875,8 +885,13 @@
 			onSelectColorScheme={selectColorScheme}
 		/>
 
-		<!-- ===== Where it runs (#514) ===== -->
-		<AreasCard areas={campaign.areas} onSave={(areas) => patchMetadata({ areas })} />
+		<!-- The areas a Place covers (#514), opened from the Place field. -->
+		<AreasDialog
+			bind:open={areasOpen}
+			placeName={campaign.place?.name ?? ''}
+			areas={campaign.areas}
+			onSave={(areas) => patchMetadata({ areas })}
+		/>
 
 		<!-- ===== Co-Hosts ===== -->
 		<!-- Live co-hosts; "Add New…" opens the org picker and grants the
