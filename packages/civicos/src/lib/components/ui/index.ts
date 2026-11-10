@@ -38,3 +38,5 @@ export { default as Accordion } from './Accordion.svelte';
 export { default as StickyNav } from './StickyNav.svelte';
 export { default as BottomSheet } from './BottomSheet.svelte';
 export { default as FieldRow } from './FieldRow.svelte';
+export { default as AccountMenu } from './AccountMenu.svelte';
+export { default as SiteHeader } from './SiteHeader.svelte';

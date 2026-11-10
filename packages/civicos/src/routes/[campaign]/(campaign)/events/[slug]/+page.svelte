@@ -3,7 +3,7 @@
 	import { safeHref } from '@civicos/shared/sanitize';
 	import { page } from '$app/state';
 	import { AppShell } from '$lib/components/layout';
-	import { Button, InfoBar } from '$lib/components/ui';
+	import { Button, SiteHeader } from '$lib/components/ui';
 	import EventCalendarInviteButton from '$lib/components/ui/EventCalendarInviteButton.svelte';
 	import { formatDurationLabel } from '$lib/config/regions';
 	import { eventCountdownLabel, formatTimeDuration } from '$lib/utils/dates.js';
@@ -106,7 +106,7 @@
 			class="flex h-full flex-col overflow-y-auto scroll-smooth bg-background"
 			bind:this={scrollContainer}
 		>
-			<InfoBar {placeName} onBack={() => history.back()} backLabel="← BACK" />
+			<SiteHeader {placeName} />
 
 			<!-- Header -->
 			<div class="mx-auto flex w-full max-w-4xl flex-col items-center px-6 pt-6 pb-0 md:pt-10">

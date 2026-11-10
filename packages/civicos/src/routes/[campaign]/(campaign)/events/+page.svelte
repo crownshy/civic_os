@@ -2,7 +2,7 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { AppShell } from '$lib/components/layout';
-	import { InfoBar, ConversationEventCard, Button, AlertBanner } from '$lib/components/ui';
+	import { SiteHeader, ConversationEventCard, Button, AlertBanner } from '$lib/components/ui';
 	import { Input } from '@civicos/shared/ui/input';
 	import { session } from '$lib/services/session.svelte';
 	import { signUpForUpdates } from '$lib/services/join';
@@ -61,7 +61,7 @@
 	the bar at the viewport edges and the content centered under it. -->
 <AppShell border={false} class="max-w-none">
 	<div class="flex h-full flex-col overflow-y-auto bg-background">
-		<InfoBar {placeName} />
+		<SiteHeader {placeName} />
 
 		<!-- Header -->
 		<div class="mx-auto flex w-full max-w-4xl flex-col items-center px-6 pt-6 pb-0 md:pt-10">
