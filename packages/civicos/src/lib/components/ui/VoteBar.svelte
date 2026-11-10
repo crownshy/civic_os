@@ -32,7 +32,7 @@
 
 <div class={cn('shrink-0', skeleton && 'pointer-events-none opacity-40', className)}>
 	<!-- Vote buttons row (sits between statement and compose area) -->
-	<div class="flex items-center gap-2.5 px-6 py-5">
+	<div class="mx-auto flex w-full max-w-[860px] items-center gap-2.5 px-6 py-5">
 		<Button
 			{disabled}
 			onclick={onAgree}
@@ -63,7 +63,7 @@
 	<!-- Rendered for the skeleton too: without it the compose bar sits a row
 		higher than on the screen it becomes, and jumps when the statement lands. -->
 	{#if onReport || skeleton}
-		<div class="px-4 pb-3 text-center">
+		<div class="mx-auto w-full max-w-[860px] px-4 pb-3 text-center">
 			<button
 				type="button"
 				disabled={skeleton}
@@ -76,14 +76,15 @@
 		</div>
 	{/if}
 
-	<!-- Compose area -->
+	<!-- Compose area. The green strip spans the screen; its row is capped to the
+		vote buttons' width so the input lines up with them on desktop. -->
 	{#if showCompose}
 		<button
 			onclick={onCompose}
 			data-umami-event="compose-click"
 			class="w-full touch-manipulation rounded-t-[40px] bg-primary p-5 text-left transition-all hover:bg-primary/95 active:bg-primary/85 active:duration-0"
 		>
-			<div class="flex items-center gap-[15px]">
+			<div class="mx-auto flex max-w-[860px] items-center gap-[15px]">
 				<img
 					src={smiley}
 					alt=""

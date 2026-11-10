@@ -84,7 +84,7 @@
 </script>
 
 <div class="flex h-full flex-col bg-background">
-	<InfoBar {placeName} {onEnd} />
+	<InfoBar {placeName} {onEnd} class="md:px-10" />
 
 	<!-- The question row is in flow so the statement centers in the space below
 		it. Positioned absolutely, it took no room and a long statement slid
@@ -93,7 +93,7 @@
 		<div class="h-[3px] w-full shrink-0 bg-secondary/30">
 			<div class="h-full bg-secondary transition-all duration-300" style="width: {progress}%"></div>
 		</div>
-		<div class="flex w-full shrink-0 items-start justify-between px-4 py-2">
+		<div class="mx-auto flex w-full max-w-[860px] shrink-0 items-start justify-between px-4 py-2">
 			<span class="pr-4 font-mono text-sm font-medium text-muted-foreground/70 uppercase"
 				>{question}</span
 			>
@@ -101,7 +101,9 @@
 				>{topRightCount} LEFT</span
 			>
 		</div>
-		<div class="flex min-h-0 flex-1 flex-col items-center justify-center px-10">
+		<div
+			class="mx-auto flex min-h-0 w-full max-w-[860px] flex-1 flex-col items-center justify-center px-10"
+		>
 			{#if waitingForNext}
 				<!-- Loading skeleton between statements, shared with VotingSkeleton -->
 				<StatementPlaceholder fadeIn />
@@ -129,7 +131,10 @@
 	<!-- Between the statement and the vote buttons, outside the statement area, so
 		it reads as a status rather than part of the quote and never covers it. -->
 	{#if error && !waitingForNext}
-		<div class="px-6 pt-3" transition:slide={{ duration: 200, easing: cubicOut }}>
+		<div
+			class="mx-auto w-full max-w-[860px] px-6 pt-3"
+			transition:slide={{ duration: 200, easing: cubicOut }}
+		>
 			<AlertBanner message="That didn't go through. Please try again." />
 		</div>
 	{/if}

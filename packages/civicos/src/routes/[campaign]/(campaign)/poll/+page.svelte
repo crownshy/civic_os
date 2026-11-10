@@ -309,14 +309,18 @@
 	// Only reachable while Polis still has a statement to show: the end screen
 	// withholds this handler otherwise, so the effect above cannot bounce the
 	// participant straight back to the thank-you screen (#411).
+	const fullWidthScreen = $derived(
+		screen === 'voting' || screen === 'loading' || screen === 'thank-you'
+	);
+
 	function handleBackToVoting() {
 		screen = 'voting';
 	}
 </script>
 
-<!-- The end screen is a page rather than a card: the landing page it mirrors runs
-	its footer edge to edge, so the shell lets go of its width for that one screen. -->
-<AppShell border={false} class={screen === 'thank-you' ? 'max-w-none' : undefined}>
+<!-- Voting and the end screen run edge to edge on desktop: the header and compose
+	bar span the window and the screens centre their own content. The rest stay a card. -->
+<AppShell border={false} class={fullWidthScreen ? 'max-w-none' : undefined}>
 	{#if pollUnreachable && (screen === 'loading' || screen === 'voting')}
 		<div class="flex h-full flex-col bg-background">
 			<InfoBar {placeName} />
