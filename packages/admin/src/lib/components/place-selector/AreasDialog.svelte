@@ -1,19 +1,20 @@
 <script lang="ts">
-	import type { CampaignArea } from '@civicos/shared/data/areas';
+	import type { Snippet } from 'svelte';
 	import * as Dialog from '@civicos/shared/ui/dialog';
 	import { Button } from '@civicos/shared/ui/button';
-	import AreasPicker from './AreasPicker.svelte';
 
 	interface Props {
 		open: boolean;
 		/** The Place the areas belong to, for the title. Empty when none is typed yet. */
 		placeName: string;
-		areas: CampaignArea[];
-		/** Persist the whole selection. Called after every pick or removal. */
-		onSave: (areas: CampaignArea[]) => Promise<void>;
+		/**
+		 * The picker. Dialog content only mounts while open, so it reads the current
+		 * selection fresh on every open.
+		 */
+		children: Snippet;
 	}
 
-	let { open = $bindable(), placeName, areas, onSave }: Props = $props();
+	let { open = $bindable(), placeName, children }: Props = $props();
 </script>
 
 <Dialog.Root bind:open>
@@ -22,7 +23,7 @@
 	>
 		<Dialog.Header class="shrink-0">
 			<Dialog.Title class="font-display text-h4 font-semibold md:text-h3">
-				{placeName ? `Areas in ${placeName}` : 'Areas'}
+				{placeName.trim() ? `Areas in ${placeName.trim()}` : 'Areas'}
 			</Dialog.Title>
 			<Dialog.Description class="text-body text-muted-foreground">
 				The states, counties and cities this Place covers. Picking a state or county does not pick
@@ -30,10 +31,8 @@
 			</Dialog.Description>
 		</Dialog.Header>
 
-		<!-- Dialog content only mounts while open, so the picker reads the saved
-		     areas fresh on every open. -->
 		<div class="-mx-6 min-h-0 flex-1 overflow-y-auto px-6">
-			<AreasPicker {areas} {onSave} />
+			{@render children()}
 		</div>
 
 		<Dialog.Footer class="shrink-0 border-t border-border pt-4">

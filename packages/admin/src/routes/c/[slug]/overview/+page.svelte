@@ -16,7 +16,8 @@
 	import { Label } from '@civicos/shared/ui/label';
 	import { Trash2 } from '@lucide/svelte';
 	import IdentityCard from './IdentityCard.svelte';
-	import AreasDialog from './AreasDialog.svelte';
+	import AreasDialog from '$lib/components/place-selector/AreasDialog.svelte';
+	import AreasPicker from './AreasPicker.svelte';
 	import CoHostsCard from './CoHostsCard.svelte';
 	import { noticeFrom } from './cohost-notice';
 	import AddCoHostsDialog from '$lib/components/setup/AddCoHostsDialog.svelte';
@@ -886,12 +887,9 @@
 		/>
 
 		<!-- The areas a Place covers (#514), opened from the Place field. -->
-		<AreasDialog
-			bind:open={areasOpen}
-			placeName={campaign.place?.name ?? ''}
-			areas={campaign.areas}
-			onSave={(areas) => patchMetadata({ areas })}
-		/>
+		<AreasDialog bind:open={areasOpen} placeName={campaign.place?.name ?? ''}>
+			<AreasPicker areas={campaign.areas} onSave={(areas) => patchMetadata({ areas })} />
+		</AreasDialog>
 
 		<!-- ===== Co-Hosts ===== -->
 		<!-- Live co-hosts; "Add New…" opens the org picker and grants the
