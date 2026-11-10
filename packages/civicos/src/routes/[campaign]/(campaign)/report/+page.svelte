@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { AppShell } from '$lib/components/layout';
 	import { Button } from '$lib/components/ui';
 	import HeroSection from './HeroSection.svelte';
 	import CommonGroundSection from './CommonGroundSection.svelte';
@@ -93,7 +92,7 @@
 	}
 </script>
 
-<AppShell class="overflow-y-hidden!">
+<div class="h-dvh w-full overflow-hidden bg-background">
 	{#if error || !report}
 		<!-- Error state -->
 		<div class="flex h-full flex-col items-center justify-center gap-6 px-8">
@@ -163,4 +162,4 @@
 
 		<FloatingNavPill text={pillText} visible={pillVisible} onclick={scrollToNextSection} />
 	{/if}
-</AppShell>
+</div>

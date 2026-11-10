@@ -11,27 +11,30 @@
 	}
 
 	let { title, regionName, phase, description }: Props = $props();
+	import SectionContent from './SectionContent.svelte';
 </script>
 
 <section
 	class="relative min-h-dvh flex-col overflow-hidden"
 	style="background: var(--gradient-hero);"
 >
-	<InfoBar placeName={regionName} variant="light" buttonText="LEARN MORE →" />
+	<SectionContent>
+		<InfoBar placeName={regionName} variant="light" buttonText="LEARN MORE →" />
 
-	<div class="mt-16 px-8">
-		<Badge variant="dark" size="lg" class="px-7">{phase}</Badge>
-	</div>
+		<div class="mt-16 px-8">
+			<Badge variant="dark" size="lg" class="px-7">{phase}</Badge>
+		</div>
 
-	<h1
-		class="mt-4 px-8 font-display text-5xl leading-[1.01] font-medium tracking-display text-primary-foreground"
-	>
-		{title}
-	</h1>
+		<h1
+			class="mt-4 px-8 font-display text-5xl leading-[1.01] font-medium tracking-display text-primary-foreground"
+		>
+			{title}
+		</h1>
 
-	<p class="mt-8 px-8 font-sans text-base leading-6 font-medium text-primary-foreground">
-		{description}
-	</p>
+		<p class="mt-8 px-8 font-sans text-base leading-6 font-medium text-primary-foreground">
+			{description}
+		</p>
+	</SectionContent>
 
 	<div class="bubble-scene">
 		<div class="bubble-grid">
