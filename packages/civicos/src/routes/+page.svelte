@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { AppShell } from '$lib/components/layout';
-	import { Button } from '$lib/components/ui';
+	import { Button, SiteHeader } from '$lib/components/ui';
 	import CampaignCard from '$lib/components/ui/CampaignCard.svelte';
 
 	const { data } = $props();
@@ -14,7 +14,8 @@
 
 <AppShell border={false}>
 	<div class="flex h-full flex-col overflow-y-auto bg-background">
-		<div class="flex flex-col items-center px-6 pt-10 pb-2 md:px-12">
+		<SiteHeader class="md:px-12" />
+		<div class="flex flex-col items-center px-6 pt-4 pb-2 md:px-12">
 			<div class="overflow-hidden rounded-full bg-foreground px-3.5 py-1">
 				<span class="font-mono text-sm font-medium text-white">LIVE NOW</span>
 			</div>
