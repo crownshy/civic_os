@@ -21,7 +21,7 @@
 
 <header class={cn('flex items-center justify-between px-6 py-4', className)}>
 	<p class="flex items-baseline gap-2 font-display text-foreground">
-		<span class="text-xl font-bold">civicOS</span>
+		<a href={resolve('/')} class="text-xl font-bold">civicOS</a>
 		{#if placeName}
 			<span aria-hidden="true">•</span>
 			<span class="text-sm font-bold lowercase">{placeName}</span>
