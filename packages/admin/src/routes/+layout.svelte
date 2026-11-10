@@ -7,7 +7,6 @@
 		PanelLeftClose,
 		PanelLeftOpen,
 		X,
-		LogOut,
 		Building2
 	} from '@lucide/svelte';
 	import { page, navigating } from '$app/state';
@@ -16,6 +15,7 @@
 	import { resolve } from '$app/paths';
 	import { hostsLink as toHostsLink, NO_HOST_ACCESS } from '$lib/host-access';
 	import { Button } from '@civicos/shared/ui/button';
+	import AccountMenu from '$lib/components/AccountMenu.svelte';
 	import NavigationProgress from '$lib/components/NavigationProgress.svelte';
 	import ConversationSkeleton from '$lib/components/skeletons/ConversationSkeleton.svelte';
 
@@ -25,9 +25,6 @@
 	const isAuthPage = $derived(['/login', '/signup', '/welcome'].includes(page.url.pathname));
 	const hostsLink = $derived(toHostsLink(data?.hostAccess ?? NO_HOST_ACCESS));
 	const viewer = $derived(data?.viewer ?? null);
-	const viewerLabel = $derived(
-		viewer ? [viewer.name, viewer.role].filter(Boolean).join(', ') : 'Signed in'
-	);
 	// Nav highlights follow the destination while it loads, so a click registers
 	// at once rather than after every `load` on the next page has resolved.
 	const activePath = $derived(navigating.to?.url.pathname ?? page.url.pathname);
@@ -258,35 +255,10 @@
 			<div
 				class={[
 					'flex shrink-0 items-center border-t border-border py-2.5',
-					collapsed && !mobileOpen ? 'justify-center px-0' : 'gap-4 px-3.5'
+					collapsed && !mobileOpen ? 'justify-center px-0' : 'px-2'
 				].join(' ')}
 			>
-				<div
-					title={viewerLabel}
-					aria-hidden="true"
-					class="grid size-7 shrink-0 place-items-center rounded-tl-xl rounded-tr-xl rounded-br-xl rounded-bl-2xl bg-foreground text-caption font-semibold text-background uppercase"
-				>
-					{viewer?.name.charAt(0) ?? ''}
-				</div>
-				{#if !collapsed || mobileOpen}
-					<div class="min-w-0 flex-1" title={viewerLabel}>
-						<div class="truncate text-caption font-medium">{viewer?.name ?? 'Signed in'}</div>
-						{#if viewer?.role}
-							<div class="truncate text-label text-muted-foreground">{viewer.role}</div>
-						{/if}
-					</div>
-					<form method="POST" action="/logout">
-						<Button
-							variant="ghost"
-							size="icon-sm"
-							type="submit"
-							title="Sign out"
-							aria-label="Sign out"
-						>
-							<LogOut class="size-4" />
-						</Button>
-					</form>
-				{/if}
+				<AccountMenu {viewer} compact={collapsed && !mobileOpen} />
 			</div>
 		</aside>
 
