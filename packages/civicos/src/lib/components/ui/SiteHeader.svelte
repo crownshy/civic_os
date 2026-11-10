@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { UserRound } from '@lucide/svelte';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { signOut } from '$lib/services/sign-out';
 	import { cn } from '$lib/utils';
@@ -25,5 +27,18 @@
 			<span class="text-sm font-bold lowercase">{placeName}</span>
 		{/if}
 	</p>
-	<AccountMenu {signedIn} onSignOut={() => signOut(page.data.api)} />
+	<AccountMenu {signedIn} onSignOut={() => signOut(page.data.api)}>
+		{#snippet accountItems({ close })}
+			{#if signedIn}
+				<a
+					href={resolve('/profile')}
+					onclick={close}
+					class="flex w-full items-center gap-3.5 rounded-xl px-2 py-2 font-sans text-base font-bold transition-colors hover:bg-muted active:bg-accent"
+				>
+					<UserRound class="size-4 shrink-0" />
+					User Profile
+				</a>
+			{/if}
+		{/snippet}
+	</AccountMenu>
 </header>

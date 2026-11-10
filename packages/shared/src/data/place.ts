@@ -235,7 +235,7 @@ export const CAMPAIGN_PAGES = { poll: 'poll', events: 'events', report: 'report'
  * Root-level paths civicos already serves. A Campaign or Place slugged one of
  * these would be shadowed by the static route, so admin refuses them.
  */
-export const PARTICIPANT_RESERVED_SLUGS = ['api', 'conversations'] as const;
+export const PARTICIPANT_RESERVED_SLUGS = ['api', 'conversations', 'profile'] as const;
 
 /**
  * The organizations a Campaign is hosted by, mirrored onto the Conversation
