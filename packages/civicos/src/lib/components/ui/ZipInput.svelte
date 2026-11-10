@@ -13,14 +13,22 @@
 		placeholder?: string;
 		disabled?: boolean;
 		flash?: boolean;
+		/**
+		 * `pill` is the landing's centred chip. `field` drops the chip so the input
+		 * sits inside a `FieldRow`, which draws the frame and the pin.
+		 */
+		appearance?: 'pill' | 'field';
 	}
 
 	let {
 		value = $bindable(),
 		placeholder = 'Enter your home zip code...',
 		disabled = false,
-		flash = $bindable(false)
+		flash = $bindable(false),
+		appearance = 'pill'
 	}: Props = $props();
+
+	const isField = $derived(appearance === 'field');
 
 	const match = $derived(ZIP_LOOKUP.get(value.trim()));
 	const isValid = $derived(!!match);
@@ -59,6 +67,7 @@
 
 	function selectZip(entry: ZipEntry) {
 		value = entry.zip;
+		searchValue = '';
 		open = false;
 	}
 
@@ -92,14 +101,20 @@
 		<Popover.Trigger class="pointer-events-none absolute inset-0 h-0 opacity-0" />
 		<span
 			class={cn(
-				'inline-flex h-11 w-fit items-center justify-center gap-2 rounded-full border-0 bg-card px-5 font-sans text-base font-medium shadow-[inset_2px_4px_4.4px_0px_rgba(79,62,11,0.25)] outline-2 -outline-offset-2 focus:ring-0',
-				isValid ? 'text-primary outline-primary' : 'text-secondary outline-secondary/30',
-				disabled && 'cursor-not-allowed opacity-60',
-				!value && 'text-secondary/80',
-				flashing && 'flash-border-active'
+				isField
+					? 'flex w-full items-center justify-between gap-2 font-sans text-lg text-foreground'
+					: [
+							'inline-flex h-11 w-fit items-center justify-center gap-2 rounded-full border-0 bg-card px-5 font-sans text-base font-medium shadow-[inset_2px_4px_4.4px_0px_rgba(79,62,11,0.25)] outline-2 -outline-offset-2 focus:ring-0',
+							isValid ? 'text-primary outline-primary' : 'text-secondary outline-secondary/30',
+							!value && 'text-secondary/80',
+							flashing && 'flash-border-active'
+						],
+				disabled && 'cursor-not-allowed opacity-60'
 			)}
 		>
-			<MapPinIcon class={cn('size-4 shrink-0', isValid ? 'text-primary' : 'text-secondary/60')} />
+			{#if !isField}
+				<MapPinIcon class={cn('size-4 shrink-0', isValid ? 'text-primary' : 'text-secondary/60')} />
+			{/if}
 			{#if displayLabel}
 				<span>{displayLabel}</span>
 				<button
@@ -115,11 +130,15 @@
 					onblur={handleBlur}
 					maxlength={5}
 					class={cn(
-						'inline-flex h-11 w-fit items-center justify-center gap-2 border-none px-5 font-sans text-base font-medium placeholder:font-sans placeholder:text-base placeholder:font-medium placeholder:text-secondary focus-visible:ring-0 md:text-base',
-						isValid ? 'text-primary outline-primary' : 'text-secondary outline-secondary/30',
-						disabled && 'cursor-not-allowed opacity-60',
-						!value && 'text-secondary/80',
-						flashing && 'flash-border-active'
+						isField
+							? 'h-8 w-full rounded-none border-none bg-transparent p-0 font-sans text-lg text-foreground shadow-none placeholder:text-foreground/70 focus-visible:ring-0 md:text-lg'
+							: [
+									'inline-flex h-11 w-fit items-center justify-center gap-2 border-none px-5 font-sans text-base font-medium placeholder:font-sans placeholder:text-base placeholder:font-medium placeholder:text-secondary focus-visible:ring-0 md:text-base',
+									isValid ? 'text-primary outline-primary' : 'text-secondary outline-secondary/30',
+									!value && 'text-secondary/80',
+									flashing && 'flash-border-active'
+								],
+						disabled && 'cursor-not-allowed opacity-60'
 					)}
 					placeholder={displayLabel || placeholder}
 					type="text"
@@ -141,7 +160,7 @@
 			onOpenAutoFocus={(e) => e.preventDefault()}
 			onCloseAutoFocus={(e) => e.preventDefault()}
 			side="top"
-			class="w-65 overflow-hidden rounded-2xl border-0 bg-card p-0 shadow-[0px_8px_24px_0px_rgba(0,0,0,0.20)]"
+			class="z-60 w-65 overflow-hidden rounded-2xl border-0 bg-card p-0 shadow-[0px_8px_24px_0px_rgba(0,0,0,0.20)]"
 		>
 			<Command.Root shouldFilter={false}>
 				<Command.List>

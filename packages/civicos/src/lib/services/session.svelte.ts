@@ -267,7 +267,13 @@ class Session {
 	rememberJoin(user: User, zipCode: string) {
 		this.user = user;
 		this.zipCode = zipCode;
+		this.#accountEmail ||= Boolean(user.email);
 		this.persistAccount();
+	}
+
+	/** Drop the participant this browser just signed out of. */
+	signOut() {
+		this.forget();
 	}
 
 	/**

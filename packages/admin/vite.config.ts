@@ -40,8 +40,8 @@ export default defineConfig({
 			// and adapters/typebox.js does a top-level `class extends Type.Base`.
 			// We use the zod4 adapter and don't install TypeBox, so this bare import
 			// resolves to `undefined` in dev SSR and 500s any page using superforms.
-			// Point it at a tiny stub. See src/lib/stubs/typebox.js for the details.
-			{ find: /^typebox$/, replacement: path.join(dirname, 'src/lib/stubs/typebox.js') }
+			// Point it at a tiny stub. See shared/src/stubs/typebox.js for the details.
+			{ find: /^typebox$/, replacement: path.join(dirname, '../shared/src/stubs/typebox.js') }
 		]
 	},
 	server: {

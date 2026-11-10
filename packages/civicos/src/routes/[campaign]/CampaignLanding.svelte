@@ -7,11 +7,14 @@
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
-	import { AboutDialog, Button, Dialog, ZipInput, Accordion, StickyNav } from '$lib/components/ui';
+	import { AboutDialog, Button, Dialog, Accordion, StickyNav } from '$lib/components/ui';
 	import { Mail } from '@lucide/svelte';
 	import { Input } from '@civicos/shared/ui/input';
 	import { session } from '$lib/services/session.svelte';
-	import { enterCampaign, join, signUpForUpdates, type JoinContext } from '$lib/services/join';
+	import { signUpForUpdates, type JoinContext } from '$lib/services/join';
+	import type { EmailJoinContext } from '$lib/services/email-join';
+	import { signOut } from '$lib/services/sign-out';
+	import type { ParticipantSession } from '$lib/services/participant';
 	import type { KnownParticipant } from '$lib/services/participant';
 	import { getRegionByZipcode } from '$lib/config/regions';
 	import type { Campaign } from '$lib/config/campaign';
@@ -27,6 +30,7 @@
 	import { listSeparator } from '$lib/utils/list';
 	import { AppShell } from '$lib/components/layout';
 	import JoinSkeleton from './JoinSkeleton.svelte';
+	import JoinSheet from './JoinSheet.svelte';
 	import PollClosedNotice from './PollClosedNotice.svelte';
 	import VotingSkeleton from './(campaign)/poll/VotingSkeleton.svelte';
 
@@ -71,7 +75,13 @@
 	// where they are, so it is not a session to continue.
 	const participant: KnownParticipant = $derived(page.data.knownParticipant);
 	const joinContext: JoinContext = $derived(page.data.joinContext);
+	// The layout hands over the whole client, so the sheet's sign-in calls are on it too.
+	const emailJoinContext = $derived(joinContext as EmailJoinContext);
 	const isReturning = $derived(participant.isReturning);
+	// The account behind the cookie, which says whether it has an email to sign in with.
+	const account: ParticipantSession | null = $derived(page.data.participant);
+	const signedInEmail = $derived(account?.email ?? null);
+	const isGuest = $derived(participant.userId !== null && !signedInEmail);
 
 	// Only the browser can read the cached session, so on the outage path
 	// `isReturning` is false during SSR and may turn true at hydration. Rendering
@@ -79,22 +89,12 @@
 	let hydrated = $state(false);
 	const joinStateSettled = $derived(isReturning || hydrated);
 
-	// --- Join (zip → the poll) state ---
-	// Seeded from the server answer, then owned by the field. Deliberately not a
-	// writable `$derived`: it is bound into ZipInput's `$bindable`, and the local
-	// value there does not survive an unrelated re-render such as the terms
-	// dialog opening, which silently empties the field mid-join. Nothing on this
-	// page changes the participant except a successful join, which navigates away
-	// immediately, so there is no resync to miss.
+	// Seeded once from the server answer or the cache; the sheet owns it after that.
 	let zipCode = $state(page.data.knownParticipant.zipCode);
-	let hasZip = $derived(!!zipCode.trim());
-	// True from the click until the poll has rendered, across the join
-	// request, the participant invalidation and the navigation itself. Reset only
-	// if we are still on this page afterwards: a failed join, or the gate on
-	// the poll sending us back.
+	// True from the sheet finishing until the poll has rendered. Reset only if we
+	// are still on this page afterwards: the gate on the poll sending us back.
 	let leaving = $state(false);
-	let joinFailed = $state(false);
-	let zipFlash = $state(false);
+	let showJoinSheet = $state(false);
 	let hasAgreedToTos = $derived(session.hasAgreedToTos);
 	let showAboutMessage = $state(false);
 	let showTermsMessage = $state(false);
@@ -105,7 +105,7 @@
 	let emailError = $state('');
 	let emailSuccess = $state(false);
 
-	// Pick up a zip carried over by the zip redirect in `handleJoin`
+	// Pick up a zip carried over by the zip redirect in `redirectsElsewhere`
 	onMount(() => {
 		if (browser && !isReturning) {
 			const params = new URLSearchParams(window.location.search);
@@ -128,60 +128,45 @@
 	function handleAgreeToTos() {
 		trackEvent('AgreedToTerms');
 		session.markAgreedToTos();
-		handleJoin();
+		showJoinSheet = true;
 	}
 
-	async function handleJoin() {
-		if (leaving) return;
+	function openJoin() {
+		if (hasAgreedToTos) showJoinSheet = true;
+		else showTermsModal();
+	}
 
-		if (isReturning) {
-			leaving = true;
-			// Every Campaign shares one origin, so someone who joined a different
-			// Campaign arrives here already known and never passes through `join`.
-			// Put them on this Campaign's workflow on the way in. Not awaited: a
-			// missing participation row is a reporting gap, not a reason to hold
-			// CONTINUE back, and the request outlives the client-side navigation.
-			void enterCampaign(joinContext);
-			await goto(pollPath);
-			leaving = false;
-			return;
-		}
+	/**
+	 * A zip may send someone to another Campaign only where a region IS the
+	 * Campaign, which is Utah, Oregon and the catch-all. For a Campaign
+	 * published to a Place, the URL already names which Campaign this is, so
+	 * routing by zip would drop its participants on a different one.
+	 */
+	function redirectsElsewhere(zip: string): boolean {
+		const zipRegion = getRegionByZipcode(zip);
+		if (!campaign.isLegacyRegion || zipRegion.conversationId === campaign.id) return false;
+		trackEvent('UnsupportedZipCode', {
+			zipCode: zip,
+			regionSlug: campaign.slug,
+			zipRegion: zipRegion.slug
+		});
+		// A full load rather than `goto`: the zip is read back in `onMount`, which
+		// a client-side move between two Campaigns does not re-run.
+		const target = campaignPath(zipRegion.slug);
+		window.location.href = `${target}?zip_code=${encodeURIComponent(zip)}`;
+		return true;
+	}
 
-		const zipRegion = getRegionByZipcode(zipCode.trim());
-
-		// A zip may send someone to another Campaign only where a region IS the
-		// Campaign, which is Utah, Oregon and the catch-all. For a Campaign
-		// published to a Place, the URL already names which Campaign this is, so
-		// routing by zip would drop its participants on a different one.
-		if (campaign.isLegacyRegion && zipRegion.conversationId !== campaign.id) {
-			trackEvent('UnsupportedZipCode', {
-				zipCode,
-				regionSlug: campaign.slug,
-				zipRegion: zipRegion.slug
-			});
-			// A full load on this host rather than `goto`: the zip is read back in
-			// `onMount`, which a client-side navigation between two Campaigns does
-			// not re-run, because it reuses this component.
-			const target = campaignPath(zipRegion.slug);
-			window.location.href = `${target}?zip_code=${encodeURIComponent(zipCode.trim())}`;
-			return;
-		}
-
-		leaving = true;
-		joinFailed = false;
-		// `joinContext` names the Campaign the URL resolved to, not the zip's
-		// `regions.ts` entry. For Utah and Oregon these are the same Conversation
-		// (the redirect above guarantees the zip matches this Campaign); for a
-		// Campaign created in admin only the URL's is right, because its region is
-		// the catch-all and would have put its participants in the USA catch-all poll.
-		if (!(await join(joinContext, zipCode.trim()))) {
-			joinFailed = true;
-			leaving = false;
-			return;
-		}
+	async function handleJoined() {
 		trackEvent('SucccesfullSignup');
+		leaving = true;
 		await goto(pollPath);
 		leaving = false;
+	}
+
+	async function handleSignOut() {
+		await signOut(page.data.api);
+		zipCode = '';
 	}
 
 	async function handleEmailSignup() {
@@ -263,38 +248,26 @@
 				<div class="mt-10 flex w-full max-w-sm flex-col items-center">
 					{#if pollStatus === 'paused' || pollStatus === 'complete'}
 						<PollClosedNotice status={pollStatus} reportHref={reportPath} />
+					{:else if joinStateSettled}
+						<div class="flex w-full flex-col items-center gap-3" in:fade={{ duration: 150 }}>
+							<Button
+								variant="primary"
+								fullWidth
+								disabled={leaving}
+								onclick={openJoin}
+								class="font-display text-xl normal-case"
+							>
+								Join the Conversation
+							</Button>
+							{#if signedInEmail}
+								<p class="flex items-center gap-2 font-sans text-sm text-foreground">
+									<span class="size-3 rounded-full bg-primary" aria-hidden="true"></span>
+									<span>Logged in as <strong>{signedInEmail}</strong></span>
+								</p>
+							{/if}
+						</div>
 					{:else}
-						<span class="font-display text-base font-medium opacity-80 md:text-lg"
-							>Your location</span
-						>
-						{#if joinStateSettled}
-							<div class="mt-1.5 flex w-full flex-col items-center" in:fade={{ duration: 150 }}>
-								<ZipInput bind:value={zipCode} disabled={isReturning} bind:flash={zipFlash} />
-								<Button
-									variant="primary"
-									fullWidth
-									disabled={leaving}
-									onclick={() => {
-										if (!hasZip) {
-											zipFlash = true;
-											return;
-										}
-										if (hasAgreedToTos) handleJoin();
-										else showTermsModal();
-									}}
-									class="mt-4"
-								>
-									{isReturning ? 'CONTINUE' : 'JOIN THE CONVERSATION'}
-								</Button>
-								{#if joinFailed}
-									<p class="mt-2 px-2 font-sans text-sm text-destructive">
-										Something went wrong joining this conversation. Please try again.
-									</p>
-								{/if}
-							</div>
-						{:else}
-							<JoinSkeleton class="mt-1.5" />
-						{/if}
+						<JoinSkeleton class="mt-1.5" />
 					{/if}
 				</div>
 			</div>
@@ -492,6 +465,21 @@
 {/if}
 
 <AboutDialog bind:open={showAboutMessage} {hostCopy} />
+
+<!-- After hydration, so a zip carried over by `redirectsElsewhere` seeds the form. -->
+{#if hydrated}
+	<JoinSheet
+		bind:open={showJoinSheet}
+		campaignTitle={campaign.title}
+		context={emailJoinContext}
+		{signedInEmail}
+		{isGuest}
+		initialZip={zipCode}
+		{redirectsElsewhere}
+		onJoined={handleJoined}
+		onSignOut={handleSignOut}
+	/>
+{/if}
 
 <Dialog
 	bind:open={showTermsMessage}
