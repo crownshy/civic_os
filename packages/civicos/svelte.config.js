@@ -13,7 +13,7 @@ const config = {
 		csrf: {
 			// Disable origin checking because /api/* routes are proxy endpoints
 			// The actual API backend handles its own CSRF/security
-			checkOrigin: false
+			trustedOrigins: ['*']
 		}
 	}
 };
