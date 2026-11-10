@@ -2,7 +2,6 @@
 	import { untrack } from 'svelte';
 	import type { CampaignArea } from '@civicos/shared/data/areas';
 	import CheckIcon from '@lucide/svelte/icons/check';
-	import SetupCard from '$lib/components/setup/SetupCard.svelte';
 	import PlaceSelector from '$lib/components/place-selector/PlaceSelector.svelte';
 	import { areasForIds, placeIdOf } from '$lib/components/place-selector/campaign-areas';
 	import {
@@ -11,7 +10,7 @@
 	} from '$lib/components/place-selector/sources';
 
 	interface Props {
-		/** The areas stored on the Campaign. Read once, when the card mounts. */
+		/** The areas stored on the Campaign. Read once, when the picker mounts. */
 		areas: CampaignArea[];
 		/** Persist the whole selection. Called after every pick or removal. */
 		onSave: (areas: CampaignArea[]) => Promise<void>;
@@ -58,10 +57,7 @@
 	}
 </script>
 
-<SetupCard
-	title="Where it runs"
-	subtitle="The states, counties and cities this Campaign is for. Picking a state or county does not pick the places inside it."
->
+<div>
 	<PlaceSelector {source} {geometrySource} selectedIds={initialIds} onchange={save} />
 	<p aria-live="polite" class="min-h-5 pt-3 text-caption">
 		{#if status === 'error'}
@@ -75,4 +71,4 @@
 			</span>
 		{/if}
 	</p>
-</SetupCard>
+</div>

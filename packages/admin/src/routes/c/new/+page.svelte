@@ -11,7 +11,8 @@
 	import AddCoHostsDialog from '$lib/components/setup/AddCoHostsDialog.svelte';
 	import { placeFromName } from '$lib/config/place';
 	import PlaceSelector from '$lib/components/place-selector/PlaceSelector.svelte';
-	import { areasForIds } from '$lib/components/place-selector/campaign-areas';
+	import AreasDialog from '$lib/components/place-selector/AreasDialog.svelte';
+	import { areasForIds, placeIdOf } from '$lib/components/place-selector/campaign-areas';
 	import {
 		createPlaceGeometrySource,
 		createPlaceSource
@@ -76,6 +77,9 @@
 		const areas = await areasForIds(placeSource, ids);
 		if (request === areasRequest) $formData.areas = areas;
 	}
+
+	let areasOpen = $state(false);
+	const areaNames = $derived($formData.areas.map((area) => area.name).join(', '));
 
 	let cohostPickerOpen = $state(false);
 
@@ -223,20 +227,24 @@
 						class="mt-1"
 					/>
 					<Form.FieldErrors class="mt-1 text-caption text-destructive" />
+					<div class="mt-1 flex flex-wrap items-center gap-x-2 text-caption">
+						<span class={areaNames ? 'text-foreground' : 'text-muted-foreground'}>
+							{areaNames ? `Covers ${areaNames}` : 'No areas picked yet'}
+						</span>
+						<Button variant="link" size="sm" class="h-auto p-0" onclick={() => (areasOpen = true)}>
+							{areaNames ? 'Edit areas' : 'Pick areas'}
+						</Button>
+					</div>
 				</Form.Field>
 
-				<div class="flex flex-col gap-1">
-					<span class={labelClass}>Where it runs</span>
-					<p class="mb-1 text-caption text-muted-foreground">
-						The states, counties and cities this conversation is for. You can change them later in
-						Setup.
-					</p>
+				<AreasDialog bind:open={areasOpen} placeName={$formData.placeName}>
 					<PlaceSelector
 						source={placeSource}
 						geometrySource={placeGeometrySource}
+						selectedIds={$formData.areas.map(placeIdOf)}
 						onchange={onAreasChange}
 					/>
-				</div>
+				</AreasDialog>
 
 				<Form.Field {form} name="keyQuestion">
 					<Form.Control>
