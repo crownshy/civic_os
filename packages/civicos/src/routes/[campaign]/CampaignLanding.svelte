@@ -457,7 +457,7 @@
 	lands on the same pixels. -->
 {#if leaving}
 	<div class="fixed inset-0 z-50 bg-background" in:fade={{ duration: 120 }}>
-		<AppShell border={false}>
+		<AppShell border={false} class="max-w-none">
 			<VotingSkeleton {placeName} {question} />
 		</AppShell>
 		<span class="sr-only" role="status">Loading the poll</span>
