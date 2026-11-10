@@ -53,7 +53,10 @@ describe('joinWithEmail', () => {
 	it('signs a new email in, puts it on the Campaign and saves the zip', async () => {
 		expect(await joinWithEmail(context(), 'a@example.com', '84101')).toBe('joined');
 
-		expect(api.SignupOtp).toHaveBeenCalledWith({ email: 'a@example.com' });
+		expect(api.SignupOtp).toHaveBeenCalledWith({
+			email: 'a@example.com',
+			username: 'a@example.com'
+		});
 		expect(session.userId).toBe(MEMBER.id);
 		expect(session.emailProvided).toBe(true);
 		expect(api.RegisterUserForConversationWorkflow).toHaveBeenCalledOnce();

@@ -36,7 +36,10 @@ export async function joinWithEmail(
 
 	let user: UserDto;
 	try {
-		user = await context.api.SignupOtp({ email });
+		// Comhairle fills a missing username with the part before the @, and
+		// usernames are unique, so jane@a.com would 409 on jane@b.com's account
+		// and read as "already signed up". The whole email is unique by construction.
+		user = await context.api.SignupOtp({ email, username: email });
 	} catch (e) {
 		if (httpStatusOf(e) === 409) return sendLoginCode(context, email);
 		console.error('[Join] Failed to sign up by email:', e);
