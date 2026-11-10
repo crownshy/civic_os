@@ -106,7 +106,7 @@ One Docker image per app: `Dockerfile` (civicos), `Dockerfile.admin`, `Dockerfil
 
 - `fetch failed` everywhere → backend down or `API_URL` wrong in that package's `.env`. `curl $API_URL/health`.
 - Polis empty → the Campaign's `metadata.poll.polisId` doesn't map to a real conversation on `polis.comhairle.scot`.
-- Your local Campaign isn't on `/` → re-run `./scripts/seed-dev.sh` and restart `pnpm dev`. It writes both `packages/civicos/.env` and `packages/admin/.env`.
+- Your seeded Campaign isn't on `/` → check `API_URL` in `packages/civicos/.env` points at the backend you seeded (`http://localhost:3000`). The Campaign lives on the backend, not in `.env`.
 - api-client types don't match the backend → bump the published package or use the `pnpm link` workflow above.
 
 ## Map
