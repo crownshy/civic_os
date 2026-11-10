@@ -6,10 +6,11 @@
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import * as Form from '@civicos/shared/ui/form';
 	import { Button } from '@civicos/shared/ui/button';
-	import { ArrowLeft, AlertCircle, X } from '@lucide/svelte';
+	import { cn } from '@civicos/shared/utils';
+	import { ArrowLeft, AlertCircle, ChevronDown, Plus, X } from '@lucide/svelte';
 	import { resolve } from '$app/paths';
 	import AddCoHostsDialog from '$lib/components/setup/AddCoHostsDialog.svelte';
-	import { placeFromName } from '$lib/config/place';
+	import { placeFromName, rescopedSlug } from '$lib/config/place';
 	import PlaceSelector from '$lib/components/place-selector/PlaceSelector.svelte';
 	import AreasDialog from '$lib/components/place-selector/AreasDialog.svelte';
 	import { areasForIds, placeIdOf } from '$lib/components/place-selector/campaign-areas';
@@ -106,13 +107,36 @@
 		$formData.cohostIds = $formData.cohostIds.filter((c) => c !== id);
 	}
 
+	// The address the Conversation will open at once the action scopes the slug
+	// to the Place. Previewed so the Host sees the `-<place>` suffix before it
+	// appears on its own.
+	const conversationUrl = $derived(
+		$formData.slug ? `${data.baseDomain}/${rescopedSlug($formData.slug, '', placeSlug)}` : ''
+	);
+
 	const inputClass =
 		'w-full rounded-[10px] border border-stone-300 bg-transparent px-3 py-2.5 text-body focus:border-primary focus:outline-none';
-	const labelClass = 'text-label font-semibold tracking-wider text-muted-foreground uppercase';
+	const helpClass = 'text-caption text-muted-foreground';
+	const errorClass = 'text-caption text-destructive';
+	const sectionHeadingClass = 'text-lg font-medium md:text-h4';
 </script>
 
+<!-- Label with its counter on the same line, so the count reads as part of the
+     field it counts. Hidden while empty: an empty field has nothing to count. -->
+{#snippet fieldLabel(text: string, count?: number, limit?: number, optional = false)}
+	<div class="flex items-baseline justify-between gap-3">
+		<Form.Label class="text-body font-medium">
+			{text}
+			{#if optional}<span class="font-normal text-muted-foreground">(optional)</span>{/if}
+		</Form.Label>
+		{#if limit !== undefined && count}
+			<CharCount {count} {limit} />
+		{/if}
+	</div>
+{/snippet}
+
 <div class="min-h-0 flex-1 overflow-y-auto">
-	<div class="mx-auto max-w-3xl p-6 sm:p-8">
+	<div class="mx-auto max-w-2xl px-6 pt-6 sm:px-8 sm:pt-8">
 		<a
 			href={resolve('/')}
 			class="mb-4 inline-flex items-center gap-1.5 text-body text-muted-foreground hover:text-foreground"
@@ -123,13 +147,12 @@
 
 		<h1 class="mb-1 text-h3 font-bold">New Conversation</h1>
 		<p class="mb-8 text-body text-muted-foreground">
-			This creates the Polis poll too, so the conversation is ready to set up. It stays a draft
-			until you make it live.
+			Creates a draft conversation. Nobody can see it until you make it live.
 		</p>
 
 		{#if data.hosts.length === 0}
 			<div
-				class="flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-body text-destructive"
+				class="mb-8 flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-body text-destructive"
 			>
 				<AlertCircle class="size-4 shrink-0 translate-y-1" />
 				<span>
@@ -156,227 +179,254 @@
 				</div>
 			{/if}
 
-			<form method="POST" use:enhance novalidate class="flex flex-col gap-6">
-				<Form.Field {form} name="title">
-					<Form.Control>
-						{#snippet children({ props })}
-							<Form.Label class={labelClass}>Title</Form.Label>
-							<input
-								{...props}
-								bind:value={$formData.title}
-								maxlength={TEXT_LIMITS.campaignTitle}
-								oninput={onTitleInput}
-								class={inputClass}
-							/>
-						{/snippet}
-					</Form.Control>
-					<CharCount
-						count={$formData.title.length}
-						limit={TEXT_LIMITS.campaignTitle}
-						class="mt-1"
-					/>
-					<Form.FieldErrors class="mt-1 text-caption text-destructive" />
-				</Form.Field>
+			<form method="POST" use:enhance novalidate class="flex flex-col">
+				<section class="flex flex-col gap-6" aria-labelledby="section-conversation">
+					<h2 id="section-conversation" class={sectionHeadingClass}>The conversation</h2>
 
-				<Form.Field {form} name="slug">
-					<Form.Control>
-						{#snippet children({ props })}
-							<Form.Label class={labelClass}>Slug</Form.Label>
-							<p class="mb-1 text-caption text-muted-foreground">
-								The last part of the conversation's URL. You can change it later.
-							</p>
-							<input
-								{...props}
-								bind:value={$formData.slug}
-								oninput={() => (slugEdited = true)}
-								spellcheck="false"
-								autocapitalize="off"
-								autocorrect="off"
-								class={inputClass}
-							/>
-						{/snippet}
-					</Form.Control>
-					<Form.FieldErrors class="mt-1 text-caption text-destructive" />
-				</Form.Field>
+					<Form.Field {form} name="title" class="space-y-1.5">
+						<Form.Control>
+							{#snippet children({ props })}
+								{@render fieldLabel('Title', $formData.title.length, TEXT_LIMITS.campaignTitle)}
+								<input
+									{...props}
+									bind:value={$formData.title}
+									maxlength={TEXT_LIMITS.campaignTitle}
+									oninput={onTitleInput}
+									placeholder="e.g. Dogs in Bushrod Park"
+									class={inputClass}
+								/>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors class={errorClass} />
+					</Form.Field>
 
-				<Form.Field {form} name="placeName">
-					<Form.Control>
-						{#snippet children({ props })}
-							<Form.Label class={labelClass}>Place</Form.Label>
-							<p class="mb-1 text-caption text-muted-foreground">
-								Where this conversation runs. It is listed on that Place's page, and the slug is
-								scoped to it. You can change it later.
-							</p>
-							<input
-								{...props}
-								bind:value={$formData.placeName}
-								maxlength={TEXT_LIMITS.placeName}
-								placeholder="e.g. Dundee, Scotland"
-								class={inputClass}
-							/>
-							{#if placeSlug}
-								<p class="mt-1 text-caption text-muted-foreground">
-									Listed at {data.baseDomain}/{placeSlug}
+					<Form.Field {form} name="keyQuestion" class="space-y-1.5">
+						<Form.Control>
+							{#snippet children({ props })}
+								{@render fieldLabel(
+									'Key question',
+									$formData.keyQuestion.length,
+									TEXT_LIMITS.keyQuestion
+								)}
+								<p class={helpClass}>
+									What participants are asked to deliberate on. This becomes the Polis topic.
 								</p>
-							{/if}
-						{/snippet}
-					</Form.Control>
-					<CharCount
-						count={$formData.placeName.length}
-						limit={TEXT_LIMITS.placeName}
-						class="mt-1"
-					/>
-					<Form.FieldErrors class="mt-1 text-caption text-destructive" />
-					<div class="mt-1 flex flex-wrap items-center gap-x-2 text-caption">
-						<span class={areaNames ? 'text-foreground' : 'text-muted-foreground'}>
-							{areaNames ? `Covers ${areaNames}` : 'No areas picked yet'}
-						</span>
-						<Button variant="link" size="sm" class="h-auto p-0" onclick={() => (areasOpen = true)}>
-							{areaNames ? 'Edit areas' : 'Pick areas'}
-						</Button>
-					</div>
-				</Form.Field>
+								<textarea
+									{...props}
+									bind:value={$formData.keyQuestion}
+									maxlength={TEXT_LIMITS.keyQuestion}
+									rows="2"
+									placeholder="e.g. Should dogs be allowed off-lead in Bushrod Park?"
+									class={inputClass}
+								></textarea>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors class={errorClass} />
+					</Form.Field>
 
-				<AreasDialog bind:open={areasOpen} placeName={$formData.placeName}>
-					<PlaceSelector
-						source={placeSource}
-						geometrySource={placeGeometrySource}
-						selectedIds={$formData.areas.map(placeIdOf)}
-						onchange={onAreasChange}
-					/>
-				</AreasDialog>
+					<Form.Field {form} name="description" class="space-y-1.5">
+						<Form.Control>
+							{#snippet children({ props })}
+								{@render fieldLabel(
+									'Description',
+									$formData.description.length,
+									TEXT_LIMITS.description,
+									true
+								)}
+								<p class={helpClass}>Shown on the conversation's homepage. You can add it later.</p>
+								<textarea
+									{...props}
+									bind:value={$formData.description}
+									maxlength={TEXT_LIMITS.description}
+									rows="4"
+									class={inputClass}
+								></textarea>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors class={errorClass} />
+					</Form.Field>
+				</section>
 
-				<Form.Field {form} name="keyQuestion">
-					<Form.Control>
-						{#snippet children({ props })}
-							<Form.Label class={labelClass}>Key question</Form.Label>
-							<p class="mb-1 text-caption text-muted-foreground">
-								What participants are asked to deliberate on. This becomes the Polis conversation's
-								topic.
-							</p>
-							<textarea
-								{...props}
-								bind:value={$formData.keyQuestion}
-								maxlength={TEXT_LIMITS.keyQuestion}
-								rows="2"
-								class={inputClass}
-							></textarea>
-						{/snippet}
-					</Form.Control>
-					<CharCount
-						count={$formData.keyQuestion.length}
-						limit={TEXT_LIMITS.keyQuestion}
-						class="mt-1"
-					/>
-					<Form.FieldErrors class="mt-1 text-caption text-destructive" />
-				</Form.Field>
-
-				<Form.Field {form} name="hostId">
-					<Form.Control>
-						{#snippet children({ props })}
-							<Form.Label class={labelClass}>Host</Form.Label>
-							<p class="mb-1 text-caption text-muted-foreground">
-								The organization that owns this conversation. Set to your Host; change it if you are
-								creating this for another one.
-							</p>
-							{#if data.hosts.length > 1}
-								<select {...props} bind:value={$formData.hostId} class={inputClass}>
-									{#each data.hosts as host (host.id)}
-										<option value={host.id}>{host.name}</option>
-									{/each}
-								</select>
-							{:else}
-								<!-- One Host to choose from: it is already the value, so show it
-								     rather than a select with a single option. -->
-								<p class="text-body font-bold">{data.hosts[0].name}</p>
-								<input {...props} type="hidden" bind:value={$formData.hostId} />
-							{/if}
-						{/snippet}
-					</Form.Control>
-					<Form.FieldErrors class="mt-1 text-caption text-destructive" />
-				</Form.Field>
-
-				<Form.Field {form} name="cohostIds">
-					<Form.Control>
-						{#snippet children({ props })}
-							<Form.Label class={labelClass}>Co-Hosts</Form.Label>
-							<p class="mb-1 text-caption text-muted-foreground">
-								Other organizations stewarding this conversation with you. They can see and edit it.
-								You can add more later.
-							</p>
-							<div {...props} class="flex flex-wrap items-center gap-2">
-								{#each selectedCohosts as host (host.id)}
-									<span
-										class="inline-flex items-center gap-1.5 rounded-full border border-stone-300 py-1 pr-2 pl-3 text-body"
-									>
-										{host.name}
-										<button
-											type="button"
-											onclick={() => removeCohost(host.id)}
-											aria-label={`Remove ${host.name}`}
-											class="touch-manipulation rounded-full p-0.5 text-muted-foreground transition-all hover:text-destructive active:scale-90 active:text-destructive/70 active:duration-0"
-										>
-											<X class="size-3.5" />
-										</button>
-									</span>
-								{/each}
-								<Button
-									type="button"
-									variant="outline"
-									onclick={() => (cohostPickerOpen = true)}
-									class="rounded-full"
-								>
-									{selectedCohosts.length === 0 ? 'Add co-hosts…' : 'Edit co-hosts…'}
-								</Button>
-							</div>
-						{/snippet}
-					</Form.Control>
-					<Form.FieldErrors class="mt-1 text-caption text-destructive" />
-				</Form.Field>
-
-				<AddCoHostsDialog
-					bind:open={cohostPickerOpen}
-					pickerOrgs={data.pickerOrgs}
-					{excludeIds}
-					initialSelected={$formData.cohostIds}
+				<section
+					class="mt-10 flex flex-col gap-6 border-t border-border pt-8"
+					aria-labelledby="section-place"
 				>
-					{#snippet footer({ selected })}
-						<Button type="button" onclick={() => commitCohosts(selected)}>
-							{selected.length
-								? `Add ${selected.length} co-host${selected.length === 1 ? '' : 's'}`
-								: 'Done'}
-						</Button>
-					{/snippet}
-				</AddCoHostsDialog>
+					<h2 id="section-place" class={sectionHeadingClass}>Where it runs</h2>
 
-				<Form.Field {form} name="description">
-					<Form.Control>
-						{#snippet children({ props })}
-							<Form.Label class={labelClass}>Basic description</Form.Label>
-							<p class="mb-1 text-caption text-muted-foreground">
-								This appears on the homepage for this conversation. You can add it later.
-							</p>
-							<textarea
-								{...props}
-								bind:value={$formData.description}
-								maxlength={TEXT_LIMITS.description}
-								rows="4"
-								class={inputClass}
-							></textarea>
+					<Form.Field {form} name="placeName" class="space-y-1.5">
+						<Form.Control>
+							{#snippet children({ props })}
+								{@render fieldLabel(
+									'Place',
+									$formData.placeName.length,
+									TEXT_LIMITS.placeName,
+									true
+								)}
+								<p class={helpClass}>
+									The conversation is listed on this Place's page. You can change it later.
+								</p>
+								<input
+									{...props}
+									bind:value={$formData.placeName}
+									maxlength={TEXT_LIMITS.placeName}
+									placeholder="e.g. Dundee, Scotland"
+									class={inputClass}
+								/>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors class={errorClass} />
+						{#if placeSlug}
+							<p class={helpClass}>Listed at {data.baseDomain}/{placeSlug}</p>
+						{/if}
+						<div class="flex flex-wrap items-center gap-x-2 text-caption">
+							<span class={areaNames ? 'text-foreground' : 'text-muted-foreground'}>
+								{areaNames ? `Covers ${areaNames}` : 'No areas picked yet'}
+							</span>
+							<Button
+								variant="link"
+								size="sm"
+								class="h-auto p-0 text-caption"
+								onclick={() => (areasOpen = true)}
+							>
+								{areaNames ? 'Edit areas' : 'Pick areas'}
+							</Button>
+						</div>
+					</Form.Field>
+
+					<AreasDialog bind:open={areasOpen} placeName={$formData.placeName}>
+						<PlaceSelector
+							source={placeSource}
+							geometrySource={placeGeometrySource}
+							selectedIds={$formData.areas.map(placeIdOf)}
+							onchange={onAreasChange}
+						/>
+					</AreasDialog>
+
+					<Form.Field {form} name="slug" class="space-y-1.5">
+						<Form.Control>
+							{#snippet children({ props })}
+								{@render fieldLabel('Slug')}
+								<p class={helpClass}>
+									Filled in from the title. The last part of the conversation's URL.
+								</p>
+								<input
+									{...props}
+									bind:value={$formData.slug}
+									oninput={() => (slugEdited = true)}
+									spellcheck="false"
+									autocapitalize="off"
+									autocorrect="off"
+									class={inputClass}
+								/>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors class={errorClass} />
+						{#if conversationUrl}
+							<p class={cn(helpClass, 'break-all')}>Opens at {conversationUrl}</p>
+						{/if}
+					</Form.Field>
+				</section>
+
+				<section
+					class="mt-10 flex flex-col gap-6 border-t border-border pt-8"
+					aria-labelledby="section-hosts"
+				>
+					<h2 id="section-hosts" class={sectionHeadingClass}>Who runs it</h2>
+
+					<Form.Field {form} name="hostId" class="space-y-1.5">
+						<Form.Control>
+							{#snippet children({ props })}
+								{@render fieldLabel('Host')}
+								<p class={helpClass}>
+									The organization that owns this conversation. Change it if you are creating it for
+									another Host.
+								</p>
+								{#if data.hosts.length > 1}
+									<div class="relative">
+										<select
+											{...props}
+											bind:value={$formData.hostId}
+											class={cn(inputClass, 'appearance-none pr-10')}
+										>
+											{#each data.hosts as host (host.id)}
+												<option value={host.id}>{host.name}</option>
+											{/each}
+										</select>
+										<ChevronDown
+											class="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted-foreground"
+										/>
+									</div>
+								{:else}
+									<!-- One Host to choose from: it is already the value, so show it
+									     rather than a select with a single option. -->
+									<p class="text-body font-medium">{data.hosts[0].name}</p>
+									<input {...props} type="hidden" bind:value={$formData.hostId} />
+								{/if}
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors class={errorClass} />
+					</Form.Field>
+
+					<Form.Field {form} name="cohostIds" class="space-y-1.5">
+						<Form.Control>
+							{#snippet children({ props })}
+								{@render fieldLabel('Co-hosts', undefined, undefined, true)}
+								<p class={helpClass}>
+									Other organizations stewarding this conversation with you. They can see and edit
+									it.
+								</p>
+								<div {...props} class="flex flex-wrap items-center gap-2">
+									{#each selectedCohosts as host (host.id)}
+										<span
+											class="inline-flex items-center gap-1.5 rounded-full border border-stone-300 py-1 pr-2 pl-3 text-body"
+										>
+											{host.name}
+											<button
+												type="button"
+												onclick={() => removeCohost(host.id)}
+												aria-label={`Remove ${host.name}`}
+												class="touch-manipulation rounded-full p-0.5 text-muted-foreground transition-all hover:text-destructive active:scale-90 active:text-destructive/70 active:duration-0"
+											>
+												<X class="size-3.5" />
+											</button>
+										</span>
+									{/each}
+									<Button
+										type="button"
+										variant="link"
+										size="sm"
+										class="h-auto gap-1 p-0 text-caption"
+										onclick={() => (cohostPickerOpen = true)}
+									>
+										<Plus class="size-3.5" />
+										{selectedCohosts.length === 0 ? 'Add co-hosts' : 'Edit co-hosts'}
+									</Button>
+								</div>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors class={errorClass} />
+					</Form.Field>
+
+					<AddCoHostsDialog
+						bind:open={cohostPickerOpen}
+						pickerOrgs={data.pickerOrgs}
+						{excludeIds}
+						initialSelected={$formData.cohostIds}
+					>
+						{#snippet footer({ selected })}
+							<Button type="button" onclick={() => commitCohosts(selected)}>
+								{selected.length
+									? `Add ${selected.length} co-host${selected.length === 1 ? '' : 's'}`
+									: 'Done'}
+							</Button>
 						{/snippet}
-					</Form.Control>
-					<CharCount
-						count={$formData.description.length}
-						limit={TEXT_LIMITS.description}
-						class="mt-1"
-					/>
-					<Form.FieldErrors class="mt-1 text-caption text-destructive" />
-				</Form.Field>
+					</AddCoHostsDialog>
+				</section>
 
-				<!-- Action row stays pinned to the bottom of the scroll region.
-			     Negative margins cancel the column padding so it spans edge to edge. -->
+				<!-- Pinned to the bottom of the scroll region, and as wide as the form
+				     column so its divider lines up with the fields above. -->
 				<div
-					class="sticky bottom-0 -mx-6 -mb-6 flex items-center gap-3 border-t border-border bg-background px-6 py-4 sm:-mx-8 sm:-mb-8 sm:px-8"
+					class="sticky bottom-0 mt-10 flex items-center gap-3 border-t border-border bg-background py-4"
 				>
 					<Button type="submit" disabled={$submitting}>
 						{$submitting ? 'Creating…' : 'Create Conversation'}
