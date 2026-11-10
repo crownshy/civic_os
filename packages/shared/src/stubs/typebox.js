@@ -11,5 +11,5 @@
 //
 // Every other adapter only touches its (missing) lib inside functions we never
 // call, so returning a class for `Base` is all that's needed for the barrel to
-// finish loading. See packages/admin/vite.config.ts for the alias.
+// finish loading. Aliased in both apps' vite.config.ts.
 export default { Base: class {} };

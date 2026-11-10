@@ -36,3 +36,5 @@ export { default as ConversationEventCard } from './ConversationEventCard.svelte
 export { default as ReportPanel } from './ReportPanel.svelte';
 export { default as Accordion } from './Accordion.svelte';
 export { default as StickyNav } from './StickyNav.svelte';
+export { default as BottomSheet } from './BottomSheet.svelte';
+export { default as FieldRow } from './FieldRow.svelte';

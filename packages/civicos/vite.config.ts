@@ -45,6 +45,14 @@ export default defineConfig({
 			outdir: './src/lib/paraglide'
 		})
 	],
+	resolve: {
+		alias: [
+			// The same superforms dev SSR crash admin works around: the adapter barrel
+			// evaluates the TypeBox adapter, whose `extends Type.Base` 500s the page.
+			// See shared/src/stubs/typebox.js.
+			{ find: /^typebox$/, replacement: path.join(dirname, '../shared/src/stubs/typebox.js') }
+		]
+	},
 	ssr: {
 		external: ['isomorphic-dompurify']
 	},
