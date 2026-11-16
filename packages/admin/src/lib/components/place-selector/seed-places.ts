@@ -1,3 +1,4 @@
+import { COUNTY_SEEDS } from './county-seeds';
 import { buildPlaces, createFixtureSource, type PlaceSeeds } from './fixture';
 import { createFixtureGeometrySource } from './geometry-fixture';
 import type { PlaceGeometrySource } from './geometry';
@@ -5,44 +6,14 @@ import type { Place, PlaceSource } from './places';
 
 // Stand-in Areas until #509 imports real ones into comhairle. Delete this file when the
 // API-backed PlaceSource lands; nothing outside stories should import it by then.
-// County bboxes come from static/counties; city bboxes and geoids are approximate.
+// Every Oregon and Utah county comes from static/counties (county-seeds.ts); the
+// cities are a hand-picked few with approximate bboxes and geoids.
 const SEEDS: PlaceSeeds = {
 	states: [
 		{ geoid: '41', name: 'Oregon', abbreviation: 'OR', bbox: [-124.55, 41.99, -116.46, 46.27] },
 		{ geoid: '49', name: 'Utah', abbreviation: 'UT', bbox: [-114.05, 37.0, -109.04, 42.0] }
 	],
-	counties: [
-		{ geoid: '41017', name: 'Deschutes County', state: '41', bbox: [-122.0, 43.61, -119.9, 44.39] },
-		{ geoid: '41029', name: 'Jackson County', state: '41', bbox: [-123.23, 42.0, -122.28, 43.0] },
-		{ geoid: '41039', name: 'Lane County', state: '41', bbox: [-124.16, 43.44, -121.77, 44.29] },
-		{
-			geoid: '41051',
-			name: 'Multnomah County',
-			state: '41',
-			bbox: [-122.93, 45.43, -121.82, 45.73]
-		},
-		{
-			geoid: '41067',
-			name: 'Washington County',
-			state: '41',
-			bbox: [-123.48, 45.32, -122.74, 45.78]
-		},
-		{ geoid: '49011', name: 'Davis County', state: '49', bbox: [-112.49, 40.77, -111.74, 41.15] },
-		{
-			geoid: '49035',
-			name: 'Salt Lake County',
-			state: '49',
-			bbox: [-112.26, 40.42, -111.55, 40.92]
-		},
-		{ geoid: '49049', name: 'Utah County', state: '49', bbox: [-112.21, 39.78, -110.86, 40.58] },
-		{
-			geoid: '49053',
-			name: 'Washington County',
-			state: '49',
-			bbox: [-114.05, 37.0, -112.9, 37.62]
-		},
-		{ geoid: '49057', name: 'Weber County', state: '49', bbox: [-112.49, 41.08, -111.42, 41.43] }
-	],
+	counties: COUNTY_SEEDS,
 	cities: [
 		{ geoid: '4105800', name: 'Bend', county: '41017', bbox: [-121.38, 43.99, -121.25, 44.11] },
 		{ geoid: '4161200', name: 'Redmond', county: '41017', bbox: [-121.21, 44.23, -121.13, 44.3] },
@@ -120,7 +91,7 @@ const SEEDS: PlaceSeeds = {
 	]
 };
 
-/** Oregon and Utah: five counties each, two or three cities per county. */
+/** Oregon and Utah: every county, and two or three cities in ten of them. */
 export const seedPlaces: Place[] = buildPlaces(SEEDS);
 
 export function createSeedPlaceSource(): PlaceSource {
