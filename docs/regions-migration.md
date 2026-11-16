@@ -18,7 +18,7 @@ inferred one. Treat it as the spec.
 | Participant surface                       | Backend field                                            | Where admin edits it             |
 | ----------------------------------------- | -------------------------------------------------------- | -------------------------------- |
 | Landing `<h1>` and page title             | `Conversation.title`                                     | Setup > Identity                 |
-| The `/<slug>` address                     | `Conversation.slug`                                      | Setup > Identity                 |
+| The `/c/<slug>` address                   | `Conversation.slug`                                      | Setup > Identity                 |
 | Landing "Context" sections and nav pills  | `Conversation.description`                               | Setup > Context for Participants |
 | Voting question                           | Polis step `topic`, mirrored to `metadata.poll.question` | Setup > Identity > Key Question  |
 | Landing FAQ accordion                     | `Conversation.faqs`                                      | Setup > FAQ                      |
@@ -36,7 +36,7 @@ and Oregon render what they rendered before until a Host saves something.
 ### How the Conversation is found
 
 Nothing about the hostname picks a Campaign (ADR 0011). The URL is
-`/<conversation-slug>` and that segment names it (ADR 0014).
+`/c/<conversation-slug>` and that segment names it (ADR 0019).
 `campaignCandidates()` turns that slug into an ordered list and takes the first
 that resolves against `GET /conversation/:idOrSlug`, which accepts either form:
 

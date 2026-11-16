@@ -43,7 +43,7 @@ The old `PUBLIC_DEV_*`, `PUBLIC_CONVERSATION_ID` and `PUBLIC_POLIS_ID` vars are 
 
 ## Campaigns and URLs
 
-The URL picks the Campaign: `/<conversation-slug>`, with the poll at `/<conversation-slug>/poll`, events at `/events` and the report at `/report` under it. Nothing is read from the hostname (ADR 0011, ADR 0014). A slug no Campaign has is a Place, whose Campaigns are listed at `/<place-slug>`. `/` is the directory of live Campaigns.
+The URL picks the Campaign: `/c/<conversation-slug>`, with the poll at `/c/<conversation-slug>/poll`, events at `/events` and the report at `/report` under it. Nothing is read from the hostname (ADR 0011, ADR 0019). A Place's Campaigns are listed at `/p/<place-slug>`. `/` is the directory of live Campaigns, and old root `/<slug>` links redirect.
 
 A Campaign is a stored Conversation. Its title, copy, FAQ, palette, demographics, asks and Polis id are set in admin and live on the Conversation and its `metadata` (see [docs/regions-migration.md](docs/regions-migration.md) for the full table). `packages/shared/src/data/regions.ts` is only the default layer behind that: the region that owns the Conversation, else the generic catch-all. Logic: `regionForCampaign` in `packages/civicos/src/lib/config/campaign.ts`.
 

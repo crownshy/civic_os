@@ -27,7 +27,7 @@ export interface User {
  *
  * Storage only: nothing here calls comhairle. Joining and signing up for
  * updates are in `join.ts`, About You answers in `profile.ts`, and which
- * participant a page is talking to is resolved in the `[campaign]` layout load.
+ * participant a page is talking to is resolved in the `c/[campaign]` layout load.
  */
 class Session {
 	user = $state<User | null>(null);
@@ -50,7 +50,7 @@ class Session {
 	/**
 	 * Which Campaign the fields above that belong to a poll are currently about.
 	 *
-	 * Empty until `useCampaign` is called from the `[campaign]` layout load,
+	 * Empty until `useCampaign` is called from the `c/[campaign]` layout load,
 	 * which runs before any component below it. It used to be seeded from
 	 * `PUBLIC_CONVERSATION_ID`, for deployments that served one Conversation and
 	 * predate the URL naming it (#421).
@@ -81,7 +81,7 @@ class Session {
 	/**
 	 * Point the poll-scoped half of the session at a Campaign.
 	 *
-	 * Called from `[campaign]/+layout.ts`, before any page below it reads
+	 * Called from `c/[campaign]/+layout.ts`, before any page below it reads
 	 * `pid` or vote progress. Until this runs the fields hold whatever the env
 	 * Conversation had, which for a deployment that sets one is the same answer.
 	 */

@@ -1,12 +1,11 @@
 import { serverApi } from '@civicos/shared/api';
 import { readParticipationReport } from '@civicos/shared/data/demographics';
-import { requireCampaign } from '../require-campaign';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ parent, params, cookies, url, depends }) => {
+export const load: PageServerLoad = async ({ parent, cookies, url, depends }) => {
 	depends('report:data');
 
-	const { campaign } = requireCampaign(await parent(), params.campaign);
+	const { campaign } = await parent();
 	const conversationId = campaign.id;
 
 	// The Campaign's own step, which `pollFor` takes from `metadata.poll` and only

@@ -1,5 +1,9 @@
 # The Campaign moves to the root
 
+> **Superseded by [ADR 0019](0019-participant-urls-are-prefixed.md).** Campaigns
+> moved to `/c/<slug>` and Places to `/p/<slug>`, so the two no longer share the
+> root and nothing decides between them. Kept for the redirect history.
+
 > **The Place suffix on slugs is dropped by [ADR 0017](0017-a-campaign-picks-areas-not-a-place.md).**
 > A new Campaign's slug is what the Host typed. The URL shape stands.
 

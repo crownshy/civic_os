@@ -27,30 +27,16 @@ vi.mock('@civicos/shared/api', () => ({
 // and its config modules can take longer than a test's 5s budget on CI.
 const { load } = await import('./+layout.server');
 
-/** A live, public Conversation as the directory lists it. */
-function listed(slug: string, place: { slug: string; name: string }) {
-	return {
-		id: `id-${slug}`,
-		slug,
-		title: slug,
-		isLive: true,
-		isPublic: true,
-		isInviteOnly: false,
-		isComplete: false,
-		metadata: { place }
-	};
-}
-
 /** An axios rejection as zodios surfaces it, which is what `httpStatusOf` reads. */
 function httpError(status: number) {
 	return Object.assign(new Error(`HTTP ${status}`), { response: { status } });
 }
 
-/** Run the layout load for `/<slug>`, signed in to admin when `hostSession` is given. */
+/** Run the layout load for `/c/<slug>`, signed in to admin when `hostSession` is given. */
 async function loadSlug(slug: string, hostSession?: string) {
 	return (await load({
 		params: { campaign: slug },
-		url: new URL(`http://localhost:5173/${slug}`),
+		url: new URL(`http://localhost:5173/c/${slug}`),
 		cookies: { get: () => hostSession },
 		depends: () => {}
 		// The load reads only these four. The rest of the SvelteKit event is
@@ -60,7 +46,7 @@ async function loadSlug(slug: string, hostSession?: string) {
 	} as any)) as Exclude<Awaited<ReturnType<typeof load>>, void>;
 }
 
-/** Run the layout load for `/<slug>`, and return how it failed. */
+/** Run the layout load for `/c/<slug>`, and return how it failed. */
 async function loadFailure(slug: string, hostSession?: string) {
 	try {
 		await loadSlug(slug, hostSession);
@@ -117,52 +103,6 @@ describe('campaign lookup failures', () => {
 
 		expect((await loadFailure('test-convo')).status).toBe(503);
 	});
-
-	it('503s when the Campaign is a 404 but the Place list cannot be read', async () => {
-		// The slug might still be a Place, so "no such Campaign" would be a guess.
-		GetConversation.mockRejectedValue(httpError(404));
-		ListConverastions.mockRejectedValue(httpError(502));
-
-		expect((await loadFailure('dundee')).status).toBe(503);
-	});
-});
-
-describe('a slug that names a Place', () => {
-	beforeEach(() => {
-		GetConversation.mockReset();
-		ListConverastions.mockReset();
-		vi.spyOn(console, 'warn').mockImplementation(() => {});
-	});
-
-	afterEach(() => {
-		vi.restoreAllMocks();
-	});
-
-	it('lists the Place when no Campaign has the slug', async () => {
-		const dundee = { slug: 'dundee', name: 'Dundee, Scotland' };
-		GetConversation.mockRejectedValue(httpError(404));
-		ListConverastions.mockResolvedValue({
-			records: [listed('ai-dundee', dundee), listed('ai-utah', { slug: 'utah', name: 'Utah' })]
-		});
-
-		const data = await loadSlug('dundee');
-
-		expect(data).toMatchObject({ kind: 'place', placeName: 'Dundee, Scotland' });
-		expect(data.kind === 'place' && data.campaigns.map((c: { href: string }) => c.href)).toEqual([
-			'/ai-dundee'
-		]);
-	});
-
-	it('serves the Campaign when a Place shares its slug', async () => {
-		// The Campaign's own card on that Place's page links to this address, so
-		// listing the Place here would send it round in a circle.
-		GetConversation.mockResolvedValue({ id: 'id-dundee', slug: 'dundee', title: 'Dundee' });
-
-		const data = await loadSlug('dundee');
-
-		expect(data.kind).toBe('campaign');
-		expect(ListConverastions).not.toHaveBeenCalled();
-	});
 });
 
 describe('a draft previewed by its Host', () => {
@@ -193,7 +133,6 @@ describe('a draft previewed by its Host', () => {
 		const data = await loadSlug('draft', 'host-token');
 
 		expect(data).toMatchObject({
-			kind: 'campaign',
 			preview: true,
 			pollStatus: 'draft',
 			previewAboutYou: [{ slug: 'age' }]
@@ -211,7 +150,7 @@ describe('a draft previewed by its Host', () => {
 
 		const data = await loadSlug('live', 'host-token');
 
-		expect(data).toMatchObject({ kind: 'campaign', preview: false, previewAboutYou: null });
+		expect(data).toMatchObject({ preview: false, previewAboutYou: null });
 		expect(HostGetConversation).not.toHaveBeenCalled();
 	});
 });

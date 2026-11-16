@@ -52,8 +52,8 @@ describe('placeFromName', () => {
 });
 
 describe('participantUrl', () => {
-	it('builds the ADR 0014 address: the conversation slug off the root', () => {
-		expect(participantUrl('ai-utah', 'bloomproject.us')).toBe('https://bloomproject.us/ai-utah');
+	it('builds the ADR 0019 address: the conversation slug under /c/', () => {
+		expect(participantUrl('ai-utah', 'bloomproject.us')).toBe('https://bloomproject.us/c/ai-utah');
 	});
 
 	it('serves every Campaign from the configured host, with no Place label', () => {
@@ -64,12 +64,12 @@ describe('participantUrl', () => {
 	});
 
 	it('drops to http on localhost, where there is no TLS', () => {
-		expect(participantUrl('ai-dundee', 'localhost:5173')).toBe('http://localhost:5173/ai-dundee');
+		expect(participantUrl('ai-dundee', 'localhost:5173')).toBe('http://localhost:5173/c/ai-dundee');
 	});
 
 	it('tolerates a base pasted with a scheme or trailing slash', () => {
 		expect(participantUrl('ai-utah', 'https://bloomproject.us/')).toBe(
-			'https://bloomproject.us/ai-utah'
+			'https://bloomproject.us/c/ai-utah'
 		);
 	});
 
@@ -80,8 +80,8 @@ describe('participantUrl', () => {
 });
 
 describe('placePath', () => {
-	it('is the Place page, one segment off the root', () => {
-		expect(placePath('dundee-scotland')).toBe('/dundee-scotland');
+	it('is the Place page, under /p/', () => {
+		expect(placePath('dundee-scotland')).toBe('/p/dundee-scotland');
 	});
 
 	it('is empty for a Campaign with no Place', () => {
@@ -92,16 +92,16 @@ describe('placePath', () => {
 
 describe('campaignPath', () => {
 	it('is the path half of the same rule', () => {
-		expect(campaignPath('ai-utah')).toBe('/ai-utah');
+		expect(campaignPath('ai-utah')).toBe('/c/ai-utah');
 	});
 
 	it('appends the pages under a Campaign', () => {
-		expect(campaignPath('ai', CAMPAIGN_PAGES.poll)).toBe('/ai/poll');
-		expect(campaignPath('ai', CAMPAIGN_PAGES.events, '42')).toBe('/ai/events/42');
+		expect(campaignPath('ai', CAMPAIGN_PAGES.poll)).toBe('/c/ai/poll');
+		expect(campaignPath('ai', CAMPAIGN_PAGES.events, '42')).toBe('/c/ai/events/42');
 	});
 
 	it('tolerates the undefined params a component sees', () => {
 		expect(campaignPath(undefined)).toBe('');
-		expect(campaignPath('ai', '')).toBe('/ai');
+		expect(campaignPath('ai', '')).toBe('/c/ai');
 	});
 });

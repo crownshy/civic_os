@@ -32,7 +32,7 @@
 	import JoinSkeleton from './JoinSkeleton.svelte';
 	import JoinSheet from './JoinSheet.svelte';
 	import PollClosedNotice from './PollClosedNotice.svelte';
-	import VotingSkeleton from './(campaign)/poll/VotingSkeleton.svelte';
+	import VotingSkeleton from './poll/VotingSkeleton.svelte';
 
 	// Derived, not captured: a client-side move to another Campaign, or an
 	// `invalidate('civicos:conversation')` after a Host edit, keeps this component
@@ -43,10 +43,8 @@
 	// The same Key Question the poll resolves, so the skeleton shown here and
 	// the voting screen it becomes label the statement identically.
 	const question = $derived(campaign.poll?.question ?? '');
-	const pollPath = $derived(resolve('/[campaign]/(campaign)/poll', { campaign: campaign.slug }));
-	const reportPath = $derived(
-		resolve('/[campaign]/(campaign)/report', { campaign: campaign.slug })
-	);
+	const pollPath = $derived(resolve('/c/[campaign]/poll', { campaign: campaign.slug }));
+	const reportPath = $derived(resolve('/c/[campaign]/report', { campaign: campaign.slug }));
 	const pollStatus = $derived(page.data.pollStatus);
 	// The organizations to credit, from `metadata.cohosts` where admin mirrored
 	// the grants. Empty for a Campaign with none, rather than the catch-all's

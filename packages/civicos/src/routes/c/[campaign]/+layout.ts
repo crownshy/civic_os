@@ -16,7 +16,6 @@ import type { LayoutLoad } from './$types';
  *
  * Spreading `data` keeps the parent data every child `load` sees: a universal
  * `load` answering nothing narrows it, and two children read `campaign` off it.
- * A Place has no poll, so there is nothing to point at.
  */
 export const load: LayoutLoad = async ({ data, parent, depends }) => {
 	depends('civicos:conversation');
@@ -28,8 +27,6 @@ export const load: LayoutLoad = async ({ data, parent, depends }) => {
 		{ participant, resolved: participantResolved },
 		browser ? { userId: session.userId, zipCode: session.zipCode } : { userId: null, zipCode: '' }
 	);
-
-	if (data.kind !== 'campaign') return { ...data, knownParticipant: known };
 
 	if (browser) session.useCampaign(data.campaign.id, data.preview);
 	return { ...data, knownParticipant: known, joinContext: joinContextFor({ ...data, api }) };

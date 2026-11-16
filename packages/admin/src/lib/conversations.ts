@@ -18,16 +18,16 @@
 import type { LocalizedConversationDto } from '@crownshy/api-client/api';
 import { REGIONS, type RegionConfig } from '@civicos/shared/data/regions';
 import { pollStatusFor, type PollStatus } from '@civicos/shared/data/poll-status';
-import { PARTICIPANT_RESERVED_SLUGS, participantUrl } from '@civicos/shared/data/place';
+import { participantUrl } from '@civicos/shared/data/place';
 import { readAreas } from '@civicos/shared/data/areas';
 import { env } from '$env/dynamic/public';
 
 /**
- * Slugs a static route already uses, in admin's `/c/**` or at the root of the
- * participant app. A Campaign carrying one would be shadowed by that route and
- * unreachable, so both the create form and the Setup rename reject them.
+ * Slugs a static route in admin's `/c/**` already uses. A Campaign carrying one
+ * would be shadowed by that route, so both the create form and the Setup rename
+ * reject them. civicos needs none since Campaigns moved under `/c/` (ADR 0019).
  */
-export const RESERVED_ROUTE_SLUGS = ['new', ...PARTICIPANT_RESERVED_SLUGS] as const;
+export const RESERVED_ROUTE_SLUGS = ['new'] as const;
 
 /**
  * What to show when comhairle refuses a slug as already taken (409 from

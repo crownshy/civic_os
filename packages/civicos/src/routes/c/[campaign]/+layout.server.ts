@@ -13,7 +13,6 @@ import {
 import { resolveParticipation } from '$lib/config/participation';
 import { readColorScheme } from '@civicos/shared/data/color-scheme';
 import { pollStatusFor } from '@civicos/shared/data/poll-status';
-import { inPlace, listDirectory } from '$lib/config/directory';
 import { httpStatusOf } from '$lib/utils/http';
 import { HOST_SESSION_COOKIE } from '@civicos/shared/data/host-session';
 import type { DemographicQuestionData } from '@civicos/shared/data/demographics';
@@ -22,26 +21,15 @@ type ResolvedConversation = CampaignConversation &
 	ConversationCopy & { isLive: boolean; isComplete: boolean };
 
 /**
- * A one-segment URL names a Campaign first and a Place second (ADR 0014).
- *
- * Campaign first because a Campaign is listed on its Place's page by the same
- * address: `utah` is both the legacy Utah Campaign and its Place, and if the
- * Place won, that Campaign's card would link back to the listing it sits on.
- * A Place only gets its page when no Campaign answers to the slug.
- *
- * Both answers come out of this one layout because SvelteKit allows a single
- * dynamic segment per level. The pages that only make sense for a Campaign
- * (poll, events, report) sit in the `(campaign)` group, whose layout 404s a
- * Place.
+ * The Campaign at `/c/<slug>` (ADR 0019). A Place has its own page at
+ * `/p/<slug>`, so a slug here only ever names a Campaign.
  */
 export const load: LayoutServerLoad = async ({ params, url, cookies, depends }) => {
 	const slug = params.campaign;
 
 	// Admin edits this copy in real time, so it needs a key an invalidation can
-	// target rather than relying on a full reload. The directory key covers the
-	// Place branch, which is the same list as the site root.
+	// target rather than relying on a full reload.
 	depends('civicos:conversation');
-	depends('civicos:directory');
 
 	// This runs server-side rather than in a universal load because that one
 	// returns the api client, which cannot be serialized, so SvelteKit re-runs
@@ -59,8 +47,7 @@ export const load: LayoutServerLoad = async ({ params, url, cookies, depends }) 
 	// site through the host-session cookie. Comhairle answers it for anyone
 	// with Read on the Conversation, so co-hosts can preview as well.
 	let preview = false;
-	const hostToken = cookies.get(HOST_SESSION_COOKIE);
-	const hostApi = hostToken ? serverApi(url, hostToken) : null;
+	const hostApi = hostSessionApi(url, cookies.get(HOST_SESSION_COOKIE));
 
 	let conversation: ResolvedConversation | null = null;
 	for (const candidate of campaignCandidates(slug)) {
@@ -85,30 +72,21 @@ export const load: LayoutServerLoad = async ({ params, url, cookies, depends }) 
 		}
 	}
 
-	// A slug naming no Campaign may still name a Place. The exception is a
-	// legacy region: those predate stored Campaigns, so an unreachable backend
-	// must not take Utah or Oregon down with it.
+	// A slug naming no Campaign is a 404. The exception is a legacy region:
+	// those predate stored Campaigns, so an unreachable backend must not take
+	// Utah or Oregon down with it.
 	if (!conversation) {
 		if (!legacyRegionForSlug(slug)) {
 			// A draft answers exactly what an unclaimed slug answers. Saying it exists
 			// but is not live would leak that the slug is taken to anyone who guesses
 			// it; the Host learns this from admin, where the Campaign is theirs to
 			// launch. The log is where the two cases stay distinguishable.
-			if (draft) console.warn(`[Campaign] "${slug}" exists but is not live yet`);
-
-			const directory = await listDirectory(api);
-			const campaigns = directory ? inPlace(directory, slug) : [];
-			const place = campaigns[0]?.place;
-			if (place) {
-				return { kind: 'place' as const, placeName: place.name, campaigns, colorScheme: null };
-			}
-
-			// Checked after `draft` because a 403 is the more definite answer: it came
-			// from a backend that was up and did know this slug. Distinct from a 404
-			// because it is temporary and not the participant's doing. Answering "no
-			// such Campaign" to an outage tells a Host their Campaign was deleted and
-			// invites them to go and re-create it.
-			if (!draft && (unreachable || directory === null)) {
+			if (draft) {
+				console.warn(`[Campaign] "${slug}" exists but is not live yet`);
+			} else if (unreachable) {
+				// Distinct from a 404 because it is temporary and not the participant's
+				// doing. Answering "no such Campaign" to an outage tells a Host their
+				// Campaign was deleted and invites them to go and re-create it.
 				error(503, {
 					message: `We could not reach the service that knows about "${slug}". Try again in a moment.`
 				});
@@ -132,7 +110,6 @@ export const load: LayoutServerLoad = async ({ params, url, cookies, depends }) 
 	const legacyDefaults = campaign.isLegacyRegion ? region : null;
 
 	return {
-		kind: 'campaign' as const,
 		campaign,
 		// Derived from this request, not from `regions.ts`: a stored `shareUrl`
 		// pointed every admin-created Campaign at the USA catch-all.
@@ -157,6 +134,12 @@ export const load: LayoutServerLoad = async ({ params, url, cookies, depends }) 
 		previewAboutYou: preview && hostApi ? await readAboutYou(hostApi, campaign.id) : null
 	};
 };
+
+/** A client on the Host's admin session, when the request carries one. */
+function hostSessionApi(url: URL, hostToken: string | undefined): Api | null {
+	if (!hostToken) return null;
+	return serverApi(url, hostToken);
+}
 
 async function readDraft(hostApi: Api | null, candidate: string) {
 	if (!hostApi) return null;

@@ -1,21 +1,13 @@
 import { redirect } from '@sveltejs/kit';
-import { CAMPAIGN_PAGES, campaignPath } from '@civicos/shared/data/place';
+import { campaignPathFromLegacy } from '$lib/config/legacy-urls';
 import type { RequestHandler } from './$types';
 
 /**
- * Pages that were renamed when the Campaign moved to the root, keyed by their
- * old segment. Anything not here kept its name.
- */
-const RENAMED: Record<string, string> = { contribute: CAMPAIGN_PAGES.poll };
-
-/**
  * The old `/<org>/conversations/<slug>/...` address, which is in emails and
- * shared posts (ADR 0014). Permanent, because the new one is the address for
- * good. The query string goes along so a `?zip_code=` or a utm tag survives.
+ * shared posts (ADR 0014, ADR 0019). Permanent, because the new one is the
+ * address for good. The query string goes along so a `?zip_code=` or a utm tag
+ * survives.
  */
 export const GET: RequestHandler = ({ params, url }) => {
-	const [page = '', ...rest] = params.rest.split('/');
-	const renamed = Object.hasOwn(RENAMED, page) ? RENAMED[page] : page;
-
-	redirect(308, `${campaignPath(params.campaign, renamed, ...rest)}${url.search}`);
+	redirect(308, `${campaignPathFromLegacy(params.campaign, params.rest)}${url.search}`);
 };

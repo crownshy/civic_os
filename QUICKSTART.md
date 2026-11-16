@@ -16,7 +16,7 @@ cp packages/admin/.env.example packages/admin/.env   # only if you run admin
 pnpm dev
 ```
 
-Open <http://localhost:5173>. It redirects to the directory of live conversations. A Place's conversations are at `/<place-slug>`, e.g. <http://localhost:5173/utah>.
+Open <http://localhost:5173>. It redirects to the directory of live conversations. A Place's conversations are at `/p/<place-slug>`, and a Campaign is at `/c/<slug>`, e.g. <http://localhost:5173/c/utah>.
 
 Stop: `Ctrl+C`. Start again: `pnpm dev`. That's it.
 
@@ -42,6 +42,6 @@ Back in this repo:
 pnpm dev
 ```
 
-Open the URL the script prints (`http://localhost:5173/<slug>`), or `http://localhost:5173/` for the directory. Re-seed = re-run script + restart `pnpm dev`.
+Open the URL the script prints (`http://localhost:5173/c/<slug>`), or `http://localhost:5173/` for the directory. Re-seed = re-run script + restart `pnpm dev`.
 
 For deeper stuff (regions, auth, api-client, polis redirect) → [README.md](README.md).
