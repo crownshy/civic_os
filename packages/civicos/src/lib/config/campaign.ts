@@ -113,8 +113,7 @@ export function legacyRegionForSlug(slug: string): RegionConfig | null {
  *
  * The legacy id leads when the slug names a `regions.ts` entry, so `utah` and
  * `oregon` keep resolving to the Campaign they always did even if some other
- * Conversation later takes those slugs. Any other slug is tried as it is: the
- * Place is already part of it (`ai-utah`), so there is nothing to add.
+ * Conversation later takes those slugs. Any other slug is tried as it is.
  */
 export function campaignCandidates(slug: string): string[] {
 	const legacyId = legacyRegionForSlug(slug)?.conversationId ?? null;

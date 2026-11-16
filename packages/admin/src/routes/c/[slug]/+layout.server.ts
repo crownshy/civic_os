@@ -1,7 +1,6 @@
 import { error } from '@sveltejs/kit';
 import type { Api } from '@civicos/shared/api';
 import { findByRouteSlug, participantBase, regionFor } from '$lib/conversations';
-import { placeForCampaign } from '$lib/config/place';
 import { hasLivePoll, polisConfigFor } from '$lib/polis-step';
 import { ensureDefaultDemographicQuestions } from '$lib/api/demographics';
 import {
@@ -149,17 +148,9 @@ export const load: LayoutServerLoad = async ({ params, parent, locals, depends }
 		slug: summary.slug,
 		title: conversation?.title ?? summary.title,
 		status: summary.status,
-		// Where this Campaign runs, and so the Place page it is listed on. Stored
-		// on the Conversation's metadata and editable on Setup; a legacy region
-		// entry is the fallback. The list resolves the same thing in `toSummary`,
-		// so this and the dashboard agree.
-		place: placeForCampaign(conversation?.metadata, region),
-		// The states, counties and cities it runs in, picked on Setup (#514).
+		// The states, counties and cities it runs in, picked on Setup (#514). The
+		// Place pages it is listed on follow from these (ADR 0017).
 		areas: readAreas(conversation?.metadata),
-		// Utah and Oregon predate place-scoped slugs and their slugs are pinned by
-		// `regions.ts`. Setup must never auto-rename one off the back of a Place
-		// edit: the many-to-many scheme is for new Campaigns (ADR 0007).
-		isLegacyRegion: !!region,
 		shareUrl: summary.shareUrl,
 		// Why there is no link, when there is none. A Campaign no longer needs a
 		// Place to have an address, so "publish it somewhere" stopped being the

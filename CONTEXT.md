@@ -15,7 +15,8 @@ the API and the frontend does not use any of it yet.
 Three things still block a Region from backing a Place directly (ADR 0006):
 it has **no URL-safe slug**, **nothing links a Conversation to it**, and
 `/regions` and `/region_areas` are **401 to an anonymous caller**, which is
-every participant. So a Place still rides on `Conversation.metadata`.
+every participant. crownshy/comhairle#1826 asks for a Region slug and a public
+read of the live Conversations in a Region, which is what the Place page needs.
 
 _Note_: `RegionDto.name` and `.description` come through the generated client
 typed `z.string().uuid()`. That is a localisation reference leaking into the
@@ -39,11 +40,10 @@ Areas, and one Area can sit under several Places (Deschutes County is in both
 pages it appears on are whichever Places cover any of those Areas. So a Campaign
 spanning Areas in two Places is listed on both, and nobody has to pick one.
 
-**Not yet true in the code.** What ships today is one Place per Campaign, stored
-as `{ slug, name }` on `Conversation.metadata.place`, with no Areas anywhere
-(ADR 0006, ADR 0008). The model above is the agreed direction, waiting on a
-Conversation-to-Area link in comhairle. See the Place & Area tab of the team doc
-for the interim mock.
+**Half true in the code.** A Host picks Areas and never names a Place (ADR 0016,
+ADR 0017). Places as records, made by super users, are #404, and the Place page
+reading them is #579. Until then civicos lists Campaigns by the typed
+`metadata.place` that older Campaigns still carry.
 
 ### Area
 **The actual geography a Campaign runs in.** A Campaign is attached to one or
@@ -162,17 +162,14 @@ comhairle model. `Campaign ↔ Conversation` mirrors `Host ↔ Organization` and
 Areas are where it actually runs; the **Places** it is listed under are derived
 from them. One poll across all of a Campaign's Areas, not one poll per Area.
 
-**What ships today is narrower**: exactly one Place, no Areas at all (ADR 0008).
-That ADR is the accurate description of the code and is now out of step with the
-agreed model above; it needs superseding rather than quiet contradiction. Utah
-and Oregon are two Campaigns under the shipped rule, and would be one Campaign
-over two Areas under the new one.
+Admin works this way since ADR 0017: a Host picks Areas on the map, and nothing
+writes a Place onto the Campaign. Utah and Oregon are still two Campaigns from
+before that.
 
-The Conversation behind a Campaign is slugged `<campaign>-<place>` (`ai-utah`),
-derived automatically when the Place is saved. Under the Area model a derived
-Place cannot supply that suffix, so the slug scheme is an open question (ADR
-0007). The participant URL is `/<conversation-slug>` on one host (ADR 0014), so
-a Campaign has a participant site from the moment it is created.
+The Conversation slug is what the Host typed, with no Place in it (ADR 0017).
+Older Campaigns keep their `<campaign>-<place>` slugs (`ai-utah`), since those are
+live links. The participant URL is `/<conversation-slug>` on one host (ADR 0014),
+so a Campaign has a participant site from the moment it is created.
 
 **A Campaign has exactly one Polis step.** comhairle's model is more general: a
 Conversation runs a workflow of many steps (`polis`, `learn`, `heyform`,

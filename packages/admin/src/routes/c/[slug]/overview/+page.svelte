@@ -26,7 +26,6 @@
 	import ParticipantAsksCard from '$lib/components/setup/ParticipantAsksCard.svelte';
 	import { readColorScheme } from '@civicos/shared/data/color-scheme';
 	import { writeMetadata, type MetadataWrites } from '@civicos/shared/data/metadata';
-	import { readOrg } from '@civicos/shared/data/place';
 	import { readFaqs, toFaqsHtml, type FaqEntry } from '@civicos/shared/data/faq';
 	import type { CustomDemographicCategory } from '@civicos/shared/data/demographics';
 	import {
@@ -34,8 +33,7 @@
 		type AskKey,
 		type AskToggles
 	} from '@civicos/shared/data/participant-asks';
-	import { placeFromName, rescopedSlug, toPlaceSlug } from '$lib/config/place';
-	import { RESERVED_ROUTE_SLUGS, routeSlugFor, slugTakenMessage } from '$lib/conversations';
+	import { routeSlugFor, slugTakenMessage } from '$lib/conversations';
 	import ContextCard from './ContextCard.svelte';
 	import RichTextEditor from '$lib/components/RichTextEditor.svelte';
 	import { shortDescriptionFrom } from '$lib/utils/rich-text';
@@ -57,8 +55,7 @@
 	const baseUrl = $derived(
 		campaign.shareUrl?.replace(/^https?:\/\//, '').replace(/\/.*$/, '') ?? ''
 	);
-	const places = $derived(campaign.place ? [campaign.place.name] : []);
-	const areaNames = $derived(campaign.areas.map((area) => area.name).join(', '));
+	const areaNames = $derived(campaign.areas.map((area) => area.name));
 	let areasOpen = $state(false);
 
 	// Live co-hosts: the owning host (Admin badge) plus organizations granted the
@@ -98,33 +95,29 @@
 	type DebouncedField = 'title' | 'description' | 'thankYouMessage' | 'keyQuestion';
 	const DEBOUNCED_FIELDS = ['title', 'description', 'thankYouMessage', 'keyQuestion'] as const;
 	type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
-	// Everything the status line speaks for. `place` is not a form field, but it
-	// shares the indicator, so it shares the bookkeeping.
 	type FormField = DebouncedField | 'slug';
-	type StatusField = FormField | 'place';
 	let saveStatus = $state<SaveStatus>('idle');
 	let debounce: ReturnType<typeof setTimeout> | undefined;
 
-	const FIELD_LABELS: Record<StatusField, string> = {
+	const FIELD_LABELS: Record<FormField, string> = {
 		title: 'Title',
 		description: 'Description',
 		thankYouMessage: 'What Happens Next',
 		keyQuestion: 'Key Question',
-		slug: 'Slug',
-		place: 'Place'
+		slug: 'Slug'
 	};
 
 	// Which fields are currently unsaved, rather than a rendered message, so that
 	// fixing one failure does not clear the indicator for another still standing,
 	// and so a field typed back to its saved value stops being complained about.
 	// The field itself carries the reason; the status line names the field.
-	let failedFields = $state<StatusField[]>([]);
+	let failedFields = $state<FormField[]>([]);
 
 	/**
 	 * Record the outcome of an attempt on `keys`, `failed` being the subset that
 	 * did not save. `ok` is the status to show when nothing is left failing.
 	 */
-	function settle(keys: StatusField[], failed: StatusField[], ok: SaveStatus = 'saved') {
+	function settle(keys: FormField[], failed: FormField[], ok: SaveStatus = 'saved') {
 		failedFields = [...failedFields.filter((k) => !keys.includes(k)), ...failed];
 		saveStatus = failedFields.length ? 'error' : ok;
 	}
@@ -439,7 +432,7 @@
 
 	/**
 	 * INTERIM STORAGE (#363/#364). Participant asks, the colour scheme and the
-	 * Place have no backend fields yet, so they live in `conversation.metadata`
+	 * areas have no backend fields yet, so they live in `conversation.metadata`
 	 * until comhairle promotes them. Demographics moved to real
 	 * ConversationDemographics links (#441).
 	 *
@@ -545,141 +538,6 @@
 		return write;
 	}
 
-	// --- Place -----------------------------------------------------------------
-	// A fourth destination, and the reason it sits outside the superform above:
-	// a Place is not a Conversation field at all, it is `metadata.place`, written
-	// through `writeMetadata` like the asks and the colour scheme.
-	//
-	// The Host types a name; the slug is derived from it, never typed, because it
-	// is a URL segment and the two must not drift. That does mean renaming a Place
-	// moves the Campaign to another Place page and rescopes its slug, which is why
-	// the resulting address is shown under the field instead of being computed
-	// silently (ADR 0011).
-	let placeName = $state(untrack(() => data.campaign.place?.name ?? ''));
-	let savedPlaceName = $state(untrack(() => data.campaign.place?.name ?? ''));
-	let placeError = $state<string | null>(null);
-
-	// Two different facts, and conflating them is a lie: the slug the Campaign is
-	// *currently* listed under is whatever was stored, which need not match what
-	// this name derives to (the dev seed stores `dundee` for "Dundee, Scotland").
-	// So the line under the field reports the stored slug until the name is
-	// edited, and only then previews where saving would move it.
-	const storedPlaceSlug = $derived(campaign.place?.slug ?? '');
-	const nextPlaceSlug = $derived(placeFromName(placeName)?.slug ?? '');
-	const placeMoves = $derived(
-		placeName.trim() !== savedPlaceName && !!nextPlaceSlug && nextPlaceSlug !== storedPlaceSlug
-	);
-
-	async function savePlace() {
-		const next = placeName.trim();
-		if (next === savedPlaceName) return;
-
-		// Clearing the field unpublishes the Campaign from its Place rather than
-		// storing a blank one. It drops off that Place's page, and its slug loses
-		// the Place suffix, so this is a real action, not a no-op.
-		const place = next === '' ? null : placeFromName(next);
-		if (next !== '' && !place) {
-			placeError = 'The name needs at least one letter or number.';
-			settle(['place'], ['place']);
-			return;
-		}
-
-		// The poll and the Host go on the public payload alongside the Place, both
-		// for the same reason: civicos reads them anonymously and the endpoints
-		// that own them (the Polis step, `/organizations`) are 401 to it. Without
-		// the poll a Campaign renders but sends its participants to whichever poll
-		// `regions.ts` guesses from their zip.
-		//
-		// Neither is cleared when the Place is. Clearing a Place unpublishes the
-		// Campaign from that subdomain; it does not stop it being served, because a
-		// Campaign with no Place is served from the apex. Wiping these would break
-		// a Campaign that is still perfectly reachable.
-		//
-		// The Host is written only when none is stored. `mirrorHosts` owns it and
-		// stores the Host's url too, which a name-only object here used to drop.
-		const poll = campaign.pollIdentity;
-		const org =
-			campaign.hostName && !readOrg(conversation?.metadata)
-				? { slug: toPlaceSlug(campaign.hostName), name: campaign.hostName }
-				: null;
-
-		placeError = null;
-		saveStatus = 'saving';
-		// Read before the write: `patchMetadata` invalidates, so `storedPlaceSlug`
-		// is the *new* Place by the time the rescope runs, and stripping the new
-		// suffix off would leave the old one in place (`ai-utah-oregon`).
-		const previousPlaceSlug = storedPlaceSlug;
-		try {
-			await patchMetadata({ place, ...(poll ? { poll } : {}), ...(org ? { org } : {}) });
-			savedPlaceName = next;
-			await rescopeSlug(previousPlaceSlug, place?.slug ?? '');
-			settle(['place'], []);
-			// Not an error: the Place saved. But the Campaign cannot be served until
-			// it has a Polis step, so say that here rather than let it 404 quietly.
-			placeError = place && !poll ? 'Published, but this Campaign has no Polis poll yet.' : null;
-		} catch (e) {
-			console.error('Failed to save the place', e);
-			// A 409 is the rescope, not the Place: a Place lives in metadata and
-			// cannot clash, the slug it scopes can. The Place is already stored by
-			// then, so say what did not follow rather than "could not save".
-			placeError =
-				apiStatus(e) === 409
-					? `The Place was saved, but the slug could not follow it. ${slugTakenMessage(
-							rescopedSlug(saved.slug, previousPlaceSlug, place?.slug ?? '')
-						)}`
-					: `Could not save: ${describeApiFailure(e)}`;
-			settle(['place'], ['place']);
-		}
-	}
-
-	/**
-	 * Keep the Conversation slug scoped to the Place it now runs in.
-	 *
-	 * A Campaign runs in many Places and each pair is its own Conversation, so
-	 * those Conversations are slugged `<campaign>-<place>`: that is what keeps
-	 * `/ai-utah` and `/ai-oregon` two addresses (ADR 0014). The Host never types
-	 * it. They name a Place, and the slug follows. The slug is the public URL, so a link shared before a Place edit
-	 * stops resolving after it.
-	 *
-	 * The old Place's suffix is stripped before the new one is applied, so moving
-	 * Utah to Oregon gives `ai-oregon` rather than `ai-utah-oregon`. Clearing the
-	 * Place strips back to the bare Campaign slug.
-	 *
-	 * Legacy regions are exempt. Utah and Oregon predate this and their slugs are
-	 * pinned in `regions.ts`; renaming one because someone edited its Place would
-	 * move a live public URL.
-	 */
-	async function rescopeSlug(previousPlaceSlug: string, placeSlug: string) {
-		if (campaign.isLegacyRegion) return;
-
-		const current = saved.slug;
-		const wanted = rescopedSlug(current, previousPlaceSlug, placeSlug);
-
-		if (!wanted || wanted === current) return;
-		if (RESERVED_ROUTE_SLUGS.includes(wanted as never)) return;
-
-		await data.api.UpdateConversation(
-			{ slug: wanted },
-			{ params: { conversation_id: campaign.id } }
-		);
-
-		saved.slug = wanted;
-		$formData.slug = wanted;
-
-		// Same move as `saveSlug`: the rename can change the `/c/<slug>` segment
-		// this page is open at, so follow it or a refresh 404s on the old one.
-		const from = page.params.slug;
-		const to = routeSlugFor({ id: campaign.id, slug: wanted });
-		if (to !== from) {
-			await goto(resolve('/c/[slug]/overview', { slug: to }), {
-				replaceState: true,
-				invalidateAll: true
-			});
-		} else {
-			await invalidate('app:conversations');
-		}
-	}
-
 	// --- Delete ----------------------------------------------------------------
 	let deleteOpen = $state(false);
 	let deleting = $state(false);
@@ -773,38 +631,18 @@
 	</Form.Field>
 {/snippet}
 
-{#snippet placeField()}
-	<div class="flex min-h-9 flex-col gap-1.5">
-		<input
-			bind:value={placeName}
-			maxlength={TEXT_LIMITS.placeName}
-			onblur={savePlace}
-			onkeydown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
-			aria-label="Place"
-			aria-invalid={placeError ? 'true' : undefined}
-			placeholder="e.g. Dundee, Scotland"
-			class="field-sizing-content min-w-40 rounded-[10px] border border-stone-300 bg-muted px-3 py-1.5 text-body font-semibold focus:border-primary focus:outline-none"
-		/>
-		<CharCount count={placeName.length} limit={TEXT_LIMITS.placeName} class="text-left" />
-		{#if placeError}
-			<p class="text-caption text-destructive">{placeError}</p>
-		{:else if placeMoves}
-			<p class="text-caption text-muted-foreground">
-				Will be listed at {baseUrl}/{nextPlaceSlug}
-			</p>
-		{:else if storedPlaceSlug}
-			<p class="text-caption text-muted-foreground">
-				Listed at {baseUrl}/{storedPlaceSlug}
-			</p>
-		{/if}
-		<div class="flex flex-wrap items-center gap-x-2 text-caption">
-			<span class={areaNames ? 'text-foreground' : 'text-muted-foreground'}>
-				{areaNames ? `Covers ${areaNames}` : 'No areas picked yet'}
+{#snippet areasField()}
+	<div class="flex min-h-9 flex-wrap items-center gap-2">
+		{#each campaign.areas as area (area.geoid)}
+			<span class="rounded-[10px] bg-primary/5 px-2.5 py-1.5 text-caption font-medium text-primary">
+				{area.name}
 			</span>
-			<Button variant="link" size="sm" class="h-auto p-0" onclick={() => (areasOpen = true)}>
-				{areaNames ? 'Edit areas' : 'Pick areas'}
-			</Button>
-		</div>
+		{:else}
+			<span class="text-body text-muted-foreground">No areas picked yet</span>
+		{/each}
+		<Button variant="link" size="sm" class="h-auto p-0" onclick={() => (areasOpen = true)}>
+			{areaNames.length ? 'Edit areas' : 'Pick areas'}
+		</Button>
 	</div>
 {/snippet}
 
@@ -877,17 +715,17 @@
 			{baseUrl}
 			{slug}
 			keyQuestion={campaign.keyQuestion}
-			{places}
+			areas={areaNames}
 			{titleField}
 			{slugField}
 			{keyQuestionField}
-			{placeField}
+			{areasField}
 			{colorSchemeId}
 			onSelectColorScheme={selectColorScheme}
 		/>
 
-		<!-- The areas a Place covers (#514), opened from the Place field. -->
-		<AreasDialog bind:open={areasOpen} placeName={campaign.place?.name ?? ''}>
+		<!-- Where the Campaign runs (#514), opened from the Identity card. -->
+		<AreasDialog bind:open={areasOpen}>
 			<AreasPicker areas={campaign.areas} onSave={(areas) => patchMetadata({ areas })} />
 		</AreasDialog>
 

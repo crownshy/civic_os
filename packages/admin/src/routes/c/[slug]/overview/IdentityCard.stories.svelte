@@ -11,7 +11,7 @@
 			baseUrl: 'oregon.bloomproject.us',
 			slug: 'ai',
 			keyQuestion: 'How should Central Oregon manage the changes that are coming with AI?',
-			places: ['Oregon']
+			areas: ['Oregon']
 		}
 	});
 </script>
@@ -19,13 +19,13 @@
 <Story name="Default" />
 
 <Story
-	name="Multiple places"
-	args={{ places: ['Prineville', 'Deschutes County', 'Jefferson County'] }}
+	name="Several areas"
+	args={{ areas: ['Prineville', 'Deschutes County', 'Jefferson County'] }}
 />
 
-<!-- A Campaign nobody has given a Place yet still shows the slot rather than
-     collapsing the row. civicos 404s this one (ADR 0007). -->
-<Story name="No places" args={{ places: [] }} />
+<!-- A Campaign with no areas yet still shows the slot rather than collapsing
+     the row. -->
+<Story name="No areas" args={{ areas: [] }} />
 
 <!-- With no `colorSchemeId` (every other story here) nothing is ringed, which is
      the honest rendering of a Campaign nobody has picked a scheme for. -->
@@ -48,7 +48,7 @@
 -->
 <Story name="Editable">
 	{#snippet template(args)}
-		<IdentityCard {...args} {titleField} {slugField} {keyQuestionField} {placeField} />
+		<IdentityCard {...args} {titleField} {slugField} {keyQuestionField} {areasField} />
 	{/snippet}
 </Story>
 
@@ -69,20 +69,14 @@
 	</div>
 {/snippet}
 
-<!--
-	The Place field on its own, with the derived Place page address under it. The Host
-	types a name and the slug follows from it, so this line is the only place the
-	consequence of a rename is visible before it happens.
--->
-{#snippet placeField()}
-	<div class="flex min-h-9 flex-col gap-1.5">
-		<input
-			value="Dundee, Scotland"
-			aria-label="Place"
-			placeholder="e.g. Dundee, Scotland"
-			class="field-sizing-content min-w-40 rounded-[10px] border border-stone-300 bg-muted px-3 py-1.5 text-body font-semibold focus:border-primary focus:outline-none"
-		/>
-		<p class="text-caption text-muted-foreground">Served from dundee-scotland.bloomproject.us</p>
+{#snippet areasField()}
+	<div class="flex min-h-9 flex-wrap items-center gap-2">
+		<span class="rounded-[10px] bg-primary/5 px-2.5 py-1.5 text-caption font-medium text-primary">
+			Deschutes County
+		</span>
+		<button type="button" class="text-caption text-primary underline-offset-4 hover:underline">
+			Edit areas
+		</button>
 	</div>
 {/snippet}
 

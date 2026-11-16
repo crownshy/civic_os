@@ -13,16 +13,16 @@
 		baseUrl: string;
 		slug: string;
 		keyQuestion: string;
-		/** Place names shown as chips, e.g. ["Oregon"]. */
-		places: string[];
+		/** Names of the areas it runs in, shown as chips, e.g. ["Deschutes County"]. */
+		areas: string[];
 		/** When provided, replaces the read-only title with an editable field. */
 		titleField?: Snippet;
 		/** When provided, replaces the read-only slug with an editable field. */
 		slugField?: Snippet;
 		/** When provided, replaces the read-only key question with an editable field. */
 		keyQuestionField?: Snippet;
-		/** When provided, replaces the read-only place chips with an editable field. */
-		placeField?: Snippet;
+		/** When provided, replaces the read-only area chips with an editable field. */
+		areasField?: Snippet;
 		/**
 		 * Id of the stored Color Scheme. Null when none has been picked, and then no
 		 * swatch is ringed even though participants see Green.
@@ -37,11 +37,11 @@
 		baseUrl,
 		slug,
 		keyQuestion,
-		places,
+		areas,
 		titleField,
 		slugField,
 		keyQuestionField,
-		placeField,
+		areasField,
 		colorSchemeId = null,
 		onSelectColorScheme
 	}: Props = $props();
@@ -101,17 +101,17 @@
 			</SetupField>
 
 			<!-- Always rendered, so the row keeps its shape on a Campaign with no
-			     places yet. -->
-			<SetupField label="Place(s)">
-				{#if placeField}
-					{@render placeField()}
+			     areas yet. -->
+			<SetupField label="Where it runs">
+				{#if areasField}
+					{@render areasField()}
 				{:else}
 					<div class="flex min-h-9 flex-wrap items-center gap-2">
-						{#each places as place (place)}
+						{#each areas as area, index (index)}
 							<span
 								class="rounded-[10px] bg-primary/5 px-2.5 py-1.5 text-caption font-medium text-primary"
 							>
-								{place}
+								{area}
 							</span>
 						{:else}
 							<span class="text-body text-muted-foreground">None yet</span>

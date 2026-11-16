@@ -1,5 +1,9 @@
 # One Campaign, one Place, one Poll
 
+> **Superseded by [ADR 0017](0017-a-campaign-picks-areas-not-a-place.md).** A
+> Campaign now picks areas and the Places it is listed on follow from them. The
+> one-poll rule stands.
+
 A Campaign runs in exactly one Place and has exactly one poll. The three are
 1:1:1, and `Conversation.metadata.place` holds a single Place object, not a list.
 

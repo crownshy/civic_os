@@ -2,9 +2,8 @@ import { fail, redirect } from '@sveltejs/kit';
 import { superValidate, message, setError } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import type { Api } from '@civicos/shared/api';
-import { placeFromName, type CampaignPoll } from '@civicos/shared/data/place';
+import type { CampaignPoll } from '@civicos/shared/data/place';
 import { writeMetadata } from '@civicos/shared/data/metadata';
-import { rescopedSlug } from '$lib/config/place';
 import { apiStatus, describeApiFailure } from '$lib/api/describe-failure';
 import { enableDefaultDemographics } from '$lib/api/demographics';
 import { polisConfigFor } from '$lib/polis-step';
@@ -14,7 +13,7 @@ import { shortDescriptionFrom } from '$lib/utils/rich-text';
 import { participantBase, slugTakenMessage } from '$lib/conversations';
 import type { PickerOrg } from '$lib/components/setup/AddCoHostsDialog.svelte';
 import { ownableHosts } from '$lib/host-access';
-import { createConversationSchema, PLACE_NAME_UNREADABLE } from './create-conversation-schema';
+import { createConversationSchema } from './create-conversation-schema';
 import type { Actions, PageServerLoad } from './$types';
 
 /** The half of a created workflow step `pollIdentity` reads. */
@@ -60,7 +59,7 @@ export const load: PageServerLoad = async ({ locals, depends }) => {
 	const form = await superValidate(zod4(createConversationSchema));
 	form.data.hostId = defaultHostId;
 
-	// Only to preview the Place page the typed Place will be listed on. Empty on a
+	// Only to preview the address the Conversation will open at. Empty on a
 	// deployment with no participant host configured, where the form says nothing
 	// rather than guessing a domain.
 	const baseDomain = participantBase()
@@ -88,7 +87,6 @@ export const actions: Actions = {
 		// Trimmed here rather than in the schema; see `limitedText`.
 		const title = form.data.title.trim();
 		const keyQuestion = form.data.keyQuestion.trim();
-		const placeName = form.data.placeName.trim();
 		const description = form.data.description.trim();
 
 		const refuse = (text: string) => message(form, { kind: 'error', text }, { status: 400 });
@@ -118,24 +116,13 @@ export const actions: Actions = {
 			);
 		}
 
-		// The Place, and the Conversation slug it scopes. A Campaign runs in many
-		// Places and each pair is its own Conversation, so the Conversations are
-		// slugged `<campaign>-<place>` (ADR 0007); the Host types a Campaign slug
-		// and this follows, the same rule Setup applies when the Place changes.
-		// `rescopedSlug` is idempotent, so a slug already ending in the Place ("ai-utah"
-		// in Utah) is left alone rather than doubled.
-		const place = placeName ? placeFromName(placeName) : null;
-		if (placeName && !place) return setError(form, 'placeName', PLACE_NAME_UNREADABLE);
-
-		const conversationSlug = rescopedSlug(slug, '', place?.slug ?? '');
-
 		// 1. The Conversation. Starts as a draft (is_live false) so the Campaign can
 		//    be set up before anyone can reach the poll.
 		let conversationId: string;
 		try {
 			const conversation = await api.CreateConversation({
 				title,
-				slug: conversationSlug,
+				slug,
 				description,
 				short_description: shortDescriptionFrom(description),
 				primary_locale: 'en',
@@ -150,12 +137,7 @@ export const actions: Actions = {
 			// taken. The Host typed a title and let the slug follow it, so the fix is
 			// on the slug field: say so there rather than reporting a status.
 			if (apiStatus(e) === 409) {
-				return setError(
-					form,
-					'slug',
-					slugTakenMessage(conversationSlug, conversationSlug === slug ? undefined : place?.name),
-					{ status: 400 }
-				);
+				return setError(form, 'slug', slugTakenMessage(slug), { status: 400 });
 			}
 			console.error('CreateConversation failed', e);
 			return refuse(`Could not create the conversation: ${describeApiFailure(e)}`);
@@ -173,7 +155,7 @@ export const actions: Actions = {
 			} catch (e) {
 				console.error('Rollback DeleteConversation failed', e);
 				return refuse(
-					`${text} A partly-created conversation was left behind; ask an admin to remove "${conversationSlug}".`
+					`${text} A partly-created conversation was left behind; ask an admin to remove "${slug}".`
 				);
 			}
 			return refuse(text);
@@ -281,8 +263,8 @@ export const actions: Actions = {
 		}
 
 		// 6. Mirror the three things the participant app cannot read for itself.
-		//    A Campaign is reachable at `<base>/<slug>` from the moment it exists
-		//    (a Place only lists it on a Place page), so what its page needs
+		//    A Campaign is reachable at `<base>/<slug>` from the moment it exists,
+		//    so what its page needs
 		//    belongs on the public payload now rather than at publish time: `metadata.org` because `/organizations` is 401 to the
 		//    participant app, `metadata.poll` because the Polis step is too, and
 		//    `metadata.cohosts` because a co-host is a permission grant and
@@ -294,15 +276,14 @@ export const actions: Actions = {
 		//    Going live mirrors the poll again, so a failure here is recoverable.
 		const poll = pollIdentity(polisStep, keyQuestion);
 		const areas = form.data.areas;
-		if (poll || place || areas.length > 0) {
+		if (poll || areas.length > 0) {
 			try {
 				await writeMetadata(api, conversationId, {
 					...(poll ? { poll } : {}),
-					...(place ? { place } : {}),
 					...(areas.length > 0 ? { areas } : {})
 				});
 			} catch (e) {
-				console.error('Mirroring poll / place / areas into metadata failed', e);
+				console.error('Mirroring poll / areas into metadata failed', e);
 			}
 		}
 
@@ -314,7 +295,7 @@ export const actions: Actions = {
 
 		// Setup's Co-Hosts card says so, since this page is gone by then.
 		const warn = grantFailed || !mirrored ? '?cohosts=failed' : '';
-		redirect(303, `/c/${conversationSlug}/overview${warn}`);
+		redirect(303, `/c/${slug}/overview${warn}`);
 	}
 };
 
