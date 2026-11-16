@@ -1,13 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { REGIONS } from '@civicos/shared/data/regions';
-import {
-	campaignSlugFrom,
-	conversationSlugFor,
-	placeForConversation,
-	placeFromRegion,
-	readPlace,
-	readPoll
-} from './place';
+import { placeForConversation, placeFromRegion, readPlace, readPoll } from './place';
 import { readCoHosts, readOrg } from '@civicos/shared/data/place';
 import type { RegionConfig } from './regions';
 
@@ -92,51 +85,6 @@ describe('placeForConversation', () => {
 
 		expect(placeForConversation(utah.conversationId, {})?.slug).toBe(utah.slug);
 		expect(placeForConversation(oregon.conversationId, {})?.slug).toBe(oregon.slug);
-	});
-});
-
-describe('conversationSlugFor', () => {
-	it('appends the place so each campaign-place pair gets its own slug', () => {
-		expect(conversationSlugFor('ai', 'utah')).toBe('ai-utah');
-		expect(conversationSlugFor('ai', 'central-oregon')).toBe('ai-central-oregon');
-	});
-
-	it('leaves the slug alone when there is no place to scope it by', () => {
-		expect(conversationSlugFor('ai', '')).toBe('ai');
-		expect(conversationSlugFor('ai', '   ')).toBe('ai');
-	});
-
-	it('does not repeat a place that is already the campaign slug', () => {
-		expect(conversationSlugFor('utah', 'utah')).toBe('utah');
-	});
-
-	it('is empty without a campaign slug, rather than inventing one from the place', () => {
-		expect(conversationSlugFor('', 'utah')).toBe('');
-	});
-});
-
-describe('campaignSlugFrom', () => {
-	const places = ['utah', 'oregon', 'central-oregon', 'all'];
-
-	it('strips a known place suffix', () => {
-		expect(campaignSlugFrom('ai-utah', places)).toBe('ai');
-	});
-
-	it('prefers the longest matching place, so a nested slug is not mis-split', () => {
-		// Splitting on the last hyphen would answer "ai-central", which is why
-		// this matches against known places instead of parsing the string.
-		expect(campaignSlugFrom('ai-central-oregon', places)).toBe('ai');
-	});
-
-	it('leaves a slug carrying no known place alone', () => {
-		expect(campaignSlugFrom('ai-in-dundee', places)).toBe('ai-in-dundee');
-		expect(campaignSlugFrom('ai', places)).toBe('ai');
-	});
-
-	it('groups a campaign back together across its places', () => {
-		const slugs = ['ai-utah', 'ai-oregon', 'ai-all'];
-
-		expect(new Set(slugs.map((s) => campaignSlugFrom(s, places)))).toEqual(new Set(['ai']));
 	});
 });
 

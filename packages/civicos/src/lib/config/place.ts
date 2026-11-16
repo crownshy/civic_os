@@ -17,8 +17,6 @@ export {
 	PLACE_METADATA_KEY,
 	toPlaceSlug,
 	placeFromName,
-	conversationSlugFor,
-	campaignSlugFrom,
 	readPoll,
 	POLL_METADATA_KEY
 } from '@civicos/shared/data/place';

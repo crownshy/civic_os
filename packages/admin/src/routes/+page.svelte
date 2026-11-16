@@ -84,8 +84,10 @@
 
 							<div class="min-w-0 flex-1">
 								<p class="truncate text-body leading-snug font-semibold">{conv.title}</p>
-								{#if conv.placeName}
-									<p class="mt-0.5 text-body text-muted-foreground">{conv.placeName}</p>
+								{#if conv.areaNames.length}
+									<p class="mt-0.5 truncate text-body text-muted-foreground">
+										{conv.areaNames.join(', ')}
+									</p>
 								{/if}
 							</div>
 

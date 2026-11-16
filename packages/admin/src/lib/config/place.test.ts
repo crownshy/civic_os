@@ -1,14 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { REGIONS, type RegionConfig } from '@civicos/shared/data/regions';
-import { placeForCampaign, placeFromName, rescopedSlug, toPlaceSlug } from './place';
 import {
 	CAMPAIGN_PAGES,
 	campaignPath,
 	participantUrl,
-	placePath
+	placeFromName,
+	placePath,
+	toPlaceSlug
 } from '@civicos/shared/data/place';
-
-const oregon = REGIONS.oregon as RegionConfig;
 
 describe('toPlaceSlug', () => {
 	it('turns a display name into a DNS label', () => {
@@ -53,67 +51,13 @@ describe('placeFromName', () => {
 	});
 });
 
-describe('placeForCampaign', () => {
-	it('prefers what the Conversation stores', () => {
-		const place = placeForCampaign({ place: { slug: 'dundee', name: 'Dundee' } }, oregon);
-
-		expect(place).toEqual({ slug: 'dundee', name: 'Dundee' });
-	});
-
-	it('falls back to the legacy region so Utah and Oregon keep their chip', () => {
-		expect(placeForCampaign({}, oregon)).toEqual({
-			slug: oregon.slug,
-			name: oregon.stateName
-		});
-	});
-
-	it('is null for a backend-only Campaign that has not been given one', () => {
-		expect(placeForCampaign({}, null)).toBeNull();
-		expect(placeForCampaign(undefined, null)).toBeNull();
-	});
-
-	it('ignores a malformed stored place rather than rendering half of one', () => {
-		expect(placeForCampaign({ place: { slug: 'dundee' } }, oregon)?.slug).toBe(oregon.slug);
-	});
-});
-
-describe('rescopedSlug', () => {
-	it('scopes a bare slug to the Place it was just given', () => {
-		expect(rescopedSlug('ai', '', 'utah')).toBe('ai-utah');
-	});
-
-	it('swaps one Place suffix for another instead of stacking them', () => {
-		expect(rescopedSlug('ai-utah', 'utah', 'oregon')).toBe('ai-oregon');
-	});
-
-	it('strips back to the Campaign slug when the Place is cleared', () => {
-		expect(rescopedSlug('ai-utah', 'utah', '')).toBe('ai');
-	});
-
-	it('is a no-op when the Place has not moved', () => {
-		expect(rescopedSlug('ai-utah', 'utah', 'utah')).toBe('ai-utah');
-	});
-
-	it('handles a multi-word Place without mis-splitting the campaign', () => {
-		expect(rescopedSlug('ai-central-oregon', 'central-oregon', 'utah')).toBe('ai-utah');
-	});
-
-	it('is idempotent on a slug that already ends in the new Place', () => {
-		// Setting Place = Dundee on a Conversation slugged `ai-in-dundee` must not
-		// double the name up.
-		expect(rescopedSlug('ai-in-dundee', '', 'dundee')).toBe('ai-in-dundee');
-		expect(rescopedSlug('ai-utah', '', 'utah')).toBe('ai-utah');
-	});
-});
-
 describe('participantUrl', () => {
 	it('builds the ADR 0014 address: the conversation slug off the root', () => {
 		expect(participantUrl('ai-utah', 'bloomproject.us')).toBe('https://bloomproject.us/ai-utah');
 	});
 
 	it('serves every Campaign from the configured host, with no Place label', () => {
-		// The Place is already in the Conversation slug. A subdomain per Place
-		// needed a certificate and a Polis allowlist entry each.
+		// A subdomain per Place needed a certificate and a Polis allowlist entry each.
 		expect(new URL(participantUrl('ai-utah', 'stage.bloomproject.us')).host).toBe(
 			'stage.bloomproject.us'
 		);

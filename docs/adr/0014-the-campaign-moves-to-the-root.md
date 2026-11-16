@@ -1,5 +1,8 @@
 # The Campaign moves to the root
 
+> **The Place suffix on slugs is dropped by [ADR 0017](0017-a-campaign-picks-areas-not-a-place.md).**
+> A new Campaign's slug is what the Host typed. The URL shape stands.
+
 Participant URLs no longer carry the Host. Each Campaign lives one segment off
 the root:
 

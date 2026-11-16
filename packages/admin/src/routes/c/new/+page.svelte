@@ -10,7 +10,6 @@
 	import { ArrowLeft, AlertCircle, ChevronDown, Plus, X } from '@lucide/svelte';
 	import { resolve } from '$app/paths';
 	import AddCoHostsDialog from '$lib/components/setup/AddCoHostsDialog.svelte';
-	import { placeFromName, rescopedSlug } from '$lib/config/place';
 	import PlaceSelector from '$lib/components/place-selector/PlaceSelector.svelte';
 	import AreasDialog from '$lib/components/place-selector/AreasDialog.svelte';
 	import { areasForIds, placeIdOf } from '$lib/components/place-selector/campaign-areas';
@@ -64,11 +63,6 @@
 		if (!slugEdited) $formData.slug = toSlug($formData.title);
 	}
 
-	// The slug the typed Place becomes, shown so the Host can see what
-	// "Dundee, Scotland" turns into before they commit to it. The action derives
-	// the same slug; this only previews it.
-	const placeSlug = $derived(placeFromName($formData.placeName)?.slug ?? '');
-
 	const placeSource = createPlaceSource();
 	const placeGeometrySource = createPlaceGeometrySource();
 	// Names resolve asynchronously, so a slow lookup must not overwrite a newer pick.
@@ -107,12 +101,7 @@
 		$formData.cohostIds = $formData.cohostIds.filter((c) => c !== id);
 	}
 
-	// The address the Conversation will open at once the action scopes the slug
-	// to the Place. Previewed so the Host sees the `-<place>` suffix before it
-	// appears on its own.
-	const conversationUrl = $derived(
-		$formData.slug ? `${data.baseDomain}/${rescopedSlug($formData.slug, '', placeSlug)}` : ''
-	);
+	const conversationUrl = $derived($formData.slug ? `${data.baseDomain}/${$formData.slug}` : '');
 
 	const inputClass =
 		'w-full rounded-[10px] border border-stone-300 bg-transparent px-3 py-2.5 text-body focus:border-primary focus:outline-none';
@@ -253,31 +242,11 @@
 				>
 					<h2 id="section-place" class={sectionHeadingClass}>Where it runs</h2>
 
-					<Form.Field {form} name="placeName" class="space-y-1.5">
-						<Form.Control>
-							{#snippet children({ props })}
-								{@render fieldLabel(
-									'Place',
-									$formData.placeName.length,
-									TEXT_LIMITS.placeName,
-									true
-								)}
-								<p class={helpClass}>
-									The conversation is listed on this Place's page. You can change it later.
-								</p>
-								<input
-									{...props}
-									bind:value={$formData.placeName}
-									maxlength={TEXT_LIMITS.placeName}
-									placeholder="e.g. Dundee, Scotland"
-									class={inputClass}
-								/>
-							{/snippet}
-						</Form.Control>
-						<Form.FieldErrors class={errorClass} />
-						{#if placeSlug}
-							<p class={helpClass}>Listed at {data.baseDomain}/{placeSlug}</p>
-						{/if}
+					<div class="space-y-1.5">
+						<p class={helpClass}>
+							The states, counties and cities it runs in. It is listed on the Place pages that cover
+							them. You can change them later.
+						</p>
 						<div class="flex flex-wrap items-center gap-x-2 text-caption">
 							<span class={areaNames ? 'text-foreground' : 'text-muted-foreground'}>
 								{areaNames ? `Covers ${areaNames}` : 'No areas picked yet'}
@@ -291,9 +260,9 @@
 								{areaNames ? 'Edit areas' : 'Pick areas'}
 							</Button>
 						</div>
-					</Form.Field>
+					</div>
 
-					<AreasDialog bind:open={areasOpen} placeName={$formData.placeName}>
+					<AreasDialog bind:open={areasOpen}>
 						<PlaceSelector
 							source={placeSource}
 							geometrySource={placeGeometrySource}

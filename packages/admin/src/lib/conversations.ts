@@ -18,12 +18,8 @@
 import type { LocalizedConversationDto } from '@crownshy/api-client/api';
 import { REGIONS, type RegionConfig } from '@civicos/shared/data/regions';
 import { pollStatusFor, type PollStatus } from '@civicos/shared/data/poll-status';
-import {
-	PARTICIPANT_RESERVED_SLUGS,
-	participantUrl,
-	readPlace,
-	type Place
-} from '@civicos/shared/data/place';
+import { PARTICIPANT_RESERVED_SLUGS, participantUrl } from '@civicos/shared/data/place';
+import { readAreas } from '@civicos/shared/data/areas';
 import { env } from '$env/dynamic/public';
 
 /**
@@ -42,14 +38,9 @@ export const RESERVED_ROUTE_SLUGS = ['new', ...PARTICIPANT_RESERVED_SLUGS] as co
  * slug is what comhairle uniques, across every Conversation including the ones
  * this Host cannot see. A raw "the server responded 409" sends people looking
  * for a permission problem instead of typing a different slug.
- *
- * `scopedTo` is the Place name when the conflicting slug is not the one that was
- * typed. The create form and Setup both scope the slug to the Place (ADR 0007),
- * so the slug that collided can be one the Host never saw.
  */
-export function slugTakenMessage(slug: string, scopedTo?: string): string {
-	const scope = scopedTo ? ` (this slug scoped to ${scopedTo})` : '';
-	return `Another conversation already uses "${slug}"${scope}. Pick a different one.`;
+export function slugTakenMessage(slug: string): string {
+	return `Another conversation already uses "${slug}". Pick a different one.`;
 }
 
 /** Anything with an id and an optional backend slug can be routed. */
@@ -65,10 +56,8 @@ export type ConversationSummary = {
 	status: ConversationStatus;
 	/** The owning Host, used to label the Campaign. Null when unowned. */
 	organizationId: string | null;
-	/** Where this Campaign runs. Null until a Host publishes it to a Place. */
-	place: Place | null;
-	/** Region name from the legacy config; null for backend-only conversations. */
-	placeName: string | null;
+	/** The areas it runs in, by name, for a one-line label. Empty when none are picked. */
+	areaNames: string[];
 	/**
 	 * Where participants go. Derived from the Conversation slug rather than
 	 * stored, so every Campaign has one and not just the four in `regions.ts`.
@@ -120,17 +109,10 @@ export function statusFor(
 export function toSummary(conversation: LocalizedConversationDto): ConversationSummary {
 	const region = regionFor(conversation);
 
-	// The stored Place first, the legacy region behind it, same order civicos
-	// resolves in. `GetPermittedConversations` returns `metadata`, so this works
-	// on the list and not only on a single Campaign.
-	const place =
-		readPlace(conversation.metadata) ??
-		(region ? { slug: region.slug, name: region.stateName } : null);
-
 	// Derived, not stored: `regions.ts` only ever had a `shareUrl` for its four
 	// entries, so every Campaign created in admin had no participant link at all.
-	// The Conversation slug is the whole address, Place included (`ai-utah`), so
-	// every Campaign has one from creation. A legacy region's hardcoded `shareUrl`
+	// The Conversation slug is the whole address, so every Campaign has one from
+	// creation. A legacy region's hardcoded `shareUrl`
 	// no longer wins: it names a Place subdomain, and nothing reads the Place from
 	// the hostname any more (ADR 0011).
 	const shareUrl = participantUrl(conversation.slug || region?.slug || '', participantBase());
@@ -141,8 +123,7 @@ export function toSummary(conversation: LocalizedConversationDto): ConversationS
 		title: conversation.title,
 		status: statusFor(conversation),
 		organizationId: conversation.organizationId ?? null,
-		place,
-		placeName: place?.name ?? null,
+		areaNames: readAreas(conversation.metadata).map((area) => area.name),
 		shareUrl: shareUrl || null
 	};
 }

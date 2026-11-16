@@ -2,20 +2,13 @@
  * A Place: the geography a Campaign runs in, and the page at `/<place-slug>`
  * that lists the Campaigns running there (ADR 0014).
  *
- * A Place has no backend table, so it rides on `Conversation.metadata.place`.
- * ADR 0006 has the full reasoning and the way out; the short version is that
- * comhairle's Region model has no slug, no link to a Conversation, and no
- * anonymous read.
+ * Campaigns made before ADR 0017 carry a typed Place on `Conversation.metadata.place`,
+ * and civicos still lists them by it. Nothing writes it any more: a Campaign
+ * now has areas, and the Places it shows on follow from them. `readPlace` goes
+ * once the Place page reads Places from comhairle (#579).
  *
- * One Place per Campaign, and one poll behind it (ADR 0008). Many-to-many is the
- * agreed direction but nothing in comhairle supports it yet, so `place` is a
- * single object rather than a list.
- *
- * This module is the whole contract: `civicos` reads a Place through it to
- * decide what to serve, `admin` reads and writes one through it on Setup. It
- * lives in `shared` so those two cannot drift on the shape, which is the single
- * thing ADR 0006 promises. Everything that depends on `RegionConfig` or on the
- * request URL stays in the apps.
+ * Everything that depends on `RegionConfig` or on the request URL stays in the
+ * apps.
  */
 
 export interface Place {
@@ -80,49 +73,6 @@ export function placeFromName(name: string): Place | null {
 	const slug = toPlaceSlug(trimmed);
 
 	return slug ? { slug, name: trimmed } : null;
-}
-
-/**
- * The comhairle Conversation slug for one Campaign in one Place.
- *
- * A Campaign runs in many Places and each pair is its own Conversation, so the
- * Conversations need distinct slugs while the Campaign keeps one name. The
- * Place is appended to make them distinct: `ai` in `utah` is `ai-utah`.
- *
- * The suffix is part of the public URL, `/ai-utah`. That is what lets
- * `GET /conversation/:idOrSlug` resolve the pair from the path alone, with no
- * campaign entity, no metadata read and nothing taken from the hostname
- * (ADR 0014).
- *
- * DERIVE FORWARD, NEVER PARSE BACK. `ai-central-oregon` is `ai` in
- * `central-oregon` or `ai-central` in `oregon`, and nothing in the string says
- * which. Code that needs the Campaign back out of a slug must match against the
- * known Place slugs (`campaignSlugFrom`), never split on a hyphen.
- */
-export function conversationSlugFor(campaignSlug: string, placeSlug: string): string {
-	const campaign = campaignSlug.trim();
-	const place = placeSlug.trim();
-	if (!campaign) return '';
-	if (!place || campaign === place) return campaign;
-
-	return `${campaign}-${place}`;
-}
-
-/**
- * The Campaign a Conversation slug belongs to, given the Places that exist.
- *
- * Longest matching Place wins, so `ai-central-oregon` resolves against
- * `central-oregon` rather than against an `oregon` that also exists. A slug
- * carrying no known Place suffix is its own Campaign, which is what every
- * single-Place Conversation looks like.
- */
-export function campaignSlugFrom(conversationSlug: string, placeSlugs: string[]): string {
-	const slug = conversationSlug.trim();
-	const match = [...placeSlugs]
-		.sort((a, b) => b.length - a.length)
-		.find((place) => slug.endsWith(`-${place}`));
-
-	return match ? slug.slice(0, -(match.length + 1)) : slug;
 }
 
 /**
@@ -197,8 +147,8 @@ export function readPoll(metadata: unknown): CampaignPoll | null {
  * from it and civicos routes to match, so a scheme change is a change here and
  * at the civicos `[campaign]` route directory, and nowhere else.
  *
- * Neither the Host nor the Place is in it (ADR 0014). The Conversation slug is
- * unique and already carries the Place (`ai-utah`), so it is the whole address.
+ * Neither the Host nor the Place is in it (ADR 0014, ADR 0017). The Conversation
+ * slug is unique, so it is the whole address.
  */
 export function participantUrl(conversationSlug: string, base: string, protocol = 'https'): string {
 	const host = base

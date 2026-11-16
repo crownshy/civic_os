@@ -62,8 +62,7 @@ function toEntry(conversation: DirectoryConversation): DirectoryEntry | null {
 	const slug = conversation.slug?.trim();
 	if (!slug) return null;
 
-	// The whole Conversation slug, Place suffix included: `ai-utah` is what
-	// resolves, and without a subdomain there is nothing else to narrow `ai` by.
+	// The whole Conversation slug is the address (ADR 0014).
 	const href = campaignPath(slug);
 	if (!href) return null;
 

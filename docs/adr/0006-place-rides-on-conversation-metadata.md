@@ -1,6 +1,8 @@
 # A Place rides on Conversation metadata, not the Region API
 
 > **The subdomain half is superseded by [ADR 0011](0011-the-place-leaves-the-hostname.md).**
+> **"Who writes it" is superseded by [ADR 0017](0017-a-campaign-picks-areas-not-a-place.md):**
+> nothing writes `metadata.place` now, and a Host never names a Place.
 > A Place is a page at `/<place-slug>` now, not a hostname. It still rides on
 > metadata, for the reasons below.
 

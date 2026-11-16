@@ -5,6 +5,9 @@ selector (#514). Until comhairle can link a Conversation to its Areas, the pick 
 stored on `Conversation.metadata.areas` as a list of `{ geoid, level, name }`,
 read and written through `packages/shared/src/data/areas.ts`.
 
+> Since [ADR 0017](0017-a-campaign-picks-areas-not-a-place.md) the areas are the
+> only thing a Host picks: there is no typed Place any more.
+
 This sits beside ADR 0008, it does not reverse it. `metadata.place` is still the
 one Place a Campaign is listed under, still typed by the Host, and still what
 scopes the slug. `areas` says where the Campaign runs; nothing on the participant

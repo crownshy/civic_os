@@ -5,8 +5,11 @@
 
 	interface Props {
 		open: boolean;
-		/** The Place the areas belong to, for the title. Empty when none is typed yet. */
-		placeName: string;
+		/**
+		 * The Place being edited, when the areas are a Place's. Omitted when they are
+		 * a Campaign's, which has no name of its own to show.
+		 */
+		placeName?: string;
 		/**
 		 * The picker. Dialog content only mounts while open, so it reads the current
 		 * selection fresh on every open.
@@ -14,7 +17,9 @@
 		children: Snippet;
 	}
 
-	let { open = $bindable(), placeName, children }: Props = $props();
+	let { open = $bindable(), placeName = '', children }: Props = $props();
+
+	const name = $derived(placeName.trim());
 </script>
 
 <Dialog.Root bind:open>
@@ -23,11 +28,11 @@
 	>
 		<Dialog.Header class="shrink-0">
 			<Dialog.Title class="font-display text-h4 font-semibold md:text-h3">
-				{placeName.trim() ? `Areas in ${placeName.trim()}` : 'Areas'}
+				{name ? `Areas in ${name}` : 'Where it runs'}
 			</Dialog.Title>
 			<Dialog.Description class="text-body text-muted-foreground">
-				The states, counties and cities this Place covers. Picking a state or county does not pick
-				the places inside it.
+				The states, counties and cities {name ? 'this Place covers' : 'this conversation runs in'}.
+				Picking a state or county does not pick the places inside it.
 			</Dialog.Description>
 		</Dialog.Header>
 

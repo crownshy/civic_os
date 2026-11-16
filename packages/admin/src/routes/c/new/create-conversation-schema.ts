@@ -1,11 +1,7 @@
 import { z } from 'zod';
 
-import { placeFromName } from '@civicos/shared/data/place';
 import { RESERVED_ROUTE_SLUGS } from '$lib/conversations';
 import { limitedText, requiredText } from '$lib/validation/text-fields';
-
-/** A Place name has to give a slug, so it needs something the slug can keep. */
-export const PLACE_NAME_UNREADABLE = 'The name needs at least one letter or number.';
 
 /**
  * Create-Campaign form.
@@ -31,19 +27,9 @@ export const createConversationSchema = z.object({
 		.refine((s) => !RESERVED_ROUTE_SLUGS.includes(s as never), 'That slug is reserved'),
 	keyQuestion: requiredText('keyQuestion', 'Key question is required'),
 	/**
-	 * Where the Campaign runs, collected here so it has a Place from the start
-	 * rather than only once someone visits Setup. Optional: a Campaign with no
-	 * Place is served all the same, it is only listed on no Place page, and the
-	 * Place can be changed later.
-	 *
-	 * A name, not a slug. The slug is derived (`placeFromName`), and the
-	 * Conversation slug is scoped to it by the action, the same rule Setup
-	 * applies on a Place change.
+	 * The states, counties and cities it runs in, from the place selector (#514).
+	 * The Place pages it is listed on follow from these; the Host never names one.
 	 */
-	placeName: limitedText('placeName')
-		.refine((s) => !s.trim() || placeFromName(s) !== null, PLACE_NAME_UNREADABLE)
-		.default(''),
-	/** The states, counties and cities it runs in, from the place selector (#514). */
 	areas: z
 		.array(
 			z.object({
