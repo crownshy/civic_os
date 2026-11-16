@@ -24,7 +24,7 @@ describe('toDirectory', () => {
 	it('links a Campaign by its whole Conversation slug, on this host', () => {
 		const [entry] = toDirectory([conversation()]);
 
-		expect(entry.href).toBe('/ai-dundee');
+		expect(entry.href).toBe('/c/ai-dundee');
 		expect(entry.place).toEqual({ slug: 'dundee', name: 'Dundee' });
 	});
 
@@ -33,7 +33,7 @@ describe('toDirectory', () => {
 			metadata: { place: { slug: 'dundee', name: 'Dundee' }, org: { name: 'Young Scot' } }
 		});
 
-		expect(toDirectory([listed])[0].href).toBe('/ai-dundee');
+		expect(toDirectory([listed])[0].href).toBe('/c/ai-dundee');
 	});
 
 	it('lists a Campaign with no Place, with no Place on it', () => {
@@ -41,7 +41,7 @@ describe('toDirectory', () => {
 
 		expect(toDirectory([listed])[0]).toMatchObject({
 			place: null,
-			href: '/ai'
+			href: '/c/ai'
 		});
 	});
 
@@ -49,7 +49,7 @@ describe('toDirectory', () => {
 		const listed = conversation({ id: oregon.conversationId, slug: 'oregon', metadata: {} });
 		const [entry] = toDirectory([listed]);
 
-		expect(entry.href).toBe('/oregon');
+		expect(entry.href).toBe('/c/oregon');
 		expect(entry.place?.slug).toBe(oregon.slug);
 	});
 

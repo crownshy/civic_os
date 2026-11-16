@@ -141,13 +141,13 @@ export function readPoll(metadata: unknown): CampaignPoll | null {
 }
 
 /**
- * Where participants go for one Campaign: `<base>/<conversation-slug>`.
+ * Where participants go for one Campaign: `<base>/c/<conversation-slug>`.
  *
  * This is the single definition of that address; admin renders share links
  * from it and civicos routes to match, so a scheme change is a change here and
- * at the civicos `[campaign]` route directory, and nowhere else.
+ * at the civicos `c/[campaign]` route directory, and nowhere else.
  *
- * Neither the Host nor the Place is in it (ADR 0014, ADR 0017). The Conversation
+ * Neither the Host nor the Place is in it (ADR 0017, ADR 0019). The Conversation
  * slug is unique, so it is the whole address.
  */
 export function participantUrl(conversationSlug: string, base: string, protocol = 'https'): string {
@@ -165,7 +165,7 @@ export function participantUrl(conversationSlug: string, base: string, protocol 
 }
 
 /**
- * The path part, `/<conversation-slug>`, plus any page under it. Internal links
+ * The path part, `/c/<conversation-slug>`, plus any page under it. Internal links
  * build from this rather than interpolating the shape by hand, so the route
  * directory and every link in the app move together.
  */
@@ -175,17 +175,11 @@ export function campaignPath(campaignSlug: string | undefined, ...rest: string[]
 
 	const tail = rest.filter((part) => part && part.trim() !== '').map((part) => `/${part.trim()}`);
 
-	return `/${campaign}${tail.join('')}`;
+	return `/c/${campaign}${tail.join('')}`;
 }
 
 /** The pages under a Campaign, for `campaignPath(slug, CAMPAIGN_PAGES.poll)`. */
 export const CAMPAIGN_PAGES = { poll: 'poll', events: 'events', report: 'report' } as const;
-
-/**
- * Root-level paths civicos already serves. A Campaign or Place slugged one of
- * these would be shadowed by the static route, so admin refuses them.
- */
-export const PARTICIPANT_RESERVED_SLUGS = ['api', 'conversations', 'profile'] as const;
 
 /**
  * The organizations a Campaign is hosted by, mirrored onto the Conversation
@@ -235,11 +229,11 @@ export function readCoHosts(metadata: unknown): CampaignCoHost[] {
 	});
 }
 
-/** A Place's page, `/<place-slug>`. Empty for a blank slug. */
+/** A Place's page, `/p/<place-slug>` (ADR 0019). Empty for a blank slug. */
 export function placePath(placeSlug: string | undefined): string {
 	const place = (placeSlug ?? '').trim();
 
-	return place ? `/${place}` : '';
+	return place ? `/p/${place}` : '';
 }
 
 /**

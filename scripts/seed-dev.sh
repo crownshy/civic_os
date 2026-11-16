@@ -114,7 +114,7 @@ AUTH_HEADER="Cookie: auth-token=$AUTH_COOKIE"
 SEED_TS="$(date +%s)"
 SEED_SLUG="${SEED_SLUG:-local-dev-$SEED_TS}"
 
-# The Place this Campaign runs in. Its Campaigns are listed at /<place-slug>.
+# The Place this Campaign runs in. Its Campaigns are listed at /p/<place-slug>.
 SEED_PLACE_SLUG="${SEED_PLACE_SLUG:-dundee}"
 SEED_PLACE_NAME="${SEED_PLACE_NAME:-Dundee, Scotland}"
 
@@ -530,7 +530,7 @@ if [ -t 0 ]; then
 fi
 
 echo ""
-echo "Then: pnpm dev → http://localhost:5173/$SEED_SLUG"
+echo "Then: pnpm dev → http://localhost:5173/c/$SEED_SLUG"
 echo "      Directory  → http://localhost:5173/"
-echo "      Place page → http://localhost:5173/$SEED_PLACE_SLUG"
+echo "      Place page → http://localhost:5173/p/$SEED_PLACE_SLUG"
 echo ""

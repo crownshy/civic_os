@@ -19,20 +19,20 @@ function redirectFor(path: string): { status: number; location: string } {
 }
 
 describe('old participant URLs', () => {
-	it('sends the Campaign page to the root, permanently', () => {
+	it('sends the Campaign page under /c/, permanently', () => {
 		expect(redirectFor('/bloom/conversations/ai-utah')).toEqual({
 			status: 308,
-			location: '/ai-utah'
+			location: '/c/ai-utah'
 		});
 	});
 
 	it('renames contribute to poll', () => {
-		expect(redirectFor('/bloom/conversations/ai-utah/contribute').location).toBe('/ai-utah/poll');
+		expect(redirectFor('/bloom/conversations/ai-utah/contribute').location).toBe('/c/ai-utah/poll');
 	});
 
 	it('keeps the pages that kept their name, and the query string', () => {
 		expect(redirectFor('/host/conversations/ai/events/42?utm_source=email').location).toBe(
-			'/ai/events/42?utm_source=email'
+			'/c/ai/events/42?utm_source=email'
 		);
 	});
 });

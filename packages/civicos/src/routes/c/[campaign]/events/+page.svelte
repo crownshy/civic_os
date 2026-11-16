@@ -104,7 +104,7 @@
 			>
 				{#each filteredEvents as event, i (event.id)}
 					<a
-						href={resolve('/[campaign]/(campaign)/events/[slug]', {
+						href={resolve('/c/[campaign]/events/[slug]', {
 							campaign: page.params.campaign!,
 							slug: event.id
 						})}

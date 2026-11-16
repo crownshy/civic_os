@@ -1,6 +1,5 @@
 import { serverApi } from '@civicos/shared/api';
 import { findAttendance } from '$lib/services/event-attendance';
-import { requireCampaign } from '../../require-campaign';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params, parent, cookies, url, depends }) => {
@@ -8,7 +7,7 @@ export const load: PageServerLoad = async ({ params, parent, cookies, url, depen
 	// someone signs up. The key is what the modal invalidates.
 	depends('civicos:attendance');
 
-	const { campaign, participant } = requireCampaign(await parent(), params.campaign);
+	const { campaign, participant } = await parent();
 
 	// With the token, because attendance is scoped to the participant the cookie
 	// names and the list is not readable anonymously.

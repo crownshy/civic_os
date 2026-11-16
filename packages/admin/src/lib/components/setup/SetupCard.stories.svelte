@@ -33,7 +33,7 @@
 
 <Story
 	name="With header action"
-	args={{ title: 'Open Poll', subtitle: 'at oregon.bloomproject.us/ai/poll' }}
+	args={{ title: 'Open Poll', subtitle: 'at bloomproject.us/c/ai/poll' }}
 >
 	{#snippet template(args)}
 		<SetupCard title={args.title} subtitle={args.subtitle}>

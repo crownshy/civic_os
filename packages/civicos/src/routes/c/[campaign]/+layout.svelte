@@ -20,7 +20,7 @@
 	{/if}
 </svelte:head>
 
-{#if data.kind === 'campaign' && data.preview}
+{#if data.preview}
 	<PreviewBadge />
 {/if}
 

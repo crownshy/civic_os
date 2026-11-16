@@ -168,7 +168,7 @@ before that.
 
 The Conversation slug is what the Host typed, with no Place in it (ADR 0017).
 Older Campaigns keep their `<campaign>-<place>` slugs (`ai-utah`), since those are
-live links. The participant URL is `/<conversation-slug>` on one host (ADR 0014),
+live links. The participant URL is `/c/<conversation-slug>` on one host (ADR 0019),
 so a Campaign has a participant site from the moment it is created.
 
 **A Campaign has exactly one Polis step.** comhairle's model is more general: a
@@ -285,14 +285,13 @@ Campaigns whose Polis step does not resolve.
 ### Participant site
 Where participants actually go:
 
-    <host>/<conversation-slug>
+    <host>/c/<conversation-slug>
 
 `civicos` resolves the Campaign from the **slug** alone; nothing about the
 hostname is read (ADR 0011). The poll is `/poll` under that path, live events
 are `/events/<event-slug>`, and the report is `/report`. A Place's Campaigns are
-listed at `/<place-slug>`, which is the same one-segment route: a slug that names
-a Campaign is the Campaign, and only otherwise a Place (ADR 0014). Old
-`/<org>/conversations/<slug>` links redirect.
+listed at `/p/<place-slug>`, and `/h/` is kept for Host pages (ADR 0019). Old
+root `/<slug>` and `/<org>/conversations/<slug>` links redirect.
 
 Three things the admin surfaces have to respect:
 

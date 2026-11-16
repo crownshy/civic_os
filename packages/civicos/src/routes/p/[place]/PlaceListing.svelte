@@ -4,9 +4,8 @@
 	import CampaignCard from '$lib/components/ui/CampaignCard.svelte';
 	import type { DirectoryEntry } from '$lib/config/directory';
 
-	// A Place's page: the Campaigns running there (ADR 0014). A Place is not a
-	// record (ADR 0006), so this is the directory filtered to its slug.
-	let { placeName, campaigns }: { placeName: string; campaigns: DirectoryEntry[] } = $props();
+	type Props = { placeName: string; campaigns: DirectoryEntry[] };
+	let { placeName, campaigns }: Props = $props();
 </script>
 
 <svelte:head>
