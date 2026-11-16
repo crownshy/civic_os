@@ -7,7 +7,8 @@
 		PanelLeftClose,
 		PanelLeftOpen,
 		X,
-		Building2
+		Building2,
+		MapPin
 	} from '@lucide/svelte';
 	import { page, navigating } from '$app/state';
 	import { afterNavigate } from '$app/navigation';
@@ -29,6 +30,8 @@
 	// at once rather than after every `load` on the next page has resolved.
 	const activePath = $derived(navigating.to?.url.pathname ?? page.url.pathname);
 	const onHosts = $derived(activePath.startsWith('/hosts'));
+	const isSuperUser = $derived(data?.hostAccess?.all ?? false);
+	const onPlaces = $derived(activePath.startsWith('/places'));
 
 	// Sidebar UI state.
 	// `collapsed` toggles icon-rail vs full sidebar on md+.
@@ -194,6 +197,23 @@
 						<Building2 class="size-4 shrink-0" />
 						{#if !collapsed || mobileOpen}
 							<span>{hostsLink.label}</span>
+						{/if}
+					</a>
+				{/if}
+
+				{#if isSuperUser}
+					<a
+						href={resolve('/places')}
+						title="Places"
+						class={[
+							'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-caption font-medium',
+							onPlaces ? 'bg-primary/5' : 'hover:bg-muted/50',
+							collapsed && !mobileOpen ? 'justify-center px-0' : ''
+						].join(' ')}
+					>
+						<MapPin class="size-4 shrink-0" />
+						{#if !collapsed || mobileOpen}
+							<span>Places</span>
 						{/if}
 					</a>
 				{/if}
