@@ -22,8 +22,8 @@
 		zipCode = zip;
 		if (!zip) return;
 		zipStatus = 'saving';
-		session.zipCode = zip;
 		const ok = await saveProfile({ api: data.api, preview: false }, { zipcode: zip });
+		if (ok) session.rememberZipCode(zip);
 		zipStatus = ok ? 'saved' : 'failed';
 	}
 
@@ -44,9 +44,7 @@
 				<h1 class="font-display text-4xl font-medium tracking-display text-foreground">
 					User Profile
 				</h1>
-				<p class="font-sans text-base text-foreground">
-					View and change your basic information. Changes are saved as you make them.
-				</p>
+				<p class="font-sans text-base text-foreground">View and change your basic information.</p>
 				<NameCard {name} api={data.api} />
 			</section>
 
@@ -66,7 +64,8 @@
 			<section class="flex flex-col gap-3">
 				<h2 class="font-display text-2xl font-medium text-foreground">Home Location</h2>
 				<p class="font-sans text-base text-foreground">
-					Used to make sure you are in the places where conversations are happening.
+					Used to make sure you are in the places where conversations are happening. Location
+					changes cannot currently be saved to your account.
 				</p>
 				<FieldRow>
 					{#snippet icon()}<MapPin class="size-4" />{/snippet}
@@ -82,7 +81,7 @@
 					<p class="px-4 text-sm text-primary">Saved</p>
 				{:else if zipStatus === 'failed'}
 					<p class="px-4 text-sm text-destructive">
-						Couldn't save your location. Please try again.
+						Your location cannot be saved to your account right now.
 					</p>
 				{/if}
 			</section>

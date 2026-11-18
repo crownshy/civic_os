@@ -8,27 +8,33 @@
 	interface Props {
 		title: string;
 		subtitle: string;
-		/** Backend-seeded categories and their Conversation relationship state. */
+		/** System questions, and whether this Campaign asks each. */
 		defaults: CustomDemographicCategory[];
-		/** Persist a default category relationship change. */
-		onToggle?: (slug: string, next: boolean) => Promise<void>;
-		/** Host-authored categories from the backend demographics question model. */
+		/** Why the card is read-only, shown in place of the controls. Null when editable. */
+		locked?: string | null;
+		/** A launched Campaign applies edits to its live questions. */
+		live?: boolean;
+		/** Switch a system question on or off for this Campaign. */
+		onToggle?: (id: string, next: boolean) => Promise<void>;
+		/** The Host's own question bank. */
 		custom?: CustomDemographicCategory[];
 		/** Toggle a custom category on or off. */
-		onToggleCustom?: (slug: string, next: boolean) => Promise<void>;
+		onToggleCustom?: (id: string, next: boolean) => Promise<void>;
 		/** Create a category. Only Campaign Setup passes this; the Open Poll card
 		    points the Host here instead (#363). */
 		onAddCustom?: (category: CustomDemographicCategory) => Promise<void>;
 		/** Update a Host-authored category's name or ordered options. */
 		onEditCustom?: (category: CustomDemographicCategory) => Promise<void>;
-		/** Remove a category the Host added. */
-		onRemoveCustom?: (slug: string) => Promise<void>;
+		/** Take a Host question off this Campaign. It stays in the Host's bank. */
+		onRemoveCustom?: (id: string) => Promise<void>;
 	}
 
 	let {
 		title,
 		subtitle,
 		defaults,
+		locked = null,
+		live = false,
 		onToggle,
 		custom = [],
 		onToggleCustom,
@@ -46,7 +52,9 @@
 	let heading = $state<Record<string, boolean>>({});
 	let error = $state<string | null>(null);
 
-	const editable = $derived(!!onToggle);
+	const editable = $derived(!!onToggle && !locked);
+	const canToggleCustom = $derived(!!onToggleCustom && !locked);
+	const canAddCustom = $derived(!locked && !!onAddCustom);
 
 	function without(record: Record<string, boolean>, key: string) {
 		return Object.fromEntries(Object.entries(record).filter(([k]) => k !== key));
@@ -61,7 +69,7 @@
 		try {
 			await fn();
 		} catch (e) {
-			console.error('PatchConversationMetadata failed', e);
+			console.error('Saving a demographics change failed', e);
 			error = failureMessage(e, 'Could not save that change.');
 		} finally {
 			saving = without(saving, key);
@@ -93,41 +101,41 @@
 		</div>
 
 		<div class="col-span-full grid grid-cols-subgrid divide-y divide-border">
-			{#each defaults as category (category.slug)}
-				{@const on = heading[category.slug] ?? category.enabled}
+			{#each defaults as category (category.id)}
+				{@const on = heading[category.id] ?? category.enabled}
 				<ToggleRow
 					name={category.displayName}
-					detail={category.options.join(', ')}
+					detail={category.options.join(', ') || (category.answerFormat ?? '')}
 					{on}
 					disabled={!editable}
-					busy={saving[category.slug]}
-					onToggle={() => toggle(category.slug, !on, onToggle!)}
+					busy={saving[category.id]}
+					onToggle={() => toggle(category.id, !on, onToggle!)}
 				/>
 			{/each}
 
-			{#each custom as category (category.slug)}
-				{@const on = heading[category.slug] ?? category.enabled}
+			{#each custom as category (category.id)}
+				{@const on = heading[category.id] ?? category.enabled}
 				<ToggleRow
 					name={category.displayName}
-					detail={category.options.join(', ')}
+					detail={category.options.join(', ') || (category.answerFormat ?? '')}
 					{on}
-					disabled={!onToggleCustom}
-					busy={saving[category.slug]}
-					onToggle={() => toggle(category.slug, !on, onToggleCustom!)}
-					onEdit={onEditCustom
+					disabled={!canToggleCustom}
+					busy={saving[category.id]}
+					onToggle={() => toggle(category.id, !on, onToggleCustom!)}
+					onEdit={onEditCustom && !locked
 						? () => {
 								editingCategory = category;
 								addOpen = true;
 							}
 						: undefined}
-					onRemove={onRemoveCustom
-						? () => run(category.slug, () => onRemoveCustom(category.slug))
+					onRemove={onRemoveCustom && !locked && on
+						? () => run(category.id, () => onRemoveCustom(category.id))
 						: undefined}
 				/>
 			{/each}
 		</div>
 
-		{#if onAddCustom}
+		{#if canAddCustom}
 			<button
 				type="button"
 				onclick={() => {
@@ -146,9 +154,13 @@
 	<AddDemographicCategoryDialog
 		bind:open={addOpen}
 		category={editingCategory}
-		existing={custom}
+		existing={[...defaults, ...custom]}
 		onSave={onEditCustom}
 	/>
 {:else if onAddCustom}
-	<AddDemographicCategoryDialog bind:open={addOpen} existing={custom} onSave={onAddCustom} />
+	<AddDemographicCategoryDialog
+		bind:open={addOpen}
+		existing={[...defaults, ...custom]}
+		onSave={onAddCustom}
+	/>
 {/if}

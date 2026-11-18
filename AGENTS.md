@@ -127,12 +127,8 @@ focused PR; do not let them silently grow:
 - `sveltekit-superforms` + `formsnap` are installed and the shared `ui/form` primitives
   exist, but app forms do not use them yet. Migrate forms onto superforms as you touch
   them.
-- Since comhairle `a8d0a6ef5` (2026-08-28) the participation report sends only
-  `totalParticipants` and `categories` (question slug to counts, grouped by option label,
-  for the questions switched on for the Conversation). Admin's Participants tab reads it
-  through `readParticipationReport` in `@civicos/shared/data/demographics`. The civicos
-  public report still reads the old top-level keys (`ethnicity`, `ageRanges`,
-  `zipcodeCounts`, ...) in `report/DemographicsSection.svelte`, so its demographics render
-  empty. Point it at the shared reader.
+- The participation report does not include labels for historical option IDs, and
+  anonymous participants cannot read the question bank. Admin marks those answers
+  unknown and the public demographic breakdown is unavailable. See ADR 0020.
 - `load` functions do not call `depends()` for explicit invalidation keys. Add them when
   you touch a `load` that needs targeted invalidation.

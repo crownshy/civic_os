@@ -59,7 +59,6 @@ export async function writeMetadata(
 	if (writes.colorScheme !== undefined) body[COLOR_SCHEME_METADATA_KEY] = writes.colorScheme;
 	if (writes.participantAsks !== undefined) body.participantAsks = writes.participantAsks;
 	if (writes.pollPaused !== undefined) body[POLL_PAUSED_METADATA_KEY] = writes.pollPaused;
-
 	if (writes.poll !== undefined) {
 		const stored = await api.GetConversation(params);
 		const poll = { ...readPoll(stored?.metadata), ...withoutUndefined(writes.poll) };

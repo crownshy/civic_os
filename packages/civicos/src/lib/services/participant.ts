@@ -1,4 +1,4 @@
-import type { ApiClient, DemographicsResponse, UserDto } from '@crownshy/api-client/api';
+import type { ApiClient, UserDto } from '@crownshy/api-client/api';
 import { httpStatusOf } from '$lib/utils/http';
 
 /**
@@ -18,7 +18,6 @@ export interface ParticipantSession {
 	emailVerified: boolean;
 	/** Empty for an email-only signup, which never gives one. */
 	zipCode: string;
-	demographicsCompleted: boolean;
 	emailProvided: boolean;
 }
 
@@ -73,49 +72,26 @@ export function knownParticipant(
 		};
 	}
 	if (!participant) return { userId: null, zipCode: '', isReturning: false };
+	const zipCode =
+		participant.zipCode || (cached.userId === participant.userId ? cached.zipCode : '');
 	return {
 		userId: participant.userId,
-		zipCode: participant.zipCode || cached.zipCode,
-		isReturning: !!participant.zipCode
+		zipCode,
+		isReturning: !!zipCode
 	};
 }
 
-type ParticipantApi = Pick<ApiClient, 'CurrentUser' | 'GetDemographicsResponses'>;
+type ParticipantApi = Pick<ApiClient, 'CurrentUser'>;
 
-const ZIPCODE_SLUG = 'zipcode';
-
-/**
- * The About You screen's questions. Zip is deliberately not one of them: it is
- * collected at join, so counting it would mark every joiner as done.
- */
-const ABOUT_YOU_SLUGS = ['age', 'ethnicity', 'gender', 'political_party'];
-
-function answerFor(responses: DemographicsResponse[], slug: string): string {
-	return String(responses.find((r) => r.questionSlug === slug)?.value ?? '');
-}
-
-/**
- * A participant has a demographics row from the moment their zip is saved, so
- * the row's presence proves nothing. Only an answered About You question means
- * the screen was filled in.
- */
-function hasDemographics(responses: DemographicsResponse[]): boolean {
-	return responses.some((r) => ABOUT_YOU_SLUGS.includes(r.questionSlug) && Boolean(r.value));
-}
-
-/** Flatten the two backend records into the shape the app reasons about. */
-export function toParticipantSession(
-	user: UserDto,
-	responses: DemographicsResponse[]
-): ParticipantSession {
+/** Flatten the account record into the shape the app reasons about. */
+export function toParticipantSession(user: UserDto): ParticipantSession {
 	return {
 		userId: user.id,
 		authType: user.authType,
 		email: user.email ?? null,
 		username: user.username ?? null,
 		emailVerified: user.emailVerified,
-		zipCode: answerFor(responses, ZIPCODE_SLUG),
-		demographicsCompleted: hasDemographics(responses),
+		zipCode: '',
 		emailProvided: Boolean(user.email)
 	};
 }
@@ -123,9 +99,8 @@ export function toParticipantSession(
 /**
  * Identify the participant behind an `auth-token` cookie.
  *
- * Two round trips rather than one: demographics are keyed by user id, and
- * `/demographics/responses` is not scoped to the caller, so the id has to be in
- * hand before the second call can be asked for this participant's rows alone.
+ * The current API cannot identify a participant-writable Postcode question, so
+ * callers use the browser's cached zip until the API supports that lookup.
  */
 export async function resolveParticipant(
 	api: ParticipantApi,
@@ -144,16 +119,5 @@ export async function resolveParticipant(
 		return { participant: null, resolved: false };
 	}
 
-	// Ordinary for someone who has answered nothing yet, so a failure here is
-	// not a failure to resolve: it costs the zip, which the caller falls back to
-	// its localStorage copy for.
-	let responses: DemographicsResponse[] = [];
-	try {
-		const page = await api.GetDemographicsResponses({ queries: { user_id: user.id } });
-		responses = page.records;
-	} catch (e) {
-		console.error('[Participant] Could not read demographics:', e);
-	}
-
-	return { participant: toParticipantSession(user, responses), resolved: true };
+	return { participant: toParticipantSession(user), resolved: true };
 }

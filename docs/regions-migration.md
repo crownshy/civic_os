@@ -15,19 +15,19 @@ inferred one. Treat it as the spec.
 
 ## Status: what a Host controls today
 
-| Participant surface                       | Backend field                                            | Where admin edits it             |
-| ----------------------------------------- | -------------------------------------------------------- | -------------------------------- |
-| Landing `<h1>` and page title             | `Conversation.title`                                     | Setup > Identity                 |
-| The `/c/<slug>` address                   | `Conversation.slug`                                      | Setup > Identity                 |
-| Landing "Context" sections and nav pills  | `Conversation.description`                               | Setup > Context for Participants |
-| Voting question                           | Polis step `topic`, mirrored to `metadata.poll.question` | Setup > Identity > Key Question  |
-| Landing FAQ accordion                     | `Conversation.faqs`                                      | Setup > FAQ                      |
-| Landing Place chip, slug suffix           | `metadata.place`                                         | Setup > Identity > Place         |
-| Palette                                   | `metadata.colorScheme`                                   | Setup > Identity > swatches      |
-| About You screen                          | `metadata.demographics`                                  | Setup > Demographics             |
-| Checkpoint and end-page asks              | `metadata.participantAsks`                               | Setup > Participant Asks         |
-| Which Polis poll the vote goes to         | `metadata.poll.polisId`                                  | Written at creation, no editor   |
-| Upcoming live conversations               | `GET /conversation/:id/events`                           | Events tab                       |
+| Participant surface                      | Backend field                                            | Where admin edits it             |
+| ---------------------------------------- | -------------------------------------------------------- | -------------------------------- |
+| Landing `<h1>` and page title            | `Conversation.title`                                     | Setup > Identity                 |
+| The `/c/<slug>` address                  | `Conversation.slug`                                      | Setup > Identity                 |
+| Landing "Context" sections and nav pills | `Conversation.description`                               | Setup > Context for Participants |
+| Voting question                          | Polis step `topic`, mirrored to `metadata.poll.question` | Setup > Identity > Key Question  |
+| Landing FAQ accordion                    | `Conversation.faqs`                                      | Setup > FAQ                      |
+| Landing Place chip, slug suffix          | `metadata.place`                                         | Setup > Identity > Place         |
+| Palette                                  | `metadata.colorScheme`                                   | Setup > Identity > swatches      |
+| About You screen                         | Campaign workflow demographic form and question steps    | Setup > Demographics             |
+| Checkpoint and end-page asks             | `metadata.participantAsks`                               | Setup > Participant Asks         |
+| Which Polis poll the vote goes to        | `metadata.poll.polisId`                                  | Written at creation, no editor   |
+| Upcoming live conversations              | `GET /conversation/:id/events`                           | Events tab                       |
 
 Copy resolves through `packages/civicos/src/lib/config/host-copy.ts` and
 identity through `campaign.ts`, both as `conversation.X ?? region.X`, so Utah

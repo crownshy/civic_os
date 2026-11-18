@@ -21,9 +21,7 @@ function fakeApi() {
 		ListConversationWorkflows: vi.fn(() => Promise.resolve([{ id: 'workflow-1', isActive: true }])),
 		RegisterUserForConversationWorkflow: vi.fn(() => Promise.resolve({})),
 		RegisterEmailForUpdates: vi.fn(() => Promise.resolve({})),
-		UpsertUserProfile: vi.fn(() => Promise.resolve({})),
-		CreateDemographicsResponse: vi.fn(() => Promise.resolve({})),
-		UpdateDemographicsResponse: vi.fn(() => Promise.resolve({}))
+		UpsertUserProfile: vi.fn(() => Promise.resolve({}))
 	};
 }
 
@@ -50,7 +48,7 @@ beforeEach(() => {
 });
 
 describe('join', () => {
-	it('signs up a guest, registers them on the workflow and saves the zip', async () => {
+	it('signs up a guest, registers them and caches the zip without claiming to save it', async () => {
 		expect(await join(context(), '84101')).toBe(true);
 
 		expect(session.userId).toBe(GUEST.id);
@@ -58,9 +56,8 @@ describe('join', () => {
 		expect(api.RegisterUserForConversationWorkflow).toHaveBeenCalledWith(undefined, {
 			params: { conversation_id: CAMPAIGN, workflow_id: 'workflow-1' }
 		});
-		expect(api.UpsertUserProfile).toHaveBeenCalledWith(
-			expect.objectContaining({ zipcode: '84101' })
-		);
+		expect(api.UpsertUserProfile).not.toHaveBeenCalled();
+		expect(console.error).not.toHaveBeenCalled();
 		expect(invalidate).toHaveBeenCalledWith('civicos:participant');
 	});
 

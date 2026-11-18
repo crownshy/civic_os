@@ -21,7 +21,6 @@ export interface AccountRecord {
 	userId?: string;
 	emailProvided: boolean;
 	zipCode: string;
-	demographicsCompleted: boolean;
 	/**
 	 * Preferences of this browser rather than of the account, so they survive a
 	 * sign-out. Kept in this record because they are equally campaign-agnostic.
@@ -39,6 +38,8 @@ export interface CampaignRecord {
 	endCtaReviewCompleted: boolean;
 	/** This Campaign signed this browser's email up for updates. */
 	emailRegistered: boolean;
+	/** Versions the participant finished or skipped on this Campaign in this browser. */
+	acknowledgedDemographicVersions: string[];
 	/**
 	 * Events of this Campaign this browser has registered for. A cache in front
 	 * of the attendance list, which is the actual record (#420): it covers the
@@ -67,7 +68,6 @@ function emptyAccount(): AccountRecord {
 	return {
 		emailProvided: false,
 		zipCode: '',
-		demographicsCompleted: false,
 		hasAgreedToTos: false,
 		hasSeenComposeInstructions: false
 	};
@@ -80,6 +80,7 @@ export function emptyCampaign(): CampaignRecord {
 		endCtaShareCompleted: false,
 		endCtaReviewCompleted: false,
 		emailRegistered: false,
+		acknowledgedDemographicVersions: [],
 		registeredEventIds: []
 	};
 }
@@ -147,7 +148,6 @@ function toAccount(raw: Record<string, unknown>): AccountRecord {
 		userId: typeof raw.userId === 'string' && raw.userId ? raw.userId : undefined,
 		emailProvided: asBoolean(raw.emailProvided),
 		zipCode: asString(raw.zipCode),
-		demographicsCompleted: asBoolean(raw.demographicsCompleted),
 		hasAgreedToTos: asBoolean(raw.hasAgreedToTos),
 		hasSeenComposeInstructions: asBoolean(raw.hasSeenComposeInstructions)
 	};
@@ -161,6 +161,7 @@ function toCampaign(raw: Record<string, unknown>): CampaignRecord {
 		endCtaShareCompleted: asBoolean(raw.endCtaShareCompleted),
 		endCtaReviewCompleted: asBoolean(raw.endCtaReviewCompleted),
 		emailRegistered: asBoolean(raw.emailRegistered),
+		acknowledgedDemographicVersions: asStringList(raw.acknowledgedDemographicVersions),
 		registeredEventIds: asStringList(raw.registeredEventIds)
 	};
 }

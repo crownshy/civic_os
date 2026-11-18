@@ -112,6 +112,19 @@ The first card on the participants page. Groups respondents by **County** with
 columns plus a map. Rows shown = counties with participants ∪ counties with a goal
 set; out-of-region or unrecognized zips fold into a single "Other / Unknown" row.
 
+### Demographic question and Campaign form
+
+A **demographic question** belongs either to the system or to one Host's question
+bank. A Campaign selects questions from those banks into its own demographics
+form; removing a question from the Campaign does not delete it from the bank.
+Hosts can change the selection and their own questions after launch.
+
+Comhairle versions questions and forms, but admin does not expose versions.
+Admin preserves the form's pinned questions and uses individual question steps
+for changes, so editing one question does not update the others. Participants
+may be asked an edited question again. See ADR 0020 for live updates, historical
+reporting, and the participant flow.
+
 ### Demographics export
 
 A CSV of **raw per-participant profile rows** — `User ID, Ethnicity, Age, Gender,
@@ -146,8 +159,7 @@ switch.
 _Avoid_: "checkpoint" for the Ask itself. A **Checkpoint** is the mid-poll screen,
 one of the two places an Ask appears. Host-facing UI says Ask.
 
-Toggles live in `conversation.metadata.participantAsks` (interim storage, same as
-demographics). The definition and the readers are
+Toggles live in `conversation.metadata.participantAsks`. The definition and the readers are
 `packages/shared/src/data/participant-asks.ts`: admin writes the switches on
 Setup, civicos derives its checkpoint order and its end-page cards from them.
 

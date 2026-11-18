@@ -308,7 +308,6 @@
 			{org}
 			api={data.api}
 			{account}
-			preview={data.preview}
 			onSignOut={() => signOut(data.api)}
 			{onRegistered}
 		/>

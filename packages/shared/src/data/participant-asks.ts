@@ -22,9 +22,8 @@
  * drift, which is the one thing that would make a switch do nothing.
  *
  * INTERIM STORAGE. The on/off state lives in
- * `conversation.metadata.participantAsks` for the same reason demographics
- * does: there is no backend table for it yet. See [demographics.ts](./demographics.ts)
- * and #363.
+ * `conversation.metadata.participantAsks` because there is no backend table
+ * for it yet.
  */
 
 export const ASK_KEYS = ['contribute', 'email', 'feedback', 'share'] as const;

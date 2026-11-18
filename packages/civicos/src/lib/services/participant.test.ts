@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import type { DemographicsResponse, UserDto } from '@crownshy/api-client/api';
+import type { UserDto } from '@crownshy/api-client/api';
 import { knownParticipant, resolveParticipant, toParticipantSession } from './participant';
 
 const USER: UserDto = {
@@ -9,65 +9,15 @@ const USER: UserDto = {
 	emailVerified: false
 };
 
-function answer(questionSlug: string, value: string): DemographicsResponse {
-	return { id: `${questionSlug}-row`, userId: USER.id, questionSlug, value };
-}
-
-/** What a participant has after joining: a zip and nothing else. */
-const ZIP_ONLY: DemographicsResponse[] = [answer('zipcode', '84101')];
-
-/** An axios rejection as zodios surfaces it. */
 function httpError(status: number) {
 	return Object.assign(new Error(`Request failed with status code ${status}`), {
 		response: { status }
 	});
 }
 
-function fakeApi(overrides: {
-	CurrentUser?: () => Promise<UserDto>;
-	GetDemographicsResponses?: () => Promise<{ records: DemographicsResponse[]; total: number }>;
-}) {
-	return {
-		CurrentUser: vi.fn(overrides.CurrentUser ?? (() => Promise.resolve(USER))),
-		GetDemographicsResponses: vi.fn(
-			overrides.GetDemographicsResponses ??
-				(() => Promise.resolve({ records: ZIP_ONLY, total: ZIP_ONLY.length }))
-		)
-	};
-}
-
-describe('toParticipantSession', () => {
-	it('reads the zip code off the zipcode answer', () => {
-		expect(toParticipantSession(USER, ZIP_ONLY).zipCode).toBe('84101');
-	});
-
-	it('has no zip code when the participant has answered nothing', () => {
-		expect(toParticipantSession(USER, []).zipCode).toBe('');
-	});
-
-	it('does not count a zip-only participant as demographics answered', () => {
-		expect(toParticipantSession(USER, ZIP_ONLY).demographicsCompleted).toBe(false);
-	});
-
-	it('counts any answered About You question as demographics answered', () => {
-		const answered = [...ZIP_ONLY, answer('gender', 'Non-binary')];
-		expect(toParticipantSession(USER, answered).demographicsCompleted).toBe(true);
-	});
-
-	it('ignores an About You question that was skipped', () => {
-		const skipped = [...ZIP_ONLY, answer('gender', '')];
-		expect(toParticipantSession(USER, skipped).demographicsCompleted).toBe(false);
-	});
-
-	it('reports an email once the account carries one', () => {
-		const withEmail = { ...USER, email: 'someone@example.com' };
-		expect(toParticipantSession(withEmail, ZIP_ONLY).emailProvided).toBe(true);
-	});
-});
-
 describe('resolveParticipant', () => {
-	it('is anonymous without asking the backend when there is no cookie', async () => {
-		const api = fakeApi({});
+	it('does not request the backend when there is no cookie', async () => {
+		const api = { CurrentUser: vi.fn() };
 		await expect(resolveParticipant(api, undefined)).resolves.toEqual({
 			participant: null,
 			resolved: true
@@ -75,105 +25,60 @@ describe('resolveParticipant', () => {
 		expect(api.CurrentUser).not.toHaveBeenCalled();
 	});
 
-	it('is anonymous when the backend rejects the cookie', async () => {
-		const api = fakeApi({ CurrentUser: () => Promise.reject(httpError(401)) });
-		await expect(resolveParticipant(api, 'stale')).resolves.toEqual({
+	it('treats a rejected cookie as signed out, but preserves the cache on an outage', async () => {
+		const rejected = { CurrentUser: vi.fn().mockRejectedValue(httpError(401)) };
+		const unavailable = { CurrentUser: vi.fn().mockRejectedValue(httpError(500)) };
+		await expect(resolveParticipant(rejected, 'token')).resolves.toEqual({
 			participant: null,
 			resolved: true
 		});
-	});
-
-	it('is unavailable when the backend cannot be reached', async () => {
-		const api = fakeApi({ CurrentUser: () => Promise.reject(new Error('ECONNREFUSED')) });
-		await expect(resolveParticipant(api, 'token')).resolves.toEqual({
+		await expect(resolveParticipant(unavailable, 'token')).resolves.toEqual({
 			participant: null,
 			resolved: false
 		});
 	});
 
-	it('is unavailable on a backend error, so a cached session survives an outage', async () => {
-		const api = fakeApi({ CurrentUser: () => Promise.reject(httpError(500)) });
+	it('resolves identity without treating an answer in another Campaign as completion', async () => {
+		const api = { CurrentUser: vi.fn().mockResolvedValue(USER) };
 		await expect(resolveParticipant(api, 'token')).resolves.toEqual({
-			participant: null,
-			resolved: false
-		});
-	});
-
-	it('returns the participant the cookie names', async () => {
-		const api = fakeApi({});
-		const resolution = await resolveParticipant(api, 'token');
-		expect(resolution).toEqual({
 			participant: {
 				userId: USER.id,
 				authType: 'guest',
 				email: null,
 				username: null,
 				emailVerified: false,
-				zipCode: '84101',
-				demographicsCompleted: false,
+				zipCode: '',
 				emailProvided: false
 			},
-			resolved: true
-		});
-	});
-
-	it('asks for this participant only, since the endpoint is not caller-scoped', async () => {
-		const api = fakeApi({});
-		await resolveParticipant(api, 'token');
-		expect(api.GetDemographicsResponses).toHaveBeenCalledWith({
-			queries: { user_id: USER.id }
-		});
-	});
-
-	it('still returns the participant when demographics cannot be read', async () => {
-		const api = fakeApi({ GetDemographicsResponses: () => Promise.reject(httpError(500)) });
-		const resolution = await resolveParticipant(api, 'token');
-		expect(resolution).toEqual({
-			participant: expect.objectContaining({ userId: USER.id, zipCode: '' }),
 			resolved: true
 		});
 	});
 });
 
 describe('knownParticipant', () => {
-	const SERVER = toParticipantSession(USER, ZIP_ONLY);
-	const CACHED = { userId: 'cached-user', zipCode: '97201' };
-	const EMPTY_CACHE = { userId: null, zipCode: '' };
+	const participant = toParticipantSession(USER);
 
-	it('takes the server participant over the cache', () => {
-		expect(knownParticipant({ participant: SERVER, resolved: true }, CACHED)).toEqual({
-			userId: USER.id,
-			zipCode: '84101',
-			isReturning: true
-		});
+	it('borrows the browser zip only for the same account', () => {
+		expect(
+			knownParticipant({ participant, resolved: true }, { userId: USER.id, zipCode: '97201' })
+		).toEqual({ userId: USER.id, zipCode: '97201', isReturning: true });
+		expect(
+			knownParticipant(
+				{ participant, resolved: true },
+				{ userId: 'another-user', zipCode: '97201' }
+			)
+		).toEqual({ userId: USER.id, zipCode: '', isReturning: false });
 	});
 
-	it('ignores the cache when the server says nobody is signed in', () => {
-		expect(knownParticipant({ participant: null, resolved: true }, CACHED)).toEqual({
+	it('keeps the cache during an outage, but not after sign-out', () => {
+		const cache = { userId: USER.id, zipCode: '97201' };
+		expect(knownParticipant({ participant: null, resolved: false }, cache)).toEqual({
+			...cache,
+			isReturning: true
+		});
+		expect(knownParticipant({ participant: null, resolved: true }, cache)).toEqual({
 			userId: null,
 			zipCode: '',
-			isReturning: false
-		});
-	});
-
-	it('falls back to the cache when the backend could not answer', () => {
-		expect(knownParticipant({ participant: null, resolved: false }, CACHED)).toEqual({
-			userId: 'cached-user',
-			zipCode: '97201',
-			isReturning: true
-		});
-	});
-
-	it('is not returning on an outage with nothing cached', () => {
-		const known = knownParticipant({ participant: null, resolved: false }, EMPTY_CACHE);
-		expect(known.isReturning).toBe(false);
-	});
-
-	it('borrows the cached zip for a known participant whose zip the server lost', () => {
-		const noZip = toParticipantSession(USER, []);
-		expect(knownParticipant({ participant: noZip, resolved: true }, CACHED)).toEqual({
-			userId: USER.id,
-			zipCode: '97201',
 			isReturning: false
 		});
 	});

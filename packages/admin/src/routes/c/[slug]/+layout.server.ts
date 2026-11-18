@@ -2,12 +2,7 @@ import { error } from '@sveltejs/kit';
 import type { Api } from '@civicos/shared/api';
 import { findByRouteSlug, participantBase, regionFor } from '$lib/conversations';
 import { hasLivePoll, polisConfigFor } from '$lib/polis-step';
-import { ensureDefaultDemographicQuestions } from '$lib/api/demographics';
-import {
-	DEFAULT_DEMOGRAPHIC_SLUGS,
-	RESERVED_DEMOGRAPHIC_SLUGS,
-	demographicsFromBackend
-} from '@civicos/shared/data/demographics';
+import { loadCampaignDemographics, type WorkflowStepDto } from '$lib/api/demographics';
 import { readPoll } from '@civicos/shared/data/place';
 import { readAreas } from '@civicos/shared/data/areas';
 import type { UserActions } from '@crownshy/api-client/api';
@@ -50,7 +45,10 @@ export const load: LayoutServerLoad = async ({ params, parent, locals, depends }
 	// (#401, Q1.3). The step is now resolved either way, because the topic is
 	// only readable from its tool config.
 	const region = regionFor(summary);
-	const polisStepPromise = resolvePolisStep(api, summary.id, region?.polis_workflow_step_id);
+	const workflowPromise = loadWorkflow(api, summary.id);
+	const polisStepPromise = workflowPromise.then((workflow) =>
+		resolvePolisStep(workflow, region?.polis_workflow_step_id)
+	);
 
 	// The owning Host's name, shown as the contact on an Event. `regions.ts`
 	// duplicates it as `hostName`; the Conversation's organization is the real
@@ -61,17 +59,18 @@ export const load: LayoutServerLoad = async ({ params, parent, locals, depends }
 				.then((organization) => organization.name)
 				.catch(() => null)
 		: Promise.resolve(null);
-	const demographicQuestionsPromise = ensureDefaultDemographicQuestions(api).catch((e) => {
-		console.warn('Ensuring default demographic questions failed', e);
-		return [];
-	});
-	const conversationDemographicsPromise = api
-		.GetConversationDemographics({ queries: { conversation_id: summary.id, limit: 200 } })
-		.then((result) => result.records)
-		.catch((e) => {
-			console.warn('GetConversationDemographics failed', e);
-			return [];
-		});
+	// The Campaign's demographics form (or, on a Campaign older than forms, its
+	// per-question steps) and the question bank the Setup card lists. Live
+	// questions are resolved from the step's pinned configuration.
+	const demographicsPromise = Promise.all([workflowPromise, polisStepPromise]).then(
+		([workflow, polisStep]) =>
+			loadCampaignDemographics(api, {
+				organizationId: summary.organizationId ?? null,
+				pollLaunched: polisStep ? polisStep.launched : null,
+				workflowId: workflow?.id ?? null,
+				steps: workflow?.steps ?? []
+			})
+	);
 
 	// Deleting needs the Conversation `admin` role. A Host's admins have it on the
 	// Host's own Campaigns; its members and co-hosts do not. A failed lookup hides
@@ -84,33 +83,14 @@ export const load: LayoutServerLoad = async ({ params, parent, locals, depends }
 			return false;
 		});
 
-	const [
-		conversation,
-		polisStep,
-		hostName,
-		demographicQuestions,
-		conversationDemographics,
-		canDelete
-	] = await Promise.all([
+	const [conversation, workflow, polisStep, hostName, demographics, canDelete] = await Promise.all([
 		conversationPromise,
+		workflowPromise,
 		polisStepPromise,
 		hostNamePromise,
-		demographicQuestionsPromise,
-		conversationDemographicsPromise,
+		demographicsPromise,
 		canDeletePromise
 	]);
-	const demographicCategories = demographicsFromBackend(
-		demographicQuestions,
-		conversationDemographics
-	);
-	const defaultDemographics = demographicCategories.filter((question) =>
-		(DEFAULT_DEMOGRAPHIC_SLUGS as readonly string[]).includes(question.slug)
-	);
-	// Reserved, not default: `zipcode` is seeded like a category but collected at
-	// join, so it is neither a Host switch nor theirs to delete.
-	const customDemographics = demographicCategories.filter(
-		(question) => !(RESERVED_DEMOGRAPHIC_SLUGS as readonly string[]).includes(question.slug)
-	);
 
 	// Pull out the { id, locale } we POST title/description edits against. Null
 	// when the backend didn't return translation detail (non-admin, or the
@@ -218,22 +198,31 @@ export const load: LayoutServerLoad = async ({ params, parent, locals, depends }
 		campaign,
 		conversation,
 		textContent,
-		defaultDemographics,
-		customDemographics,
+		campaignDemographics: demographics,
+		// Where demographics writes go. Null when the card is read-only for want of
+		// a Host, workflow, or known launch state, which the card explains.
+		demographicsTarget:
+			workflow && summary.organizationId && polisStep
+				? {
+						conversationId: summary.id,
+						workflowId: workflow.id,
+						organizationId: summary.organizationId,
+						title: conversation?.title ?? summary.title,
+						pollLaunched: polisStep.launched
+					}
+				: null,
 		canDelete
 	};
 };
 
 /**
- * The workflow step wrapping this Campaign's Polis poll: the id Insights and the
- * Open Poll surfaces key everything off, plus the `topic` Setup renders as the
- * Key Question.
- *
- * `pinnedStepId` is a legacy region's configured id. Preferring that step keeps
- * the id and the topic pointing at the same step, rather than reading the topic
- * off one step and writing edits against another.
+ * The Campaign's active workflow and its steps, read once for both the Polis
+ * step and demographics. Null when there is no workflow or it cannot be read.
  */
-async function resolvePolisStep(api: Api, conversationId: string, pinnedStepId?: string) {
+async function loadWorkflow(
+	api: Api,
+	conversationId: string
+): Promise<{ id: string; steps: WorkflowStepDto[] } | null> {
 	try {
 		const workflows = await api.ListConversationWorkflows({
 			params: { conversation_id: conversationId }
@@ -244,30 +233,46 @@ async function resolvePolisStep(api: Api, conversationId: string, pinnedStepId?:
 		const steps = await api.ListConversationWorkflowSteps({
 			params: { conversation_id: conversationId, workflow_id: workflow.id }
 		});
-		// `polisConfigFor` is both the search and the read, so the step this picks
-		// and the poll it reports cannot come from different places. It looks past
-		// `toolConfig` to the preview config, without which a Campaign created in
-		// admin has no Polis step at all as far as this function is concerned.
-		const isPolis = (step: (typeof steps)[number]) => !!polisConfigFor(step);
-		const step = steps.find((s) => s.id === pinnedStepId && isPolis(s)) ?? steps.find(isPolis);
-		if (!step) return null;
-
-		const polis = polisConfigFor(step);
-
-		return {
-			id: step.id,
-			topic: polis?.topic ?? null,
-			// Mirrored into `metadata.poll` so the participant app can read them:
-			// this step is 401 anonymously, and civicos has no other way to learn
-			// which Polis conversation it is serving.
-			polisId: polis?.pollId ?? null,
-			polisUrl: polis?.serverUrl ?? null,
-			launched: hasLivePoll(step)
-		};
+		return { id: workflow.id, steps };
 	} catch (e) {
-		console.warn('Resolving the Polis workflow step failed', e);
+		console.warn('Loading the workflow failed', e);
 		return null;
 	}
+}
+
+/**
+ * The workflow step wrapping this Campaign's Polis poll: the id Insights and the
+ * Open Poll surfaces key everything off, plus the `topic` Setup renders as the
+ * Key Question.
+ *
+ * `pinnedStepId` is a legacy region's configured id. Preferring that step keeps
+ * the id and the topic pointing at the same step, rather than reading the topic
+ * off one step and writing edits against another.
+ */
+function resolvePolisStep(workflow: { steps: WorkflowStepDto[] } | null, pinnedStepId?: string) {
+	if (!workflow) return null;
+	const { steps } = workflow;
+
+	// `polisConfigFor` is both the search and the read, so the step this picks
+	// and the poll it reports cannot come from different places. It looks past
+	// `toolConfig` to the preview config, without which a Campaign created in
+	// admin has no Polis step at all as far as this function is concerned.
+	const isPolis = (step: WorkflowStepDto) => !!polisConfigFor(step);
+	const step = steps.find((s) => s.id === pinnedStepId && isPolis(s)) ?? steps.find(isPolis);
+	if (!step) return null;
+
+	const polis = polisConfigFor(step);
+
+	return {
+		id: step.id,
+		topic: polis?.topic ?? null,
+		// Mirrored into `metadata.poll` so the participant app can read them:
+		// this step is 401 anonymously, and civicos has no other way to learn
+		// which Polis conversation it is serving.
+		polisId: polis?.pollId ?? null,
+		polisUrl: polis?.serverUrl ?? null,
+		launched: hasLivePoll(step)
+	};
 }
 
 type TxField = { textContent?: { id: string; primaryLocale: string } | null } | null;

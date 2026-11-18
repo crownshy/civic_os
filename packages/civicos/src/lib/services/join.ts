@@ -1,7 +1,7 @@
 import type { ApiClient } from '@crownshy/api-client/api';
 import { invalidate } from '$app/navigation';
 import { httpStatusOf } from '$lib/utils/http';
-import { saveProfile, type ProfileContext } from './profile';
+import type { ProfileContext } from './profile';
 import { session } from './session.svelte';
 
 /**
@@ -46,12 +46,6 @@ export async function join(context: JoinContext, zipCode: string): Promise<boole
 		session.rememberJoin(user, zipCode);
 
 		await registerOnWorkflow(context);
-
-		// Best effort. TEMPORARY: comhairle 404s the first profile write because
-		// there is no `zipcode` demographics question to file the answer under,
-		// so this fails for everyone and the throw it used to do ended every
-		// first join. Put the throw back once that question exists.
-		if (zipCode) await saveProfile(context, { zipcode: zipCode });
 	} catch (e) {
 		console.error('[Join] Failed to join:', e);
 		return false;

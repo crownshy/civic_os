@@ -61,8 +61,8 @@
 				type="button"
 				onclick={onRemove}
 				{disabled}
-				aria-label={`Delete ${name}`}
-				title="Delete this category"
+				aria-label={`Remove ${name} from Campaign`}
+				title="Remove from this Campaign"
 				class="cursor-pointer touch-manipulation p-1 text-muted-foreground transition-all hover:text-destructive active:scale-90 active:text-destructive/70 active:duration-0 disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100"
 			>
 				<Trash2 class="size-4" />

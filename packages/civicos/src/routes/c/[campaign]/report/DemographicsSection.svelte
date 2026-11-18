@@ -1,55 +1,14 @@
 <script lang="ts">
 	import Badge from '@civicos/shared/ui/Badge.svelte';
+	import type { ParticipationReport } from '@civicos/shared/data/demographics';
 	import PanelCard from '$lib/components/ui/PanelCard.svelte';
-	import SwipeCarousel from '$lib/components/ui/SwipeCarousel.svelte';
-	import DonutChart from '$lib/components/ui/DonutChart.svelte';
-
-	import type {
-		DemographicCategoryCount,
-		ParticipationReport
-	} from '@civicos/shared/data/demographics';
+	import SectionContent from './SectionContent.svelte';
 
 	interface Props {
 		demographics: ParticipationReport | null;
 	}
 
 	let { demographics }: Props = $props();
-
-	const chartColors = [
-		'bg-chart-1',
-		'bg-chart-2',
-		'bg-chart-3',
-		'bg-chart-4',
-		'bg-chart-5',
-		'bg-chart-6'
-	];
-
-	const tabs = ['Age', 'Location', 'Gender', 'Race & Ethnicity', 'Political'] as const;
-	let activeTab = $state(1);
-
-	// Keyed by question slug since comhairle a8d0a6ef5. A question the Host
-	// switched off is absent, which renders as no data.
-	function itemsFor(slug: string) {
-		return toCategoryItems(demographics?.categories[slug] ?? []);
-	}
-
-	function toCategoryItems(categories: DemographicCategoryCount[]) {
-		return categories.map((c, i) => ({
-			label: c.value ? c.value : 'Not Provided',
-			color: c.value ? chartColors[i % chartColors.length] : 'bg-chart-undefined',
-			count: c.count
-		}));
-	}
-
-	const ageData = $derived(itemsFor('age'));
-	const genderData = $derived(itemsFor('gender'));
-	const ethnicityData = $derived(itemsFor('ethnicity'));
-	const politicalData = $derived(itemsFor('political_party'));
-
-	function handleTabClick(index: number) {
-		activeTab = index;
-	}
-	import SectionContent from './SectionContent.svelte';
 </script>
 
 <section class="relative overflow-hidden bg-background py-6">
@@ -57,100 +16,19 @@
 		<div class="px-6">
 			<Badge variant="soft" size="lg">DEMOGRAPHICS</Badge>
 		</div>
-
 		<div class="mt-8 px-8">
 			<h2 class="font-display text-3xl leading-8 font-medium tracking-display text-foreground">
 				This Open Poll engaged people of different backgrounds.
 			</h2>
 		</div>
-
-		<p class="mt-5 px-8 font-sans text-base font-medium text-foreground">
-			Participation generally reflected the state's population. Explore the demographics below.
-		</p>
-
-		<!-- Demographics card -->
 		<PanelCard bg="bg-card" borderClass="border border-border" class="mx-6 mt-10">
-			<!-- Tabs -->
-			<div class="scrollbar-hide flex gap-8 overflow-x-auto px-6 pt-5">
-				{#each tabs as tab, i (tab)}
-					<button
-						onclick={() => handleTabClick(i)}
-						class="shrink-0 touch-manipulation font-sans text-2xl leading-7 font-bold whitespace-nowrap transition-all select-none active:scale-95 active:duration-0 {activeTab ===
-						i
-							? 'text-foreground opacity-100'
-							: 'text-foreground opacity-40 hover:opacity-70 active:opacity-80'}"
-					>
-						{tab}
-					</button>
-				{/each}
-			</div>
-
-			<!-- Swipeable content -->
-			<SwipeCarousel count={tabs.length} bind:index={activeTab} hideDots={true}>
-				{#snippet children(i)}
-					<div class="min-h-[280px] px-6 py-8">
-						{#if i === 0}
-							<!-- Age breakdown -->
-							<DonutChart data={ageData} size={200} />
-						{:else if i === 1}
-							<!-- Location (map placeholder) -->
-							<div class="flex flex-col items-center">
-								<div class="flex h-[200px] w-full items-center justify-center rounded-lg bg-muted">
-									<p class="font-mono text-xs text-muted-foreground">MAP PLACEHOLDER</p>
-								</div>
-
-								<div class="mt-4 flex w-full flex-col items-center gap-1">
-									<span class="font-mono text-[10px] font-medium text-muted-foreground opacity-50"
-										>PARTICIPATION</span
-									>
-									<div class="flex w-full items-center gap-2">
-										<span class="font-mono text-[10px] text-muted-foreground">0</span>
-										<div class="h-3.5 flex-1 rounded-sm bg-primary"></div>
-										<span class="font-mono text-[10px] text-muted-foreground">X</span>
-									</div>
-								</div>
-							</div>
-						{:else if i === 2}
-							<!-- Gender -->
-							{#if genderData.length}
-								<DonutChart data={genderData} size={200} />
-							{:else}
-								<p class="mt-8 font-sans text-sm text-muted-foreground">
-									No gender data available yet.
-								</p>
-							{/if}
-						{:else if i === 3}
-							<!-- Race & Ethnicity -->
-							{#if ethnicityData.length}
-								<DonutChart data={ethnicityData} size={200} />
-							{:else}
-								<p class="mt-8 font-sans text-sm text-muted-foreground">
-									No ethnicity data available yet.
-								</p>
-							{/if}
-						{:else}
-							<!-- Political -->
-							{#if politicalData.length}
-								<DonutChart data={politicalData} size={200} />
-							{:else}
-								<p class="mt-8 font-sans text-sm text-muted-foreground">
-									No political affiliation data available yet.
-								</p>
-							{/if}
-						{/if}
-					</div>
-				{/snippet}
-			</SwipeCarousel>
+			<p class="px-6 py-8 font-sans text-base text-muted-foreground">
+				{#if demographics}
+					Detailed demographic breakdowns are temporarily unavailable.
+				{:else}
+					Demographic data is unavailable. Please try again later.
+				{/if}
+			</p>
 		</PanelCard>
 	</SectionContent>
 </section>
-
-<style>
-	.scrollbar-hide::-webkit-scrollbar {
-		display: none;
-	}
-	.scrollbar-hide {
-		-ms-overflow-style: none;
-		scrollbar-width: none;
-	}
-</style>

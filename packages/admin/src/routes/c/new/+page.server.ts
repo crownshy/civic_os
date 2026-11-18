@@ -5,7 +5,7 @@ import type { Api } from '@civicos/shared/api';
 import type { CampaignPoll } from '@civicos/shared/data/place';
 import { writeMetadata } from '@civicos/shared/data/metadata';
 import { apiStatus, describeApiFailure } from '$lib/api/describe-failure';
-import { enableDefaultDemographics } from '$lib/api/demographics';
+import { createDefaultCampaignForm } from '$lib/api/demographics';
 import { polisConfigFor } from '$lib/polis-step';
 import { COHOST_ROLE, CONVERSATION_RESOURCE } from '$lib/permissions';
 import { mirrorHosts } from '$lib/cohost-mirror';
@@ -161,13 +161,6 @@ export const actions: Actions = {
 			return refuse(text);
 		};
 
-		try {
-			await enableDefaultDemographics(api, conversationId);
-		} catch (e) {
-			console.error('Enabling default demographics failed', e);
-			return rollback(`Could not enable default demographics: ${describeApiFailure(e)}`);
-		}
-
 		// 2. The workflow that holds the steps. One active workflow per Campaign
 		//    (CONTEXT.md: a Campaign has exactly one Polis step).
 		let workflowId: string;
@@ -186,6 +179,18 @@ export const actions: Actions = {
 		} catch (e) {
 			console.error('CreateConversationWorkflow failed', e);
 			return rollback(`Could not create the workflow: ${describeApiFailure(e)}`);
+		}
+
+		// Demographics forms belong to a Host, and comhairle validates each
+		// workflow step against the Conversation's owner when the step is made.
+		try {
+			await api.UpdateConversation(
+				{ default_workflow_id: workflowId, organization_id: hostId },
+				{ params: { conversation_id: conversationId } }
+			);
+		} catch (e) {
+			console.error('Setting owner / default workflow failed', e);
+			return rollback(`Could not assign the Campaign's Host: ${describeApiFailure(e)}`);
 		}
 
 		// 3. The Polis step. `tool_setup` is the provisioning shape: comhairle
@@ -216,21 +221,21 @@ export const actions: Actions = {
 			return rollback(`Could not create the Polis poll: ${describeApiFailure(e)}`);
 		}
 
-		// 4. Owner and default workflow. Neither is settable at create time:
-		//    organization_id is not on CreateConversation, and the workflow does not
-		//    exist yet. A failure here leaves a usable Campaign, so it is logged
-		//    rather than rolled back, but an unowned one will not pass the
-		//    /c/[slug] permission check.
+		// 3b. The Campaign's own demographics form, starting with the system
+		//     defaults, asked after the poll. Setup adds and removes questions on
+		//     it before and after launch (ADR 0020).
 		try {
-			await api.UpdateConversation(
-				{ default_workflow_id: workflowId, ...(hostId ? { organization_id: hostId } : {}) },
-				{ params: { conversation_id: conversationId } }
+			await createDefaultCampaignForm(
+				api,
+				{ conversationId, workflowId, organizationId: hostId, title, pollLaunched: false },
+				1
 			);
 		} catch (e) {
-			console.error('Setting owner / default workflow failed', e);
+			console.error('Creating the demographics form failed', e);
+			return rollback(`Could not set up demographics questions: ${describeApiFailure(e)}`);
 		}
 
-		// 5. Team access, for the owning Host and any Co-Hosts picked on the form.
+		// 4. Team access, for the owning Host and any Co-Hosts picked on the form.
 		//    The PUT above records the owner but does not make the Campaign visible
 		//    to that Host's members: comhairle's `list_for_permitted_user` admits a
 		//    Conversation on `owner_id` or a matching `resource_permissions` row,

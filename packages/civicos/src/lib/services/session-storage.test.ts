@@ -7,6 +7,7 @@ import {
 	saveAccount,
 	saveCampaign
 } from './session-storage';
+import { session } from './session.svelte';
 
 /** Enough of the Storage interface for the module under test. */
 class MemoryStorage implements Storage {
@@ -75,6 +76,44 @@ describe('campaign records', () => {
 		expect(loadCampaign(OREGON).registeredEventIds).toEqual([]);
 	});
 
+	it('keeps skipped question versions scoped to their Campaign', () => {
+		saveCampaign(UTAH, { ...emptyCampaign(), acknowledgedDemographicVersions: ['version-1'] });
+		expect(loadCampaign(UTAH).acknowledgedDemographicVersions).toEqual(['version-1']);
+		expect(loadCampaign(OREGON).acknowledgedDemographicVersions).toEqual([]);
+	});
+
+	it('acknowledges skipped versions on the originating Campaign after navigation', () => {
+		session.signOut();
+		session.rememberJoin({ id: 'user', authType: 'guest', emailVerified: false }, '');
+		session.useCampaign(UTAH);
+		session.useCampaign(OREGON);
+		session.acknowledgeDemographicVersions(UTAH, false, 'user', ['version-1']);
+
+		expect(loadCampaign(UTAH).acknowledgedDemographicVersions).toEqual(['version-1']);
+		expect(loadCampaign(OREGON).acknowledgedDemographicVersions).toEqual([]);
+		expect(session.acknowledgedDemographicVersions).toEqual([]);
+	});
+
+	it("does not save the previous account's acknowledgement after sign-in changes", () => {
+		session.signOut();
+		session.rememberJoin({ id: 'new-user', authType: 'guest', emailVerified: false }, '');
+		session.useCampaign(UTAH);
+		session.acknowledgeDemographicVersions(UTAH, false, 'previous-user', ['version-1']);
+
+		expect(loadCampaign(UTAH).acknowledgedDemographicVersions).toEqual([]);
+	});
+
+	it('keeps preview acknowledgements separate after navigating to the live Campaign', () => {
+		session.signOut();
+		session.rememberJoin({ id: 'user', authType: 'guest', emailVerified: false }, '');
+		session.useCampaign(UTAH, true);
+		session.useCampaign(UTAH, false);
+		session.acknowledgeDemographicVersions(UTAH, true, 'user', ['version-1']);
+
+		expect(loadCampaign(`preview:${UTAH}`).acknowledgedDemographicVersions).toEqual(['version-1']);
+		expect(loadCampaign(UTAH).acknowledgedDemographicVersions).toEqual([]);
+	});
+
 	it('keeps an email signup with the Campaign it was made on', () => {
 		saveCampaign(UTAH, { ...emptyCampaign(), emailRegistered: true });
 
@@ -137,7 +176,6 @@ describe('clearCampaigns', () => {
 			userId: 'abc',
 			emailProvided: true,
 			zipCode: '84101',
-			demographicsCompleted: true,
 			hasAgreedToTos: true,
 			hasSeenComposeInstructions: false
 		});
@@ -222,7 +260,6 @@ describe('migrating the pre-#418 blob', () => {
 			userId: undefined,
 			emailProvided: false,
 			zipCode: '',
-			demographicsCompleted: false,
 			hasAgreedToTos: false,
 			hasSeenComposeInstructions: false
 		});

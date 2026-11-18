@@ -45,7 +45,7 @@ The old `PUBLIC_DEV_*`, `PUBLIC_CONVERSATION_ID` and `PUBLIC_POLIS_ID` vars are 
 
 The URL picks the Campaign: `/c/<conversation-slug>`, with the poll at `/c/<conversation-slug>/poll`, events at `/events` and the report at `/report` under it. Nothing is read from the hostname (ADR 0011, ADR 0019). A Place's Campaigns are listed at `/p/<place-slug>`. `/` is the directory of live Campaigns, and old root `/<slug>` links redirect.
 
-A Campaign is a stored Conversation. Its title, copy, FAQ, palette, demographics, asks and Polis id are set in admin and live on the Conversation and its `metadata` (see [docs/regions-migration.md](docs/regions-migration.md) for the full table). `packages/shared/src/data/regions.ts` is only the default layer behind that: the region that owns the Conversation, else the generic catch-all. Logic: `regionForCampaign` in `packages/civicos/src/lib/config/campaign.ts`.
+A Campaign is a stored Conversation. Its title, copy, FAQ, palette, asks and Polis id are set in admin and live on the Conversation and its `metadata`. Demographics use versioned workflow forms and questions, not Campaign metadata (see [docs/regions-migration.md](docs/regions-migration.md) for the full table). `packages/shared/src/data/regions.ts` is only the default layer behind that: the region that owns the Conversation, else the generic catch-all. Logic: `regionForCampaign` in `packages/civicos/src/lib/config/campaign.ts`.
 
 Zip redirect only applies to the legacy Utah, Oregon and catch-all Campaigns: `84xxx → utah`, `97xxx → oregon`. If the zip's region ≠ the Campaign's, the browser goes to that region's Campaign before registering.
 

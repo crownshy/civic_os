@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
+	import { fromAction } from 'svelte/attachments';
 	import { Mail, MapPin, User } from '@lucide/svelte';
 	import { defaults, superForm } from 'sveltekit-superforms';
 	import { zod4, zod4Client } from 'sveltekit-superforms/adapters';
@@ -16,7 +17,6 @@
 	import ThankYouMessage from '$lib/components/ui/ThankYouMessage.svelte';
 	import eventRegistrationSchema from '$lib/components/ui/EventRegistrationSchema';
 	import { registerForEvent, registrationErrorMessage } from '$lib/services/event-registration';
-	import { saveProfile } from '$lib/services/profile';
 	import { session } from '$lib/services/session.svelte';
 
 	type Props = {
@@ -29,7 +29,6 @@
 		api: ApiClient;
 		/** The signed-in account, when there is one, to fill the form from. */
 		account: { email: string; name: string; zipCode: string } | null;
-		preview: boolean;
 		onSignOut: () => void;
 		/** Fired once the attendance is filed, so the page can reflect it. */
 		onRegistered?: () => void;
@@ -42,7 +41,6 @@
 		org,
 		api,
 		account,
-		preview,
 		onSignOut,
 		onRegistered
 	}: Props = $props();
@@ -80,11 +78,9 @@
 				name: name.trim(),
 				signedIn: !!account
 			});
-			// Only a new account is a session this browser holds, so only then is
-			// there a profile to file the zip on.
+			// Only a new account is a session this browser holds.
 			if (created) {
 				session.rememberJoin(created, zipCode);
-				await saveProfile({ api, preview }, { zipcode: zipCode });
 				await invalidate('civicos:participant');
 			}
 			status = 'success';
@@ -133,7 +129,16 @@
 				Enter your information so that {org?.name ?? 'the Host'} can get in touch with you.
 			{/if}
 		</p>
-		<form id="event-join" method="POST" novalidate use:enhance class="mt-6 flex flex-col gap-2">
+		<p class="mx-auto mt-3 max-w-sm text-center font-sans text-base text-muted-foreground">
+			Zip codes cannot currently be saved to accounts.
+		</p>
+		<form
+			id="event-join"
+			method="POST"
+			novalidate
+			{@attach fromAction(enhance)}
+			class="mt-6 flex flex-col gap-2"
+		>
 			<Form.Field {form} name="name">
 				<Form.Control>
 					{#snippet children({ props })}

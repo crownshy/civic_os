@@ -15,10 +15,9 @@ import { readColorScheme } from '@civicos/shared/data/color-scheme';
 import { pollStatusFor } from '@civicos/shared/data/poll-status';
 import { httpStatusOf } from '$lib/utils/http';
 import { HOST_SESSION_COOKIE } from '@civicos/shared/data/host-session';
-import type { DemographicQuestionData } from '@civicos/shared/data/demographics';
 
 type ResolvedConversation = CampaignConversation &
-	ConversationCopy & { isLive: boolean; isComplete: boolean };
+	ConversationCopy & { isLive: boolean; isComplete: boolean; organizationId?: string | null };
 
 /**
  * The Campaign at `/c/<slug>` (ADR 0019). A Place has its own page at
@@ -118,9 +117,7 @@ export const load: LayoutServerLoad = async ({ params, url, cookies, depends }) 
 		// The Host's own questions when they have written any, and for Utah and
 		// Oregon the `regions.ts` placeholders until then.
 		faq: resolveFaq(conversation, legacyDefaults),
-		// Which demographics and which asks the Host left switched on. Falling
-		// back to all-on when the Conversation is unreachable keeps a legacy
-		// region asking what it always asked.
+		// Which participant asks the Host left switched on.
 		participation: resolveParticipation(conversation),
 		// Null when the Host never picked one, and `theme.css` (Green) shows through.
 		colorScheme: readColorScheme(conversation?.metadata),
@@ -129,9 +126,7 @@ export const load: LayoutServerLoad = async ({ params, url, cookies, depends }) 
 		// the same way it keeps its copy.
 		pollStatus: conversation ? pollStatusFor(conversation) : ('live' as const),
 		preview,
-		// The poll's About You questions are read anonymously in the browser, and
-		// a draft refuses that, so the preview hands over the ones read here.
-		previewAboutYou: preview && hostApi ? await readAboutYou(hostApi, campaign.id) : null
+		previewOrganizationId: preview ? (conversation?.organizationId ?? null) : null
 	};
 };
 
@@ -148,19 +143,6 @@ async function readDraft(hostApi: Api | null, candidate: string) {
 	} catch {
 		// Signed out of admin, or not on this Campaign's team: the same 404 a
 		// stranger gets.
-		return null;
-	}
-}
-
-async function readAboutYou(hostApi: Api, conversationId: string | undefined) {
-	if (!conversationId) return null;
-	try {
-		const { records } = await hostApi.GetDemographicsQuestions({
-			queries: { conversation_id: conversationId, limit: 50 }
-		});
-		return records as DemographicQuestionData[];
-	} catch (e) {
-		console.warn(`[Preview] Could not read "${conversationId}"'s About You questions`, e);
 		return null;
 	}
 }

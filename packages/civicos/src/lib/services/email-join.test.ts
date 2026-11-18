@@ -1,6 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { invalidate } from '$app/navigation';
-import { joinWithCode, joinWithEmail, type EmailJoinContext } from './email-join';
+import {
+	continueAsSignedIn,
+	joinWithCode,
+	joinWithEmail,
+	type EmailJoinContext
+} from './email-join';
 import { session } from './session.svelte';
 
 vi.mock('$app/navigation', () => ({ invalidate: vi.fn() }));
@@ -23,9 +28,7 @@ function fakeApi() {
 		ListConversationWorkflows: vi.fn(() => Promise.resolve([{ id: 'workflow-1', isActive: true }])),
 		RegisterUserForConversationWorkflow: vi.fn(() => Promise.resolve({})),
 		RegisterEmailForUpdates: vi.fn(),
-		UpsertUserProfile: vi.fn(() => Promise.resolve({})),
-		CreateDemographicsResponse: vi.fn(),
-		UpdateDemographicsResponse: vi.fn()
+		UpsertUserProfile: vi.fn(() => Promise.resolve({}))
 	};
 }
 
@@ -50,7 +53,7 @@ beforeEach(() => {
 });
 
 describe('joinWithEmail', () => {
-	it('signs a new email in, puts it on the Campaign and saves the zip', async () => {
+	it('signs a new email in, puts it on the Campaign and caches the zip', async () => {
 		expect(await joinWithEmail(context(), 'a@example.com', '84101')).toBe('joined');
 
 		expect(api.SignupOtp).toHaveBeenCalledWith({
@@ -60,9 +63,8 @@ describe('joinWithEmail', () => {
 		expect(session.userId).toBe(MEMBER.id);
 		expect(session.emailProvided).toBe(true);
 		expect(api.RegisterUserForConversationWorkflow).toHaveBeenCalledOnce();
-		expect(api.UpsertUserProfile).toHaveBeenCalledWith(
-			expect.objectContaining({ zipcode: '84101' })
-		);
+		expect(api.UpsertUserProfile).not.toHaveBeenCalled();
+		expect(console.error).not.toHaveBeenCalled();
 		expect(invalidate).toHaveBeenCalledWith('civicos:participant');
 	});
 
@@ -96,6 +98,33 @@ describe('joinWithCode', () => {
 		expect(api.LoginOtpUser).toHaveBeenCalledWith({ email: 'a@example.com', code: '123456' });
 		expect(session.userId).toBe(MEMBER.id);
 		expect(invalidate).toHaveBeenCalledWith('civicos:participant');
+	});
+
+	describe('continuing as a signed-in participant', () => {
+		it('remembers a changed zip locally without trying to save it to the account', async () => {
+			session.zipCode = '84101';
+			await continueAsSignedIn(context(), '97201');
+			expect(session.zipCode).toBe('97201');
+			expect(api.UpsertUserProfile).not.toHaveBeenCalled();
+			expect(console.error).not.toHaveBeenCalled();
+		});
+
+		it('does not change the account location while previewing', async () => {
+			session.zipCode = '84101';
+			await continueAsSignedIn(context({ preview: true }), '97201');
+			expect(session.zipCode).toBe('84101');
+			expect(api.RegisterUserForConversationWorkflow).not.toHaveBeenCalled();
+		});
+
+		it('clears the previous account’s Campaign progress when signing in as someone else', () => {
+			session.user = { id: 'previous', authType: 'guest', emailVerified: false };
+			session.pid = 42;
+			session.acknowledgedDemographicVersions = ['old-version'];
+			session.rememberJoin(MEMBER, '97201');
+			expect(session.pid).toBeUndefined();
+			expect(session.acknowledgedDemographicVersions).toEqual([]);
+			expect(session.userId).toBe(MEMBER.id);
+		});
 	});
 
 	it('fails on a wrong code without signing anyone in', async () => {

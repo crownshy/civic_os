@@ -2,7 +2,6 @@ import type { ApiClient, UserDto } from '@crownshy/api-client/api';
 import { invalidate } from '$app/navigation';
 import { httpStatusOf } from '$lib/utils/http';
 import { enterCampaign, type JoinContext } from './join';
-import { saveProfile } from './profile';
 import { session } from './session.svelte';
 
 /** A Campaign's join context, plus the calls that sign a participant in by email. */
@@ -72,13 +71,13 @@ export async function joinWithCode(
 }
 
 /**
- * Put a participant who is already signed in on this Campaign, saving the zip
- * when they changed it in the sheet.
+ * Put a participant who is already signed in on this Campaign, remembering the
+ * zip locally when they changed it in the sheet.
  */
 export async function continueAsSignedIn(context: JoinContext, zipCode: string): Promise<void> {
+	if (context.preview) return;
 	if (zipCode && zipCode !== session.zipCode) {
-		session.zipCode = zipCode;
-		await saveProfile(context, { zipcode: zipCode });
+		session.rememberZipCode(zipCode);
 	}
 	await enterCampaign(context);
 }
@@ -96,7 +95,5 @@ async function sendLoginCode(context: EmailJoinContext, email: string): Promise<
 async function finishJoin(context: JoinContext, user: UserDto, zipCode: string): Promise<void> {
 	session.rememberJoin(user, zipCode);
 	await enterCampaign(context);
-	// Best effort, for the same reason as in `join`: the zip is cached either way.
-	if (zipCode) await saveProfile(context, { zipcode: zipCode });
 	await invalidate('civicos:participant');
 }

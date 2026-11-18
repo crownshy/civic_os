@@ -14,13 +14,10 @@ const GetConversation = vi.fn();
 const ListConverastions = vi.fn();
 // The client built from the Host's session, for a draft preview.
 const HostGetConversation = vi.fn();
-const GetDemographicsQuestions = vi.fn();
 
 vi.mock('@civicos/shared/api', () => ({
 	serverApi: (_url: URL, token?: string) =>
-		token
-			? { GetConversation: HostGetConversation, GetDemographicsQuestions }
-			: { GetConversation, ListConverastions }
+		token ? { GetConversation: HostGetConversation } : { GetConversation, ListConverastions }
 }));
 
 // Imported once here, not inside a test: the first cold import of the layout
@@ -110,7 +107,6 @@ describe('a draft previewed by its Host', () => {
 		GetConversation.mockReset();
 		ListConverastions.mockReset();
 		HostGetConversation.mockReset();
-		GetDemographicsQuestions.mockReset();
 		ListConverastions.mockResolvedValue({ records: [] });
 		GetConversation.mockRejectedValue(httpError(403));
 		vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -126,16 +122,16 @@ describe('a draft previewed by its Host', () => {
 			slug: 'draft',
 			title: 'Draft',
 			isLive: false,
-			isComplete: false
+			isComplete: false,
+			organizationId: 'host-id'
 		});
-		GetDemographicsQuestions.mockResolvedValue({ records: [{ slug: 'age' }] });
 
 		const data = await loadSlug('draft', 'host-token');
 
 		expect(data).toMatchObject({
 			preview: true,
 			pollStatus: 'draft',
-			previewAboutYou: [{ slug: 'age' }]
+			previewOrganizationId: 'host-id'
 		});
 	});
 
@@ -150,7 +146,7 @@ describe('a draft previewed by its Host', () => {
 
 		const data = await loadSlug('live', 'host-token');
 
-		expect(data).toMatchObject({ preview: false, previewAboutYou: null });
+		expect(data).toMatchObject({ preview: false, previewOrganizationId: null });
 		expect(HostGetConversation).not.toHaveBeenCalled();
 	});
 });

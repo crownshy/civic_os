@@ -1,6 +1,12 @@
 import { fail, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { describeApiFailure } from '$lib/api/describe-failure';
+import {
+	answerLabels,
+	loadCampaignDemographics,
+	type CampaignQuestion,
+	type LegacyDemographicKey
+} from '$lib/api/demographics';
 import type { RecruitmentTargetDto } from '@crownshy/api-client/api';
 import {
 	emptyGoals,
@@ -9,9 +15,9 @@ import {
 	type RegionGoals
 } from '$lib/config/representation-goals';
 import {
+	DEMOGRAPHIC_CATEGORIES,
 	readParticipationReport,
-	type CustomDemographicCategory,
-	type DemographicCategoryCount,
+	type DemographicAnswerCount,
 	type ParticipationReport
 } from '@civicos/shared/data/demographics';
 import { rollUpByCounty } from '@civicos/shared/data/zipcodes';
@@ -29,9 +35,11 @@ const METRIC_NAMES: GoalMetric[] = [
 /**
  * The recruitment-target metric a built-in question's goals are stored under.
  * These predate per-question goals, so they keep their old names; every other
- * question stores goals under its slug.
+ * question stores goals under its id.
  */
-const GOAL_METRIC_BY_SLUG: Record<string, Exclude<GoalMetric, 'totalParticipants' | 'county'>> = {
+const GOAL_METRIC_BY_KEY: Partial<
+	Record<LegacyDemographicKey, Exclude<GoalMetric, 'totalParticipants' | 'county'>>
+> = {
 	age: 'ageRanges',
 	ethnicity: 'ethnicity',
 	gender: 'gender',
@@ -48,55 +56,93 @@ export interface QuestionRow {
 
 /** One table on the page: a question switched on for this Campaign. */
 export interface QuestionResult {
-	slug: string;
+	id: string;
 	displayName: string;
 	/** The recruitment-target metric its goals are stored under. */
 	goalMetric: string;
 	/** The question's options, which are what goals can be set against. */
 	buckets: string[];
 	rows: QuestionRow[];
+	hasUnknownOptions: boolean;
+}
+
+/** Answer counts per label. A skipped answer counts as Not Provided. */
+function countByLabel(
+	answers: DemographicAnswerCount[],
+	question: Pick<CampaignQuestion, 'optionLabels' | 'legacyKey'>
+): Map<string, number> {
+	const byLabel = new Map<string, number>();
+	for (const answer of answers) {
+		const labels = answerLabels(answer.value, question);
+		for (const label of labels.length ? labels : [NOT_PROVIDED]) {
+			byLabel.set(label, (byLabel.get(label) ?? 0) + answer.count);
+		}
+	}
+	return byLabel;
 }
 
 /**
  * A row per option, in the question's order, then any answer the options do
- * not cover (skipped, or an option since renamed). An option nobody picked
- * still gets a row so a goal set on it has somewhere to show.
+ * not cover (skipped, free text, or an option since renamed). An option nobody
+ * picked still gets a row so a goal set on it has somewhere to show.
  */
 function questionRows(
 	options: string[],
-	counts: DemographicCategoryCount[],
+	byLabel: Map<string, number>,
 	goalMap: Record<string, number>
 ): QuestionRow[] {
-	const byLabel = new Map<string, number>();
-	for (const c of counts) {
-		const label = c.value || NOT_PROVIDED;
-		byLabel.set(label, (byLabel.get(label) ?? 0) + c.count);
-	}
 	const labels = [...new Set([...options, ...byLabel.keys()])];
 	return labels.map((label) => ({ label, count: byLabel.get(label) ?? 0, goal: goalMap[label] }));
 }
 
+/**
+ * The buckets a question's goals are set against: its options, or for a
+ * pre-versioning question that comhairle migrated to a number or free text,
+ * the buckets its goals have always used. Comhairle reports raw ages, which
+ * `answerLabels` buckets to match.
+ */
+function bucketsFor(question: CampaignQuestion): string[] {
+	if (question.options.length || !question.legacyKey) return question.options;
+	const key = question.legacyKey === 'political_party' ? 'politicalParty' : question.legacyKey;
+	return DEMOGRAPHIC_CATEGORIES.find((category) => category.key === key)?.options ?? [];
+}
+
 function questionResult(
-	question: CustomDemographicCategory,
+	question: CampaignQuestion,
 	report: ParticipationReport,
 	goals: RegionGoals
 ): QuestionResult {
-	const builtInMetric = GOAL_METRIC_BY_SLUG[question.slug];
-	const goalMap = builtInMetric ? goals[builtInMetric] : (goals.custom[question.slug] ?? {});
+	const builtInMetric = question.legacyKey ? GOAL_METRIC_BY_KEY[question.legacyKey] : undefined;
+	const goalMap = builtInMetric ? goals[builtInMetric] : (goals.custom[question.id] ?? {});
+	const buckets = bucketsFor(question);
+	const answers = report.questions[question.id]?.answers ?? [];
+	const hasUnknownOptions = answers.some(({ value }) => {
+		if (!value || typeof value !== 'object') return false;
+		const ids = (value as { option_ids?: unknown }).option_ids;
+		return (
+			Array.isArray(ids) &&
+			ids.some((id) => typeof id !== 'string' || !Object.hasOwn(question.optionLabels, id))
+		);
+	});
 	return {
-		slug: question.slug,
+		id: question.id,
 		displayName: question.displayName,
-		goalMetric: builtInMetric ?? question.slug,
-		buckets: question.options,
-		rows: questionRows(question.options, report.categories[question.slug] ?? [], goalMap)
+		goalMetric: builtInMetric ?? question.id,
+		buckets,
+		rows: questionRows(buckets, countByLabel(answers, question), goalMap),
+		hasUnknownOptions
 	};
 }
 
-/** Zip code to participant count, from the `zipcode` question's answers. */
-function zipcodeCounts(report: ParticipationReport): Record<string, number> {
+/** Zip code to participant count, from the answers to every postcode question. */
+function zipcodeCounts(report: ParticipationReport, zipQuestionIds: string[]) {
 	const counts: Record<string, number> = {};
-	for (const c of report.categories.zipcode ?? []) {
-		if (c.value) counts[c.value] = (counts[c.value] ?? 0) + c.count;
+	for (const id of zipQuestionIds) {
+		for (const answer of report.questions[id]?.answers ?? []) {
+			for (const zip of answerLabels(answer.value, { optionLabels: {}, legacyKey: 'zipcode' })) {
+				counts[zip] = (counts[zip] ?? 0) + answer.count;
+			}
+		}
 	}
 	return counts;
 }
@@ -128,12 +174,7 @@ export const load: PageServerLoad = async ({ parent, locals, depends }) => {
 	depends('open-poll:demographics');
 	depends('open-poll:goals');
 
-	const { campaign, defaultDemographics, customDemographics } = await parent();
-	// The page shows what Setup has switched on, in Setup's order and by the
-	// question's stored name.
-	const enabledQuestions = [...defaultDemographics, ...customDemographics].filter(
-		(question) => question.enabled
-	);
+	const { campaign, campaignDemographics: setup } = await parent();
 	const api = locals.api;
 	const conversationId = campaign.id;
 
@@ -156,7 +197,7 @@ export const load: PageServerLoad = async ({ parent, locals, depends }) => {
 		const workflows = await api.ListConversationWorkflows({
 			params: { conversation_id: conversationId }
 		});
-		workflowId = workflows[0]?.id ?? null;
+		workflowId = workflows.find((workflow) => workflow.isActive)?.id ?? workflows[0]?.id ?? null;
 
 		if (!workflowId) {
 			error = 'this Campaign has no workflow yet.';
@@ -176,14 +217,15 @@ export const load: PageServerLoad = async ({ parent, locals, depends }) => {
 
 			const participation = readParticipationReport(report);
 			demographics = participation;
-			const zips = zipcodeCounts(participation);
+			const zips = zipcodeCounts(participation, setup.zipQuestionIds);
 			countyCounts = rollUpByCounty(zips);
 			mapStates = statesForZipCounts(zips);
 			if (targets) goals = targetsToGoals(targets);
 
-			questions = enabledQuestions.map((question) =>
-				questionResult(question, participation, goals)
-			);
+			// Live option labels come from the pinned step. Older option ids
+			// remain explicitly unknown until the report supplies their labels.
+			const enabled = [...setup.defaults, ...setup.custom].filter((question) => question.enabled);
+			questions = enabled.map((question) => questionResult(question, participation, goals));
 		}
 	} catch (e) {
 		console.warn('Loading participants failed', e);
@@ -216,14 +258,33 @@ export const actions: Actions = {
 		const isKnownMetric = (METRIC_NAMES as string[]).includes(metric);
 		if (!isKnownMetric) {
 			try {
-				const relationships = await api.GetConversationDemographics({
-					queries: { conversation_id: conversationId, question_slug: metric, limit: 1 }
+				// The report omits questions with no answers, but a Host can set
+				// goals before anyone has answered. Read the workflow instead.
+				const [conversation, steps] = await Promise.all([
+					api.GetConversation({ params: { conversation_id: conversationId } }),
+					api.ListConversationWorkflowSteps({
+						params: { conversation_id: conversationId, workflow_id: workflowId }
+					})
+				]);
+				const setup = await loadCampaignDemographics(api, {
+					organizationId: conversation.organizationId ?? null,
+					pollLaunched: true,
+					workflowId,
+					steps
 				});
-				if (!relationships.records.some((relationship) => relationship.questionSlug === metric)) {
+				if (setup.lock) {
+					return fail(502, { error: 'Could not verify this Campaign’s questions.' });
+				}
+				if (
+					![...setup.defaults, ...setup.custom].some(
+						(question) => question.id === metric && question.enabled
+					)
+				) {
 					return fail(400, { error: `Unknown metric: ${metric}` });
 				}
-			} catch {
-				return fail(400, { error: `Unknown metric: ${metric}` });
+			} catch (e) {
+				console.warn('Verifying the demographic goal failed', e);
+				return fail(502, { error: 'Could not verify this Campaign’s questions.' });
 			}
 		}
 

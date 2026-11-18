@@ -18,15 +18,14 @@ export interface User {
 /**
  * The participant as this browser remembers them.
  *
- * Two halves, and the split is load bearing. Identity, the zip and the
- * demographics flag are the same wherever the participant goes and are
- * reconciled against the server in `hydrate`. Polis's `pid`, the vote counters
- * and the CTA flags belong to one poll and are read back per Conversation, so
+ * Two halves, and the split is load bearing. Identity and the zip are shared
+ * across Campaigns. Polis's `pid`, the vote counters, skipped demographic
+ * versions and CTA flags belong to one poll and are read back per Conversation, so
  * a Place serving a second Campaign cannot resume against the first one's
  * votes. See `session-storage.ts`.
  *
  * Storage only: nothing here calls comhairle. Joining and signing up for
- * updates are in `join.ts`, About You answers in `profile.ts`, and which
+ * updates are in `join.ts`, About You answers in `demographics.ts`, and which
  * participant a page is talking to is resolved in the `c/[campaign]` layout load.
  */
 class Session {
@@ -37,7 +36,7 @@ class Session {
 	emailRegistered = $state(false);
 	zipCode = $state('');
 	pid = $state<number | undefined>(undefined);
-	demographicsCompleted = $state(false);
+	acknowledgedDemographicVersions = $state<string[]>([]);
 	totalVotes = $state(0);
 	hasSeenPause = $state(false);
 	hasSeenComposeInstructions = $state(false);
@@ -61,7 +60,7 @@ class Session {
 	 * A Host previewing a draft. Its poll-scoped record is kept apart, so the
 	 * preview poll's `pid` never resumes against the live one, and it never
 	 * writes the account record every Campaign shares. `join.ts` and
-	 * `profile.ts` keep its answers away from comhairle.
+	 * `demographics.ts` keep its answers away from comhairle.
 	 */
 	#preview = $state(false);
 
@@ -72,7 +71,6 @@ class Session {
 		}
 		this.#accountEmail = account.emailProvided;
 		this.zipCode = account.zipCode;
-		this.demographicsCompleted = account.demographicsCompleted;
 		this.hasAgreedToTos = account.hasAgreedToTos;
 		this.hasSeenComposeInstructions = account.hasSeenComposeInstructions;
 		this.#readCampaign();
@@ -106,6 +104,7 @@ class Session {
 		this.endCtaShareCompleted = record.endCtaShareCompleted;
 		this.endCtaReviewCompleted = record.endCtaReviewCompleted;
 		this.emailRegistered = record.emailRegistered;
+		this.acknowledgedDemographicVersions = record.acknowledgedDemographicVersions;
 		this.registeredEventIds = record.registeredEventIds;
 	}
 
@@ -114,7 +113,6 @@ class Session {
 			userId: this.user?.id,
 			emailProvided: this.#accountEmail,
 			zipCode: this.zipCode,
-			demographicsCompleted: this.demographicsCompleted,
 			hasAgreedToTos: this.hasAgreedToTos,
 			hasSeenComposeInstructions: this.hasSeenComposeInstructions
 		});
@@ -128,6 +126,7 @@ class Session {
 			endCtaShareCompleted: this.endCtaShareCompleted,
 			endCtaReviewCompleted: this.endCtaReviewCompleted,
 			emailRegistered: this.emailRegistered,
+			acknowledgedDemographicVersions: this.acknowledgedDemographicVersions,
 			registeredEventIds: this.registeredEventIds
 		});
 	}
@@ -139,10 +138,8 @@ class Session {
 	 * The server is the authority on identity: when it says nobody is signed in,
 	 * a cache naming someone is stale and goes. It is the authority on whether
 	 * the account has an email, which is all that flag means now that each
-	 * Campaign remembers its own signup. It is not the authority on
-	 * `demographicsCompleted`, which it can turn on but never off: leaving every
-	 * About You field blank stores no demographics, so a `false` from the server
-	 * means "no record of it", not "it did not happen".
+	 * Campaign remembers its own signup. Skipped questions are only remembered
+	 * locally, by Campaign and question version.
 	 */
 	hydrate(participant: ParticipantSession | null, resolved: boolean) {
 		// An unreachable backend is not an answer. Keep what we have.
@@ -153,6 +150,7 @@ class Session {
 			return;
 		}
 
+		if (this.user && this.user.id !== participant.userId) this.forget();
 		this.user = {
 			id: participant.userId,
 			authType: participant.authType,
@@ -161,7 +159,6 @@ class Session {
 		};
 		if (participant.zipCode) this.zipCode = participant.zipCode;
 		this.#accountEmail = participant.emailProvided;
-		this.demographicsCompleted ||= participant.demographicsCompleted;
 		this.persistAccount();
 	}
 
@@ -182,7 +179,7 @@ class Session {
 		this.zipCode = '';
 		this.#accountEmail = false;
 		this.emailRegistered = false;
-		this.demographicsCompleted = false;
+		this.acknowledgedDemographicVersions = [];
 		this.pid = undefined;
 		this.totalVotes = 0;
 		this.hasSeenPause = false;
@@ -246,11 +243,29 @@ class Session {
 		this.persistCampaign();
 	}
 
-	markDemographicsCompleted() {
-		this.demographicsCompleted = true;
-		// The account record is shared by every Campaign, and a preview that
-		// marked it would skip About You on the live poll later.
-		if (!this.#preview) this.persistAccount();
+	acknowledgeDemographicVersions(
+		conversationId: string,
+		preview: boolean,
+		userId: string | null,
+		versionIds: string[]
+	) {
+		if (!conversationId) throw new Error('A Campaign is required to acknowledge questions.');
+		if (this.userId !== userId) return;
+		const key = preview ? `preview:${conversationId}` : conversationId;
+		if (key === this.#campaignKey) {
+			this.acknowledgedDemographicVersions = [
+				...new Set([...this.acknowledgedDemographicVersions, ...versionIds])
+			];
+			this.persistCampaign();
+			return;
+		}
+		const record = loadCampaign(key);
+		saveCampaign(key, {
+			...record,
+			acknowledgedDemographicVersions: [
+				...new Set([...record.acknowledgedDemographicVersions, ...versionIds])
+			]
+		});
 	}
 
 	saveVoteProgress(totalVotes: number, hasSeenPause: boolean) {
@@ -261,13 +276,20 @@ class Session {
 
 	/**
 	 * Remember the guest account a join created, and the zip it joined with.
-	 * The zip is cached even though comhairle may not have kept it: the poll
-	 * sends it again with every profile write.
+	 * The zip is cached because the current API has no participant-writable
+	 * Postcode question.
 	 */
 	rememberJoin(user: User, zipCode: string) {
+		if (this.user && this.user.id !== user.id) this.forget();
 		this.user = user;
 		this.zipCode = zipCode;
 		this.#accountEmail ||= Boolean(user.email);
+		this.persistAccount();
+	}
+
+	/** Remember a location on this browser until the API can store it. */
+	rememberZipCode(zipCode: string) {
+		this.zipCode = zipCode;
 		this.persistAccount();
 	}
 

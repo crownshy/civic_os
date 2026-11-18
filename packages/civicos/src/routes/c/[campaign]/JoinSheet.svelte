@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
+	import { fromAction } from 'svelte/attachments';
 	import { Mail, MapPin, KeyRound } from '@lucide/svelte';
 	import { defaults, superForm } from 'sveltekit-superforms';
 	import { zod4, zod4Client } from 'sveltekit-superforms/adapters';
@@ -141,7 +142,13 @@
 		<p class="mx-auto mt-4 max-w-sm text-center font-sans text-base text-foreground">
 			{$details.email} already has an account. We've emailed it a code to sign in with.
 		</p>
-		<form id="join-code" method="POST" novalidate use:enhanceCode class="mt-6 flex flex-col gap-2">
+		<form
+			id="join-code"
+			method="POST"
+			novalidate
+			{@attach fromAction(enhanceCode)}
+			class="mt-6 flex flex-col gap-2"
+		>
 			<Form.Field form={codeForm} name="code">
 				<Form.Control>
 					{#snippet children({ props })}
@@ -175,7 +182,7 @@
 			id="join-details"
 			method="POST"
 			novalidate
-			use:enhanceDetails
+			{@attach fromAction(enhanceDetails)}
 			class="mt-6 flex flex-col gap-2"
 		>
 			<Form.Field form={detailsForm} name="email">
@@ -214,6 +221,13 @@
 				</Form.Control>
 				<Form.FieldErrors class="px-4 text-sm text-destructive" />
 			</Form.Field>
+			<p class="px-4 text-base text-muted-foreground">
+				{#if context.preview}
+					Your zip code will not be saved in this preview.
+				{:else}
+					For now, your zip code is kept on this device, not saved to your account.
+				{/if}
+			</p>
 		</form>
 	{/if}
 

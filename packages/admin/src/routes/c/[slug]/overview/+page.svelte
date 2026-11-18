@@ -29,6 +29,12 @@
 	import { readFaqs, toFaqsHtml, type FaqEntry } from '@civicos/shared/data/faq';
 	import type { CustomDemographicCategory } from '@civicos/shared/data/demographics';
 	import {
+		createCustomQuestion,
+		editCustomQuestion,
+		lockMessage,
+		setQuestionEnabled
+	} from '$lib/api/demographics';
+	import {
 		readAskToggles,
 		type AskKey,
 		type AskToggles
@@ -427,14 +433,13 @@
 				? `Couldn't save ${failedFields.map((k) => FIELD_LABELS[k]).join(' and ')}`
 				: statusLabel[saveStatus]
 	);
-	const defaultDemographics = $derived(data.defaultDemographics);
-	const customDemographics = $derived(data.customDemographics);
+	const demographics = $derived(data.campaignDemographics);
 
 	/**
 	 * INTERIM STORAGE (#363/#364). Participant asks, the colour scheme and the
 	 * areas have no backend fields yet, so they live in `conversation.metadata`
-	 * until comhairle promotes them. Demographics moved to real
-	 * ConversationDemographics links (#441).
+	 * until comhairle promotes them. Demographics live on the Campaign's
+	 * demographics form (ADR 0020).
 	 *
 	 * `writeMetadata` owns how each key merges.
 	 */
@@ -443,59 +448,31 @@
 		await invalidate(`campaign:${page.params.slug}`);
 	}
 
+	/** Where demographics writes go. The card is read-only whenever this is missing. */
+	function demographicsTarget() {
+		if (!data.demographicsTarget) throw new Error('This Campaign cannot change its questions.');
+		return data.demographicsTarget;
+	}
+
 	async function addCustomDemographic(category: CustomDemographicCategory) {
-		await data.api.CreateDemographicsQuestion({
-			slug: category.slug,
-			displayName: category.displayName,
-			responseType: 'string',
-			bucketConfig: {
-				type: 'string',
-				options: category.options.map((option) => ({ label: option, value: option }))
-			}
-		});
-		await data.api.CreateConversationDemographics({
-			conversationId: campaign.id,
-			questionSlug: category.slug
-		});
+		await createCustomQuestion(data.api, demographicsTarget(), category);
 		await invalidate(`campaign:${page.params.slug}`);
 	}
 
 	async function editCustomDemographic(category: CustomDemographicCategory) {
-		await data.api.UpdateDemographicsQuestion(
-			{
-				displayName: category.displayName,
-				bucketConfig: {
-					type: 'string',
-					options: category.options.map((option) => ({ label: option, value: option }))
-				}
-			},
-			{ params: { question_slug: category.slug } }
-		);
+		await editCustomQuestion(data.api, demographicsTarget(), category);
 		await invalidate(`campaign:${page.params.slug}`);
 	}
 
-	async function toggleCustomDemographic(slug: string, next: boolean) {
-		if (next) {
-			await data.api.CreateConversationDemographics({
-				conversationId: campaign.id,
-				questionSlug: slug
-			});
-		} else {
-			await data.api.DeleteConversationDemographicsByQuestion(undefined, {
-				params: { conversation_id: campaign.id, question_slug: slug }
-			});
-		}
+	async function toggleDemographic(id: string, next: boolean) {
+		await setQuestionEnabled(data.api, demographicsTarget(), id, next);
 		await invalidate(`campaign:${page.params.slug}`);
 	}
 
-	async function removeCustomDemographic(slug: string) {
-		if (customDemographics.find((category) => category.slug === slug)?.enabled) {
-			await data.api.DeleteConversationDemographicsByQuestion(undefined, {
-				params: { conversation_id: campaign.id, question_slug: slug }
-			});
-		}
-		await data.api.DeleteDemographicsQuestion(undefined, { params: { question_slug: slug } });
-		await invalidate(`campaign:${page.params.slug}`);
+	// Removing takes the question off this Campaign only. It stays in the Host's
+	// question bank, where other Campaigns may still be asking it.
+	async function removeCustomDemographic(id: string) {
+		await toggleDemographic(id, false);
 	}
 
 	// --- FAQ -------------------------------------------------------------------
@@ -791,10 +768,12 @@
 		<DemographicsCard
 			title="Demographics"
 			subtitle="Participants will be shown these questions at the end of the Open Poll. You can turn on/off any questions, or add your own."
-			defaults={defaultDemographics}
-			onToggle={toggleCustomDemographic}
-			custom={customDemographics}
-			onToggleCustom={toggleCustomDemographic}
+			defaults={demographics.defaults}
+			custom={demographics.custom}
+			locked={lockMessage(demographics.lock)}
+			live={campaign.pollLaunched === true}
+			onToggle={toggleDemographic}
+			onToggleCustom={toggleDemographic}
 			onAddCustom={addCustomDemographic}
 			onEditCustom={editCustomDemographic}
 			onRemoveCustom={removeCustomDemographic}
@@ -804,8 +783,7 @@
 		     One switch per ask, governing both surfaces civicos shows it on: the
 		     mid-poll checkpoint screen and the end-page CTA card. They already
 		     share a completion flag per ask, so they are one ask shown twice.
-		     Stored alongside demographics in conversation.metadata, and obeyed by
-		     civicos since #426. -->
+		     Stored in conversation.metadata, and obeyed by civicos since #426. -->
 		<ParticipantAsksCard
 			title="Participant Asks"
 			subtitle="What we ask participants for besides their votes. Each one shows up while they vote and again on the thank-you page. Turn off any you don't want to ask for."

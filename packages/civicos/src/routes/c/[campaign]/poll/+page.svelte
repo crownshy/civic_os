@@ -15,19 +15,20 @@
 		ReviewPanelContent
 	} from '$lib/components/ui';
 	import { popQuizQuestions } from '$lib/data/mock';
-	import {
-		ageBucketToNumber,
-		askedVariants,
-		type AboutYouQuestion,
-		type Participation
-	} from '$lib/config/participation';
+	import { askedVariants, type Participation } from '$lib/config/participation';
 	import type { Campaign } from '$lib/config/campaign';
 	import { BATCH_SIZE, recordVote, resumeProgress } from '$lib/utils/poll-checkpoints';
 	import PolisApi from '$lib/services/polis-api.svelte';
 	import { session } from '$lib/services/session.svelte';
-	import type { JoinContext } from '$lib/services/join';
+	import { enterCampaign, type JoinContext } from '$lib/services/join';
 	import type { KnownParticipant } from '$lib/services/participant';
-	import { saveDemographicResponse, saveProfile, type ProfileAnswers } from '$lib/services/profile';
+	import {
+		responseValue,
+		saveCampaignAnswers,
+		unacknowledgedQuestions,
+		type AboutYouQuestion,
+		type AnswerDrafts
+	} from '$lib/services/demographics';
 	import VotingScreen from './VotingScreen.svelte';
 	import VotingSkeleton from './VotingSkeleton.svelte';
 	import ComposeScreen from './ComposeScreen.svelte';
@@ -60,9 +61,9 @@
 	// poll it always ran. Derived, not captured, so an
 	// `invalidate('civicos:conversation')` after a Host edit reaches here.
 	const participation: Participation = $derived(page.data.participation);
-	// The demographics the Host switched on in admin, resolved in this page's
-	// load from the Campaign's ConversationDemographics links (#441).
-	const aboutYouQuestions: AboutYouQuestion[] = $derived(page.data.aboutYouQuestions);
+	const aboutYouQuestions: AboutYouQuestion[] = $derived(
+		unacknowledgedQuestions(page.data.aboutYouQuestions, session.acknowledgedDemographicVersions)
+	);
 
 	// Use the participant's user ID for the Polis xid (falls back to random if not yet joined)
 	const userId = participant.userId ?? `bloom-anon-${Math.random().toString(36).slice(2, 8)}`;
@@ -95,7 +96,9 @@
 		| 'voting'
 		| 'compose'
 		| 'pause'
+		| 'about-you-loading'
 		| 'about-you'
+		| 'about-you-error'
 		| 'thank-you'
 		// Preserved but unused in conference flow:
 		| 'did-you-know'
@@ -122,7 +125,7 @@
 
 	// Returning user: show loading splash until Polis resolves, then decide screen
 	const isReturning = session.pid !== undefined;
-	const initialScreen: Screen = session.demographicsCompleted && isReturning ? 'loading' : 'voting';
+	const initialScreen: Screen = isReturning ? 'loading' : 'voting';
 	let screen = $state<Screen>(initialScreen);
 	// `untrack` because the checkpoint cursor takes its starting position from
 	// the asks once and then walks itself.
@@ -177,14 +180,15 @@
 	// When Polis runs out of statements while voting, go to end flow
 	$effect(() => {
 		if (screen === 'voting' && polis.ready && !polis.loading && !polis.currentStatement) {
-			goToEndFlow();
+			void goToEndFlow();
 		}
 	});
 
 	// Resolve the loading screen once Polis is ready
 	$effect(() => {
 		if (screen === 'loading' && polis.ready && !polis.loading) {
-			screen = polis.currentStatement ? 'voting' : 'thank-you';
+			if (polis.currentStatement) screen = 'voting';
+			else void goToEndFlow();
 		}
 	});
 
@@ -206,45 +210,81 @@
 		}
 	}
 
-	/** Transition to the ending sequence: demographics → email → thank-you */
-	function goToEndFlow() {
-		// No categories left on means no screen, not an empty one.
-		if (session.demographicsCompleted || aboutYouQuestions.length === 0) {
+	let questionsLoadError = $state<string | null>(null);
+
+	function showEndFlow() {
+		if (questionsLoadError || page.data.demographicsError) {
+			screen = 'about-you-error';
+		} else if (aboutYouQuestions.length === 0) {
 			screen = 'thank-you';
 		} else {
 			screen = 'about-you';
 		}
 	}
 
+	/** Refresh the live questions when voting ends, so Host edits are visible. */
+	async function goToEndFlow() {
+		screen = 'about-you-loading';
+		questionsLoadError = null;
+		try {
+			await enterCampaign(joinContext);
+			await invalidate('civicos:demographics');
+		} catch (error) {
+			console.error('[About You] Could not refresh the Campaign questions:', error);
+			questionsLoadError = 'We could not load your questions. Check your connection and try again.';
+		}
+		showEndFlow();
+	}
+
 	function handleEnd() {
-		goToEndFlow();
+		void goToEndFlow();
 	}
 
 	/** Resolves to whether every answer saved; on false the screen stays put to retry. */
-	async function handleDemographicsDone(answers?: Record<string, string>): Promise<boolean> {
-		// Awaited so the answers land before the screen moves on. Built-ins go on
-		// the profile, which the participation report reads; a Host's own
-		// categories are filed as demographics responses.
-		if (answers) {
-			const profile: ProfileAnswers = {};
-			const custom: [string, string][] = [];
-			for (const question of aboutYouQuestions) {
-				const value = answers[question.key];
-				if (!value) continue;
-				if (question.profileField === 'age') profile.age = ageBucketToNumber(value);
-				else if (question.profileField) profile[question.profileField] = value;
-				else custom.push([question.key, value]);
-			}
-			const saved = await Promise.all([
-				saveProfile(joinContext, profile),
-				...custom.map(([slug, value]) => saveDemographicResponse(joinContext, slug, value))
-			]);
-			if (saved.includes(false)) return false;
+	async function handleDemographicsDone(answers: AnswerDrafts, alreadySaved: string[]) {
+		const questions = aboutYouQuestions;
+		const preview = page.data.preview;
+		const userId = session.userId;
+		const result = await saveCampaignAnswers(
+			page.data.api,
+			campaign.id,
+			questions,
+			answers,
+			alreadySaved,
+			preview
+		);
+		if (result.success) {
+			const skipped = questions.filter(
+				(question) => preview || responseValue(question, answers[question.version.id]) === undefined
+			);
+			session.acknowledgeDemographicVersions(
+				campaign.id,
+				preview,
+				userId,
+				skipped.map((question) => question.version.id)
+			);
+			screen = 'thank-you';
 		}
+		return result;
+	}
 
-		session.markDemographicsCompleted();
-		screen = 'thank-you';
-		return true;
+	let retryingQuestions = $state(false);
+	async function retryQuestions() {
+		if (retryingQuestions) return;
+		retryingQuestions = true;
+		try {
+			questionsLoadError = null;
+			await enterCampaign(joinContext);
+			await invalidate(
+				page.data.participantResolved ? 'civicos:demographics' : 'civicos:participant'
+			);
+			showEndFlow();
+		} catch (error) {
+			console.error('[About You] Could not refresh the Campaign questions:', error);
+			questionsLoadError = 'We could not load your questions. Check your connection and try again.';
+		} finally {
+			retryingQuestions = false;
+		}
 	}
 
 	function resumeVoting() {
@@ -381,6 +421,28 @@
 		/>
 	{:else if screen === 'about-you'}
 		<AboutYouScreen {placeName} questions={aboutYouQuestions} onDone={handleDemographicsDone} />
+	{:else if screen === 'about-you-loading'}
+		<div class="flex h-full flex-col bg-background">
+			<InfoBar {placeName} />
+			<p class="m-auto px-6 text-center font-sans text-base text-foreground" role="status">
+				Loading your questions...
+			</p>
+		</div>
+	{:else if screen === 'about-you-error'}
+		<div class="flex h-full flex-col bg-background">
+			<InfoBar {placeName} />
+			<div class="flex flex-1 flex-col items-center justify-center gap-6 px-10 text-center">
+				<p role="alert" class="font-sans text-base font-medium text-foreground">
+					{questionsLoadError ?? page.data.demographicsError}
+				</p>
+				<Button variant="primary" disabled={retryingQuestions} onclick={retryQuestions}>
+					{retryingQuestions ? 'LOADING...' : 'TRY AGAIN'}
+				</Button>
+				<Button variant="outline" onclick={() => (screen = 'thank-you')}
+					>CONTINUE WITHOUT SHARING</Button
+				>
+			</div>
+		</div>
 	{:else if screen === 'thank-you'}
 		<ThankYouScreen
 			{placeName}

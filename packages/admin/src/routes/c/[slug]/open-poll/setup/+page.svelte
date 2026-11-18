@@ -7,6 +7,7 @@
 	import { statusFor } from '$lib/conversations';
 	import type { PolisStatementAux } from '$lib/types/aux';
 	import DemographicsCard from '$lib/components/setup/DemographicsCard.svelte';
+	import { lockMessage, setQuestionEnabled } from '$lib/api/demographics';
 	import StatusCard from './StatusCard.svelte';
 	import SeedStatementsCard from './SeedStatementsCard.svelte';
 
@@ -63,20 +64,11 @@
 		await invalidate('open-poll:aux');
 	}
 
-	const defaultDemographics = $derived(data.defaultDemographics);
-	const customDemographics = $derived(data.customDemographics);
+	const demographics = $derived(data.campaignDemographics);
 
-	async function toggleCustomDemographic(slug: string, next: boolean) {
-		if (next) {
-			await data.api.CreateConversationDemographics({
-				conversationId: campaign.id,
-				questionSlug: slug
-			});
-		} else {
-			await data.api.DeleteConversationDemographicsByQuestion(undefined, {
-				params: { conversation_id: campaign.id, question_slug: slug }
-			});
-		}
+	async function toggleDemographic(id: string, next: boolean) {
+		if (!data.demographicsTarget) throw new Error('This Campaign cannot change its questions.');
+		await setQuestionEnabled(data.api, data.demographicsTarget, id, next);
 		await invalidate(`campaign:${page.params.slug}`);
 	}
 </script>
@@ -102,9 +94,11 @@
 	<DemographicsCard
 		title="Demographics Questions"
 		subtitle="Select from your active demographic categories. To add or edit categories, use the Campaign Setup tab."
-		defaults={defaultDemographics}
-		onToggle={toggleCustomDemographic}
-		custom={customDemographics}
-		onToggleCustom={toggleCustomDemographic}
+		defaults={demographics.defaults}
+		custom={demographics.custom}
+		locked={lockMessage(demographics.lock)}
+		live={campaign.pollLaunched === true}
+		onToggle={toggleDemographic}
+		onToggleCustom={toggleDemographic}
 	/>
 </div>

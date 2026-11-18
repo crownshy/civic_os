@@ -24,4 +24,7 @@
 	<PreviewBadge />
 {/if}
 
-{@render children()}
+<!-- Poll state and demographic drafts belong to one Campaign and preview mode. -->
+{#key `${data.campaign.id}:${data.preview}`}
+	{@render children()}
+{/key}

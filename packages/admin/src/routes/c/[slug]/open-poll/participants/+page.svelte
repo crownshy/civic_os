@@ -87,7 +87,7 @@
 	const jumpLinks = $derived([
 		{ href: '#geography', label: 'Geography' },
 		...questions.map((question) => ({
-			href: `#demographic-${question.slug}`,
+			href: `#demographic-${question.id}`,
 			label: question.displayName
 		}))
 	]);
@@ -136,6 +136,18 @@
 				Download Demographics
 			</Button>
 		</div>
+
+		{#if questions.length}
+			<p class="pb-4 text-body text-muted-foreground">
+				Results can include answers to multiple versions of a question, so the same participant
+				may be counted more than once.
+			</p>
+		{/if}
+		{#if questions.some((question) => question.hasUnknownOptions)}
+			<p class="pb-4 text-body text-muted-foreground">
+				Some older option labels are unavailable and their answers appear as Unknown option.
+			</p>
+		{/if}
 
 		<!-- Jump-to pills -->
 		<div
@@ -230,8 +242,8 @@
 				</Card>
 			</div>
 
-			{#each questions as question (question.slug)}
-				<div id={`demographic-${question.slug}`} class="scroll-mt-4">
+			{#each questions as question (question.id)}
+				<div id={`demographic-${question.id}`} class="scroll-mt-4">
 					<DemographicTable
 						title={question.displayName}
 						rows={question.rows}
