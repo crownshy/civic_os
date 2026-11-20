@@ -3,6 +3,7 @@ import { superValidate, message, setError, type Infer } from 'sveltekit-superfor
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { createBackendClient } from '$lib/server/backend-client';
 import { captureSetCookies, forwardAuthCookie } from '$lib/server/auth-cookie';
+import { readSession } from '$lib/server/session';
 import { isExpired, readEmailLinkToken } from '$lib/server/email-link-token';
 import { apiStatus } from '$lib/api/describe-failure';
 import { welcomeSchema, type WelcomeMessage } from './welcome-schema';
@@ -52,7 +53,7 @@ async function signIn(
 	}
 
 	for (const setCookie of setCookies()) forwardAuthCookie(setCookie, cookies, adminHost);
-	return cookies.get('auth-token') ?? null;
+	return readSession(cookies) ?? null;
 }
 
 export const actions: Actions = {

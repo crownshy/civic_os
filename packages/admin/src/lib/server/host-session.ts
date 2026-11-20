@@ -32,7 +32,8 @@ function isLocal(labels: string[]) {
 	return labels[0] === 'localhost' || labels.every((l) => /^\d+$/.test(l));
 }
 
-const domainFor = (adminHost: string) => sharedCookieDomain(adminHost, participantBase());
+export const sharedDomainFor = (adminHost: string) =>
+	sharedCookieDomain(adminHost, participantBase());
 
 /** Copy admin's session to the cookie civicos reads for draft previews. */
 export function setHostSession(
@@ -42,7 +43,7 @@ export function setHostSession(
 ) {
 	cookies.set(HOST_SESSION_COOKIE, token, {
 		path: '/',
-		domain: domainFor(adminHost),
+		domain: sharedDomainFor(adminHost),
 		maxAge,
 		secure,
 		httpOnly: true,
@@ -61,5 +62,5 @@ export function ensureHostSession(cookies: Pick<Cookies, 'get' | 'set'>, token: 
 }
 
 export function clearHostSession(cookies: Pick<Cookies, 'delete'>, url: URL) {
-	cookies.delete(HOST_SESSION_COOKIE, { path: '/', domain: domainFor(url.host) });
+	cookies.delete(HOST_SESSION_COOKIE, { path: '/', domain: sharedDomainFor(url.host) });
 }
