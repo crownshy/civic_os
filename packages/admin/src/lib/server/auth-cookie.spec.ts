@@ -3,6 +3,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createApiClient } from '@crownshy/api-client/client';
 import { HOST_SESSION_COOKIE } from '@civicos/shared/data/host-session';
 import { forwardAuthCookie, setCookiesOf } from './auth-cookie';
+import { sessionCookieName } from './session';
 
 /**
  * Login is the one call that needs the response headers rather than the body,
@@ -117,7 +118,7 @@ describe('login session capture', () => {
 });
 
 describe('forwardAuthCookie', () => {
-	it('re-issues auth-token same-origin, keeping max-age and the flags', () => {
+	it('re-issues auth-token as the shared session, keeping max-age and the flags', () => {
 		const set: unknown[][] = [];
 		const cookies = { set: (...args: unknown[]) => set.push(args) };
 
@@ -125,9 +126,16 @@ describe('forwardAuthCookie', () => {
 
 		expect(forwarded).toBe(true);
 		expect(set[0]).toEqual([
-			'auth-token',
+			sessionCookieName(),
 			'tok-abc123',
-			{ path: '/', maxAge: 604800, secure: true, httpOnly: true, sameSite: 'lax' }
+			{
+				path: '/',
+				domain: undefined,
+				maxAge: 604800,
+				secure: true,
+				httpOnly: true,
+				sameSite: 'lax'
+			}
 		]);
 	});
 

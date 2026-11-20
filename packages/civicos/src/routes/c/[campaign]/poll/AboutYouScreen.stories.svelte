@@ -7,7 +7,7 @@
 	const { Story } = defineMeta({
 		title: 'Screens/AboutYouScreen',
 		component: AboutYouScreen,
-		tags: ['autodocs'],
+		tags: ['autodocs', '!test'],
 		parameters: { layout: 'fullscreen' }
 	});
 

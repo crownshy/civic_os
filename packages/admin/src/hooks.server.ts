@@ -1,6 +1,7 @@
 import { redirect, type Handle, type RequestEvent } from '@sveltejs/kit';
 import { createBackendClient } from '$lib/server/backend-client';
 import { clearHostSession, ensureHostSession } from '$lib/server/host-session';
+import { clearSession, readSession } from '$lib/server/session';
 import { createAdminCache, probeAdmin } from '$lib/server/admin-gate';
 
 /**
@@ -43,9 +44,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 	// itself, so gating it as well cost two extra comhairle calls per request.
 	if (path.startsWith('/api/')) return resolve(event);
 
-	// The user's cookie and nothing else: comhairle prefers a Bearer token over
+	// The user's session and nothing else: comhairle prefers a Bearer token over
 	// the cookie, so a service key sent alongside would act as the key's owner.
-	const authToken = event.cookies.get('auth-token');
+	const authToken = readSession(event.cookies);
 	const api = createBackendClient(authToken, clientAddress(event));
 	event.locals.api = api;
 	// The gate and the root layout both need this; one request asks comhairle once.
@@ -62,12 +63,14 @@ export const handle: Handle = async ({ event, resolve }) => {
 			GetUserOrganizations: () => event.locals.userOrganizations()
 		});
 		if (result === 'unauthorized') {
-			event.cookies.delete('auth-token', { path: '/' });
-			clearHostSession(event.cookies, event.url);
+			// token is bad - log this user out everywhere.
+			clearSession(event.cookies, event.url);
 			throw redirect(303, '/login');
 		}
 		if (result === 'forbidden') {
-			event.cookies.delete('auth-token', { path: '/' });
+			// The user doesn't appear to be an Admin. Clearing the "host session" will disable campaign
+			// previews on the participant app. But we don't clear the main session cookie, and the user thus stays
+			// logged in.
 			clearHostSession(event.cookies, event.url);
 			throw redirect(303, '/login?denied=1');
 		}

@@ -2,6 +2,7 @@ import { toSummary, type ConversationSummary } from '$lib/conversations';
 import { describeApiFailure } from '$lib/api/describe-failure';
 import { toViewer } from '$lib/viewer';
 import { NO_HOST_ACCESS, toHostAccess } from '$lib/host-access';
+import { readSession } from '$lib/server/session';
 import type { LayoutServerLoad } from './$types';
 
 /** Every Campaign the caller may see, unfiltered. */
@@ -21,13 +22,13 @@ function bySidebarOrder(a: ConversationSummary, b: ConversationSummary) {
 }
 
 /**
- * Expose the auth-token to the universal +layout.ts so the server-side api
+ * Expose the session token to the universal +layout.ts so the server-side api
  * client can authenticate during SSR (e.g. on a full-page refresh), resolve
  * whether the caller is a Site SuperAdmin (BLOOM / Crown Shy staff), and load
  * the Campaigns this user is allowed to see.
  *
- * NOTE: auth-token is httpOnly, so it can only be read here on the server.
- * Returning it means it is serialized into the client data payload — an
+ * NOTE: the session cookie is httpOnly, so it can only be read here on the
+ * server. Returning it means it is serialized into the client data payload, an
  * accepted tradeoff to let SSR render real data instead of empty-then-populate.
  *
  * `hostAccess` says which Host pages the caller may open (#454). Its `all` flag
@@ -47,7 +48,7 @@ function bySidebarOrder(a: ConversationSummary, b: ConversationSummary) {
 export const load: LayoutServerLoad = async ({ cookies, locals, depends }) => {
 	depends('app:conversations');
 
-	const authToken = cookies.get('auth-token');
+	const authToken = readSession(cookies);
 	if (!authToken)
 		return {
 			authToken,
